@@ -21,6 +21,25 @@ local_sigchain_filename_list =  ["duplicity-full-signatures.2002-08-17T16:17:01-
 								 "duplicity-new-signatures.2002-08-17T16:17:01-07:00.to.2002-08-18T00:04:30-07:00.sigtar.gz",
 								 "duplicity-new-signatures.2002-08-18T00:04:30-07:00.to.2002-08-20T00:00:00-07:00.sigtar.gz"]
 
+# A filename list with some incomplete volumes, an older full volume,
+# and a complete chain.
+filename_list2 = ["duplicity-full.2001-01-01T16:17:01-07:00.manifest.gpg",
+				  "duplicity-full.2001-01-01T16:17:01-07:00.vol1.difftar.gpg",
+				  "duplicity-full.2002-08-17T16:17:01-07:00.manifest.gpg",
+				  "duplicity-full.2002-08-17T16:17:01-07:00.vol1.difftar.gpg",
+				  "duplicity-full.2002-08-17T16:17:01-07:00.vol2.difftar.gpg",
+				  "duplicity-full.2002-08-17T16:17:01-07:00.vol3.difftar.gpg",
+				  "duplicity-full.2002-08-17T16:17:01-07:00.vol4.difftar.gpg",
+				  "duplicity-full.2002-08-17T16:17:01-07:00.vol5.difftar.gpg",
+				  "duplicity-full.2002-08-17T16:17:01-07:00.vol6.difftar.gpg",
+				  "duplicity-inc.2002-08-17T16:17:01-07:00.to.2002-08-18T00:04:30-07:00.manifest.gpg",
+				  "duplicity-inc.2002-08-17T16:17:01-07:00.to.2002-08-18T00:04:30-07:00.vol1.difftar.gpg",
+				  "The following are extraneous duplicity files",
+				  "duplicity-new-signatures.2001-08-17T02:05:13-05:00.to.2002-08-17T05:05:14-05:00.sigtar.gpg",
+				  "duplicity-full.2002-08-15T01:01:01-07:00.vol1.difftar.gpg",
+				  "duplicity-inc.2000-08-17T16:17:01-07:00.to.2000-08-18T00:04:30-07:00.manifest.gpg",
+				  "duplicity-inc.2000-08-17T16:17:01-07:00.to.2000-08-18T00:04:30-07:00.vol1.difftar.gpg",
+				  "Extra stuff to be ignored"]
 
 col_test_dir = path.Path("testfiles/collectionstest")
 archive_dir = col_test_dir.append("archive_dir")
@@ -30,10 +49,17 @@ archive_dir_backend = backends.get_backend("file://testfiles/collectionstest"
 dummy_backend = None
 real_backend = backends.get_backend("file://%s/%s" %
 									(col_test_dir.name, "remote_dir"))
+output_dir = path.Path("testfiles/output") # used as a temp directory
+output_dir_backend = backends.get_backend("file://testfiles/output")
 
 
 class CollectionTest(unittest.TestCase):
 	"""Test collections"""
+	def del_tmp(self):
+		"""Reset the testfiles/output directory"""
+		output_dir.deltree()
+		output_dir.mkdir()
+
 	def set_gpg_profile(self):
 		"""Set gpg profile to standard "foobar" sym"""
 		globals.gpg_profile = gpg.GPGProfile(passphrase = "foobar")
@@ -132,6 +158,33 @@ class CollectionTest(unittest.TestCase):
 		self.sigchain_fileobj_testlist(self.sigchain_fileobj_get(1))
 		self.sigchain_fileobj_testlist(self.sigchain_fileobj_get(None))		
 
-		
+	def test_get_extraneous(self):
+		"""Test the listing of extraneous files"""
+		# Set up testfiles/output with files from filename_list2
+		self.del_tmp()
+		for filename in filename_list2:
+			p = output_dir.append(filename)
+			p.touch()
+
+		cs = collections.CollectionsStatus(output_dir_backend)
+		cs.set_values()
+
+		assert len(cs.orphaned_backup_sets) == 1, cs.orphaned_backup_sets
+		assert len(cs.orphaned_sig_names) == 1, cs.orphaned_sig_names
+		assert len(cs.incomplete_backup_sets) == 1, cs.incomplete_backup_sets
+
+		right_list = ["duplicity-new-signatures.2001-08-17T02:05:13-05:00.to.2002-08-17T05:05:14-05:00.sigtar.gpg",
+					  "duplicity-full.2002-08-15T01:01:01-07:00.vol1.difftar.gpg",
+					  "duplicity-inc.2000-08-17T16:17:01-07:00.to.2000-08-18T00:04:30-07:00.manifest.gpg",
+					  "duplicity-inc.2000-08-17T16:17:01-07:00.to.2000-08-18T00:04:30-07:00.vol1.difftar.gpg"]
+		received_list = cs.get_extraneous()
+		errors = []
+		for filename in received_list:
+			if filename not in right_list:
+				errors.append("### Got bad extraneous filename " + filename)
+			else: right_list.remove(filename)
+		for filename in right_list:
+			errors.append("### Didn't receive extraneous filename " + filename)
+		assert not errors, "\n"+"\n".join(errors)
 
 if __name__ == "__main__": unittest.main()

@@ -140,6 +140,13 @@ remote backup set or the local archive directory has been corrupted.""")
 		if self.local_manifest_path: return self.get_local_manifest()
 		else: return self.get_remote_manifest()
 
+	def get_filenames(self):
+		"""Return list of (remote) filenames of files in set"""
+		assert self.info_set
+		if self.remote_manifest_name:
+			return [self.remote_manifest_name] + self.volume_name_dict.values()
+		else: return self.volume_name_dict.values()
+		
 
 class BackupChain:
 	"""BackupChain - a number of linked BackupSets
@@ -271,6 +278,13 @@ class SignatureChain:
 			inclist_copy.append(self.fullsig)
 			self.backend.delete(inclist_copy)
 
+	def get_filenames(self):
+		"""Return ordered list of filenames in set"""
+		if self.fullsig: l = [self.fullsig]
+		else: l = []
+		l.extend(self.inclist)
+		return l
+
 
 class CollectionsStatus:
 	"""Hold information about available chains and sets"""
@@ -323,8 +337,9 @@ class CollectionsStatus:
 		self.values_set = 1
 		backend_filename_list = self.backend.list()
 
-		backup_chains, self.orphaned_backup_sets, self.incomplete_backup_set=\
-					   self.get_backup_chains(backend_filename_list)
+		(backup_chains, self.orphaned_backup_sets,
+		         self.incomplete_backup_sets) = \
+				 self.get_backup_chains(backend_filename_list)
 		backup_chains = self.get_sorted_chains(backup_chains)
 		self.all_backup_chains = backup_chains
 
@@ -380,7 +395,8 @@ class CollectionsStatus:
 					"from aborted session", 2)
 		if self.orphaned_backup_sets:
 			log.Log("Warning, found the following orphaned backup files:\n"
-					+ "\n".join(map(lambda x: str(x), orphaned_sets)), 2)
+					+ "\n".join(map(lambda x: str(x),
+									self.orphaned_backup_sets)), 2)
 
 	def get_backup_chains(self, filename_list):
 		"""Split given filename_list into chains
@@ -423,7 +439,7 @@ class CollectionsStatus:
 		"""Sort set list by end time, return (sorted list, incomplete)"""
 		time_set_pairs, incomplete_sets = [], []
 		for set in set_list:
-			if not set.is_complete: incomplete_sets.append(set)
+			if not set.is_complete(): incomplete_sets.append(set)
 			elif set.type == "full": time_set_pairs.append((set.time, set))
 			else: time_set_pairs.append((set.end_time, set))
 		time_set_pairs.sort()
@@ -521,3 +537,21 @@ class CollectionsStatus:
 	def cleanup_signatures(self):
 		"""Delete unnecessary older signatures"""
 		map(SignatureChain.delete, self.other_sig_chains)
+
+	def get_extraneous(self):
+		"""Return list of the names of extraneous duplicity files
+
+		A duplicity file is considered extraneous if it is
+		recognizable as a duplicity file, but isn't part of some
+		complete backup set, or current signature chain.
+
+		"""
+		assert self.values_set
+		filenames = []
+		ext_containers = (self.other_sig_chains, self.orphaned_backup_sets,
+						  self.incomplete_backup_sets)
+		for set_or_chain_list in ext_containers:
+			for set_or_chain in set_or_chain_list:
+				filenames.extend(set_or_chain.get_filenames())
+		filenames.extend(self.orphaned_sig_names)
+		return filenames

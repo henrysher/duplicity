@@ -2,6 +2,14 @@ New in v0.3.1 (2002/??/??)
 --------------------------
 
 Now by default the most recent files get restored, not the oldest.
+You can get the old weird behavior by specifying --restore-time 1 (or
+any other very early time).
+
+Fixed a couple bugs where duplicity would crash if it found the remote
+directory corrupted in various ways (for instance, if it contained a
+file that looked like a duplicity file but had an invalid time
+string).
+
 
 
 New in v0.3.0 (2002/11/10)

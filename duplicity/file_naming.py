@@ -91,6 +91,12 @@ def get(type, volume_number = None, manifest = None,
 
 def parse(filename):
 	"""Parse duplicity filename, return None or ParseResults object"""
+	def str2time(timestr):
+		"""Return time in seconds if string can be converted, None otherwise"""
+		try: t = dup_time.genstrtotime(timestr)
+		except dup_time.TimeException: return None
+		return t
+
 	def check_full():
 		"""Return ParseResults if file is from full backup, None otherwise"""
 		if globals.short_filenames: m1 = full_vol_re_short.search(filename)
@@ -99,7 +105,7 @@ def parse(filename):
 			m2 = full_manifest_re_short.search(filename)
 		else: m2 = full_manifest_re.search(filename)
 		if m1 or m2:
-			t = dup_time.genstrtotime((m1 or m2).group("time"))
+			t = str2time((m1 or m2).group("time"))
 			if t:
 				if m1: return ParseResults("full", time = t,
 										volume_number = int(m1.group("num")))
@@ -115,8 +121,8 @@ def parse(filename):
 		else: m2 = inc_manifest_re.search(filename)
 
 		if m1 or m2:
-			t1 = dup_time.genstrtotime((m1 or m2).group("start_time"))
-			t2 = dup_time.genstrtotime((m1 or m2).group("end_time"))
+			t1 = str2time((m1 or m2).group("start_time"))
+			t2 = str2time((m1 or m2).group("end_time"))
 			if t1 and t2:
 				if m1: return ParseResults("inc", start_time = t1,
 						 end_time = t2, volume_number = int(m1.group("num")))
@@ -129,15 +135,15 @@ def parse(filename):
 		if globals.short_filenames: m = full_sig_re_short.search(filename)
 		else: m = full_sig_re.search(filename)
 		if m:
-			t = dup_time.genstrtotime(m.group("time"))
+			t = str2time(m.group("time"))
 			if t: return ParseResults("full-sig", time = t)
 			else: return None
 
 		if globals.short_filenames: m = new_sig_re_short.search(filename)
 		else: m = new_sig_re.search(filename)
 		if m:
-			t1 = dup_time.genstrtotime(m.group("start_time"))
-			t2 = dup_time.genstrtotime(m.group("end_time"))
+			t1 = str2time(m.group("start_time"))
+			t2 = str2time(m.group("end_time"))
 			if t1 and t2:
 				return ParseResults("new-sig", start_time = t1, end_time = t2)
 		return None

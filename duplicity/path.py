@@ -380,6 +380,12 @@ class Path(ROPath):
 		else: os.unlink(self.name)
 		self.setdata()
 
+	def touch(self):
+		"""Open the file, write 0 bytes, close"""
+		log.Log("Touching %s" % (self.name,), 7)
+		fp = self.open("wb")
+		fp.close()
+
 	def deltree(self):
 		"""Remove self by recursively deleting files under it"""
 		log.Log("Deleting tree %s" % (self.name,), 7)
