@@ -245,7 +245,7 @@ class ROPath:
 			if not self.perms_equal(other): return 0
 			if self.stat.st_mtime == other.stat.st_mtime: return 1
 			# Below, treat negative mtimes as equal to 0
-			return self.stat.st_mtime <= 0 and other.stat.st_time <= 0
+			return self.stat.st_mtime <= 0 and other.stat.st_mtime <= 0
 		elif self.issym(): # here only symtext matters
 			return self.symtext == other.symtext
 		elif self.isdev():
