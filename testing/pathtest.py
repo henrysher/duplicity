@@ -1,7 +1,9 @@
 import sys
 sys.path.insert(0, "../duplicity")
-import os, unittest
+import os, unittest, log
 from path import *
+
+#log.setverbosity(4)
 
 class PathTest(unittest.TestCase):
 	"""Test basic path functions"""
@@ -49,5 +51,17 @@ class PathTest(unittest.TestCase):
 
 		c = Path("//foo/bar/./").get_canonical()
 		assert c == "/foo/bar", c
+
+	def test_compare_verbose(self):
+		"""Run compare_verbose on a few files"""
+		vft = Path("testfiles/various_file_types")
+		assert vft.compare_verbose(vft)
+		reg_file = vft.append("regular_file")
+		assert not vft.compare_verbose(reg_file)
+		assert reg_file.compare_verbose(reg_file)
+		file2 = vft.append("executable")
+		assert not file2.compare_verbose(reg_file)
+		assert file2.compare_verbose(file2)
+		
 
 if __name__ == "__main__": unittest.main()

@@ -24,7 +24,7 @@ associates stat information with filenames
 """
 
 import stat, os, errno, pwd, grp, socket, time, re, gzip
-import librsync
+import librsync, log
 from lazy import *
 
 _copy_blocksize = 64 * 1024
@@ -249,7 +249,7 @@ class ROPath:
 		if self.type != other.type: return 0
 
 		if self.isreg() or self.isdir() or self.isfifo():
-			# Don't compare sizes, because we would be comparing
+			# Don't compare sizes, because we might be comparing
 			# signature size to size of file.
 			if not self.perms_equal(other): return 0
 			if self.stat.st_mtime == other.stat.st_mtime: return 1
@@ -262,6 +262,84 @@ class ROPath:
 		assert 0
 
 	def __ne__(self, other): return not self.__eq__(other)
+
+	def compare_verbose(self, other, include_data = 0):
+		"""Compare ROPaths like __eq__, but log reason if different
+
+		This is placed in a separate function from __eq__ because
+		__eq__ should be very time sensitive, and logging statements
+		would slow it down.  Used when verifying.
+
+		If include_data is true, also read all the data of regular
+		files and see if they differ.
+
+		"""
+		def log_diff(log_string):
+			log_str = "Difference found: " + log_string
+			log.Log(log_str % (self.get_relative_path(),), 4)
+
+		if not self.type and not other.type: return 1
+		if not self.stat and other.stat:
+			log_diff("New file %s")
+			return 0
+		if not other.stat and self.stat:
+			log_diff("File %s is missing")
+			return 0
+		if self.type != other.type:
+			log_diff("File %%s has type %s, expected %s" %
+					 (other.type, self.type))
+			return 0
+
+		if self.isreg() or self.isdir or self.isfifo():
+			if not self.perms_equal(other):
+				log_diff("File %%s has permissions %o, expected %o" %
+						 (other.getperms(), self.getperms()))
+				return 0
+			if (self.stat.st_mtime != other.stat.st_mtime and
+				(self.stat.st_mtime > 0 or other.stat.st_mtime > 0)):
+				log_diff("File %%s has mtime %s, expected %s" %
+						 (other.stat.st_mtime, self.stat.st_mtime))
+				return 0
+			if self.isreg() and include_data:
+				if self.compare_data(other): return 1
+				else:
+					log_diff("Data for file %s is different")
+					return 0
+			else: return 1
+		elif self.issym():
+			if self.symtext == other.symtext: return 1
+			else:
+				log_diff("Symlink %%s points to %s, expected %s" %
+						 (other.symtext, self.symtext))
+				return 0
+		elif self.isdev():
+			if not self.perms_equal(other):
+				log_diff("File %%s has permissions %o, expected %o" %
+						 (other.getperms(), self.getperms()))
+				return 0
+			if self.devnums != other.devnums:
+				log_diff("Device file %%s has numbers %s, expected %s"
+						 % (other.devnums, self.devnums))
+				return 0
+			return 1
+		assert 0
+		
+	def compare_data(self, other):
+		"""Compare data from two regular files, return true if same"""
+		f1 = self.open("rb")
+		f2 = other.open("rb")
+		def close():
+			assert not f1.close()
+			assert not f2.close()
+		while 1:
+			buf1 = f1.read(_copy_blocksize)
+			buf2 = f2.read(_copy_blocksize)
+			if buf1 != buf2:
+				close()
+				return 0
+			if not buf1:
+				close()
+				return 1
 
 	def perms_equal(self, other):
 		"""True if self and other have same permissions and ownership"""
