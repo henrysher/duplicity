@@ -42,7 +42,7 @@ def parse_cmdline_options(arglist):
 		 ["allow-source-mismatch", "archive-dir=", "cleanup",
 		  "current-time=", "collection-status", "encrypt-key=",
 		  "exclude=", "exclude-device-files", "exclude-filelist=",
-		  "exclude-globbing-filelist", "exclude-filelist-stdin",
+		  "exclude-globbing-filelist=", "exclude-filelist-stdin",
 		  "exclude-other-filesystems", "exclude-regexp=",
 		  "file-to-restore=", "force", "full", "incremental",
 		  "include=", "include-filelist=", "include-filelist-stdin",
