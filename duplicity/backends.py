@@ -18,7 +18,7 @@
 
 """Provides functions and classes for getting/sending files to destination"""
 
-import os, types, ftplib
+import os, types, ftplib, tempfile
 import log, path, dup_temp, file_naming
 
 class BackendException(Exception): pass
@@ -372,11 +372,72 @@ class ftpBackend(Backend):
 		self.error_wrap('quit')
 
 
-# Dictionary relating protocol strings to tuples (backend_object,
-# separate_host).  If separate_host is true, get_backend() above will
-# parse the url further to try to extract a hostname, protocol, etc.
+class rsyncBackend(Backend):
+	"""Connect to remote store using rsync
+
+	rsync backend contributed by Sebastian Wilhelmi <seppi@seppi.de>
+
+	"""
+	def __init__(self, parsed_url):
+		"""rsyncBackend initializer"""
+		self.url_string = parsed_url.url_string
+		if self.url_string[-1] != '/':
+			self.url_string += '/'
+
+	def put(self, source_path, remote_filename = None):
+		"""Use scp to copy source_dir/filename to remote computer"""
+		if not remote_filename: remote_filename = source_path.get_filename()
+		remote_path = os.path.join (self.url_string, remote_filename)
+		commandline = "rsync %s %s" % (source_path.name, remote_path)
+		self.run_command(commandline)
+
+	def get(self, remote_filename, local_path):
+		"""Use rsync to get a remote file"""
+		remote_path = os.path.join (self.url_string, remote_filename)
+		commandline = "rsync %s %s" % (remote_path, local_path.name)
+		self.run_command(commandline)
+		local_path.setdata()
+		if not local_path.exists():
+			raise BackendException("File %s not found" % local_path.name)
+		
+	def list(self):
+		"""List files"""
+		def split (str):
+			line = str.split ()
+			if len (line) > 4 and line[4] != '.':
+				return line[4]
+			else:
+				return None
+		commandline = "rsync %s" % self.url_string
+		return filter (lambda x: x, map (split, self.popen(commandline).split('\n')))
+
+	def delete(self, filename_list):
+		"""Delete file."""
+		dir = tempfile.mktemp ()
+		exclude_name = tempfile.mktemp ()
+		exclude = open (exclude_name, 'w')
+		os.mkdir (dir)
+		to_delete = []
+		for file in self.list ():
+			if file not in filename_list:
+				path = os.path.join (dir, file)
+				to_delete.append (path)
+				f = open (path, 'w')
+				f.close ()
+				print >>exclude, file
+		exclude.close ()
+		commandline = ("rsync --recursive --delete --exclude-from=%s %s/ %s" %
+			       (exclude_name, dir, self.url_string))
+		self.run_command(commandline)
+		for file in to_delete:
+			os.unlink (file)
+		os.unlink (exclude_name)
+		os.rmdir (dir)
+		
+# Dictionary relating protocol strings to backend_object classes.
 protocol_class_dict = {"scp": scpBackend,
 					   "ssh": scpBackend,
 					   "file": LocalBackend,
-					   "ftp": ftpBackend}
+					   "ftp": ftpBackend,
+					   "rsync": rsyncBackend}
 
