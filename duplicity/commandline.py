@@ -51,7 +51,7 @@ def parse_cmdline_options(arglist):
 		  "no-print-statistics", "null-separator",
 		  "remove-older-than=", "restore-dir=", "restore-time=",
 		  "scp-command=", "short-filenames", "sign-key=",
-		  "ssh-command=", "verbosity=", "verify"])
+		  "ssh-command=", "verbosity=", "verify", "version"])
 	except getopt.error, e:
 		command_line_error("%s" % (str(e),))
 
@@ -98,8 +98,8 @@ def parse_cmdline_options(arglist):
 		elif opt == "--short-filenames": globals.short_filenames = 1
 		elif opt == "--sign-key": set_sign_key(arg)
 		elif opt == "--ssh-command": backends.ssh_command = arg
-		elif opt == "-V":
-			print "duplicity version", str(globals.version)
+		elif opt == "-V" or opt == "--version":
+			print "duplicity", str(globals.version)
 			sys.exit(0)
 		elif opt == "-v" or opt == "--verbosity": log.setverbosity(int(arg))
 		elif opt == "--verify": verify = 1
