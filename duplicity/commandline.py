@@ -44,7 +44,8 @@ def parse_cmdline_options(arglist):
 		  "include-filelist-stdin", "include-globbing-filelist=",
 		  "include-regexp=", "list-current-files",
 		  "no-print-statistics", "null-separator", "restore-dir=",
-		  "restore-time=", "sign-key=", "verbosity="])
+		  "restore-time=", "short-filenames", "sign-key=",
+		  "verbosity="])
 	except getopt.error, e:
 		command_line_error("%s" % (str(e),))
 
@@ -81,6 +82,7 @@ def parse_cmdline_options(arglist):
 			globals.restore_dir = arg
 		elif opt == "-t" or opt == "--restore-time":
 			globals.restore_time = dup_time.genstrtotime(arg)
+		elif opt == "--short-filenames": globals.short_filenames = 1
 		elif opt == "--sign-key": set_sign_key(arg)
 		elif opt == "-V":
 			print "duplicity version", str(globals.version)

@@ -1,6 +1,13 @@
 New in v0.3.0 (2002/10/07)
 --------------------------
 
+Added ftp backend.  Now the remote repository can accessed by ftp and
+can be specified like "ftp://user@foo.bar/".
+
+Added --short-filenames option, for use when uploading to a file
+system that can't have filenames longer than 30 characters (e.g. Mac
+OS 8).
+
 Added --list-current-files mode, which lists the files currently at
 the given destination url.
 
