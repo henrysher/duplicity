@@ -162,6 +162,10 @@ class FinalTest(unittest.TestCase):
 		os.symlink("SYMLINK-DESTINATION-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------", lf4_1.name)
 		lf4_1.setdata()
 		assert lf4_1.issym()
+		lf4_2 = lf3.append("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
+		fp = lf4_2.open("wb")
+		fp.write("hello" * 1000)
+		assert not fp.close()
 
 		self.runtest(["testfiles/empty_dir", lf_dir.name,
 					  "testfiles/empty_dir", lf_dir.name])

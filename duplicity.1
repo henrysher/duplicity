@@ -240,6 +240,10 @@ itself.  Thus the whole archive does not have to be downloaded, but on
 the other hand if the archive has been deleted or corrupted, this
 command may not detect it.
 .TP
+.B --no-encryption
+Do not use GnuPG to encrypt files on remote system.  Instead just
+write gzipped volumes.
+.TP
 .B --no-print-statistics
 By default duplicity will print statistics about the current session
 after a successful backup.  This switch disables that behavior.

@@ -385,7 +385,7 @@ class rsyncBackend(Backend):
 			self.url_string += '/'
 
 	def put(self, source_path, remote_filename = None):
-		"""Use scp to copy source_dir/filename to remote computer"""
+		"""Use rsync to copy source_dir/filename to remote computer"""
 		if not remote_filename: remote_filename = source_path.get_filename()
 		remote_path = os.path.join (self.url_string, remote_filename)
 		commandline = "rsync %s %s" % (source_path.name, remote_path)
@@ -412,14 +412,23 @@ class rsyncBackend(Backend):
 		return filter (lambda x: x, map (split, self.popen(commandline).split('\n')))
 
 	def delete(self, filename_list):
-		"""Delete file."""
+		"""Delete files."""
+		delete_list = filename_list
+		dont_delete_list = []
+		for file in self.list ():
+			if file in delete_list:
+				delete_list.remove (file)
+			else:
+				dont_delete_list.append (file)
+		if len (delete_list) > 0:
+			raise BackendException("Files %s not found" % str (delete_list))
+
 		dir = tempfile.mktemp ()
 		exclude_name = tempfile.mktemp ()
 		exclude = open (exclude_name, 'w')
+		to_delete = [exclude_name]
 		os.mkdir (dir)
-		to_delete = []
-		for file in self.list ():
-			if file not in filename_list:
+		for file in dont_delete_list:
 				path = os.path.join (dir, file)
 				to_delete.append (path)
 				f = open (path, 'w')
@@ -431,7 +440,6 @@ class rsyncBackend(Backend):
 		self.run_command(commandline)
 		for file in to_delete:
 			os.unlink (file)
-		os.unlink (exclude_name)
 		os.rmdir (dir)
 		
 # Dictionary relating protocol strings to backend_object classes.

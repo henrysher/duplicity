@@ -61,6 +61,8 @@ class UnivTest:
 		fin.close()
 		assert buf == "hello, world!", buf
 
+		backend.delete ([filename])
+
 	def try_fileobj_ops(self, backend):
 		"""Test above try_fileobj_filename with a few filenames"""
 		# Must set dup_time strings because they are used by file_naming
@@ -121,7 +123,7 @@ class LocalTest(unittest.TestCase, UnivTest):
 class scpTest(unittest.TestCase, UnivTest):
 	"""Test the SSH backend by logging into local host"""
 	# Change this for your own host
-	url_string = "ssh://localhost//home/ben/prog/python/" \
+	url_string = "ssh://localhost//home/ben/prog/" \
 				 "duplicity/testing/testfiles/output"
 
 	def test_basic(self):
@@ -152,6 +154,25 @@ class ftpTest(unittest.TestCase, UnivTest):
 	def test_fileobj_ops(self):
 		self.try_fileobj_ops(backends.get_backend(self.url_string))
 
+
+class rsyncTest(unittest.TestCase, UnivTest):
+	"""Test the rsync backend"""
+	# This constant should be changed for your own computer
+	# Call rsync --server --config=rsyncd.conf . with the following
+	# rsyncd.conf and create /tmp/test
+	# [test]
+        #     path = /tmp/test/
+        #     read only = false
+	#     uid = "your loginname"
+
+	url_string = "rsync://localhost/test"
+
+	def test_basic(self):
+		self.del_tmp()
+		self.try_basic(backends.get_backend(self.url_string))
+		
+	def test_fileobj_ops(self):
+		self.try_fileobj_ops(backends.get_backend(self.url_string))
 
 if __name__ == "__main__": unittest.main()
 
