@@ -37,6 +37,7 @@ def get_passphrase():
 		log.Log("PASSPHRASE variable not set, asking user.", 5)
 		return getpass.getpass("GnuPG passphrase: ")
 
+
 def write_multivol(backup_type, tarblock_iter, backend):
 	"""Encrypt volumes of tarblock_iter and write to backend
 
@@ -141,6 +142,7 @@ def incremental_backup(sig_chain):
 	new_sig_outfp.close()
 	print_statistics(diffdir.stats, bytes_written)
 
+
 def list_current(col_stats):
 	"""List the files current in the archive (examining signature only)"""
 	sig_chain = check_sig_chain(col_stats)
@@ -148,6 +150,7 @@ def list_current(col_stats):
 		log.FatalError("No signature data found, unable to list files.")
 	path_iter = diffdir.get_combined_path_iter(sig_chain.get_fileobjs())
 	for path in path_iter: print path.get_relative_path()
+
 
 def restore(col_stats):
 	"""Restore archive in globals.backend to globals.local_path"""
@@ -215,6 +218,24 @@ def restore_add_sig_check(fileobj):
 						   (actual_sig, globals.gpg_profile.sign_key))
 	fileobj.addhook(check_signature)
 
+
+def cleanup(col_stats):
+	"""Delete the extraneous files in the current backend"""
+	extraneous = col_stats.get_extraneous()
+	if not extraneous:
+		log.Warn("No extraneous files found, nothing deleted in cleanup.")
+		return
+
+	filestr = "\n".join(extraneous)
+	if globals.force:
+		log.Log("Deleting these files from backend:\n"+filestr, 3)
+		col_stats.backend.delete(extraneous)
+	else:
+		log.Warn("Found the following files to delete:\n%s\n"
+			"Run duplicity again with the --force option to actually delete."
+				 % filestr)
+
+
 def check_last_manifest(col_stats):
 	"""Check consistency and hostname/directory of last manifest"""
 	if not col_stats.all_backup_chains: return
@@ -234,6 +255,7 @@ def main():
 	if action == "restore": restore(col_stats)
 	elif action == "list-current": list_current(col_stats)
 	elif action == "collection-status": print str(col_stats)
+	elif action == "cleanup": cleanup(col_stats)
 	else:
 		assert action == "inc" or action == "full", action
 		check_last_manifest(col_stats)

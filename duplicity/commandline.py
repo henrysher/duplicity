@@ -26,20 +26,21 @@ select_files = [] # Will hold file objects when filelist given
 full_backup = None # Will be set to true if -f or --full option given
 list_current = None # Will be set to true if --list-current option given
 collection_status = None # Will be set to true if --collection-status given
+cleanup = None # Set to true if --cleanup option given
 
 def parse_cmdline_options(arglist):
 	"""Parse argument list"""
 	global select_opts, select_files, full_backup
-	global list_current, collection_status
+	global list_current, collection_status, cleanup
 	def sel_fl(filename):
 		"""Helper function for including/excluding filelists below"""
 		try: return open(filename, "r")
 		except IOError: log.FatalError("Error opening file %s" % filename)
 
 	try: optlist, args = getopt.getopt(arglist, "firt:v:V",
-		 ["allow-source-mismatch", "archive-dir=", "current-time=",
-		  "collection-status", "encrypt-key=", "exclude=",
-		  "exclude-device-files", "exclude-filelist=",
+		 ["allow-source-mismatch", "archive-dir=", "cleanup",
+		  "current-time=", "collection-status", "encrypt-key=",
+		  "exclude=", "exclude-device-files", "exclude-filelist=",
 		  "exclude-globbing-filelist", "exclude-filelist-stdin",
 		  "exclude-other-filesystems", "exclude-regexp=",
 		  "file-to-restore=", "force", "full", "incremental",
@@ -55,6 +56,7 @@ def parse_cmdline_options(arglist):
 	for opt, arg in optlist:
 		if opt == "--allow-source-mismatch": globals.allow_source_mismatch = 1
 		elif opt == "--archive-dir": set_archive_dir(arg)
+		elif opt == "--cleanup": cleanup = 1
 		elif opt == "--collection-status": collection_status = 1
 		elif opt == "--current-time":
 			globals.current_time = get_int(arg, "current-time")
@@ -173,7 +175,15 @@ def process_local_dir(action, local_pathname):
 def check_consistency(action):
 	"""Final consistency check, see if something wrong with command line"""
 	global full_backup, select_opts, list_current
-	if action == "list-current" or action == "collection-status": pass
+	if action == "list-current":
+		assert not cleanup, "Cannot use --cleanup in list-current mode"
+		assert not collection_status, "Cannot use --collection-status here"
+	elif action == "collection-status":
+		assert not cleanup, "Cannot use --cleanup in collection-status mode"
+		assert not list_current, "Cannot use --list-current in this mode"
+	elif action == "cleanup":
+		assert not list_current, "Cannot use --list-current in this mode"
+		assert not collection_status, "Cannot use --collection-status here"
 	elif action == "restore":
 		if full_backup:
 			command_line_error("--full option cannot be used when restoring")
@@ -204,6 +214,7 @@ def ProcessCommandLine(cmdline_list):
 	elif len(args) == 1:
 		if list_current: action = "list-current"
 		elif collection_status: action = "collection-status"
+		elif cleanup: action = "cleanup"
 		else: command_line_error("Too few arguments")
 		globals.backend = backends.get_backend(args[0])
 		if not globals.backend: log.FatalError("""Bad URL '%s'.

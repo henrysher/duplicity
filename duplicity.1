@@ -15,6 +15,11 @@ duplicity \- Encrypted backup using rsync algorithm
 .B --list-current-files
 .I source_url
 
+.B duplicity
+.BI [ options ]
+.B --cleanup
+.I target_url
+
 .SH DESCRIPTION
 Duplicity incrementally backs up files and directory by encrypting
 tar-format volumes with GnuPG and uploading them to a remote (or
@@ -99,6 +104,12 @@ When restoring, specify the local archive directory.  This option is
 not necessary, but if hash data is found locally in
 .I path
 it will be checked against remote files.
+.TP
+.B --cleanup
+Delete the extraneous duplicity files on the given backend.
+Non-duplicity files, or files in complete data sets will not be
+deleted.  This should only be necessary after a duplicity session
+fails or is aborted prematurely.
 .TP
 .BI "--encrypt-key " key
 When backing up, encrypt to the given public key, instead of using
