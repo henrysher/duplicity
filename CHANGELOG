@@ -1,8 +1,14 @@
-New in v0.4.0 (2002/??/??)
+New in v0.4.0 (2002/11/30)
 --------------------------
 
 Changed restore procedure to download volumes from all backup sets
 simultaneously.
+
+Changed the verbosity level of some messages to 5, so level 4 is
+cleaner.
+
+Added --verify option, for checking whether a backup is up-to-date, or
+to see what has changed since that backup.
 
 
 New in v0.3.1 (2002/11/17)

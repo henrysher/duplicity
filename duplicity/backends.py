@@ -137,13 +137,13 @@ class Backend:
 
 	def run_command(self, commandline):
 		"""Run given commandline with logging and error detection"""
-		log.Log("Running '%s'" % commandline, 4)
+		log.Log("Running '%s'" % commandline, 5)
 		if os.system(commandline):
 			raise BackendException("Error running '%s'" % commandline)
 
 	def popen(self, commandline):
 		"""Run command and return stdout results"""
-		log.Log("Reading results of '%s'" % commandline, 4)
+		log.Log("Reading results of '%s'" % commandline, 5)
 		fout = os.popen(commandline)
 		results = fout.read()
 		if fout.close():
@@ -343,14 +343,14 @@ class ftpBackend(Backend):
 		"""Transfer source_path to remote_filename"""
 		if not remote_filename: remote_filename = source_path.get_filename()
 		source_file = source_path.open("rb")
-		log.Log("Saving %s on FTP server" % (remote_filename,), 4)
+		log.Log("Saving %s on FTP server" % (remote_filename,), 5)
 		self.error_wrap('storbinary', "STOR "+remote_filename, source_file)
 		assert not source_file.close()
 
 	def get(self, remote_filename, local_path):
 		"""Get remote filename, saving it to local_path"""
 		target_file = local_path.open("wb")
-		log.Log("Retrieving %s from FTP server" % (remote_filename,), 4)
+		log.Log("Retrieving %s from FTP server" % (remote_filename,), 5)
 		self.error_wrap('retrbinary', "RETR "+remote_filename,
 						target_file.write)
 		assert not target_file.close()
@@ -358,13 +358,13 @@ class ftpBackend(Backend):
 
 	def list(self):
 		"""List files in directory"""
-		log.Log("Listing files on FTP server", 4)
+		log.Log("Listing files on FTP server", 5)
 		return self.error_wrap('nlst')
 
 	def delete(self, filename_list):
 		"""Delete files in filename_list"""
 		for filename in filename_list:
-			log.Log("Deleting %s from FTP server" % (filename,), 4)
+			log.Log("Deleting %s from FTP server" % (filename,), 5)
 			self.error_wrap('delete', filename)
 
 	def close(self):

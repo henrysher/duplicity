@@ -12,6 +12,11 @@ duplicity \- Encrypted backup using rsync algorithm
 
 .B duplicity
 .BI [ options ]
+.B --verify
+.I source_url filename
+
+.B duplicity
+.BI [ options ]
 .B --list-current-files
 .I source_url
 
@@ -65,6 +70,13 @@ directory.  If we wanted to restore just the file "Mail/article" in
 .PP
 .RS
 duplicity -t 3D --file-to-restore Mail/article scp://uid@other.host/some_dir /home/me/restored_file
+.PP
+.RE
+The following command compares the files we backed up, so see what has
+changed since then:
+.PP
+.RS
+duplicity --verify scp://uid@other.host/some_dir /home/me
 .PP
 .RE
 Finally, duplicity recognizes several include/exclude options.  For
@@ -280,6 +292,14 @@ When restoring, specify the time to restore to.
 .BI -v [0-9] ", --verbosity " [0-9]
 Specify verbosity level (0 is total silent, 3 is the default, and 9 is
 noisiest).
+.TP
+.B --verify
+Enter verify mode instead of restore.  If the --file-to-restore option
+is given, restrict verify to that file or directory.  duplicity will
+exit with a non-zero error level if any files are different.  On
+verbosity level 4 or higher, log a message for each file that has
+changed.
+
 
 .SH TIME FORMATS
 duplicity uses time strings in two places.  Firstly, many of the files

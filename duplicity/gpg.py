@@ -68,7 +68,7 @@ class GPGFile:
 		"""
 		self.status_fp = None # used to find signature
 		self.closed = None # set to true after file closed
-		if log.verbosity >= 4: # If verbosity low, suppress gpg log messages
+		if log.verbosity >= 5: # If verbosity low, suppress gpg log messages
 			self.logger_fp = sys.stderr
 		else: self.logger_fp = tempfile.TemporaryFile()
 		
@@ -167,7 +167,7 @@ def GPGWriteFile(block_iter, filename, profile,
 		gnupg.options.extra_args.append('--no-secmem-warning')
 		gnupg.passphrase = passphrase
 		if profile.sign_key: gnupg.options.default_key = profile.sign_key
-		if log.verbosity < 4: # suppress gpg log messages if low verbosity
+		if log.verbosity < 5: # suppress gpg log messages if low verbosity
 			logger_fp_list[0] = tempfile.TemporaryFile()
 		
 		if profile.recipients:

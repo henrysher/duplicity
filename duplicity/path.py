@@ -24,7 +24,7 @@ associates stat information with filenames
 """
 
 import stat, os, errno, pwd, grp, socket, time, re, gzip
-import librsync, log
+import librsync, log, dup_time
 from lazy import *
 
 _copy_blocksize = 64 * 1024
@@ -298,7 +298,8 @@ class ROPath:
 			if (self.stat.st_mtime != other.stat.st_mtime and
 				(self.stat.st_mtime > 0 or other.stat.st_mtime > 0)):
 				log_diff("File %%s has mtime %s, expected %s" %
-						 (other.stat.st_mtime, self.stat.st_mtime))
+						 (dup_time.timetopretty(other.stat.st_mtime),
+						  dup_time.timetopretty(self.stat.st_mtime)))
 				return 0
 			if self.isreg() and include_data:
 				if self.compare_data(other): return 1

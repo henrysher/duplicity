@@ -12,6 +12,9 @@ other_args = []
 #other_args = ["--short-filenames"]
 #other_args = ["--ssh-command 'ssh -v'", "--scp-command 'scp -C'"]
 
+# If this is set to true, after each backup, verify contents
+verify = 1
+
 class FinalTest(unittest.TestCase):
 	"""Test backup/restore using duplicity binary"""
 	def run_duplicity(self, arglist, options = [], current_time = None):
@@ -41,6 +44,15 @@ class FinalTest(unittest.TestCase):
 		args = ["'%s'" % backend_url, "testfiles/restore_out"]
 		if file_to_restore:
 			options.extend(['--file-to-restore', file_to_restore])
+		if time: options.extend(['--restore-time', str(time)])
+		self.run_duplicity(args, options, current_time)
+
+	def verify(self, dirname, file_to_verify = None, time = None, options = [],
+			   current_time = None):
+		options = options[:]
+		args = ["--verify", "'%s'" % backend_url, dirname]
+		if file_to_verify:
+			options.extend(['--file-to-restore', file_to_verify])
 		if time: options.extend(['--restore-time', str(time)])
 		self.run_duplicity(args, options, current_time)
 
@@ -74,6 +86,9 @@ class FinalTest(unittest.TestCase):
 			current_time = 100000*(i + 1)
 			self.restore(time = current_time, options = restore_options)
 			self.check_same(dirname, "testfiles/restore_out")
+			if verify:
+				self.verify(dirname,
+							time = current_time, options = restore_options)
 
 	def check_same(self, filename1, filename2):
 		"""Verify two filenames are the same"""
@@ -94,9 +109,13 @@ class FinalTest(unittest.TestCase):
 									('directory_to_file', 100100, 'dir1'),
 									('directory_to_file', 200100, 'dir2'),
 									('largefile', 300000, 'dir3')]:
-			self.restore(filename, time)
+			self.restore(filename, time, options = restore_options)
 			self.check_same('testfiles/%s/%s' % (dir, filename),
 							'testfiles/restore_out')
+			if verify:
+				self.verify('testfiles/%s/%s' % (dir, filename),
+							file_to_verify = filename, time = time,
+							options = restore_options)
 
 	def test_asym_cycle(self):
 		"""Like test_basic_cycle but use asymmetric encryption and signing"""
