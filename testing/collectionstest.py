@@ -1,6 +1,6 @@
 import sys, random, unittest
 sys.path.insert(0, "../duplicity")
-import collections, backends, path, gpg, globals
+import collections, backends, path, gpg, globals, dup_time
 
 filename_list1 = ["duplicity-full.2002-08-17T16:17:01-07:00.manifest.gpg",
 				  "duplicity-full.2002-08-17T16:17:01-07:00.vol1.difftar.gpg",
@@ -158,8 +158,8 @@ class CollectionTest(unittest.TestCase):
 		self.sigchain_fileobj_testlist(self.sigchain_fileobj_get(1))
 		self.sigchain_fileobj_testlist(self.sigchain_fileobj_get(None))		
 
-	def test_get_extraneous(self):
-		"""Test the listing of extraneous files"""
+	def get_filelist2_cs(self):
+		"""Return set CollectionsStatus object from filelist 2"""
 		# Set up testfiles/output with files from filename_list2
 		self.del_tmp()
 		for filename in filename_list2:
@@ -168,7 +168,11 @@ class CollectionTest(unittest.TestCase):
 
 		cs = collections.CollectionsStatus(output_dir_backend)
 		cs.set_values()
+		return cs
 
+	def test_get_extraneous(self):
+		"""Test the listing of extraneous files"""
+		cs = self.get_filelist2_cs()
 		assert len(cs.orphaned_backup_sets) == 1, cs.orphaned_backup_sets
 		assert len(cs.orphaned_sig_names) == 1, cs.orphaned_sig_names
 		assert len(cs.incomplete_backup_sets) == 1, cs.incomplete_backup_sets
@@ -186,5 +190,24 @@ class CollectionTest(unittest.TestCase):
 		for filename in right_list:
 			errors.append("### Didn't receive extraneous filename " + filename)
 		assert not errors, "\n"+"\n".join(errors)
+
+	def test_get_olderthan(self):
+		"""Test getting list of files older than a certain time"""
+		cs = self.get_filelist2_cs()
+		oldsets = cs.get_older_than(
+			dup_time.genstrtotime("2002-05-01T16:17:01-07:00"))
+		oldset_times = map(lambda s: s.get_time(), oldsets)
+		right_times = map(dup_time.genstrtotime, ['2001-01-01T16:17:01-07:00'])
+		assert oldset_times == right_times, \
+			   [oldset_times, right_times]
+
+		oldsets_required = cs.get_older_than_required(
+			dup_time.genstrtotime("2002-08-17T20:00:00-07:00"))
+		oldset_times = map(lambda s: s.get_time(), oldsets_required)
+		right_times_required = map(dup_time.genstrtotime,
+								   ['2002-08-17T16:17:01-07:00'])
+		assert oldset_times == right_times_required, \
+			   [oldset_times, right_times_required]
+		
 
 if __name__ == "__main__": unittest.main()

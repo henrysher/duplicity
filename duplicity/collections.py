@@ -92,8 +92,9 @@ class BackupSet:
 
 	def delete(self):
 		"""Remove all files in set"""
-		self.backend.delete(self.remote_manfest_name)
-		for filename in self.volume_name_dict: self.backend.delete(filename)
+		l = self.get_filenames()
+		l.reverse() # delete starting with manifest
+		self.backend.delete(l)
 
 	def __str__(self):
 		"""For now just list files in set"""
@@ -141,12 +142,22 @@ remote backup set or the local archive directory has been corrupted.""")
 		else: return self.get_remote_manifest()
 
 	def get_filenames(self):
-		"""Return list of (remote) filenames of files in set"""
+		"""Return sorted list of (remote) filenames of files in set"""
 		assert self.info_set
+		volume_num_list = self.volume_name_dict.keys()
+		volume_num_list.sort()
+		volume_filenames = map(lambda x: self.volume_name_dict[x],
+							   volume_num_list)
 		if self.remote_manifest_name:
-			return [self.remote_manifest_name] + self.volume_name_dict.values()
-		else: return self.volume_name_dict.values()
+			return [self.remote_manifest_name] + volume_filenames
+		else: return volume_filenames
 		
+	def get_time(self):
+		"""Return time if full backup, or end_time if incremental"""
+		if self.time: return self.time
+		if self.end_time: return self.end_time
+		assert 0, "Neither self.time nor self.end_time set"
+
 
 class BackupChain:
 	"""BackupChain - a number of linked BackupSets
@@ -182,6 +193,7 @@ class BackupChain:
 		"""Delete all sets in chain, in reverse order"""
 		for i in range(len(self.incset_list)-1, -1, -1):
 			self.incset_list[i].delete()
+		if self.fullset: self.fullset.delete()
 
 	def get_sets_at_time(self, time):
 		"""Return a list of sets in chain earlier or equal to time"""
@@ -201,6 +213,11 @@ class BackupChain:
 				"             Start Time: %s\n"
 				"             End Time: %s" % (self.fullset, incset_str,
 											   self.start_time, self.end_time))
+
+	def get_all_sets(self):
+		"""Return list of all backup sets in chain"""
+		if self.fullset: return [self.fullset] + self.incset_list
+		else: return self.incset_list
 
 
 class SignatureChain:
@@ -555,3 +572,45 @@ class CollectionsStatus:
 				filenames.extend(set_or_chain.get_filenames())
 		filenames.extend(self.orphaned_sig_names)
 		return filenames
+
+	def sort_sets(self, setlist):
+		"""Return new list containing same elems of setlist, sorted by time"""
+		pairs = map(lambda s: (s.get_time(), s), setlist)
+		pairs.sort()
+		return map(lambda p: p[1], pairs)
+
+	def get_chains_older_than(self, t):
+		"""Return a list of chains older than time t"""
+		assert self.values_set
+		return filter(lambda c: c.end_time < t, self.all_backup_chains)
+
+	def get_older_than(self, t):
+		"""Returns a list of backup sets older than the given time t
+
+		All of the times will be associated with an intact chain.
+		Furthermore, none of the times will be of a set which a newer
+		set may depend on.  For instance, if set A is a full set older
+		than t, and set B is an incremental based on A which is newer
+		than tt, then the time of set A will not be returned.
+
+		"""
+		old_sets = []
+		for chain in self.get_chains_older_than(t):
+			old_sets.extend(chain.get_all_sets())
+		return self.sort_sets(old_sets)
+
+	def get_older_than_required(self, t):
+		"""Returns list of times of old backup sets required by new sets
+
+		This function is similar to the previous one, but it only
+		returns the times of sets which are old but part of the chains
+		where the newer end of the chain is newer than t.
+
+		"""
+		assert self.values_set
+		new_chains = filter(lambda c: c.end_time >= t, self.all_backup_chains)
+		result_sets = []
+		for chain in new_chains:
+			old_sets = filter(lambda s: s.get_time() < t, chain.get_all_sets())
+			result_sets.extend(old_sets)
+		return self.sort_sets(result_sets)
