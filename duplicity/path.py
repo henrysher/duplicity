@@ -173,13 +173,13 @@ class ROPath:
 		self.stat.st_mtime = tarinfo.mtime
 		self.stat.st_size = tarinfo.size
 
-	def get_rorpath(self):
-		"""Return rorpath copy of self"""
-		new_rorpath = ROPath(self.index, self.stat)
-		new_rorpath.type, new_rorpath.mode = self.type, self.mode
-		if self.issym(): new_rorpath.symtext = self.symtext
-		elif self.isdev(): new_rorpath.devnums = self.devnums
-		return new_rorpath
+	def get_ropath(self):
+		"""Return ropath copy of self"""
+		new_ropath = ROPath(self.index, self.stat)
+		new_ropath.type, new_ropath.mode = self.type, self.mode
+		if self.issym(): new_ropath.symtext = self.symtext
+		elif self.isdev(): new_ropath.devnums = self.devnums
+		return new_ropath
 
 	def get_tarinfo(self):
 		"""Generate a tarfile.TarInfo object based on self
