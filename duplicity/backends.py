@@ -18,10 +18,11 @@
 
 """Provides functions and classes for getting/sending files to destination"""
 
-import os
-import log, path, dup_temp, file_naming, ftplib
+import os, types, ftplib
+import log, path, dup_temp, file_naming
 
 class BackendException(Exception): pass
+class ParsingException(Exception): pass
 
 def get_backend(url_string):
 	"""Return Backend object from url string, or None if not a url string
@@ -32,10 +33,11 @@ def get_backend(url_string):
 
 	"""
 	global protocol_class_dict
-	pu = ParsedUrl(url_string)
+	try: pu = ParsedUrl(url_string)
+	except ParsingException: return None
 
 	try: backend_class = protocol_class_dict[pu.protocol]
-	except KeyError: bad_url("Unknown protocol '%s'" % (pu.protocol,))
+	except KeyError: log.FatalError("Unknown protocol '%s'" % (pu.protocol,))
 	return backend_class(pu)
 
 class ParsedUrl:
@@ -60,9 +62,9 @@ class ParsedUrl:
 	def bad_url(self, message = None):
 		"""Report a bad url, using message if given"""
 		if message:
-			err_string = "Bad URL string '%s': %s" % (url_string, message)
-		else: err_string = "Bad URL string '%s'" % url_string
-		log.FatalError(err_string)
+			err_string = "Bad URL string '%s': %s" % (self.url_string, message)
+		else: err_string = "Bad URL string '%s'" % (self.url_string,)
+		raise ParsingException(err_string)
 
 	def set_protocol_suffix(self):
 		"""Parse self.url_string, setting self.protocol and self.suffix"""
@@ -122,6 +124,7 @@ class Backend:
 
 	def get(self, remote_filename, local_path):
 		"""Retrieve remote_filename and place in local_path"""
+		local_path.setdata()
 		pass
 	
 	def list(self):
@@ -241,6 +244,7 @@ class LocalBackend(Backend):
 
 	def delete(self, filename_list):
 		"""Delete all files in filename list"""
+		assert type(filename_list) is not types.StringType
 		try:
 			for filename in filename_list:
 				self.remote_pathdir.append(filename).delete()
@@ -327,24 +331,29 @@ class ftpBackend(Backend):
 		"""Transfer source_path to remote_filename"""
 		if not remote_filename: remote_filename = source_path.get_filename()
 		source_file = source_path.open("rb")
-		print "Remote filename: ", remote_filename
+		log.Log("Saving %s on FTP server" % (remote_filename,), 4)
 		self.error_wrap('storbinary', "STOR "+remote_filename, source_file)
 		assert not source_file.close()
 
 	def get(self, remote_filename, local_path):
 		"""Get remote filename, saving it to local_path"""
 		target_file = local_path.open("wb")
+		log.Log("Retrieving %s from FTP server" % (remote_filename,), 4)
 		self.error_wrap('retrbinary', "RETR "+remote_filename,
 						target_file.write)
 		assert not target_file.close()
+		local_path.setdata()
 
 	def list(self):
 		"""List files in directory"""
+		log.Log("Listing files on FTP server", 4)
 		return self.error_wrap('nlst')
 
 	def delete(self, filename_list):
 		"""Delete files in filename_list"""
-		for filename in filename_list: self.error_wrap('delete', filename)
+		for filename in filename_list:
+			log.Log("Deleting %s from FTP server" % (filename,), 4)
+			self.error_wrap('delete', filename)
 
 	def close(self):
 		"""Shut down connection"""

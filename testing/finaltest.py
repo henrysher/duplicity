@@ -1,14 +1,22 @@
 import sys, os, unittest
 sys.path.insert(0, "../duplicity")
-import path
+import path, backends
+
+# This can be changed to select the URL to use
+#backend_url = "file://testfiles/output"
+backend_url = "ftp://Stan Ford@90-92L-imac.stanford.edu/Macintosh HD/temp"
+
+# Comment or uncomment these depending on the backend used
+short_filenames = 1
 
 class FinalTest(unittest.TestCase):
 	"""Test backup/restore using duplicity binary"""
 	def run_duplicity(self, arglist, options = [], current_time = None):
 		"""Run duplicity binary with given arguments and options"""
 		cmd_list = ["../duplicity-bin"]
-		cmd_list.extend(options + ["-v3", "--allow-source-mismatch"])
+		cmd_list.extend(options + ["-v5", "--allow-source-mismatch"])
 		if current_time: cmd_list.append("--current-time %s" % (current_time,))
+		if short_filenames: cmd_list.append("--short-filenames")
 		cmd_list.extend(arglist)
 		cmdline = " ".join(cmd_list)
 		print "Running '%s'." % cmdline
@@ -20,14 +28,14 @@ class FinalTest(unittest.TestCase):
 		"""Run duplicity backup to default directory"""
 		options = options[:]
 		if type == "full": options.append('--full')
-		args = [input_dir, "file://testfiles/output"]
+		args = [input_dir, "'%s'" % backend_url]
 		self.run_duplicity(args, options, current_time)
 
 	def restore(self, file_to_restore = None, time = None, options = [],
 				current_time = None):
 		options = options[:] # just nip any mutability problems in bud
 		assert not os.system("rm -rf testfiles/restore_out")
-		args = ["file://testfiles/output", "testfiles/restore_out"]
+		args = ["'%s'" % backend_url, "testfiles/restore_out"]
 		if file_to_restore:
 			options.extend(['--file-to-restore', file_to_restore])
 		if time: options.extend(['--restore-time', str(time)])
@@ -35,6 +43,9 @@ class FinalTest(unittest.TestCase):
 
 	def deltmp(self):
 		"""Delete temporary directories"""
+		backend = backends.get_backend(backend_url)
+		backend.delete(backend.list())
+		backend.close()
 		assert not os.system("rm -rf testfiles/output "
 							 "testfiles/restore_out testfiles/tmp_archive")
 		assert not os.system("mkdir testfiles/output testfiles/tmp_archive")

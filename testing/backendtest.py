@@ -26,7 +26,7 @@ class UnivTest:
 
 		regpath = path.Path("testfiles/various_file_types/regular_file")
 		normal_file = "testfile"
-		colonfile = ("file%swith.%scolons_-etc%s%s" %
+		colonfile = ("file%swith.%scolons_-and%s%setc" %
 					 ((globals.time_separator,) * 4))
 		tmpregpath = path.Path("testfiles/backend_tmp/regfile")
 
@@ -136,8 +136,8 @@ class ftpTest(unittest.TestCase, UnivTest):
 	# This constant should be changed for your own computer
 	url_string = "ftp://Stan Ford@90-92L-imac.stanford.edu/Macintosh HD/temp"
 	parsed_url = backends.ParsedUrl(url_string)
-	globals.time_separator = "_"
 	globals.short_filenames = 1
+	globals.time_separator = '_'
 
 	def del_tmp(self):
 		"""Remove all files from test directory"""

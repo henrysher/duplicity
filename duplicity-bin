@@ -241,6 +241,7 @@ def main():
 			sig_chain = check_sig_chain(col_stats)
 			if not sig_chain: full_backup(col_stats)
 			else: incremental_backup(sig_chain)
+	globals.backend.close()
 	dup_temp.cleanup()
 
 
