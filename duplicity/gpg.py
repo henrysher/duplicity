@@ -19,7 +19,7 @@
 """duplicity's gpg interface, builds upon Frank Tobin's GnuPGInterface"""
 
 import select, os, sys, thread, sha, md5, types, cStringIO, tempfile, re
-import GnuPGInterface, misc
+import GnuPGInterface, misc, log
 
 blocksize = 256 * 1024
 
@@ -68,13 +68,17 @@ class GPGFile:
 		"""
 		self.status_fp = None # used to find signature
 		self.closed = None # set to true after file closed
-
+		if log.verbosity >= 4: # If verbosity low, suppress gpg log messages
+			self.logger_fp = sys.stderr
+		else: self.logger_fp = tempfile.TemporaryFile()
+		
 		# Start GPG process - copied from GnuPGInterface docstring.
 		gnupg = GnuPGInterface.GnuPG()
 		gnupg.options.meta_interactive = 0
 		gnupg.options.extra_args.append('--no-secmem-warning')
 		gnupg.passphrase = profile.passphrase
 		if profile.sign_key: gnupg.options.default_key = profile.sign_key
+
 
 		if encrypt:
 			if profile.recipients:
@@ -83,13 +87,15 @@ class GPGFile:
 				if profile.sign_key: cmdlist.append("--sign")
 			else: cmdlist = ['--symmetric']
 			p1 = gnupg.run(cmdlist, create_fhs=['stdin'],
-						   attach_fhs={'stdout': encrypt_path.open("wb")})
+						   attach_fhs={'stdout': encrypt_path.open("wb"),
+									   'logger': self.logger_fp})
 			self.gpg_input = p1.handles['stdin']
 		else:
 			self.status_fp = tempfile.TemporaryFile()
 			p1 = gnupg.run(['--decrypt'], create_fhs=['stdout'],
 						   attach_fhs={'stdin': encrypt_path.open("rb"),
-									   'status': self.status_fp})
+									   'status': self.status_fp,
+									   'logger': self.logger_fp})
 			self.gpg_output = p1.handles['stdout']
 		self.gpg_process = p1
 		self.encrypt = encrypt
@@ -108,6 +114,7 @@ class GPGFile:
 			self.gpg_output.close()
 			if self.status_fp: self.set_signature()
 			self.gpg_process.wait()
+		if self.logger_fp is not sys.stderr: self.logger_fp.close()
 		self.closed = 1
 
 	def set_signature(self):
@@ -148,6 +155,7 @@ def GPGWriteFile(block_iter, filename, profile,
 	max_footer_size.
 
 	"""
+	logger_fp_list = [sys.stderr]
 	def start_gpg(filename, passphrase):
 		"""Start GPG process, return (process, to_gpg_fileobj)"""
 		gnupg = GnuPGInterface.GnuPG()
@@ -155,14 +163,17 @@ def GPGWriteFile(block_iter, filename, profile,
 		gnupg.options.extra_args.append('--no-secmem-warning')
 		gnupg.passphrase = passphrase
 		if profile.sign_key: gnupg.options.default_key = profile.sign_key
-
+		if log.verbosity < 4: # suppress gpg log messages if low verbosity
+			logger_fp_list[0] = tempfile.TemporaryFile()
+		
 		if profile.recipients:
 			gnupg.options.recipients = profile.recipients
 			cmdlist = ['--encrypt']
 			if profile.sign_key: cmdlist.append("--sign")
 		else: cmdlist = ['--symmetric']
 		p1 = gnupg.run(cmdlist, create_fhs=['stdin'],
-					   attach_fhs={'stdout': open(filename, "wb")})
+					   attach_fhs={'stdout': open(filename, "wb"),
+								   'logger': logger_fp})
 		return (p1, p1.handles['stdin'])
 
 	def top_off(bytes, to_gpg_fp):
@@ -183,6 +194,7 @@ def GPGWriteFile(block_iter, filename, profile,
 		"""Close gpg process and clean up"""
 		to_gpg_fp.close()
 		gpg_process.wait()
+		if logger_fp_list[0] is not sys.stderr: logger_fp_list[0].close()
 
 	target_size = size - 18 * 1024 # fudge factor, compensate for gpg buffering
 	check_size = target_size - max_footer_size

@@ -16,6 +16,9 @@ a duplicity session is aborted after it has uploaded some files.
 Added --remove-older-than option, for safely deleting backup sets
 older than the given time.
 
+Suppress GPG log messages like "gpg: CAST5 encrypted data" if
+verbosity is set to 3 or less.
+
 
 New in v0.3.0 (2002/11/10)
 --------------------------
