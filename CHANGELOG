@@ -5,6 +5,9 @@ Added rdiff-backup-style --include/exclude-filelist-globbing options.
 Now filelists with "+ /- " can be treated exactly like repeated
 --include or --exclude options.
 
+Fixed bug backing up normal files instead of directories.  Thanks to
+Mathieu Doidy for bug report.
+
 
 New in v0.2.1 (2002/10/31)
 --------------------------

@@ -41,7 +41,7 @@ class FinalTest(unittest.TestCase):
 
 	def runtest(self, dirlist, backup_options = [], restore_options = []):
 		"""Run backup/restore test on directories in dirlist"""
-		assert len(dirlist) > 1
+		assert len(dirlist) >= 1
 		self.deltmp()
 
 		# Back up directories to local backend
@@ -68,7 +68,9 @@ class FinalTest(unittest.TestCase):
 	def test_basic_cycle(self, backup_options = [], restore_options = []):
 		"""Run backup/restore test on basic directories"""
 		self.runtest(["testfiles/dir1", "testfiles/dir2",
-					  "testfiles/dir3", "testfiles/empty_dir"],
+					  "testfiles/dir3",
+					  "testfiles/various_file_types/regular_file",
+					  "testfiles/empty_dir"],
 					 backup_options = backup_options,
 					 restore_options = restore_options)
 
@@ -93,5 +95,10 @@ class FinalTest(unittest.TestCase):
 		options = ["--archive-dir testfiles/tmp_archive"]
 		self.test_basic_cycle(backup_options = options,
 							  restore_options = options)
+
+	def test_single_regfile(self):
+		"""Test backing and restoring up a single regular file"""
+		self.runtest(["testfiles/various_file_types/regular_file"])
+
 
 if __name__ == "__main__": unittest.main()

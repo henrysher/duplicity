@@ -83,7 +83,6 @@ def filter_path_iter(path_iter, index):
 
 def difftar2path_iter(diff_tarfile):
 	"""Turn file-like difftarobj into iterator of ROPaths"""
-	prefixes = ["snapshot/", "diff/", "deleted/"]
 	tar_iter = iter(diff_tarfile)
 	multivol_fileobj = None
 
@@ -138,7 +137,7 @@ def get_index_from_tarinfo(tarinfo):
 			break
 	else: raise PatchDirException("Unrecognized diff entry %s" %
 								 (tarinfo.name,))
-	if name == ".": index = ()
+	if name == "." or name == "": index = ()
 	else:
 		index = tuple(name.split("/"))
 		if '..' in index:
@@ -216,7 +215,7 @@ class PathPatcher(ITRBranch):
 	def start_process(self, index, basis_path, diff_ropath):
 		"""Start processing when diff_ropath is a directory"""
 		if not (diff_ropath and diff_ropath.isdir()):
-			assert index == () # this should only happen for first elem
+			assert index == (), str(index) # should only happen for first elem
 			self.fast_process(index, basis_path, diff_ropath)
 			return
 			
