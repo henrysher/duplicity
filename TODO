@@ -7,3 +7,5 @@ Add --list-increments type option
 include/exclude options should work when restoring.
 
 Figure out better way of searching through the archive.
+
+Examine large file performance.

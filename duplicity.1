@@ -286,6 +286,12 @@ depend on them.  See the
 .B TIME FORMATS
 section for more information.
 .TP
+.BI --short-filenames
+If this option is specified, the names of the files duplicity writes
+will be shorter (about 30 chars) but less understandable.  This may be
+useful when backing up to MacOS or another OS or FS that doesn't
+support long filenames.
+.TP
 .BI -t time ", --restore-time " time
 When restoring, specify the time to restore to.
 .TP
