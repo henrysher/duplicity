@@ -37,13 +37,13 @@
 """Read from and write to tar format archives.
 """
 
-__version__ = "$Revision: 1.2 $"
+__version__ = "$Revision: 1.3 $"
 # $Source: /sources/duplicity/duplicity/duplicity/tarfile.py,v $
 
 version     = "0.4.9"
 __author__  = "Lars Gustäbel (lars@gustaebel.de)"
-__date__    = "$Date: 2003/03/14 01:35:02 $"
-__cvsid__   = "$Id: tarfile.py,v 1.2 2003/03/14 01:35:02 bescoto Exp $"
+__date__    = "$Date: 2003/08/08 19:13:36 $"
+__cvsid__   = "$Id: tarfile.py,v 1.3 2003/08/08 19:13:36 bescoto Exp $"
 __credits__ = "Gustavo Niemeyer for his support, " \
               "Detlef Lannert for some early contributions"
 
@@ -62,6 +62,8 @@ try:
     import grp, pwd
 except ImportError:
     grp = pwd = None
+# These are used later to cache user and group names and ids
+gname_dict = uname_dict = uid_dict = gid_dict = None
 
 # We won't need this anymore in Python 2.3
 #
@@ -357,15 +359,11 @@ class TarInfo:
         self.mtime = statres.st_mtime
         self.type  = type
         if pwd:
-            try:
-                self.uname = pwd.getpwuid(self.uid)[0]
-            except KeyError:
-                pass
+            try: self.uname = uid2uname(self.uid)
+            except KeyError: pass
         if grp:
-            try:
-                self.gname = grp.getgrgid(self.gid)[0]
-            except KeyError:
-                pass
+            try: self.gname = gid2gname(self.gid)
+            except KeyError: pass
 
         if type in (CHRTYPE, BLKTYPE):
             if hasattr(os, "major") and hasattr(os, "minor"):
@@ -982,20 +980,18 @@ class TarFile:
         """
         if pwd and os.geteuid() == 0:
             # We have to be root to do so.
-            try:
-                g = grp.getgrnam(tarinfo.gname)[2]
+            try: g = gname2gid(tarinfo.gname)
             except KeyError:
                 try:
-                    g = grp.getgrgid(tarinfo.gid)[2]
-                except KeyError:
-                    g = os.getgid()
-            try:
-                u = pwd.getpwnam(tarinfo.uname)[2]
+                    gid2gname(tarinfo.gid) # Make sure gid exists
+                    g = tarinfo.gid
+                except KeyError: g = os.getgid()
+            try: u = uname2uid(tarinfo.uname)
             except KeyError:
                 try:
-                    u = pwd.getpwuid(tarinfo.uid)[2]
-                except KeyError:
-                    u = os.getuid()
+                    uid2uname(tarinfo.uid) # Make sure uid exists
+                    u = tarinfo.uid
+                except KeyError: u = os.getuid()
             try:
                 if tarinfo.issym() and hasattr(os, "lchown"):
                     os.lchown(targetpath, u, g)
@@ -1652,3 +1648,43 @@ class TarFromIterator(TarFile):
         """Close file obj"""
         assert not self.closed
         self.closed = 1
+
+
+def uid2uname(uid):
+    """Return uname of uid, or raise KeyError if none"""
+    if uid_dict is None: set_pwd_dict()
+    return uid_dict[uid]
+
+def uname2uid(uname):
+    """Return uid of given uname, or raise KeyError if none"""
+    if uname_dict is None: set_pwd_dict()
+    return uname_dict[uname]
+
+def set_pwd_dict():
+    """Set global pwd caching dictionaries uid_dict and uname_dict"""
+    global uid_dict, uname_dict
+    assert uid_dict is None and uname_dict is None and pwd
+    uid_dict = {}; uname_dict = {}
+    for entry in pwd.getpwall():
+        uname = entry[0]; uid = entry[2]
+        uid_dict[uid] = uname
+        uname_dict[uname] = uid
+
+def gid2gname(gid):
+    """Return group name of gid, or raise KeyError if none"""
+    if gid_dict is None: set_grp_dict()
+    return gid_dict[gid]
+
+def gname2gid(gname):
+    """Return gid of given group name, or raise KeyError if none"""
+    if gname_dict is None: set_grp_dict()
+    return gname_dict[gname]
+
+def set_grp_dict():
+    global gid_dict, gname_dict
+    assert gid_dict is None and gname_dict is None and grp
+    gid_dict = {}; gname_dict = {}
+    for entry in grp.getgrall():
+        gname = entry[0]; gid = entry[2]
+        gid_dict[gid] = gname
+        gname_dict[gname] = gid

@@ -1,16 +1,9 @@
 # unittest for the tarfile module
 #
-# $Id: test_tarfile.py,v 1.2 2002/11/02 20:35:00 bescoto Exp $
+# $Id: test_tarfile.py,v 1.3 2003/08/08 19:13:36 bescoto Exp $
 
 from __future__ import generators
-import sys
-import os
-import shutil
-import StringIO
-import tempfile
-
-import unittest
-import stat
+import sys, os, shutil, StringIO, tempfile, unittest, stat, pwd, grp
 sys.path.insert(0, "../duplicity")
 import tarfile
 
@@ -329,7 +322,47 @@ class FileLogger:
     def close(self):
         print "Closing"
         return self.infp.close()
-    
+
+
+class PasswordTest(unittest.TestCase):
+	"""Test retrieving, storing password information"""
+	def compare(self, thunk1, thunk2):
+		"""Make sure thunk1 and thunk2 return the same"""
+		try: result1 = thunk1()
+		except KeyError, exc1: keyerror = 1
+		else: keyerror = 0
+
+		try: result2 = thunk2()
+		except KeyError, exc2:
+			assert keyerror, "Got KeyError vs " + str(result2)
+			return
+		else: assert not keyerror, "Got %s vs KeyError" % (str(result1),)
+
+		assert result1 == result2, (result1, result2)
+
+	def test_uid2uname(self):
+		"""Test getting unames by uid"""
+		for uid in (0, 500, 789, 0, 0, 500):
+			self.compare(lambda: tarfile.uid2uname(uid),
+						 lambda: pwd.getpwuid(uid)[0])
+
+	def test_gid2gname(self):
+		"""Test getting group names by gid"""
+		for gid in (0, 500, 789, 0, 0, 500):
+			self.compare(lambda: tarfile.gid2gname(gid),
+						 lambda: grp.getgrgid(gid)[0])
+
+	def test_gname2gid(self):
+		"""Test getting gids from gnames"""
+		for gname in ('root', 'ben', 'bin', 'sanothua', 'root', 'root'):
+			self.compare(lambda: tarfile.gname2gid(gname),
+						 lambda: grp.getgrnam(gname)[2])
+
+	def test_uname2uid(self):
+		"""Test getting uids from unames"""
+		for uname in ('root', 'ben', 'bin', 'sanothua', 'root', 'root'):
+			self.compare(lambda: tarfile.uname2uid(uname),
+						 lambda: pwd.getpwnam(uname)[2])
 
 
 if __name__ == "__main__":
