@@ -35,10 +35,6 @@ local_path = None
 # collection.
 archive_dir = None
 
-# If set, use this value as the current time in seconds instead of
-# reading from the clock.
-current_time = None
-
 # Restores will try to bring back the state as of the following time.
 # If it is None, default to current time.
 restore_time = None
@@ -84,3 +80,8 @@ short_filenames = 0
 # Used to confirm certain destructive operations like deleting old
 # files.
 force = None
+
+# If set, signifies time in seconds before which backup files should
+# be deleted.
+remove_time = None
+

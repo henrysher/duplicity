@@ -266,6 +266,14 @@ matters when using the ssh/scp backend.  See
 .B --scp-command
 for more information.
 .TP
+.BI "--remove-older-than " time
+Delete all backup sets older than the given time.  If old backup sets
+will not be deleted if backup sets newer than
+.I time
+depend on them.  See the 
+.B TIME FORMATS
+section for more information.
+.TP
 .BI -t time ", --restore-time " time
 When restoring, specify the time to restore to.
 .TP

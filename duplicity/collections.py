@@ -600,7 +600,7 @@ class CollectionsStatus:
 		return self.sort_sets(old_sets)
 
 	def get_older_than_required(self, t):
-		"""Returns list of times of old backup sets required by new sets
+		"""Returns list of old backup sets required by new sets
 
 		This function is similar to the previous one, but it only
 		returns the times of sets which are old but part of the chains

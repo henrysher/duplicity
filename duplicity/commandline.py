@@ -31,7 +31,7 @@ cleanup = None # Set to true if --cleanup option given
 def parse_cmdline_options(arglist):
 	"""Parse argument list"""
 	global select_opts, select_files, full_backup
-	global list_current, collection_status, cleanup
+	global list_current, collection_status, cleanup, remove_time
 	def sel_fl(filename):
 		"""Helper function for including/excluding filelists below"""
 		try: return open(filename, "r")
@@ -47,9 +47,9 @@ def parse_cmdline_options(arglist):
 		  "include=", "include-filelist=", "include-filelist-stdin",
 		  "include-globbing-filelist=", "include-regexp=",
 		  "list-current-files", "no-print-statistics",
-		  "null-separator", "restore-dir=", "restore-time=",
-		  "scp-command=", "short-filenames", "sign-key=",
-		  "ssh-command=", "verbosity="])
+		  "null-separator", "remove-older-than=", "restore-dir=",
+		  "restore-time=", "scp-command=", "short-filenames",
+		  "sign-key=", "ssh-command=", "verbosity="])
 	except getopt.error, e:
 		command_line_error("%s" % (str(e),))
 
@@ -59,7 +59,7 @@ def parse_cmdline_options(arglist):
 		elif opt == "--cleanup": cleanup = 1
 		elif opt == "--collection-status": collection_status = 1
 		elif opt == "--current-time":
-			globals.current_time = get_int(arg, "current-time")
+			dup_time.setcurtime(get_int(arg, "current-time"))
 		elif opt == "--encrypt-key":
 			globals.gpg_profile.recipients.append(arg)
 		elif (opt == "--exclude" or opt == "--exclude-regexp" or
@@ -87,6 +87,8 @@ def parse_cmdline_options(arglist):
 		elif opt == "--null-separator": globals.null_separator = 1
 		elif opt == "-r" or opt == "--file-to-restore":
 			globals.restore_dir = arg
+		elif opt == "--remove-older-than":
+			globals.remove_time = dup_time.genstrtotime(arg)
 		elif opt == "-t" or opt == "--restore-time":
 			globals.restore_time = dup_time.genstrtotime(arg)
 		elif opt == "--scp-command": backends.scp_command = arg
@@ -175,15 +177,16 @@ def process_local_dir(action, local_pathname):
 def check_consistency(action):
 	"""Final consistency check, see if something wrong with command line"""
 	global full_backup, select_opts, list_current
-	if action == "list-current":
-		assert not cleanup, "Cannot use --cleanup in list-current mode"
-		assert not collection_status, "Cannot use --collection-status here"
-	elif action == "collection-status":
-		assert not cleanup, "Cannot use --cleanup in collection-status mode"
-		assert not list_current, "Cannot use --list-current in this mode"
-	elif action == "cleanup":
-		assert not list_current, "Cannot use --list-current in this mode"
-		assert not collection_status, "Cannot use --collection-status here"
+	def assert_only_one(arglist):
+		"""Raises error if two or more of the elements of arglist are true"""
+		n = 0
+		for m in arglist:
+			if m: n+=1
+		assert n <= 1, "Invalid syntax, two conflicting modes specified"
+	if action in ["list-current", "collection-status",
+				  "cleanup", "remove-old"]:
+		assert_only_one([list_current, collection_status, cleanup,
+						 globals.remove_time is not None])
 	elif action == "restore":
 		if full_backup:
 			command_line_error("--full option cannot be used when restoring")
@@ -206,7 +209,6 @@ def ProcessCommandLine(cmdline_list):
 	action will be "list-current", "restore", "full", or "inc".
 
 	"""
-	global full_backup, list_current, collection_status
 	globals.gpg_profile = gpg.GPGProfile()
 
 	args = parse_cmdline_options(cmdline_list)
@@ -215,6 +217,7 @@ def ProcessCommandLine(cmdline_list):
 		if list_current: action = "list-current"
 		elif collection_status: action = "collection-status"
 		elif cleanup: action = "cleanup"
+		elif globals.remove_time is not None: action = "remove-old"
 		else: command_line_error("Too few arguments")
 		globals.backend = backends.get_backend(args[0])
 		if not globals.backend: log.FatalError("""Bad URL '%s'.

@@ -228,12 +228,50 @@ def cleanup(col_stats):
 
 	filestr = "\n".join(extraneous)
 	if globals.force:
-		log.Log("Deleting these files from backend:\n"+filestr, 3)
+		if len(extraneous) > 1:
+			log.Log("Deleting these files from backend:\n"+filestr, 3)
+		else: log.Log("Deleting this file from backend:\n"+filestr, 3)
 		col_stats.backend.delete(extraneous)
 	else:
-		log.Warn("Found the following files to delete:\n%s\n"
-			"Run duplicity again with the --force option to actually delete."
-				 % filestr)
+		if len(extraneous) > 1:
+			log.Warn("Found the following files to delete:")
+		else: log.Warn("Found the following file to delete:")
+		log.Warn(filestr + "\nRun duplicity again with the --force "
+				 "option to actually delete.")
+
+
+def remove_old(col_stats):
+	"""Remove backup files older than globals.remove_time from backend"""
+	assert globals.remove_time is not None
+	def set_times_str(setlist):
+		"""Return string listing times of sets in setlist"""
+		return "\n".join(map(lambda s: dup_time.timetopretty(s.get_time()),
+							 setlist))
+
+	req_list = col_stats.get_older_than_required(globals.remove_time)
+	if req_list:
+		log.Warn("There are backup set(s) at time(s):\n%s\nWhich can't be "
+				 "deleted because newer sets depend on them." %
+				 set_times_str(req_list))
+
+	setlist = col_stats.get_older_than(globals.remove_time)
+	if not setlist:
+		log.Warn("No old backup sets found, nothing deleted.")
+		return
+	if globals.force:
+		if len(setlist) > 1:
+			log.Log("Deleting backup sets at times:\n" +
+					set_times_str(setlist), 3)
+		else: log.Log("Deleting backup set at times:\n" +
+					  set_times_str(setlist), 3)
+		setlist.reverse() # save oldest for last
+		for set in setlist: set.delete()
+	else:
+		if len(setlist) > 1:
+			log.Warn("Found old backup sets at the following times:")
+		else: log.Warn("Found old backup set at the following time:")
+		log.Warn(set_times_str(setlist) + 
+				 "\nRerun command with --force option to actually delete.")
 
 
 def check_last_manifest(col_stats):
@@ -244,8 +282,8 @@ def check_last_manifest(col_stats):
 
 def main():
 	"""Start/end here"""
+	dup_time.setcurtime()
 	action = commandline.ProcessCommandLine(sys.argv[1:])
-	dup_time.setcurtime(globals.current_time)
 	col_stats = collections.CollectionsStatus(globals.backend,
 											  globals.archive_dir).set_values()
 	log.Log("Collection Status\n-----------------\n" + str(col_stats), 8)
@@ -256,6 +294,7 @@ def main():
 	elif action == "list-current": list_current(col_stats)
 	elif action == "collection-status": print str(col_stats)
 	elif action == "cleanup": cleanup(col_stats)
+	elif action == "remove-old": remove_old(col_stats)
 	else:
 		assert action == "inc" or action == "full", action
 		check_last_manifest(col_stats)
