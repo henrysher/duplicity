@@ -143,7 +143,7 @@ def copyfileobj(infp, outfp, byte_count = -1):
 	byte_count if find eof.  Does not close either fileobj.
 
 	"""
-	blocksize = 32 * 1024
+	blocksize = 64 * 1024
 	bytes_written = 0
 	if byte_count < 0:
 		while 1:

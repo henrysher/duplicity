@@ -120,6 +120,10 @@ class ROPath:
 		if self.index: return "/".join(self.index)
 		else: return "."
 
+	def getperms(self):
+		"""Return permissions mode"""
+		return self.mode
+
 	def open(self, mode):
 		"""Return fileobj associated with self"""
 		assert mode == "rb" and self.fileobj and not self.opened, \
@@ -179,6 +183,7 @@ class ROPath:
 		new_ropath.type, new_ropath.mode = self.type, self.mode
 		if self.issym(): new_ropath.symtext = self.symtext
 		elif self.isdev(): new_ropath.devnums = self.devnums
+		if self.exists(): new_ropath.stat = self.stat
 		return new_ropath
 
 	def get_tarinfo(self):
@@ -424,6 +429,11 @@ class Path(ROPath):
 		"""Like rename but destination may be on different file system"""
 		self.copy(new_path)
 		self.delete()
+
+	def chmod(self, mode):
+		"""Change permissions of the path"""
+		os.chmod(self.name, mode)
+		self.setdata()
 
 	def patch_with_attribs(self, diff_ropath):
 		"""Patch self with diff and then copy attributes over"""

@@ -3,9 +3,9 @@ sys.path.insert(0, "../duplicity")
 import path, backends
 
 # This can be changed to select the URL to use
-#backend_url = "file://testfiles/output"
+backend_url = "file://testfiles/output"
 #backend_url = "ftp://Stan Ford@90-92L-imac.stanford.edu/Macintosh HD/temp"
-backend_url = "scp://localhost//home/ben/prog/python/duplicity/testing/testfiles/output"
+#backend_url = "scp://localhost//home/ben/prog/python/duplicity/testing/testfiles/output"
 
 # Extra arguments to be passed to duplicity
 other_args = []
@@ -17,7 +17,7 @@ class FinalTest(unittest.TestCase):
 	def run_duplicity(self, arglist, options = [], current_time = None):
 		"""Run duplicity binary with given arguments and options"""
 		cmd_list = ["../duplicity-bin"]
-		cmd_list.extend(options + ["-v5", "--allow-source-mismatch"])
+		cmd_list.extend(options + ["-v3", "--allow-source-mismatch"])
 		if current_time: cmd_list.append("--current-time %s" % (current_time,))
 		if other_args: cmd_list.extend(other_args)
 		cmd_list.extend(arglist)

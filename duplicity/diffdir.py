@@ -81,7 +81,7 @@ def delta_iter_error_handler(exc, new_path, sig_path, sig_tar = None):
 
 def get_delta_path(new_path, sig_path):
 	"""Get one delta_path, or None if error"""
-	delta_path = new_path.get_rorpath()
+	delta_path = new_path.get_ropath()
 	if not new_path.isreg():
 		delta_path.difftype = "snapshot"
 	elif not sig_path or not sig_path.isreg():
@@ -115,7 +115,7 @@ def get_delta_iter(new_iter, sig_iter):
 	instead of Paths.
 
 	"""
-	collated = collate_iters(new_iter, sig_iter)
+	collated = collate2iters(new_iter, sig_iter)
 	for new_path, sig_path in collated:
 		log.Log("Comparing %s and %s" % (new_path and new_path.index,
 										 sig_path and sig_path.index), 6)
@@ -155,7 +155,7 @@ def sigtar2path_iter(sigtarobj):
 		yield ropath
 	sigtarobj.close()
 
-def collate_iters(riter1, riter2):
+def collate2iters(riter1, riter2):
 	"""Collate two iterators.
 
 	The elements yielded by each iterator must be have an index
@@ -256,7 +256,7 @@ def get_combined_path_iter(sig_infp_list):
 
 def get_delta_iter_w_sig(path_iter, sig_path_iter, sig_fileobj):
 	"""Like get_delta_iter but also write signatures to sig_fileobj"""
-	collated = collate_iters(path_iter, sig_path_iter)
+	collated = collate2iters(path_iter, sig_path_iter)
 	sigTarFile = tarfile.TarFile("arbitrary", "w", sig_fileobj)
 	for new_path, sig_path in collated:
 		log.Log("Comparing %s and %s" % (new_path and new_path.index,
@@ -288,7 +288,7 @@ def get_delta_path_w_sig(new_path, sig_path, sigTarFile):
 	assert new_path
 	ti = new_path.get_tarinfo()
 	index = new_path.index
-	delta_path = new_path.get_rorpath()
+	delta_path = new_path.get_ropath()
 	log.Log("Getting delta of %s and %s" % (new_path, sig_path), 7)
 
 	def callback(sig_string):

@@ -19,8 +19,8 @@
 """Functions for patching of directories"""
 
 from __future__ import generators
-import re
-import tarfile, librsync, log, diffdir
+import re, tempfile
+import tarfile, librsync, log, diffdir, misc
 from path import *
 from lazy import *
 
@@ -51,7 +51,7 @@ def patch_diff_tarfile(base_path, diff_tarfile, restrict_index = ()):
 	diff_path_iter = difftar2path_iter(diff_tarfile)
 	if restrict_index:
 		diff_path_iter = filter_path_iter(diff_path_iter, restrict_index)
-	collated = diffdir.collate_iters(path_iter, diff_path_iter)
+	collated = diffdir.collate2iters(path_iter, diff_path_iter)
 
 	ITR = IterTreeReducer(PathPatcher, [base_path])
 	for basis_path, diff_ropath in collated:
@@ -102,7 +102,8 @@ def difftar2path_iter(diff_tarfile):
 		ropath = ROPath(index)
 		ropath.init_from_tarinfo(tarinfo_list[0])
 		ropath.difftype = difftype
-		if ropath.isreg():
+		if difftype == "deleted": ropath.type = None
+		elif ropath.isreg():
 			if multivol:
 				multivol_fileobj = Multivol_Filelike(diff_tarfile, tar_iter,
 													 tarinfo_list, index)
@@ -290,4 +291,209 @@ class TarFile_FromFileobjs:
 	def extractfile(self, tarinfo):
 		"""Return data associated with given tarinfo"""
 		return self.tarfile.extractfile(tarinfo)
+
+
+def collate_iters(iter_list):
+	"""Collate iterators by index
+
+	Input is a list of n iterators each of which must iterate elements
+	with an index attribute.  The elements must come out in increasing
+	order, and the index should be a tuple itself.
+
+	The output is an iterator which yields tuples where all elements
+	in the tuple have the same index, and the tuple has n elements in
+	it.  If any iterator lacks an element with that index, the tuple
+	will have None in that spot.
+
+	"""
+	# overflow[i] means that iter_list[i] has been exhausted
+	# elems[i] is None means that it is time to replenish it.
+	iter_num = len(iter_list)
+	if iter_num == 2:
+		return diffdir.collate2iters(iter_list[0], iter_list[1])
+	overflow = [None] * iter_num
+	elems = overflow[:]
+
+	def setrorps(overflow, elems):
+		"""Set the overflow and rorps list"""
+		for i in range(iter_num):
+			if not overflow[i] and elems[i] is None:
+				try: elems[i] = iter_list[i].next()
+				except StopIteration:
+					overflow[i] = 1
+					elems[i] = None
+
+	def getleastindex(elems):
+		"""Return the first index in elems, assuming elems isn't empty"""
+		return min(map(lambda elem: elem.index, filter(lambda x: x, elems)))
+
+	def yield_tuples(iter_num, overflow, elems):
+		while 1:
+			setrorps(overflow, elems)
+			if not None in overflow: break
+
+			index = getleastindex(elems)
+			yieldval = []
+			for i in range(iter_num):
+				if elems[i] and elems[i].index == index:
+					yieldval.append(elems[i])
+					elems[i] = None
+				else: yieldval.append(None)
+			yield tuple(yieldval)
+	return yield_tuples(iter_num, overflow, elems)
+
+class IndexedTuple:
+	"""Like a tuple, but has .index (used previously by collate_iters)"""
+	def __init__(self, index, sequence):
+		self.index = index
+		self.data = tuple(sequence)
+
+	def __len__(self): return len(self.data)
+
+	def __getitem__(self, key):
+		"""This only works for numerical keys (easier this way)"""
+		return self.data[key]
+
+	def __lt__(self, other): return self.__cmp__(other) == -1
+	def __le__(self, other): return self.__cmp__(other) != 1
+	def __ne__(self, other): return not self.__eq__(other)
+	def __gt__(self, other): return self.__cmp__(other) == 1
+	def __ge__(self, other): return self.__cmp__(other) != -1
+	
+	def __cmp__(self, other):
+		assert isinstance(other, IndexedTuple)
+		if self.index < other.index: return -1
+		elif self.index == other.index: return 0
+		else: return 1
+
+	def __eq__(self, other):
+		if isinstance(other, IndexedTuple):
+			return self.index == other.index and self.data == other.data
+		elif type(other) is types.TupleType:
+			return self.data == other
+		else: return None
+
+	def __str__(self):
+		return  "(%s).%s" % (", ".join(map(str, self.data)), self.index)
+
+def normalize_ps(patch_sequence):
+	"""Given an sequence of ROPath deltas, remove blank and unnecessary
+
+	The sequence is assumed to be in patch order (later patches apply
+	to earlier ones).  A patch is unnecessary if a later one doesn't
+	require it (for instance, any patches before a "delete" are
+	unnecessary).
+
+	"""
+	result_list = []
+	i = len(patch_sequence)-1
+	while i >= 0:
+		delta = patch_sequence[i]
+		if delta is not None: # skip blank entries
+			result_list.insert(0, delta)
+			if delta.difftype != "diff": break
+		i -= 1
+	return result_list
+
+def patch_seq2ropath(patch_seq):
+	"""Apply the patches in patch_seq, return single ropath"""
+	first = patch_seq[0]
+	assert first.difftype != "diff", patch_seq
+	if not first.isreg(): # No need to bother with data if not regular file
+		assert len(patch_seq) == 1, len(patch_seq)
+		return first.get_ropath()
+
+	current_file = first.open("rb")
+
+	for delta_ropath in patch_seq[1:]:
+		assert delta_ropath.difftype == "diff", delta_ropath.difftype
+		if not isinstance(current_file, file): # librsync needs true file
+			tempfp = tempfile.TemporaryFile()
+			misc.copyfileobj(current_file, tempfp)
+			assert not current_file.close()
+			tempfp.seek(0)
+			current_file = tempfp
+		current_file = librsync.PatchedFile(current_file,
+											delta_ropath.open("rb"))
+	result = patch_seq[-1].get_ropath()
+	result.setfileobj(current_file)
+	return result
+
+def integrate_patch_iters(iter_list):
+	"""Combine a list of iterators of ropath patches
+
+	The iter_list should be sorted in patch order, and the elements in
+	each iter_list need to be orderd by index.  The output will be an
+	iterator of the final ROPaths in index order.
+
+	"""
+	collated = collate_iters(iter_list)
+	for patch_seq in collated:
+		final_ropath = patch_seq2ropath(normalize_ps(patch_seq))
+		if final_ropath.exists(): # otherwise final patch was delete
+			yield final_ropath
+
+def tarfiles2rop_iter(tarfile_list, restrict_index = ()):
+	"""Integrate tarfiles of diffs into single ROPath iter
+
+	Then filter out all the diffs in that index which don't start with
+	the restrict_index.
+
+	"""
+	diff_iters = map(difftar2path_iter, tarfile_list)
+	if restrict_index: # Apply filter before integration
+		diff_iters = map(lambda i: filter_path_iter(i, restrict_index),
+						 diff_iters)
+	return integrate_patch_iters(diff_iters)
+
+def Write_ROPaths(base_path, rop_iter):
+	"""Write out ropaths in rop_iter starting at base_path"""
+	ITR = IterTreeReducer(ROPath_IterWriter, [base_path])
+	for ropath in rop_iter: ITR(ropath.index, ropath)
+	ITR.Finish()
+	base_path.setdata()
+
+class ROPath_IterWriter(ITRBranch):
+	"""Used in Write_ROPaths above
+
+	We need to use an ITR because we have to update the
+	permissions/times of directories after we write the files in them.
+
+	"""
+	def __init__(self, base_path):
+		"""Set base_path, Path of root of tree"""
+		self.base_path = base_path
+		self.dir_diff_ropath = None
+		self.dir_new_path = None
+
+	def start_process(self, index, ropath):
+		"""Write ropath.  Only handles the directory case"""
+		if not ropath.isdir(): # Base may not be a directory, but rest should
+			assert ropath.index == (), ropath.index
+			new_path = self.base_path.new_index(index)
+			if ropath.exists():
+				if new_path.exists(): new_path.deltree()
+				ropath.copy(new_path)
+
+		self.dir_new_path = self.base_path.new_index(index)
+		if self.dir_new_path.exists(): # base may exist, but nothing else
+			assert index == (), index
+		else: self.dir_new_path.mkdir()
+		self.dir_diff_ropath = ropath
+
+	def end_process(self):
+		"""Update information of a directory when leaving it"""
+		if self.dir_diff_ropath:
+			self.dir_diff_ropath.copy_attribs(self.dir_new_path)
+
+	def can_fast_process(self, index, ropath):
+		"""Can fast process (no recursion) if ropath isn't a directory"""
+		log.Log("Writing %s of type %s" %
+				(ropath.get_relative_path(), ropath.type), 5)
+		return not ropath.isdir()
+
+	def fast_process(self, index, ropath):
+		"""Write non-directory ropath to destination"""
+		if ropath.exists(): ropath.copy(self.base_path.new_index(index))
+
 
