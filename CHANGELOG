@@ -24,6 +24,12 @@ times and volume numbers.  This change is not backwards compatible but
 probably I'm the only one affected.  If not, let me know and I can
 probably write a little script.
 
+Improved the way files are packed into the volumes so less space is
+wasted per volume.
+
+Decreased default volume size to 5MB (from 50MB) in preparation for
+the new restore system planned for 0.4.0.
+
 
 New in v0.3.0 (2002/11/10)
 --------------------------

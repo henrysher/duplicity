@@ -81,14 +81,18 @@ class GPGTest(unittest.TestCase):
 	def test_GPGWriteFile(self):
 		"""Test GPGWriteFile"""
 		self.deltmp()
-		size = 250000
+		size = 400 * 1000
 		gwfh = GPGWriteFile_Helper()
 		profile = gpg.GPGProfile(passphrase = "foobar")
 		for i in range(10):
 			gpg.GPGWriteFile(gwfh, "testfiles/output/gpgwrite.gpg",
 							 profile, size = size)
-			#print os.stat("testfiles/output/gpgwrite.gpg").st_size - size
+			#print os.stat("testfiles/output/gpgwrite.gpg").st_size-size
 			assert size - 32 * 1024 <= os.stat("testfiles/output/gpgwrite.gpg").st_size <= size + 32 * 1024
+		gwfh.set_at_end()
+		gpg.GPGWriteFile(gwfh, "testfiles/output/gpgwrite.gpg",
+						 profile, size = size)
+		#print os.stat("testfiles/output/gpgwrite.gpg").st_size
 
 class GPGWriteHelper2:
 	def __init__(self, data): self.data = data
@@ -97,19 +101,24 @@ class GPGWriteFile_Helper:
 	"""Used in test_GPGWriteFile above"""
 	def __init__(self):
 		self.from_random_fp = open("/dev/urandom", "rb")
-		self.set_next_block()
+		self.at_end = 0
 
-	def set_next_block(self):
-		self.next_block_length = random.randrange(0, 40000)
-		block_data = self.from_random_fp.read(self.next_block_length)
-		self.next_block = GPGWriteHelper2(block_data)
+	def set_at_end(self):
+		"""Iterator stops when you call this"""
+		self.at_end = 1
 
-	def peek(self): return self.next_block
+	def get_buffer(self, size):
+		"""Return buffer of size size, consisting of half random data"""
+		s1 = size/2
+		s2 = size - s1
+		return "a"*s1 + self.from_random_fp.read(s2)
 
-	def next(self):
-		result = self.next_block
-		self.set_next_block()
-		return result
+	def next(self, size):
+		if self.at_end: raise StopIteration
+		if random.randrange(2): real_size = size
+		else: real_size = random.randrange(0, size)
+		block_data = self.get_buffer(real_size)
+		return GPGWriteHelper2(block_data)
 
 	def get_footer(self):
 		return "e" * random.randrange(0, 15000)

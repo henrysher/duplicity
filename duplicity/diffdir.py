@@ -30,10 +30,6 @@ import tarfile, librsync, log, statistics
 from path import *
 from lazy import *
 
-# Deltas will be broken up into volume_size chunks, so that an entire
-# delta doesn't have to be read into memory.
-volume_size = 1024 * 1024
-
 # A StatsObj will be written to this whenever DirDelta_WriteSig is
 # run.
 stats = None
@@ -356,21 +352,21 @@ class TarBlock:
 		self.data = data
 
 class TarBlockIter:
-	"""A bit like an iterator, yield tar blocks
+	"""A bit like an iterator, yield tar blocks given input iterator
 
-	We use this class because the process that writes the tar file in
-	blocks may need to know how big the next block is, and it is also
-	useful to know the index of the current file.
+	Unlike an iterator, however, control over the maximum size of a
+	tarblock is available by passing an argument to next().  Also the
+	get_footer() is available.
 
 	"""
 	def __init__(self, input_iter):
 		"""TarBlockIter initializer"""
 		self.input_iter = input_iter
-		self.next_value = None # holds next value if available
-		self.next_set = None # True iff next value is loaded
-		self.at_end = None
 		self.offset = 0l # total length of data read
 		self.process_waiting = None # process_continued has more blocks
+		self.previous_index = None # holds index of last block returned
+		self.remember_next = None # see remember_next_index()
+		self.remember_value = None
 
 		# We need to instantiate a dummy TarFile just to get access to
 		# some of the functions like _get_full_headers.
@@ -385,11 +381,12 @@ class TarBlockIter:
 		else: filler_data = ""
 		return TarBlock(index, "%s%s%s" % (headers, file_data, filler_data))
 
-	def process(self, val):
+	def process(self, val, size):
 		"""Turn next value of input_iter into a TarBlock"""
-		XXX # this should be subclassed
+		assert not self.process_waiting
+		XXX # this should be overridden in subclass
 
-	def process_continued(self):
+	def process_continued(self, size):
 		"""Get more tarblocks
 
 		If processing val above would produce more than one TarBlock,
@@ -397,36 +394,34 @@ class TarBlockIter:
 
 		"""
 		assert self.process_waiting
-		XXX # subclass this also
+		XXX # Override this too in subclass
 
-	def set_next(self):
-		"""Get value of next element"""
-		if self.process_waiting: self.next_value = self.process_continued()
-		else:
-			try: input = self.input_iter.next()
-			except StopIteration: self.at_end = 1
-			else: self.next_value = self.process(input)
-		self.next_set = 1
-
-	def next(self):
-		"""Return next value, update offset, and clear stored info"""
-		if not self.next_set: self.set_next()
-		if self.at_end: raise StopIteration
-		result = self.next_value
-		self.next_value, self.next_set = None, None
+	def next(self, size = 1024 * 1024):
+		"""Return next block, no bigger than size, and update offset"""
+		if self.process_waiting: result = self.process_continued(size)
+		else: # Below a StopIteration exception will just be passed upwards
+			result = self.process(self.input_iter.next(), size)
 		self.offset += len(result.data)
 		self.previous_index = result.index
+		if self.remember_next:
+			self.remember_value = result.index
+			self.remember_next = None
 		return result
 		
-	def peek(self):
-		"""Return next element without discarding, or None if at end"""
-		if not self.next_set: self.set_next()
-		if self.at_end: return None
-		else: return self.next_value
-		
 	def get_previous_index(self):
-		"""Return index of last TarBlock given by self.next()"""
+		"""Return index of last tarblock"""
+		assert self.previous_index is not None
 		return self.previous_index
+
+	def remember_next_index(self):
+		"""When called, remember the index of the next block iterated"""
+		self.remember_next = 1
+		self.remember_value = None
+
+	def recall_index(self):
+		"""Retrieve index remembered with remember_next_index"""
+		assert self.remember_value is not None
+		return self.remember_value
 
 	def get_footer(self):
 		"""Return closing string for tarfile, reset offset"""
@@ -438,8 +433,14 @@ class TarBlockIter:
 
 class SigTarBlockIter(TarBlockIter):
 	"""TarBlockIter that yields blocks of a signature tar from path_iter"""
-	def process(self, path):
-		"""Return associated signature TarBlock from path"""
+	def process(self, path, size):
+		"""Return associated signature TarBlock from path
+
+		Here size is just ignored --- let's hope a signature isn't too
+		big.  Also signatures are stored in multiple volumes so it
+		doesn't matter.
+
+		"""
 		ti = path.get_tarinfo()
 		if path.isreg():
 			sfp = librsync.SigFile(path.open("rb"))
@@ -456,12 +457,10 @@ class DeltaTarBlockIter(TarBlockIter):
 
 	Unlike SigTarBlockIter, the argument to __init__ is a
 	delta_path_iter, so the delta information has already been
-	calculated.  The blocks produced by this class should not have
-	data bigger than self.len_limit.
+	calculated.
 
 	"""
-	len_limit = 1024 * 1024
-	def process(self, delta_ropath):
+	def process(self, delta_ropath, size):
 		"""Get a tarblock from delta_ropath"""
 		def add_prefix(tarinfo, prefix):
 			"""Add prefix to the name of a tarinfo file"""
@@ -481,7 +480,8 @@ class DeltaTarBlockIter(TarBlockIter):
 			
 		# Now handle single volume block case
 		fp = delta_ropath.open("rb")
-		data, last_block = self.get_data_block(fp)
+		# Below the 512 is the usual length of a tar header
+		data, last_block = self.get_data_block(fp, size - 512)
 		if stats: stats.RawDeltaSize += len(data)
 		if last_block:
 			if delta_ropath.difftype == "snapshot": add_prefix(ti, "snapshot")
@@ -499,21 +499,21 @@ class DeltaTarBlockIter(TarBlockIter):
 		self.process_next_vol_number = 2
 		return self.tarinfo2tarblock(index, ti, data)
 
-	def get_data_block(self, fp):
+	def get_data_block(self, fp, max_size):
 		"""Return pair (next data block, boolean last data block)"""
-		buf = fp.read(self.len_limit)
-		if len(buf) < self.len_limit:
+		buf = fp.read(max_size)
+		if len(buf) < max_size:
 			if fp.close(): raise DiffDirException("Error closing file")
 			return (buf, 1)
 		else: return (buf, None)
 
-	def process_continued(self):
+	def process_continued(self, size):
 		"""Return next volume in multivol diff or snapshot"""
 		assert self.process_waiting
 		ropath = self.process_ropath
 		ti, index = ropath.get_tarinfo(), ropath.index
 		ti.name = "%s/%d" % (self.process_prefix, self.process_next_vol_number)
-		data, last_block = self.get_data_block(self.process_fp)
+		data, last_block = self.get_data_block(self.process_fp, size-512)
 		if last_block:
 			self.process_prefix = None
 			self.process_fp = None

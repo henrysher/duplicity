@@ -48,19 +48,19 @@ def write_multivol(backup_type, tarblock_iter, backend):
 
 	"""
 	mf = manifest.Manifest().set_dirinfo()
-	vol_num = 1; bytes_written = 0
-	while tarblock_iter.peek():
+	vol_num = 1; bytes_written = 0; at_end = 0
+	while not at_end:
 		# Create volume
-		start_index = tarblock_iter.peek().index
+		tarblock_iter.remember_next_index() # keep track of start index
 		dest_filename = file_naming.get(backup_type, vol_num, encrypted = 1)
 		tdp = dup_temp.new_tempduppath(file_naming.parse(dest_filename))
-		gpg.GPGWriteFile(tarblock_iter, tdp.name, globals.gpg_profile)
+		at_end = gpg.GPGWriteFile(tarblock_iter, tdp.name, globals.gpg_profile)
 		end_index = tarblock_iter.get_previous_index()
 		tdp.setdata()
 
 		# Add volume information to manifest
 		vi = manifest.VolumeInfo()
-		vi.set_info(vol_num, start_index, end_index)
+		vi.set_info(vol_num, tarblock_iter.recall_index(), end_index)
 		vi.set_hash("SHA1", gpg.get_hash("SHA1", tdp))
 		mf.add_volume_info(vi)
 

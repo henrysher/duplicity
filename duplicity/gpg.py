@@ -79,7 +79,6 @@ class GPGFile:
 		gnupg.passphrase = profile.passphrase
 		if profile.sign_key: gnupg.options.default_key = profile.sign_key
 
-
 		if encrypt:
 			if profile.recipients:
 				gnupg.options.recipients = profile.recipients
@@ -140,7 +139,7 @@ class GPGFile:
 
 
 def GPGWriteFile(block_iter, filename, profile,
-				 size = 50 * 1024 * 1024, max_footer_size = 16 * 1024):
+				 size = 5 * 1024 * 1024, max_footer_size = 16 * 1024):
 	"""Write GPG compressed file of given size
 
 	This function writes a gpg compressed file by reading from the
@@ -148,11 +147,16 @@ def GPGWriteFile(block_iter, filename, profile,
 	close to the size limit, it "tops off" the incoming data with
 	incompressible data, to try to hit the limit exactly.
 
-	block_iter should have methods .next(), which returns the next
-	block of data, and .peek(), which returns the next block without
-	deleting it.  Also .get_footer() returns a string to write at the
-	end of the input file.  The footer should have max length
-	max_footer_size.
+	block_iter should have methods .next(size), which returns the next
+	block of data, which should be at most size bytes long.  Also
+	.get_footer() returns a string to write at the end of the input
+	file.  The footer should have max length max_footer_size.
+
+	Because gpg uses compression, we don't assume that putting
+	bytes_in bytes into gpg will result in bytes_out = bytes_in out.
+	However, do assume that bytes_out <= bytes_in approximately.
+
+	Returns true if succeeded in writing until end of block_iter.
 
 	"""
 	logger_fp_list = [sys.stderr]
@@ -173,7 +177,7 @@ def GPGWriteFile(block_iter, filename, profile,
 		else: cmdlist = ['--symmetric']
 		p1 = gnupg.run(cmdlist, create_fhs=['stdin'],
 					   attach_fhs={'stdout': open(filename, "wb"),
-								   'logger': logger_fp})
+								   'logger': logger_fp_list[0]})
 		return (p1, p1.handles['stdin'])
 
 	def top_off(bytes, to_gpg_fp):
@@ -196,17 +200,26 @@ def GPGWriteFile(block_iter, filename, profile,
 		gpg_process.wait()
 		if logger_fp_list[0] is not sys.stderr: logger_fp_list[0].close()
 
-	target_size = size - 18 * 1024 # fudge factor, compensate for gpg buffering
-	check_size = target_size - max_footer_size
+	minimum_block_size = 128 * 1024 # don't bother requesting blocks smaller
+	target_size = size - 21 * 1024 # fudge factor, compensate for gpg buffering
+	data_size = target_size - max_footer_size
 	gpg_process, to_gpg_fp = start_gpg(filename, profile.passphrase)
-	while (block_iter.peek() and
-		   get_current_size() + len(block_iter.peek().data) <= check_size):
-		to_gpg_fp.write(block_iter.next().data)
+	at_end_of_blockiter = 0
+	while 1:
+		bytes_to_go = data_size - get_current_size()
+		if bytes_to_go < minimum_block_size: break
+		try: data = block_iter.next(bytes_to_go).data
+		except StopIteration:
+			at_end_of_blockiter = 1
+			break
+		to_gpg_fp.write(data)
+		
 	to_gpg_fp.write(block_iter.get_footer())
-	if block_iter.peek():
+	if not at_end_of_blockiter: # don't pad last volume
 		cursize = get_current_size()
 		if cursize < target_size: top_off(target_size - cursize, to_gpg_fp)
 	close_process(gpg_process, to_gpg_fp)
+	return at_end_of_blockiter
 
 
 def get_hash(hash, path, hex = 1):
