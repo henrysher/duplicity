@@ -1,46 +1,53 @@
+%define PYTHON_NAME %((rpm -q --quiet python2 && echo python2) || echo python)
+
 Version: $version
 Summary: Untrusted/encrypted backup using rsync algorithm
 Name: duplicity
-Release: 1
-URL: http://rdiff-backup.stanford.edu/duplicity
-Source: %{name}-%{version}.tar.gz
-Copyright: GPL
+Release: 0.fdr.1
+Epoch: 0
+URL: http://www.nongnu.org/duplicity/
+Source: http://savannah.nongnu.org/download/duplicity/%{name}-%{version}.tar.gz
+License: GPL
 Group: Applications/Archiving
-BuildRoot: %{_tmppath}/%{name}-root
-requires: librsync >= 0.9.5.1, python2 >= 2.2, gnupg >= 1.0.6
-BuildPrereq: python2-devel >= 2.2, librsync-devel >= 0.9.5.1
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+requires: librsync >= 0.9.6, %{PYTHON_NAME} >= 2.2, gnupg >= 1.0.6
+BuildPrereq: %{PYTHON_NAME}-devel >= 2.2, librsync-devel >= 0.9.6
 
 %description
 Duplicity incrementally backs up files and directory by encrypting
 tar-format volumes with GnuPG and uploading them to a remote (or
 local) file server.  In theory many remote backends are possible;
-right now only the local or ssh/scp backend is written.  Because
-duplicity uses librsync, the incremental archives are space efficient
-and only record the parts of files that have changed since the last
-backup.  Currently duplicity supports deleted files, full unix
-permissions, directories, symbolic links, fifos, etc., but not hard
-links.
+right now local, ssh/scp, ftp, and rsync backends are written.
+Because duplicity uses librsync, the incremental archives are space
+efficient and only record the parts of files that have changed since
+the last backup.  Currently duplicity supports deleted files, full
+unix permissions, directories, symbolic links, fifos, etc., but not
+hard links.
 
 %prep
-%setup
+%setup -q
 
 %build
-python2 setup.py build
+%{PYTHON_NAME} setup.py build
 
 %install
-python2 setup.py install --prefix=$RPM_BUILD_ROOT/usr
+%{PYTHON_NAME} setup.py install --prefix=$RPM_BUILD_ROOT/usr
+
 %clean
+[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-/usr/bin/rdiffdir
-/usr/bin/duplicity
+%{_bindir}/rdiffdir
+%{_bindir}/duplicity
 /usr/share/doc/duplicity-%{version}
-/usr/share/man/man1
-/usr/lib
+%{_mandir}/man1/*
+%{_libdir}/
 
 
 %changelog
+* Sat Aug 09 2003 Ben Escoto <bescoto@stanford.edu>
+- Repackaging for Fedora, autodetect python version
 * Sun Aug 30 2002 Ben Escoto <bescoto@stanford.edu>
 - Initial RPM
 

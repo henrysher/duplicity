@@ -73,7 +73,8 @@ class ROPath:
 		self.mode = stat.S_IMODE(st_mode)
 		# The following can be replaced with major(), minor() macros
 		# in later versions of python (>= 2.3 I think)
-		self.devnums = (self.stat.st_rdev >> 8, self.stat.st_rdev & 0xff)
+		if self.type in ("chr", "blk"):
+			self.devnums = (self.stat.st_rdev >> 8, self.stat.st_rdev & 0xff)
 		
 	def blank(self):
 		"""Black out self - set type and stat to None"""
@@ -232,12 +233,11 @@ class ROPath:
 			try: ti.uname = pwd.getpwuid(ti.uid)[0]
 			except KeyError: pass
 			try: ti.gname = grp.getgrgid(ti.gid)[0]
-			except KeyError: pass			
+			except KeyError: pass
 
 			if ti.type in (tarfile.CHRTYPE, tarfile.BLKTYPE):
 				if hasattr(os, "major") and hasattr(os, "minor"):
-					ti.devmajor = os.major(self.stat.st_rdev)
-					ti.devminor = os.minor(self.stat.st_rdev)
+					ti.devmajor, ti.devminor = self.devnums
 		else:
 			# Currently we depend on an uninitiliazed tarinfo file to
 			# already have appropriate headers.  Still, might as well

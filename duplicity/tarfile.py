@@ -10,7 +10,7 @@
 # for further details on how to use tarfile.
 #
 #-------------------------------------------------------------------
-# Copyright (C) 2002 Lars Gustäbel <lars@gustaebel.de>
+# Copyright (C) 2002 Lars Gustabel <lars@gustaebel.de>
 # All rights reserved.
 #
 # Permission  is  hereby granted,  free  of charge,  to  any person
@@ -37,13 +37,13 @@
 """Read from and write to tar format archives.
 """
 
-__version__ = "$Revision: 1.3 $"
+__version__ = "$Revision: 1.4 $"
 # $Source: /sources/duplicity/duplicity/duplicity/tarfile.py,v $
 
 version     = "0.4.9"
-__author__  = "Lars Gustäbel (lars@gustaebel.de)"
-__date__    = "$Date: 2003/08/08 19:13:36 $"
-__cvsid__   = "$Id: tarfile.py,v 1.3 2003/08/08 19:13:36 bescoto Exp $"
+__author__  = "Lars Gustabel (lars@gustaebel.de)"
+__date__    = "$Date: 2003/08/10 01:05:17 $"
+__cvsid__   = "$Id: tarfile.py,v 1.4 2003/08/10 01:05:17 bescoto Exp $"
 __credits__ = "Gustavo Niemeyer for his support, " \
               "Detlef Lannert for some early contributions"
 
