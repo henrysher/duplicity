@@ -25,10 +25,12 @@ select_opts = [] # Will hold all the selection options
 select_files = [] # Will hold file objects when filelist given
 full_backup = None # Will be set to true if -f or --full option given
 list_current = None # Will be set to true if --list-current option given
+collection_status = None # Will be set to true if --collection-status given
 
 def parse_cmdline_options(arglist):
 	"""Parse argument list"""
-	global select_opts, select_files, full_backup, list_current
+	global select_opts, select_files, full_backup
+	global list_current, collection_status
 	def sel_fl(filename):
 		"""Helper function for including/excluding filelists below"""
 		try: return open(filename, "r")
@@ -36,22 +38,24 @@ def parse_cmdline_options(arglist):
 
 	try: optlist, args = getopt.getopt(arglist, "firt:v:V",
 		 ["allow-source-mismatch", "archive-dir=", "current-time=",
-		  "encrypt-key=", "exclude=", "exclude-device-files",
-		  "exclude-filelist=", "exclude-globbing-filelist",
-		  "exclude-filelist-stdin", "exclude-other-filesystems",
-		  "exclude-regexp=", "file-to-restore=", "full",
-		  "incremental", "include=", "include-filelist=",
-		  "include-filelist-stdin", "include-globbing-filelist=",
-		  "include-regexp=", "list-current-files",
-		  "no-print-statistics", "null-separator", "restore-dir=",
-		  "restore-time=", "scp-command=", "short-filenames",
-		  "sign-key=", "ssh-command=", "verbosity="])
+		  "collection-status", "encrypt-key=", "exclude=",
+		  "exclude-device-files", "exclude-filelist=",
+		  "exclude-globbing-filelist", "exclude-filelist-stdin",
+		  "exclude-other-filesystems", "exclude-regexp=",
+		  "file-to-restore=", "full", "incremental", "include=",
+		  "include-filelist=", "include-filelist-stdin",
+		  "include-globbing-filelist=", "include-regexp=",
+		  "list-current-files", "no-print-statistics",
+		  "null-separator", "restore-dir=", "restore-time=",
+		  "scp-command=", "short-filenames", "sign-key=",
+		  "ssh-command=", "verbosity="])
 	except getopt.error, e:
 		command_line_error("%s" % (str(e),))
 
 	for opt, arg in optlist:
 		if opt == "--allow-source-mismatch": globals.allow_source_mismatch = 1
 		elif opt == "--archive-dir": set_archive_dir(arg)
+		elif opt == "--collection-status": collection_status = 1
 		elif opt == "--current-time":
 			globals.current_time = get_int(arg, "current-time")
 		elif opt == "--encrypt-key":
@@ -168,8 +172,7 @@ def process_local_dir(action, local_pathname):
 def check_consistency(action):
 	"""Final consistency check, see if something wrong with command line"""
 	global full_backup, select_opts, list_current
-	if action == "list-current":
-		if not list_current: command_line_error("Too few arguments")
+	if action == "list-current" or action == "collection-status": pass
 	elif action == "restore":
 		if full_backup:
 			command_line_error("--full option cannot be used when restoring")
@@ -192,14 +195,15 @@ def ProcessCommandLine(cmdline_list):
 	action will be "list-current", "restore", "full", or "inc".
 
 	"""
-	global full_backup
+	global full_backup, list_current, collection_status
 	globals.gpg_profile = gpg.GPGProfile()
 
 	args = parse_cmdline_options(cmdline_list)
 	if len(args) < 1: command_line_error("Too few arguments")
 	elif len(args) == 1:
-		if not list_current: command_line_error("Too few arguments")
-		action = "list-current"
+		if list_current: action = "list-current"
+		elif collection_status: action = "collection-status"
+		else: command_line_error("Too few arguments")
 		globals.backend = backends.get_backend(args[0])
 		if not globals.backend: log.FatalError("""Bad URL '%s'.
 Examples of URL strings are "scp://user@host.net:1234/path" and
@@ -216,4 +220,5 @@ Examples of URL strings are "scp://user@host.net:1234/path" and
 	elif len(args) > 2: command_line_error("Too many arguments")
 
 	check_consistency(action)
+	log.Log("Main action: " + action, 7)
 	return action

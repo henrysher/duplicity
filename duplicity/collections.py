@@ -101,7 +101,7 @@ class BackupSet:
 		if self.remote_manifest_name:
 			filelist.append(self.remote_manifest_name)
 		filelist.extend(self.volume_name_dict.values())
-		return "\n".join(filelist)
+		return "[%s]" % ", ".join(filelist)
 
 	def get_timestr(self):
 		"""Return time string suitable for log statements"""
@@ -185,6 +185,15 @@ class BackupChain:
 		"""Return last BackupSet in chain"""
 		if self.incset_list: return self.incset_list[-1]
 		else: return self.fullset
+
+	def __str__(self):
+		"""Return string representation, for testing purposes"""
+		incset_str = "{%s}" % ", ".join(map(str, self.incset_list))
+		return ("BackupChain: Fullset: %s\n"
+				"             Incsetlist: %s\n"
+				"             Start Time: %s\n"
+				"             End Time: %s" % (self.fullset, incset_str,
+											   self.start_time, self.end_time))
 
 
 class SignatureChain:
@@ -297,7 +306,10 @@ class CollectionsStatus:
 			 "Orphaned sig names: %s" % (self.orphaned_sig_names,),
 			 "Orphaned backup sets: %s" % (self.orphaned_backup_sets,),
 			 "Incomplete backup sets: %s" % (self.incomplete_backup_sets,)]
-		return "\n".join(l)
+		part1 = "\n".join(l)
+		part2 = "\n----------------Backup Chains----------------------\n"
+		part3 = "\n------\n".join(map(str, self.all_backup_chains))
+		return part1+part2+part3
 
 	def set_values(self, sig_chain_warning = 1):
 		"""Set values from archive_dir and backend.

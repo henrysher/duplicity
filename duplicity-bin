@@ -233,6 +233,7 @@ def main():
 	globals.gpg_profile.passphrase = get_passphrase()
 	if action == "restore": restore(col_stats)
 	elif action == "list-current": list_current(col_stats)
+	elif action == "collection-status": print str(col_stats)
 	else:
 		assert action == "inc" or action == "full", action
 		check_last_manifest(col_stats)
