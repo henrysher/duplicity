@@ -1,0 +1,84 @@
+.TH RDIFFDIR 1 "AUGUST 2002" "Version 0.0" "User Manuals" \"  -*- nroff -*-
+.SH NAME
+rdiffdir \- compute and apply signatures and diffs to directories
+.SH SYNOPSIS
+.B rdiffdir
+.BI [ options ]
+.B sig[nature]
+.I basis_dir signature_file
+
+.B rdiffdir
+.BI [ options ]
+.B delta
+.I signature_file new_dir delta_file
+
+.B rdiffdir
+.BI [ options ]
+.B patch
+.I basis_dir delta_file
+
+.B rdiffdir
+.BI [ options ]
+.B tar
+.I basis_dir tar_file
+
+If
+.I signature_file
+or
+.I delta_file
+are "-", the data will be read from stdin or written to stdout as appropriate.
+
+.SH DESCRIPTION
+.B rdiffdir
+is supposed to be like rdiff, but can operate on directories.  See
+.BR rdiff (1)
+for more information.  The syntax is similar.
+
+.SH OPTIONS
+.TP
+.BI "--write-sig-to " sigfile
+This option is only used in
+.B delta
+and
+.B tar
+modes.  When specified, rdiffdir will write a signature of the
+directory it is processing to sigfile.  The end result will be a delta
+and a new signature calculated over the
+.B same
+data.
+
+.TP
+.B -z, --gzip-compress
+Enable gzip compression and decompression of signature and delta
+files.
+
+.SH SELECTION OPTIONS
+
+In
+.B signature
+and
+.B delta
+modes, rdiffdir accepts
+.BR rdiff-backup -like
+selection options including --exclude, --exclude-filelist-stdin, etc.
+See the
+.BR rdiff-backup (1)
+manual page for more information.
+
+.SH BUGS
+Hard links currently unsupported (they will be treated as non-linked
+regular files).
+
+Bad signatures will be treated as empty instead of logging appropriate
+error message.
+
+.SH AUTHOR
+Ben Escoto <bescoto@stanford.edu>
+
+.SH SEE ALSO
+.BR duplicity (1),
+.BR python (1),
+.BR rdiff (1),
+.BR rdiff-backup (1).
+
+

@@ -1,0 +1,92 @@
+irdu-backup uses tarfile, written by Lars Gustäbel.  The following
+notice was included in the tarfile distribution:
+
+-----------------------------------------------------------------
+      tarfile    - python module for accessing TAR archives
+
+                   Lars Gustäbel <lars@gustaebel.de>
+-----------------------------------------------------------------
+
+
+Description
+-----------
+
+The tarfile module provides a set of functions for accessing  TAR
+format archives. Because  it is written  in pure Python,  it does
+not require any platform specific functions. GZIP  compressed TAR
+archives are seamlessly supported.
+
+
+Requirements
+------------
+
+tarfile needs at least Python version 2.2.
+(For a tarfile for Python 1.5.2 take a look on the webpage.)
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+IMPORTANT NOTE (*NIX only)
+--------------------------
+
+The addition of character and block devices is enabled by a C
+extension module (_tarfile.c), because Python does not yet
+provide the major() and minor() macros.
+Currently Linux and FreeBSD are implemented. If your OS is not
+supported, then please send me a patch.
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+Download
+--------
+
+You can download the newest version at URL:
+http://www.gustaebel.de/lars/tarfile/
+
+
+Installation
+------------
+
+1. extract the tarfile-x.x.x.tar.gz archive to a temporary folder
+2. type "python setup.py install"
+
+
+Contact
+-------
+
+Suggestions, comments, bug reports and patches to:
+lars@gustaebel.de
+
+
+License
+-------
+
+Copyright (C) 2002 Lars Gustäbel <lars@gustaebel.de>
+All rights reserved.
+
+Permission  is  hereby granted,  free  of charge,  to  any person
+obtaining a  copy of  this software  and associated documentation
+files  (the  "Software"),  to   deal  in  the  Software   without
+restriction,  including  without limitation  the  rights to  use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies  of  the  Software,  and to  permit  persons  to  whom the
+Software  is  furnished  to  do  so,  subject  to  the  following
+conditions:
+
+The above copyright  notice and this  permission notice shall  be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS  IS", WITHOUT WARRANTY OF ANY  KIND,
+EXPRESS OR IMPLIED, INCLUDING  BUT NOT LIMITED TO  THE WARRANTIES
+OF  MERCHANTABILITY,  FITNESS   FOR  A  PARTICULAR   PURPOSE  AND
+NONINFRINGEMENT.  IN  NO  EVENT SHALL  THE  AUTHORS  OR COPYRIGHT
+HOLDERS  BE LIABLE  FOR ANY  CLAIM, DAMAGES  OR OTHER  LIABILITY,
+WHETHER  IN AN  ACTION OF  CONTRACT, TORT  OR OTHERWISE,  ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+
+README Version
+--------------
+
+$Id: tarfile-LICENSE,v 1.1 2002/10/29 01:49:46 bescoto Exp $

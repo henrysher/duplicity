@@ -1,0 +1,215 @@
+#!/usr/bin/env python
+# duplicity -- Encrypted bandwidth efficient backup
+# Version $version released September 29, 2002
+#
+# Copyright (C) 2002 Ben Escoto <bescoto@stanford.edu>
+#
+# This program is licensed under the GNU General Public License (GPL).
+# you can redistribute it and/or modify it under the terms of the GNU
+# General Public License as published by the Free Software Foundation,
+# Inc., 675 Mass Ave, Cambridge MA 02139, USA; either version 2 of the
+# License, or (at your option) any later version.  Distributions of
+# rdiff-backup should include a copy of the GPL in a file called
+# COPYING.  The GPL is also available online at
+# http://www.gnu.org/copyleft/gpl.html.
+#
+# See http://rdiff-backup.stanford.edu/duplicity for more information.
+# Please send mail to me or the mailing list if you find bugs or have
+# any suggestions.
+
+from __future__ import generators
+import getpass, gzip, os, sys, time, types
+from duplicity import collections, commandline, diffdir, dup_temp, \
+	 dup_time, file_naming, globals, gpg, log, manifest, patchdir, \
+	 path, robust
+
+def get_passphrase():
+	"""Get passphrase from environment or, failing that, from user"""
+	try: return os.environ['PASSPHRASE']
+	except KeyError:
+		log.Log("PASSPHRASE variable not set, asking user.", 5)
+		return getpass.getpass("GnuPG passphrase: ")
+
+def write_multivol(backup_type, tarblock_iter, backend):
+	"""Encrypt volumes of tarblock_iter and write to backend
+
+	backup_type should be "inc" or "full" and only matters here when
+	picking the filenames.  The path_prefix will determine the names
+	of the files written to backend.  Also writes manifest file.
+
+	"""
+	mf = manifest.Manifest().set_dirinfo()
+	vol_num = 1
+	while tarblock_iter.peek():
+		# Create volume
+		start_index = tarblock_iter.peek().index
+		dest_filename = file_naming.get(backup_type, vol_num, encrypted = 1)
+		tdp = dup_temp.new_tempduppath(file_naming.parse(dest_filename))
+		gpg.GPGWriteFile(tarblock_iter, tdp.name, globals.gpg_profile)
+		tdp.setdata()
+		end_index = tarblock_iter.get_previous_index()
+
+		# Add volume information to manifest
+		vi = manifest.VolumeInfo()
+		vi.set_info(vol_num, start_index, end_index)
+		vi.set_hash("SHA1", gpg.get_hash("SHA1", tdp))
+		mf.add_volume_info(vi)
+
+		backend.put(tdp, dest_filename)
+		tdp.delete()
+		vol_num += 1
+
+	write_manifest(mf, backup_type, backend)
+
+def write_manifest(mf, backup_type, backend):
+	"""Write manifest to file in archive_dir and encrypted to backend"""
+	mf_string = mf.to_string()
+	if globals.archive_dir:
+		local_mf_name = file_naming.get(backup_type, manifest = 1)
+		fin = dup_temp.get_fileobj_duppath(globals.archive_dir, local_mf_name)
+		fin.write(mf_string)
+		fin.close()
+
+	remote_mf_name = file_naming.get(backup_type, manifest = 1, encrypted = 1)
+	remote_fin = backend.get_fileobj_write(remote_mf_name)
+	remote_fin.write(mf_string)
+	remote_fin.close()
+
+def get_sig_fileobj(sig_type):
+	"""Return a fileobj opened for writing, save results as signature
+
+	If globals.archive_dir is available, save signatures there
+	gzipped.  Otherwise save them on the backend encrypted.
+
+	"""
+	assert sig_type == "full-sig" or sig_type == "new-sig"
+	if globals.archive_dir:
+		sig_filename = file_naming.get(sig_type, gzipped = 1)
+		return dup_temp.get_fileobj_duppath(globals.archive_dir, sig_filename)
+	else:
+		sig_filename = file_naming.get(sig_type, encrypted = 1)
+		return globals.backend.get_fileobj_write(sig_filename)
+
+def full_backup(col_stats):
+	"""Do full backup of directory to backend, using archive_dir"""
+	sig_outfp = get_sig_fileobj("full-sig")
+	tarblock_iter = diffdir.DirFull_WriteSig(globals.select, sig_outfp)
+	write_multivol("full", tarblock_iter, globals.backend)
+	sig_outfp.close()
+	col_stats.set_values(sig_chain_warning = None).cleanup_signatures()
+	
+def check_sig_chain(col_stats):
+	"""Get last signature chain for inc backup, or None if none available"""
+	if not col_stats.matched_chain_pair:
+		if globals.incremental:
+			log.FatalError(
+"""Fatal Error: Unable to start incremental backup.  Old signatures
+not found and --incremental specified""")
+		else: log.Warn("No signatures found, switching to full backup.")
+		return None
+	return col_stats.matched_chain_pair[0]
+
+def incremental_backup(sig_chain):
+	"""Do incremental backup of directory to backend, using archive_dir"""
+	dup_time.setprevtime(sig_chain.end_time)
+	new_sig_outfp = get_sig_fileobj("new-sig")
+	tarblock_iter = diffdir.DirDelta_WriteSig(globals.select,
+							  sig_chain.get_fileobjs(), new_sig_outfp)
+	write_multivol("inc", tarblock_iter, globals.backend)
+	new_sig_outfp.close()
+
+def restore(col_stats):
+	"""Restore archive in globals.backend to globals.local_path"""
+	if globals.restore_dir: index = tuple(globals.restore_dir.split("/"))
+	else: index = ()
+	target = globals.local_path
+	time = globals.restore_time or globals.current_time # default to now
+	backup_chain = col_stats.get_backup_chain_at_time(time)
+	assert backup_chain, col_stats.all_backup_chains
+	backup_setlist = backup_chain.get_sets_at_time(time)
+
+	for backup_set in backup_setlist:
+		log.Log("Patching from backup set at time " +
+				backup_set.get_timestr(), 4)
+		patchdir.Patch_from_iter(target,
+								 restore_fileobj_iter(backup_set, index),
+								 index)
+
+def restore_fileobj_iter(backup_set, index = ()):
+	"""Get file object iterator from backup_set contain given index"""
+	manifest = backup_set.get_manifest()
+	for vol_num in manifest.get_containing_volumes(index):
+		yield restore_get_enc_fileobj(backup_set.backend,
+									  backup_set.volume_name_dict[vol_num],
+									  manifest.volume_info_dict[vol_num])
+
+def restore_get_enc_fileobj(backend, filename, volume_info):
+	"""Return plaintext fileobj from encrypted filename on backend
+
+	If volume_info is set, the hash of the file will be checked,
+	assuming some hash is available.  Also, if globals.sign_key is
+	set, a fatal error will be raised if file not signed by sign_key.
+
+	"""
+	parseresults = file_naming.parse(filename)
+	tdp = dup_temp.new_tempduppath(parseresults)
+	backend.get(filename, tdp)
+	restore_check_hash(volume_info, tdp)
+	
+	fileobj = tdp.filtered_open_with_delete("rb")
+	if parseresults.encrypted and globals.gpg_profile.sign_key:
+		restore_add_sig_check(fileobj)
+	return fileobj
+
+def restore_check_hash(volume_info, vol_path):
+	"""Check the hash of vol_path path against data in volume_info"""
+	hash_pair = volume_info.get_best_hash()
+	if hash_pair:
+		calculated_hash = gpg.get_hash(hash_pair[0], vol_path)
+		if calculated_hash != hash_pair[1]:
+			log.FatalError("Invalid data - %s hash mismatch:\n"
+						   "Calculated hash: %s\n"
+						   "Manifest hash: %s\n" %
+						   (hash_pair[0], calculated_hash, hash_pair[1]))
+
+def restore_add_sig_check(fileobj):
+	"""Require signature when closing fileobj matches sig in gpg_profile"""
+	assert (isinstance(fileobj, dup_temp.FileobjHooked) and
+			isinstance(fileobj.fileobj, gpg.GPGFile)), fileobj
+	def check_signature():
+		"""Thunk run when closing volume file"""
+		actual_sig = fileobj.fileobj.get_signature()
+		if actual_sig != globals.gpg_profile.sign_key:
+			log.FatalError("Volume was not signed by key %s, not %s" %
+						   (actual_sig, globals.gpg_profile.sign_key))
+	fileobj.addhook(check_signature)
+
+def check_last_manifest(col_stats):
+	"""Check consistency and hostname/directory of last manifest"""
+	if not col_stats.all_backup_chains: return
+	last_backup_set = col_stats.all_backup_chains[-1].get_last()
+	last_backup_set.check_manifests()
+
+def main():
+	"""Start/end here"""
+	action = commandline.ProcessCommandLine(sys.argv[1:])
+	dup_time.setcurtime(globals.current_time)
+	col_stats = collections.CollectionsStatus(globals.backend,
+											  globals.archive_dir).set_values()
+	log.Log("Collection Status\n-----------------\n" + str(col_stats), 8)
+
+	os.umask(077)
+	globals.gpg_profile.passphrase = get_passphrase()
+	if action == "restore": restore(col_stats)
+	else:
+		assert action == "inc" or action == "full", action
+		check_last_manifest(col_stats)
+		if action == "full": full_backup(col_stats)
+		else:
+			sig_chain = check_sig_chain(col_stats)
+			if not sig_chain: full_backup(col_stats)
+			else: incremental_backup(sig_chain)
+	dup_temp.cleanup()
+
+
+if __name__ == "__main__": main()

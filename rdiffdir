@@ -1,0 +1,173 @@
+#!/usr/bin/env python
+# rdiffdir -- Extend rdiff functionality to directories
+# Version $version released June 30, 2002
+#
+# Copyright (C) 2002 Ben Escoto <bescoto@stanford.edu>
+#
+# This program is licensed under the GNU General Public License (GPL).
+# you can redistribute it and/or modify it under the terms of the GNU
+# General Public License as published by the Free Software Foundation,
+# Inc., 675 Mass Ave, Cambridge MA 02139, USA; either version 2 of the
+# License, or (at your option) any later version.  Distributions of
+# rdiff-backup should include a copy of the GPL in a file called
+# COPYING.  The GPL is also available online at
+# http://www.gnu.org/copyleft/gpl.html.
+#
+# See http://rdiff-backup.stanford.edu/duplicity for more information.
+# Please send mail to me or the mailing list if you find bugs or have
+# any suggestions.
+
+import sys, getopt, gzip, os
+from duplicity import diffdir, patchdir, log, tarfile, globals, selection, path
+
+# If set, compress diff and delta files using gzip
+gzip_compress = None
+
+# If set, when computing delta, also compute signature and write to
+# specified file.
+sig_fileobj = None
+
+# Add selection argument tuples to this
+select_opts = []
+
+def parse_cmdline_options(arglist):
+	"""Parse argument list"""
+	global gzip_compress, select_opts, sig_fileobj
+	try: optlist, args = getopt.getopt(arglist, "v:Vz",
+		 ["gzip-compress", "exclude=", "exclude-device-files",
+		  "exclude-filelist=", "exclude-filelist-stdin",
+		  "exclude-other-filesystems", "exclude-regexp=", "include=",
+		  "include-filelist=", "include-filelist-stdin",
+		  "include-regexp=", "null-separator", "verbosity=",
+		  "write-sig-to="])
+	except getopt.error, e:
+		command_line_error("Bad command line option: %s" % (str(e),))
+
+	for opt, arg in optlist:
+		if opt == "--gzip_compress" or opt == "-z": gzip_compress = 1
+		elif (opt == "--exclude" or opt == "--exclude-regexp" or
+			  opt == "--include" or opt == "--include-regexp"):
+			select_opts.append((opt, arg))
+		elif (opt == "--exclude-device-files" or
+			  opt == "--exclude-other-filesystems"):
+			select_opts.append((opt, None))
+		elif opt == "--exclude-filelist" or opt == "--include-filelist":
+			select_opts.append((opt, (arg, open(arg, "rb"))))
+		elif (opt == "--exclude-filelist-stdin" or
+			  opt == "--include-filelist-stdin"):
+			select_opts.append((opt, ("stdin", sys.stdin)))
+		elif opt == "--null-separator": globals.null_separator = 1
+		elif opt == "-V":
+			print "rdiffdir", str(globals.version)
+			sys.exit(0)
+		elif opt == "-v" or opt == "--verbosity": log.setverbosity(int(arg))
+		elif opt == "--write-sig-to" or opt == "--write-signature-to":
+			sig_fileobj = get_fileobj(arg, "wb")
+		else: command_line_error("Unknown option %s" % opt)
+
+	return args
+
+def command_line_error(message):
+	"""Indicate a command line error and exit"""
+	sys.stderr.write("Error: %s\n" % (message,))
+	sys.stderr.write("See the rdiffdir manual page for instructions\n")
+	sys.exit(1)
+
+def check_does_not_exist(filename):
+	"""Exit with error message if filename already exists"""
+	try: os.lstat(filename)
+	except OSError: pass
+	else: log.FatalError("File %s already exists, will not "
+						 "overwrite." % filename)
+
+def get_action(args):
+	"""Figure out the main action from the arguments"""
+	def require_args(num):
+		if len(args)-1 < num: command_line_error("Too few arguments")
+		elif len(args)-1 > num: command_line_error("Too many arguments")
+
+	if not args: command_line_error("No arguments found")
+	command = args[0]
+	if command == "sig" or command == "signature":
+		require_args(2)
+		command = "sig"
+	elif command == "tar": require_args(2)
+	elif command == "delta": require_args(3)
+	elif command == "patch": require_args(2)
+	return command, args[1:]
+
+def get_selection(filename):
+	"""Return selection iter starting at path with arguments applied"""
+	sel = selection.Select(path.Path(filename))
+	sel.ParseArgs(select_opts)
+	return sel.set_iter()
+
+def get_fileobj(filename, mode):
+	"""Get file object or stdin/stdout from filename"""
+	if mode == "r" or mode == "rb":
+		if filename == "-": fp = sys.stdin
+		else: fp = open(filename, mode)
+	elif mode == "w" or mode == "wb":
+		if filename == "-": fp = sys.stdout
+		else:
+			check_does_not_exist(filename)
+			fp = open(filename, mode)
+	else: assert 0, "Unknown mode " + str(mode)
+
+	if gzip_compress: return gzip.GzipFile(None, fp.mode, 9, fp)
+	else: return fp
+
+def write_sig(dirname, outfp):
+	"""Write signature of dirname into file object outfp"""
+	diffdir.write_block_iter(diffdir.DirSig(get_selection(dirname)), outfp)
+
+def write_delta(dirname, sig_infp, outfp):
+	"""Write delta to fileobj outfp, reading from dirname and sig_infp"""
+	delta_iter = diffdir.DirDelta(get_selection(dirname), sig_infp)
+	diffdir.write_block_iter(delta_iter, outfp)
+	assert not outfp.close()
+
+def write_delta_and_sig(filename, sig_infp, delta_outfp, sig_outfp):
+	"""Write delta and also signature of filename"""
+	sel = get_selection(filename)
+	delta_iter = diffdir.DirDelta_WriteSig(sel, sig_infp, sig_outfp)
+	diffdir.write_block_iter(delta_iter, outfp)
+	assert not sig_outfp.close()
+
+def patch(dirname, deltafp):
+	"""Patch dirname, reading delta tar from deltafp"""
+	patchdir.Patch(path.Path(dirname), deltafp)
+
+def write_tar(dirname, outfp):
+	"""Store dirname into a tarfile, write to outfp"""
+	diffdir.write_block_iter(diffdir.DirFull(get_selection(filename)), outfp)
+
+def write_tar_and_sig(dirname, outfp, sig_outfp):
+	"""Write tar of dirname to outfp, signature of same to sig_outfp"""
+	full_iter = diffdir.DirFull_WriteSig(get_selection(filename), sig_outfp)
+	diffdir.write_block_iter(full_iter, outfp)
+
+
+def main():
+	"""Start here"""
+	args = parse_cmdline_options(sys.argv[1:])
+	action, file_args = get_action(args)
+	if action == "sig":
+		write_sig(file_args[0], get_fileobj(file_args[1], "wb"))
+	elif action == "delta":
+		sig_infp = get_fileobj(file_args[0], "rb")
+		delta_outfp = get_fileobj(file_args[2], "wb")
+		if sig_fileobj: write_delta_and_sig(file_args[1], sig_infp,
+											delta_outfp, sig_fileobj)
+		else: write_delta(file_args[1], sig_infp, delta_outfp)
+	elif action == "patch":
+		patch(file_args[0], get_fileobj(file_args[1], "rb"))
+	elif action == "tar":
+		if sig_fileobj: write_tar_and_sig(file_args[0],
+										  get_fileobj(file_args[1], "wb"),
+										  sig_fileobj)
+		else: write_tar(file_args[0], get_fileobj(file_args[1], "wb"))
+	else: command_line_error("Bad command " + action)
+
+
+if __name__ == "__main__": main()
