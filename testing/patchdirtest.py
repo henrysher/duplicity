@@ -1,6 +1,6 @@
 from __future__ import generators
 import sys, StringIO
-sys.path.insert(0, "../src")
+sys.path.insert(0, "../duplicity")
 import os, unittest
 import diffdir, patchdir, log, selection, tarfile
 from path import *

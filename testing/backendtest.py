@@ -1,5 +1,5 @@
 import sys, unittest, os
-sys.path.insert(0, "../src")
+sys.path.insert(0, "../duplicity")
 import backends, path, log, file_naming, dup_time, globals, gpg
 
 log.setverbosity(7)

@@ -1,6 +1,6 @@
 from __future__ import generators
 import re, StringIO, unittest, sys
-sys.path.insert(0, "../src")
+sys.path.insert(0, "../duplicity")
 import log
 from selection import *
 from lazy import *

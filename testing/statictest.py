@@ -1,5 +1,5 @@
 import unittest, types, sys
-sys.path.insert(0, "../src")
+sys.path.insert(0, "../duplicity")
 from static import *
 
 

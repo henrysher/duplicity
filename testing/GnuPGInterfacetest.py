@@ -28,12 +28,12 @@ import os
 import tempfile
 import sys
 
-sys.path.insert(0, "../src")
+sys.path.insert(0, "../duplicity")
 import GnuPGInterface
 
 __author__   = "Frank J. Tobin, ftobin@neverending.org"
 __version__  = "0.2.2"
-__revision__ = "$Id: GnuPGInterfacetest.py,v 1.1 2002/10/29 01:49:47 bescoto Exp $"
+__revision__ = "$Id: GnuPGInterfacetest.py,v 1.2 2002/11/02 20:35:00 bescoto Exp $"
 
 class BasicTest(unittest.TestCase):
     """an initializer superclass"""

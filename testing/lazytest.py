@@ -1,6 +1,6 @@
 from __future__ import generators
 import unittest, pickle, sys
-sys.path.insert(0, "../src")
+sys.path.insert(0, "../duplicity")
 from lazy import *
 
 class Iterators(unittest.TestCase):

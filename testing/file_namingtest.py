@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, "../src")
+sys.path.insert(0, "../duplicity")
 import unittest
 import dup_time, file_naming, log
 

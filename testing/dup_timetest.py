@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, "../src")
+sys.path.insert(0, "../duplicity")
 import unittest, time, types
 import globals, dup_time
 

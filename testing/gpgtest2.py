@@ -1,5 +1,5 @@
 import sys, os, time
-sys.path.insert(0, "../src")
+sys.path.insert(0, "../duplicity")
 
 import GnuPGInterface, thread
 

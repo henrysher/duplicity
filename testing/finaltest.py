@@ -1,5 +1,5 @@
 import sys, os, unittest
-sys.path.insert(0, "../src")
+sys.path.insert(0, "../duplicity")
 import path
 
 class FinalTest(unittest.TestCase):

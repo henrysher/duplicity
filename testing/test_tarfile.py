@@ -1,6 +1,6 @@
 # unittest for the tarfile module
 #
-# $Id: test_tarfile.py,v 1.1 2002/10/29 01:49:47 bescoto Exp $
+# $Id: test_tarfile.py,v 1.2 2002/11/02 20:35:00 bescoto Exp $
 
 from __future__ import generators
 import sys
@@ -11,7 +11,7 @@ import tempfile
 
 import unittest
 import stat
-sys.path.insert(0, "../src")
+sys.path.insert(0, "../duplicity")
 import tarfile
 
 SAMPLETAR = "testtar.tar"

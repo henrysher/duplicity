@@ -1,5 +1,5 @@
 import sys, unittest, types
-sys.path.insert(0, "../src")
+sys.path.insert(0, "../duplicity")
 import manifest, globals, path
 
 class VolumeInfoTest(unittest.TestCase):

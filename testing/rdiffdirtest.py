@@ -1,5 +1,5 @@
 import sys, unittest, os
-sys.path.insert(0, "../src")
+sys.path.insert(0, "../duplicity")
 import path
 
 class RdiffdirTest(unittest.TestCase):

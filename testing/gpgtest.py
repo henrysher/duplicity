@@ -1,6 +1,6 @@
 from __future__ import generators
 import sys
-sys.path.insert(0, "../src")
+sys.path.insert(0, "../duplicity")
 import os, unittest, cStringIO, random
 import gpg, path
 

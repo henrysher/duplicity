@@ -1,0 +1,31 @@
+CVS README - Notes for people checking out of CVS
+-------------------------------------------------
+
+Getting duplicity to run:
+-------------------------
+
+If you want to run a version of duplicity checked out of CVS into your
+$DUP_ROOT directory, change to $DUP_ROOT/duplicity and run the
+./compilec.py file.  With any luck, a _librsync.so library will appear
+in that directory.  Then run duplicity-bin, making sure that all the
+files are in your PYTHONPATH:
+
+PYTHONPATH=$DUP_ROOT duplicity-bin
+
+or
+
+PYTHONPATH=$DUP_ROOT rdiffdir
+
+
+Running the unit tests:
+-----------------------
+
+If you want to try some of tests, you first have to untar the
+testfiles.tar.gz as root (the tarball contains device files, files
+with various uid/gid, etc):
+
+cd testing; tar -xvzf testfiles.tar.gz
+
+Then run the various *test.py files, for instance:
+
+cd testing; python lazytest.py

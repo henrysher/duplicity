@@ -6,7 +6,7 @@ would cause a memory leak.
 """
 
 import sys, gzip, os, random
-sys.path.insert(0, "../src")
+sys.path.insert(0, "../duplicity")
 import tarfile
 
 def main():

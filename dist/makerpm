@@ -2,7 +2,7 @@
 
 import os, sys, re
 
-SourceDir = "src"
+SourceDir = "duplicity"
 
 if len(sys.argv) == 2:
 	version = sys.argv[1]
