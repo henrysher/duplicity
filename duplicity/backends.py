@@ -301,9 +301,12 @@ class scpBackend(Backend):
 		"""Runs ssh rm to delete files.  Files must not require quoting"""
 		assert len(filename_list) > 0
 		pathlist = map(lambda fn: self.remote_prefix + fn, filename_list)
-		commandline = ("%s %s rm %s" %
-					   (ssh_command, self.host_string, " ".join(pathlist)))
-		self.run_command(commandline)
+		del_prefix = "%s %s rm " % (ssh_command, self.host_string)
+
+		# Delete in groups of 10 to avoid overflowing command line
+		for i in range(0, len(pathlist), 10):
+			commandline = del_prefix + " ".join(pathlist[i:i+10])
+			self.run_command(commandline)
 
 
 class sftpBackend(Backend):
