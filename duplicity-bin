@@ -37,12 +37,15 @@ exit_val = None
 def get_passphrase():
 	"""Get passphrase from environment or, failing that, from user"""
 	try: return os.environ['PASSPHRASE']
-	except KeyError:
-		if globals.encryption:
-			log.Log("PASSPHRASE variable not set, asking user.", 5)
-			return getpass.getpass("GnuPG passphrase: ")
-		else: return "" # assume we don't need passphrase
+	except KeyError: pass
+	if not globals.encryption: return "" # assume we don't need passphrase
 
+	log.Log("PASSPHRASE variable not set, asking user.", 5)
+	while 1:
+		pass1 = getpass.getpass("GnuPG passphrase: ")
+		pass2 = getpass.getpass("Retype to confirm: ")
+		if pass1 == pass2: return pass1
+		print "First and second passphrases do not match!  Please try again."
 
 def write_multivol(backup_type, tarblock_iter, backend):
 	"""Encrypt volumes of tarblock_iter and write to backend
