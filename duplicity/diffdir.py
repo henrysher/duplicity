@@ -240,11 +240,14 @@ def DirDelta_WriteSig(path_iter, sig_infp_list, newsig_outfp):
 
 	"""
 	if type(sig_infp_list) is types.ListType:
-		sig_path_iter = combine_path_iters(map(sigtar2path_iter,
-											   sig_infp_list))
+		sig_path_iter = get_combined_path_iter(sig_infp_list)
 	else: sig_path_iter = sigtar2path_iter(sig_infp_list)
 	delta_iter = get_delta_iter_w_sig(path_iter, sig_path_iter, newsig_outfp)
 	return DeltaTarBlockIter(delta_iter)
+
+def get_combined_path_iter(sig_infp_list):
+	"""Return path iter combining signatures in list of open sig files"""
+	return combine_path_iters(map(sigtar2path_iter, sig_infp_list))
 
 def get_delta_iter_w_sig(path_iter, sig_path_iter, sig_fileobj):
 	"""Like get_delta_iter but also write signatures to sig_fileobj"""

@@ -125,6 +125,14 @@ def incremental_backup(sig_chain):
 	write_multivol("inc", tarblock_iter, globals.backend)
 	new_sig_outfp.close()
 
+def list_current(col_stats):
+	"""List the files current in the archive (examining signature only)"""
+	sig_chain = check_sig_chain(col_stats)
+	if not sig_chain:
+		log.FatalError("No signature data found, unable to list files.")
+	path_iter = diffdir.get_combined_path_iter(sig_chain.get_fileobjs())
+	for path in path_iter: print path.get_relative_path()
+
 def restore(col_stats):
 	"""Restore archive in globals.backend to globals.local_path"""
 	if globals.restore_dir: index = tuple(globals.restore_dir.split("/"))
@@ -208,6 +216,7 @@ def main():
 	os.umask(077)
 	globals.gpg_profile.passphrase = get_passphrase()
 	if action == "restore": restore(col_stats)
+	elif action == "list-current": list_current(col_stats)
 	else:
 		assert action == "inc" or action == "full", action
 		check_last_manifest(col_stats)

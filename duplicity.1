@@ -10,6 +10,11 @@ duplicity \- Encrypted backup using rsync algorithm
 .BI [ options ]
 .I source_url target_filename
 
+.B duplicity
+.BI [ options ]
+.B --list-current-files
+.I source_url
+
 .SH DESCRIPTION
 Duplicity incrementally backs up files and directory by encrypting
 tar-format volumes with GnuPG and uploading them to a remote (or
@@ -186,6 +191,13 @@ Only files explicitly matched by
 will be included by this option.  See the
 .B FILE SELECTION
 section for more information.
+.TP
+.B --list-current-files
+Lists the files currently backed up in the archive.  The information
+will be extracted from the signature files, not the archive data
+itself.  Thus the whole archive does not have to be downloaded, but on
+the other hand if the archive has been deleted or corrupted, this
+command may not detect it.
 .TP
 .BI "--sign-key " key
 This option can be used when backing up or restoring.  When backing

@@ -24,10 +24,11 @@ import backends, globals, log, path, selection, gpg, dup_time
 select_opts = [] # Will hold all the selection options
 select_files = [] # Will hold file objects when filelist given
 full_backup = None # Will be set to true if -f or --full option given
+list_current = None # Will be set to true if --list-current option given
 
 def parse_cmdline_options(arglist):
 	"""Parse argument list"""
-	global select_opts, select_files, full_backup
+	global select_opts, select_files, full_backup, list_current
 	def sel_fl(filename):
 		"""Helper function for including/excluding filelists below"""
 		try: return open(filename, "r")
@@ -41,8 +42,8 @@ def parse_cmdline_options(arglist):
 		  "exclude-regexp=", "file-to-restore=", "full",
 		  "incremental", "include=", "include-filelist=",
 		  "include-filelist-stdin", "include-globbing-filelist=",
-		  "include-regexp=", "null-separator", "restore-dir=",
-		  "restore-time=", "sign-key=", "verbosity="])
+		  "include-regexp=", "list-current-files", "null-separator",
+		  "restore-dir=", "restore-time=", "sign-key=", "verbosity="])
 	except getopt.error, e:
 		command_line_error("%s" % (str(e),))
 
@@ -72,6 +73,8 @@ def parse_cmdline_options(arglist):
 			select_opts.append(("--include-filelist", "standard input"))
 			select_files.append(sys.stdin)
 		elif opt == "-i" or opt == "--incremental": globals.incremental = 1
+		elif opt == "--list-current-files": list_current = 1
+		elif opt == "--null-separator": globals.null_separator = 1
 		elif opt == "-r" or opt == "--file-to-restore":
 			globals.restore_dir = arg
 		elif opt == "-t" or opt == "--restore-time":
@@ -111,18 +114,6 @@ def set_sign_key(sign_key):
 		log.FatalError("Sign key should be an 8 character hex string, like "
 					   "'AA0E73D2'.\nReceived '%s' instead." % (sign_key,))
 	globals.gpg_profile.sign_key = sign_key
-
-def get_action(args):
-	"""Figure out the main action from the arguments"""
-
-	if len(args) < 3: command_line_error("Too few arguments")
-	command = args[0]
-	if command != "restore" and len(args) < 4:
-		command_line_error("Too few arguments")
-	if len(args) > 4: command_line_error("Too many arguments")
-
-	if command == "inc" or command == "increment": command = "inc"
-	return command, args[1:]
 
 def set_selection():
 	"""Return selection iter starting at filename with arguments applied"""
@@ -170,8 +161,10 @@ def process_local_dir(action, local_pathname):
 
 def check_consistency(action):
 	"""Final consistency check, see if something wrong with command line"""
-	global full_backup, select_opts
-	if action == "restore":
+	global full_backup, select_opts, list_current
+	if action == "list-current":
+		if not list_current: command_line_error("Too few arguments")
+	elif action == "restore":
 		if full_backup:
 			command_line_error("--full option cannot be used when restoring")
 		elif globals.incremental:
@@ -190,23 +183,31 @@ def check_consistency(action):
 def ProcessCommandLine(cmdline_list):
 	"""Process command line, set globals, return action
 
-	action will be "restore", "full", or "inc".
+	action will be "list-current", "restore", "full", or "inc".
 
 	"""
 	global full_backup
 	globals.gpg_profile = gpg.GPGProfile()
 
 	args = parse_cmdline_options(cmdline_list)
-	if len(args) < 2: command_line_error("Too few arguments")
+	if len(args) < 1: command_line_error("Too few arguments")
+	elif len(args) == 1:
+		if not list_current: command_line_error("Too few arguments")
+		action = "list-current"
+		globals.backend = backends.get_backend(args[0])
+		if not globals.backend: log.FatalError("""Bad URL '%s'.
+Examples of URL strings are "scp://user@host.net:1234/path" and
+"file:///usr/local".  See the man page for more information.""" % (args[0],))
+	elif len(args) == 2: # Figure out whether backup or restore
+		backup, local_pathname = set_backend(args[0], args[1])
+		if backup:
+			if full_backup: action = "full"
+			else: action = "inc"
+		else: action = "restore"
+
+		process_local_dir(action, local_pathname)
+		if backup: set_selection()
 	elif len(args) > 2: command_line_error("Too many arguments")
 
-	backup, local_pathname = set_backend(args[0], args[1])
-	if backup:
-		if full_backup: action = "full"
-		else: action = "inc"
-	else: action = "restore"
-
-	process_local_dir(action, local_pathname)
-	if backup: set_selection()
 	check_consistency(action)
 	return action

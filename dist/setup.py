@@ -26,5 +26,3 @@ setup(name="duplicity",
 					 ['COPYING', 'README', 'CHANGELOG'])])
 
 
-
-
