@@ -47,7 +47,7 @@ class FileNamingBase:
 	def test_more(self):
 		"""More file_parsing tests"""
 		if globals.short_filenames:
-			pr = file_naming.parse("dns.1029654270.1029826800.st.g")
+			pr = file_naming.parse("dns.h112bi.h14rg0.st.g")
 		else:
 			pr = file_naming.parse("duplicity-new-signatures.2002-08-18T00:04:30-07:00.to.2002-08-20T00:00:00-07:00.sigtar.gpg")
 		assert pr, pr
@@ -55,7 +55,7 @@ class FileNamingBase:
 		assert pr.end_time == 1029826800L
 
 		if globals.short_filenames:
-			pr = file_naming.parse("dfs.1036954144.st.g")
+			pr = file_naming.parse("dfs.h5dixs.st.g")
 			assert pr, pr
 			assert pr.type == "full-sig"
 			assert pr.time == 1036954144, repr(pr.time)

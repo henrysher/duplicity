@@ -19,6 +19,11 @@ older than the given time.
 Suppress GPG log messages like "gpg: CAST5 encrypted data" if
 verbosity is set to 3 or less.
 
+short-filenames get even shorter---now use base 36 (0-9 and a-z) for
+times and volume numbers.  This change is not backwards compatible but
+probably I'm the only one affected...
+
+
 
 New in v0.3.0 (2002/11/10)
 --------------------------
