@@ -85,3 +85,5 @@ force = None
 # be deleted.
 remove_time = None
 
+# If set to false, then do not encrypt files on remote system
+encryption = 1

@@ -38,8 +38,10 @@ def get_passphrase():
 	"""Get passphrase from environment or, failing that, from user"""
 	try: return os.environ['PASSPHRASE']
 	except KeyError:
-		log.Log("PASSPHRASE variable not set, asking user.", 5)
-		return getpass.getpass("GnuPG passphrase: ")
+		if globals.encryption:
+			log.Log("PASSPHRASE variable not set, asking user.", 5)
+			return getpass.getpass("GnuPG passphrase: ")
+		else: return "" # assume we don't need passphrase
 
 
 def write_multivol(backup_type, tarblock_iter, backend):
@@ -51,20 +53,33 @@ def write_multivol(backup_type, tarblock_iter, backend):
 	Returns number of bytes written.
 
 	"""
+	def get_indicies(tarblock_iter):
+		"""Return start_index and end_index of previous volume"""
+		start_index = tarblock_iter.recall_index()
+		if start_index is None: start_index = ()
+		end_index = tarblock_iter.get_previous_index()
+		if end_index is None: end_index = start_index
+		return start_index, end_index
+
 	mf = manifest.Manifest().set_dirinfo()
 	vol_num = 1; bytes_written = 0; at_end = 0
 	while not at_end:
 		# Create volume
 		tarblock_iter.remember_next_index() # keep track of start index
-		dest_filename = file_naming.get(backup_type, vol_num, encrypted = 1)
+		dest_filename = file_naming.get(backup_type, vol_num,
+										encrypted = globals.encryption,
+										gzipped = not globals.encryption)
 		tdp = dup_temp.new_tempduppath(file_naming.parse(dest_filename))
-		at_end = gpg.GPGWriteFile(tarblock_iter, tdp.name, globals.gpg_profile)
-		end_index = tarblock_iter.get_previous_index()
+		if globals.encryption:
+			at_end = gpg.GPGWriteFile(tarblock_iter, tdp.name,
+									  globals.gpg_profile)
+		else: at_end = gpg.GzipWriteFile(tarblock_iter, tdp.name)
 		tdp.setdata()
 
 		# Add volume information to manifest
 		vi = manifest.VolumeInfo()
-		vi.set_info(vol_num, tarblock_iter.recall_index(), end_index)
+		start_index, end_index = get_indicies(tarblock_iter)
+		vi.set_info(vol_num, start_index, end_index)
 		vi.set_hash("SHA1", gpg.get_hash("SHA1", tdp))
 		mf.add_volume_info(vi)
 
@@ -89,7 +104,8 @@ def write_manifest(mf, backup_type, backend):
 		fin.close()
 
 	sizelist = [] # will hold length of file in bytes
-	remote_mf_name = file_naming.get(backup_type, manifest = 1, encrypted = 1)
+	remote_mf_name = file_naming.get(backup_type, manifest = 1,
+									 encrypted = globals.encryption)
 	remote_fin = backend.get_fileobj_write(remote_mf_name, sizelist = sizelist)
 	remote_fin.write(mf_string)
 	remote_fin.close()
@@ -107,7 +123,8 @@ def get_sig_fileobj(sig_type):
 		sig_filename = file_naming.get(sig_type, gzipped = 1)
 		return dup_temp.get_fileobj_duppath(globals.archive_dir, sig_filename)
 	else:
-		sig_filename = file_naming.get(sig_type, encrypted = 1)
+		sig_filename = file_naming.get(sig_type,
+			 encrypted = globals.encryption, gzipped = not globals.encryption)
 		return globals.backend.get_fileobj_write(sig_filename)
 
 def full_backup(col_stats):

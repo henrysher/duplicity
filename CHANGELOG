@@ -10,6 +10,14 @@ cleaner.
 Added --verify option, for checking whether a backup is up-to-date, or
 to see what has changed since that backup.
 
+GPG no longer needed: with --no-encryption option duplicity will write
+gzipped volumes.  The checksums of volumes will still be verified, but
+this will not stop a malicious attack because the manifest files can
+be easily updated.
+
+Earlier versions could crash when doing an incremental backup where no
+files had changed.
+
 
 New in v0.3.1 (2002/11/17)
 --------------------------

@@ -18,7 +18,7 @@
 
 """duplicity's gpg interface, builds upon Frank Tobin's GnuPGInterface"""
 
-import select, os, sys, thread, sha, md5, types, cStringIO, tempfile, re
+import select, os, sys, thread, sha, md5, types, cStringIO, tempfile, re, gzip
 import GnuPGInterface, misc, log
 
 blocksize = 256 * 1024
@@ -219,6 +219,45 @@ def GPGWriteFile(block_iter, filename, profile,
 		cursize = get_current_size()
 		if cursize < target_size: top_off(target_size - cursize, to_gpg_fp)
 	close_process(gpg_process, to_gpg_fp)
+	return at_end_of_blockiter
+
+def GzipWriteFile(block_iter, filename, size = 5 * 1024 * 1024,
+				  max_footer_size = 16 * 1024):
+	"""Write gzipped compressed file of given size
+
+	This is like the earlier GPGWriteFile except it writes a gzipped
+	file instead of a gpg'd file.  This function is somewhat out of
+	place, because it doesn't deal with GPG at all, but it is very
+	similar to GPGWriteFile so they might as well be defined together.
+
+	The input requirements on block_iter and the output is the same as
+	GPGWriteFile (returns true if wrote until end of block_iter).
+
+	"""
+	class FileCounted:
+		"""Wrapper around file object that counts number of bytes written"""
+		def __init__(self, fileobj):
+			self.fileobj = fileobj
+			self.byte_count = 0
+		def write(self, buf):
+			result = self.fileobj.write(buf)
+			self.byte_count += len(buf)
+			return result
+		def close(self): return self.fileobj.close()
+
+	file_counted = FileCounted(open(filename, "wb"))
+	gzip_file = gzip.GzipFile(None, "wb", 6, file_counted)
+	at_end_of_blockiter = 0
+	while 1:
+		bytes_to_go = size - file_counted.byte_count
+		if bytes_to_go < 32 * 1024: break
+		try: new_block = block_iter.next(bytes_to_go)
+		except StopIteration:
+			at_end_of_blockiter = 1
+			break
+		gzip_file.write(new_block.data)
+
+	assert not gzip_file.close() and not file_counted.close()
 	return at_end_of_blockiter
 
 

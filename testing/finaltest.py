@@ -11,6 +11,7 @@ backend_url = "file://testfiles/output"
 other_args = []
 #other_args = ["--short-filenames"]
 #other_args = ["--ssh-command 'ssh -v'", "--scp-command 'scp -C'"]
+#other_args = ['--no-encryption']
 
 # If this is set to true, after each backup, verify contents
 verify = 1
@@ -134,5 +135,10 @@ class FinalTest(unittest.TestCase):
 		"""Test backing and restoring up a single regular file"""
 		self.runtest(["testfiles/various_file_types/regular_file"])
 
+	def test_empty_backup(self):
+		"""Make sure backup works when no files change"""
+		self.backup("full", "testfiles/empty_dir")
+		self.backup("inc", "testfiles/empty_dir")
+		
 
 if __name__ == "__main__": unittest.main()

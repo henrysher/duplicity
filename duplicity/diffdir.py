@@ -409,8 +409,7 @@ class TarBlockIter:
 		return result
 		
 	def get_previous_index(self):
-		"""Return index of last tarblock"""
-		assert self.previous_index is not None
+		"""Return index of last tarblock, or None if no previous index"""
 		return self.previous_index
 
 	def remember_next_index(self):
@@ -420,8 +419,7 @@ class TarBlockIter:
 
 	def recall_index(self):
 		"""Retrieve index remembered with remember_next_index"""
-		assert self.remember_value is not None
-		return self.remember_value
+		return self.remember_value # or None if no index recalled
 
 	def get_footer(self):
 		"""Return closing string for tarfile, reset offset"""
