@@ -115,6 +115,10 @@ class ROPath:
 		"""Return length in bytes from stat object"""
 		return self.stat.st_size
 
+	def getmtime(self):
+		"""Return mod time of path in seconds"""
+		return self.stat.st_mtime
+
 	def get_relative_path(self):
 		"""Return relative path, created from index"""
 		if self.index: return "/".join(self.index)

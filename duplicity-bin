@@ -170,7 +170,10 @@ def list_current(col_stats):
 	if not sig_chain:
 		log.FatalError("No signature data found, unable to list files.")
 	path_iter = diffdir.get_combined_path_iter(sig_chain.get_fileobjs())
-	for path in path_iter: print path.get_relative_path()
+	for path in path_iter:
+		if path.difftype != "deleted":
+			print dup_time.timetopretty(path.getmtime()), \
+				  path.get_relative_path()
 
 
 def restore(col_stats):

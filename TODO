@@ -2,17 +2,8 @@ Look at handling of files with very long names
 
 Raise error/warning when --file-to-restore doesn't match anything.
 
-Think about option to disable gpg encryption.  (Suggested by Attila
-Kinali, maybe Dean Gaudet a while ago.)
+Add --list-increments type option
 
-Think about doing restores file-by-file: download the first volume in
-every increment and then produce the first file, then the second, etc.
-This would make doing verifies easier.  Also restore would in theory
-be more efficient, because, for instance, deleted files would not have
-to be created, possibly patched, and then deleted again.
-	However, it seems that temp space usage would be a problem - the
-amount required could grow to 50MB (volume size)* num of increments.
-So 100 days of increments = 5GB max volume size.  This can be reduced
-by decreasing the volume size, but that might lead to other
-inefficiencies.
+include/exclude options should work when restoring.
 
+Figure out better way of searching through the archive.
