@@ -26,6 +26,7 @@ from lazy import *
 
 class PatchDirException(Exception): pass
 
+
 def Patch(base_path, difftar_fileobj):
 	"""Patch given base_path and file object containing delta"""
 	diff_tarfile = tarfile.TarFile("arbitrary", "r", difftar_fileobj)
@@ -127,18 +128,22 @@ def get_index_from_tarinfo(tarinfo):
 					  re.subn("^multivol_(diff|snapshot)/(.*)/[0-9]+$",
 							  "\\2", tarinfo.name)
 				if num_subs != 1:
-					raise DiffDirException("Unrecognized diff entry %s" %
-										   (tarinfo.name,))
+					raise PatchDirException("Unrecognized diff entry %s" %
+											(tarinfo.name,))
 			else:
 				difftype = prefix[:-1] # strip trailing /
 				name = tarinfo.name[len(prefix):]
 				if name.endswith("/"): name = name[:-1] # strip trailing /'s
 				multivol = 0
 			break
-	else: raise DiffDirException("Unrecognized diff entry %s" %
+	else: raise PatchDirException("Unrecognized diff entry %s" %
 								 (tarinfo.name,))
 	if name == ".": index = ()
-	else: index = tuple(name.split("/"))
+	else:
+		index = tuple(name.split("/"))
+		if '..' in index:
+			raise PatchDirException("Tar entry %s contains '..'.  Security "
+									"violation" % (tarinfo.name,))
 	return (index, difftype, multivol)
 
 

@@ -1,5 +1,5 @@
 from __future__ import generators
-import sys
+import sys, StringIO
 sys.path.insert(0, "../src")
 import os, unittest
 import diffdir, patchdir, log, selection, tarfile
@@ -107,6 +107,41 @@ class PatchingTest(unittest.TestCase):
 		for tarinfo in tf: namelist.append(tarinfo.name)
 		for i in range(1, 6):
 			assert ("tmp/%d" % i) in namelist, namelist
-		
+
+	def test_doubledot_hole(self):
+		"""Test for the .. bug that lets tar overwrite parent dir"""
+		self.deltmp()
+
+		def make_bad_tar(filename):
+			"""Write attack tarfile to filename"""
+			def iterate_one_pair(path):
+				"""Iterate one (tarinfo, fp) pair
+
+				file object will be empty, and tarinfo will have path
+				"snapshot/../warning-security-error"
+
+				"""
+				path.index = ("diff", "..", "warning-security-error")
+				ti = path.get_tarinfo()
+				fp = StringIO.StringIO("")
+				yield (ti, fp)
+			assert not os.system("cat /dev/null >testfiles/output/file")
+			tf = tarfile.TarFromIterator(iterate_one_pair(
+				Path("testfiles/output/file")))
+			tfbuf = tf.read()
+
+			fout = open(filename, "wb")
+			fout.write(tfbuf)
+			assert not fout.close()
+
+		self.deltmp()
+		make_bad_tar("testfiles/output/bad.tar")
+		os.mkdir("testfiles/output/temp")
+
+		self.assertRaises(patchdir.PatchDirException, patchdir.Patch,
+						  Path("testfiles/output/temp"),
+						  open("testfiles/output/bad.tar"))
+		assert not Path("testfiles/output/warning-security-error").exists()
+
 
 if __name__ == "__main__": unittest.main()
