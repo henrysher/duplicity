@@ -39,6 +39,9 @@ Duplicity will read the PASSPHRASE environment variable to find the
 passphrase to give to GnuPG.  If this is not set, the user will be
 prompted for the passphrase.
 
+If you are backing up the root directory /, remember to --exclude
+/proc, or else duplicity will probably crash on the weird stuff in
+there.
 
 .SH EXAMPLES
 Here is an example of a backup, using scp to back up /home/me to
