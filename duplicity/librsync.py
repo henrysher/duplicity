@@ -2,12 +2,12 @@
 #
 # This file is part of duplicity.
 #
-# Duplicity is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the
-# Free Software Foundation; either version 2 of the License, or (at your
-# option) any later version.
+# duplicity is free software; you can redistribute it and/or modify
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
 #
-# Duplicity is distributed in the hope that it will be useful, but
+# duplicity is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
@@ -107,7 +107,7 @@ class LikeFile:
 
 class SigFile(LikeFile):
 	"""File-like object which incrementally generates a librsync signature"""
-	def __init__(self, infile):
+	def __init__(self, infile, blocksize = _librsync.RS_DEFAULT_BLOCK_LEN):
 		"""SigFile initializer - takes basis file
 
 		basis file only needs to have read() and close() methods.  It
@@ -115,7 +115,7 @@ class SigFile(LikeFile):
 
 		"""
 		LikeFile.__init__(self, infile)
-		try: self.maker = _librsync.new_sigmaker()
+		try: self.maker = _librsync.new_sigmaker(blocksize)
 		except _librsync.librsyncError, e: raise librsyncError(str(e))
 
 class DeltaFile(LikeFile):
@@ -162,9 +162,9 @@ class SigGenerator:
 	module, not filelike object
 
 	"""
-	def __init__(self):
+	def __init__(self, blocksize = _librsync.RS_DEFAULT_BLOCK_LEN):
 		"""Return new signature instance"""
-		try: self.sig_maker = _librsync.new_sigmaker()
+		try: self.sig_maker = _librsync.new_sigmaker(blocksize)
 		except _librsync.librsyncError, e: raise librsyncError(str(e))
 		self.gotsig = None
 		self.buffer = ""

@@ -1,19 +1,28 @@
 /* ----------------------------------------------------------------------- *
  *   
- *   Copyright 2002 Ben Escoto
+ *   Copyright 2002 2003 Ben Escoto
  *
- *   This file is part of rdiff-backup.
+ *   This file is part of duplicity.
  *
- *   rdiff-backup is free software; you can redistribute it and/or
- *   modify it under the terms of the GNU General Public License as
- *   published by the Free Software Foundation, Inc., 675 Mass Ave,
- *   Cambridge MA 02139, USA; either version 2 of the License, or (at
- *   your option) any later version; incorporated herein by reference.
+ *   duplicity is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published
+ *   by the Free Software Foundation; either version 2 of the License,
+ *   or (at your option) any later version.
+ *
+ *   duplicity is distributed in the hope that it will be useful, but
+ *   WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *   General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with duplicity; if not, write to the Free Software
+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+ *   02111-1307 USA
  *
  * ----------------------------------------------------------------------- */
 
 #include <Python.h>
-#include <rsync.h>
+#include <librsync.h>
 #define RS_JOB_BLOCKSIZE 65536
 
 static PyObject *librsyncError;
@@ -41,15 +50,16 @@ static PyObject*
 _librsync_new_sigmaker(PyObject* self, PyObject* args)
 {
   _librsync_SigMakerObject* sm;
+  long blocklen;
   
-  if (!PyArg_ParseTuple(args,":new_sigmaker"))
+  if (!PyArg_ParseTuple(args, "l:new_sigmaker", &blocklen))
 	return NULL;
 
   sm = PyObject_New(_librsync_SigMakerObject, &_librsync_SigMakerType);
   if (sm == NULL) return NULL;
   sm->x_attr = NULL;
 
-  sm->sig_job = rs_sig_begin((size_t)RS_DEFAULT_BLOCK_LEN,
+  sm->sig_job = rs_sig_begin((size_t)blocklen,
 							 (size_t)RS_DEFAULT_STRONG_LEN);
   return (PyObject*)sm;
 }
@@ -70,7 +80,7 @@ static PyObject *
 _librsync_sigmaker_cycle(_librsync_SigMakerObject *self, PyObject *args)
 {
   char *inbuf, outbuf[RS_JOB_BLOCKSIZE];
-  long inbuf_length;
+  int inbuf_length;
   rs_buffers_t buf;
   rs_result result;
 
@@ -91,7 +101,7 @@ _librsync_sigmaker_cycle(_librsync_SigMakerObject *self, PyObject *args)
   }
 
   return Py_BuildValue("(ils#)", (result == RS_DONE),
-					   inbuf_length - (long)buf.avail_in,
+					   (long)inbuf_length - (long)buf.avail_in,
 					   outbuf, RS_JOB_BLOCKSIZE - (long)buf.avail_out);
 }
 
@@ -168,7 +178,7 @@ _librsync_new_deltamaker(PyObject* self, PyObject* args)
 {
   _librsync_DeltaMakerObject* dm;
   char *sig_string, outbuf[RS_JOB_BLOCKSIZE];
-  long sig_length;
+  int sig_length;
   rs_job_t *sig_loader;
   rs_signature_t *sig_ptr;
   rs_buffers_t buf;
@@ -224,7 +234,7 @@ static PyObject *
 _librsync_deltamaker_cycle(_librsync_DeltaMakerObject *self, PyObject *args)
 {
   char *inbuf, outbuf[RS_JOB_BLOCKSIZE];
-  long inbuf_length;
+  int inbuf_length;
   rs_buffers_t buf;
   rs_result result;
 
@@ -244,7 +254,7 @@ _librsync_deltamaker_cycle(_librsync_DeltaMakerObject *self, PyObject *args)
   }
 
   return Py_BuildValue("(ils#)", (result == RS_DONE),
-					   inbuf_length - (long)buf.avail_in,
+					   (long)inbuf_length - (long)buf.avail_in,
 					   outbuf, RS_JOB_BLOCKSIZE - (long)buf.avail_out);
 }
 
@@ -360,7 +370,7 @@ static PyObject *
 _librsync_patchmaker_cycle(_librsync_PatchMakerObject *self, PyObject *args)
 {
   char *inbuf, outbuf[RS_JOB_BLOCKSIZE];
-  long inbuf_length;
+  int inbuf_length;
   rs_buffers_t buf;
   rs_result result;
 
@@ -380,7 +390,7 @@ _librsync_patchmaker_cycle(_librsync_PatchMakerObject *self, PyObject *args)
   }
 
   return Py_BuildValue("(ils#)", (result == RS_DONE),
-					   inbuf_length - (long)buf.avail_in,
+					   (long)inbuf_length - (long)buf.avail_in,
 					   outbuf, RS_JOB_BLOCKSIZE - (long)buf.avail_out);
 }
 

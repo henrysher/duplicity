@@ -13,5 +13,5 @@ setup(name="CModule",
 							 ["_librsyncmodule.c"],
 							 libraries=["rsync"])])
 
-assert not os.system("mv `find . -name _librsync.so` .")
+assert not os.system("mv `find build -name _librsync.so` .")
 assert not os.system("rm -rf build")
