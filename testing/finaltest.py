@@ -8,6 +8,7 @@ import path, backends
 backend_url = "scp://localhost//home/ben/prog/python/duplicity/testing/testfiles/output"
 
 # Extra arguments to be passed to duplicity
+other_args = []
 #other_args = ["--short-filenames"]
 #other_args = ["--ssh-command 'ssh -v'", "--scp-command 'scp -C'"]
 
@@ -45,13 +46,13 @@ class FinalTest(unittest.TestCase):
 
 	def deltmp(self):
 		"""Delete temporary directories"""
+		assert not os.system("rm -rf testfiles/output "
+							 "testfiles/restore_out testfiles/tmp_archive")
+		assert not os.system("mkdir testfiles/output testfiles/tmp_archive")
 		backend = backends.get_backend(backend_url)
 		bl = backend.list()
 		if bl: backend.delete(backend.list())
 		backend.close()
-		assert not os.system("rm -rf testfiles/output "
-							 "testfiles/restore_out testfiles/tmp_archive")
-		assert not os.system("mkdir testfiles/output testfiles/tmp_archive")
 
 	def runtest(self, dirlist, backup_options = [], restore_options = []):
 		"""Run backup/restore test on directories in dirlist"""
