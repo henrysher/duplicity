@@ -178,8 +178,12 @@ def list_current(col_stats):
 
 def restore(col_stats):
 	"""Restore archive in globals.backend to globals.local_path"""
-	patchdir.Write_ROPaths(globals.local_path, 
-						   restore_get_patched_rop_iter(col_stats))
+	if not patchdir.Write_ROPaths(globals.local_path, 
+								  restore_get_patched_rop_iter(col_stats)):
+		if globals.restore_dir:
+			log.FatalError("%s not found in archive, no files restored."
+						   % (globals.restore_dir,))
+		else: log.FatalError("No files found in archive - nothing restored.")
 
 def restore_get_patched_rop_iter(col_stats):
 	"""Return iterator of patched ROPaths of desired restore data"""

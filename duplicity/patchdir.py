@@ -447,11 +447,19 @@ def tarfiles2rop_iter(tarfile_list, restrict_index = ()):
 	return integrate_patch_iters(diff_iters)
 
 def Write_ROPaths(base_path, rop_iter):
-	"""Write out ropaths in rop_iter starting at base_path"""
+	"""Write out ropaths in rop_iter starting at base_path
+
+	Returns 1 if something was actually written, 0 otherwise.
+
+	"""
 	ITR = IterTreeReducer(ROPath_IterWriter, [base_path])
-	for ropath in rop_iter: ITR(ropath.index, ropath)
+	return_val = 0
+	for ropath in rop_iter:
+		return_val = 1
+		ITR(ropath.index, ropath)
 	ITR.Finish()
 	base_path.setdata()
+	return return_val
 
 class ROPath_IterWriter(ITRBranch):
 	"""Used in Write_ROPaths above

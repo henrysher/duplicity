@@ -1,7 +1,3 @@
-Look at handling of files with very long names
-
-Raise error/warning when --file-to-restore doesn't match anything.
-
 Add --list-increments type option
 
 include/exclude options should work when restoring.

@@ -16,6 +16,10 @@ other_args = []
 # If this is set to true, after each backup, verify contents
 verify = 1
 
+class CmdError(Exception):
+	"""Indicates an error running an external command"""
+	pass
+
 class FinalTest(unittest.TestCase):
 	"""Test backup/restore using duplicity binary"""
 	def run_duplicity(self, arglist, options = [], current_time = None):
@@ -29,7 +33,8 @@ class FinalTest(unittest.TestCase):
 		print "Running '%s'." % cmdline
 		if not os.environ.has_key('PASSPHRASE'):
 			os.environ['PASSPHRASE'] = 'foobar'
-		assert not os.system(cmdline)
+		return_val = os.system(cmdline)
+		if return_val: raise CmdError(return_val)
 
 	def backup(self, type, input_dir, options = [], current_time = None):
 		"""Run duplicity backup to default directory"""
@@ -156,5 +161,12 @@ class FinalTest(unittest.TestCase):
 
 		self.runtest(["testfiles/empty_dir", lf_dir.name,
 					  "testfiles/empty_dir", lf_dir.name])
+
+	def test_empty_restore(self):
+		"""Make sure error raised when restore doesn't match anything"""
+		self.backup("full", "testfiles/dir1")
+		self.assertRaises(CmdError, self.restore, "this_file_does_not_exist")
+		self.backup("inc", "testfiles/empty_dir")
+		self.assertRaises(CmdError, self.restore, "this_file_does_not_exist")
 
 if __name__ == "__main__": unittest.main()
