@@ -9,7 +9,13 @@ have long names.
 
 Applied Stephen Isard's patch to fix exclude-globbing-filelist.
 
-Applied Sebastian Wilhelmi's patch to add rsync as a backend.
+Applied Sebastian Wilhelmi's patches to add rsync as a backend.
+
+To improve large file performance, signature block size is now based
+on file length.
+
+duplicity should now build with librsync 0.9.6.  Much thanks to
+Donovan Baarda for his work in this version of librsync.
 
 
 New in v0.4.0 (2002/11/30)
