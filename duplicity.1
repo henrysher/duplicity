@@ -143,6 +143,13 @@ See the
 .B FILE SELECTION
 section for more information.
 .TP
+.BI "--file-to-restore " path
+This option may be given in restore mode, causing only
+.I path
+to be restored instead of the entire contents of the backup archive.
+.I path
+should be given relative to the root of the directory backed up.
+.TP
 .BR -f ", " --full
 Indicate full backup.  If this is set, perform full backup even if
 signatures are available.
