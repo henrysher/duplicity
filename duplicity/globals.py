@@ -80,3 +80,7 @@ print_statistics = 1
 
 # If set, use short (< 30 char) filenames for all the remote files.
 short_filenames = 0
+
+# Used to confirm certain destructive operations like deleting old
+# files.
+force = None

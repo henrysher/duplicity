@@ -42,8 +42,8 @@ def parse_cmdline_options(arglist):
 		  "exclude-device-files", "exclude-filelist=",
 		  "exclude-globbing-filelist", "exclude-filelist-stdin",
 		  "exclude-other-filesystems", "exclude-regexp=",
-		  "file-to-restore=", "full", "incremental", "include=",
-		  "include-filelist=", "include-filelist-stdin",
+		  "file-to-restore=", "force", "full", "incremental",
+		  "include=", "include-filelist=", "include-filelist-stdin",
 		  "include-globbing-filelist=", "include-regexp=",
 		  "list-current-files", "no-print-statistics",
 		  "null-separator", "restore-dir=", "restore-time=",
@@ -75,6 +75,7 @@ def parse_cmdline_options(arglist):
 			select_opts.append(("--exclude-filelist", "standard input"))
 			select_files.append(sys.stdin)
 		elif opt == "-f" or opt == "--full": full_backup = 1
+		elif opt == "--force": globals.force = 1
 		elif opt == "--include-filelist-stdin":
 			select_opts.append(("--include-filelist", "standard input"))
 			select_files.append(sys.stdin)

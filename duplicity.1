@@ -162,6 +162,10 @@ should be given relative to the root of the directory backed up.
 Indicate full backup.  If this is set, perform full backup even if
 signatures are available.
 .TP
+.B --force
+Proceed even if data loss might result.  Duplicity will let the user
+know when this option is required.
+.TP
 .BR -i ", " --incremental
 If this is set, duplicity will abort if old signatures cannot be
 found.  The default is to switch to full backup under these
