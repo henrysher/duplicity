@@ -39,12 +39,14 @@ been_awake_since = None # stores last time sleep() was run
 def setcurtime(time_in_secs = None):
 	"""Sets the current time in curtime and curtimestr"""
 	global curtime, curtimestr
-	t = time_in_secs or time.time()
+	t = time_in_secs or long(time.time())
+	assert type(t) in (types.LongType, types.IntType)
 	curtime, curtimestr = t, timetostring(t)
 
 def setprevtime(time_in_secs):
 	"""Sets the previous time in prevtime and prevtimestr"""
 	global prevtime, prevtimestr
+	assert type(time_in_secs) in (types.LongType, types.IntType), prevtime
 	prevtime, prevtimestr = time_in_secs, timetostring(time_in_secs)
 
 def timetostring(timeinseconds):

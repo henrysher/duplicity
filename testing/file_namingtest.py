@@ -54,6 +54,12 @@ class FileNamingBase:
 		assert pr.type == "new-sig"
 		assert pr.end_time == 1029826800L
 
+		if globals.short_filenames:
+			pr = file_naming.parse("dfs.1036954144.st.g")
+			assert pr, pr
+			assert pr.type == "full-sig"
+			assert pr.time == 1036954144, repr(pr.time)
+
 
 class FileNamingLong(unittest.TestCase, FileNamingBase):
 	"""Test long filename parsing and generation"""

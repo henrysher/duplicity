@@ -18,7 +18,7 @@
 
 """Classes and functions on collections of backup volumes"""
 
-import gzip
+import gzip, types
 import log, file_naming, path, dup_time, globals, manifest
 
 class CollectionsError(Exception): pass
@@ -208,6 +208,12 @@ class SignatureChain:
 		self.inclist = [] # list of filenames of incremental signatures
 		self.start_time, self.end_time = None, None
 
+	def check_times(self, time_list):
+		"""Check to make sure times are in whole seconds"""
+		for time in time_list:
+			if type(time) not in (types.LongType, types.IntType):
+				assert 0, "Time %s in %s wrong type" % (time, time_list)
+
 	def islocal(self):
 		"""Return true if represents a signature chain in archive_dir"""
 		return self.archive_dir
@@ -221,11 +227,13 @@ class SignatureChain:
 			if pr.type != "new-sig": return None
 			if pr.start_time != self.end_time: return None
 			self.inclist.append(filename)
+			self.check_times([pr.end_time])
 			self.end_time = pr.end_time
 			return 1
 		else:
 			if pr.type != "full-sig": return None
 			self.fullsig = filename
+			self.check_times([pr.time, pr.time])
 			self.start_time, self.end_time = pr.time, pr.time
 			return 1
 		

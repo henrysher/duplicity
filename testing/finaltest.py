@@ -4,7 +4,8 @@ import path, backends
 
 # This can be changed to select the URL to use
 #backend_url = "file://testfiles/output"
-backend_url = "ftp://Stan Ford@90-92L-imac.stanford.edu/Macintosh HD/temp"
+#backend_url = "ftp://Stan Ford@90-92L-imac.stanford.edu/Macintosh HD/temp"
+backend_url = "scp://localhost//home/ben/prog/python/duplicity/testing/testfiles/output"
 
 # Comment or uncomment these depending on the backend used
 short_filenames = 1
@@ -44,7 +45,8 @@ class FinalTest(unittest.TestCase):
 	def deltmp(self):
 		"""Delete temporary directories"""
 		backend = backends.get_backend(backend_url)
-		backend.delete(backend.list())
+		bl = backend.list()
+		if bl: backend.delete(backend.list())
 		backend.close()
 		assert not os.system("rm -rf testfiles/output "
 							 "testfiles/restore_out testfiles/tmp_archive")

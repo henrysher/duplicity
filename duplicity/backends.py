@@ -179,7 +179,7 @@ class Backend:
 		"""
 		if not parseresults:
 			parseresults = file_naming.parse(filename)
-			assert parseresults, "Filename not correctly parsed"
+			assert parseresults, "Filename %s not correctly parsed" % filename
 		tdp = dup_temp.new_tempduppath(parseresults)
 
 		def close_file_hook():
@@ -291,6 +291,7 @@ class scpBackend(Backend):
 
 	def delete(self, filename_list):
 		"""Runs ssh rm to delete files.  Files must not require quoting"""
+		assert len(filename_list) > 0
 		pathlist = map(lambda fn: self.remote_prefix + fn, filename_list)
 		commandline = "ssh %s rm %s" % \
 					  (self.host_string, " ".join(pathlist))
