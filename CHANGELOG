@@ -6,7 +6,8 @@ the given destination url.
 
 Ported some statistics code from rdiff-backup.  Now by default
 statistics are printed after a backup session.  This can be disabled
-with the --no-print-statistics option.
+with the --no-print-statistics option.  Thanks to Mathieu Doidy for
+requesting the above two features.
 
 Added rdiff-backup-style --include/exclude-filelist-globbing options.
 Now filelists with "+ /- " can be treated exactly like repeated
