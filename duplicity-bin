@@ -154,8 +154,7 @@ def restore(col_stats):
 	if globals.restore_dir: index = tuple(globals.restore_dir.split("/"))
 	else: index = ()
 	target = globals.local_path
-	time = (globals.restore_time or globals.current_time or
-			dup_time.curtime) # Look for restore_time first, then current_time
+	time = globals.restore_time or dup_time.curtime
 	backup_chain = col_stats.get_backup_chain_at_time(time)
 	assert backup_chain, col_stats.all_backup_chains
 	backup_setlist = backup_chain.get_sets_at_time(time)
