@@ -8,6 +8,4 @@ include/exclude options should work when restoring.
 Figure out better way of searching through the archive (for instance
 for last backed up version of a file).
 
-Examine large file performance.
-
 Have duplicity work on /proc
