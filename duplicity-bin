@@ -122,13 +122,18 @@ def get_sig_fileobj(sig_type):
 
 	"""
 	assert sig_type == "full-sig" or sig_type == "new-sig"
+
+	sig_filename = file_naming.get(sig_type, encrypted = globals.encryption,
+								   gzipped = not globals.encryption)
+	fh = globals.backend.get_fileobj_write(sig_filename)
+
+	# by MDR.  This was changed to use addfilehandle so we get both
+	# remote and local sig files
 	if globals.archive_dir:
-		sig_filename = file_naming.get(sig_type, gzipped = 1)
-		return dup_temp.get_fileobj_duppath(globals.archive_dir, sig_filename)
-	else:
-		sig_filename = file_naming.get(sig_type,
-			 encrypted = globals.encryption, gzipped = not globals.encryption)
-		return globals.backend.get_fileobj_write(sig_filename)
+		local_sig_filename = file_naming.get(sig_type, gzipped = 1)
+		fh.addfilehandle(dup_temp.get_fileobj_duppath(globals.archive_dir,
+													  local_sig_filename))
+	return fh
 
 def full_backup(col_stats):
 	"""Do full backup of directory to backend, using archive_dir"""

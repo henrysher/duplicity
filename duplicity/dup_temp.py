@@ -112,16 +112,29 @@ class FileobjHooked:
 		self.fileobj = fileobj
 		self.closed = None
 		self.hooklist = [] # fill later with thunks to run on close
+		# self.second by MDR.  Will be filled by addfilehandle -- poor mans tee
+		self.second = None
 
-	def write(self, buf): return self.fileobj.write(buf)
+	def write(self, buf):
+		if self.second: self.second.write(buf) # by MDR.  actual tee
+		return self.fileobj.write(buf)
+	
 	def read(self, length = -1): return self.fileobj.read(length)
 
 	def close(self):
 		"""Close fileobj, running hooks right afterwards"""
 		assert not self.fileobj.close()
 		for hook in self.hooklist: hook()
+		if not self.second == None:
+			assert not self.second.close()
 
 	def addhook(self, hook):
 		"""Add hook (function taking no arguments) to run upon closing"""
 		self.hooklist.append(hook)
 
+	def addfilehandle(self, fh): # by MDR
+		"""Add a second filehandle for listening to the input
+		
+		This only works properly for two write handles"""
+		assert not self.second
+		self.second = fh

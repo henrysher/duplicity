@@ -114,14 +114,20 @@ class BackupSet:
 			log.FatalError("Fatal Error: "
 						   "No manifests found for most recent backup")
 		assert self.remote_manifest_name, "if only one, should be remote"
+
 		remote_manifest = self.get_remote_manifest()
 		if self.local_manifest_path:
 			local_manifest = self.get_local_manifest()
+		if remote_manifest and self.local_manifest_path and local_manifest:
 			if remote_manifest != local_manifest:
 				log.FatalError(
 """Fatal Error: Remote manifest does not match local one.  Either the
 remote backup set or the local archive directory has been corrupted.""")
 
+		if not remote_manifest:
+			if local_manifest: remote_manifest = local_manifest
+			else: log.FatalError("Fatal Error: Neither remote nor "
+								 "local manifest readable.")
 		remote_manifest.check_dirinfo()
 
 	def get_local_manifest(self):
@@ -133,7 +139,13 @@ remote backup set or the local archive directory has been corrupted.""")
 	def get_remote_manifest(self):
 		"""Return manifest by reading remote manifest on backend"""
 		assert self.remote_manifest_name
-		manifest_buffer = self.backend.get_data(self.remote_manifest_name)
+		# Following by MDR.  Should catch if remote encrypted with
+		# public key w/o secret key
+		try: manifest_buffer = self.backend.get_data(self.remote_manifest_name)
+		except IOError, message:
+			if message.args[0] == "GnuPG exited non-zero, with code 131072":
+				return None
+			else: raise
 		return manifest.Manifest().from_string(manifest_buffer)
 
 	def get_manifest(self):
@@ -382,15 +394,19 @@ class CollectionsStatus:
 		to be downloaded).
 
 		"""
+		self.matched_chain_pair = None
 		if sig_chains and backup_chains:
 			latest_backup_chain = backup_chains[-1]
 			sig_chains = self.get_sorted_chains(sig_chains)
 			for i in range(len(sig_chains)-1, -1, -1):
 				if sig_chains[i].end_time == latest_backup_chain.end_time:
-					self.matched_chain_pair = (sig_chains[i],
-											   backup_chains[-1])
+					if self.matched_chain_pair == None:
+						self.matched_chain_pair = (sig_chains[i],
+												   backup_chains[-1])
+					
 					del sig_chains[i]
-					break
+					# break     # MDR this way the remote will not be
+					            # deleted if local present
 			
 		self.other_sig_chains = sig_chains
 		self.other_backup_chains = backup_chains
