@@ -26,13 +26,17 @@ the second, the ROPath iterator is put into tar block form.
 
 from __future__ import generators
 import cStringIO, re, types
-import tarfile, librsync, log
+import tarfile, librsync, log, statistics
 from path import *
 from lazy import *
 
 # Deltas will be broken up into volume_size chunks, so that an entire
 # delta doesn't have to be read into memory.
 volume_size = 1024 * 1024
+
+# A StatsObj will be written to this whenever DirDelta_WriteSig is
+# run.
+stats = None
 
 class DiffDirException(Exception): pass
 
@@ -96,12 +100,15 @@ def get_delta_path(new_path, sig_path):
 	delta_path.stat.st_size = new_path.stat.st_size		
 	return delta_path
 
-def log_delta_path(delta_path):
-	"""Look at delta path and log delta"""
+def log_delta_path(delta_path, new_path = None, stats = None):
+	"""Look at delta path and log delta.  Add stats if new_path is set"""
 	if delta_path.difftype == "snapshot":
+		if new_path: stats.add_new_file(new_path)
 		log.Log("Generating delta - new file: %s" %
 				(delta_path.get_relative_path(),), 5)
-	else: log.Log("Generating delta - changed file: %s" %
+	else:
+		if new_path: stats.add_changed_file(new_path)
+		log.Log("Generating delta - changed file: %s" %
 				  (delta_path.get_relative_path(),), 5)
 
 def get_delta_iter(new_iter, sig_iter):
@@ -239,6 +246,8 @@ def DirDelta_WriteSig(path_iter, sig_infp_list, newsig_outfp):
 	is different from (the combined) sig_infp_list.
 
 	"""
+	global stats
+	stats = statistics.StatsDeltaProcess()
 	if type(sig_infp_list) is types.ListType:
 		sig_path_iter = get_combined_path_iter(sig_infp_list)
 	else: sig_path_iter = sigtar2path_iter(sig_infp_list)
@@ -263,6 +272,7 @@ def get_delta_iter_w_sig(path_iter, sig_path_iter, sig_fileobj):
 				ti = ROPath(sig_path.index).get_tarinfo()
 				ti.name = "deleted/" + "/".join(sig_path.index)
 				sigTarFile.addfile(ti)
+				stats.add_deleted_file()
 				yield ROPath(sig_path.index)
 		elif not sig_path or new_path != sig_path:
 			# Must calculate new signature and create delta
@@ -270,8 +280,11 @@ def get_delta_iter_w_sig(path_iter, sig_path_iter, sig_fileobj):
 				delta_iter_error_handler, get_delta_path_w_sig,
 				(new_path, sig_path, sigTarFile))
 			if delta_path:
-				log_delta_path(delta_path)
+				log_delta_path(delta_path, new_path, stats)
 				yield delta_path
+			else: stats.Errors += 1
+		else: stats.add_unchanged_file(new_path)
+	stats.close()
 	sigTarFile.close()
 
 def get_delta_path_w_sig(new_path, sig_path, sigTarFile):
@@ -469,6 +482,7 @@ class DeltaTarBlockIter(TarBlockIter):
 		# Now handle single volume block case
 		fp = delta_ropath.open("rb")
 		data, last_block = self.get_data_block(fp)
+		if stats: stats.RawDeltaSize += len(data)
 		if last_block:
 			if delta_ropath.difftype == "snapshot": add_prefix(ti, "snapshot")
 			elif delta_ropath.difftype == "diff": add_prefix(ti, "diff")

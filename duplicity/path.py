@@ -111,6 +111,10 @@ class ROPath:
 		"""Return device number path resides on"""
 		return self.stat.st_dev
 
+	def getsize(self):
+		"""Return length in bytes from stat object"""
+		return self.stat.st_size
+
 	def get_relative_path(self):
 		"""Return relative path, created from index"""
 		if self.index: return "/".join(self.index)

@@ -199,6 +199,17 @@ itself.  Thus the whole archive does not have to be downloaded, but on
 the other hand if the archive has been deleted or corrupted, this
 command may not detect it.
 .TP
+.B --no-print-statistics
+By default duplicity will print statistics about the current session
+after a successful backup.  This switch disables that behavior.
+.TP
+.B --null-separator
+Use nulls (\\0) instead of newlines (\\n) as line separators, which
+may help when dealing with filenames containing newlines.  This
+affects the expected format of the files specified by the
+--{include|exclude}-filelist[-stdin] switches as well as the format of
+the directory statistics file.
+.TP
 .BI "--sign-key " key
 This option can be used when backing up or restoring.  When backing
 up, all backup files will be signed with keyid

@@ -112,12 +112,16 @@ class Backend:
 		tdp.setdata()
 		return tdp.filtered_open_with_delete("rb")
 
-	def get_fileobj_write(self, filename, parseresults = None):
+	def get_fileobj_write(self, filename, parseresults = None,
+						  sizelist = None):
 		"""Return fileobj opened for writing, write to backend on close
 
 		The file will be encoded as specified in parseresults (or as
 		read from the filename), and stored in a temp file until it
 		can be copied over and deleted.
+
+		If sizelist is not None, it should be set to an empty list.
+		The number of bytes will be inserted into the list.
 
 		"""
 		if not parseresults:
@@ -128,6 +132,9 @@ class Backend:
 		def close_file_hook():
 			"""This is called when returned fileobj is closed"""
 			self.put(tdp, filename)
+			if sizelist is not None:
+				tdp.setdata()
+				sizelist.append(tdp.getsize())
 			tdp.delete()
 
 		fh = dup_temp.FileobjHooked(tdp.filtered_open("wb"))

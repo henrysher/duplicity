@@ -43,18 +43,19 @@ def write_multivol(backup_type, tarblock_iter, backend):
 	backup_type should be "inc" or "full" and only matters here when
 	picking the filenames.  The path_prefix will determine the names
 	of the files written to backend.  Also writes manifest file.
+	Returns number of bytes written.
 
 	"""
 	mf = manifest.Manifest().set_dirinfo()
-	vol_num = 1
+	vol_num = 1; bytes_written = 0
 	while tarblock_iter.peek():
 		# Create volume
 		start_index = tarblock_iter.peek().index
 		dest_filename = file_naming.get(backup_type, vol_num, encrypted = 1)
 		tdp = dup_temp.new_tempduppath(file_naming.parse(dest_filename))
 		gpg.GPGWriteFile(tarblock_iter, tdp.name, globals.gpg_profile)
-		tdp.setdata()
 		end_index = tarblock_iter.get_previous_index()
+		tdp.setdata()
 
 		# Add volume information to manifest
 		vi = manifest.VolumeInfo()
@@ -63,13 +64,18 @@ def write_multivol(backup_type, tarblock_iter, backend):
 		mf.add_volume_info(vi)
 
 		backend.put(tdp, dest_filename)
+		vol_num += 1; bytes_written += tdp.getsize()
 		tdp.delete()
-		vol_num += 1
 
-	write_manifest(mf, backup_type, backend)
+	bytes_written += write_manifest(mf, backup_type, backend)
+	return bytes_written
 
 def write_manifest(mf, backup_type, backend):
-	"""Write manifest to file in archive_dir and encrypted to backend"""
+	"""Write manifest to file in archive_dir and encrypted to backend
+
+	Returns number of bytes written
+
+	"""
 	mf_string = mf.to_string()
 	if globals.archive_dir:
 		local_mf_name = file_naming.get(backup_type, manifest = 1)
@@ -77,10 +83,12 @@ def write_manifest(mf, backup_type, backend):
 		fin.write(mf_string)
 		fin.close()
 
+	sizelist = [] # will hold length of file in bytes
 	remote_mf_name = file_naming.get(backup_type, manifest = 1, encrypted = 1)
-	remote_fin = backend.get_fileobj_write(remote_mf_name)
+	remote_fin = backend.get_fileobj_write(remote_mf_name, sizelist = sizelist)
 	remote_fin.write(mf_string)
 	remote_fin.close()
+	return sizelist[0]
 
 def get_sig_fileobj(sig_type):
 	"""Return a fileobj opened for writing, save results as signature
@@ -101,9 +109,10 @@ def full_backup(col_stats):
 	"""Do full backup of directory to backend, using archive_dir"""
 	sig_outfp = get_sig_fileobj("full-sig")
 	tarblock_iter = diffdir.DirFull_WriteSig(globals.select, sig_outfp)
-	write_multivol("full", tarblock_iter, globals.backend)
+	bytes_written = write_multivol("full", tarblock_iter, globals.backend)
 	sig_outfp.close()
 	col_stats.set_values(sig_chain_warning = None).cleanup_signatures()
+	print_statistics(diffdir.stats, bytes_written)
 	
 def check_sig_chain(col_stats):
 	"""Get last signature chain for inc backup, or None if none available"""
@@ -116,14 +125,21 @@ not found and --incremental specified""")
 		return None
 	return col_stats.matched_chain_pair[0]
 
+def print_statistics(stats, bytes_written):
+	"""If globals.print_statistics, print stats after adding bytes_written"""
+	if globals.print_statistics:
+		diffdir.stats.TotalDestinationSizeChange = bytes_written
+		print diffdir.stats.get_stats_logstring("Backup Statistics")	
+
 def incremental_backup(sig_chain):
 	"""Do incremental backup of directory to backend, using archive_dir"""
 	dup_time.setprevtime(sig_chain.end_time)
 	new_sig_outfp = get_sig_fileobj("new-sig")
 	tarblock_iter = diffdir.DirDelta_WriteSig(globals.select,
 							  sig_chain.get_fileobjs(), new_sig_outfp)
-	write_multivol("inc", tarblock_iter, globals.backend)
+	bytes_written = write_multivol("inc", tarblock_iter, globals.backend)
 	new_sig_outfp.close()
+	print_statistics(diffdir.stats, bytes_written)
 
 def list_current(col_stats):
 	"""List the files current in the archive (examining signature only)"""

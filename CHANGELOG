@@ -1,6 +1,13 @@
 New in v0.3.0 (2002/10/07)
 --------------------------
 
+Added --list-current-files mode, which lists the files currently at
+the given destination url.
+
+Ported some statistics code from rdiff-backup.  Now by default
+statistics are printed after a backup session.  This can be disabled
+with the --no-print-statistics option.
+
 Added rdiff-backup-style --include/exclude-filelist-globbing options.
 Now filelists with "+ /- " can be treated exactly like repeated
 --include or --exclude options.

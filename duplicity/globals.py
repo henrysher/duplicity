@@ -75,3 +75,5 @@ allow_source_mismatch = None
 # signatures not found, default to full.
 incremental = None
 
+# If set, print the statistics after every backup session
+print_statistics = 1

@@ -42,8 +42,9 @@ def parse_cmdline_options(arglist):
 		  "exclude-regexp=", "file-to-restore=", "full",
 		  "incremental", "include=", "include-filelist=",
 		  "include-filelist-stdin", "include-globbing-filelist=",
-		  "include-regexp=", "list-current-files", "null-separator",
-		  "restore-dir=", "restore-time=", "sign-key=", "verbosity="])
+		  "include-regexp=", "list-current-files",
+		  "no-print-statistics", "null-separator", "restore-dir=",
+		  "restore-time=", "sign-key=", "verbosity="])
 	except getopt.error, e:
 		command_line_error("%s" % (str(e),))
 
@@ -74,6 +75,7 @@ def parse_cmdline_options(arglist):
 			select_files.append(sys.stdin)
 		elif opt == "-i" or opt == "--incremental": globals.incremental = 1
 		elif opt == "--list-current-files": list_current = 1
+		elif opt == "--no-print-statistics": globals.print_statistics = 0
 		elif opt == "--null-separator": globals.null_separator = 1
 		elif opt == "-r" or opt == "--file-to-restore":
 			globals.restore_dir = arg
