@@ -1,4 +1,4 @@
-New in v0.3.0 (2002/10/07)
+New in v0.3.0 (2002/11/10)
 --------------------------
 
 Added ftp backend.  Now the remote repository can accessed by ftp and

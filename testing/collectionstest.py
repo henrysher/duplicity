@@ -28,7 +28,8 @@ archive_dir_backend = backends.get_backend("file://testfiles/collectionstest"
 										   "/archive_dir")
 
 dummy_backend = None
-real_backend = backends.LocalBackend(col_test_dir.append("remote_dir").name)
+real_backend = backends.get_backend("file://%s/%s" %
+									(col_test_dir.name, "remote_dir"))
 
 
 class CollectionTest(unittest.TestCase):

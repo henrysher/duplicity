@@ -19,7 +19,7 @@ duplicity \- Encrypted backup using rsync algorithm
 Duplicity incrementally backs up files and directory by encrypting
 tar-format volumes with GnuPG and uploading them to a remote (or
 local) file server.  In theory many remote backends are possible;
-right now only the local or ssh/scp backend is written.  Because
+right now local, ftp, and ssh/scp backends are written.  Because
 duplicity uses librsync, the incremental archives are space efficient
 and only record the parts of files that have changed since the last
 backup.  Currently duplicity supports deleted files, full unix
@@ -78,6 +78,14 @@ directories under root:
 .RS
 duplicity --include /home --include /etc --exclude '**' /
 file:///usr/local/backup
+.PP
+.RE
+Duplicity can also access a repository via ftp.  If a user name is
+given, the environment variable FTP_PASSWORD is read to determine the
+password:
+.PP
+.RS
+FTP_PASSWORD=mypassword duplicity /local/dir ftp://user@other.host/some_dir
 
 .SH OPTIONS
 .TP

@@ -7,7 +7,7 @@ class TimeTest(unittest.TestCase):
 	def testConversion(self):
 		"""test timetostring and stringtotime"""
 		dup_time.setcurtime()
-		assert type(dup_time.curtime) is types.FloatType
+		assert type(dup_time.curtime) in (types.IntType, types.LongType)
 		assert type(dup_time.curtimestr) is types.StringType
 		assert (dup_time.cmp(int(dup_time.curtime), dup_time.curtimestr) == 0 or
 				dup_time.cmp(int(dup_time.curtime) + 1, dup_time.curtimestr) == 0)

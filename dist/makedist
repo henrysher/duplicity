@@ -95,7 +95,7 @@ def MakeTar():
 					 "lazy.py", "librsync.py", "log.py",
 					 "manifest.py", "misc.py", "patchdir.py",
 					 "path.py", "robust.py", "selection.py",
-					 "static.py", "tarfile.py"]:
+					 "static.py", "statistics.py", "tarfile.py"]:
 		assert not os.system("cp %s/%s %s/src" %
 							 (SourceDir, filename, tardir)), filename
 
