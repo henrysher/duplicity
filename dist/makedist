@@ -7,7 +7,7 @@ DistDir = "dist"
 
 # Various details about the files must also be specified by the rpm
 # spec template.
-spec_template = "dist/duplicity.spec"
+spec_template = "dist/duplicity.spec.template"
 
 def CopyMan(input_name, destination, version):
 	"""Create updated man page at the specified location"""
@@ -115,7 +115,7 @@ def MakeTar():
 
 def MakeSpecFile():
 	"""Create spec file using spec template"""
-	specfile = "duplicity-%s-1.spec" % Version
+	specfile = "duplicity.spec"
 	VersionedCopy(spec_template, specfile)
 	return specfile
 
