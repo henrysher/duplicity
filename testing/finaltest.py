@@ -139,6 +139,22 @@ class FinalTest(unittest.TestCase):
 		"""Make sure backup works when no files change"""
 		self.backup("full", "testfiles/empty_dir")
 		self.backup("inc", "testfiles/empty_dir")
-		
+
+	def test_long_filenames(self):
+		"""Test backing up a directory with long filenames in it"""
+		lf_dir = path.Path("testfiles/long_filenames")
+		if lf_dir.exists(): lf_dir.deltree()
+		lf_dir.mkdir()
+		lf1 = lf_dir.append("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+		lf1.mkdir()
+		lf2 = lf1.append("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
+		lf2.mkdir()
+		lf3 = lf2.append("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
+		lf3.mkdir()
+		lf4 = lf3.append("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
+		lf4.touch()
+
+		self.runtest(["testfiles/empty_dir", lf_dir.name,
+					  "testfiles/empty_dir", lf_dir.name])
 
 if __name__ == "__main__": unittest.main()
