@@ -117,6 +117,15 @@ but the list of files will be read from standard input.  See the
 .B FILE SELECTION
 section for more information.
 .TP
+.BR "--exclude-globbing-filelist " filename
+Like
+.B --exclude-filelist
+but each line of the filelist will be interpreted according to the
+same rules as
+.B --include
+and
+.B --exclude.
+.TP
 .B --exclude-other-filesystems
 Exclude files on file systems (identified by device number) other than
 the file system the root of the source directory is on.
@@ -159,6 +168,15 @@ section for more information.
 Like
 .BR --include-filelist ,
 but read the list of included files from standard input.
+.TP
+.BI "--include-globbing-filelist " filename
+Like
+.B --include-filelist
+but each line of the filelist will be interpreted according to the
+same rules as
+.B --include
+and
+.B --exclude.
 .TP
 .BI "--include-regexp " regexp
 Include files matching the regular expression
@@ -234,10 +252,12 @@ line options:
 .BR --exclude-device-files ,
 .BR --exclude-filelist ,
 .BR --exclude-filelist-stdin ,
+.BR --exclude-globbing-filelist ,
 .BR --exclude-regexp ,
 .BR --include ,
 .BR --include-filelist ,
 .BR --include-filelist-stdin ,
+.BR --include-globbing-filelist ,
 and
 .BR --include-regexp .
 Each file selection condition either matches or doesn't match a given
@@ -271,9 +291,11 @@ would backup the /usr/local/bin directory (and its contents), but not
 /usr/local/doc.
 
 The
-.B include
+.BR include ,
+.BR exclude ,
+.BR include-globbing-filelist ,
 and
-.B exclude
+.B exclude-globbing-filelist
 options accept
 .IR "extended shell globbing patterns" .
 These patterns can contain the special patterns
@@ -419,6 +441,34 @@ then "--include-filelist list.txt" would include /usr, /usr/local, and
 specification condition.  Finally, it is undefined what happens with
 /var.  A single file list should not contain conflicting file
 specifications.
+
+The
+.B --include-globbing-filelist
+and
+.B --exclude-globbing-filelist
+options also specify filelists, but each line in the filelist will be
+interpreted as a globbing pattern the way
+.B --include
+and
+.B --exclude
+options are interpreted (although "+ " and "- " prefixing is still
+allowed).  For instance, if the file "globbing-list.txt" contains the
+lines:
+
+.RE
+.RS
+dir/foo
+.RE
+.RS
++ dir/bar
+.RE
+.RS
+- **
+
+.RE
+Then "--include-globbing-filelist globbing-list.txt" would be exactly
+the same as specifying "--include dir/foo --include dir/bar --exclude **"
+on the command line.
 
 Finally, the
 .B --include-regexp

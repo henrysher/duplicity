@@ -59,15 +59,15 @@ In
 and
 .B delta
 modes, rdiffdir accepts
-.BR rdiff-backup -like
+.BR duplicity -like
 selection options including --exclude, --exclude-filelist-stdin, etc.
 See the
-.BR rdiff-backup (1)
+.BR duplicity (1)
 manual page for more information.
 
 .SH BUGS
-Hard links currently unsupported (they will be treated as non-linked
-regular files).
+Hard links are currently unsupported (they will be treated as
+non-linked regular files).
 
 Bad signatures will be treated as empty instead of logging appropriate
 error message.
@@ -80,5 +80,3 @@ Ben Escoto <bescoto@stanford.edu>
 .BR python (1),
 .BR rdiff (1),
 .BR rdiff-backup (1).
-
-
