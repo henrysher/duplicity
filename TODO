@@ -1,3 +1,3 @@
-Check whether ".." filenames are secure.
+Add rdiff-backup style statistics.
 
-Include rdiff-backup selection.
+Add option to use signature file to list files in backup store.

@@ -1,8 +1,11 @@
 from __future__ import generators
 import re, StringIO, unittest, sys
 sys.path.insert(0, "../src")
+import log
 from selection import *
 from lazy import *
+
+#log.setverbosity(8)
 
 class MatchingTest(unittest.TestCase):
 	"""Test matching of file names against various selection functions"""
@@ -104,7 +107,7 @@ testfiles/select/3/3/2""")
 		assert sf(self.makeext("3/3")) == 1
 		assert sf(self.makeext("3/3/3")) == None
 		assert sf(self.makeext("hello\nthere")) == 1
-		globals.null_separator = 1
+		globals.null_separator = 0
 
 	def testFilelistExclude(self):
 		"""Test included filelist"""
@@ -234,14 +237,23 @@ testfiles/select/1/1
 class ParseArgsTest(unittest.TestCase):
 	"""Test argument parsing"""
 	root = None
-	def ParseTest(self, tuplelist, indicies):
+	def ParseTest(self, tuplelist, indicies, filelists = []):
 		"""No error if running select on tuple goes over indicies"""
 		if not self.root: self.root = Path("testfiles/select")
 		self.Select = Select(self.root)
-		self.Select.ParseArgs(tuplelist)
+		self.Select.ParseArgs(tuplelist, self.remake_filelists(filelists))
 		self.Select.set_iter()
 		assert Iter.equal(Iter.map(lambda path: path.index, self.Select),
 						  iter(indicies), verbose = 1)
+
+	def remake_filelists(self, filelist):
+		"""Turn strings in filelist into fileobjs"""
+		new_filelists = []
+		for f in filelist:
+			if type(f) is types.StringType:
+				new_filelists.append(StringIO.StringIO(f))
+			else: new_filelists.append(f)
+		return new_filelists
 
 	def testParse(self):
 		"""Test just one include, all exclude"""
@@ -258,6 +270,18 @@ class ParseArgsTest(unittest.TestCase):
 							   ("--exclude", "**")],
 					   [(), ('1',), ('1', '1'), ('1', '1', '2'),
 						('1', '1', '3')])
+
+	def test_globbing_filelist(self):
+		"""Filelist glob test similar to above testParse2"""
+		self.ParseTest([("--include-globbing-filelist", "file")],
+					   [(), ('1',), ('1', '1'), ('1', '1', '2'),
+						('1', '1', '3')],
+					   ["""
+- testfiles/select/1/1/1
+testfiles/select/1/1
+- testfiles/select/1
+- **
+"""])
 
 	def testGlob(self):
 		"""Test globbing expression"""
@@ -288,6 +312,41 @@ class ParseArgsTest(unittest.TestCase):
 						('3', '3'),
 						('3', '3', '2')])
 
+	def test_globbing_filelist2(self):
+		"""Filelist glob test similar to above testGlob"""
+		self.ParseTest([("--exclude-globbing-filelist", "asoeuth")],
+					   [(), ('1',), ('1', '1'),
+						('1', '1', '1'), ('1', '1', '2'),
+						('1', '2'), ('1', '2', '1'), ('1', '2', '2')],
+					   ["""
+**[3-5]
++ testfiles/select/1
+**
+"""])
+		self.ParseTest([("--include-globbing-filelist", "file")],
+					   [(), ('1',), ('1', '1'),
+						('1', '1', '2'),
+						('1', '2'),
+						('1', '2', '1'), ('1', '2', '2'), ('1', '2', '3'),
+						('1', '3'),
+						('1', '3', '2'),
+						('2',), ('2', '1'),
+						('2', '1', '1'), ('2', '1', '2'), ('2', '1', '3'),
+						('2', '2'),
+						('2', '2', '1'), ('2', '2', '2'), ('2', '2', '3'),
+						('2', '3'),
+						('2', '3', '1'), ('2', '3', '2'), ('2', '3', '3'),
+						('3',), ('3', '1'),
+						('3', '1', '2'),
+						('3', '2'),
+						('3', '2', '1'), ('3', '2', '2'), ('3', '2', '3'),
+						('3', '3'),
+						('3', '3', '2')],
+					   ["""
+testfiles/select**/2
+- **
+"""])
+					   
 	def testGlob2(self):
 		"""Test more globbing functions"""
 		self.ParseTest([("--include", "testfiles/select/*foo*/p*"),

@@ -159,7 +159,7 @@ class Select:
 			if result is not None: return result
 		return 1
 
-	def ParseArgs(self, argtuples):
+	def ParseArgs(self, argtuples, filelists):
 		"""Create selection functions based on list of tuples
 
 		The tuples are created when the initial commandline arguments
@@ -168,6 +168,7 @@ class Select:
 		(option-string, (additional argument, filelist_fp)).
 
 		"""
+		filelists_index = 0
 		try:
 			for opt, arg in argtuples:
 				if opt == "--exclude":
@@ -176,7 +177,13 @@ class Select:
 					self.add_selection_func(self.devfiles_get_sf())
 				elif opt == "--exclude-filelist":
 					self.add_selection_func(self.filelist_get_sf(
-						arg[1], 0, arg[0]))
+						filelists[filelists_index], 0, arg))
+					filelists_index += 1
+				elif opt == "--exclude-globbing-filelist":
+					map(self.add_selection_func,
+						self.filelist_globbing_get_sfs(
+						           filelists[filelists_index], 0, arg))
+					filelists_index += 1
 				elif opt == "--exclude-other-filesystems":
 					self.add_selection_func(self.other_filesystems_get_sf(0))
 				elif opt == "--exclude-regexp":
@@ -185,11 +192,18 @@ class Select:
 					self.add_selection_func(self.glob_get_sf(arg, 1))
 				elif opt == "--include-filelist":
 					self.add_selection_func(self.filelist_get_sf(
-						arg[1], 1, arg[0]))
+						filelists[filelists_index], 1, arg))
+					filelists_index += 1
+				elif opt == "--include-globbing-filelist":
+					map(self.add_selection_func,
+						self.filelist_globbing_get_sfs(
+						          filelists[filelists_index], 1, arg))
+					filelists_index += 1
 				elif opt == "--include-regexp":
 					self.add_selection_func(self.regexp_get_sf(arg, 1))
 				else: assert 0, "Bad selection option %s" % opt
 		except SelectError, e: self.parse_catch_error(e)
+		assert filelists_index == len(filelists)
 		self.parse_last_excludes()
 
 	def parse_catch_error(self, exc):
@@ -329,6 +343,23 @@ probably isn't what you meant.""" %
 			elif index < path.index: return (None, 1)
 			else: return (None, None) # path greater, not initial sequence
 		else: assert 0, "Include is %s, should be 0 or 1" % (include,)
+
+	def filelist_globbing_get_sfs(self, filelist_fp, inc_default, list_name):
+		"""Return list of selection functions by reading fileobj
+
+		filelist_fp should be an open file object
+		inc_default is true iff this is an include list
+		list_name is just the name of the list, used for logging
+		See the man page on --[include/exclude]-globbing-filelist
+
+		"""
+		log.Log("Reading globbing filelist %s" % list_name, 4)
+		separator = globals.null_separator and "\0" or "\n"
+		for line in filelist_fp.read().split(separator):
+			if not line: continue # skip blanks
+			if line[:2] == "+ ": yield self.glob_get_sf(line[2:], 1)
+			elif line[:2] == "- ": yield self.glob_get_sf(line[2:], 0)
+			else: yield self.glob_get_sf(line, inc_default)
 
 	def other_filesystems_get_sf(self, include):
 		"""Return selection function matching files on other filesystems"""

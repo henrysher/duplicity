@@ -22,18 +22,25 @@ import getopt, re, sys
 import backends, globals, log, path, selection, gpg, dup_time
 
 select_opts = [] # Will hold all the selection options
+select_files = [] # Will hold file objects when filelist given
 full_backup = None # Will be set to true if -f or --full option given
 
 def parse_cmdline_options(arglist):
 	"""Parse argument list"""
-	global select_opts, full_backup
+	global select_opts, select_files, full_backup
+	def sel_fl(filename):
+		"""Helper function for including/excluding filelists below"""
+		try: return open(filename, "r")
+		except IOError: log.FatalError("Error opening file %s" % filename)
+
 	try: optlist, args = getopt.getopt(arglist, "firt:v:V",
 		 ["allow-source-mismatch", "archive-dir=", "current-time=",
 		  "encrypt-key=", "exclude=", "exclude-device-files",
-		  "exclude-filelist=", "exclude-filelist-stdin",
-		  "exclude-other-filesystems", "exclude-regexp=",
-		  "file-to-restore=", "full", "incremental", "include=",
-		  "include-filelist=", "include-filelist-stdin",
+		  "exclude-filelist=", "exclude-globbing-filelist",
+		  "exclude-filelist-stdin", "exclude-other-filesystems",
+		  "exclude-regexp=", "file-to-restore=", "full",
+		  "incremental", "include=", "include-filelist=",
+		  "include-filelist-stdin", "include-globbing-filelist=",
 		  "include-regexp=", "null-separator", "restore-dir=",
 		  "restore-time=", "sign-key=", "verbosity="])
 	except getopt.error, e:
@@ -52,12 +59,18 @@ def parse_cmdline_options(arglist):
 		elif (opt == "--exclude-device-files" or
 			  opt == "--exclude-other-filesystems"):
 			select_opts.append((opt, None))
-		elif opt == "--exclude-filelist" or opt == "--include-filelist":
-			select_opts.append((opt, (arg, open(arg, "rb"))))
-		elif (opt == "--exclude-filelist-stdin" or
-			  opt == "--include-filelist-stdin"):
-			select_opts.append((opt, ("stdin", sys.stdin)))
+		elif (opt == "--exclude-filelist" or opt == "--include-filelist" or
+			  opt == "--exclude-globbing-filelist" or
+			  opt == "--include-globbing-filelist"):
+			select_opts.append((opt, arg))
+			select_files.append(sel_fl(arg))
+		elif opt == "--exclude-filelist-stdin":
+			select_opts.append(("--exclude-filelist", "standard input"))
+			select_files.append(sys.stdin)
 		elif opt == "-f" or opt == "--full": full_backup = 1
+		elif opt == "--include-filelist-stdin":
+			select_opts.append(("--include-filelist", "standard input"))
+			select_files.append(sys.stdin)
 		elif opt == "-i" or opt == "--incremental": globals.incremental = 1
 		elif opt == "-r" or opt == "--file-to-restore":
 			globals.restore_dir = arg
@@ -113,9 +126,9 @@ def get_action(args):
 
 def set_selection():
 	"""Return selection iter starting at filename with arguments applied"""
-	global select_opts
+	global select_opts, select_files
 	sel = selection.Select(globals.local_path)
-	sel.ParseArgs(select_opts)
+	sel.ParseArgs(select_opts, select_files)
 	globals.select = sel.set_iter()
 
 def set_backend(arg1, arg2):
