@@ -4,6 +4,10 @@ New in v0.3.0 (2002/10/07)
 Added ftp backend.  Now the remote repository can accessed by ftp and
 can be specified like "ftp://user@foo.bar/".
 
+Added --ssh-command and --scp-command options, which can be used to
+replace ssh and scp, or pass different arguments to them.  Requested
+by Will Dyson.
+
 Added --short-filenames option, for use when uploading to a file
 system that can't have filenames longer than 30 characters (e.g. Mac
 OS 8).

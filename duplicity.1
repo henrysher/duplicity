@@ -217,6 +217,15 @@ affects the expected format of the files specified by the
 --{include|exclude}-filelist[-stdin] switches as well as the format of
 the directory statistics file.
 .TP
+.BI "--scp-command " command
+This option only matters when using the ssh/scp backend.  There
+.I command
+will be used instead of scp to send or receive files.
+.I command
+must have the same syntax as scp.  This option can also be used to
+give extra arguments to scp, for instance "--scp-command \'scp -i
+foo\'".  The default is "scp".
+.TP
 .BI "--sign-key " key
 This option can be used when backing up or restoring.  When backing
 up, all backup files will be signed with keyid
@@ -225,6 +234,14 @@ When restoring, duplicity will signal an error if any remote file is
 not signed with the given keyid.
 .I key
 should be an 8 character hex string, like AA0E73D2.
+.TP
+.BI "--ssh-command " command
+Use
+.I command
+instead of "ssh" to execute commands on the remote side.  This only
+matters when using the ssh/scp backend.  See
+.B --scp-command
+for more information.
 .TP
 .BI -t time ", --restore-time " time
 When restoring, specify the time to restore to.

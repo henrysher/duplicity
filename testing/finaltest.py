@@ -7,8 +7,9 @@ import path, backends
 #backend_url = "ftp://Stan Ford@90-92L-imac.stanford.edu/Macintosh HD/temp"
 backend_url = "scp://localhost//home/ben/prog/python/duplicity/testing/testfiles/output"
 
-# Comment or uncomment these depending on the backend used
-short_filenames = 1
+# Extra arguments to be passed to duplicity
+#other_args = ["--short-filenames"]
+#other_args = ["--ssh-command 'ssh -v'", "--scp-command 'scp -C'"]
 
 class FinalTest(unittest.TestCase):
 	"""Test backup/restore using duplicity binary"""
@@ -17,7 +18,7 @@ class FinalTest(unittest.TestCase):
 		cmd_list = ["../duplicity-bin"]
 		cmd_list.extend(options + ["-v5", "--allow-source-mismatch"])
 		if current_time: cmd_list.append("--current-time %s" % (current_time,))
-		if short_filenames: cmd_list.append("--short-filenames")
+		if other_args: cmd_list.extend(other_args)
 		cmd_list.extend(arglist)
 		cmdline = " ".join(cmd_list)
 		print "Running '%s'." % cmdline

@@ -251,6 +251,13 @@ class LocalBackend(Backend):
 		except OSError, e: raise BackendException(str(e))
 
 
+# The following can be redefined to use different shell commands from
+# ssh or scp or to add more arguments.  However, the replacements must
+# have the same syntax.  Also these strings will be executed by the
+# shell, so shouldn't have strange characters in them.
+ssh_command = "ssh"
+scp_command = "scp"
+
 class scpBackend(Backend):
 	"""This backend copies files using scp.  List not supported"""
 	def __init__(self, parsed_url):
@@ -263,15 +270,15 @@ class scpBackend(Backend):
 	def put(self, source_path, remote_filename = None):
 		"""Use scp to copy source_dir/filename to remote computer"""
 		if not remote_filename: remote_filename = source_path.get_filename()
-		commandline = "scp %s %s:%s%s" % \
-					  (source_path.name, self.host_string,
+		commandline = "%s %s %s:%s%s" % \
+					  (scp_command, source_path.name, self.host_string,
 					   self.remote_prefix, remote_filename)
 		self.run_command(commandline)
 
 	def get(self, remote_filename, local_path):
 		"""Use scp to get a remote file"""
-		commandline = "scp %s:%s%s %s" % \
-					  (self.host_string, self.remote_prefix,
+		commandline = "%s %s:%s%s %s" % \
+					  (scp_command, self.host_string, self.remote_prefix,
 					   remote_filename, local_path.name)
 		self.run_command(commandline)
 		local_path.setdata()
@@ -286,15 +293,16 @@ class scpBackend(Backend):
 		be distinguished from the file boundaries.
 
 		"""
-		commandline = "ssh %s ls %s" % (self.host_string, self.remote_dir)
+		commandline = ("%s %s ls %s" %
+					   (ssh_command, self.host_string, self.remote_dir))
 		return filter(lambda x: x, self.popen(commandline).split("\n"))
 
 	def delete(self, filename_list):
 		"""Runs ssh rm to delete files.  Files must not require quoting"""
 		assert len(filename_list) > 0
 		pathlist = map(lambda fn: self.remote_prefix + fn, filename_list)
-		commandline = "ssh %s rm %s" % \
-					  (self.host_string, " ".join(pathlist))
+		commandline = ("%s %s rm %s" %
+					   (ssh_command, self.host_string, " ".join(pathlist)))
 		self.run_command(commandline)
 
 
