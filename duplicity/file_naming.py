@@ -49,11 +49,11 @@ def from_base36(s):
 	total = 0L
 	for i in range(len(s)):
 		total *= 36
-		try: total += int(s[i])
-		except ValueError:
-			val = ord(s[i]) - ord('a') + 10
-			assert 10 <= val <= 35, val
-			total += val
+		digit_ord = ord(s[i])
+		if ord('0') <= digit_ord <= ord('9'): total += digit_ord - ord('0')
+		elif ord('a') <= digit_ord <= ord('z'):
+			total += digit_ord - ord('a') + 10
+		else: assert 0, "Digit %s in %s not in proper range" % (s[i], s)
 	return total
 
 
