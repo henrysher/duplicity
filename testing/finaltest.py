@@ -104,9 +104,9 @@ class FinalTest(unittest.TestCase):
 	def test_basic_cycle(self, backup_options = [], restore_options = []):
 		"""Run backup/restore test on basic directories"""
 		self.runtest(["testfiles/dir1", "testfiles/dir2",
-					  "testfiles/dir3",
-					  "testfiles/various_file_types/regular_file",
-					  "testfiles/empty_dir"],
+					  "testfiles/dir3"],
+					  #"testfiles/various_file_types/regular_file",
+					  #"testfiles/empty_dir"],
 					 backup_options = backup_options,
 					 restore_options = restore_options)
 
@@ -158,6 +158,10 @@ class FinalTest(unittest.TestCase):
 		lf3.mkdir()
 		lf4 = lf3.append("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
 		lf4.touch()
+		lf4_1 = lf3.append("SYMLINK--------------------------------------------------------------------------------------------")
+		os.symlink("SYMLINK-DESTINATION-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------", lf4_1.name)
+		lf4_1.setdata()
+		assert lf4_1.issym()
 
 		self.runtest(["testfiles/empty_dir", lf_dir.name,
 					  "testfiles/empty_dir", lf_dir.name])

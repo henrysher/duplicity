@@ -1,5 +1,11 @@
+New in v0.4.1 (2003/03/15)
+--------------------------
+
 Applied (version of) Helmut Schneider's patch to display file mod
 times with --list-current-files.
+
+Fixed bug found by Rob Browning handling symlinks with long names that
+have long names.
 
 
 New in v0.4.0 (2002/11/30)

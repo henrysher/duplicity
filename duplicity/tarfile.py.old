@@ -37,13 +37,13 @@
 """Read from and write to tar format archives.
 """
 
-__version__ = "$Revision: 1.1 $"
+__version__ = "$Revision: 1.2 $"
 # $Source: /sources/duplicity/duplicity/duplicity/Attic/tarfile.py.old,v $
 
 version     = "0.4.9"
 __author__  = "Lars Gustäbel (lars@gustaebel.de)"
-__date__    = "$Date: 2002/10/29 01:51:36 $"
-__cvsid__   = "$Id: tarfile.py.old,v 1.1 2002/10/29 01:51:36 bescoto Exp $"
+__date__    = "$Date: 2003/03/14 01:35:24 $"
+__cvsid__   = "$Id: tarfile.py.old,v 1.2 2003/03/14 01:35:24 bescoto Exp $"
 __credits__ = "Gustavo Niemeyer for his support, " \
               "Detlef Lannert for some early contributions"
 
@@ -334,6 +334,56 @@ class TarInfo:
         self.offset   = 0          # the tar header starts here
         self.offset_data = 0       # the optional file's data starts here
 
+    def init_from_stat(self, statres):
+        """Initialize various attributes from statobj (these are
+        returned by os.stat() and related functions.  Return none on error"""
+        stmd = statres.st_mode
+        if stat.S_ISREG(stmd): type = REGTYPE
+        elif stat.S_ISDIR(stmd):
+            type = DIRTYPE
+            if self.name[-1:] != "/": self.name += "/"
+        elif stat.S_ISFIFO(stmd): type = FIFOTYPE
+        elif stat.S_ISLNK(stmd): type = SYMTYPE
+        elif stat.S_ISCHR(stmd): type = CHRTYPE
+        elif stat.S_ISBLK(stmd): type = BLKTYPE
+        else: return None
+
+        # Fill the TarInfo instance with all
+        # information we can get.
+        self.mode  = stat.S_IMODE(stmd)
+        self.uid   = statres.st_uid
+        self.gid   = statres.st_gid
+        self.size  = statres.st_size
+        self.mtime = statres.st_mtime
+        self.type  = type
+        if pwd:
+            try:
+                self.uname = pwd.getpwuid(self.uid)[0]
+            except KeyError:
+                pass
+        if grp:
+            try:
+                self.gname = grp.getgrgid(self.gid)[0]
+            except KeyError:
+                pass
+
+        if type in (CHRTYPE, BLKTYPE):
+            if hasattr(os, "major") and hasattr(os, "minor"):
+                self.devmajor = os.major(statres.st_rdev)
+                self.devminor = os.minor(statres.st_rdev)
+        return 1
+
+    def set_arcname(self, name):
+        """Set the name of the member in the archive.  Backward
+        slashes are converted to forward slashes, Absolute paths are
+        turned to relative paths.
+        """
+        arcname = normpath(name)
+        drv, arcname = os.path.splitdrive(arcname)
+        while arcname[0:1] == "/":
+            arcname = arcname[1:]
+        self.name = arcname
+
     def getheader(self):
         """Return a tar header block as a 512 byte string.
         """
@@ -425,17 +475,22 @@ class TarFile:
             self._extfileobj = 1
         self.fileobj = fileobj
 
+        self.init_datastructures()
+
+        if self._mode == "a":
+            self.fileobj.seek(0)
+            self._load()
+
+    def init_datastructures(self):
         # Init datastructures
-        self.members     = []       # list of members as TarInfo instances
-        self.membernames = []       # names of members
-        self.chunks      = [0]      # chunk cache
+        #self.members     = []       # list of members as TarInfo instances
+        #self.membernames = []       # names of members
+        #self.chunks      = [0]      # chunk cache
         self._loaded     = 0        # flag if all members have been read
         self.offset      = 0l       # current position in the archive file
         self.inodes      = {}       # dictionary caching the inodes of
                                     # archive members already added
-        if self._mode == "a":
-            self.fileobj.seek(0)
-            self._load()
+        self.next_chunk = 0 # offset of next tarinfo, used when reading
 
     def close(self):
         """Close the TarFile instance and do some cleanup.
@@ -452,6 +507,17 @@ class TarFile:
                 self.fileobj.close()
             self.fileobj = None
 
+    def throwaway_until(self, position):
+        """Read data, throwing it away until we get to position"""
+        bufsize = 16 * 1024
+        bytes_to_read = position - self.offset
+        assert bytes_to_read >= 0
+        while bytes_to_read >= bufsize:
+            self.fileobj.read(bufsize)
+            bytes_to_read -= bufsize
+        self.fileobj.read(bytes_to_read)
+        self.offset = position
+
     def next(self):
         """Return the next member from the archive.
            Return None if the end is reached.
@@ -464,7 +530,10 @@ class TarFile:
             raise ValueError, "reading from a write-mode file"
 
         # Read the next block.
-        self.fileobj.seek(self.chunks[-1])
+        # self.fileobj.seek(self.chunks[-1])
+        #self.fileobj.seek(self.next_chunk)
+        #self.offset = self.next_chunk
+        self.throwaway_until(self.next_chunk)
         while 1:
             buf = self.fileobj.read(BLOCKSIZE)
             if not buf:
@@ -490,6 +559,7 @@ class TarFile:
             tarinfo = self._proc_gnulong(tarinfo, tarinfo.type)
 
         if tarinfo.issparse():
+            assert 0, "Sparse file support turned off"
             # Sparse files need some care,
             # due to the possible extra headers.
             tarinfo.offset = self.offset
@@ -506,15 +576,16 @@ class TarFile:
             self.offset += BLOCKSIZE
             tarinfo.offset_data = self.offset
             if tarinfo.isreg():
-                # Skip the following data blocks.
+                ## Skip the following data blocks.
                 blocks, remainder = divmod(tarinfo.size, BLOCKSIZE)
                 if remainder:
                     blocks += 1
-                self.offset += blocks * BLOCKSIZE
+                self.next_chunk = self.offset + (blocks * BLOCKSIZE)
+            else: self.next_chunk = self.offset
 
-        self.members.append(tarinfo)
-        self.membernames.append(tarinfo.name)
-        self.chunks.append(self.offset)
+        #self.members.append(tarinfo)  These use too much memory
+        #self.membernames.append(tarinfo.name)
+        #self.chunks.append(self.offset)
         return tarinfo
 
     def getmember(self, name):
@@ -558,19 +629,12 @@ class TarFile:
            Optional arcname defines the name under which the file
            shall be stored in the archive.
         """
-        # Building the name of the member in the archive.
-        # Backward slashes are converted to forward slashes,
-        # Absolute paths are turned to relative paths.
-        if arcname is None:
-            arcname = name
-        arcname = normpath(arcname)
-        drv, arcname = os.path.splitdrive(arcname)
-        while arcname[0:1] == "/":
-            arcname = arcname[1:]
-
         # Now, fill the TarInfo instance with
         # information specific for the file.
         tarinfo = TarInfo()
+
+        if arcname is None: tarinfo.set_arcname(name)
+        else: tarinfo.set_arcname(arcname)
 
         # Use os.stat or os.lstat, depending on platform
         # and if symlinks shall be resolved.
@@ -579,62 +643,23 @@ class TarFile:
         else:
             statres = os.stat(name)
 
-        linkname = ""
+        if not tarinfo.init_from_stat(statres): return None
 
-        stmd = statres.st_mode
-        if stat.S_ISREG(stmd):
-            inode = (statres.st_ino, statres.st_dev,
-                     statres.st_mtime)
+        if tarinfo.type == REGTYPE:
+            inode = (statres.st_ino, statres.st_dev, statres.st_mtime)
             if inode in self.inodes.keys() and not self.dereference:
                 # Is it a hardlink to an already
                 # archived file?
-                type = LNKTYPE
-                linkname = self.inodes[inode]
+                tarinfo.type = LNKTYPE
+                tarinfo.linkname = self.inodes[inode]
             else:
                 # The inode is added only if its valid.
                 # For win32 it is always 0.
-                type = REGTYPE
-                if inode[0]: self.inodes[inode] = arcname
-        elif stat.S_ISDIR(stmd):
-            type = DIRTYPE
-            if arcname[-1:] != "/": arcname += "/"
-        elif stat.S_ISFIFO(stmd):
-            type = FIFOTYPE
-        elif stat.S_ISLNK(stmd):
-            type = SYMTYPE
-            linkname = os.readlink(name)
-        elif stat.S_ISCHR(stmd):
-            type = CHRTYPE
-        elif stat.S_ISBLK(stmd):
-            type = BLKTYPE
-        else:
-            return None
+                if inode[0]: self.inodes[inode] = tarinfo.name
+        elif tarinfo.type == SYMTYPE:
+            tarinfo.linkname = os.readlink(name)
+            tarinfo.size = 0
 
-        # Fill the TarInfo instance with all
-        # information we can get.
-        tarinfo.name  = arcname
-        tarinfo.mode  = stmd
-        tarinfo.uid   = statres.st_uid
-        tarinfo.gid   = statres.st_gid
-        tarinfo.size  = statres.st_size
-        tarinfo.mtime = statres.st_mtime
-        tarinfo.type  = type
-        tarinfo.linkname = linkname
-        if pwd:
-            try:
-                tarinfo.uname = pwd.getpwuid(tarinfo.uid)[0]
-            except KeyError:
-                pass
-        if grp:
-            try:
-                tarinfo.gname = grp.getgrgid(tarinfo.gid)[0]
-            except KeyError:
-                pass
-
-        if type in (CHRTYPE, BLKTYPE):
-            if hasattr(os, "major") and hasattr(os, "minor"):
-                tarinfo.devmajor = os.major(statres.st_rdev)
-                tarinfo.devminor = os.minor(statres.st_rdev)
         return tarinfo
 
     def list(self, verbose=1):
@@ -724,27 +749,15 @@ class TarFile:
             raise ValueError, "writing to a read-mode file"
 
         # XXX What was this good for again?
-        try:
-            self.fileobj.seek(self.chunks[-1])
-        except IOError:
-            pass
+        #try:
+        #    self.fileobj.seek(self.chunks[-1])
+        #except IOError:
+        #    pass
 
-        # Now we must check if the strings for filename
-        # and linkname fit into the posix header.
-        # (99 chars + "\0" for each)
-        # If not, we must create GNU extension headers.
-        # If both filename and linkname are too long,
-        # the longlink is first to be written out.
-        if len(tarinfo.linkname) >= LENGTH_LINK - 1:
-            self._create_gnulong(tarinfo.linkname, GNUTYPE_LONGLINK)
-            tarinfo.linkname = tarinfo.linkname[:LENGTH_LINK -1]
-        if len(tarinfo.name) >= LENGTH_NAME - 1:
-            self._create_gnulong(tarinfo.name, GNUTYPE_LONGNAME)
-            tarinfo.name = tarinfo.name[:LENGTH_NAME - 1]
-
-        header = tarinfo.getheader()
-        self.fileobj.write(header)
-        self.offset += BLOCKSIZE
+        full_headers = self._get_full_headers(tarinfo)
+        self.fileobj.write(full_headers)
+        assert len(full_headers) % BLOCKSIZE == 0
+        self.offset += len(full_headers)
 
         # If there's data to follow, append it.
         if fileobj is not None:
@@ -755,9 +768,27 @@ class TarFile:
                 blocks += 1
             self.offset += blocks * BLOCKSIZE
 
-        self.members.append(tarinfo)
-        self.membernames.append(tarinfo.name)
-        self.chunks.append(self.offset)
+        #self.members.append(tarinfo)  #These take up too much memory
+        #self.membernames.append(tarinfo.name)
+        #self.chunks.append(self.offset)
+
+    def _get_full_headers(self, tarinfo):
+        """Return string containing headers around tarinfo, including gnulongs
+        """
+        buf = ""
+        # Now we must check if the strings for filename
+        # and linkname fit into the posix header.
+        # (99 chars + "\0" for each)
+        # If not, we must create GNU extension headers.
+        # If both filename and linkname are too long,
+        # the longlink is first to be written out.
+        if len(tarinfo.linkname) >= LENGTH_LINK - 1:
+            buf += self._return_gnulong(tarinfo.linkname, GNUTYPE_LONGLINK)
+            tarinfo.linkname = tarinfo.linkname[:LENGTH_LINK -1]
+        if len(tarinfo.name) >= LENGTH_NAME - 1:
+            buf += self._return_gnulong(tarinfo.name, GNUTYPE_LONGNAME)
+            tarinfo.name = tarinfo.name[:LENGTH_NAME - 1]
+        return buf + tarinfo.getheader()
 
 #    def untar(self, path):
 #        """Untar the whole archive to path.
@@ -1075,7 +1106,7 @@ class TarFile:
         self.offset += BLOCKSIZE
         return tarinfo
 
-    def _create_gnulong(self, name, type):
+    def _return_gnulong(self, name, type):
         """Insert a GNU longname/longlink member into the archive.
            It consists of a common tar header, with the length
            of the longname as size, followed by a data block,
@@ -1087,9 +1118,8 @@ class TarFile:
         tarinfo.mode = 0
         tarinfo.size = len(name)
 
-        self.fileobj.write(tarinfo.getheader())
-        self.fileobj.write(name + "\0" * (512 - len(name)))
-        self.offset += BLOCKSIZE * 2
+        return "%s%s%s" % (tarinfo.getheader(), name,
+                           "\0" * (512 - len(name)))
 
     def _proc_sparse(self, tarinfo):
         """Analyze a GNU sparse header plus extra headers.
@@ -1220,6 +1250,7 @@ class _FileObject:
     """
 
     def __init__(self, tarfile, tarinfo):
+        self.tarfile = tarfile
         self.fileobj = tarfile.fileobj
         self.name    = tarinfo.name
         self.mode    = "r"
@@ -1281,13 +1312,14 @@ class _FileObject:
         """
         if self.closed:
             raise ValueError, "I/O operation on closed file"
-        self.fileobj.seek(self.offset + self.pos)
+        #self.fileobj.seek(self.offset + self.pos)
         bytesleft = self.size - self.pos
         if size is None:
             bytestoread = bytesleft
         else:
             bytestoread = min(size, bytesleft)
         self.pos += bytestoread
+        self.tarfile.offset += bytestoread
         return self.fileobj.read(bytestoread)
 
     def _readsparse(self, size=None):
@@ -1496,3 +1528,129 @@ wildcards *, ?, [seq], [!seq] are accepted.
             for f in files:
                 tarfile.add(f, dir)
     tarfile.close()
+
+
+class TarFromIterator(TarFile):
+    """Readable tarfile-like object generated from iterator
+    """
+    # These various status numbers indicate what we are in the process
+    # of doing in the tarfile.
+    BEGIN = 0 # next step is to read tarinfo, write new header
+    MIDDLE_OF_FILE = 1 # in process of writing file data
+    END = 2 # end of data
+
+    # Buffer is added to in multiples of following
+    BUFFER_ADDLEN = 64 * 1024
+
+    def __init__(self, pair_iter):
+        """Construct a TarFromIterator instance.  pair_iter is an
+        iterator of (TarInfo, fileobj) objects, which fileobj should
+        be a file-like object opened for reading, or None.  The
+        fileobjs will be closed before the next element in the
+        iterator is read.
+        """
+        self.closed = None
+        self.name = None
+        self.mode = "rb"
+        self.pair_iter = pair_iter
+
+        self.init_datastructures()
+        self.status = self.BEGIN
+        self.cur_tarinfo, self.cur_fileobj = None, None
+        self.cur_pos_in_fileobj = 0
+        self.buffer = ""
+        # holds current position as seen by reading client.  This is
+        # distinct from self.offset.
+        self.tar_iter_offset = 0
+
+    def seek(self, offset):
+        """Seek to current position.  Just read and discard some amount"""
+        if offset < self.tar_iter_offset:
+            raise TarError("Seeks in TarFromIterator must go forwards,\n"
+                           "Instead asking for %s from %s" %
+                           (offset, self.tar_iter_offset))
+        while offset - self.tar_iter_offset >= self.BUFFER_ADDLEN:
+            buf = self.read(self.BUFFER_ADDLEN)
+            if not buf: return # eof
+        self.read(offset - self.tar_iter_offset)
+
+    def read(self, length = -1):
+        """Return next length bytes, or everything if length < 0"""
+        if length < 0:
+            while 1:
+                if not self._addtobuffer(): break
+            result = self.buffer
+            self.buffer = ""
+        else:
+            while len(self.buffer) < length:
+                if not self._addtobuffer(): break
+            # It's possible that length > len(self.buffer)
+            result = self.buffer[:length]
+            self.buffer = self.buffer[length:]
+        self.tar_iter_offset += len(result)
+        return result
+        
+    def _addtobuffer(self):
+        """Write more data into the buffer.  Return None if at end"""
+        if self.status == self.BEGIN:
+            # Just write headers into buffer
+            try: self.cur_tarinfo, self.cur_fileobj = self.pair_iter.next()
+            except StopIteration:
+                self._add_final()
+                self.status = self.END
+                return None
+
+            # Zero out tarinfo sizes for various file types
+            if self.cur_tarinfo.type in (LNKTYPE, SYMTYPE,
+                                         FIFOTYPE, CHRTYPE, BLKTYPE):
+                self.cur_tarinfo.size = 0l
+
+            full_headers = self._get_full_headers(self.cur_tarinfo)
+            self.buffer += full_headers
+            self.offset += len(full_headers)
+            assert len(full_headers) % BLOCKSIZE == 0
+
+            if self.cur_fileobj is None: # no data with header
+                self.status = self.BEGIN
+                self._finish_fileobj()
+            else:
+                self.status = self.MIDDLE_OF_FILE
+                self.cur_pos_in_fileobj = 0
+            return 1
+        elif self.status == self.MIDDLE_OF_FILE:
+            # Add next chunk of self.cur_fileobj to self.buffer
+            l = min(self.BUFFER_ADDLEN,
+                    self.cur_tarinfo.size - self.cur_pos_in_fileobj)
+            s = self.cur_fileobj.read(l)
+            self.cur_pos_in_fileobj += len(s)
+            if len(s) == 0:
+                if l != 0: raise IOError, "end of file reached"
+                blocks, remainder = divmod(self.cur_tarinfo.size, BLOCKSIZE)
+                if remainder > 0:
+                    self.buffer += "\0" * (BLOCKSIZE - remainder)
+                    blocks += 1
+                self.cur_fileobj.close()
+                self.offset += blocks * BLOCKSIZE
+                self._finish_fileobj()
+                self.status = self.BEGIN
+            else: self.buffer += s
+            return 1
+        elif self.status == self.END: return None
+        assert 0
+
+    def _finish_fileobj(self):
+        """Update some variables when done writing fileobj"""
+        return # Skip saving tarinfo information to save memory
+        self.members.append(self.cur_tarinfo)
+        self.membernames.append(self.cur_tarinfo.name)
+        self.chunks.append(self.offset)
+
+    def _add_final(self):
+        """Add closing footer to buffer"""
+        blocks, remainder = divmod(self.offset, RECORDSIZE)
+        if remainder > 0: self.buffer += "\0" * (RECORDSIZE - remainder)
+
+    def close(self):
+        """Close file obj"""
+        assert not self.closed
+        self.closed = 1

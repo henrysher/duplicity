@@ -37,13 +37,13 @@
 """Read from and write to tar format archives.
 """
 
-__version__ = "$Revision: 1.1 $"
+__version__ = "$Revision: 1.2 $"
 # $Source: /sources/duplicity/duplicity/duplicity/tarfile.py,v $
 
 version     = "0.4.9"
 __author__  = "Lars Gustäbel (lars@gustaebel.de)"
-__date__    = "$Date: 2002/10/29 01:51:36 $"
-__cvsid__   = "$Id: tarfile.py,v 1.1 2002/10/29 01:51:36 bescoto Exp $"
+__date__    = "$Date: 2003/03/14 01:35:02 $"
+__cvsid__   = "$Id: tarfile.py,v 1.2 2003/03/14 01:35:02 bescoto Exp $"
 __credits__ = "Gustavo Niemeyer for his support, " \
               "Detlef Lannert for some early contributions"
 
@@ -1087,18 +1087,16 @@ class TarFile:
         name = None
         linkname = None
         buf = self.fileobj.read(BLOCKSIZE)
-        if not buf:
-            return None
+        if not buf: return None
         self.offset += BLOCKSIZE
-        if type == GNUTYPE_LONGNAME:
-            name = nts(buf)
-        if type == GNUTYPE_LONGLINK:
-            linkname = nts(buf)
+        if type == GNUTYPE_LONGNAME: name = nts(buf)
+        if type == GNUTYPE_LONGLINK: linkname = nts(buf)
 
         buf = self.fileobj.read(BLOCKSIZE)
-        if not buf:
-            return None
+        if not buf: return None
         tarinfo = self._buftoinfo(buf)
+        if tarinfo.type in (GNUTYPE_LONGLINK, GNUTYPE_LONGNAME):
+            tarinfo = self._proc_gnulong(tarinfo, tarinfo.type)
         if name is not None:
             tarinfo.name = name
         if linkname is not None:
