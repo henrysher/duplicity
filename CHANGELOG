@@ -1,4 +1,4 @@
-New in v0.4.1 (2003/??/??)
+New in v0.4.1 (2003/08/09)
 --------------------------
 
 Applied (version of) Helmut Schneider's patch to display file mod
@@ -16,6 +16,8 @@ on file length.
 
 duplicity should now build with librsync 0.9.6.  Much thanks to
 Donovan Baarda for his work in this version of librsync.
+
+duplicity should work with Python 2.3 now.
 
 
 New in v0.4.0 (2002/11/30)

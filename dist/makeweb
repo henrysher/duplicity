@@ -15,15 +15,19 @@ if len(sys.argv) == 4:
 	old_version = sys.argv[3]
 	command = sys.argv[1][1:]
 elif len(sys.argv) == 3:
-	version = sys.argv[1]
-	old_version = sys.argv[2]
-	command = "all"
+	command = sys.argv[1][1:]
+	if command in ('u', 'm', 'c'): version = old_version = sys.argv[2]
+	else:
+		version = sys.argv[1]
+		old_version = sys.argv[2]
+		command = "all"
 else: command_line_error()
 
 duplicity_mirror = "/home/ben/misc/html/mirror/duplicity"
+fedora_release = 1
 tarball = "duplicity-%s.tar.gz" % version
-srcrpm = "duplicity-%s-1.src.rpm" % version
-i386rpm = "duplicity-%s-1.i386.rpm" % version
+srcrpm = "duplicity-%s-0.fdr.%d.src.rpm" % (version, fedora_release)
+i386rpm = "duplicity-%s-0.fdr.%d.i386.rpm" % (version, fedora_release)
 
 old_tarball = "duplicity-%s.tar.gz" % old_version
 old_srcrpm = "duplicity-%s-1.src.rpm" % old_version
