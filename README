@@ -17,16 +17,19 @@ The default prefix is /usr, so files are put in /usr/bin,
 
 REQUIREMENTS:
 
-Remember that you must have Python 2.2 or later and librsync 0.9.5.1
-or later installed.  For Python, see http://www.python.org.  The
-rdiff-backup homepage at http://rdiff-backup.stanford.edu/ should have
-a recent version of librsync; otherwise see the librsync homepage at
-http://sourceforge.net/projects/librsync/.
+Remember that you must have Python 2.2 or later, librsync 0.9.5.1 or
+later, and GnuPG installed.  For Python, see http://www.python.org.
+The rdiff-backup homepage at http://rdiff-backup.stanford.edu/ should
+have a recent version of librsync; otherwise see the librsync homepage
+at http://sourceforge.net/projects/librsync/.  For GnuPG, see the
+GnuPG homepage at http://www.gnupg.org/.
 
 
 HELP:
 
-If you are having problems, you may want to try the mailing list.
-Duplicity and rdiff-backup currently share a mailing list, so see:
-http://rdiff-backup.stanford.edu/list.html.
+For more information see the duplicity home page at:
 
+    http://www.nongnu.org/duplicity
+
+or post to the mailing list at
+http://mail.nongnu.org/mailman/listinfo/duplicity-talk/.
