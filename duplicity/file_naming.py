@@ -36,6 +36,27 @@ full_sig_re_short = re.compile("^dfs\\.(?P<time>[0-9a-z]+?)\\.st(\\.|$)")
 new_sig_re = re.compile("^duplicity-new-signatures\\.(?P<start_time>.*?)\\.to\\.(?P<end_time>.*?)\\.sigtar(\\.|$)")
 new_sig_re_short = re.compile("^dns\\.(?P<start_time>[0-9a-z]+?)\\.(?P<end_time>[0-9a-z]+?)\\.st(\\.|$)")
 
+def to_base36(n):
+	"""Return string representation of n in base 36 (use 0-9 and a-z)"""
+	div, mod = divmod(n, 36)
+	if mod <= 9: last_digit = str(mod)
+	else: last_digit = chr(ord('a') + mod - 10)
+	if n == mod: return last_digit
+	else: return to_base36(div)+last_digit
+
+def from_base36(s):
+	"""Convert string s in base 36 to long int"""
+	total = 0L
+	for i in range(len(s)):
+		total *= 36
+		try: total += int(s[i])
+		except ValueError:
+			val = ord(s[i]) - ord('a') + 10
+			assert 10 <= val <= 35, val
+			total += val
+	return total
+
+
 def get(type, volume_number = None, manifest = None,
 		encrypted = None, gzipped = None):
 	"""Return duplicity filename of specified type
@@ -45,14 +66,6 @@ def get(type, volume_number = None, manifest = None,
 	filename is of a full or inc manifest file.
 
 	"""
-	def base36(n):
-		"""Return string representation of n in base 36 (use 0-9 and a-z)"""
-		div, mod = divmod(n, 36)
-		if mod <= 9: last_digit = str(mod)
-		else: last_digit = chr(ord('a') + mod - 10)
-		if n == mod: return last_digit
-		else: return base36(div)+last_digit
-
 	assert dup_time.curtimestr
 	assert not (encrypted and gzipped)
 	if encrypted:
@@ -67,13 +80,13 @@ def get(type, volume_number = None, manifest = None,
 		assert not volume_number and not manifest
 		if type == "full-sig":
 			if globals.short_filenames:
-				return "dfs.%s.st%s" % (base36(dup_time.curtime), suffix)
+				return "dfs.%s.st%s" % (to_base36(dup_time.curtime), suffix)
 			else: return ("duplicity-full-signatures.%s.sigtar%s" %
 						  (dup_time.curtimestr, suffix))
 		elif type == "new-sig":
 			if globals.short_filenames:
-				return "dns.%s.%s.st%s" % (base36(dup_time.prevtime),
-										   base36(dup_time.curtime), suffix)
+				return "dns.%s.%s.st%s" % (to_base36(dup_time.prevtime),
+										   to_base36(dup_time.curtime), suffix)
 			return "duplicity-new-signatures.%s.to.%s.sigtar%s" % \
 				   (dup_time.prevtimestr, dup_time.curtimestr, suffix)
 	else:
@@ -81,21 +94,21 @@ def get(type, volume_number = None, manifest = None,
 		assert not (volume_number and manifest)
 		if volume_number:
 			if globals.short_filenames:
-				vol_string = "%s.dt" % base36(volume_number)
+				vol_string = "%s.dt" % to_base36(volume_number)
 			else: vol_string = "vol%d.difftar" % volume_number
 		else:
 			if globals.short_filenames: vol_string = "m"
 			else: vol_string = "manifest"
 		if type == "full":
 			if globals.short_filenames:
-				return "df.%s.%s%s" % (base36(dup_time.curtime),
+				return "df.%s.%s%s" % (to_base36(dup_time.curtime),
 									   vol_string, suffix)
 			else: return "duplicity-full.%s.%s%s" % (dup_time.curtimestr,
 													 vol_string, suffix)
 		elif type == "inc":
 			if globals.short_filenames:
-				return "di.%s.%s.%s%s" % (base36(dup_time.prevtime),
-							base36(dup_time.curtime), vol_string, suffix)
+				return "di.%s.%s.%s%s" % (to_base36(dup_time.prevtime),
+						   to_base36(dup_time.curtime), vol_string, suffix)
 			else: return "duplicity-inc.%s.to.%s.%s%s" % \
 			   (dup_time.prevtimestr, dup_time.curtimestr, vol_string, suffix)
 		else: assert 0
@@ -104,18 +117,6 @@ def get(type, volume_number = None, manifest = None,
 def parse(filename):
 	"""Parse duplicity filename, return None or ParseResults object"""
 	filename = filename.lower()
-	def from_base36(s):
-		"""Convert string s in base 36 to long int"""
-		total = 0L
-		for i in range(len(s)):
-			total *= 36
-			try: total += int(s[i])
-			except ValueError:
-				val = ord(s[i]) - ord('a') + 10
-				assert 10 <= val <= 35, val
-				total += val
-		return total
-
 	def str2time(timestr):
 		"""Return time in seconds if string can be converted, None otherwise"""
 		if globals.short_filenames: t = from_base36(timestr)

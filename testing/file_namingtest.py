@@ -5,6 +5,15 @@ import dup_time, file_naming, log, globals
 
 log.setverbosity(5)
 
+class Test36(unittest.TestCase):
+	def test_base36(self):
+		"""Test conversion to/from base 36"""
+		numlist = [0, 1, 10, 1313, 34233, 872338, 2342889,
+				   134242234, 1204684368, 34972382455]
+		for n in numlist:
+			b = file_naming.to_base36(n)
+			assert file_naming.from_base36(b) == n, (b, n)
+
 class FileNamingBase:
 	"""Holds file naming test functions, for use in subclasses"""
 	def test_basic(self):
