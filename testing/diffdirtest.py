@@ -37,8 +37,33 @@ class DDTest(unittest.TestCase):
 			i += 1
 		assert i >= 5, "There should be at least 5 files in sigtar"
 
+	def empty_diff_schema(self, dirname):
+		"""Given directory name, make sure can tell when nothing changes"""
+		self.deltmp()
+		select = selection.Select(Path(dirname))
+		select.set_iter()
+		sigtar = diffdir.SigTarBlockIter(select)
+		diffdir.write_block_iter(sigtar, "testfiles/output/sigtar")
+
+		sigtar_fp = open("testfiles/output/sigtar")
+		select2 = selection.Select(Path(dirname))
+		select2.set_iter()
+		diffdir.write_block_iter(diffdir.DirDelta(select2, sigtar_fp),
+								 "testfiles/output/difftar")
+
+		size = os.stat("testfiles/output/difftar").st_size
+		assert size == 0 or size == 10240, size # 10240 is size of one record
+		if size != 0:
+			fin = open("testfiles/output/difftar", "rb")
+			diff_buf = fin.read()
+			assert not fin.close()
+			assert diff_buf == '\0'*10240
+
 	def test_empty_diff(self):
 		"""Test producing a diff against same sig; should be len 0"""
+		self.empty_diff_schema("testfiles/various_file_types")
+		return
+
 		self.deltmp()
 		select = selection.Select(Path("testfiles/various_file_types"))
 		select.set_iter()
@@ -52,7 +77,11 @@ class DDTest(unittest.TestCase):
 								 "testfiles/output/difftar")
 
 		size = os.stat("testfiles/output/difftar").st_size
-		assert size == 0 or size == 10240 # 10240 is size of one record
+
+	def test_empty_diff2(self):
+		"""Test producing diff against directories of special files"""
+		self.empty_diff_schema("testfiles/special_cases/neg_mtime")
+		self.empty_diff_schema("testfiles/special_cases/no_uname")
 
 	def test_diff(self):
 		"""Test making a diff"""
