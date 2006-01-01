@@ -33,7 +33,7 @@ class StatsObjTest(unittest.TestCase):
 		assert s1.get_stat('SourceFiles') == 0
 
 	def test_get_stats_string(self):
-		"""Test conversion of stat object into string"""
+		"""Test conversion of stat object into string (adjust for your tz)"""
 		s = StatsObj()
 		stats_string = s.get_stats_string()
 		assert stats_string == "", stats_string
@@ -41,8 +41,8 @@ class StatsObjTest(unittest.TestCase):
 		self.set_obj(s)
 		stats_string = s.get_stats_string()
 		assert stats_string == \
-"""StartTime 13.00 (Wed Dec 31 16:00:13 1969)
-EndTime 14.00 (Wed Dec 31 16:00:14 1969)
+"""StartTime 13.00 (Wed Dec 31 18:00:13 1969)
+EndTime 14.00 (Wed Dec 31 18:00:14 1969)
 ElapsedTime 1.00 (1 second)
 SourceFiles 1
 SourceFileSize 2 (2 bytes)

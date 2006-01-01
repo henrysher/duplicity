@@ -4,15 +4,15 @@ import path
 
 class RdiffdirTest(unittest.TestCase):
 	"""Test rdiffdir command line program"""
-	def run(self, command): assert not os.system(command)
+	def run_cmd(self, command): assert not os.system(command)
 	def del_tmp(self):
 		"""Make new testfiles/output dir"""
-		self.run("rm -rf testfiles/output")
+		self.run_cmd("rm -rf testfiles/output")
 		os.mkdir("testfiles/output")
 
 	def run_rdiffdir(self, argstring):
 		"""Run rdiffdir with given arguments"""
-		self.run("../rdiffdir " + argstring)
+		self.run_cmd("../rdiffdir " + argstring)
 
 	def run_cycle(self, dirname_list):
 		"""Run diff/patch cycle on directories in dirname_list"""
@@ -24,7 +24,7 @@ class RdiffdirTest(unittest.TestCase):
 		delta_path = path.Path("testfiles/output/delta.tar")
 		sig_path = path.Path("testfiles/output/sig.tar")
 
-		self.run("cp -a %s %s" % (new_path.name, seq_path.name))
+		self.run_cmd("cp -a %s %s" % (new_path.name, seq_path.name))
 		seq_path.setdata()
 		self.run_rdiffdir("sig %s %s" % (seq_path.name, sig_path.name))
 		sig_path.setdata()

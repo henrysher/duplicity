@@ -88,7 +88,7 @@ class GPGTest(unittest.TestCase):
 			gpg.GPGWriteFile(gwfh, "testfiles/output/gpgwrite.gpg",
 							 profile, size = size)
 			#print os.stat("testfiles/output/gpgwrite.gpg").st_size-size
-			assert size - 32 * 1024 <= os.stat("testfiles/output/gpgwrite.gpg").st_size <= size + 32 * 1024
+			assert size - 64 * 1024 <= os.stat("testfiles/output/gpgwrite.gpg").st_size <= size + 64 * 1024
 		gwfh.set_at_end()
 		gpg.GPGWriteFile(gwfh, "testfiles/output/gpgwrite.gpg",
 						 profile, size = size)
@@ -102,11 +102,11 @@ class GPGTest(unittest.TestCase):
 		for i in range(10):
 			gpg.GzipWriteFile(gwfh, "testfiles/output/gzwrite.gz",
 							  size = size)
-			print os.stat("testfiles/output/gzwrite.gz").st_size-size
-			assert size - 32 * 1024 <= os.stat("testfiles/output/gzwrite.gz").st_size <= size + 32 * 1024
+			#print os.stat("testfiles/output/gzwrite.gz").st_size-size
+			assert size - 64 * 1024 <= os.stat("testfiles/output/gzwrite.gz").st_size <= size + 64 * 1024
 		gwfh.set_at_end()
 		gpg.GzipWriteFile(gwfh, "testfiles/output/gzwrite.gpg", size = size)
-		print os.stat("testfiles/output/gzwrite.gz").st_size
+		#print os.stat("testfiles/output/gzwrite.gz").st_size
 		
 
 class GPGWriteHelper2:

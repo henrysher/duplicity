@@ -201,7 +201,7 @@ def GPGWriteFile(block_iter, filename, profile,
 		if logger_fp_list[0] is not sys.stderr: logger_fp_list[0].close()
 
 	minimum_block_size = 128 * 1024 # don't bother requesting blocks smaller
-	target_size = size - 21 * 1024 # fudge factor, compensate for gpg buffering
+	target_size = size - 50 * 1024 # fudge factor, compensate for gpg buffering
 	data_size = target_size - max_footer_size
 	gpg_process, to_gpg_fp = start_gpg(filename, profile.passphrase)
 	at_end_of_blockiter = 0
