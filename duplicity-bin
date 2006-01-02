@@ -320,6 +320,7 @@ def remove_old(col_stats):
 					  set_times_str(setlist), 3)
 		setlist.reverse() # save oldest for last
 		for set in setlist: set.delete()
+		col_stats.set_values(sig_chain_warning = None).cleanup_signatures()
 	else:
 		if len(setlist) > 1:
 			log.Warn("Found old backup sets at the following times:")
