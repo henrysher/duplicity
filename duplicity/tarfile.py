@@ -37,13 +37,13 @@
 """Read from and write to tar format archives.
 """
 
-__version__ = "$Revision: 1.4 $"
+__version__ = "$Revision: 1.5 $"
 # $Source: /sources/duplicity/duplicity/duplicity/tarfile.py,v $
 
 version     = "0.4.9"
 __author__  = "Lars Gustabel (lars@gustaebel.de)"
-__date__    = "$Date: 2003/08/10 01:05:17 $"
-__cvsid__   = "$Id: tarfile.py,v 1.4 2003/08/10 01:05:17 bescoto Exp $"
+__date__    = "$Date: 2006/01/12 16:29:53 $"
+__cvsid__   = "$Id: tarfile.py,v 1.5 2006/01/12 16:29:53 bescoto Exp $"
 __credits__ = "Gustavo Niemeyer for his support, " \
               "Detlef Lannert for some early contributions"
 
@@ -385,6 +385,12 @@ class TarInfo:
     def getheader(self):
         """Return a tar header block as a 512 byte string.
         """
+        if self.uid > 2097151 or self.uid < 0:
+            sys.stderr.write("uid %i of file %s not in range. Setting uid to 60001\n" % (self.uid,self.name))
+            self.uid = 60001
+        if self.gid > 2097151 or self.gid < 0:
+            sys.stderr.write("gid %i of file %s not in range. Setting gid to 60001\n" % (self.gid, self.name))
+            self.gid = 60001
         # The following code was contributed by Detlef Lannert.
         parts = []
         for value, fieldsize in (

@@ -7,6 +7,11 @@ confirm.
 Eric Hanchrow's patch makes sure duplicity deletes older signatures
 when using --remove-older-than.
 
+Jiri Taylor's patch may fix some scp/sftp problems.
+
+asdf's patch makes sure uids or gids over 2097151 don't corrupt the
+tarfiles.
+
 
 New in v0.4.1 (2003/08/09)
 --------------------------
