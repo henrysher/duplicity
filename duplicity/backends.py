@@ -257,6 +257,7 @@ class LocalBackend(Backend):
 # shell, so shouldn't have strange characters in them.
 ssh_command = "ssh"
 scp_command = "scp"
+sftp_command = "sftp"
 
 class scpBackend(Backend):
 	"""This backend copies files using scp.  List not supported"""
@@ -293,19 +294,20 @@ class scpBackend(Backend):
 		be distinguished from the file boundaries.
 
 		"""
-		commandline = ("%s %s ls %s" %
-					   (ssh_command, self.host_string, self.remote_dir))
+		commandline = ("echo -e 'cd %s\nls -1' | %s -b - %s | grep -v 'sftp> '" %
+					   (self.remote_dir, sftp_command, self.host_string))
 		return filter(lambda x: x, self.popen(commandline).split("\n"))
 
 	def delete(self, filename_list):
 		"""Runs ssh rm to delete files.  Files must not require quoting"""
 		assert len(filename_list) > 0
 		pathlist = map(lambda fn: self.remote_prefix + fn, filename_list)
-		del_prefix = "%s %s rm " % (ssh_command, self.host_string)
+		del_prefix = "echo 'rm "
+		del_postfix = "' | %s -b - %s 1>/dev/null" % (sftp_command, self.host_string)
 
 		# Delete in groups of 10 to avoid overflowing command line
 		for i in range(0, len(pathlist), 10):
-			commandline = del_prefix + " ".join(pathlist[i:i+10])
+			commandline = del_prefix + " ".join(pathlist[i:i+10]) + del_postfix
 			self.run_command(commandline)
 
 
