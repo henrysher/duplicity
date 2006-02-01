@@ -15,6 +15,9 @@ tarfiles.
 Cleaned up and documented --collection-status option, which lists the
 backup chains and sets found in the repository.
 
+FTP error 450 when listing a directory now understood to mean the
+directory is empty (duplicity will not exit with error).
+
 
 New in v0.4.1 (2003/08/09)
 --------------------------

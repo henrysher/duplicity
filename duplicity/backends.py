@@ -361,7 +361,11 @@ class ftpBackend(Backend):
 	def list(self):
 		"""List files in directory"""
 		log.Log("Listing files on FTP server", 5)
-		return self.error_wrap('nlst')
+		# Some ftp servers raise error 450 if the directory is empty
+		try: return self.error_wrap('nlst')
+		except BackendException, e:
+			if "450" in str(e): return []
+			raise
 
 	def delete(self, filename_list):
 		"""Delete files in filename_list"""
