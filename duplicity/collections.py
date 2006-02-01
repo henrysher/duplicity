@@ -170,6 +170,10 @@ remote backup set or the local archive directory has been corrupted.""")
 		if self.end_time: return self.end_time
 		assert 0, "Neither self.time nor self.end_time set"
 
+	def __len__(self):
+		"""Return the number of volumes in the set"""
+		return len(self.volume_name_dict.keys())
+
 
 class BackupChain:
 	"""BackupChain - a number of linked BackupSets
@@ -219,12 +223,33 @@ class BackupChain:
 
 	def __str__(self):
 		"""Return string representation, for testing purposes"""
-		incset_str = "{%s}" % ", ".join(map(str, self.incset_list))
-		return ("BackupChain: Fullset: %s\n"
-				"             Incsetlist: %s\n"
-				"             Start Time: %s\n"
-				"             End Time: %s" % (self.fullset, incset_str,
-											   self.start_time, self.end_time))
+		set_schema = "%20s   %30s   %15s"
+		l = ["-------------------------",
+			 "Chain start time: " + dup_time.timetopretty(self.start_time),
+			 "Chain end time: " + dup_time.timetopretty(self.end_time),
+			 "Number of contained backup sets: %d" %
+			 (len(self.incset_list)+1,),
+			 "Total number of contained volumes: %d" %
+			 (self.get_num_volumes(),),
+			 set_schema % ("Type of backup set:", "Time:", "Num volumes:")]
+
+		for s in self.get_all_sets():
+			if s.time:
+				type = "Full"
+				time = s.time
+			else:
+				type = "Incremental"
+				time = s.end_time
+			l.append(set_schema % (type, dup_time.timetopretty(time), len(s)))
+
+		l.append("-------------------------")
+		return "\n".join(l)
+
+	def get_num_volumes(self):
+		"""Return the total number of volumes in the chain"""
+		n = 0
+		for s in self.get_all_sets(): n+=len(s)
+		return n
 
 	def get_all_sets(self):
 		"""Return list of all backup sets in chain"""
@@ -339,20 +364,34 @@ class CollectionsStatus:
 		self.values_set = None
 
 	def __str__(self):
-		"""Return string version, for testing purposes"""
-		l = ["Backend: %s" % (self.backend,),
-			 "Archive dir: %s" % (self.archive_dir,),
-			 "Matched pair: %s" % (self.matched_chain_pair,),
-			 "All backup chains: %s" % (self.all_backup_chains,),
-			 "Other backup chains: %s" % (self.other_backup_chains,),
-			 "Other sig chains: %s" % (self.other_sig_chains,),
-			 "Orphaned sig names: %s" % (self.orphaned_sig_names,),
-			 "Orphaned backup sets: %s" % (self.orphaned_backup_sets,),
-			 "Incomplete backup sets: %s" % (self.incomplete_backup_sets,)]
-		part1 = "\n".join(l)
-		part2 = "\n----------------Backup Chains----------------------\n"
-		part3 = "\n------\n".join(map(str, self.all_backup_chains))
-		return part1+part2+part3
+		"""Return string summary of the collection"""
+		l = ["Connecting with backend: %s" %
+			 (self.backend.__class__.__name__,),
+			 "Archive dir: %s" % (self.archive_dir,)]
+		if self.matched_chain_pair:
+			l.append("\nFound a complete backup chain with matching "
+					 "signature chain:")
+			l.append(str(self.matched_chain_pair[1]))
+		else: l.append("No backup chains with active signatures found")
+
+		l.append("\nFound %d backup chains without signatures."
+				 % len(self.other_backup_chains))
+		for i in range(len(self.other_backup_chains)):
+			l.append("Signature-less chain %d of %d:" %
+					 (i+1, len(self.other_backup_chains)))
+			l.append(str(self.other_backup_chains[i]))
+			l.append("")
+
+		if self.orphaned_backup_sets or self.incomplete_backup_sets:
+			l.append("Also found %d backup sets not part of any chain,"
+					 % (len(self.orphaned_backup_sets),))
+			l.append("and %d incomplete backup sets."
+					 % (len(self.incomplete_backup_sets),))
+			l.append("These may be deleted by running duplicity with the "
+					 "--cleanup option.")
+		else: l.append("No orphaned or incomplete backup sets found.")
+
+		return "\n".join(l)
 
 	def set_values(self, sig_chain_warning = 1):
 		"""Set values from archive_dir and backend.
@@ -394,6 +433,8 @@ class CollectionsStatus:
 		to be downloaded).
 
 		"""
+		self.other_sig_chains = sig_chains
+		self.other_backup_chains = backup_chains
 		self.matched_chain_pair = None
 		if sig_chains and backup_chains:
 			latest_backup_chain = backup_chains[-1]
@@ -407,9 +448,9 @@ class CollectionsStatus:
 					del sig_chains[i]
 					# break     # MDR this way the remote will not be
 					            # deleted if local present
-			
-		self.other_sig_chains = sig_chains
-		self.other_backup_chains = backup_chains
+		if self.matched_chain_pair:
+			self.other_sig_chains.remove(self.matched_chain_pair[0])
+			self.other_backup_chains.remove(self.matched_chain_pair[1])
 
 	def warn(self, sig_chain_warning):
 		"""Log various error messages if find incomplete/orphaned files"""

@@ -12,6 +12,9 @@ Jiri Taylor's patch may fix some scp/sftp problems.
 asdf's patch makes sure uids or gids over 2097151 don't corrupt the
 tarfiles.
 
+Cleaned up and documented --collection-status option, which lists the
+backup chains and sets found in the repository.
+
 
 New in v0.4.1 (2003/08/09)
 --------------------------

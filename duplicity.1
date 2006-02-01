@@ -17,7 +17,7 @@ duplicity \- Encrypted backup using rsync algorithm
 
 .B duplicity
 .BI [ options ]
-.B --list-current-files
+.B [--collection-status | --list-current-files]
 .I source_url
 
 .B duplicity
@@ -124,6 +124,10 @@ Delete the extraneous duplicity files on the given backend.
 Non-duplicity files, or files in complete data sets will not be
 deleted.  This should only be necessary after a duplicity session
 fails or is aborted prematurely.
+.TP
+.B --collection-status
+Summarize the status of the backup repository by printing the chains
+and sets found, and the number of volumes in each.
 .TP
 .BI "--encrypt-key " key
 When backing up, encrypt to the given public key, instead of using
