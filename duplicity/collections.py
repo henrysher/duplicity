@@ -434,7 +434,7 @@ class CollectionsStatus:
 
 		"""
 		self.other_sig_chains = sig_chains
-		self.other_backup_chains = backup_chains
+		self.other_backup_chains = backup_chains[:]
 		self.matched_chain_pair = None
 		if sig_chains and backup_chains:
 			latest_backup_chain = backup_chains[-1]
@@ -653,7 +653,10 @@ class CollectionsStatus:
 		"""
 		old_sets = []
 		for chain in self.get_chains_older_than(t):
-			old_sets.extend(chain.get_all_sets())
+			if (not self.matched_chain_pair or
+				chain is not self.matched_chain_pair[1]):
+				# don't delete the active (matched) chain
+				old_sets.extend(chain.get_all_sets())
 		return self.sort_sets(old_sets)
 
 	def get_older_than_required(self, t):

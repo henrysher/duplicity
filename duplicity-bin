@@ -308,6 +308,12 @@ def remove_old(col_stats):
 				 "deleted because newer sets depend on them." %
 				 set_times_str(req_list))
 
+	if (col_stats.matched_chain_pair and
+		col_stats.matched_chain_pair[1].end_time < globals.remove_time):
+		log.Warn("Current active backup chain is older than specified time.\n"
+			 "However, it will not be deleted.  To remove all your backups,\n"
+				 "manually purge the repository.")
+
 	setlist = col_stats.get_older_than(globals.remove_time)
 	if not setlist:
 		log.Warn("No old backup sets found, nothing deleted.")

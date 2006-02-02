@@ -1,6 +1,6 @@
 import sys, os, unittest
 sys.path.insert(0, "../duplicity")
-import path, backends
+import path, backends, collections
 
 # This can be changed to select the URL to use
 backend_url = "file://testfiles/output"
@@ -172,9 +172,45 @@ class FinalTest(unittest.TestCase):
 
 	def test_empty_restore(self):
 		"""Make sure error raised when restore doesn't match anything"""
+		self.deltmp()
 		self.backup("full", "testfiles/dir1")
 		self.assertRaises(CmdError, self.restore, "this_file_does_not_exist")
 		self.backup("inc", "testfiles/empty_dir")
 		self.assertRaises(CmdError, self.restore, "this_file_does_not_exist")
+
+	def test_remove_older_than(self):
+		"""Test removing old backup chains"""
+		self.deltmp()
+		self.backup("full", "testfiles/dir1", current_time = 10000,
+					options = ["--no-print-statistics"])
+		self.backup("inc", "testfiles/dir2", current_time = 20000,
+					options = ["--no-print-statistics"])
+		self.backup("full", "testfiles/dir1", current_time = 30000,
+					options = ["--no-print-statistics"])
+		self.backup("inc", "testfiles/dir3", current_time = 40000,
+					options = ["--no-print-statistics"])
+
+		b = backends.get_backend(backend_url)
+		cs = collections.CollectionsStatus(b).set_values()
+		assert len(cs.all_backup_chains) == 2, cs.all_backup_chains
+		assert cs.matched_chain_pair
+
+		self.run_duplicity(["--remove-older-than 35000 --force", backend_url])
+		cs2 = collections.CollectionsStatus(b).set_values()
+		assert len(cs2.all_backup_chains) == 1, cs.all_backup_chains
+		assert cs2.matched_chain_pair
+		chain = cs2.all_backup_chains[0]
+		assert chain.start_time == 30000, chain.start_time
+		assert chain.end_time == 40000, chain.end_time
+
+		# Now check to make sure we can't delete only chain
+		self.run_duplicity(["--remove-older-than 50000 --force", backend_url])
+		cs3 = collections.CollectionsStatus(b).set_values()
+		assert len(cs3.all_backup_chains) == 1
+		assert cs3.matched_chain_pair
+		chain = cs3.all_backup_chains[0]
+		assert chain.start_time == 30000, chain.start_time
+		assert chain.end_time == 40000, chain.end_time
+
 
 if __name__ == "__main__": unittest.main()

@@ -18,6 +18,10 @@ backup chains and sets found in the repository.
 FTP error 450 when listing a directory now understood to mean the
 directory is empty (duplicity will not exit with error).
 
+--remove-older-than now cannot delete the active backup chain, even if
+you specify a time later than the chain (e.g. "--remove-older-than
+now").
+
 
 New in v0.4.1 (2003/08/09)
 --------------------------
