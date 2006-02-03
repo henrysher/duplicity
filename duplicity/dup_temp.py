@@ -125,8 +125,7 @@ class FileobjHooked:
 		"""Close fileobj, running hooks right afterwards"""
 		assert not self.fileobj.close()
 		for hook in self.hooklist: hook()
-		if not self.second == None:
-			assert not self.second.close()
+		if self.second: assert not self.second.close()
 
 	def addhook(self, hook):
 		"""Add hook (function taking no arguments) to run upon closing"""

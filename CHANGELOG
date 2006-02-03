@@ -1,6 +1,9 @@
 New in v0.4.2 (??????????)
 --------------------------
 
+Mathias de Riese's substantial patch or patches appear to have been
+applied to CVS years ago, but not released yet.  Sorry about that.
+
 Followed suggestion by David Rigel, make user type passphrase twice to
 confirm.
 

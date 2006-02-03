@@ -294,20 +294,20 @@ class scpBackend(Backend):
 		be distinguished from the file boundaries.
 
 		"""
-		commandline = ("echo -e 'cd %s\nls -1' | %s -b - %s | grep -v 'sftp> '" %
+		commandline = ("echo -e 'cd %s\nls -1' | %s -b - %s" %
 					   (self.remote_dir, sftp_command, self.host_string))
-		return filter(lambda x: x, self.popen(commandline).split("\n"))
+		l = self.popen(commandline).split('\n')[2:] # omit sftp prompts
+		return filter(lambda x: x, l)
 
 	def delete(self, filename_list):
 		"""Runs ssh rm to delete files.  Files must not require quoting"""
 		assert len(filename_list) > 0
 		pathlist = map(lambda fn: self.remote_prefix + fn, filename_list)
 		del_prefix = "echo 'rm "
-		del_postfix = "' | %s -b - %s 1>/dev/null" % (sftp_command, self.host_string)
-
-		# Delete in groups of 10 to avoid overflowing command line
-		for i in range(0, len(pathlist), 10):
-			commandline = del_prefix + " ".join(pathlist[i:i+10]) + del_postfix
+		del_postfix = ("' | %s -b - %s 1>/dev/null" %
+					   (sftp_command, self.host_string))
+		for fn in filename_list:
+			commandline = del_prefix + self.remote_prefix + fn + del_postfix
 			self.run_command(commandline)
 
 
