@@ -50,7 +50,7 @@ def parse_cmdline_options(arglist):
 		  "list-current-files", "no-encryption",
 		  "no-print-statistics", "null-separator",
 		  "remove-older-than=", "restore-dir=", "restore-time=",
-		  "scp-command=", "short-filenames", "sign-key=",
+		  "scp-command=", "sftp-command=", "short-filenames", "sign-key=",
 		  "ssh-command=", "verbosity=", "verify", "version"])
 	except getopt.error, e:
 		command_line_error("%s" % (str(e),))
@@ -95,6 +95,7 @@ def parse_cmdline_options(arglist):
 		elif opt == "-t" or opt == "--restore-time":
 			globals.restore_time = dup_time.genstrtotime(arg)
 		elif opt == "--scp-command": backends.scp_command = arg
+		elif opt == "--sftp-command": backends.sftp_command = arg
 		elif opt == "--short-filenames": globals.short_filenames = 1
 		elif opt == "--sign-key": set_sign_key(arg)
 		elif opt == "--ssh-command": backends.ssh_command = arg
