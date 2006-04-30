@@ -1,3 +1,10 @@
+New in v0.4.3 (????/??/??)
+--------------------------
+
+Added --sftp-command option, now that the scp backend uses sftp for
+listing and deleting files.
+
+
 New in v0.4.2 (2006/02/02)
 --------------------------
 
