@@ -4,6 +4,9 @@ New in v0.4.3 (????/??/??)
 Added --sftp-command option, now that the scp backend uses sftp for
 listing and deleting files.
 
+Brian Sutherland has contributed a new backend for Amazon's S3 data
+storage service.
+
 
 New in v0.4.2 (2006/02/02)
 --------------------------

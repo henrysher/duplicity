@@ -447,11 +447,55 @@ class rsyncBackend(Backend):
 		for file in to_delete:
 			os.unlink (file)
 		os.rmdir (dir)
+
+
+class BitBucketBackend(Backend):
+	"""Connect to Amazon's S3 service using the bitbucket module"""
+	def __init__(self, parsed_url):
+		import bitbucket
+		self.module = bitbucket
+		parts = parsed_url.suffix.split('/')
+		bucket_name = parts[-1]
+		AccessKeyID, SecretAccessKey = '/'.join(parts[:-1]).split(':')
+		self.bucket = self.module.BitBucket(bucket_name,
+											access_key=AccessKeyID,
+											secret_key=SecretAccessKey,
+											page_size=100)
+
+	def put(self, source_path, remote_filename = None):
+		"""Transfer source_path (Path object) to remote_filename (string)
 		
+		If remote_filename is None, get the filename from the last
+		path component of pathname.
+		
+		"""
+		if not remote_filename:
+			remote_filename = source_path.get_filename()
+			bits = self.module.Bits(filename=source_path.name)
+			self.bucket[remote_filename] = bits
+
+	def get(self, remote_filename, local_path):
+		"""Retrieve remote_filename and place in local_path"""
+		bits = self.bucket[remote_filename]
+		bits.to_file(local_path.name)
+		local_path.setdata()
+
+	def list(self):
+		"""Return list of filenames (strings) present in backend"""
+		self.bucket.fetch_all_keys() # XXX I don't think this should be necessary
+		return self.bucket.keys()
+
+	def delete(self, filename_list):
+		"""Delete each filename in filename_list, in order if possible"""
+		for file in filename_list:
+			del self.bucket[file]
+
+
 # Dictionary relating protocol strings to backend_object classes.
 protocol_class_dict = {"scp": scpBackend,
 					   "ssh": scpBackend,
 					   "file": LocalBackend,
 					   "ftp": ftpBackend,
-					   "rsync": rsyncBackend}
+					   "rsync": rsyncBackend,
+					   "s3+http": BitBucketBackend}
 
