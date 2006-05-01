@@ -7,6 +7,16 @@ listing and deleting files.
 Brian Sutherland has contributed a new backend for Amazon's S3 data
 storage service.
 
+Added some patches compiled by Andre Beckedorf:
+
+	Use "-" in filenames instead of ":" on windows machines.
+
+	Tolerate more errors when listing an ftp directory (errors
+	indicate an empty dir).
+
+	Retry ftp commands when upon temporary error.  (Patch written by
+	Stefan Schimanski.)
+
 
 New in v0.4.2 (2006/02/02)
 --------------------------

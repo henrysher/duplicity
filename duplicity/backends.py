@@ -18,7 +18,7 @@
 
 """Provides functions and classes for getting/sending files to destination"""
 
-import os, types, ftplib, tempfile
+import os, types, ftplib, tempfile, time
 import log, path, dup_temp, file_naming
 
 class BackendException(Exception): pass
@@ -318,20 +318,37 @@ class sftpBackend(Backend):
 
 class ftpBackend(Backend):
 	"""Connect to remote store using File Transfer Protocol"""
+	SLEEP = 10 # time in seconds before reconnecting on temporary errors	
 	def __init__(self, parsed_url):
 		"""Create a new ftp backend object, log in to host"""
-		self.ftp = ftplib.FTP()
-		if parsed_url.port is None: self.error_wrap('connect', parsed_url.host)
-		else: self.error_wrap('connect', parsed_url.host, parsed_url.port)
+		self.parsed_url = parsed_url
+		self.connect()
 
-		if parsed_url.user is not None:
-			self.error_wrap('login', parsed_url.user, self.get_password())
+	def connect(self):
+		"""Connect to self.parsed_url"""
+		self.ftp = ftplib.FTP()
+		if self.parsed_url.port is None:
+			self.error_wrap('connect', self.parsed_url.host)
+		else: self.error_wrap('connect', self.parsed_url.host,
+							  self.parsed_url.port)
+
+		if self.parsed_url.user is not None:
+			self.error_wrap('login', self.parsed_url.user, self.get_password())
 		else: self.error_wrap('login')
-		self.ftp.cwd(parsed_url.path)
+		self.ftp.cwd(self.parsed_url.path)
 
 	def error_wrap(self, command, *args):
 		"""Run self.ftp.command(*args), but raise BackendException on error"""
 		try: return ftplib.FTP.__dict__[command](self.ftp, *args)
+		except ftplib.error_temp, e:
+			if "450" in str(e) and command == 'nlst':
+				# 450 on list isn't a temp error, but indicates an empty dir
+				return []
+			log.Log("Temporary error '%s'. Trying to reconnect in %d seconds."
+					% (str(e), self.SLEEP), 3)
+			time.sleep(self.SLEEP)
+			self.connect()
+			return self.error_wrap(command, *args)			
 		except ftplib.all_errors, e: raise BackendException(e)
 
 	def get_password(self):
@@ -364,7 +381,8 @@ class ftpBackend(Backend):
 		# Some ftp servers raise error 450 if the directory is empty
 		try: return self.error_wrap('nlst')
 		except BackendException, e:
-			if "450" in str(e): return []
+			if "450" in str(e) or "500" in str(e) or "550" in str(e):
+				return []
 			raise
 
 	def delete(self, filename_list):
@@ -375,7 +393,10 @@ class ftpBackend(Backend):
 
 	def close(self):
 		"""Shut down connection"""
-		self.error_wrap('quit')
+		try: self.error_wrap('quit')
+		except BackendException, e:
+			if "104" in str(e): return
+			raise  
 
 
 class rsyncBackend(Backend):
