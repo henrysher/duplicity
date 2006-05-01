@@ -9,8 +9,6 @@ storage service.
 
 Added some patches compiled by Andre Beckedorf:
 
-	Use "-" in filenames instead of ":" on windows machines.
-
 	Tolerate more errors when listing an ftp directory (errors
 	indicate an empty dir).
 
