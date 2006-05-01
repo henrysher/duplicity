@@ -61,8 +61,7 @@ null_separator = None
 # Character used like the ":" in time strings like
 # 2002-08-06T04:22:00-07:00.  The colon isn't good for filenames on
 # windows machines.
-if sys.platform in ('cygwin', 'win32'): time_separator = "-"
-else: time_separator = ":"
+time_separator = ":"
 
 # If this is true, only warn and don't raise fatal error when backup
 # source directory doesn't match previous backup source directory.
