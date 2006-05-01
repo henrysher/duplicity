@@ -471,46 +471,93 @@ class rsyncBackend(Backend):
 
 
 class BitBucketBackend(Backend):
-	"""Connect to Amazon's S3 service using the bitbucket module"""
-	def __init__(self, parsed_url):
-		import bitbucket
-		self.module = bitbucket
-		parts = parsed_url.suffix.split('/')
-		bucket_name = parts[-1]
-		AccessKeyID, SecretAccessKey = '/'.join(parts[:-1]).split(':')
-		self.bucket = self.module.BitBucket(bucket_name,
-											access_key=AccessKeyID,
-											secret_key=SecretAccessKey,
-											page_size=100)
+        """Backend for accessing Amazon S3 using the bitbucket.py module.
 
-	def put(self, source_path, remote_filename = None):
+        This backend supports access to Amazon S3 (http://aws.amazon.com/s3)
+        using a mix of environment variables and URL's. The access key and
+        secret key are taken from the environment variables S3KEY and S3SECRET
+        and the bucket name from the url. For example (in BASH):
+
+            $ export S3KEY='44CF9590006BF252F707'
+            $ export S3SECRET='OtxrzxIsfpFjA7SwPzILwy8Bw21TLhquhboDYROV'
+            $ duplicity /home/me s3+http://bucket_name
+
+        Note: / is disallowed in bucket names in case prefix support is implemented
+        in future.
+
+        TODO:
+            - support bucket prefixes with url's like s3+http://bucket_name/prefix
+            - bitbucket and amazon s3 are currently not very robust. We provide a
+              simplistic way of trying to re-connect and re-try an operation when
+              it fails. This is just a band-aid and should be removed if bitbucket
+              becomes more robust.
+            - Logging of actions.
+            - Better error messages for failures.
+        """
+    
+        def __init__(self, parsed_url):
+                import bitbucket
+                self.module = bitbucket
+                self.bucket_name = parsed_url.suffix
+                if '/' in self.bucket_name:
+                    raise NotImplementedError("/ disallowed in bucket names and "
+                                              "bucket prefixes not supported.")
+                self.access_key = os.environ["S3KEY"]
+                self.secret_key = os.environ["S3SECRET"]
+                self._connect()
+
+        def _connect(self):
+                self.connection = self.module.connect(access_key=self.access_key,
+                                                      secret_key=self.secret_key)
+                self.bucket = self.connection.get_bucket(self.bucket_name)
+                # populate the bitbucket cache we do it here to be sure that
+                # even on re-connect we have a list of all keys on the server
+                self.bucket.fetch_all_keys()
+
+        def put(self, source_path, remote_filename = None):
 		"""Transfer source_path (Path object) to remote_filename (string)
-		
+
 		If remote_filename is None, get the filename from the last
 		path component of pathname.
-		
+
 		"""
 		if not remote_filename:
-			remote_filename = source_path.get_filename()
-			bits = self.module.Bits(filename=source_path.name)
-			self.bucket[remote_filename] = bits
+                    remote_filename = source_path.get_filename()
+                bits = self.module.Bits(filename=source_path.name)
+                try:
+                    self.bucket[remote_filename] = bits
+                except:
+                    self._connect()
+                    self.bucket[remote_filename] = bits
 
 	def get(self, remote_filename, local_path):
 		"""Retrieve remote_filename and place in local_path"""
-		bits = self.bucket[remote_filename]
-		bits.to_file(local_path.name)
+		local_path.setdata()
+                bits = self.bucket[remote_filename]
+                try:
+                    bits.to_file(local_path.name)
+                except:
+                    self._connect()
+                    bits.to_file(local_path.name)
 		local_path.setdata()
 
 	def list(self):
 		"""Return list of filenames (strings) present in backend"""
-		self.bucket.fetch_all_keys() # XXX I don't think this should be necessary
-		return self.bucket.keys()
+                try:
+                    keys = self.bucket.keys()
+                except:
+                    self._connect()
+                    keys = self.bucket.keys()
+                return keys
 
 	def delete(self, filename_list):
 		"""Delete each filename in filename_list, in order if possible"""
-		for file in filename_list:
-			del self.bucket[file]
-
+                for file in filename_list:
+                    try:
+                        del self.bucket[file]
+                    except:
+                        self._connect()
+                        del self.bucket[file]
 
 # Dictionary relating protocol strings to backend_object classes.
 protocol_class_dict = {"scp": scpBackend,
