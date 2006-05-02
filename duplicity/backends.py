@@ -533,11 +533,12 @@ class BitBucketBackend(Backend):
 	def get(self, remote_filename, local_path):
 		"""Retrieve remote_filename and place in local_path"""
 		local_path.setdata()
-                bits = self.bucket[remote_filename]
                 try:
+                    bits = self.bucket[remote_filename]
                     bits.to_file(local_path.name)
                 except:
                     self._connect()
+                    bits = self.bucket[remote_filename]
                     bits.to_file(local_path.name)
 		local_path.setdata()
 
