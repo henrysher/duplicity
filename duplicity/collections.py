@@ -125,7 +125,7 @@ class BackupSet:
 remote backup set or the local archive directory has been corrupted.""")
 
 		if not remote_manifest:
-			if local_manifest: remote_manifest = local_manifest
+			if self.local_manifest_path: remote_manifest = local_manifest
 			else: log.FatalError("Fatal Error: Neither remote nor "
 								 "local manifest readable.")
 		remote_manifest.check_dirinfo()
