@@ -18,7 +18,7 @@
 
 """Provides functions and classes for getting/sending files to destination"""
 
-import os, types, ftplib, tempfile, time
+import os, types, ftplib, tempfile, time, sys
 import log, path, dup_temp, file_naming
 
 class BackendException(Exception): pass
@@ -514,6 +514,13 @@ class BitBucketBackend(Backend):
                 # even on re-connect we have a list of all keys on the server
                 self.bucket.fetch_all_keys()
 
+        def _logException(self, message=None):
+                # Simply dump the exception onto stderr since formatting it
+                # ourselves looks dangerous.
+                if message is not None:
+                    sys.stderr.write(message)
+                sys.excepthook(*sys.exc_info())        
+
         def put(self, source_path, remote_filename = None):
 		"""Transfer source_path (Path object) to remote_filename (string)
 
@@ -527,6 +534,9 @@ class BitBucketBackend(Backend):
                 try:
                     self.bucket[remote_filename] = bits
                 except:
+                    self._logException("Error sending file %s, attempting to "
+                                       "re-connect.\n Got this Traceback:\n"
+                                       % remote_filename)
                     self._connect()
                     self.bucket[remote_filename] = bits
 
@@ -537,6 +547,9 @@ class BitBucketBackend(Backend):
                     bits = self.bucket[remote_filename]
                     bits.to_file(local_path.name)
                 except:
+                    self._logException("Error getting file %s, attempting to "
+                                       "re-connect.\n Got this Traceback:\n"
+                                       % remote_filename)
                     self._connect()
                     bits = self.bucket[remote_filename]
                     bits.to_file(local_path.name)
@@ -547,6 +560,8 @@ class BitBucketBackend(Backend):
                 try:
                     keys = self.bucket.keys()
                 except:
+                    self._logException("Error getting bucket keys, attempting to "
+                                       "re-connect.\n Got this Traceback:\n")
                     self._connect()
                     keys = self.bucket.keys()
                 return keys
@@ -557,6 +572,9 @@ class BitBucketBackend(Backend):
                     try:
                         del self.bucket[file]
                     except:
+                        self._logException("Error deleting file %s, attempting to "
+                                           "re-connect.\n Got this Traceback:\n"
+                                           % file)
                         self._connect()
                         del self.bucket[file]
 
