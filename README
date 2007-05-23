@@ -17,12 +17,15 @@ The default prefix is /usr, so files are put in /usr/bin,
 
 REQUIREMENTS:
 
-Remember that you must have Python 2.2 or later, librsync 0.9.5.1 or
-later, and GnuPG installed.  For Python, see http://www.python.org.
+ * Python 2.2 or later (http://www.python.org)
+ * librsync 0.9.5.1 or later
+ * GnuPG (http://www.gnupg.org/)
+ * GnuPGInterface 0.3.2 or later (http://py-gnupg.sourceforge.net/)
+ * BitBucket 0.4a or later (http://code.google.com/p/bitbucket-s3/)
+ 
 The rdiff-backup homepage at http://rdiff-backup.stanford.edu/ should
 have a recent version of librsync; otherwise see the librsync homepage
-at http://sourceforge.net/projects/librsync/.  For GnuPG, see the
-GnuPG homepage at http://www.gnupg.org/.
+at http://sourceforge.net/projects/librsync/.
 
 
 HELP:

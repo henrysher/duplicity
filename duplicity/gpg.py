@@ -19,7 +19,7 @@
 """duplicity's gpg interface, builds upon Frank Tobin's GnuPGInterface"""
 
 import select, os, sys, thread, sha, md5, types, cStringIO, tempfile, re, gzip
-import GnuPGInterface, misc, log
+import GnuPGInterface, misc, log, path
 
 blocksize = 256 * 1024
 
@@ -84,7 +84,10 @@ class GPGFile:
 				gnupg.options.recipients = profile.recipients
 				cmdlist = ['--encrypt']
 				if profile.sign_key: cmdlist.append("--sign")
-			else: cmdlist = ['--symmetric']
+			else:
+				cmdlist = ['--symmetric']
+				# use integrity protection
+				gnupg.options.extra_args.append('--force-mdc')
 			p1 = gnupg.run(cmdlist, create_fhs=['stdin'],
 						   attach_fhs={'stdout': encrypt_path.open("wb"),
 									   'logger': self.logger_fp})
@@ -159,28 +162,7 @@ def GPGWriteFile(block_iter, filename, profile,
 	Returns true if succeeded in writing until end of block_iter.
 
 	"""
-	logger_fp_list = [sys.stderr]
-	def start_gpg(filename, passphrase):
-		"""Start GPG process, return (process, to_gpg_fileobj)"""
-		gnupg = GnuPGInterface.GnuPG()
-		gnupg.options.meta_interactive = 0
-		gnupg.options.extra_args.append('--no-secmem-warning')
-		gnupg.passphrase = passphrase
-		if profile.sign_key: gnupg.options.default_key = profile.sign_key
-		if log.verbosity < 5: # suppress gpg log messages if low verbosity
-			logger_fp_list[0] = tempfile.TemporaryFile()
-		
-		if profile.recipients:
-			gnupg.options.recipients = profile.recipients
-			cmdlist = ['--encrypt']
-			if profile.sign_key: cmdlist.append("--sign")
-		else: cmdlist = ['--symmetric']
-		p1 = gnupg.run(cmdlist, create_fhs=['stdin'],
-					   attach_fhs={'stdout': open(filename, "wb"),
-								   'logger': logger_fp_list[0]})
-		return (p1, p1.handles['stdin'])
-
-	def top_off(bytes, to_gpg_fp):
+	def top_off(bytes, file):
 		"""Add bytes of incompressible data to to_gpg_fp
 
 		In this case we take the incompressible data from the
@@ -189,21 +171,15 @@ def GPGWriteFile(block_iter, filename, profile,
 
 		"""
 		incompressible_fp = open(filename, "rb")
-		assert misc.copyfileobj(incompressible_fp, to_gpg_fp, bytes) == bytes
+		assert misc.copyfileobj(incompressible_fp, file.gpg_input, bytes) == bytes
 		incompressible_fp.close()
 
 	def get_current_size(): return os.stat(filename).st_size
 
-	def close_process(gpg_process, to_gpg_fp):
-		"""Close gpg process and clean up"""
-		to_gpg_fp.close()
-		gpg_process.wait()
-		if logger_fp_list[0] is not sys.stderr: logger_fp_list[0].close()
-
 	minimum_block_size = 128 * 1024 # don't bother requesting blocks smaller
 	target_size = size - 50 * 1024 # fudge factor, compensate for gpg buffering
 	data_size = target_size - max_footer_size
-	gpg_process, to_gpg_fp = start_gpg(filename, profile.passphrase)
+	file = GPGFile(True, path.Path(filename), profile)
 	at_end_of_blockiter = 0
 	while 1:
 		bytes_to_go = data_size - get_current_size()
@@ -212,13 +188,13 @@ def GPGWriteFile(block_iter, filename, profile,
 		except StopIteration:
 			at_end_of_blockiter = 1
 			break
-		to_gpg_fp.write(data)
+		file.write(data)
 		
-	to_gpg_fp.write(block_iter.get_footer())
+	file.write(block_iter.get_footer())
 	if not at_end_of_blockiter: # don't pad last volume
 		cursize = get_current_size()
-		if cursize < target_size: top_off(target_size - cursize, to_gpg_fp)
-	close_process(gpg_process, to_gpg_fp)
+		if cursize < target_size: top_off(target_size - cursize, file)
+	file.close()
 	return at_end_of_blockiter
 
 def GzipWriteFile(block_iter, filename, size = 5 * 1024 * 1024,
