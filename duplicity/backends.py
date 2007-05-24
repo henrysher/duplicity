@@ -650,9 +650,17 @@ class webdavBackend(Backend):
 	
 	webdav backend contributed in 2006 by Jesper Zedlitz <jesper@zedlitz.de>
 	"""
+	listbody = """\
+<?xml version="1.0" encoding="utf-8" ?>
+<D:propfind xmlns:D="DAV:">
+  <D:allprop/>
+</D:propfind>
+
+"""
 	
 	"""Connect to remote store using WebDAV Protocol"""
 	def __init__(self, parsed_url):
+		self.headers = {}
 		self.parsed_url = parsed_url
 		
 		if parsed_url.path:
@@ -669,15 +677,15 @@ class webdavBackend(Backend):
 		except KeyError:
 			password = getpass.getpass('Password for '+parsed_url.user+'@'+parsed_url.host+': ')
 
-		self.conn = httplib.HTTPConnection( parsed_url.host )
-		self.headers['Authorization'] = 'Basic ' + base64.encodestring( parsed_url.user+':'+ password).strip()
+		self.conn = httplib.HTTPConnection(parsed_url.host)
+		self.headers['Authorization'] = 'Basic ' + base64.encodestring(parsed_url.user+':'+ password).strip()
 		
 		# check password by connection to the server
-		self.conn.request( "OPTIONS", self.directory, None, self.headers )
+		self.conn.request("OPTIONS", self.directory, None, self.headers)
 		response = self.conn.getresponse()
 		response.read()
 		if response.status !=  200:
-			raise BackendException( response.reason )
+			raise BackendException((response.status, response.reason))
 
 	def _getText(self,nodelist):
 		rc = ""
@@ -692,18 +700,21 @@ class webdavBackend(Backend):
 	def list(self):
 		"""List files in directory"""
 		log.Log("Listing directory %s on WebDAV server" % (self.directory,), 5)
-		self.conn.request( "PROPFIND", self.directory, None, self.headers )
+		self.headers['Depth'] = "1"
+		self.conn.request("PROPFIND", self.directory, self.listbody, self.headers)
+		del self.headers['Depth']
 		response = self.conn.getresponse()
 		if response.status != 207:
-			raise BackendException( response.reason )
+			raise BackendException((response.status, response.reason))
 
 		document = response.read()
+		print document
 		dom = xml.dom.minidom.parseString(document)
 
 		result = []
-		for href in dom.getElementsByTagName( '__NS1:href' ):
+		for href in dom.getElementsByTagName('D:href'):
 			filename = urllib.unquote(self._getText(href.childNodes).strip())
-			if filename.startswith( self.directory ):
+			if filename.startswith(self.directory):
 				filename = filename.replace(self.directory,'',1)
 				result.append(filename)
 		return result
@@ -711,13 +722,13 @@ class webdavBackend(Backend):
 	def get(self, remote_filename, local_path):
 		"""Get remote filename, saving it to local_path"""
 		url = self.directory + remote_filename
-		log.Log("Retrieving %s from FTP server" % ( url ,), 5)
+		log.Log("Retrieving %s from FTP server" % (url ,), 5)
 		target_file = local_path.open("wb")
-		self.conn.request( "GET", url, None, self.headers )
+		self.conn.request("GET", url, None, self.headers)
 		response = self.conn.getresponse()		
 		if response.status != 200:
-			raise BackendException( response.reason )
-		target_file.write( response.read() )
+			raise BackendException((response.status, response.reason))
+		target_file.write(response.read())
 		assert not target_file.close()
 		local_path.setdata()
 
@@ -728,10 +739,10 @@ class webdavBackend(Backend):
 		url = self.directory + remote_filename
 		source_file = source_path.open("rb")
 		log.Log("Saving %s on WebDAV server" % (url,), 5)
-		self.conn.request( "PUT", url, source_file.read(), self.headers )
+		self.conn.request("PUT", url, source_file.read(), self.headers)
 		response = self.conn.getresponse()
 		if response.status != 201:
-			raise BackendException( response.reason )
+			raise BackendException((response.status, response.reason))
 		response.read()
 		assert not source_file.close()
 
@@ -740,10 +751,10 @@ class webdavBackend(Backend):
 		for filename in filename_list:
 			url = self.directory + filename
 			log.Log("Deleting %s from WebDAV server" % (url,), 5)
-			self.conn.request( "DELETE", url, None, self.headers )
+			self.conn.request("DELETE", url, None, self.headers)
 			response = self.conn.getresponse()
 			if response.status != 204:
-				raise BackendException( response.reason )
+				raise BackendException((response.status, response.reason))
 			response.read()
 
 hsi_command = "hsi"
