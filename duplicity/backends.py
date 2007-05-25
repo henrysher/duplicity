@@ -348,7 +348,6 @@ class ftpBackend(Backend):
 	def connect(self):
 		"""Connect to self.parsed_url"""
 		self.ftp = ftplib.FTP()
-		self.ftp.set_pasv(False)
 		if log.verbosity > 8:
 			self.ftp.set_debuglevel(2)
 		self.is_connected = False
