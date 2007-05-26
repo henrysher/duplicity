@@ -390,7 +390,7 @@ class ftpBackend(Backend):
 			try:
 				return ftplib.FTP.__dict__[command](self.ftp, *args)
 			except ftplib.all_errors, e:
-				if ("450" in str(e) or "550" in str(e)) and command == 'nlst':
+				if ("450" in str(e) or "550" in str(e) or "104" in str(e)) and command == 'nlst':
 					# 450 on list isn't an error, but indicates an empty dir
 					return []
 
@@ -415,8 +415,7 @@ class ftpBackend(Backend):
 		"""Get ftp password using environment if possible"""
 		try: return os.environ['FTP_PASSWORD']
 		except KeyError:
-			log.Log("FTP_PASSWORD not set, using empty ftp password", 3)
-			return ''
+			return getpass.getpass('Password for '+parsed_url.user+'@'+parsed_url.host+': ')
 
 	def put(self, source_path, remote_filename = None):
 		"""Transfer source_path to remote_filename"""
@@ -471,7 +470,7 @@ class rsyncBackend(Backend):
 	"""
 	def __init__(self, parsed_url):
 		"""rsyncBackend initializer"""
-		self.url_string = parsed_url.url_string
+		self.url_string = "%s:%s" % (parsed_url.server, parsed_url.path)
 		if self.url_string[-1] != '/':
 			self.url_string += '/'
 
