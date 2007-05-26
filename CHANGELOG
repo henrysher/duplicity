@@ -1,5 +1,24 @@
-New in v0.4.3 (????/??/??)
+New in v0.4.3 (2007/05/26)
 --------------------------
+
+Applied patches:
+  https://savannah.nongnu.org/patch/?4486
+  https://savannah.nongnu.org/patch/?5183
+  https://savannah.nongnu.org/patch/?5185
+  https://savannah.nongnu.org/patch/?5412
+  https://savannah.nongnu.org/patch/?5413
+  https://savannah.nongnu.org/patch/?5680
+  https://savannah.nongnu.org/patch/?5681
+  https://savannah.nongnu.org/patch/?5682
+  https://savannah.nongnu.org/patch/?5794
+  https://savannah.nongnu.org/patch/?5830
+
+Fixed bugs:
+  https://savannah.nongnu.org/bugs/?2441
+  https://savannah.nongnu.org/bugs/?16711
+
+ProFTPD resets the connection after returning 226 when NLSTing an 
+empty directory, so changed code to allow that exception.
 
 Added --sftp-command option, now that the scp backend uses sftp for
 listing and deleting files.
@@ -9,11 +28,11 @@ storage service.
 
 Added some patches compiled by Andre Beckedorf:
 
-	Tolerate more errors when listing an ftp directory (errors
-	indicate an empty dir).
+    Tolerate more errors when listing an ftp directory (errors
+    indicate an empty dir).
 
-	Retry ftp commands when upon temporary error.  (Patch written by
-	Stefan Schimanski.)
+    Retry ftp commands when upon temporary error.  (Patch written by
+    Stefan Schimanski.)
 
 
 New in v0.4.2 (2006/02/02)
