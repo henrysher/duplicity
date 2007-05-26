@@ -20,6 +20,11 @@ Fixed bugs:
 ProFTPD resets the connection after returning 226 when NLSTing an 
 empty directory, so changed code to allow that exception.
 
+ftpBackend now asks for a password if FTP_PASSWORD does not exist.
+
+rsyncBackend was using full URL in the commandline and failing.
+It now uses only server:path/, leaving off rsync://.
+
 Added --sftp-command option, now that the scp backend uses sftp for
 listing and deleting files.
 
