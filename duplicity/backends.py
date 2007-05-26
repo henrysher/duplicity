@@ -415,7 +415,7 @@ class ftpBackend(Backend):
 		"""Get ftp password using environment if possible"""
 		try: return os.environ['FTP_PASSWORD']
 		except KeyError:
-			return getpass.getpass('Password for '+parsed_url.user+'@'+parsed_url.host+': ')
+			return getpass.getpass('Password for '+ self.parsed_url.user + '@' + self.parsed_url.host + ': ')
 
 	def put(self, source_path, remote_filename = None):
 		"""Transfer source_path to remote_filename"""
