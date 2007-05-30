@@ -11,17 +11,17 @@ else:
 	sys.exit(1)
 
 base = "duplicity-%s" % (version,)
-fedora_release = 1
+fedora_release = 6
 i386rpm = "%s-0.fdr.%d.i386.rpm" % (base, fedora_release)
 source_rpm = "%s-0.fdr.%d.src.rpm" % (base, fedora_release)
 tarfile = base + ".tar.gz"
 
-# These assume the rpm root directory $HOME/rpm.  The
+# These assume the rpm root directory $HOME/rpmbuild.  The
 # nonstandard location allows for building by non-root user.
-assert not os.system("cp %s $HOME/rpm/SOURCES" % (tarfile,))
+assert not os.system("cp %s $HOME/rpmbuild/SOURCES/" % (tarfile,))
 assert not os.system("rpmbuild -ba --sign -vv --target i386 " + specfile)
-assert not os.system("cp $HOME/rpm/RPMS/i386/%s ." % i386rpm)
-assert not os.system("cp $HOME/rpm/SRPMS/%s ." % source_rpm)
+assert not os.system("cp $HOME/rpmbuild/RPMS/i386/%s ." % i386rpm)
+assert not os.system("cp $HOME/rpmbuild/SRPMS/%s ." % source_rpm)
 
 # Old root RPM instructions
 #assert not os.system("install -o root -g root -m 644 %s "

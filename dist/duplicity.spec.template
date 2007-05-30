@@ -3,7 +3,7 @@
 Version: $version
 Summary: Untrusted/encrypted backup using rsync algorithm
 Name: duplicity
-Release: 0.fdr.1
+Release: 0.fdr.6
 Epoch: 0
 URL: http://www.nongnu.org/duplicity/
 Source: http://savannah.nongnu.org/download/duplicity/%{name}-%{version}.tar.gz
