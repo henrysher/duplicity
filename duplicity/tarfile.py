@@ -37,13 +37,13 @@
 """Read from and write to tar format archives.
 """
 
-__version__ = "$Revision: 1.5 $"
+__version__ = "$Revision: 1.6 $"
 # $Source: /sources/duplicity/duplicity/duplicity/tarfile.py,v $
 
 version     = "0.4.9"
 __author__  = "Lars Gustabel (lars@gustaebel.de)"
-__date__    = "$Date: 2006/01/12 16:29:53 $"
-__cvsid__   = "$Id: tarfile.py,v 1.5 2006/01/12 16:29:53 bescoto Exp $"
+__date__    = "$Date: 2007/05/30 00:30:57 $"
+__cvsid__   = "$Id: tarfile.py,v 1.6 2007/05/30 00:30:57 loafman Exp $"
 __credits__ = "Gustavo Niemeyer for his support, " \
               "Detlef Lannert for some early contributions"
 
@@ -1062,12 +1062,14 @@ class TarFile:
         """
         tarinfo = TarInfo()
         tarinfo.name = nts(buf[0:100])
-        tarinfo.mode = int(buf[100:108], 8)
-        tarinfo.uid = int(buf[108:116],8)
-        tarinfo.gid = int(buf[116:124],8)
-        tarinfo.size = long(buf[124:136], 8)
-        tarinfo.mtime = long(buf[136:148], 8)
-        tarinfo.chksum = int(buf[148:156], 8)
+        tarinfo.mode = int(buf[100:107], 8)
+        tarinfo.uid = int(buf[108:115],8)
+        tarinfo.gid = int(buf[116:123],8)
+        tarinfo.size = long(buf[124:135], 8)
+        tarinfo.mtime = long(buf[136:147], 8)
+		# chksum stored as a six digit octal number with
+		# leading zeroes followed by a nul and then a space
+        tarinfo.chksum = int(buf[148:154], 8)
         tarinfo.type = buf[156:157]
         tarinfo.linkname = nts(buf[157:257])
         tarinfo.uname = nts(buf[265:297])
