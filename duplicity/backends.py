@@ -342,11 +342,17 @@ class ftpBackend(Backend):
 
 	def __init__(self, parsed_url):
 		"""Create a new ftp backend object, log in to host"""
+		self.is_connected = False
 		self.parsed_url = parsed_url
 		self.connect()
 
 	def connect(self):
 		"""Connect to self.parsed_url"""
+		if self.is_connected:
+			try:
+				self.ftp.quit()
+			except:
+				pass
 		self.ftp = ftplib.FTP()
 		if log.verbosity > 8:
 			self.ftp.set_debuglevel(2)
@@ -390,18 +396,33 @@ class ftpBackend(Backend):
 			try:
 				return ftplib.FTP.__dict__[command](self.ftp, *args)
 			except ftplib.all_errors, e:
-				if ("450" in str(e) or "550" in str(e) or "104" in str(e)) and command == 'nlst':
-					# 450 on list isn't an error, but indicates an empty dir
+				# 450 or 550 on list isn't an error, but indicates an empty dir
+				# 104 indicates a reset connection, sometimes instead of 450/550
+				if ("450" in str(e) or "550" in str(e) or "104" in str(e)) and command is 'nlst':
 					return []
 
+				# 221/421 indicate connection closed, we need to close and reconnect
+				if "221" in str(e) or "421" in str(e):
+					if self.is_connected:
+						try:
+							self.ftp.quit()
+						except:
+							pass
+						self.is_connected = False
+
+				# Give up, maybe
 				if tries > self.RETRIES:
-					# Give up:
-					log.FatalError("Catched exception %s: %s (%d exceptions in total), giving up.." % (sys.exc_info()[0],sys.exc_info()[1],tries,))
+					log.FatalError("Caught exception %s: %s (%d exceptions in total), giving up.." % (sys.exc_info()[0],
+																									  sys.exc_info()[1],
+																									  tries,))
 					raise BackendException(e)
 
 				# Sleep and retry (after trying to reconnect, if possible):
 				sleep_time = self.RETRY_SLEEP * tries;
-				log.Warn("Catched exception %s: %s (#%d), sleeping %ds before retry.." % (sys.exc_info()[0],sys.exc_info()[1],tries,sleep_time,))
+				log.Warn("Caught exception %s: %s (#%d), sleeping %ds before retry.." % (sys.exc_info()[0],
+																						 sys.exc_info()[1],
+																						 tries,
+																						 sleep_time,))
 				time.sleep(sleep_time)
 				try:
 					if not self.is_connected:
