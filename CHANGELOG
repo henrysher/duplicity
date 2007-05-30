@@ -1,5 +1,13 @@
-New in v0.4.3 (2007/05/26)
---------------------------
+New in v0.4.3.RC2 (2007/05/30)
+------------------------------
+
+Fixed bug in tarfile.py that was causing ValueError exception.
+Thanks to dAniel hAhler for pointing out the Debian patch.
+Refer to: http://savannah.nongnu.org/bugs/?19998
+
+
+New in v0.4.3.RC1 (2007/05/26)
+------------------------------
 
 Applied patches:
   https://savannah.nongnu.org/patch/?4486
