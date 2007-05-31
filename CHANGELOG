@@ -1,8 +1,19 @@
+New in v0.4.3.RC3 (2007/05/31)
+------------------------------
+
+Fixed connection problem in FTP where it was not quitting on
+connection reset and just logging in again.  This created many
+stale logins on the remote system.
+
+Changed attribution of a couple of patches to dAniel hAhler, 
+who actually wrote the patches, not just found them.
+
+
 New in v0.4.3.RC2 (2007/05/30)
 ------------------------------
 
 Fixed bug in tarfile.py that was causing ValueError exception.
-Thanks to dAniel hAhler for pointing out the Debian patch.
+Thanks to dAniel hAhler for the patch that fixed the problem.
 Refer to: http://savannah.nongnu.org/bugs/?19998
 
 
@@ -44,8 +55,8 @@ Added some patches compiled by Andre Beckedorf:
     Tolerate more errors when listing an ftp directory (errors
     indicate an empty dir).
 
-    Retry ftp commands when upon temporary error.  (Patch written by
-    Stefan Schimanski.)
+    Retry ftp commands when upon temporary error.  (Thanks to to
+    Stefan Schimanski and dAniel hAhler for their patches.)
 
 
 New in v0.4.2 (2006/02/02)
