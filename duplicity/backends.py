@@ -334,7 +334,9 @@ class sftpBackend(Backend):
 	"""This backend uses sftp to perform file operations"""
 	pass # Do this later
 
-
+# TODO: handle login failures, by not retrying, but printing a helpful error?!
+#	e.g. """Caught exception <class 'duplicity.ftplib.error_perm'>: 521 unknown user (proxy auth failed) (#3), sleeping 20s before retry.."""
+#       and  """Caught exception <class 'duplicity.ftplib.error_perm'>: 530 Login incorrect. (#2), sleeping 10s before retry.."""
 class ftpBackend(Backend):
 	"""Connect to remote store using File Transfer Protocol"""
 	RETRY_SLEEP = 10 # time in seconds before reconnecting on errors (gets multiplied with the try counter)
@@ -349,10 +351,7 @@ class ftpBackend(Backend):
 	def connect(self):
 		"""Connect to self.parsed_url"""
 		if self.is_connected:
-			try:
-				self.ftp.quit()
-			except:
-				pass
+			self.close()
 		self.ftp = ftplib.FTP()
 		if log.verbosity > 8:
 			self.ftp.set_debuglevel(2)
@@ -376,57 +375,55 @@ class ftpBackend(Backend):
 	def error_wrap(self, command, *args):
 		"""Run self.ftp.command(*args), but raise BackendException on error"""
 
-		# Log FTP command:
-		if command is 'login':
-			if log.verbosity > 8:
-				# Log full args at level 9:
-				log.Log("FTP: %s %s" % (command,args), 9)
-			else:
-				# replace password with stars:
-				log_args = list(args)
-				log_args[1] = '*' * len(log_args[1])
-				log.Log("FTP: %s %s" % (command,log_args), 5)
-		else:
-			log.Log("FTP: %s %s" % (command,args), 5)
-
 		# Execute:
 		tries = 0
 		while( True ):
 			tries = tries+1
+
+			# Log FTP command:
+			if command is 'login':
+				if log.verbosity > 8:
+					# Log full args at level 9:
+					log.Log("FTP: %s %s" % (command,args), 9)
+				else:
+					# replace password with stars:
+					log_args = list(args)
+					log_args[1] = '*' * len(log_args[1])
+					log.Log("FTP: %s %s" % (command,log_args), 5)
+			else:
+				log.Log("FTP: %s %s" % (command,args), 5)
+
+			# Execute command:
 			try:
 				return ftplib.FTP.__dict__[command](self.ftp, *args)
 			except ftplib.all_errors, e:
-				# 450 or 550 on list isn't an error, but indicates an empty dir
-				# 104 indicates a reset connection, sometimes instead of 450/550
-				if ("450" in str(e) or "550" in str(e) or "104" in str(e)) and command is 'nlst':
-					return []
-
-				# 221/421 indicate connection closed, we need to close and reconnect
-				if "221" in str(e) or "421" in str(e):
-					if self.is_connected:
-						try:
-							self.ftp.quit()
-						except:
-							pass
-						self.is_connected = False
-
 				# Give up, maybe
 				if tries > self.RETRIES:
-					log.FatalError("Caught exception %s: %s (%d exceptions in total), giving up.." % (sys.exc_info()[0],
-																									  sys.exc_info()[1],
-																									  tries,))
+					import traceback
+					log.FatalError("Caught exception %s: %s (%d exceptions in total), giving up..\nTraceback:\n%s" % (
+						sys.exc_info()[0],
+						sys.exc_info()[1],
+						tries,
+						traceback.extract_stack()
+						))
 					raise BackendException(e)
 
 				# Sleep and retry (after trying to reconnect, if possible):
-				sleep_time = self.RETRY_SLEEP * tries;
-				log.Warn("Caught exception %s: %s (#%d), sleeping %ds before retry.." % (sys.exc_info()[0],
-																						 sys.exc_info()[1],
-																						 tries,
-																						 sleep_time,))
+				sleep_time = self.RETRY_SLEEP * (tries-1);
+				log.Warn("Caught exception %s: %s (#%d), sleeping %ds before retry.." % (
+						sys.exc_info()[0],
+						sys.exc_info()[1],
+						tries,
+						sleep_time,))
 				time.sleep(sleep_time)
+
+				# Re-connect, if we expect to be connected, but not if we're in the "login" process already:
+				if self.is_connected and command is not "login":
+					log.Log("Re-connecting...", 5)
+					self.connect()
+
+				# Retry the command:
 				try:
-					if not self.is_connected:
-						self.connect()
 					return ftplib.FTP.__dict__[command](self.ftp, *args)
 				except ftplib.all_errors, e:
 					continue
@@ -460,13 +457,14 @@ class ftpBackend(Backend):
 		log.Log("Listing files on FTP server", 5)
 		try: return self.error_wrap('nlst')
 		except BackendException, e:
-			if "425" in str(e):
+			# 450 or 550 on list isn't an error, but indicates an empty dir
+			# 104 indicates a reset connection, sometimes instead of 450/550
+			if "450" in str(e) or "550" in str(e) or "104" in str(e):
+				return []
+			elif "425" in str(e):
 				log.Log("Turning passive mode OFF", 5)
 				self.ftp.set_pasv(False)
 				return self.list()
-			# Some ftp servers raise error 450 if the directory is empty
-			elif "450" in str(e) or "500" in str(e) or "550" in str(e):
-				return []
 			raise
 
 	def delete(self, filename_list):
@@ -477,10 +475,9 @@ class ftpBackend(Backend):
 
 	def close(self):
 		"""Shut down connection"""
-		try: self.error_wrap('quit')
-		except BackendException, e:
-			if "104" in str(e): return
-			raise
+		self.is_connected = False
+		try: self.ftp.quit()
+		except ftplib.all_errors: pass
 
 
 class rsyncBackend(Backend):
