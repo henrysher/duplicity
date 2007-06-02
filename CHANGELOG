@@ -5,9 +5,6 @@ More fixes on FTP.  dAniel hAhler supplied a new patch for FTP
 that cleans up the error handling and reduces the retry time to
 zero on the first retry.
 
-Cleaned up the NLST error handling by moving the error catch to
-the self.list() function itself.
-
 
 New in v0.4.3.RC3 (2007/05/31)
 ------------------------------
