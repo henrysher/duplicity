@@ -397,6 +397,11 @@ class ftpBackend(Backend):
 			try:
 				return ftplib.FTP.__dict__[command](self.ftp, *args)
 			except ftplib.all_errors, e:
+				# 450 or 550 on list isn't an error, but indicates an empty dir
+				# 104 indicates a reset connection, sometimes instead of 450/550
+				if command is "nlst" and ("450" in str(e) or "550" in str(e) or "104" in str(e)):
+					return []
+
 				# Give up, maybe
 				if tries > self.RETRIES:
 					import traceback
@@ -457,11 +462,7 @@ class ftpBackend(Backend):
 		log.Log("Listing files on FTP server", 5)
 		try: return self.error_wrap('nlst')
 		except BackendException, e:
-			# 450 or 550 on list isn't an error, but indicates an empty dir
-			# 104 indicates a reset connection, sometimes instead of 450/550
-			if "450" in str(e) or "550" in str(e) or "104" in str(e):
-				return []
-			elif "425" in str(e):
+			if "425" in str(e):
 				log.Log("Turning passive mode OFF", 5)
 				self.ftp.set_pasv(False)
 				return self.list()
