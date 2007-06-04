@@ -26,8 +26,12 @@ termverbosity = 3
 def Log(s, verb_level):
 	"""Write s to stderr if verbosity level low enough"""
 	if verb_level <= termverbosity:
-		if verb_level <= 2: sys.stderr.write(s + "\n")
-		else: sys.stdout.write(s + "\n")
+		if verb_level <= 2:
+			sys.stderr.write(s + "\n")
+			sys.stderr.flush()
+		else:
+			sys.stdout.write(s + "\n")
+			sys.stdout.flush()
 
 def Warn(s):
 	"""Shortcut used for warning messages (verbosity 2)"""
