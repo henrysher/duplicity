@@ -1,28 +1,42 @@
+New in v0.4.3.RC5 (2007/06/04)
+------------------------------
+GnuPG fails when trying to access stdin on an empty passphrase.
+Changes allow empty passphrase on public-key encryption and now
+respond gracefully on empty passphrase for symmetric encryption.
+
+dAniel hAhler submitted a patch to change "Error initializing file
+foo" (log level 2), where foo was a socket, to "Skipping socket foo"
+(log level 7).  https://savannah.nongnu.org/patch/?5985
+
+Change logging to flush after every write, unbuffering stdout and
+stderr, thus producing logs that are coherent.
+
+
 New in v0.4.3.RC4 (2007/06/02)
 ------------------------------
 
-More fixes on FTP.  dAniel hAhler supplied a new patch for FTP
-that cleans up the error handling and reduces the retry time to
-zero on the first retry.
+More fixes on FTP.  dAniel hAhler supplied a new patch for FTP that
+cleans up the error handling and reduces the retry time to zero on the
+first retry.
 
 
 New in v0.4.3.RC3 (2007/05/31)
 ------------------------------
 
 Fixed connection problem in FTP where it was not quitting on
-connection reset and just logging in again.  This created many
-stale logins on the remote system.
+connection reset and just logging in again.  This created many stale
+logins on the remote system.
 
-Changed attribution of a couple of patches to dAniel hAhler, 
-who actually wrote the patches, not just found them.
+Changed attribution of a couple of patches to dAniel hAhler, who
+actually wrote the patches, not just found them.
 
 
 New in v0.4.3.RC2 (2007/05/30)
 ------------------------------
 
-Fixed bug in tarfile.py that was causing ValueError exception.
-Thanks to dAniel hAhler for the patch that fixed the problem.
-Refer to: http://savannah.nongnu.org/bugs/?19998
+Fixed bug in tarfile.py that was causing ValueError exception.  Thanks
+to dAniel hAhler for the patch that fixed the problem.  Refer to:
+http://savannah.nongnu.org/bugs/?19998
 
 
 New in v0.4.3.RC1 (2007/05/26)
