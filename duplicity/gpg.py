@@ -76,7 +76,6 @@ class GPGFile:
 		gnupg = GnuPGInterface.GnuPG()
 		gnupg.options.meta_interactive = 0
 		gnupg.options.extra_args.append('--no-secmem-warning')
-		gnupg.passphrase = profile.passphrase
 		if profile.sign_key: gnupg.options.default_key = profile.sign_key
 
 		if encrypt:
@@ -88,16 +87,20 @@ class GPGFile:
 				cmdlist = ['--symmetric']
 				# use integrity protection
 				gnupg.options.extra_args.append('--force-mdc')
-			p1 = gnupg.run(cmdlist, create_fhs=['stdin'],
+			p1 = gnupg.run(cmdlist, create_fhs=['stdin', 'passphrase'],
 						   attach_fhs={'stdout': encrypt_path.open("wb"),
 									   'logger': self.logger_fp})
+			p1.handles['passphrase'].write(profile.passphrase)
+			p1.handles['passphrase'].close()
 			self.gpg_input = p1.handles['stdin']
 		else:
 			self.status_fp = tempfile.TemporaryFile()
-			p1 = gnupg.run(['--decrypt'], create_fhs=['stdout'],
+			p1 = gnupg.run(['--decrypt'], create_fhs=['stdout', 'passphrase'],
 						   attach_fhs={'stdin': encrypt_path.open("rb"),
 									   'status': self.status_fp,
 									   'logger': self.logger_fp})
+			p1.handles['passphrase'].write(profile.passphrase)
+			p1.handles['passphrase'].close()
 			self.gpg_output = p1.handles['stdout']
 		self.gpg_process = p1
 		self.encrypt = encrypt

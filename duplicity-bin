@@ -44,8 +44,13 @@ def get_passphrase():
 	while 1:
 		pass1 = getpass.getpass("GnuPG passphrase: ")
 		pass2 = getpass.getpass("Retype to confirm: ")
-		if pass1 == pass2: return pass1
-		print "First and second passphrases do not match!  Please try again."
+		if not pass1 == pass2:
+			print "First and second passphrases do not match!  Please try again."
+			continue
+		if not pass1 and not globals.gpg_profile.recipients:
+			print "Cannot use empty passphrase with symmetric encryption!  Please try again."
+			continue
+		return pass1
 
 def write_multivol(backup_type, tarblock_iter, backend):
 	"""Encrypt volumes of tarblock_iter and write to backend
