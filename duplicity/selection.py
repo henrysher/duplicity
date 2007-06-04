@@ -27,6 +27,7 @@ from __future__ import generators
 import re
 from path import *
 import robust, log, globals
+import os, stat
 
 
 class SelectError(Exception):
@@ -104,7 +105,11 @@ class Select:
 
 		"""
 		def error_handler(exc, path, filename):
-			log.Log("Error initializing file %s/%s" % (path.name, filename), 2)
+			mode = os.stat(path.name+"/"+filename)[stat.ST_MODE]
+			if stat.S_ISSOCK(mode):
+				log.Log("Skipping socket %s/%s" % (path.name, filename), 7)
+			else:
+				log.Log("Error initializing file %s/%s" % (path.name, filename), 2)
 			return None
 
 		def diryield(path):
