@@ -1,3 +1,16 @@
+New in v0.4.3.RC6 (2007/06/13)
+------------------------------
+Bug 20419 - dAniel hAhler: When errors cause an incomplete backup set,
+flag the error with a message, rather than erroring out.  The user
+then knows to run --cleanup.
+
+Patch 5998 - Kuang-che Wu: Cache uid and gid lookup to speed
+operations.
+
+Patch 5993 - daacyy302@sneakemail.com: Make Amazon S3 backend 
+incrementally more robust for recovery.
+
+
 New in v0.4.3.RC5 (2007/06/04)
 ------------------------------
 GnuPG fails when trying to access stdin on an empty passphrase.
