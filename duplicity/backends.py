@@ -144,7 +144,6 @@ class Backend:
 		if os.system(commandline):
 			raise BackendException("Error running '%s'" % commandline)
 
-
 	def run_command_persist(self, commandline):
 		"""Run given commandline with logging and error detection
 		repeating it several times if it fails"""
@@ -630,13 +629,12 @@ class BitBucketBackend(Backend):
 		try:
 			bits = self.bucket[remote_filename]
 			bits.to_file(local_path.name)
-		except:
-			self._logException("Error getting file %s, attempting to "
-							   "re-connect.\n Got this Traceback:\n"
-							   % remote_filename)
+		except (socket.error, self.module.BitBucketResponseError), error:
+			sys.stderr.write("Network error '%s'. Trying to reconnect in %d seconds.\n"
+				% (str(error), self.SLEEP))
+			time.sleep(self.SLEEP)
 			self._connect()
-			bits = self.bucket[remote_filename]
-			bits.to_file(local_path.name)
+			return self.get(remote_filename, local_path)
 		local_path.setdata()
 
 	def list(self):

@@ -120,14 +120,11 @@ class BackupSet:
 			local_manifest = self.get_local_manifest()
 		if remote_manifest and self.local_manifest_path and local_manifest:
 			if remote_manifest != local_manifest:
-				log.FatalError(
-"""Fatal Error: Remote manifest does not match local one.  Either the
-remote backup set or the local archive directory has been corrupted.""")
-
+				log.FatalError("Fatal Error: Remote manifest does not match local one.  Either the "
+							   "remote backup set or the local archive directory has been corrupted.")
 		if not remote_manifest:
 			if self.local_manifest_path: remote_manifest = local_manifest
-			else: log.FatalError("Fatal Error: Neither remote nor "
-								 "local manifest readable.")
+			else: log.FatalError("Fatal Error: Neither remote nor local manifest is readable.")
 		remote_manifest.check_dirinfo()
 
 	def get_local_manifest(self):
@@ -441,13 +438,23 @@ class CollectionsStatus:
 			sig_chains = self.get_sorted_chains(sig_chains)
 			for i in range(len(sig_chains)-1, -1, -1):
 				if sig_chains[i].end_time == latest_backup_chain.end_time:
-					if self.matched_chain_pair == None:
-						self.matched_chain_pair = (sig_chains[i],
-												   backup_chains[-1])
-					
-					del sig_chains[i]
-					# break     # MDR this way the remote will not be
-					            # deleted if local present
+					pass
+				# See if the set before last matches:
+				elif sig_chains[i].end_time == latest_backup_chain.get_all_sets()[-2].end_time:
+						# It matches, remove the last backup set:
+						log.Warn("Warning, discarding last backup set, because of missing signature file.")
+						self.incomplete_backup_sets.append(latest_backup_chain.incset_list[-1])
+						latest_backup_chain.incset_list = latest_backup_chain.incset_list[:-1]
+				else: continue
+
+				# Found a matching pair:
+				if self.matched_chain_pair == None:
+					self.matched_chain_pair = (sig_chains[i], latest_backup_chain)
+				
+				del sig_chains[i]
+				# break     # MDR this way the remote will not be
+					    # deleted if local present
+							
 		if self.matched_chain_pair:
 			self.other_sig_chains.remove(self.matched_chain_pair[0])
 			self.other_backup_chains.remove(self.matched_chain_pair[1])
