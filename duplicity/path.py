@@ -23,7 +23,7 @@ associates stat information with filenames
 
 """
 
-import stat, os, errno, pwd, grp, socket, time, re, gzip
+import stat, os, errno, socket, time, re, gzip
 import librsync, log, dup_time
 from lazy import *
 
@@ -174,9 +174,9 @@ class ROPath:
 		self.stat = StatResult()
 
 		# Set user and group id
-		try: self.stat.st_uid = pwd.getpwnam(tarinfo.uname)[2]
+		try: self.stat.st_uid = tarfile.uname2uid(tarinfo.uname)
 		except KeyError: self.stat.st_uid = tarinfo.uid
-		try: self.stat.st_gid = grp.getgrnam(tarinfo.gname)[2]
+		try: self.stat.st_gid = tarfile.gname2gid(tarinfo.gname)
 		except KeyError: self.stat.st_gid = tarinfo.gid
 
 		self.stat.st_mtime = tarinfo.mtime
@@ -230,9 +230,9 @@ class ROPath:
 				ti.mtime = 0
 			else: ti.mtime = self.stat.st_mtime
 
-			try: ti.uname = pwd.getpwuid(ti.uid)[0]
+			try: ti.uname = tarfile.uid2uname(ti.uid)
 			except KeyError: pass
-			try: ti.gname = grp.getgrgid(ti.gid)[0]
+			try: ti.gname = tarfile.gid2gname(ti.gid)
 			except KeyError: pass
 
 			if ti.type in (tarfile.CHRTYPE, tarfile.BLKTYPE):
