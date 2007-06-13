@@ -29,6 +29,7 @@ socket.setdefaulttimeout(10)
 class BackendException(Exception): pass
 class ParsingException(Exception): pass
 
+
 def get_backend(url_string):
 	"""Return Backend object from url string, or None if not a url string
 
@@ -44,6 +45,7 @@ def get_backend(url_string):
 	try: backend_class = protocol_class_dict[pu.protocol]
 	except KeyError: log.FatalError("Unknown protocol '%s'" % (pu.protocol,))
 	return backend_class(pu)
+
 
 class ParsedUrl:
 	"""Contains information gleaned from a generic url"""
