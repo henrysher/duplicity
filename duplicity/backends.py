@@ -345,34 +345,56 @@ class ftpBackend(Backend):
 
 	def __init__(self, parsed_url):
 		"""Create a new ftp backend object, log in to host"""
-		self.is_connected = False
 		self.parsed_url = parsed_url
+		self.ftp = False
 		self.connect()
 
 	def connect(self):
 		"""Connect to self.parsed_url"""
-		if self.is_connected:
-			self.close()
-		self.ftp = ftplib.FTP()
-		if log.verbosity > 8:
-			self.ftp.set_debuglevel(2)
-		self.is_connected = False
-		if self.parsed_url.port is None:
-			self.error_wrap('connect', self.parsed_url.host)
-		else: self.error_wrap('connect', self.parsed_url.host,
-							  self.parsed_url.port)
-		self.is_connected = True
+		tries = 0
+		while( True ):
+			tries = tries + 1
 
-		if self.parsed_url.user is not None:
-			self.error_wrap('login', self.parsed_url.user, self.get_password())
-		else: self.error_wrap('login')
-		try: self.ftp.cwd(self.parsed_url.path)
-		except ftplib.error_perm, e:
-			if "550" in str(e):
-				self.ftp.mkd(self.parsed_url.path)
-				self.ftp.cwd(self.parsed_url.path)
-			else: raise
-			
+			if self.ftp:
+				self.close()
+			self.ftp = ftplib.FTP()
+			if log.verbosity > 8:
+				self.ftp.set_debuglevel(2)
+			try:
+				if self.parsed_url.port is None:
+					self.log_wrap('connect', self.parsed_url.host)
+				else:
+					self.log_wrap('connect', self.parsed_url.host,
+						self.parsed_url.port)
+
+				if self.parsed_url.user is not None:
+					self.log_wrap('login', self.parsed_url.user,
+						self.get_password())
+				else: self.log_wrap('login')
+
+				try:
+					self.log_wrap('cwd', self.parsed_url.path)
+				except ftplib.error_perm, e:
+					if "550" in str(e):
+						self.log_wrap('mkd', self.parsed_url.path)
+						self.log_wrap('cwd', self.parsed_url.path)
+					else: raise
+				# OK:
+				break
+			except ftplib.all_errors, e:
+				if tries > self.RETRIES:
+					raise( BackendException(e) )
+
+			sleep_time = self.RETRY_SLEEP * (tries-1)
+			import traceback
+			log.Log("Caught exception %s during connect: %s (#%d), sleeping %ds before retry..\nTraceback:\n%s" % (
+					sys.exc_info()[0],
+					sys.exc_info()[1],
+					tries,
+					sleep_time,
+					"".join(traceback.format_stack())), 7)
+			time.sleep(sleep_time)
+
 	def error_wrap(self, command, *args):
 		"""Run self.ftp.command(*args), but raise BackendException on error"""
 
@@ -381,18 +403,7 @@ class ftpBackend(Backend):
 		while( True ):
 			tries = tries+1
 
-			# Log FTP command:
-			if command is 'login':
-				if log.verbosity > 8:
-					# Log full args at level 9:
-					log.Log("FTP: %s %s" % (command,args), 9)
-				else:
-					# replace password with stars:
-					log_args = list(args)
-					log_args[1] = '*' * len(log_args[1])
-					log.Log("FTP: %s %s" % (command,log_args), 5)
-			else:
-				log.Log("FTP: %s %s" % (command,args), 5)
+			log.Log("FTP: %s %s" % (command,args), 5)
 
 			# Execute command:
 			try:
@@ -406,34 +417,43 @@ class ftpBackend(Backend):
 				# Give up, maybe
 				if tries > self.RETRIES:
 					import traceback
-					log.FatalError("Caught exception %s: %s (%d exceptions in total), giving up..\nTraceback:\n%s" % (
+					log.Warn("Caught exception %s: %s (%d exceptions in total), giving up..\nTraceback:\n%s" % (
 						sys.exc_info()[0],
 						sys.exc_info()[1],
 						tries,
-						traceback.extract_stack()
+						"".join(traceback.format_stack())
 						))
 					raise BackendException(e)
 
 				# Sleep and retry (after trying to reconnect, if possible):
 				sleep_time = self.RETRY_SLEEP * (tries-1);
-				log.Warn("Caught exception %s: %s (#%d), sleeping %ds before retry.." % (
+				import traceback
+				log.Log("Caught exception %s: %s (#%d), sleeping %ds before retry..\nTraceback:\n%s" % (
 						sys.exc_info()[0],
 						sys.exc_info()[1],
 						tries,
-						sleep_time,))
+						sleep_time,
+						"".join(traceback.format_stack())), 9)
 				time.sleep(sleep_time)
 
-				# Re-connect, if we expect to be connected, but not if we're in the "login" process already:
-				if self.is_connected and command is not "login":
-					log.Log("Re-connecting...", 5)
-					self.connect()
-
-				# Retry the command:
-				try:
-					return ftplib.FTP.__dict__[command](self.ftp, *args)
-				except ftplib.all_errors, e:
-					continue
+				log.Log("Re-connecting...", 5)
+				self.connect()
 			else: break
+
+	def log_wrap(self, command, *args):
+		"""Log FTP command and execute it"""
+		if command is 'login':
+			if log.verbosity > 8:
+				# Log full args at level 9:
+				log.Log("FTP: %s %s" % (command,args), 9)
+			else:
+				# replace password with stars:
+				log_args = list(args)
+				log_args[1] = '*' * len(log_args[1])
+				log.Log("FTP: %s %s" % (command,log_args), 5)
+		else:
+			log.Log("FTP: %s %s" % (command,args), 5)
+		return ftplib.FTP.__dict__[command](self.ftp, *args)
 
 	def get_password(self):
 		"""Get ftp password using environment if possible"""
@@ -477,7 +497,6 @@ class ftpBackend(Backend):
 
 	def close(self):
 		"""Shut down connection"""
-		self.is_connected = False
 		try: self.ftp.quit()
 		except ftplib.all_errors: pass
 
