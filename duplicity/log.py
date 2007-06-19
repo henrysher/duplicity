@@ -40,6 +40,7 @@ def Warn(s):
 def FatalError(s):
 	"""Write fatal error message and exit"""
 	sys.stderr.write(s + "\n")
+	sys.stderr.flush()
 	sys.exit(1)
 
 def setverbosity(verb, termverb = None):
