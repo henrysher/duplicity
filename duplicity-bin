@@ -1,4 +1,4 @@
-#!/usr/bin/env python -u
+#!/usr/bin/env python
 # duplicity -- Encrypted bandwidth efficient backup
 # Version $version released September 29, 2002
 #
@@ -80,8 +80,8 @@ def write_multivol(backup_type, tarblock_iter, backend):
 		tdp = dup_temp.new_tempduppath(file_naming.parse(dest_filename))
 		if globals.encryption:
 			at_end = gpg.GPGWriteFile(tarblock_iter, tdp.name,
-									  globals.gpg_profile)
-		else: at_end = gpg.GzipWriteFile(tarblock_iter, tdp.name)
+									  globals.gpg_profile,globals.volsize)
+		else: at_end = gpg.GzipWriteFile(tarblock_iter, tdp.name,globals.volsize)
 		tdp.setdata()
 
 		# Add volume information to manifest

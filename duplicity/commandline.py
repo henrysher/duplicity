@@ -51,7 +51,7 @@ def parse_cmdline_options(arglist):
 		  "no-print-statistics", "null-separator",
 		  "remove-older-than=", "restore-dir=", "restore-time=",
 		  "scp-command=", "sftp-command=", "short-filenames", "sign-key=",
-		  "ssh-command=", "verbosity=", "verify", "version"])
+		  "ssh-command=", "verbosity=", "verify", "version","volsize="])
 	except getopt.error, e:
 		command_line_error("%s" % (str(e),))
 
@@ -104,6 +104,7 @@ def parse_cmdline_options(arglist):
 			sys.exit(0)
 		elif opt == "-v" or opt == "--verbosity": log.setverbosity(int(arg))
 		elif opt == "--verify": verify = 1
+		elif opt == "--volsize": globals.volsize=int(arg)*1024*1024
 		else: command_line_error("Unknown option %s" % opt)
 
 	return args
