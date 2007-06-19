@@ -320,8 +320,8 @@ class SignatureChain:
 		# Try to delete in opposite order, so something useful even if aborted
 		if self.archive_dir:
 			for i in range(len(self.inclist)-1, -1, -1):
-				self.inclist[i].delete()
-			self.fullsig.delete()
+				self.archive_dir.append(self.inclist[i]).delete()       
+			self.archive_dir.append(self.fullsig).delete()
 		else:
 			assert self.backend
 			inclist_copy = self.inclist[:]
