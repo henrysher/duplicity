@@ -51,7 +51,7 @@ def parse_cmdline_options(arglist):
 		  "no-print-statistics", "null-separator",
 		  "remove-older-than=", "restore-dir=", "restore-time=",
 		  "scp-command=", "sftp-command=", "short-filenames", "sign-key=",
-		  "ssh-command=", "verbosity=", "verify", "version","volsize="])
+		  "ssh-command=", "verbosity=", "verify", "version","volsize=","help"])
 	except getopt.error, e:
 		command_line_error("%s" % (str(e),))
 
@@ -105,6 +105,7 @@ def parse_cmdline_options(arglist):
 		elif opt == "-v" or opt == "--verbosity": log.setverbosity(int(arg))
 		elif opt == "--verify": verify = 1
 		elif opt == "--volsize": globals.volsize=int(arg)*1024*1024
+		elif opt == "--help": usage(); sys.exit(1);
 		else: command_line_error("Unknown option %s" % opt)
 
 	return args
@@ -112,8 +113,66 @@ def parse_cmdline_options(arglist):
 def command_line_error(message):
 	"""Indicate a command line error and exit"""
 	sys.stderr.write("Command line error: %s\n" % (message,))
-	sys.stderr.write("See the duplicity manual page for instructions\n")
+	usage()
 	sys.exit(1)
+
+def usage():
+	"""Print terse usage info"""
+	sys.stderr.write("""
+Usage:	duplicity [options] input_directory destination_url
+	duplicity [options] source_url target_directory
+	duplicity [options] --verify source_url filename
+	duplicity [options] --collection-status source_url
+	duplicity [options] --list-current-files source_url
+	duplicity [options] --cleanup target_url
+
+Backends and their URL formats:
+	ssh://user@other.host:port/some_dir
+	scp://user@other.host:port/some_dir
+	ftp://user@other.host/some_dir
+	hsi://user@other.host/some_dir
+	file:///some_dir
+	rsync://user@host::module/some_dir
+	s3+http://bucket_name
+	webdav://user@other.host/some_dir
+
+Options:
+	--allow-source-mismatch
+	--archive-dir <path>
+	--cleanup
+	--collection-status
+	--encrypt-key <gpg-key-id>
+	--exclude <shell_pattern>
+	--exclude-device-files
+	--exclude-filelist <filename>
+	--exclude-filelist-stdin
+	--exclude-globbing-filelist <filename>
+	--exclude-other-filesystems
+	--exclude-regexp <regexp>
+	--file-to-restore <path>
+	-f, --full
+	--force
+	-i, --incremental
+	--include <shell_pattern>
+	--include-filelist <filename>
+	--include-filelist-stdin
+	--include-globbing-filelist <filename>
+	--include-regexp <regexp>
+	--list-current-files
+	--no-encryption
+	--no-print-statistics
+	--null-separator
+	--scp-command <command>
+	--sftp-command <command>
+	--sign-key <gpg-key-id>>
+	--remove-older-than <time>
+	--short-filenames
+	-t<time>, --restore-time <time>
+	-v[0-9], --verbosity [0-9]
+	--verify
+	--volsize <number>
+""")
+
 
 def get_int(int_string, description):
 	"""Require that int_string be an integer, return int value"""
