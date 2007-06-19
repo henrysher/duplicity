@@ -1,3 +1,37 @@
+New in v0.4.3.RC7 (2007/06/19)
+------------------------------
+Bug 20179 - dAniel hAhler: 
+When errors cause login to fail in FTP, reset and try again.
+
+Patch 6015 -dAniel hAhler:
+Better display of traceback when ftpBackend errors out.
+
+Patch 6029 - Alexander Zangerl <az@debian.org>:
+http://bugs.debian.org/370206
+archive-dir together with incremental backup results in crash. the
+patch is simple, the code in 0.4.2 did attempt to access strings as
+objects.
+
+Patch 6031 - Alexander Zangerl <az@debian.org>:
+http://bugs.debian.org/369971
+there's some problems with unattended encrypted dumps, if the user
+doesn't want to hand duplicity the gpg passphrase and attempts to work
+around this by using a local archive dir.  the patch makes it look at
+a manifest in a local archive dir if gpg doesn't manage to decrypt a
+remote one (no surprise without a passphrase).
+
+Patch 6032 - Alexander Zangerl <az@debian.org>:
+a new feature patch: i've recently gotten annoyed with having
+gazillions of 5mb files and therefore added a --volsize option to
+allow the user setting the chunk size. the patch is simple and
+contains a manpage update as well.
+
+Patch 6033 - Alexander Zangerl <az@debian.org>:
+let's add a --help terse usage message and don't just direct the user
+to the manual. this should come handy if somebody needs to restore
+stuff without having the manual available.
+
+
 New in v0.4.3.RC6 (2007/06/13)
 ------------------------------
 Bug 20419 - dAniel hAhler: When errors cause an incomplete backup set,
