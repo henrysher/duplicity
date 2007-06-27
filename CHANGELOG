@@ -1,3 +1,20 @@
+New in v0.4.3.RC8 (2007/06/27)
+------------------------------
+Bug 20282 - Thomas Tuttle:
+An out of range index when checking past history in the backup
+sets caused a failure when trying to access later.
+
+Bug 20149 - dAniel hAhler:
+dAniel submitted a second patch for this for further cleanup.
+The new patch prefers the latest intact backup set.
+
+Bug 20039 - Andreas Schildbach: --and--
+Patch 6030 - Alexander Zangerl <az@debian.org>:
+Duplicity now uses bzip2 for compression.  This matches the way
+the Debian distribution handles it.  I'll think about adding an
+option to override later, if its needed.
+
+
 New in v0.4.3.RC7 (2007/06/19)
 ------------------------------
 Bug 20179 - dAniel hAhler: 
@@ -34,7 +51,7 @@ stuff without having the manual available.
 
 New in v0.4.3.RC6 (2007/06/13)
 ------------------------------
-Bug 20419 - dAniel hAhler: When errors cause an incomplete backup set,
+Bug 20149 - dAniel hAhler: When errors cause an incomplete backup set,
 flag the error with a message, rather than erroring out.  The user
 then knows to run --cleanup.
 
