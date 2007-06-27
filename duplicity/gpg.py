@@ -76,6 +76,8 @@ class GPGFile:
 		gnupg = GnuPGInterface.GnuPG()
 		gnupg.options.meta_interactive = 0
 		gnupg.options.extra_args.append('--no-secmem-warning')
+		gnupg.options.extra_args.append('--compression-algo=bzip2')
+		gnupg.options.extra_args.append('--bzip2-compress-level=9')
 		if profile.sign_key: gnupg.options.default_key = profile.sign_key
 
 		if encrypt:
