@@ -197,10 +197,24 @@ class BackupChain:
 		"""Add incset to self.  Return None if incset does not match"""
 		if self.end_time == incset.start_time:
 			self.incset_list.append(incset)
-			self.end_time = incset.end_time
-			assert self.end_time
-			return 1
-		else: return None
+		else:
+			if( incset.start_time == self.incset_list[-1].start_time
+				and incset.end_time > self.incset_list[-1] ):
+				log.Log("Preferring Backupset over previous one!", 8)
+				self.incset_list[-1] = incset
+			else:
+				log.Log("Ignoring incremental Backupset "
+					+ "(start_time: %s; needed: %s)"
+					% (dup_time.timetopretty(incset.start_time),
+					dup_time.timetopretty(self.end_time)), 8)
+				return None
+		self.end_time = incset.end_time
+		log.Log("Added incremental Backupset "
+		 	+ "(start_time: %s / end_time: %s)"
+			% (dup_time.timetopretty(incset.start_time),
+			dup_time.timetopretty(incset.end_time)), 8)
+		assert self.end_time
+		return 1
 
 	def delete(self):
 		"""Delete all sets in chain, in reverse order"""
@@ -440,7 +454,8 @@ class CollectionsStatus:
 				if sig_chains[i].end_time == latest_backup_chain.end_time:
 					pass
 				# See if the set before last matches:
-				elif sig_chains[i].end_time == latest_backup_chain.get_all_sets()[-2].end_time:
+				elif (len(latest_backup_chain.get_all_sets()) >= 2 and
+					  sig_chains[i].end_time == latest_backup_chain.get_all_sets()[-2].end_time):
 						# It matches, remove the last backup set:
 						log.Warn("Warning, discarding last backup set, because of missing signature file.")
 						self.incomplete_backup_sets.append(latest_backup_chain.incset_list[-1])
