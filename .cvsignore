@@ -1,0 +1,5 @@
+*.gz
+*.pyc
+*.rpm
+*.sig
+*.spec
