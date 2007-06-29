@@ -547,5 +547,4 @@ def get_block_size(file_len):
 	"""
 	if file_len < 1024000: return 512 # set minimum of 512 bytes
 	else: # Split file into about 2000 pieces, rounding to 512
-		return long((file_len/(2000*512))*512)
-
+		return min(long((file_len/(2000*512))*512), 2048)
