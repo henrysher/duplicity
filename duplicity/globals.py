@@ -58,6 +58,9 @@ gpg_profile = None
 # nulls instead of newlines.
 null_separator = None
 
+# number of retries on network operations
+num_retries = 5
+
 # Character used like the ":" in time strings like
 # 2002-08-06T04:22:00-07:00.  The colon isn't good for filenames on
 # windows machines.

@@ -48,18 +48,23 @@ def parse_cmdline_options(arglist):
 		  "include=", "include-filelist=", "include-filelist-stdin",
 		  "include-globbing-filelist=", "include-regexp=",
 		  "list-current-files", "no-encryption",
-		  "no-print-statistics", "null-separator",
+		  "no-print-statistics", "null-separator", "num-retries="
 		  "remove-older-than=", "restore-dir=", "restore-time=",
 		  "scp-command=", "sftp-command=", "short-filenames", "sign-key=",
+## 		  "time-separator=",
 		  "ssh-command=", "verbosity=", "verify", "version","volsize=","help"])
 	except getopt.error, e:
 		command_line_error("%s" % (str(e),))
 
 	for opt, arg in optlist:
-		if opt == "--allow-source-mismatch": globals.allow_source_mismatch = 1
-		elif opt == "--archive-dir": set_archive_dir(arg)
-		elif opt == "--cleanup": cleanup = 1
-		elif opt == "--collection-status": collection_status = 1
+		if opt == "--allow-source-mismatch":
+			globals.allow_source_mismatch = 1
+		elif opt == "--archive-dir":
+			set_archive_dir(arg)
+		elif opt == "--cleanup":
+			cleanup = 1
+		elif opt == "--collection-status":
+			collection_status = 1
 		elif opt == "--current-time":
 			dup_time.setcurtime(get_int(arg, "current-time"))
 		elif opt == "--encrypt-key":
@@ -78,35 +83,56 @@ def parse_cmdline_options(arglist):
 		elif opt == "--exclude-filelist-stdin":
 			select_opts.append(("--exclude-filelist", "standard input"))
 			select_files.append(sys.stdin)
-		elif opt == "-f" or opt == "--full": full_backup = 1
-		elif opt == "--force": globals.force = 1
+		elif opt == "-f" or opt == "--full":
+			full_backup = 1
+		elif opt == "--force":
+			globals.force = 1
 		elif opt == "--include-filelist-stdin":
 			select_opts.append(("--include-filelist", "standard input"))
 			select_files.append(sys.stdin)
-		elif opt == "-i" or opt == "--incremental": globals.incremental = 1
-		elif opt == "--list-current-files": list_current = 1
-		elif opt == "--no-encryption": globals.encryption = 0
-		elif opt == "--no-print-statistics": globals.print_statistics = 0
-		elif opt == "--null-separator": globals.null_separator = 1
+		elif opt == "-i" or opt == "--incremental":
+			globals.incremental = 1
+		elif opt == "--list-current-files":
+			list_current = 1
+		elif opt == "--no-encryption":
+			globals.encryption = 0
+		elif opt == "--no-print-statistics":
+			globals.print_statistics = 0
+		elif opt == "--null-separator":
+			globals.null_separator = 1
+		elif opt == "--num-retries":
+			globals.num_retries = int(arg)
 		elif opt == "-r" or opt == "--file-to-restore":
 			globals.restore_dir = arg
 		elif opt == "--remove-older-than":
 			globals.remove_time = dup_time.genstrtotime(arg)
 		elif opt == "-t" or opt == "--restore-time":
 			globals.restore_time = dup_time.genstrtotime(arg)
-		elif opt == "--scp-command": backends.scp_command = arg
-		elif opt == "--sftp-command": backends.sftp_command = arg
-		elif opt == "--short-filenames": globals.short_filenames = 1
-		elif opt == "--sign-key": set_sign_key(arg)
-		elif opt == "--ssh-command": backends.ssh_command = arg
+		elif opt == "--scp-command":
+			backends.scp_command = arg
+		elif opt == "--sftp-command":
+			backends.sftp_command = arg
+		elif opt == "--short-filenames":
+			globals.short_filenames = 1
+		elif opt == "--sign-key":
+			set_sign_key(arg)
+		elif opt == "--ssh-command":
+			backends.ssh_command = arg
+## 		elif opt == "--time-separator":
+## 			globals.time_separator = arg
 		elif opt == "-V" or opt == "--version":
 			print "duplicity", str(globals.version)
 			sys.exit(0)
-		elif opt == "-v" or opt == "--verbosity": log.setverbosity(int(arg))
-		elif opt == "--verify": verify = 1
-		elif opt == "--volsize": globals.volsize=int(arg)*1024*1024
-		elif opt == "--help": usage(); sys.exit(1);
-		else: command_line_error("Unknown option %s" % opt)
+		elif opt == "-v" or opt == "--verbosity":
+			log.setverbosity(int(arg))
+		elif opt == "--verify":
+			verify = 1
+		elif opt == "--volsize":
+			globals.volsize=int(arg)*1024*1024
+		elif opt == "--help":
+			usage(); sys.exit(1);
+		else:
+			command_line_error("Unknown option %s" % opt)
 
 	return args
 
@@ -162,6 +188,7 @@ Options:
 	--no-encryption
 	--no-print-statistics
 	--null-separator
+	--num-retries <number>
 	--scp-command <command>
 	--sftp-command <command>
 	--sign-key <gpg-key-id>>
