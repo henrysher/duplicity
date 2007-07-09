@@ -1,3 +1,28 @@
+New in v0.4.3.RC9 (2007/07/09)
+------------------------------
+Change to a max block size of 2048 bytes for rsync difference buffer.
+This may slow things down for truly large files, but will give much
+smaller deltas on files with numerous small changes, such as database
+files.
+
+New S3 backend, Boto, from Eric Evans, replaces bitBucket.  Boto can
+be obtained from http://code.google.com/p/boto/.  I did not make this
+a requirement for setup since its not in the normal repositories.
+
+New FTP backend from Thorsten Schnebeck that uses ncftp instead of
+Pythons ftplib.  This seems to be much more solid.  I added the -f
+option with a secure temp file to contain host, user, and password,
+rather than having them on the command line.  I also added the -m
+option to the put command to create the target directory and the -t
+option to make sure it times out if there is a network problem.
+
+The Backend class now contains a popen_persist function that acts like
+run_command_persist.  Both use the new num_retries global.
+
+Added a commandline option, '--num-retries=<int>', to set the number
+of retries.  The default is 5.
+
+
 New in v0.4.3.RC8 (2007/06/27)
 ------------------------------
 Bug 20282 - Thomas Tuttle:
@@ -78,7 +103,6 @@ stderr, thus producing logs that are coherent.
 
 New in v0.4.3.RC4 (2007/06/02)
 ------------------------------
-
 More fixes on FTP.  dAniel hAhler supplied a new patch for FTP that
 cleans up the error handling and reduces the retry time to zero on the
 first retry.
@@ -86,7 +110,6 @@ first retry.
 
 New in v0.4.3.RC3 (2007/05/31)
 ------------------------------
-
 Fixed connection problem in FTP where it was not quitting on
 connection reset and just logging in again.  This created many stale
 logins on the remote system.
@@ -97,7 +120,6 @@ actually wrote the patches, not just found them.
 
 New in v0.4.3.RC2 (2007/05/30)
 ------------------------------
-
 Fixed bug in tarfile.py that was causing ValueError exception.  Thanks
 to dAniel hAhler for the patch that fixed the problem.  Refer to:
 http://savannah.nongnu.org/bugs/?19998
@@ -105,7 +127,6 @@ http://savannah.nongnu.org/bugs/?19998
 
 New in v0.4.3.RC1 (2007/05/26)
 ------------------------------
-
 Applied patches:
   https://savannah.nongnu.org/patch/?4486
   https://savannah.nongnu.org/patch/?5183
@@ -147,7 +168,6 @@ Added some patches compiled by Andre Beckedorf:
 
 New in v0.4.2 (2006/02/02)
 --------------------------
-
 Mathias de Riese's substantial patch or patches appear to have been
 applied to CVS years ago, but not released yet.  Sorry about that.
 
@@ -175,7 +195,6 @@ now").
 
 New in v0.4.1 (2003/08/09)
 --------------------------
-
 Applied (version of) Helmut Schneider's patch to display file mod
 times with --list-current-files.
 
@@ -197,7 +216,6 @@ duplicity should work with Python 2.3 now.
 
 New in v0.4.0 (2002/11/30)
 --------------------------
-
 Changed restore procedure to download volumes from all backup sets
 simultaneously.
 
@@ -218,7 +236,6 @@ files had changed.
 
 New in v0.3.1 (2002/11/17)
 --------------------------
-
 Now by default the most recent files get restored, not the oldest.
 You can get the old weird behavior by specifying --restore-time 1 (or
 any other very early time).
@@ -251,7 +268,6 @@ the new restore system planned for 0.4.0.
 
 New in v0.3.0 (2002/11/10)
 --------------------------
-
 Added ftp backend.  Now the remote repository can accessed by ftp and
 can be specified like "ftp://user@foo.bar/".
 
@@ -281,7 +297,6 @@ Mathieu Doidy for bug report.
 
 New in v0.2.1 (2002/10/31)
 --------------------------
-
 Security Fix:  Fixed bug where an rdiffdir patch containing a path
 with a '..' component could overwrite files in parent directory.
 
@@ -295,7 +310,6 @@ to Peter Ehrenberg for report.
 
 New in v0.2.0 (2002/09/29)
 --------------------------
-
 (Thanks to Peter Ehrenberg for his valuable suggestions on many of the
 below.)
 
@@ -330,7 +344,6 @@ with (-f/--full and -i/--incremental).
 
 New in v0.1.1 (2002/09/16)
 --------------------------
-
 Supports asymmetric encryption with GPG public keys using the
 --encrypt-key option.
 
@@ -348,5 +361,4 @@ partial restores would end with a spurious GnuPG error message.
 
 New in v0.1.0 (2002/08/26)
 --------------------------
-
 First real version.
