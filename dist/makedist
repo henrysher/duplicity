@@ -90,7 +90,7 @@ def MakeTar():
 
 	for filename in ["backends.py", "collections.py", "commandline.py",
 					 "diffdir.py", "dup_temp.py", "dup_time.py",
-					 "file_naming.py", "ftplib.py", "globals.py",
+					 "file_naming.py", "globals.py",
 					 "gpg.py", "__init__.py",
 					 "lazy.py", "librsync.py", "log.py",
 					 "manifest.py", "misc.py", "patchdir.py",
