@@ -18,10 +18,10 @@
 
 """Provides functions and classes for getting/sending files to destination"""
 
-import os, socket, types, ftplib, tempfile, time, sys
-import log, path, dup_temp, file_naming
+import os, socket, types, tempfile, time, sys
+import log, path, dup_temp, file_naming, atexit
 import base64, getpass, xml.dom.minidom, httplib, urllib
-import socket
+import socket, globals
 
 # TODO: move into globals?
 socket.setdefaulttimeout(10)
@@ -149,14 +149,13 @@ class Backend:
 	def run_command_persist(self, commandline):
 		"""Run given commandline with logging and error detection
 		repeating it several times if it fails"""
-		numtries = 3
-		for n in range(1, numtries+1):
+		for n in range(1, globals.num_retries+1):
 			log.Log("Running '%s' (attempt #%d)" % (commandline, n), 5)
 			if not os.system(commandline):
 				return
 			log.Log("Running '%s' failed (attempt #%d)" % (commandline, n), 1)
-			time.sleep(60)
-		log.Log("Giving up trying to execute '%s' after %d attempts" % (commandline, numtries), 1)
+			time.sleep(30)
+		log.Log("Giving up trying to execute '%s' after %d attempts" % (commandline, globals.num_retries), 1)
 		raise BackendException("Error running '%s'" % commandline)
 
 	def popen(self, commandline):
@@ -167,6 +166,19 @@ class Backend:
 		if fout.close():
 			raise BackendException("Error running '%s'" % commandline)
 		return results
+
+	def popen_persist(self, commandline):
+		"""Run command and return stdout results, repeating on failure"""
+		for n in range(1, globals.num_retries+1):
+			log.Log("Reading results of '%s'" % commandline, 5)
+			fout = os.popen(commandline)
+			results = fout.read()
+			if not fout.close():
+				return results
+			log.Log("Running '%s' failed (attempt #%d)" % (commandline, n), 1)
+			time.sleep(30)
+		log.Log("Giving up trying to execute '%s' after %d attempts" % (commandline, globals.num_retries), 1)
+		raise BackendException("Error running '%s'" % commandline)
 
 	def get_fileobj_read(self, filename, parseresults = None):
 		"""Return fileobject opened for reading of filename on backend
@@ -335,170 +347,59 @@ class sftpBackend(Backend):
 	"""This backend uses sftp to perform file operations"""
 	pass # Do this later
 
-# TODO: handle login failures, by not retrying, but printing a helpful error?!
-#	e.g. """Caught exception <class 'duplicity.ftplib.error_perm'>: 521 unknown user (proxy auth failed) (#3), sleeping 20s before retry.."""
-#       and  """Caught exception <class 'duplicity.ftplib.error_perm'>: 530 Login incorrect. (#2), sleeping 10s before retry.."""
+
 class ftpBackend(Backend):
 	"""Connect to remote store using File Transfer Protocol"""
-	RETRY_SLEEP = 10 # time in seconds before reconnecting on errors (gets multiplied with the try counter)
-	RETRIES = 15 # number of retries
-
 	def __init__(self, parsed_url):
-		"""Create a new ftp backend object, log in to host"""
-		self.parsed_url = parsed_url
-		self.ftp = False
-		self.connect()
-
-	def connect(self):
-		"""Connect to self.parsed_url"""
-		tries = 0
-		while( True ):
-			tries = tries + 1
-
-			if self.ftp:
-				self.close()
-			self.ftp = ftplib.FTP()
-			if log.verbosity > 8:
-				self.ftp.set_debuglevel(2)
-			try:
-				if self.parsed_url.port is None:
-					self.log_wrap('connect', self.parsed_url.host)
-				else:
-					self.log_wrap('connect', self.parsed_url.host,
-						self.parsed_url.port)
-
-				if self.parsed_url.user is not None:
-					self.log_wrap('login', self.parsed_url.user,
-						self.get_password())
-				else: self.log_wrap('login')
-
-				try:
-					self.log_wrap('cwd', self.parsed_url.path)
-				except ftplib.error_perm, e:
-					if "550" in str(e):
-						self.log_wrap('mkd', self.parsed_url.path)
-						self.log_wrap('cwd', self.parsed_url.path)
-					else: raise
-				# OK:
-				break
-			except ftplib.all_errors, e:
-				if tries > self.RETRIES:
-					raise( BackendException(e) )
-
-			sleep_time = self.RETRY_SLEEP * (tries-1)
-			import traceback
-			log.Log("Caught exception %s during connect: %s (#%d), sleeping %ds before retry..\nTraceback:\n%s" % (
-					sys.exc_info()[0],
-					sys.exc_info()[1],
-					tries,
-					sleep_time,
-					"".join(traceback.format_stack())), 7)
-			time.sleep(sleep_time)
-
-	def error_wrap(self, command, *args):
-		"""Run self.ftp.command(*args), but raise BackendException on error"""
-
-		# Execute:
-		tries = 0
-		while( True ):
-			tries = tries+1
-
-			log.Log("FTP: %s %s" % (command,args), 5)
-
-			# Execute command:
-			try:
-				return ftplib.FTP.__dict__[command](self.ftp, *args)
-			except ftplib.all_errors, e:
-				# 450 or 550 on list isn't an error, but indicates an empty dir
-				# 104 indicates a reset connection, sometimes instead of 450/550
-				if command is "nlst" and ("450" in str(e) or "550" in str(e) or "104" in str(e)):
-					return []
-
-				# Give up, maybe
-				if tries > self.RETRIES:
-					import traceback
-					log.Warn("Caught exception %s: %s (%d exceptions in total), giving up..\nTraceback:\n%s" % (
-						sys.exc_info()[0],
-						sys.exc_info()[1],
-						tries,
-						"".join(traceback.format_stack())
-						))
-					raise BackendException(e)
-
-				# Sleep and retry (after trying to reconnect, if possible):
-				sleep_time = self.RETRY_SLEEP * (tries-1);
-				import traceback
-				log.Log("Caught exception %s: %s (#%d), sleeping %ds before retry..\nTraceback:\n%s" % (
-						sys.exc_info()[0],
-						sys.exc_info()[1],
-						tries,
-						sleep_time,
-						"".join(traceback.format_stack())), 9)
-				time.sleep(sleep_time)
-
-				log.Log("Re-connecting...", 5)
-				self.connect()
-			else: break
-
-	def log_wrap(self, command, *args):
-		"""Log FTP command and execute it"""
-		if command is 'login':
-			if log.verbosity > 8:
-				# Log full args at level 9:
-				log.Log("FTP: %s %s" % (command,args), 9)
-			else:
-				# replace password with stars:
-				log_args = list(args)
-				log_args[1] = '*' * len(log_args[1])
-				log.Log("FTP: %s %s" % (command,log_args), 5)
-		else:
-			log.Log("FTP: %s %s" % (command,args), 5)
-		return ftplib.FTP.__dict__[command](self.ftp, *args)
+		self.url_string = parsed_url.url_string
+		if self.url_string[-1] != '/':
+			self.url_string += '/'
+		self.password = self.get_password()
+		self.tempfile, self.tempname = tempfile.mkstemp()
+		atexit.register(os.unlink, self.tempname)
+		os.write(self.tempfile, "host %s\n" % parsed_url.host)
+		os.write(self.tempfile, "user %s\n" % parsed_url.user)
+		os.write(self.tempfile, "pass %s\n" % self.password)
+		os.close(self.tempfile)
 
 	def get_password(self):
 		"""Get ftp password using environment if possible"""
-		try: return os.environ['FTP_PASSWORD']
+		try: password = os.environ['FTP_PASSWORD']
 		except KeyError:
-			return getpass.getpass('Password for '+ self.parsed_url.user + '@' + self.parsed_url.host + ': ')
+			password = getpass.getpass("Password for '%s': " % self.url_string)
+		return password
 
 	def put(self, source_path, remote_filename = None):
 		"""Transfer source_path to remote_filename"""
-		if not remote_filename: remote_filename = source_path.get_filename()
-		source_file = source_path.open("rb")
-		log.Log("Saving %s on FTP server" % (remote_filename,), 5)
-		self.error_wrap('storbinary', "STOR "+remote_filename, source_file)
-		assert not source_file.close()
+		pu = ParsedUrl(self.url_string)
+		remote_path = os.path.join (pu.path, remote_filename).rstrip()
+		commandline = "ncftpput -m -t 30 -V -f '%s' -c '%s' '%s'< '%s'" % \
+					  (self.tempname, pu.host, remote_path, source_path.name)
+		self.run_command_persist(commandline)
 
 	def get(self, remote_filename, local_path):
 		"""Get remote filename, saving it to local_path"""
-		target_file = local_path.open("wb")
-		log.Log("Retrieving %s from FTP server" % (remote_filename,), 5)
-		self.error_wrap('retrbinary', "RETR "+remote_filename,
-						target_file.write)
-		assert not target_file.close()
+		pu = ParsedUrl(self.url_string)
+		remote_path = os.path.join(pu.path, remote_filename).rstrip()
+		commandline = "ncftpget -t 30 -V -f '%s' -c '%s' > '%s'" % \
+					  (self.tempname, remote_path, local_path.name)
+		self.run_command_persist(commandline)
 		local_path.setdata()
 
 	def list(self):
 		"""List files in directory"""
-		log.Log("Listing files on FTP server", 5)
-		try: return self.error_wrap('nlst')
-		except BackendException, e:
-			if "425" in str(e):
-				log.Log("Turning passive mode OFF", 5)
-				self.ftp.set_pasv(False)
-				return self.list()
-			raise
+		commandline = "ncftpls -t 30 -1 -f '%s' '%s'" % \
+					  (self.tempname, self.url_string)
+		l = self.popen_persist(commandline).split('\n')
+		return filter(lambda x: x, l)
 
 	def delete(self, filename_list):
 		"""Delete files in filename_list"""
+		pu = ParsedUrl(self.url_string)
 		for filename in filename_list:
-			log.Log("Deleting %s from FTP server" % (filename,), 5)
-			self.error_wrap('delete', filename)
-
-	def close(self):
-		"""Shut down connection"""
-		try: self.ftp.quit()
-		except ftplib.all_errors: pass
+			commandline = "ncftpls -t 30 -1 -f '%s' -X 'DELE /%s%s' '%s' > /dev/null" % \
+						  (self.tempname, pu.path, filename, self.url_string)
+			self.run_command_persist(commandline)
 
 
 class rsyncBackend(Backend):
@@ -572,114 +473,61 @@ class rsyncBackend(Backend):
 		os.rmdir (dir)
 
 
-class BitBucketBackend(Backend):
-	"""Backend for accessing Amazon S3 using the bitbucket.py module.
+class BotoBackend(Backend):
+	"""
+	Backend for Amazon's Simple Storage System, (aka Amazon S3), though
+	the use of the boto module, (http://code.google.com/p/boto/).
 
-	This backend supports access to Amazon S3 (http://aws.amazon.com/s3)
-	using a mix of environment variables and URL's. The access key and
-	secret key are taken from the environment variables S3KEY and S3SECRET
-	and the bucket name from the url. For example (in BASH):
-
-	$ export S3KEY='44CF9590006BF252F707'
-	$ export S3SECRET='OtxrzxIsfpFjA7SwPzILwy8Bw21TLhquhboDYROV'
-	$ duplicity /home/me s3+http://bucket_name
-	
-	Note: / is disallowed in bucket names in case prefix support is implemented
-	in future.
-
-	TODO:
-		- support bucket prefixes with url's like s3+http://bucket_name/prefix
-		- bitbucket and amazon s3 are currently not very robust. We provide a
-		  simplistic way of trying to re-connect and re-try an operation when
-		  it fails. This is just a band-aid and should be removed if bitbucket
-		  becomes more robust.
-		- Logging of actions.
-		- Better error messages for failures.
+	To make use of this backend you must export the environment variables
+	AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY with your Amazon Web 
+	Services key id and secret respectively.
 	"""
 
-	SLEEP = 10 # time in seconds before reconnecting on temporary errors	
-	
 	def __init__(self, parsed_url):
-		import bitbucket
-		self.module = bitbucket
+		try:
+			from boto.s3.connection import S3Connection
+			from boto.s3.key import Key
+		except ImportError:
+			raise BackendException("This backend requires the boto library, " \
+				"(http://code.google.com/p/boto/).")
+
+		self.key_class = Key
+
+		self.conn = S3Connection()
 		self.bucket_name = parsed_url.suffix
+		self.bucket = self.conn.create_bucket(self.bucket_name)
+
+		if not (os.environ.has_key('AWS_ACCESS_KEY_ID') and 
+				os.environ.has_key('AWS_SECRET_ACCESS_KEY')):
+			raise BackendException("The AWS_ACCESS_KEY_ID and " \
+				"AWS_SECRET_ACCESS_KEY environment variables are not set.")
+
 		if '/' in self.bucket_name:
-			raise NotImplementedError("/ disallowed in bucket names and "
-									  "bucket prefixes not supported.")
-		self.access_key = os.environ["S3KEY"]
-		self.secret_key = os.environ["S3SECRET"]
-		self._connect()
+			raise BackendException("Invalid bucket specification.")
 
-	def _connect(self):
-		self.connection = self.module.connect(access_key=self.access_key,
-											  secret_key=self.secret_key)
-		self.bucket = self.connection.get_bucket(self.bucket_name)
-		# populate the bitbucket cache we do it here to be sure that
-		# even on re-connect we have a list of all keys on the server
-		self.bucket.fetch_all_keys()
-
-	def _logException(self, message=None):
-		# Simply dump the exception onto stderr since formatting it
-		# ourselves looks dangerous.
-		if message is not None:
-			sys.stderr.write(message)
-		sys.excepthook(*sys.exc_info())
-
-	def put(self, source_path, remote_filename = None):
-		"""Transfer source_path (Path object) to remote_filename (string)
-
-		If remote_filename is None, get the filename from the last
-		path component of pathname.
-		"""
+	def put(self, source_path, remote_filename=None):
 		if not remote_filename:
 			remote_filename = source_path.get_filename()
-		log.Log("Sending %s" % remote_filename, 6)
-		bits = self.module.Bits(filename=source_path.name)
-		try:
-			self.bucket[remote_filename] = bits
-		except (socket.error, self.module.BitBucketResponseError), error:
-			sys.stderr.write("Network error '%s'. Trying to reconnect in %d seconds.\n"
-				% (str(error), self.SLEEP))
-			time.sleep(self.SLEEP)
-			self._connect()
-			return self.put(source_path, remote_filename)
-
+		log.Log("Uploading %s to Amazon S3" % remote_filename, 5)
+		key = self.key_class(self.bucket)
+		key.key = remote_filename
+		key.set_contents_from_filename(source_path.name, 
+				{'Content-Type': 'application/octet-stream'})
+	
 	def get(self, remote_filename, local_path):
-		"""Retrieve remote_filename and place in local_path"""
-		local_path.setdata()
-		try:
-			bits = self.bucket[remote_filename]
-			bits.to_file(local_path.name)
-		except (socket.error, self.module.BitBucketResponseError), error:
-			sys.stderr.write("Network error '%s'. Trying to reconnect in %d seconds.\n"
-				% (str(error), self.SLEEP))
-			time.sleep(self.SLEEP)
-			self._connect()
-			return self.get(remote_filename, local_path)
+		log.Log("Downloading %s from Amazon S3" % remote_filename, 5)
+		key = self.key_class(self.bucket)
+		key.key = remote_filename
+		key.get_contents_to_filename(local_path.name)
 		local_path.setdata()
 
 	def list(self):
-		"""Return list of filenames (strings) present in backend"""
-		try:
-			keys = self.bucket.keys()
-		except:
-			self._logException("Error getting bucket keys, attempting to "
-							   "re-connect.\n Got this Traceback:\n")
-			self._connect()
-			keys = self.bucket.keys()
-		return keys
+		filename_list = [k.key for k in self.bucket.get_all_keys()]
+		return filename_list
 
 	def delete(self, filename_list):
-		"""Delete each filename in filename_list, in order if possible"""
-		for file in filename_list:
-			try:
-				del self.bucket[file]
-			except:
-				self._logException("Error deleting file %s, attempting to "
-								   "re-connect.\n Got this Traceback:\n"
-								   % file)
-				self._connect()
-				del self.bucket[file]
+		for filename in filename_list:
+			self.bucket.delete_key(filename)
 
 class webdavBackend(Backend):
 	"""Backend for accessing a WebDAV repository.
@@ -838,5 +686,5 @@ protocol_class_dict = {"scp": scpBackend,
 					   "ftp": ftpBackend,
 					   "hsi": hsiBackend,
 					   "rsync": rsyncBackend,
-					   "s3+http": BitBucketBackend,
+					   "s3+http": BotoBackend,
 					   "webdav": webdavBackend}
