@@ -48,7 +48,7 @@ def parse_cmdline_options(arglist):
 		  "include=", "include-filelist=", "include-filelist-stdin",
 		  "include-globbing-filelist=", "include-regexp=",
 		  "list-current-files", "no-encryption",
-		  "no-print-statistics", "null-separator", "num-retries="
+		  "no-print-statistics", "null-separator", "num-retries=",
 		  "remove-older-than=", "restore-dir=", "restore-time=",
 		  "scp-command=", "sftp-command=", "short-filenames", "sign-key=",
 ## 		  "time-separator=",
