@@ -44,14 +44,15 @@ def parse_cmdline_options(arglist):
 		  "exclude=", "exclude-device-files", "exclude-filelist=",
 		  "exclude-globbing-filelist=", "exclude-filelist-stdin",
 		  "exclude-other-filesystems", "exclude-regexp=",
-		  "file-to-restore=", "force", "full", "incremental",
+		  "file-to-restore=", "force",
+		  "ftp-passive", "ftp-regular",
+		  "full", "incremental",
 		  "include=", "include-filelist=", "include-filelist-stdin",
 		  "include-globbing-filelist=", "include-regexp=",
 		  "list-current-files", "no-encryption",
 		  "no-print-statistics", "null-separator", "num-retries=",
 		  "remove-older-than=", "restore-dir=", "restore-time=",
 		  "scp-command=", "sftp-command=", "short-filenames", "sign-key=",
-## 		  "time-separator=",
 		  "ssh-command=", "verbosity=", "verify", "version","volsize=","help"])
 	except getopt.error, e:
 		command_line_error("%s" % (str(e),))
@@ -87,6 +88,10 @@ def parse_cmdline_options(arglist):
 			full_backup = 1
 		elif opt == "--force":
 			globals.force = 1
+		elif opt == "--ftp-passive":
+			globals.ftp_connection = 'passive'
+		elif opt == "--ftp-regular":
+			globals.ftp_connection = 'regular'
 		elif opt == "--include-filelist-stdin":
 			select_opts.append(("--include-filelist", "standard input"))
 			select_files.append(sys.stdin)
@@ -118,8 +123,6 @@ def parse_cmdline_options(arglist):
 			set_sign_key(arg)
 		elif opt == "--ssh-command":
 			backends.ssh_command = arg
-## 		elif opt == "--time-separator":
-## 			globals.time_separator = arg
 		elif opt == "-V" or opt == "--version":
 			print "duplicity", str(globals.version)
 			sys.exit(0)
@@ -178,6 +181,8 @@ Options:
 	--file-to-restore <path>
 	-f, --full
 	--force
+	--ftp-passive
+	--ftp-regular
 	-i, --incremental
 	--include <shell_pattern>
 	--include-filelist <filename>
