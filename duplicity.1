@@ -194,6 +194,14 @@ signatures are available.
 Proceed even if data loss might result.  Duplicity will let the user
 know when this option is required.
 .TP
+.B --ftp-passive
+Use passive (PASV) data connections.  The default is to use passive, 
+but to fallback to regular if the passive connection fails or times
+out.
+.TP
+.B --ftp-regular
+Use regular (PORT) data connections.
+.TP
 .BR -i ", " --incremental
 If this is set, duplicity will abort if old signatures cannot be
 found.  The default is to switch to full backup under these
@@ -261,6 +269,9 @@ affects the expected format of the files specified by the
 --{include|exclude}-filelist[-stdin] switches as well as the format of
 the directory statistics file.
 .TP
+.BI "--num-retries " number
+Number of retries to make on errors before giving up.
+.TP
 .BI "--scp-command " command
 This option only matters when using the ssh/scp backend.  There
 .I command
@@ -314,7 +325,7 @@ exit with a non-zero error level if any files are different.  On
 verbosity level 4 or higher, log a message for each file that has
 changed.
 .TP
-.B --volsize number
+.BI "--volsize " number
 Change the volume size to 
 .IR number 
 Mb. Default is 5Mb.
