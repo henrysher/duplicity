@@ -21,10 +21,9 @@
 import os, socket, types, tempfile, time, sys
 import log, path, dup_temp, file_naming, atexit
 import base64, getpass, xml.dom.minidom, httplib, urllib
-import socket, globals
+import socket, globals, re
 
-# TODO: move into globals?
-socket.setdefaulttimeout(10)
+socket.setdefaulttimeout(globals.timeout)
 
 class BackendException(Exception): pass
 class ParsingException(Exception): pass
@@ -140,45 +139,56 @@ class Backend:
 		"""Delete each filename in filename_list, in order if possible"""
 		pass
 
+	def munge_password(self, commandline):
+		try:
+			password = os.environ['FTP_PASSWORD']
+			return re.sub(re.escape(password), "???", commandline)
+		except:
+			return commandline
+
 	def run_command(self, commandline):
 		"""Run given commandline with logging and error detection"""
-		log.Log("Running '%s'" % commandline, 5)
+		private = self.munge_password(commandline)
+		log.Log("Running '%s'" % private, 5)
 		if os.system(commandline):
-			raise BackendException("Error running '%s'" % commandline)
+			raise BackendException("Error running '%s'" % private)
 
 	def run_command_persist(self, commandline):
 		"""Run given commandline with logging and error detection
 		repeating it several times if it fails"""
 		for n in range(1, globals.num_retries+1):
-			log.Log("Running '%s' (attempt #%d)" % (commandline, n), 5)
+			private = self.munge_password(commandline)
+			log.Log("Running '%s' (attempt #%d)" % (private, n), 5)
 			if not os.system(commandline):
 				return
-			log.Log("Running '%s' failed (attempt #%d)" % (commandline, n), 1)
+			log.Log("Running '%s' failed (attempt #%d)" % (private, n), 1)
 			time.sleep(30)
-		log.Log("Giving up trying to execute '%s' after %d attempts" % (commandline, globals.num_retries), 1)
-		raise BackendException("Error running '%s'" % commandline)
+		log.Log("Giving up trying to execute '%s' after %d attempts" % (private, globals.num_retries), 1)
+		raise BackendException("Error running '%s'" % private)
 
 	def popen(self, commandline):
 		"""Run command and return stdout results"""
-		log.Log("Reading results of '%s'" % commandline, 5)
+		private = self.munge_password(commandline)
+		log.Log("Reading results of '%s'" % private, 5)
 		fout = os.popen(commandline)
 		results = fout.read()
 		if fout.close():
-			raise BackendException("Error running '%s'" % commandline)
+			raise BackendException("Error running '%s'" % private)
 		return results
 
 	def popen_persist(self, commandline):
 		"""Run command and return stdout results, repeating on failure"""
 		for n in range(1, globals.num_retries+1):
-			log.Log("Reading results of '%s'" % commandline, 5)
+			private = self.munge_password(commandline)
+			log.Log("Reading results of '%s'" % private, 5)
 			fout = os.popen(commandline)
 			results = fout.read()
 			if not fout.close():
 				return results
-			log.Log("Running '%s' failed (attempt #%d)" % (commandline, n), 1)
+			log.Log("Running '%s' failed (attempt #%d)" % (private, n), 1)
 			time.sleep(30)
-		log.Log("Giving up trying to execute '%s' after %d attempts" % (commandline, globals.num_retries), 1)
-		raise BackendException("Error running '%s'" % commandline)
+		log.Log("Giving up trying to execute '%s' after %d attempts" % (private, globals.num_retries), 1)
+		raise BackendException("Error running '%s'" % private)
 
 	def get_fileobj_read(self, filename, parseresults = None):
 		"""Return fileobject opened for reading of filename on backend
@@ -356,40 +366,42 @@ class ftpBackend(Backend):
 			self.url_string += '/'
 		self.password = self.get_password()
 		self.tempfile, self.tempname = tempfile.mkstemp()
-		atexit.register(os.unlink, self.tempname)
-		os.write(self.tempfile, "host %s\n" % parsed_url.host)
-		os.write(self.tempfile, "user %s\n" % parsed_url.user)
-		os.write(self.tempfile, "pass %s\n" % self.password)
-		os.close(self.tempfile)
+		if globals.ftp_connection == 'regular':
+			self.conn_opt = '-E'
+		else:
+			self.conn_opt = '-F'
+		self.flags = "%s -t %s -u '%s' -p '%s'" % \
+					 (self.conn_opt, globals.timeout, parsed_url.user, self.password)
 
 	def get_password(self):
 		"""Get ftp password using environment if possible"""
 		try: password = os.environ['FTP_PASSWORD']
 		except KeyError:
 			password = getpass.getpass("Password for '%s': " % self.url_string)
+			os.environ['FTP_PASSWORD'] = password
 		return password
 
 	def put(self, source_path, remote_filename = None):
 		"""Transfer source_path to remote_filename"""
 		pu = ParsedUrl(self.url_string)
 		remote_path = os.path.join (pu.path, remote_filename).rstrip()
-		commandline = "ncftpput -m -t 30 -V -f '%s' -c '%s' '%s'< '%s'" % \
-					  (self.tempname, pu.host, remote_path, source_path.name)
+		commandline = "ncftpput %s -V -c '%s' '%s' < '%s'" % \
+					  (self.flags, pu.host, remote_path, source_path.name)
 		self.run_command_persist(commandline)
 
 	def get(self, remote_filename, local_path):
 		"""Get remote filename, saving it to local_path"""
 		pu = ParsedUrl(self.url_string)
 		remote_path = os.path.join(pu.path, remote_filename).rstrip()
-		commandline = "ncftpget -t 30 -V -f '%s' -c '%s' > '%s'" % \
-					  (self.tempname, remote_path, local_path.name)
+		commandline = "ncftpget %s -V -c '%s' '%s' > '%s'" % \
+					  (self.flags, pu.host, remote_path, local_path.name)
 		self.run_command_persist(commandline)
 		local_path.setdata()
 
 	def list(self):
 		"""List files in directory"""
-		commandline = "ncftpls -t 30 -1 -f '%s' '%s'" % \
-					  (self.tempname, self.url_string)
+		commandline = "ncftpls %s '%s'" % \
+					  (self.flags, self.url_string)
 		l = self.popen_persist(commandline).split('\n')
 		return filter(lambda x: x, l)
 
@@ -397,8 +409,8 @@ class ftpBackend(Backend):
 		"""Delete files in filename_list"""
 		pu = ParsedUrl(self.url_string)
 		for filename in filename_list:
-			commandline = "ncftpls -t 30 -1 -f '%s' -X 'DELE /%s%s' '%s' > /dev/null" % \
-						  (self.tempname, pu.path, filename, self.url_string)
+			commandline = "ncftpls %s -X 'DELE /%s%s' '%s' >& /dev/null" % \
+						  (self.flags, pu.path, filename, self.url_string)
 			self.run_command_persist(commandline)
 
 
@@ -523,11 +535,13 @@ class BotoBackend(Backend):
 
 	def list(self):
 		filename_list = [k.key for k in self.bucket.get_all_keys()]
+		log.Log("Files in bucket:\n%s" % string.join(filename_list, '\n'), 9)
 		return filename_list
 
 	def delete(self, filename_list):
 		for filename in filename_list:
 			self.bucket.delete_key(filename)
+
 
 class webdavBackend(Backend):
 	"""Backend for accessing a WebDAV repository.
@@ -641,6 +655,7 @@ class webdavBackend(Backend):
 				raise BackendException((response.status, response.reason))
 			response.read()
 
+
 hsi_command = "hsi"
 class hsiBackend(Backend):
 	def __init__(self, parsed_url):
@@ -658,14 +673,14 @@ class hsiBackend(Backend):
 			print commandline
 
 	def get(self, remote_filename, local_path):
-		commandline = '%s "get %s : %s%s"' % (hsi_command, local_path.name,self.remote_prefix, remote_filename)
+		commandline = '%s "get %s : %s%s"' % (hsi_command, local_path.name, self.remote_prefix, remote_filename)
 		self.run_command(commandline)
 		local_path.setdata()
 		if not local_path.exists():
 			raise BackendException("File %s not found" % local_path.name)
 
 	def list(self):
-		commandline = '%s "ls -l %s"' % (hsi_command,self.remote_dir)
+		commandline = '%s "ls -l %s"' % (hsi_command, self.remote_dir)
 		l = os.popen3(commandline)[2].readlines()[3:]
 		for i in range(0,len(l)):
 			l[i] = l[i].split()[-1]
@@ -678,6 +693,7 @@ class hsiBackend(Backend):
 		for fn in filename_list:
 			commandline = '%s "rm %s%s"' % (hsi_command, self.remote_prefix, fn)
 			self.run_command(commandline)
+
 
 # Dictionary relating protocol strings to backend_object classes.
 protocol_class_dict = {"scp": scpBackend,
