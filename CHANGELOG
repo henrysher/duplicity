@@ -1,3 +1,22 @@
+New in v0.4.3.RC10 (2007/07/14)
+------------------------------
+Add support for:
+  --ftp-passive,
+  --ftp-regular,
+
+Removed -m option on FTP put command.  This means that
+the remote directory must exist prior to backup.
+
+Changed ftpBackend from -f option back to commandline.
+Various versions of ncftp* interact differently when
+both -f and commandline options are supplied.
+
+The FTP password is munged in all log operations.
+
+Added logging of filenames in the bucket when -v9 is
+used on Amazon S3.
+
+
 New in v0.4.3.RC9 (2007/07/09)
 ------------------------------
 Change to a max block size of 2048 bytes for rsync difference buffer.
