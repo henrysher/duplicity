@@ -503,19 +503,20 @@ class BotoBackend(Backend):
 			raise BackendException("This backend requires the boto library, " \
 				"(http://code.google.com/p/boto/).")
 
-		self.key_class = Key
-
-		self.conn = S3Connection()
-		self.bucket_name = parsed_url.suffix
-		self.bucket = self.conn.create_bucket(self.bucket_name)
-
 		if not (os.environ.has_key('AWS_ACCESS_KEY_ID') and 
 				os.environ.has_key('AWS_SECRET_ACCESS_KEY')):
 			raise BackendException("The AWS_ACCESS_KEY_ID and " \
 				"AWS_SECRET_ACCESS_KEY environment variables are not set.")
 
+		self.bucket_name = parsed_url.suffix
+
 		if '/' in self.bucket_name:
 			raise BackendException("Invalid bucket specification.")
+
+		self.key_class = Key
+
+		self.conn = S3Connection()
+		self.bucket = self.conn.create_bucket(self.bucket_name)
 
 	def put(self, source_path, remote_filename=None):
 		if not remote_filename:
@@ -535,7 +536,7 @@ class BotoBackend(Backend):
 
 	def list(self):
 		filename_list = [k.key for k in self.bucket.get_all_keys()]
-		log.Log("Files in bucket:\n%s" % string.join(filename_list, '\n'), 9)
+		log.Log("Files in bucket:\n%s" % '\n'.join(filename_list), 9)
 		return filename_list
 
 	def delete(self, filename_list):
