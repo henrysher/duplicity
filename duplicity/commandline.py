@@ -53,6 +53,7 @@ def parse_cmdline_options(arglist):
 		  "no-print-statistics", "null-separator", "num-retries=",
 		  "remove-older-than=", "restore-dir=", "restore-time=",
 		  "scp-command=", "sftp-command=", "short-filenames", "sign-key=",
+		  "ssh-askpass",
 		  "ssh-command=", "verbosity=", "verify", "version","volsize=","help"])
 	except getopt.error, e:
 		command_line_error("%s" % (str(e),))
@@ -121,6 +122,8 @@ def parse_cmdline_options(arglist):
 			globals.short_filenames = 1
 		elif opt == "--sign-key":
 			set_sign_key(arg)
+		elif opt == "--ssh-askpass":
+			backends.ssh_askpass = True
 		elif opt == "--ssh-command":
 			backends.ssh_command = arg
 		elif opt == "-V" or opt == "--version":
@@ -154,6 +157,7 @@ Usage:	duplicity [options] input_directory destination_url
 	duplicity [options] --collection-status source_url
 	duplicity [options] --list-current-files source_url
 	duplicity [options] --cleanup target_url
+	duplicity [options] --remove-older-than target_url
 
 Backends and their URL formats:
 	ssh://user@other.host:port/some_dir
@@ -197,6 +201,7 @@ Options:
 	--scp-command <command>
 	--sftp-command <command>
 	--sign-key <gpg-key-id>>
+    --ssh-askpass
 	--remove-older-than <time>
 	--short-filenames
 	-t<time>, --restore-time <time>
