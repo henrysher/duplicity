@@ -1,20 +1,43 @@
+New in v0.4.3.RC11 (2007/07/20)
+------------------------------
+Duplicity now correctly processes scp URL's of the form:
+  scp://user@host[:port]/
+where the directory spec is empty.  This fixes a bug where the
+user could not write into the home directory on the target.
+
+The SSH/SCP backend has had an overhaul.  It now requires the
+python-pexpect module.  Normally this can be obtained from your
+distro's repository, but if you want, you can download pexpect
+from http://pexpect.sourceforge.net.
+
+The SSH/SCP backend work was done to allow the user to use password
+authentication rather than public-key.  You may now enter a password,
+either through the FTP_PASSWORD environment variable, or at the
+console.  To activate this feature you will need to use the option
+--ssh-askpass on the command line.  The default is public-key, which 
+does *not* look for a password from either source.
+
+Various fixes to the man page for --ssh-askpass, --remove-older-than,
+and --archive-dir.
+
+
 New in v0.4.3.RC10 (2007/07/14)
 ------------------------------
 Add support for:
   --ftp-passive,
-  --ftp-regular,
+  --ftp-regular
 
-Removed -m option on FTP put command.  This means that
-the remote directory must exist prior to backup.
+Removed -m option on FTP put command.  This means that the remote
+directory must exist prior to backup.
 
-Changed ftpBackend from -f option back to commandline.
-Various versions of ncftp* interact differently when
-both -f and commandline options are supplied.
+Changed ftpBackend from -f option back to commandline.  Various
+versions of ncftp* interact differently when both -f and commandline
+options are supplied.
 
 The FTP password is munged in all log operations.
 
-Added logging of filenames in the bucket when -v9 is
-used on Amazon S3.
+Added logging of filenames in the bucket when -v9 is used on
+Amazon S3.
 
 
 New in v0.4.3.RC9 (2007/07/09)

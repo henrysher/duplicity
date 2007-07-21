@@ -1,4 +1,4 @@
-.TH DUPLICITY 1 "AUGUST 2002" "Version 0.0" "User Manuals" \"  -*- nroff -*-
+.TH DUPLICITY 1 "JULY 2007" "Version 2.4.3" "User Manuals" \"  -*- nroff -*-
 .SH NAME
 duplicity \- Encrypted backup using rsync algorithm
 .SH SYNOPSIS
@@ -23,6 +23,11 @@ duplicity \- Encrypted backup using rsync algorithm
 .B duplicity
 .BI [ options ]
 .B --cleanup
+.I target_url
+
+.B duplicity
+.BI [ options ]
+.B --remove-older-than
 .I target_url
 
 .SH DESCRIPTION Duplicity incrementally backs up files and directory
@@ -113,10 +118,10 @@ to back up different directories.  duplicity will tell you if you need
 this switch.
 .TP
 .BI "--archive-dir " path
-When restoring, specify the local archive directory.  This option is
-not necessary, but if hash data is found locally in
+When backing up or restoring, specify the local archive directory.  
+This option is not necessary, but if hash data is found locally in
 .I path
-it will be checked against remote files.
+it will be used in preference to the remote hash data.
 .TP
 .B --cleanup
 Delete the extraneous duplicity files on the given backend.
@@ -297,13 +302,19 @@ not signed with the given keyid.
 .I key
 should be an 8 character hex string, like AA0E73D2.
 .TP
+.B --ssh-askpass
+Tells the ssh/scp backend to use SSH_PASSWORD from the environment,
+or, if that is not present, to prompt the user for the remote system
+password.
+.TP
 .BI "--remove-older-than " time
 Delete all backup sets older than the given time.  If old backup sets
 will not be deleted if backup sets newer than
 .I time
 depend on them.  See the 
 .B TIME FORMATS
-section for more information.
+section for more information.  Note, this action cannot be combined
+with backup or other actions, such as cleanup.
 .TP
 .BI --short-filenames
 If this option is specified, the names of the files duplicity writes
