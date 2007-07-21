@@ -21,7 +21,7 @@
 import os, socket, types, tempfile, time, sys
 import log, path, dup_temp, file_naming, atexit
 import base64, getpass, xml.dom.minidom, httplib, urllib
-import socket, globals, re
+import socket, globals, re, string
 
 socket.setdefaulttimeout(globals.timeout)
 
@@ -156,8 +156,8 @@ class Backend:
 	def run_command_persist(self, commandline):
 		"""Run given commandline with logging and error detection
 		repeating it several times if it fails"""
+		private = self.munge_password(commandline)
 		for n in range(1, globals.num_retries+1):
-			private = self.munge_password(commandline)
 			log.Log("Running '%s' (attempt #%d)" % (private, n), 5)
 			if not os.system(commandline):
 				return
@@ -178,8 +178,8 @@ class Backend:
 
 	def popen_persist(self, commandline):
 		"""Run command and return stdout results, repeating on failure"""
+		private = self.munge_password(commandline)
 		for n in range(1, globals.num_retries+1):
-			private = self.munge_password(commandline)
 			log.Log("Reading results of '%s'" % private, 5)
 			fout = os.popen(commandline)
 			results = fout.read()
@@ -299,31 +299,168 @@ ssh_command = "ssh"
 scp_command = "scp"
 sftp_command = "sftp"
 
+# default to batch mode using public-key encryption
+ssh_askpass = False
+
+# this keeps us from having to mess with the prompts regarding known hosts
+ssh_opts = "-oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no"
+
 class scpBackend(Backend):
 	"""This backend copies files using scp.  List not supported"""
 	def __init__(self, parsed_url):
 		"""scpBackend initializer"""
-		self.host_string = parsed_url.server # of form user@hostname:port
-		self.remote_dir = parsed_url.path # can be empty string
-		if parsed_url.port: self.port_string = parsed_url.port
-		else: self.port_string = 22
-		if self.remote_dir: self.remote_prefix = self.remote_dir + "/"
-		else: self.remote_prefix = ""
+		try:
+			import pexpect
+			self.pexpect = pexpect
+		except ImportError:
+			raise BackendException("This backend requires the pexpect module, "
+								   "pexpect from http://pexpect.sourceforge.net or "
+								   "python-pexpect from your distro's repository.")
+		# host string of form user@hostname:port
+		self.host_string = parsed_url.server 
+		# make sure remote_dir is always valid
+		if parsed_url.path:
+			self.remote_dir = parsed_url.path
+		else:
+			self.remote_dir = '.'
+		self.remote_prefix = self.remote_dir + '/'
+		# maybe use different ssh port
+		if parsed_url.port:
+			self.ssh_opts += ssh_opts + " -oPort=%s"
+		else:
+			self.ssh_opts = ssh_opts
+		# set up password
+		if ssh_askpass:
+			self.password = self.get_password()
+		else:
+			self.password = ''
+
+	def get_password(self):
+		"""Get ssh password using environment if possible"""
+		try:
+			password = os.environ['FTP_PASSWORD']
+		except KeyError:
+			password = getpass.getpass("Password for '%s': " % self.host_string)
+			os.environ['FTP_PASSWORD'] = password
+		return password
+
+	def run_scp_command(self, commandline):
+		""" Run an scp command, responding to password prompts """
+		for n in range(1, globals.num_retries+1):
+			log.Log("Running '%s' (attempt #%d)" % (commandline, n), 5)
+			child = self.pexpect.spawn(commandline, timeout = globals.timeout)
+			cmdloc = 0
+			if ssh_askpass:
+				state = "authorizing"
+			else:
+				state = "copying"
+			while 1:
+				if state == "authorizing":
+					match = child.expect([self.pexpect.EOF,
+										  self.pexpect.TIMEOUT,
+										  "(?i)password",
+										  "(?i)permission denied"],
+										 timeout = globals.timeout)
+					if match == 0:
+						log.Log("Failed to authenticate", 5)
+						break
+					elif match == 1:
+						log.Log("Timeout waiting to authenticate", 5)
+						break
+					elif match == 2:
+						child.sendline(self.password)
+						state = "copying"
+					elif match == 3:
+						log.Log("Invalid SSH password", 1)
+						break
+				elif state == "copying":
+					match = child.expect([self.pexpect.EOF,
+										  self.pexpect.TIMEOUT,
+										  "stalled",
+										  "ETA"],
+										 timeout = globals.timeout)
+					if match == 0:
+						break
+					elif match == 1:
+						log.Log("Timeout waiting for response", 5)
+						break
+					elif match == 2:
+						state = "stalled"
+				elif state == "stalled":
+					match = child.expect([self.pexpect.EOF,
+										  self.pexpect.TIMEOUT,
+										  "ETA"],
+										 timeout = globals.timeout)
+					if match == 0:
+						break
+					elif match == 1:
+						log.Log("Stalled for too long, aborted copy", 5)
+						break
+					elif match == 2:
+						state = "copying"
+			child.close(force = True)
+			if child.exitstatus == 0:
+				return
+			log.Log("Running '%s' failed (attempt #%d)" % (commandline, n), 1)
+			time.sleep(30)
+		log.Log("Giving up trying to execute '%s' after %d attempts" % (commandline, globals.num_retries), 1)
+		raise BackendException("Error running '%s'" % commandline)
+
+	def run_sftp_command(self, commandline, commands):
+		""" Run an sftp command, responding to password prompts, passing commands from list """
+		for n in range(1, globals.num_retries+1):
+			log.Log("Running '%s' (attempt #%d)" % (commandline, n), 5)
+			child = self.pexpect.spawn(commandline, timeout = globals.timeout)
+			cmdloc = 0
+			while 1:
+				match = child.expect([self.pexpect.EOF,
+									  self.pexpect.TIMEOUT,
+									  "sftp>",
+									  "(?i)password",
+									  "(?i)permission denied",
+									  "(?i)no such file or directory"])
+				if match == 0:
+					break
+				elif match == 1:
+					log.Log("Timeout waiting for response", 5)
+					break
+				if match == 2:
+					if cmdloc < len(commands):
+						child.sendline(commands[cmdloc])
+						cmdloc += 1
+					else:
+						child.sendeof()
+						res = child.before
+				elif match == 3:
+					child.sendline(self.password)
+				elif match == 4:
+					log.Log("Invalid SSH password", 1)
+					break
+				elif match == 5:
+					log.Log("Remote file or directory '%s' does not exist" % self.remote_dir, 1)
+					break
+			child.close()
+			if child.exitstatus == 0:
+				return res
+			log.Log("Running '%s' failed (attempt #%d)" % (commandline, n), 1)
+			time.sleep(30)
+		log.Log("Giving up trying to execute '%s' after %d attempts" % (commandline, globals.num_retries), 1)
+		raise BackendException("Error running '%s'" % commandline)
 
 	def put(self, source_path, remote_filename = None):
 		"""Use scp to copy source_dir/filename to remote computer"""
 		if not remote_filename: remote_filename = source_path.get_filename()
-		commandline = "%s -P %s %s %s:%s%s" % \
-					  (scp_command, self.port_string, source_path.name, self.host_string,
+		commandline = "%s %s %s %s:%s%s" % \
+					  (scp_command, ssh_opts, source_path.name, self.host_string,
 					   self.remote_prefix, remote_filename)
-		self.run_command_persist(commandline)
+		self.run_scp_command(commandline)
 
 	def get(self, remote_filename, local_path):
 		"""Use scp to get a remote file"""
-		commandline = "%s -P %s %s:%s%s %s" % \
-					  (scp_command, self.port_string, self.host_string, self.remote_prefix,
+		commandline = "%s %s %s:%s%s %s" % \
+					  (scp_command, ssh_opts, self.host_string, self.remote_prefix,
 					   remote_filename, local_path.name)
-		self.run_command_persist(commandline)
+		self.run_scp_command(commandline)
 		local_path.setdata()
 		if not local_path.exists():
 			raise BackendException("File %s not found" % local_path.name)
@@ -334,23 +471,20 @@ class scpBackend(Backend):
 		Note that this command can get confused when dealing with
 		files with newlines in them, as the embedded newlines cannot
 		be distinguished from the file boundaries.
-
 		"""
-		commandline = ("printf 'cd %s\nls -1' | %s -oPort=%s -b - %s" %
-					   (self.remote_dir, sftp_command, self.port_string, self.host_string))
-		l = self.popen(commandline).split('\n')[2:] # omit sftp prompts
-		return filter(lambda x: x, l)
+		commands = ["cd %s" % (self.remote_dir,),
+					"ls -1"]
+		commandline = ("%s %s %s" % (sftp_command, ssh_opts, self.host_string))
+		l = self.run_sftp_command(commandline, commands).split('\n')[1:]
+		return filter(lambda x: x, map(string.strip, l))
 
 	def delete(self, filename_list):
-		"""Runs ssh rm to delete files.  Files must not require quoting"""
-		assert len(filename_list) > 0
-		pathlist = map(lambda fn: self.remote_prefix + fn, filename_list)
-		del_prefix = "echo 'rm "
-		del_postfix = ("' | %s -oPort=%s -b - %s 1>/dev/null" %
-					   (sftp_command, self.port_string, self.host_string))
+		"""Runs sftp rm to delete files.  Files must not require quoting"""
+		commands = ["cd %s" % (self.remote_dir,)]
 		for fn in filename_list:
-			commandline = del_prefix + self.remote_prefix + fn + del_postfix
-			self.run_command(commandline)
+			commands.append("rm %s" % fn)
+		commandline = ("%s %s %s" % (sftp_command, ssh_opts, self.host_string))
+		self.run_sftp_command(commandline, commands)
 
 
 class sftpBackend(Backend):
@@ -500,13 +634,13 @@ class BotoBackend(Backend):
 			from boto.s3.connection import S3Connection
 			from boto.s3.key import Key
 		except ImportError:
-			raise BackendException("This backend requires the boto library, " \
-				"(http://code.google.com/p/boto/).")
+			raise BackendException("This backend requires the boto library, "
+								   "(http://code.google.com/p/boto/).")
 
 		if not (os.environ.has_key('AWS_ACCESS_KEY_ID') and 
 				os.environ.has_key('AWS_SECRET_ACCESS_KEY')):
-			raise BackendException("The AWS_ACCESS_KEY_ID and " \
-				"AWS_SECRET_ACCESS_KEY environment variables are not set.")
+			raise BackendException("The AWS_ACCESS_KEY_ID and "
+								   "AWS_SECRET_ACCESS_KEY environment variables are not set.")
 
 		self.bucket_name = parsed_url.suffix
 
