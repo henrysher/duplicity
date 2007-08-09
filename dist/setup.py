@@ -22,8 +22,8 @@ if not pexpect_version or pexpect_version < "2.1":
 setup(name="duplicity",
 	  version=version_string,
 	  description="Encrypted backup using rsync algorithm",
-	  author="Ben Escoto"
-	  author_email="bescoto@stanford.edu"
+	  author="Ben Escoto",
+	  author_email="bescoto@stanford.edu",
 	  maintainer="Kenneth Loafman",
 	  maintainer_email="kenneth@loafman.com",
 	  url="http://duplicity.nongnu.org/index.html",
