@@ -151,7 +151,9 @@ def command_line_error(message):
 def usage():
 	"""Print terse usage info"""
 	sys.stderr.write("""
-Usage:	duplicity [options] input_directory destination_url
+duplicity version %s running on %s.
+Usage:
+	duplicity [options] input_directory destination_url
 	duplicity [options] source_url target_directory
 	duplicity [options] --verify source_url filename
 	duplicity [options] --collection-status source_url
@@ -201,14 +203,14 @@ Options:
 	--scp-command <command>
 	--sftp-command <command>
 	--sign-key <gpg-key-id>>
-    --ssh-askpass
+	--ssh-askpass
 	--remove-older-than <time>
 	--short-filenames
 	-t<time>, --restore-time <time>
 	-v[0-9], --verbosity [0-9]
 	--verify
 	--volsize <number>
-""")
+""" % (globals.version, sys.platform))
 
 
 def get_int(int_string, description):
