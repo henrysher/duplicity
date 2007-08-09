@@ -280,6 +280,10 @@ class LocalBackend(Backend):
 
 	def list(self):
 		"""List files in that directory"""
+		try:
+			os.makedirs(self.remote_pathdir.base)
+		except:
+			pass
 		return self.remote_pathdir.listdir()
 
 	def delete(self, filename_list):
@@ -472,7 +476,8 @@ class scpBackend(Backend):
 		files with newlines in them, as the embedded newlines cannot
 		be distinguished from the file boundaries.
 		"""
-		commands = ["cd %s" % (self.remote_dir,),
+		commands = ["mkdir %s" % (self.remote_dir,),
+					"cd %s" % (self.remote_dir,),
 					"ls -1"]
 		commandline = ("%s %s %s" % (sftp_command, ssh_opts, self.host_string))
 		l = self.run_sftp_command(commandline, commands).split('\n')[1:]
@@ -534,6 +539,16 @@ class ftpBackend(Backend):
 
 	def list(self):
 		"""List files in directory"""
+		pu = ParsedUrl(self.url_string)
+		# first try for a long listing to avoid connection reset
+		# we create the directory first so we have target dir
+		commandline = "ncftpls %s -l -W 'MKD %s' '%s'" % \
+					  (self.flags, pu.path, self.url_string)
+		l = self.popen_persist(commandline).split('\n')
+		l = filter(lambda x: x, l)
+		if not l:
+			return l
+		# if long list is not empty, get short list of names only
 		commandline = "ncftpls %s '%s'" % \
 					  (self.flags, self.url_string)
 		l = self.popen_persist(commandline).split('\n')
@@ -543,8 +558,8 @@ class ftpBackend(Backend):
 		"""Delete files in filename_list"""
 		pu = ParsedUrl(self.url_string)
 		for filename in filename_list:
-			commandline = "ncftpls %s -X 'DELE /%s%s' '%s' >& /dev/null" % \
-						  (self.flags, pu.path, filename, self.url_string)
+			commandline = "ncftpls %s -X 'DELE %s' '%s'" % \
+						  (self.flags, filename, self.url_string)
 			self.run_command_persist(commandline)
 
 
