@@ -198,21 +198,20 @@ class BackupChain:
 		if self.end_time == incset.start_time:
 			self.incset_list.append(incset)
 		else:
-			if( incset.start_time == self.incset_list[-1].start_time
-				and incset.end_time > self.incset_list[-1] ):
+			if (self.incset_list
+				and incset.start_time == self.incset_list[-1].start_time
+				and incset.end_time > self.incset_list[-1]):
 				log.Log("Preferring Backupset over previous one!", 8)
 				self.incset_list[-1] = incset
 			else:
-				log.Log("Ignoring incremental Backupset "
-					+ "(start_time: %s; needed: %s)"
-					% (dup_time.timetopretty(incset.start_time),
-					dup_time.timetopretty(self.end_time)), 8)
+				log.Log("Ignoring incremental Backupset (start_time: %s; needed: %s)" %
+						(dup_time.timetopretty(incset.start_time),
+						 dup_time.timetopretty(self.end_time)), 8)
 				return None
 		self.end_time = incset.end_time
-		log.Log("Added incremental Backupset "
-		 	+ "(start_time: %s / end_time: %s)"
-			% (dup_time.timetopretty(incset.start_time),
-			dup_time.timetopretty(incset.end_time)), 8)
+		log.Log("Added incremental Backupset (start_time: %s / end_time: %s)" %
+				(dup_time.timetopretty(incset.start_time),
+				 dup_time.timetopretty(incset.end_time)), 8)
 		assert self.end_time
 		return 1
 
