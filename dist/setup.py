@@ -9,11 +9,23 @@ if sys.version_info[:2] < (2,2):
 	print "Sorry, duplicity requires version 2.2 or later of python"
 	sys.exit(1)
 
+try:
+	import pexpect
+	pexpect_version = pexpect.__version__
+except ImportError:
+	pexpect_version = None
+
+if not pexpect_version or pexpect_version < "2.1":
+	print ("Warning: pexpect version 2.1 or greater is required for the ssh backend.\n"
+		   "         If you do not plan to use the ssh backend, this is not a problem.")
+
 setup(name="duplicity",
 	  version=version_string,
 	  description="Encrypted backup using rsync algorithm",
-	  author="Kenneth Loafman",
-	  author_email="kenneth@loafman.com",
+	  author="Ben Escoto"
+	  author_email="bescoto@stanford.edu"
+	  maintainer="Kenneth Loafman",
+	  maintainer_email="kenneth@loafman.com",
 	  url="http://duplicity.nongnu.org/index.html",
 	  packages = ['duplicity'],
 	  package_dir = {"duplicity": "src"},
