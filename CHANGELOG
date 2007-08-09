@@ -1,5 +1,18 @@
+New in v0.4.3.RC12 (2007/08/09)
+-------------------------------
+Fix index out of range in Bug 20730, triggered when there
+is only one incremental in the list.
+https://savannah.nongnu.org/bugs/?20730
+
+Changed the file:, ftp:, and ssh: backends so that
+the target directory will be created at start.
+
+Changed the ftp: backend so that empty target dirs
+do not error out.
+
+
 New in v0.4.3.RC11 (2007/07/20)
-------------------------------
+-------------------------------
 Duplicity now correctly processes scp URL's of the form:
   scp://user@host[:port]/
 where the directory spec is empty.  This fixes a bug where the
@@ -22,7 +35,7 @@ and --archive-dir.
 
 
 New in v0.4.3.RC10 (2007/07/14)
-------------------------------
+-------------------------------
 Add support for:
   --ftp-passive,
   --ftp-regular
