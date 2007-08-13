@@ -320,7 +320,7 @@ class scpBackend(Backend):
 								   "pexpect from http://pexpect.sourceforge.net or "
 								   "python-pexpect from your distro's repository.")
 		# host string of form user@hostname:port
-		self.host_string = parsed_url.server 
+		self.host_string = parsed_url.server.split(':')[0]
 		# make sure remote_dir is always valid
 		if parsed_url.path:
 			self.remote_dir = parsed_url.path
@@ -429,10 +429,12 @@ class scpBackend(Backend):
 					break
 				if match == 2:
 					if cmdloc < len(commands):
-						child.sendline(commands[cmdloc])
+						command = commands[cmdloc]
+						child.sendline(command)
 						cmdloc += 1
 					else:
-						child.sendline('quit')
+						command = 'quit'
+						child.sendline(command)
 						res = child.before
 				elif match == 3:
 					child.sendline(self.password)
