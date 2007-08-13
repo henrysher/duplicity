@@ -330,7 +330,7 @@ class scpBackend(Backend):
 		self.remote_prefix = self.remote_dir + '/'
 		# maybe use different ssh port
 		if parsed_url.port:
-			self.ssh_opts += ssh_opts + " -oPort=%s"
+			self.ssh_opts += self.ssh_opts + " -oPort=%s"
 		else:
 			self.ssh_opts = ssh_opts
 		# set up password
@@ -433,7 +433,7 @@ class scpBackend(Backend):
 						child.sendline(commands[cmdloc])
 						cmdloc += 1
 					else:
-						child.sendeof()
+						child.sendline('quit')
 						res = child.before
 				elif match == 3:
 					child.sendline(self.password)
