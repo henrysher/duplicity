@@ -44,17 +44,15 @@ def parse_cmdline_options(arglist):
 		  "exclude=", "exclude-device-files", "exclude-filelist=",
 		  "exclude-globbing-filelist=", "exclude-filelist-stdin",
 		  "exclude-other-filesystems", "exclude-regexp=",
-		  "file-to-restore=", "force",
-		  "ftp-passive", "ftp-regular",
-		  "full", "incremental",
-		  "include=", "include-filelist=", "include-filelist-stdin",
-		  "include-globbing-filelist=", "include-regexp=",
-		  "list-current-files", "no-encryption",
+		  "file-to-restore=", "force", "ftp-passive", "ftp-regular",
+		  "full", "incremental", "include=", "include-filelist=",
+		  "include-filelist-stdin", "include-globbing-filelist=",
+		  "include-regexp=", "list-current-files", "no-encryption",
 		  "no-print-statistics", "null-separator", "num-retries=",
 		  "remove-older-than=", "restore-dir=", "restore-time=",
 		  "scp-command=", "sftp-command=", "short-filenames", "sign-key=",
-		  "ssh-askpass",
-		  "ssh-command=", "verbosity=", "verify", "version","volsize=","help"])
+		  "ssh-askpass", "ssh-options=", "verbosity=", "verify", "version",
+		  "volsize=", "help"])
 	except getopt.error, e:
 		command_line_error("%s" % (str(e),))
 
@@ -124,8 +122,8 @@ def parse_cmdline_options(arglist):
 			set_sign_key(arg)
 		elif opt == "--ssh-askpass":
 			backends.ssh_askpass = True
-		elif opt == "--ssh-command":
-			backends.ssh_command = arg
+		elif opt == "--ssh-options":
+			backends.ssh_command += (' ' + arg)
 		elif opt == "-V" or opt == "--version":
 			print "duplicity", str(globals.version)
 			sys.exit(0)
@@ -204,6 +202,7 @@ Options:
 	--sftp-command <command>
 	--sign-key <gpg-key-id>>
 	--ssh-askpass
+	--ssh-options
 	--remove-older-than <time>
 	--short-filenames
 	-t<time>, --restore-time <time>

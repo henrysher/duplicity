@@ -299,7 +299,6 @@ class LocalBackend(Backend):
 # ssh or scp or to add more arguments.	However, the replacements must
 # have the same syntax.  Also these strings will be executed by the
 # shell, so shouldn't have strange characters in them.
-ssh_command = "ssh"
 scp_command = "scp"
 sftp_command = "sftp"
 
@@ -307,7 +306,7 @@ sftp_command = "sftp"
 ssh_askpass = False
 
 # this keeps us from having to mess with the prompts regarding known hosts
-ssh_opts = "-oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no"
+ssh_options = "-oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no"
 
 class scpBackend(Backend):
 	"""This backend copies files using scp.  List not supported"""
@@ -330,9 +329,9 @@ class scpBackend(Backend):
 		self.remote_prefix = self.remote_dir + '/'
 		# maybe use different ssh port
 		if parsed_url.port:
-			self.ssh_opts += self.ssh_opts + " -oPort=%s"
+			self.ssh_options = ssh_options + " -oPort=%s" % parsed_url.port
 		else:
-			self.ssh_opts = ssh_opts
+			self.ssh_options = ssh_options
 		# set up password
 		if ssh_askpass:
 			self.password = self.get_password()
@@ -455,14 +454,14 @@ class scpBackend(Backend):
 		"""Use scp to copy source_dir/filename to remote computer"""
 		if not remote_filename: remote_filename = source_path.get_filename()
 		commandline = "%s %s %s %s:%s%s" % \
-					  (scp_command, ssh_opts, source_path.name, self.host_string,
+					  (scp_command, self.ssh_options, source_path.name, self.host_string,
 					   self.remote_prefix, remote_filename)
 		self.run_scp_command(commandline)
 
 	def get(self, remote_filename, local_path):
 		"""Use scp to get a remote file"""
 		commandline = "%s %s %s:%s%s %s" % \
-					  (scp_command, ssh_opts, self.host_string, self.remote_prefix,
+					  (scp_command, self.ssh_options, self.host_string, self.remote_prefix,
 					   remote_filename, local_path.name)
 		self.run_scp_command(commandline)
 		local_path.setdata()
@@ -479,7 +478,7 @@ class scpBackend(Backend):
 		commands = ["mkdir %s" % (self.remote_dir,),
 					"cd %s" % (self.remote_dir,),
 					"ls -1"]
-		commandline = ("%s %s %s" % (sftp_command, ssh_opts, self.host_string))
+		commandline = ("%s %s %s" % (sftp_command, self.ssh_options, self.host_string))
 		l = self.run_sftp_command(commandline, commands).split('\n')[1:]
 		return filter(lambda x: x, map(string.strip, l))
 
@@ -488,7 +487,7 @@ class scpBackend(Backend):
 		commands = ["cd %s" % (self.remote_dir,)]
 		for fn in filename_list:
 			commands.append("rm %s" % fn)
-		commandline = ("%s %s %s" % (sftp_command, ssh_opts, self.host_string))
+		commandline = ("%s %s %s" % (sftp_command, self.ssh_options, self.host_string))
 		self.run_sftp_command(commandline, commands)
 
 
