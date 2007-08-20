@@ -116,6 +116,9 @@ class Backend:
 	and delete methods.
 
 	"""
+	def __init__(self, parsed_url):
+		self.parsed_url = parsed_url
+
 	def put(self, source_path, remote_filename = None):
 		"""Transfer source_path (Path object) to remote_filename (string)
 
@@ -138,6 +141,15 @@ class Backend:
 	def delete(self, filename_list):
 		"""Delete each filename in filename_list, in order if possible"""
 		pass
+
+	def get_password(self):
+		"""Get password using environment if possible"""
+		try:
+			password = os.environ['FTP_PASSWORD']
+		except KeyError:
+			password = getpass.getpass("Password for '%s': " % self.parsed_url.server)
+			os.environ['FTP_PASSWORD'] = password
+		return password
 
 	def munge_password(self, commandline):
 		try:
@@ -260,6 +272,7 @@ class LocalBackend(Backend):
 
 	"""
 	def __init__(self, parsed_url):
+		Backend.__init__(self, parsed_url)
 		self.remote_pathdir = path.Path(parsed_url.suffix)
 
 	def put(self, source_path, remote_filename = None, rename = None):
@@ -308,10 +321,11 @@ ssh_askpass = False
 # this keeps us from having to mess with the prompts regarding known hosts
 ssh_options = "-oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no"
 
-class scpBackend(Backend):
+class sshBackend(Backend):
 	"""This backend copies files using scp.  List not supported"""
 	def __init__(self, parsed_url):
 		"""scpBackend initializer"""
+		Backend.__init__(self, parsed_url)
 		try:
 			import pexpect
 			self.pexpect = pexpect
@@ -337,15 +351,6 @@ class scpBackend(Backend):
 			self.password = self.get_password()
 		else:
 			self.password = ''
-
-	def get_password(self):
-		"""Get ssh password using environment if possible"""
-		try:
-			password = os.environ['FTP_PASSWORD']
-		except KeyError:
-			password = getpass.getpass("Password for '%s': " % self.host_string)
-			os.environ['FTP_PASSWORD'] = password
-		return password
 
 	def run_scp_command(self, commandline):
 		""" Run an scp command, responding to password prompts """
@@ -493,33 +498,20 @@ class scpBackend(Backend):
 		self.run_sftp_command(commandline, commands)
 
 
-class sftpBackend(Backend):
-	"""This backend uses sftp to perform file operations"""
-	pass # Do this later
-
-
 class ftpBackend(Backend):
 	"""Connect to remote store using File Transfer Protocol"""
 	def __init__(self, parsed_url):
+		Backend.__init__(self, parsed_url)
 		self.url_string = parsed_url.url_string
 		if self.url_string[-1] != '/':
 			self.url_string += '/'
 		self.password = self.get_password()
-		self.tempfile, self.tempname = tempfile.mkstemp()
 		if globals.ftp_connection == 'regular':
 			self.conn_opt = '-E'
 		else:
 			self.conn_opt = '-F'
 		self.flags = "%s -t %s -u '%s' -p '%s'" % \
 					 (self.conn_opt, globals.timeout, parsed_url.user, self.password)
-
-	def get_password(self):
-		"""Get ftp password using environment if possible"""
-		try: password = os.environ['FTP_PASSWORD']
-		except KeyError:
-			password = getpass.getpass("Password for '%s': " % self.url_string)
-			os.environ['FTP_PASSWORD'] = password
-		return password
 
 	def put(self, source_path, remote_filename = None):
 		"""Transfer source_path to remote_filename"""
@@ -541,10 +533,13 @@ class ftpBackend(Backend):
 	def list(self):
 		"""List files in directory"""
 		pu = ParsedUrl(self.url_string)
-		# first try for a long listing to avoid connection reset
 		# we create the directory first so we have target dir
-		commandline = "ncftpls %s -l -W 'MKD %s' '%s'" % \
-					  (self.flags, pu.path, self.url_string)
+		commandline = "ncftpls %s -W 'MKD %s' 'ftp://%s'" % \
+					  (self.flags, pu.path, pu.host)
+		l = self.popen_persist(commandline).split('\n')
+		# try for a long listing to avoid connection reset
+		commandline = "ncftpls %s -l '%s'" % \
+					  (self.flags, self.url_string)
 		l = self.popen_persist(commandline).split('\n')
 		l = filter(lambda x: x, l)
 		if not l:
@@ -572,6 +567,7 @@ class rsyncBackend(Backend):
 	"""
 	def __init__(self, parsed_url):
 		"""rsyncBackend initializer"""
+		Backend.__init__(self, parsed_url)
 		self.url_string = "%s:%s" % (parsed_url.server, parsed_url.path)
 		if self.url_string[-1] != '/':
 			self.url_string += '/'
@@ -646,6 +642,7 @@ class BotoBackend(Backend):
 	"""
 
 	def __init__(self, parsed_url):
+		Backend.__init__(self, parsed_url)
 		try:
 			from boto.s3.connection import S3Connection
 			from boto.s3.key import Key
@@ -709,6 +706,7 @@ class webdavBackend(Backend):
 	
 	"""Connect to remote store using WebDAV Protocol"""
 	def __init__(self, parsed_url):
+		Backend.__init__(self, parsed_url)
 		self.headers = {}
 		self.parsed_url = parsed_url
 		
@@ -722,9 +720,7 @@ class webdavBackend(Backend):
 		log.Log("Using WebDAV host %s" % (parsed_url.host,), 5)
 		log.Log("Using WebDAV directory %s" % (self.directory,), 5)
 		
-		try: password = os.environ['FTP_PASSWORD']
-		except KeyError:
-			password = getpass.getpass('Password for '+parsed_url.user+'@'+parsed_url.host+': ')
+		password = self.get_password()
 
 		self.conn = httplib.HTTPConnection(parsed_url.host)
 		self.headers['Authorization'] = 'Basic ' + base64.encodestring(parsed_url.user+':'+ password).strip()
@@ -810,6 +806,7 @@ class webdavBackend(Backend):
 hsi_command = "hsi"
 class hsiBackend(Backend):
 	def __init__(self, parsed_url):
+		Backend.__init__(self, parsed_url)
 		self.host_string = parsed_url.server
 		self.remote_dir = parsed_url.path
 		if self.remote_dir: self.remote_prefix = self.remote_dir + "/"
@@ -847,11 +844,11 @@ class hsiBackend(Backend):
 
 
 # Dictionary relating protocol strings to backend_object classes.
-protocol_class_dict = {"scp": scpBackend,
-					   "ssh": scpBackend,
-					   "file": LocalBackend,
+protocol_class_dict = {"file": LocalBackend,
 					   "ftp": ftpBackend,
 					   "hsi": hsiBackend,
 					   "rsync": rsyncBackend,
+					   "scp": sshBackend,
+					   "ssh": sshBackend,
 					   "s3+http": BotoBackend,
-					   "webdav": webdavBackend}
+					   "webdav": webdavBackend,}
