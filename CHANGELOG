@@ -1,3 +1,40 @@
+New in v0.4.3 (2007/08/??)
+--------------------------
+All the changes in RC1 through RC12 plus:
+
+Move get_password() to Backend class to standardize.
+
+Fix problem with ftpBackend to create target directory 
+if needed.  Note: this creates only one level.
+
+Dropped ssh-command and added ssh-options to allow users
+to add options to the scp and sftp commmands.
+
+Removed use of tempfile.TemporaryFile().  This fixes the
+restore problem on Windows that was due to Python bug
+1776696 reported on Sourceforge.
+
+Fixed Debian Bug#437694: Make bzip2 compression optional.
+The default is not to do bzip2 compression.  To use bzip2
+add the following command line option:
+--gpg-options='--compress-algo=bzip2 --bzip2-compress-level=9'
+Note: do not add spaces in the string value.
+
+Fixed bug 20764 - unable to use port in ssh backend.
+https://savannah.nongnu.org/bugs/?20764
+
+Remove ssh_command option, add ssh_options.  This adds
+options to the scp and sftp commands that are used by
+the ssh backend.
+
+Change ssh backend to send 'quit' instead of EOF when
+using sftp.  This allows it to run under cron as long
+as the password is supplied non-interactively. 
+
+Change ssh backend to not pass :port part of URL to
+scp or sftp.  We already supply -oPort=xx for port.
+
+
 New in v0.4.3.RC12 (2007/08/09)
 -------------------------------
 Fix index out of range in Bug 20730, triggered when there
@@ -13,6 +50,8 @@ do not error out.
 
 New in v0.4.3.RC11 (2007/07/20)
 -------------------------------
+Duplicity is now covered under GPL version 3 (or later).
+
 Duplicity now correctly processes scp URL's of the form:
   scp://user@host[:port]/
 where the directory spec is empty.  This fixes a bug where the

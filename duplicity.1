@@ -207,6 +207,12 @@ out.
 .B --ftp-regular
 Use regular (PORT) data connections.
 .TP
+.BI "--gpg-options " options
+Allows you to pass options to gpg encryption.  The 
+.I options 
+list should be of the form "opt1=parm1 opt2=parm2" where the string is
+quoted and the only spaces allowed are between options.
+.TP
 .BR -i ", " --incremental
 If this is set, duplicity will abort if old signatures cannot be
 found.  The default is to switch to full backup under these
@@ -278,20 +284,18 @@ the directory statistics file.
 Number of retries to make on errors before giving up.
 .TP
 .BI "--scp-command " command
-This option only matters when using the ssh/scp backend.  There
+This option only matters when using the ssh/scp backend.  The
 .I command
-will be used instead of scp to send or receive files.
-.I command
-must have the same syntax as scp.  This option can also be used to
-give extra arguments to scp, for instance "--scp-command \'scp -i
-foo\'".  The default is "scp".
+will be used instead of scp to send or receive files.  The default 
+is "scp".  See
+.BR --ssh-options .
 .TP
 .BI "--sftp-command " command
-This option only matters when using the ssh/scp backend.  There 
+This option only matters when using the ssh/scp backend.  The 
 .I command
 will be used instead of sftp for listing and deleting files.  The
-default is "sftp".  For more information see
-.BR --scp-command .
+default is "sftp".  See
+.BR --ssh-options .
 .TP
 .BI "--sign-key " key
 This option can be used when backing up or restoring.  When backing
@@ -306,6 +310,12 @@ should be an 8 character hex string, like AA0E73D2.
 Tells the ssh/scp backend to use FTP_PASSWORD from the environment,
 or, if that is not present, to prompt the user for the remote system
 password.
+.TP
+.BI "--ssh-options " options
+Allows you to pass options to the ssh/scp backend.  The 
+.I options 
+list should be of the form "opt1=parm1 opt2=parm2" where the string is
+quoted and the only spaces allowed are between options.
 .TP
 .BI "--remove-older-than " time
 Delete all backup sets older than the given time.  If old backup sets
