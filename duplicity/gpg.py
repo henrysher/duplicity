@@ -23,6 +23,9 @@ import GnuPGInterface, misc, log, path
 
 blocksize = 256 * 1024
 
+# user options appended by --gpg-options
+gpg_options = ""
+
 class GPGError(Exception):
 	"""Indicate some GPG Error"""
 	pass
@@ -76,9 +79,12 @@ class GPGFile:
 		gnupg = GnuPGInterface.GnuPG()
 		gnupg.options.meta_interactive = 0
 		gnupg.options.extra_args.append('--no-secmem-warning')
-		gnupg.options.extra_args.append('--compression-algo=bzip2')
-		gnupg.options.extra_args.append('--bzip2-compress-level=9')
-		if profile.sign_key: gnupg.options.default_key = profile.sign_key
+		if gpg_options:
+			for opt in gpg_options.split():
+				gnupg.options.extra_args.append(opt)
+
+		if profile.sign_key:
+			gnupg.options.default_key = profile.sign_key
 
 		if encrypt:
 			if profile.recipients:
