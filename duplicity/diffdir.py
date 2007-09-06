@@ -504,7 +504,7 @@ class DeltaTarBlockIter(TarBlockIter):
 
 	def get_data_block(self, fp, max_size):
 		"""Return pair (next data block, boolean last data block)"""
-		buf = fp.read(max_size)
+		buf = fp.read(min(max_size, 64*1024))
 		if len(buf) < max_size:
 			if fp.close(): raise DiffDirException("Error closing file")
 			return (buf, 1)
