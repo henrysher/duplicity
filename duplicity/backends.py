@@ -318,8 +318,8 @@ sftp_command = "sftp"
 # default to batch mode using public-key encryption
 ssh_askpass = False
 
-# this keeps us from having to mess with the prompts regarding known hosts
-ssh_options = "-oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no"
+# user added ssh options
+ssh_options = ""
 
 class sshBackend(Backend):
 	"""This backend copies files using scp.  List not supported"""
@@ -367,7 +367,8 @@ class sshBackend(Backend):
 					match = child.expect([self.pexpect.EOF,
 										  self.pexpect.TIMEOUT,
 										  "(?i)password",
-										  "(?i)permission denied"],
+										  "(?i)permission denied",
+										  "authenticity"],
 										 timeout = globals.timeout)
 					if match == 0:
 						log.Log("Failed to authenticate", 5)
@@ -381,10 +382,14 @@ class sshBackend(Backend):
 					elif match == 3:
 						log.Log("Invalid SSH password", 1)
 						break
+					elif match == 4:
+						log.Log("Remote host authentication failed (missing known_hosts entry?)", 1)
+						break
 				elif state == "copying":
 					match = child.expect([self.pexpect.EOF,
 										  self.pexpect.TIMEOUT,
 										  "stalled",
+										  "authenticity",
 										  "ETA"],
 										 timeout = globals.timeout)
 					if match == 0:
@@ -394,6 +399,9 @@ class sshBackend(Backend):
 						break
 					elif match == 2:
 						state = "stalled"
+					elif match == 3:
+						log.Log("Remote host authentication failed (missing known_hosts entry?)", 1)
+						break
 				elif state == "stalled":
 					match = child.expect([self.pexpect.EOF,
 										  self.pexpect.TIMEOUT,
@@ -426,6 +434,7 @@ class sshBackend(Backend):
 									  "sftp>",
 									  "(?i)password",
 									  "(?i)permission denied",
+									  "authenticity",
 									  "(?i)no such file or directory"])
 				if match == 0:
 					break
@@ -447,6 +456,9 @@ class sshBackend(Backend):
 					log.Log("Invalid SSH password", 1)
 					break
 				elif match == 5:
+					log.Log("Host key authenticity could not be verified (missing known_hosts entry?)", 1)
+					break
+				elif match == 6:
 					log.Log("Remote file or directory '%s' does not exist" % self.remote_dir, 1)
 					break
 			child.close()
