@@ -45,7 +45,7 @@ def cleanup():
 
 def new_temppath():
 	"""Return a new TempPath"""
-	filename = tempfile.mktemp()
+	filename = tempfile.mktemp("","duplicity.")
 	register_filename(filename)
 	return TempPath(filename)
 
@@ -81,7 +81,7 @@ def get_fileobj_duppath(dirpath, filename):
 
 def new_tempduppath(parseresults):
 	"""Return a new TempDupPath, using settings from parseresults"""
-	filename = tempfile.mktemp()
+	filename = tempfile.mktemp("","duplicity.")
 	register_filename(filename)
 	return TempDupPath(filename, parseresults = parseresults)
 
