@@ -28,9 +28,11 @@ duplicity \- Encrypted backup using rsync algorithm
 .B duplicity
 .BI [ options ]
 .B --remove-older-than
+.I time
 .I target_url
 
-.SH DESCRIPTION Duplicity incrementally backs up files and directory
+.SH DESCRIPTION
+Duplicity incrementally backs up files and directory
 by encrypting tar-format volumes with GnuPG and uploading them to a
 remote (or local) file server.  Currently local, ftp, ssh/scp, rsync,
 and Amazon S3 backends are available.  Because duplicity uses
@@ -387,7 +389,6 @@ to the current timezone settings.  For instance, "2002/3/5",
 "03-05-2002", and "2002-3-05" all mean March 5th, 2002.
 
 .SH FILE SELECTION
-
 duplicity accepts the same file selection options
 .B rdiff-backup
 does, including --exclude, --exclude-filelist-stdin, etc.
@@ -708,7 +709,8 @@ Bad signatures will be treated as empty instead of logging appropriate
 error message.
 
 .SH AUTHOR
-Ben Escoto <bescoto@stanford.edu>
+Original Author - Ben Escoto <bescoto@stanford.edu>
+Current Maintainer - Kenneth Loafman <kenneth@loafman.com>
 
 .SH SEE ALSO
 .BR rdiffdir (1),
