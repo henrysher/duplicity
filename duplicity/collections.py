@@ -482,8 +482,8 @@ class CollectionsStatus:
 		if self.other_sig_chains and sig_chain_warning:
 			if self.matched_chain_pair:
 				log.Log("Warning, found unnecessary signature chain(s)", 2)
-			else: log.FatalError("Found signatures but no corresponding "
-								 "backup files")
+			else: log.Log("Warning, found signatures but no corresponding "
+								 "backup files", 2)
 
 		if self.incomplete_backup_sets:
 			log.Log("Warning, found incomplete backup sets, probably left "
