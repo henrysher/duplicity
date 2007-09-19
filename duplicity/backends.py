@@ -557,7 +557,7 @@ class ftpBackend(Backend):
 		if not l:
 			return l
 		# if long list is not empty, get short list of names only
-		commandline = "ncftpls %s '%s'" % \
+		commandline = "ncftpls %s -1 '%s'" % \
 					  (self.flags, self.url_string)
 		l = self.popen_persist(commandline).split('\n')
 		return filter(lambda x: x, l)
