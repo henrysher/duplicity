@@ -1,3 +1,25 @@
+New in v0.4.4.RC1 (2007/09/19)
+------------------------------
+Patches applied from Debian
+DP: fix #228388: old/aborted/offending sig files prohibit further action
+DP: fixes manual page and usage msg for rsync url and --remove-older-than
+DP: make tempfiles with useful names
+DP: do not ask for a passphrase if none is required!
+
+https://savannah.nongnu.org/bugs/?21123
+duplicity 0.4.3 ftpBackend did not find backup sets when there was 
+more than 20 files in directory.
+
+https://savannah.nongnu.org/patch/index.php?6212
+Large performance boost for large volume sizes.
+
+https://savannah.nongnu.org/patch/index.php?6211
+Restore strict host checking in sshBackend.
+
+https://savannah.nongnu.org/patch/index.php?6205
+Add option --librsync-dir for when its not found.
+
+
 New in v0.4.3 (2007/08/20)
 --------------------------
 All the changes in RC1 through RC12 plus:
