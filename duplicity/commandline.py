@@ -190,7 +190,7 @@ Usage:
 	duplicity [options] --collection-status source_url
 	duplicity [options] --list-current-files source_url
 	duplicity [options] --cleanup target_url
-	duplicity [options] --remove-older-than target_url
+	duplicity [options] --remove-older-than time target_url
 
 Backends and their URL formats:
 	ssh://user@other.host:port/some_dir
@@ -198,7 +198,8 @@ Backends and their URL formats:
 	ftp://user@other.host/some_dir
 	hsi://user@other.host/some_dir
 	file:///some_dir
-	rsync://user@host::module/some_dir
+	rsync://user@host:/module/some_dir
+	rsync://user@host/some_non_module_path
 	s3+http://bucket_name
 	webdav://user@other.host/some_dir
 
@@ -237,7 +238,6 @@ Options:
 	--sign-key <gpg-key-id>>
 	--ssh-askpass
 	--ssh-options
-	--remove-older-than <time>
 	--short-filenames
 	-t<time>, --restore-time <time>
 	-v[0-9], --verbosity [0-9]
