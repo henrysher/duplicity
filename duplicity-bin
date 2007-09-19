@@ -38,7 +38,6 @@ def get_passphrase():
 	"""Get passphrase from environment or, failing that, from user"""
 	try: return os.environ['PASSPHRASE']
 	except KeyError: pass
-	if not globals.encryption: return "" # assume we don't need passphrase
 
 	log.Log("PASSPHRASE variable not set, asking user.", 5)
 	while 1:
@@ -355,7 +354,18 @@ def main():
 	log.Log("Collection Status\n-----------------\n" + str(col_stats), 8)
 
 	os.umask(077)
-	globals.gpg_profile.passphrase = get_passphrase()
+	
+	# if running full backups without signing, or if we run with
+	# encryption disabled, or if we have an archive dir and no signing
+	# or if we're only looking at the repository or an archive dir
+	# then no passphrase is required, so don't ask for one.
+	if (action == "full" and not globals.gpg_profile.sign_key) \
+	or (action == "inc" and not globals.gpg_profile.sign_key and globals.archive_dir) \
+	or (not globals.encryption) \
+	or (action == "list-current" and globals.archive_dir) \
+	or action == "collection-status":  globals.gpg_profile.passphrase = ""
+	else: globals.gpg_profile.passphrase = get_passphrase()
+
 	if action == "restore": restore(col_stats)
 	elif action == "verify": verify(col_stats)
 	elif action == "list-current": list_current(col_stats)
@@ -364,9 +374,9 @@ def main():
 	elif action == "remove-old": remove_old(col_stats)
 	else:
 		assert action == "inc" or action == "full", action
-		check_last_manifest(col_stats)
 		if action == "full": full_backup(col_stats)
 		else:
+			check_last_manifest(col_stats) # not needed for full backup
 			sig_chain = check_sig_chain(col_stats)
 			if not sig_chain: full_backup(col_stats)
 			else: incremental_backup(sig_chain)
