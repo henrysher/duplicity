@@ -79,6 +79,8 @@ def parse_cmdline_options(arglist):
 		  "sign-key=",
 		  "ssh-askpass",
 		  "ssh-options=",
+		  "timeout=",
+		  "time-separator=",
 		  "verbosity=",
 		  "verify",
 		  "version",
@@ -157,6 +159,12 @@ def parse_cmdline_options(arglist):
 			backends.ssh_askpass = True
 		elif opt == "--ssh-options":
 			backends.ssh_options = (backends.ssh_options + ' ' + arg).strip()
+		elif opt == "--timeout":
+			globals.timeout = int(arg)
+		elif opt == "--time-separator":
+			if arg[0] == '-':
+				command_line_error("Dash ('-') not valid for time-separator.")
+			globals.time_separator = arg[0]
 		elif opt == "-V" or opt == "--version":
 			print "duplicity", str(globals.version)
 			sys.exit(0)
@@ -165,7 +173,7 @@ def parse_cmdline_options(arglist):
 		elif opt == "--verify":
 			verify = 1
 		elif opt == "--volsize":
-			globals.volsize=int(arg)*1024*1024
+			globals.volsize = int(arg)*1024*1024
 		elif opt == "--help":
 			usage(); sys.exit(1);
 		else:
@@ -203,11 +211,18 @@ Backends and their URL formats:
 	s3+http://bucket_name
 	webdav://user@other.host/some_dir
 
+Commands:
+	--cleanup
+	--collection-status
+	-f, --full
+	-i, --incremental
+	--list-current-files
+	--remove-older-than
+	--verify
+
 Options:
 	--allow-source-mismatch
 	--archive-dir <path>
-	--cleanup
-	--collection-status
 	--encrypt-key <gpg-key-id>
 	--exclude <shell_pattern>
 	--exclude-device-files
@@ -217,18 +232,15 @@ Options:
 	--exclude-other-filesystems
 	--exclude-regexp <regexp>
 	--file-to-restore <path>
-	-f, --full
 	--force
 	--ftp-passive
 	--ftp-regular
 	--gpg-options
-	-i, --incremental
 	--include <shell_pattern>
 	--include-filelist <filename>
 	--include-filelist-stdin
 	--include-globbing-filelist <filename>
 	--include-regexp <regexp>
-	--list-current-files
 	--no-encryption
 	--no-print-statistics
 	--null-separator
@@ -239,10 +251,10 @@ Options:
 	--ssh-askpass
 	--ssh-options
 	--short-filenames
+	--timeout <seconds>
 	-t<time>, --restore-time <time>
-	-v[0-9], --verbosity [0-9]
-	--verify
 	--volsize <number>
+	-v[0-9], --verbosity [0-9]
 """ % (globals.version, sys.platform))
 
 
