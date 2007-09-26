@@ -1,3 +1,30 @@
+New in v0.4.4.RC2 (2007/09/26)
+------------------------------
+Added --timeout <seconds> (default 30) to allow users to change
+duplicity's network timeout settings.
+
+Added --time-separator <char> to allow users to change the time 
+separator from ':' to another character that will work on their
+system.  HINT: For Windows SMB shares, use --time-separator='_'.
+NOTE: '-' is not valid as it conflicts with date separator.
+
+Add patch from Alexander Zangerl to suppress the GPG passphrase
+prompt when a passphrase is not needed.
+ - full and pubkey enc:  doesn't depend on old encrypted info
+ - inc and pubkey enc and archive-dir: need manifest and sigs,
+   which the archive dir contains unencrypted
+ - with encryption disabled
+ - listing files:  needs manifest, but the archive dir has that
+ - collection status:  only looks at a repository
+
+Add patch from Olivier Croquette to allow user@domain usernames,
+making ftp://user@domain@domain.com/path a valid URL.
+
+Added a bit of debug print to sshBackend for --verbosity=9.
+
+Changed usage message to separate options and commands.
+
+
 New in v0.4.4.RC1 (2007/09/19)
 ------------------------------
 Patches applied from Debian
