@@ -355,15 +355,22 @@ def main():
 
 	os.umask(077)
 	
-	# if running full backups without signing, or if we run with
-	# encryption disabled, or if we have an archive dir and no signing
-	# or if we're only looking at the repository or an archive dir
-	# then no passphrase is required, so don't ask for one.
-	if (action == "full" and not globals.gpg_profile.sign_key) \
-	or (action == "inc" and not globals.gpg_profile.sign_key and globals.archive_dir) \
-	or (not globals.encryption) \
-	or (action == "list-current" and globals.archive_dir) \
-	or action == "collection-status":  globals.gpg_profile.passphrase = ""
+	# for public key encryption (without signing!), no passphrase is required.
+	pubkey_only = (not globals.gpg_profile.sign_key and
+				   globals.gpg_profile.recipients and
+				   globals.encryption)
+
+	# cases where we do not need to get a passphrase:
+	# full: with pubkey enc. doesn't depend on old encrypted info
+	# inc and pubkey enc.: need a manifest, which the archive dir has unencrypted
+	# with encryption disabled
+	# listing files: needs a manifest, but the archive dir has that
+	# collection status only looks at a repository
+	if ((action == "full" and pubkey_only) or
+		(action == "inc" and pubkey_only and globals.archive_dir) or
+		(not globals.encryption) or
+		(action == "list-current" and globals.archive_dir) or
+		action == "collection-status"): globals.gpg_profile.passphrase = ""
 	else: globals.gpg_profile.passphrase = get_passphrase()
 
 	if action == "restore": restore(col_stats)
