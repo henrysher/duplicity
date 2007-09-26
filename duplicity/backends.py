@@ -65,6 +65,12 @@ class ParsedUrl:
 		self.set_server_path()
 		self.set_host_user_port()
 
+	def straight_url(self):
+		if self.path <> None:
+			return '%s://%s/%s' % (self.protocol, self.host, self.path)
+		else:
+			return '%s://%s/' % (self.protocol, self.host)
+
 	def bad_url(self, message = None):
 		"""Report a bad url, using message if given"""
 		if message:
@@ -104,8 +110,8 @@ class ParsedUrl:
 		# Set user and host
 		user_comps = user_host.split("@")
 		if len(user_comps) >= 2:
-			self.user = user_comps[0]
-			self.host = "@".join(user_comps[1:])
+			self.user = "@".join(user_comps[0:-1])
+			self.host = user_comps[-1]
 		else: self.host = user_host
 
 
@@ -366,10 +372,11 @@ class sshBackend(Backend):
 				if state == "authorizing":
 					match = child.expect([self.pexpect.EOF,
 										  self.pexpect.TIMEOUT,
-										  "(?i)password",
+										  "(?i)password:",
 										  "(?i)permission denied",
 										  "authenticity"],
 										 timeout = globals.timeout)
+					log.Log("State = %s, Before = '%s'" % (state, child.before.strip()), 9)
 					if match == 0:
 						log.Log("Failed to authenticate", 5)
 						break
@@ -392,6 +399,7 @@ class sshBackend(Backend):
 										  "authenticity",
 										  "ETA"],
 										 timeout = globals.timeout)
+					log.Log("State = %s, Before = '%s'" % (state, child.before.strip()), 9)
 					if match == 0:
 						break
 					elif match == 1:
@@ -407,6 +415,7 @@ class sshBackend(Backend):
 										  self.pexpect.TIMEOUT,
 										  "ETA"],
 										 timeout = globals.timeout)
+					log.Log("State = %s, Before = '%s'" % (state, child.before.strip()), 9)
 					if match == 0:
 						break
 					elif match == 1:
@@ -432,10 +441,11 @@ class sshBackend(Backend):
 				match = child.expect([self.pexpect.EOF,
 									  self.pexpect.TIMEOUT,
 									  "sftp>",
-									  "(?i)password",
+									  "(?i)password:",
 									  "(?i)permission denied",
 									  "authenticity",
 									  "(?i)no such file or directory"])
+				log.Log("State = sftp, Before = '%s'" % (child.before.strip()), 9)
 				if match == 0:
 					break
 				elif match == 1:
@@ -514,7 +524,7 @@ class ftpBackend(Backend):
 	"""Connect to remote store using File Transfer Protocol"""
 	def __init__(self, parsed_url):
 		Backend.__init__(self, parsed_url)
-		self.url_string = parsed_url.url_string
+		self.url_string = parsed_url.straight_url()
 		if self.url_string[-1] != '/':
 			self.url_string += '/'
 		self.password = self.get_password()
@@ -694,7 +704,7 @@ class BotoBackend(Backend):
 		local_path.setdata()
 
 	def list(self):
-		filename_list = [k.key for k in self.bucket.get_all_keys()]
+		filename_list = [k.key for k in self.bucket]
 		log.Log("Files in bucket:\n%s" % '\n'.join(filename_list), 9)
 		return filename_list
 
