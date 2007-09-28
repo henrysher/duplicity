@@ -66,10 +66,12 @@ class ParsedUrl:
 		self.set_host_user_port()
 
 	def straight_url(self):
-		if self.path <> None:
-			return '%s://%s/%s' % (self.protocol, self.host, self.path)
-		else:
-			return '%s://%s/' % (self.protocol, self.host)
+		"""Return the URL with the username stripped"""
+		# Emulation of the ternary operator:
+		strpath = (self.path != None and self.path or "")
+		strport = (self.port != None and (":%d"%self.port) or "")
+		url = '%s://%s%s/%s' % (self.protocol, self.host, strport, strpath)
+		return url
 
 	def bad_url(self, message = None):
 		"""Report a bad url, using message if given"""
@@ -336,9 +338,14 @@ class sshBackend(Backend):
 			import pexpect
 			self.pexpect = pexpect
 		except ImportError:
-			raise BackendException("This backend requires the pexpect module, "
-								   "pexpect from http://pexpect.sourceforge.net or "
-								   "python-pexpect from your distro's repository.")
+			self.pexpect = None
+		if not (self.pexpect and
+				hasattr(self.pexpect, '__version__') and
+				self.pexpect.__version__ >= '2.1'):
+			log.FatalError("This backend requires the pexpect module version 2.1 or later."
+						   "You can get pexpect from http://pexpect.sourceforge.net or "
+						   "python-pexpect from your distro's repository.")
+		
 		# host string of form user@hostname:port
 		self.host_string = parsed_url.server.split(':')[0]
 		# make sure remote_dir is always valid
@@ -556,8 +563,8 @@ class ftpBackend(Backend):
 		"""List files in directory"""
 		pu = ParsedUrl(self.url_string)
 		# we create the directory first so we have target dir
-		commandline = "ncftpls %s -W 'MKD %s' 'ftp://%s'" % \
-					  (self.flags, pu.path, pu.host)
+		commandline = "ncftpls %s -W 'MKD %s' '%s'" % \
+					  (self.flags, pu.path, self.url_string)
 		l = self.popen_persist(commandline).split('\n')
 		# try for a long listing to avoid connection reset
 		commandline = "ncftpls %s -l '%s'" % \
