@@ -539,8 +539,12 @@ class ftpBackend(Backend):
 			self.conn_opt = '-E'
 		else:
 			self.conn_opt = '-F'
-		self.flags = "%s -t %s -u '%s' -p '%s'" % \
-					 (self.conn_opt, globals.timeout, parsed_url.user, self.password)
+		if parsed_url.port != None and parsed_url.port != 21:
+			self.flags = "%s -t %s -u '%s' -p '%s' -P '%s'" % \
+					 (self.conn_opt, globals.timeout, parsed_url.user, self.password, parsed_url.port)
+		else:
+			self.flags = "%s -t %s -u '%s' -p '%s'" % \
+					 (self.conn_opt, globals.timeout, parsed_url.user, self.password)			 
 
 	def put(self, source_path, remote_filename = None):
 		"""Transfer source_path to remote_filename"""
