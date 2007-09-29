@@ -353,6 +353,11 @@ def main():
 											  globals.archive_dir).set_values()
 	log.Log("Collection Status\n-----------------\n" + str(col_stats), 8)
 
+	log.Log("Last full backup date: " + dup_time.timetopretty(col_stats.get_last_full_backup()), 4)
+	if action == "inc" and col_stats.get_last_full_backup() < globals.full_force_time:
+		log.Log("Last full backup is too old, forcing full backup", 3)
+		action = "full"
+
 	os.umask(077)
 	
 	# for public key encryption (without signing!), no passphrase is required.

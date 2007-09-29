@@ -57,6 +57,7 @@ def parse_cmdline_options(arglist):
 		  "ftp-passive",
 		  "ftp-regular",
 		  "full",
+		  "full-if-older-than=",
 		  "gpg-options=",
 		  "help",
 		  "incremental",
@@ -118,6 +119,8 @@ def parse_cmdline_options(arglist):
 			select_files.append(sys.stdin)
 		elif opt == "-f" or opt == "--full":
 			full_backup = 1
+		elif opt == "--full-if-older-than":
+			globals.full_force_time = dup_time.genstrtotime(arg)
 		elif opt == "--force":
 			globals.force = 1
 		elif opt == "--ftp-passive":
@@ -192,11 +195,11 @@ def usage():
 	sys.stderr.write("""
 duplicity version %s running on %s.
 Usage:
-	duplicity [options] input_directory destination_url
+	duplicity [options] source_directory target_url
 	duplicity [options] source_url target_directory
-	duplicity [options] --verify source_url filename
-	duplicity [options] --collection-status source_url
-	duplicity [options] --list-current-files source_url
+	duplicity [options] --verify source_url target_directory
+	duplicity [options] --collection-status target_url
+	duplicity [options] --list-current-files target_url
 	duplicity [options] --cleanup target_url
 	duplicity [options] --remove-older-than time target_url
 
@@ -212,12 +215,12 @@ Backends and their URL formats:
 	webdav://user@other.host/some_dir
 
 Commands:
-	--cleanup
-	--collection-status
+	--cleanup <target_url>
+	--collection-status <target_url>
 	-f, --full
 	-i, --incremental
-	--list-current-files
-	--remove-older-than
+	--list-current-files <target_url>
+	--remove-older-than <time> <target_url>
 	--verify
 
 Options:
@@ -232,6 +235,7 @@ Options:
 	--exclude-other-filesystems
 	--exclude-regexp <regexp>
 	--file-to-restore <path>
+ 	--full-if-older-than <time>
 	--force
 	--ftp-passive
 	--ftp-regular
@@ -268,8 +272,8 @@ def set_archive_dir(dirstring):
 	"""Check archive dir and set global"""
 	archive_dir = path.Path(dirstring)
 	if not archive_dir.isdir():
-		log.FatalError("Specified archive directory '%s' does not exist "
-					   " or is not a directory" % (archive_dir.name,))
+		log.FatalError("Specified archive directory '%s' does not exist, "
+					   "or is not a directory" % (archive_dir.name,))
 	globals.archive_dir = archive_dir
 
 def set_sign_key(sign_key):

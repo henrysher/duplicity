@@ -231,6 +231,10 @@ class BackupChain:
 		if self.incset_list: return self.incset_list[-1]
 		else: return self.fullset
 
+	def get_first(self):
+		"""Return first BackupSet in chain (ie the full backup)"""
+		return self.fullset
+
 	def __str__(self):
 		"""Return string representation, for testing purposes"""
 		set_schema = "%20s   %30s   %15s"
@@ -661,6 +665,18 @@ class CollectionsStatus:
 		"""Return a list of chains older than time t"""
 		assert self.values_set
 		return filter(lambda c: c.end_time < t, self.all_backup_chains)
+	
+	def get_last_full_backup(self):
+		"""Return the time of the last full backup of the collection, or 0"""
+		assert self.values_set
+		# Is there a nicer way to do that with a lambda function?
+		if len(self.all_backup_chains) == 0:
+			return 0
+		last = self.all_backup_chains[0]
+		for bc in self.all_backup_chains:
+			if bc.get_first().time > last.get_first().time:
+				last = bc
+		return last.get_first().time
 
 	def get_older_than(self, t):
 		"""Returns a list of backup sets older than the given time t

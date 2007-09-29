@@ -80,6 +80,10 @@ print_statistics = 1
 # If set, use short (< 30 char) filenames for all the remote files.
 short_filenames = 0
 
+# If set, forces a full backup if the last full backup is older than
+# the time specified
+full_force_time = None
+
 # Used to confirm certain destructive operations like deleting old
 # files.
 force = None

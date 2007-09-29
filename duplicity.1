@@ -153,7 +153,7 @@ reasons or if rdiff-backup is not handling device files correctly.
 .TP
 .BI "--exclude-filelist " filename
 Excludes the files listed in 
-.I filename
+.IR filename .
 See the
 .B FILE SELECTION
 section for more information.
@@ -196,6 +196,14 @@ should be given relative to the root of the directory backed up.
 .BR -f ", " --full
 Indicate full backup.  If this is set, perform full backup even if
 signatures are available.
+.TP
+.BI "--full-if-older-than " time
+Perform a full backup if an incremental backup is requested, but the
+latest full backup in the collection is older than the given 
+.IR time .
+See the 
+.B TIME FORMATS
+section for more information.
 .TP
 .B --force
 Proceed even if data loss might result.  Duplicity will let the user
