@@ -3,3 +3,4 @@
 *.rpm
 *.sig
 *.spec
+patch
