@@ -1,3 +1,21 @@
+New in v0.4.4.RC3 (2007/10/02)
+------------------------------
+Patch from Olivier Croquette to add --full-if-older-than=<time>
+option to force a full backup at <time> rather than incremental.
+
+Patch from Olivier Croquette to add :port option in FTP.
+
+Patch from Mitchell Garnaat to get all keys from S3, rather
+than just the first 1000.
+
+Fix to sshBackend to version check for python-pexpect 2.1.
+
+Fix one case in ftpBackend where host string was used instead of
+url_string.  This only affected the creation of the target dir on
+the remote system, if it did not exist, and only if the user or
+port needed to be specified.
+
+
 New in v0.4.4.RC2 (2007/09/26)
 ------------------------------
 Added --timeout <seconds> (default 30) to allow users to change
