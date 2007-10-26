@@ -299,7 +299,7 @@ class ROPath:
 				log_diff("File %%s has permissions %o, expected %o" %
 						 (other.getperms(), self.getperms()))
 				return 0
-			if (self.stat.st_mtime != other.stat.st_mtime and
+			if ((int(self.stat.st_mtime) != int(other.stat.st_mtime)) and
 				(self.stat.st_mtime > 0 or other.stat.st_mtime > 0)):
 				log_diff("File %%s has mtime %s, expected %s" %
 						 (dup_time.timetopretty(other.stat.st_mtime),
