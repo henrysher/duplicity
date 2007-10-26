@@ -589,7 +589,7 @@ class ftpBackend(Backend):
 		for filename in filename_list:
 			commandline = "ncftpls %s -X 'DELE %s' '%s'" % \
 						  (self.flags, filename, self.url_string)
-			self.run_command_persist(commandline)
+			self.popen_persist(commandline)
 
 
 class rsyncBackend(Backend):
