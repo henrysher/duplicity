@@ -410,7 +410,7 @@ class CollectionsStatus:
 	def set_values(self, sig_chain_warning = 1):
 		"""Set values from archive_dir and backend.
 
-		if archive_dir is None, omit any local chains.  Returs self
+		if archive_dir is None, omit any local chains.  Returns self
 		for convenience.  If sig_chain_warning is set to None, do not
 		warn about unnecessary sig chains.  This is because there may
 		naturally be some unecessary ones after a full backup.
@@ -427,10 +427,10 @@ class CollectionsStatus:
 
 		if self.archive_dir:
 			local_sig_chains, local_orphaned_sig_names = \
-							  self.get_signature_chains(local = 1)
+							  self.get_signature_chains(True)
 		else: local_sig_chains, local_orphaned_sig_names = [], []
 		remote_sig_chains, remote_orphaned_sig_names = \
-						   self.get_signature_chains(0, backend_filename_list)
+						   self.get_signature_chains(False, filelist = backend_filename_list)
 		self.orphaned_sig_names = (local_orphaned_sig_names +
 								   remote_orphaned_sig_names)
 		self.set_matched_chain_pair(local_sig_chains + remote_sig_chains,
