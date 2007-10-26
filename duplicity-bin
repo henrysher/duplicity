@@ -349,6 +349,7 @@ def main():
 	"""Start/end here"""
 	dup_time.setcurtime()
 	action = commandline.ProcessCommandLine(sys.argv[1:])
+	dup_time.setcurtime()
 	col_stats = collections.CollectionsStatus(globals.backend,
 											  globals.archive_dir).set_values()
 	log.Log("Collection Status\n-----------------\n" + str(col_stats), 8)
