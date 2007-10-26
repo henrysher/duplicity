@@ -1,4 +1,4 @@
-.TH DUPLICITY 1 "JULY 2007" "Version 2.4.3" "User Manuals" \"  -*- nroff -*-
+.TH DUPLICITY 1 "NOVEMBER 2007" "Version 2.4.4" "User Manuals" \"  -*- nroff -*-
 .SH NAME
 duplicity \- Encrypted backup using rsync algorithm
 .SH SYNOPSIS
@@ -10,25 +10,33 @@ duplicity \- Encrypted backup using rsync algorithm
 .BI [ options ]
 .I source_url target_directory
 
-.B duplicity
+.B duplicity full
 .BI [ options ]
-.B --verify
-.I source_url filename
+.I input_directory destination_url
 
-.B duplicity
+.B duplicity incremental
 .BI [ options ]
-.B [--collection-status | --list-current-files]
-.I source_url
+.I input_directory destination_url
 
-.B duplicity
+.B duplicity verify
 .BI [ options ]
-.B --cleanup
+.I source_url target_directory
+
+.B duplicity collection-status
+.BI [ options ]
 .I target_url
 
-.B duplicity
+.B duplicity list-current-files
 .BI [ options ]
-.B --remove-older-than
+.I target_url
+
+.B duplicity cleanup
+.BI [ options ]
+.I target_url
+
+.B duplicity remove-older-than
 .I time
+.BI [ options ]
 .I target_url
 
 .SH DESCRIPTION
@@ -59,10 +67,11 @@ duplicity /home/me scp://uid@other.host/some_dir
 .RE
 If the above is run repeatedly, the first will be a full backup, and
 subsequent ones will be incremental.  To force a full backup, use the
---full option:
+.I full
+action:
 .PP
 .RS
-duplicity --full /home/me scp://uid@other.host/some_dir
+duplicity full /home/me scp://uid@other.host/some_dir
 .PP
 .RE
 Now suppose we accidentally delete /home/me and want to restore it
@@ -84,7 +93,7 @@ The following command compares the files we backed up, so see what has
 changed since then:
 .PP
 .RS
-duplicity --verify scp://uid@other.host/some_dir /home/me
+duplicity verify scp://uid@other.host/some_dir /home/me
 .PP
 .RE
 Finally, duplicity recognizes several include/exclude options.  For
@@ -110,7 +119,52 @@ given, the environment variable FTP_PASSWORD is read to determine the
 password:
 .PP
 .RS
-FTP_PASSWORD=mypassword duplicity /local/dir ftp://user@other.host/some_dir
+FTP_PASSWORD=mypassword; duplicity /local/dir ftp://user@other.host/some_dir
+
+.SH ACTIONS
+.TP
+.B cleanup
+Delete the extraneous duplicity files on the given backend.
+Non-duplicity files, or files in complete data sets will not be
+deleted.  This should only be necessary after a duplicity session
+fails or is aborted prematurely.
+.TP
+.B collection-status
+Summarize the status of the backup repository by printing the chains
+and sets found, and the number of volumes in each.
+.TP
+.B full
+Indicate full backup.  If this is set, perform full backup even if
+signatures are available.
+.TP
+.BR incr
+If this is requested an incremental backup will be performed.
+Duplicity will abort if old signatures cannot be
+found.  The default is to switch to full backup under these
+conditions.
+.TP
+.B list-current-files
+Lists the files currently backed up in the archive.  The information
+will be extracted from the signature files, not the archive data
+itself.  Thus the whole archive does not have to be downloaded, but on
+the other hand if the archive has been deleted or corrupted, this
+command may not detect it.
+.TP
+.BI "remove-older-than " time
+Delete all backup sets older than the given time.  If old backup sets
+will not be deleted if backup sets newer than
+.I time
+depend on them.  See the 
+.B TIME FORMATS
+section for more information.  Note, this action cannot be combined
+with backup or other actions, such as cleanup.
+.TP
+.B verify
+Enter verify mode instead of restore.  If the --file-to-restore option
+is given, restrict verify to that file or directory.  duplicity will
+exit with a non-zero error level if any files are different.  On
+verbosity level 4 or higher, log a message for each file that has
+changed.
 
 .SH OPTIONS
 .TP
@@ -124,16 +178,6 @@ When backing up or restoring, specify the local archive directory.
 This option is not necessary, but if hash data is found locally in
 .I path
 it will be used in preference to the remote hash data.
-.TP
-.B --cleanup
-Delete the extraneous duplicity files on the given backend.
-Non-duplicity files, or files in complete data sets will not be
-deleted.  This should only be necessary after a duplicity session
-fails or is aborted prematurely.
-.TP
-.B --collection-status
-Summarize the status of the backup repository by printing the chains
-and sets found, and the number of volumes in each.
 .TP
 .BI "--encrypt-key " key
 When backing up, encrypt to the given public key, instead of using
@@ -193,10 +237,6 @@ to be restored instead of the entire contents of the backup archive.
 .I path
 should be given relative to the root of the directory backed up.
 .TP
-.BR -f ", " --full
-Indicate full backup.  If this is set, perform full backup even if
-signatures are available.
-.TP
 .BI "--full-if-older-than " time
 Perform a full backup if an incremental backup is requested, but the
 latest full backup in the collection is older than the given 
@@ -222,11 +262,6 @@ Allows you to pass options to gpg encryption.  The
 .I options 
 list should be of the form "opt1=parm1 opt2=parm2" where the string is
 quoted and the only spaces allowed are between options.
-.TP
-.BR -i ", " --incremental
-If this is set, duplicity will abort if old signatures cannot be
-found.  The default is to switch to full backup under these
-conditions.
 .TP
 .BI "--include " shell_pattern
 Similar to
@@ -268,13 +303,6 @@ will be included by this option.  See the
 .B FILE SELECTION
 section for more information.
 .TP
-.B --list-current-files
-Lists the files currently backed up in the archive.  The information
-will be extracted from the signature files, not the archive data
-itself.  Thus the whole archive does not have to be downloaded, but on
-the other hand if the archive has been deleted or corrupted, this
-command may not detect it.
-.TP
 .B --no-encryption
 Do not use GnuPG to encrypt files on remote system.  Instead just
 write gzipped volumes.
@@ -297,15 +325,19 @@ Number of retries to make on errors before giving up.
 This option only matters when using the ssh/scp backend.  The
 .I command
 will be used instead of scp to send or receive files.  The default 
-is "scp".  See
-.BR --ssh-options .
+is "scp". To list and delete existing files, the sftp command is used.  See
+.BR --ssh-options 
+and 
+.BR --sftp-command .
 .TP
 .BI "--sftp-command " command
 This option only matters when using the ssh/scp backend.  The 
 .I command
 will be used instead of sftp for listing and deleting files.  The
-default is "sftp".  See
-.BR --ssh-options .
+default is "sftp". File transfers are done using the scp command. See
+.BR --ssh-options 
+and 
+.BR --scp-command .
 .TP
 .BI "--sign-key " key
 This option can be used when backing up or restoring.  When backing
@@ -322,19 +354,23 @@ or, if that is not present, to prompt the user for the remote system
 password.
 .TP
 .BI "--ssh-options " options
-Allows you to pass options to the ssh/scp backend.  The 
+Allows you to pass options to the ssh/scp/sftp backend.  The 
 .I options 
-list should be of the form "opt1=parm1 opt2=parm2" where the string is
-quoted and the only spaces allowed are between options.
-.TP
-.BI "--remove-older-than " time
-Delete all backup sets older than the given time.  If old backup sets
-will not be deleted if backup sets newer than
-.I time
-depend on them.  See the 
-.B TIME FORMATS
-section for more information.  Note, this action cannot be combined
-with backup or other actions, such as cleanup.
+list should be of the form "opt1=parm1 opt2=parm2" where the option string is
+quoted and the only spaces allowed are between options. The option string 
+will be passed verbatim to both scp and sftp, whose command line syntax 
+differs slightly: options passed with 
+.BR --ssh-options
+should therefore be given in the long option format described in 
+.BR ssh_config(5) ,
+like in this example:
+.PP
+.RS
+duplicity --ssh-options="-oProtocol=2 -oIdentityFile=/my/backup/id" /home/me scp://uid@other.host/some_dir
+.PP
+.RE
+
+
 .TP
 .BI --short-filenames
 If this option is specified, the names of the files duplicity writes
@@ -348,13 +384,6 @@ When restoring, specify the time to restore to.
 .BI -v [0-9] ", --verbosity " [0-9]
 Specify verbosity level (0 is total silent, 3 is the default, and 9 is
 noisiest).
-.TP
-.B --verify
-Enter verify mode instead of restore.  If the --file-to-restore option
-is given, restrict verify to that file or directory.  duplicity will
-exit with a non-zero error level if any files are different.  On
-verbosity level 4 or higher, log a message for each file that has
-changed.
 .TP
 .BI "--volsize " number
 Change the volume size to 
@@ -706,8 +735,9 @@ and
 .B duplicity-new-signatures
 respectively.  If
 .B --archive-dir
-is used, these signatures will be stored locally only, which further
-saves bandwidth.
+is used, these signatures will be stored both locally and remotely.
+The remote signatures will be encrypted if encryption is enabled.
+The local signatures will not be encrypted
 
 .SH BUGS
 Hard links currently unsupported (they will be treated as non-linked
@@ -718,6 +748,7 @@ error message.
 
 .SH AUTHOR
 Original Author - Ben Escoto <bescoto@stanford.edu>
+
 Current Maintainer - Kenneth Loafman <kenneth@loafman.com>
 
 .SH SEE ALSO

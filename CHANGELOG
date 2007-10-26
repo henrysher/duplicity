@@ -1,3 +1,26 @@
+New in v0.4.4.RC4 (2007/10/??)
+------------------------------
+WARNING:  COMMAND LINE CHANGES ARE NOT BACKWARDS COMPATIBLE!
+There is a new command line syntax to separate actions and
+options.  Refer to the new man page for full details of the
+change.  The new syntax looks like:
+    duplicity [full|incr] [options] source_dir target_url
+    duplicity [restore] [options] source_url target_dir
+    duplicity verify [options] source_url target_dir
+    duplicity collection-status [options] target_url
+    duplicity list-current-files [options] target_url
+    duplicity cleanup [options] target_url
+    duplicity remove-older-than time [options] target_url
+
+Fixed issue in --time-separator where the current time string
+was being set prior to setting the separator, causing errors
+when trying to set the --time-separator for Windows systems.
+
+Fix so that file mtime is always compared in full seconds.
+
+Fix so that ftpBackend.delete() does not print file list.
+
+
 New in v0.4.4.RC3 (2007/10/02)
 ------------------------------
 Patch from Olivier Croquette to add --full-if-older-than=<time>
