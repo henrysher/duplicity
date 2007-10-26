@@ -18,7 +18,7 @@
 
 """Parse command line, check for consistency, and set globals"""
 
-import getopt, re, sys
+import getopt, re, sys, os
 import backends, globals, log, path, selection, gpg, dup_time
 
 select_opts = [] # Will hold all the selection options
@@ -29,64 +29,107 @@ collection_status = None # Will be set to true if --collection-status given
 cleanup = None # Set to true if --cleanup option given
 verify = None # Set to true if --verify option given
 
+commands = ["cleanup",
+			"collection-status",
+			"full",
+			"incremental",
+			"list-current-files",
+			"remove-older-than",
+			"verify",
+			]
+
+options = ["allow-source-mismatch",
+		   "archive-dir=",
+		   "current-time=",
+		   "encrypt-key=",
+		   "exclude=",
+		   "exclude-device-files",
+		   "exclude-filelist=",
+		   "exclude-globbing-filelist=",
+		   "exclude-filelist-stdin",
+		   "exclude-other-filesystems",
+		   "exclude-regexp=",
+		   "file-to-restore=",
+		   "force",
+		   "ftp-passive",
+		   "ftp-regular",
+		   "full-if-older-than=",
+		   "gpg-options=",
+		   "help",
+		   "include=",
+		   "include-filelist=",
+		   "include-filelist-stdin",
+		   "include-globbing-filelist=",
+		   "include-regexp=",
+		   "no-encryption",
+		   "no-print-statistics",
+		   "null-separator",
+		   "num-retries=",
+		   "restore-dir=",
+		   "restore-time=",
+		   "scp-command=",
+		   "sftp-command=",
+		   "short-filenames",
+		   "sign-key=",
+		   "ssh-askpass",
+		   "ssh-options=",
+		   "timeout=",
+		   "time-separator=",
+		   "verbosity=",
+		   "version",
+		   "volsize=",
+		   ]
+
 def parse_cmdline_options(arglist):
 	"""Parse argument list"""
 	global select_opts, select_files, full_backup
 	global list_current, collection_status, cleanup, remove_time, verify
+
 	def sel_fl(filename):
 		"""Helper function for including/excluding filelists below"""
-		try: return open(filename, "r")
-		except IOError: log.FatalError("Error opening file %s" % filename)
+		try:
+			return open(filename, "r")
+		except IOError:
+			log.FatalError("Error opening file %s" % filename)
 
-	try: optlist, args = getopt.getopt(arglist, "firt:v:V",
-		 ["allow-source-mismatch",
-		  "archive-dir=",
-		  "cleanup",
-		  "current-time=",
-		  "collection-status",
-		  "encrypt-key=",
-		  "exclude=",
-		  "exclude-device-files",
-		  "exclude-filelist=",
-		  "exclude-globbing-filelist=",
-		  "exclude-filelist-stdin",
-		  "exclude-other-filesystems",
-		  "exclude-regexp=",
-		  "file-to-restore=",
-		  "force",
-		  "ftp-passive",
-		  "ftp-regular",
-		  "full",
-		  "full-if-older-than=",
-		  "gpg-options=",
-		  "help",
-		  "incremental",
-		  "include=",
-		  "include-filelist=",
-		  "include-filelist-stdin",
-		  "include-globbing-filelist=",
-		  "include-regexp=",
-		  "list-current-files",
-		  "no-encryption",
-		  "no-print-statistics",
-		  "null-separator",
-		  "num-retries=",
-		  "remove-older-than=",
-		  "restore-dir=",
-		  "restore-time=",
-		  "scp-command=",
-		  "sftp-command=",
-		  "short-filenames",
-		  "sign-key=",
-		  "ssh-askpass",
-		  "ssh-options=",
-		  "timeout=",
-		  "time-separator=",
-		  "verbosity=",
-		  "verify",
-		  "version",
-		  "volsize=",
-		  ])
+	# expect 2 positional args, no commands
+	num_expect = 2
+	
+	# process first arg as command
+	if arglist:
+		cmd = arglist.pop(0)
+		if cmd == "cleanup":
+			cleanup = True
+			num_expect = 1
+		elif cmd == "collection-status":
+			collection_status = True
+			num_expect = 1
+		elif cmd == "full":
+			full_backup = True
+			num_expect = 2
+		elif cmd == "incremental":
+			globals.incremental = True
+			num_expect = 2
+		elif cmd == "list-current-files":
+			list_current = True
+			num_expect = 1
+		elif cmd == "remove-older-than":
+			try:
+				arg = arglist.pop(0)
+			except:
+				command_line_error("Missing time string for remove-older-than")
+			globals.remove_time = dup_time.genstrtotime(arg)
+			num_expect = 1
+		elif cmd == "verify":
+			verify = True
+			num_expect = 2
+		else:
+			arglist.insert(0, cmd)
+			cmd = "incremental"
+
+	# parse the remaining args
+	try:
+		optlist, args = getopt.gnu_getopt(arglist, "rt:v:V", options)
 	except getopt.error, e:
 		command_line_error("%s" % (str(e),))
 
@@ -95,21 +138,20 @@ def parse_cmdline_options(arglist):
 			globals.allow_source_mismatch = 1
 		elif opt == "--archive-dir":
 			set_archive_dir(arg)
-		elif opt == "--cleanup":
-			cleanup = 1
-		elif opt == "--collection-status":
-			collection_status = 1
 		elif opt == "--current-time":
 			dup_time.setcurtime(get_int(arg, "current-time"))
 		elif opt == "--encrypt-key":
 			globals.gpg_profile.recipients.append(arg)
-		elif (opt == "--exclude" or opt == "--exclude-regexp" or
-			opt == "--include" or opt == "--include-regexp"):
+		elif (opt == "--exclude" or
+			  opt == "--exclude-regexp" or
+			  opt == "--include" or
+			  opt == "--include-regexp"):
 			select_opts.append((opt, arg))
 		elif (opt == "--exclude-device-files" or
 			  opt == "--exclude-other-filesystems"):
 			select_opts.append((opt, None))
-		elif (opt == "--exclude-filelist" or opt == "--include-filelist" or
+		elif (opt == "--exclude-filelist" or
+			  opt == "--include-filelist" or
 			  opt == "--exclude-globbing-filelist" or
 			  opt == "--include-globbing-filelist"):
 			select_opts.append((opt, arg))
@@ -117,8 +159,6 @@ def parse_cmdline_options(arglist):
 		elif opt == "--exclude-filelist-stdin":
 			select_opts.append(("--exclude-filelist", "standard input"))
 			select_files.append(sys.stdin)
-		elif opt == "-f" or opt == "--full":
-			full_backup = 1
 		elif opt == "--full-if-older-than":
 			globals.full_force_time = dup_time.genstrtotime(arg)
 		elif opt == "--force":
@@ -132,10 +172,6 @@ def parse_cmdline_options(arglist):
 		elif opt == "--include-filelist-stdin":
 			select_opts.append(("--include-filelist", "standard input"))
 			select_files.append(sys.stdin)
-		elif opt == "-i" or opt == "--incremental":
-			globals.incremental = 1
-		elif opt == "--list-current-files":
-			list_current = 1
 		elif opt == "--no-encryption":
 			globals.encryption = 0
 		elif opt == "--no-print-statistics":
@@ -144,11 +180,11 @@ def parse_cmdline_options(arglist):
 			globals.null_separator = 1
 		elif opt == "--num-retries":
 			globals.num_retries = int(arg)
-		elif opt == "-r" or opt == "--file-to-restore":
+		elif (opt == "-r" or
+			  opt == "--file-to-restore"):
 			globals.restore_dir = arg
-		elif opt == "--remove-older-than":
-			globals.remove_time = dup_time.genstrtotime(arg)
-		elif opt == "-t" or opt == "--restore-time":
+		elif (opt == "-t" or
+			  opt == "--restore-time"):
 			globals.restore_time = dup_time.genstrtotime(arg)
 		elif opt == "--scp-command":
 			backends.scp_command = arg
@@ -165,16 +201,15 @@ def parse_cmdline_options(arglist):
 		elif opt == "--timeout":
 			globals.timeout = int(arg)
 		elif opt == "--time-separator":
-			if arg[0] == '-':
+			if arg == '-':
 				command_line_error("Dash ('-') not valid for time-separator.")
-			globals.time_separator = arg[0]
+			globals.time_separator = arg
 		elif opt == "-V" or opt == "--version":
 			print "duplicity", str(globals.version)
 			sys.exit(0)
-		elif opt == "-v" or opt == "--verbosity":
+		elif (opt == "-v" or
+			  opt == "--verbosity"):
 			log.setverbosity(int(arg))
-		elif opt == "--verify":
-			verify = 1
 		elif opt == "--volsize":
 			globals.volsize = int(arg)*1024*1024
 		elif opt == "--help":
@@ -182,12 +217,15 @@ def parse_cmdline_options(arglist):
 		else:
 			command_line_error("Unknown option %s" % opt)
 
+	if len(args) != num_expect:
+		command_line_error("Expected %d args, got %d" % (num_expect, len(args)))
+
 	return args
 
 def command_line_error(message):
 	"""Indicate a command line error and exit"""
 	sys.stderr.write("Command line error: %s\n" % (message,))
-	usage()
+	sys.stderr.write("Enter 'duplicity --help' for help screen.\n")
 	sys.exit(1)
 
 def usage():
@@ -195,13 +233,13 @@ def usage():
 	sys.stderr.write("""
 duplicity version %s running on %s.
 Usage:
-	duplicity [options] source_directory target_url
-	duplicity [options] source_url target_directory
-	duplicity [options] --verify source_url target_directory
-	duplicity [options] --collection-status target_url
-	duplicity [options] --list-current-files target_url
-	duplicity [options] --cleanup target_url
-	duplicity [options] --remove-older-than time target_url
+	duplicity [full|incr] [options] source_dir target_url
+	duplicity [restore] [options] source_url target_dir
+	duplicity verify [options] source_url target_dir
+	duplicity collection-status [options] target_url
+	duplicity list-current-files [options] target_url
+	duplicity cleanup [options] target_url
+	duplicity remove-older-than time [options] target_url
 
 Backends and their URL formats:
 	ssh://user@other.host:port/some_dir
@@ -215,13 +253,14 @@ Backends and their URL formats:
 	webdav://user@other.host/some_dir
 
 Commands:
-	--cleanup <target_url>
-	--collection-status <target_url>
-	-f, --full
-	-i, --incremental
-	--list-current-files <target_url>
-	--remove-older-than <time> <target_url>
-	--verify
+	cleanup <target_url>
+	collection-status <target_url>
+	full <source_dir> <target_url>
+	incr <source_dir> <target_url>
+	list-current-files <target_url>
+	restore <target_url> <source_dir>
+	remove-older-than <time> <target_url>
+	verify <target_url> <source_dir>
 
 Options:
 	--allow-source-mismatch
@@ -270,7 +309,7 @@ def get_int(int_string, description):
 
 def set_archive_dir(dirstring):
 	"""Check archive dir and set global"""
-	archive_dir = path.Path(dirstring)
+	archive_dir = path.Path(os.path.expanduser(dirstring))
 	if not archive_dir.isdir():
 		log.FatalError("Specified archive directory '%s' does not exist, "
 					   "or is not a directory" % (archive_dir.name,))
