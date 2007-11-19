@@ -531,34 +531,51 @@ class ftpBackend(Backend):
 	"""Connect to remote store using File Transfer Protocol"""
 	def __init__(self, parsed_url):
 		Backend.__init__(self, parsed_url)
+		try:
+			fout = self.popen("ncftpls -v")
+		except:
+			log.FatalError("NcFTP not found:  Please install NcFTP version 3.1.9 or later")
+
+		version = fout.split('\n')[0].split()[1]
+		if version < "3.1.9":
+			log.FatalError("NcFTP too old:  Duplicity requires NcFTP version 3.1.9 or later")
+		log.Log("NcFTP version is %s" % version, 4)
+
 		self.url_string = parsed_url.straight_url()
 		if self.url_string[-1] != '/':
 			self.url_string += '/'
+
 		self.password = self.get_password()
+
 		if globals.ftp_connection == 'regular':
 			self.conn_opt = '-E'
 		else:
 			self.conn_opt = '-F'
+
+ 		self.tempfile, self.tempname = tempfile.mkstemp("", "duplicity.")
+ 		atexit.register(os.unlink, self.tempname)
+		os.write(self.tempfile, "host %s\n" % parsed_url.host)
+ 		os.write(self.tempfile, "user %s\n" % parsed_url.user)
+ 		os.write(self.tempfile, "pass %s\n" % self.password)
+ 		os.close(self.tempfile)
+		self.flags = "-f %s %s -t %s" % \
+					 (self.tempname, self.conn_opt, globals.timeout)
 		if parsed_url.port != None and parsed_url.port != 21:
-			self.flags = "%s -t %s -u '%s' -p '%s' -P '%s'" % \
-					 (self.conn_opt, globals.timeout, parsed_url.user, self.password, parsed_url.port)
-		else:
-			self.flags = "%s -t %s -u '%s' -p '%s'" % \
-					 (self.conn_opt, globals.timeout, parsed_url.user, self.password)			 
+			self.flags += " -P '%s'" % (parsed_url.port)
 
 	def put(self, source_path, remote_filename = None):
 		"""Transfer source_path to remote_filename"""
 		pu = ParsedUrl(self.url_string)
 		remote_path = os.path.join (pu.path, remote_filename).rstrip()
-		commandline = "ncftpput %s -V -c '%s' '%s' < '%s'" % \
-					  (self.flags, pu.host, remote_path, source_path.name)
+		commandline = "ncftpput %s -V -C '%s'  '%s'" % \
+					  (self.flags, source_path.name, remote_path)
 		self.run_command_persist(commandline)
 
 	def get(self, remote_filename, local_path):
 		"""Get remote filename, saving it to local_path"""
 		pu = ParsedUrl(self.url_string)
 		remote_path = os.path.join(pu.path, remote_filename).rstrip()
-		commandline = "ncftpget %s -V -c '%s' '%s' > '%s'" % \
+		commandline = "ncftpget %s -V -C '%s' '%s' '%s'" % \
 					  (self.flags, pu.host, remote_path, local_path.name)
 		self.run_command_persist(commandline)
 		local_path.setdata()
@@ -701,18 +718,36 @@ class BotoBackend(Backend):
 	def put(self, source_path, remote_filename=None):
 		if not remote_filename:
 			remote_filename = source_path.get_filename()
-		log.Log("Uploading %s to Amazon S3" % remote_filename, 5)
 		key = self.key_class(self.bucket)
 		key.key = remote_filename
-		key.set_contents_from_filename(source_path.name, 
-				{'Content-Type': 'application/octet-stream'})
+		for n in range(1, globals.num_retries+1):
+			log.Log("Uploading %s to Amazon S3 (attempt #%d)" % (remote_filename, n), 5)
+			try:
+				key.set_contents_from_filename(source_path.name, 
+					{'Content-Type': 'application/octet-stream'})
+				return
+			except:
+				pass
+			log.Log("Uploading %s failed (attempt #%d)" % (remote_filename, n), 1)
+			time.sleep(30)
+		log.Log("Giving up trying to upload %s after %d attempts" % (remote_filename, globals.num_retries), 1)
+		raise BackendException("Error uploading %s" % remote_filename)
 	
 	def get(self, remote_filename, local_path):
-		log.Log("Downloading %s from Amazon S3" % remote_filename, 5)
 		key = self.key_class(self.bucket)
 		key.key = remote_filename
-		key.get_contents_to_filename(local_path.name)
-		local_path.setdata()
+		for n in range(1, globals.num_retries+1):
+			log.Log("Downloading %s from Amazon S3 (attempt #%d)" % (remote_filename, n), 5)
+			try:
+				key.get_contents_to_filename(local_path.name)
+				local_path.setdata()
+				return
+			except:
+				pass
+			log.Log("Downloading %s failed (attempt #%d)" % (remote_filename, n), 1)
+			time.sleep(30)
+		log.Log("Giving up trying to download %s after %d attempts" % (remote_filename, globals.num_retries), 1)
+		raise BackendException("Error downloading %s" % remote_filename)
 
 	def list(self):
 		filename_list = [k.key for k in self.bucket]
@@ -777,18 +812,22 @@ class webdavBackend(Backend):
 		
 	def list(self):
 		"""List files in directory"""
-		log.Log("Listing directory %s on WebDAV server" % (self.directory,), 5)
-		self.headers['Depth'] = "1"
-		self.conn.request("PROPFIND", self.directory, self.listbody, self.headers)
-		del self.headers['Depth']
-		response = self.conn.getresponse()
-		if response.status != 207:
-			raise BackendException((response.status, response.reason))
+		for n in range(1, globals.num_retries+1):
+			log.Log("Listing directory %s on WebDAV server" % (self.directory,), 5)
+			self.headers['Depth'] = "1"
+			self.conn.request("PROPFIND", self.directory, self.listbody, self.headers)
+			del self.headers['Depth']
+			response = self.conn.getresponse()
+			if response.status == 207:
+				document = response.read()
+				break
+			log.Log("WebDAV PROPFIND attempt #%d failed: %s %s" % (n, response.status, response.reason), 5)
+			if n == globals.num_retries +1:
+				log.Log("WebDAV backend giving up after %d attempts to PROPFIND %s" % (globals.num_retries, self.directory), 1)
+				raise BackendException((response.status, response.reason))
 
-		document = response.read()
-		print document
+		log.Log("%s" % (document,), 6)
 		dom = xml.dom.minidom.parseString(document)
-
 		result = []
 		for href in dom.getElementsByTagName('D:href'):
 			filename = urllib.unquote(self._getText(href.childNodes).strip())
@@ -800,15 +839,19 @@ class webdavBackend(Backend):
 	def get(self, remote_filename, local_path):
 		"""Get remote filename, saving it to local_path"""
 		url = self.directory + remote_filename
-		log.Log("Retrieving %s from FTP server" % (url ,), 5)
 		target_file = local_path.open("wb")
-		self.conn.request("GET", url, None, self.headers)
-		response = self.conn.getresponse()		
-		if response.status != 200:
-			raise BackendException((response.status, response.reason))
-		target_file.write(response.read())
-		assert not target_file.close()
-		local_path.setdata()
+		for n in range(1, globals.num_retries+1):
+			log.Log("Retrieving %s from WebDAV server" % (url ,), 5)
+			self.conn.request("GET", url, None, self.headers)
+			response = self.conn.getresponse()		
+			if response.status == 200:
+				target_file.write(response.read())
+				assert not target_file.close()
+				local_path.setdata()
+				return
+			log.Log("WebDAV GET attempt #%d failed: %s %s" % (n, response.status, response.reason), 5)
+		log.Log("WebDAV backend giving up after %d attempts to GET %s" % (globals.num_retries, url), 1)
+		raise BackendException((response.status, response.reason))
 
 	def put(self, source_path, remote_filename = None):
 		"""Transfer source_path to remote_filename"""
@@ -816,25 +859,33 @@ class webdavBackend(Backend):
 			remote_filename = source_path.get_filename()
 		url = self.directory + remote_filename
 		source_file = source_path.open("rb")
-		log.Log("Saving %s on WebDAV server" % (url,), 5)
-		self.conn.request("PUT", url, source_file.read(), self.headers)
-		response = self.conn.getresponse()
-		if response.status != 201:
-			raise BackendException((response.status, response.reason))
-		response.read()
-		assert not source_file.close()
+		for n in range(1, globals.num_retries+1):
+			log.Log("Saving %s on WebDAV server" % (url ,), 5)
+			self.conn.request("PUT", url, source_file.read(), self.headers)
+			response = self.conn.getresponse()
+			if response.status == 201:
+				response.read()
+				assert not source_file.close()
+				return
+			log.Log("WebDAV PUT attempt #%d failed: %s %s" % (n, response.status, response.reason), 5)
+		log.Log("WebDAV backend giving up after %d attempts to PUT %s" % (globals.num_retries, url), 1)
+		raise BackendException((response.status, response.reason))
 
 	def delete(self, filename_list):
 		"""Delete files in filename_list"""
 		for filename in filename_list:
 			url = self.directory + filename
-			log.Log("Deleting %s from WebDAV server" % (url,), 5)
-			self.conn.request("DELETE", url, None, self.headers)
-			response = self.conn.getresponse()
-			if response.status != 204:
-				raise BackendException((response.status, response.reason))
-			response.read()
-
+			for n in range(1, globals.num_retries+1):
+				log.Log("Deleting %s from WebDAV server" % (url ,), 5)
+				self.conn.request("DELETE", url, None, self.headers)
+				response = self.conn.getresponse()
+				if response.status == 204:
+					response.read()
+					break
+				log.Log("WebDAV DELETE attempt #%d failed: %s %s" % (n, response.status, response.reason), 5)
+				if n == globals.num_retries +1:
+					log.Log("WebDAV backend giving up after %d attempts to DELETE %s" % (globals.num_retries, url), 1)
+					raise BackendException((response.status, response.reason))
 
 hsi_command = "hsi"
 class hsiBackend(Backend):
