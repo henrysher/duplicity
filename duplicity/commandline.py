@@ -92,40 +92,49 @@ def parse_cmdline_options(arglist):
 		except IOError:
 			log.FatalError("Error opening file %s" % filename)
 
-	# expect 2 positional args, no commands
+	# expect no cmd and two positional args
+	cmd = ""
 	num_expect = 2
 	
 	# process first arg as command
-	if arglist:
+	if arglist and arglist[0][0] != '-':
 		cmd = arglist.pop(0)
-		if cmd == "cleanup":
-			cleanup = True
-			num_expect = 1
-		elif cmd == "collection-status":
-			collection_status = True
-			num_expect = 1
-		elif cmd == "full":
-			full_backup = True
-			num_expect = 2
-		elif cmd == "incremental":
-			globals.incremental = True
-			num_expect = 2
-		elif cmd == "list-current-files":
-			list_current = True
-			num_expect = 1
-		elif cmd == "remove-older-than":
-			try:
-				arg = arglist.pop(0)
-			except:
-				command_line_error("Missing time string for remove-older-than")
-			globals.remove_time = dup_time.genstrtotime(arg)
-			num_expect = 1
-		elif cmd == "verify":
-			verify = True
-			num_expect = 2
-		else:
+		possible = [c for c in commands if c.startswith(cmd)]
+		# no unique match, that's an error
+		if len(possible) > 1:
+			log.FatalError("command '%s' not unique, could be %s" % (cmd, possible))
+		# only one match, that's a keeper
+		elif len(possible) == 1:
+			cmd = possible[0]
+		# no matches, assume no cmd
+		elif not possible:
 			arglist.insert(0, cmd)
-			cmd = "incremental"
+		
+	if cmd == "cleanup":
+		cleanup = True
+		num_expect = 1
+	elif cmd == "collection-status":
+		collection_status = True
+		num_expect = 1
+	elif cmd == "full":
+		full_backup = True
+		num_expect = 2
+	elif cmd == "incremental":
+		globals.incremental = True
+		num_expect = 2
+	elif cmd == "list-current-files":
+		list_current = True
+		num_expect = 1
+	elif cmd == "remove-older-than":
+		try:
+			arg = arglist.pop(0)
+		except:
+			command_line_error("Missing time string for remove-older-than")
+		globals.remove_time = dup_time.genstrtotime(arg)
+		num_expect = 1
+	elif cmd == "verify":
+		verify = True
+		num_expect = 2
 
 	# parse the remaining args
 	try:
@@ -230,10 +239,10 @@ def command_line_error(message):
 
 def usage():
 	"""Print terse usage info"""
-	sys.stderr.write("""
+	sys.stdout.write("""
 duplicity version %s running on %s.
 Usage:
-	duplicity [full|incr] [options] source_dir target_url
+	duplicity [full|incremental] [options] source_dir target_url
 	duplicity [restore] [options] source_url target_dir
 	duplicity verify [options] source_url target_dir
 	duplicity collection-status [options] target_url
