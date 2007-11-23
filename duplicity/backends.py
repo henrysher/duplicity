@@ -531,11 +531,19 @@ class ftpBackend(Backend):
 	"""Connect to remote store using File Transfer Protocol"""
 	def __init__(self, parsed_url):
 		Backend.__init__(self, parsed_url)
+
+		# we expect an error return, so go low-level and ignore it
 		try:
-			fout = self.popen("ncftpls -v")
+			p = os.popen("ncftpls -v")
+			fout = p.read()
+			ret = p.close()
 		except:
+			pass
+		# the expected error is 8 in the high-byte and some output
+		if ret != 0x0800 or not fout:
 			log.FatalError("NcFTP not found:  Please install NcFTP version 3.1.9 or later")
 
+		# version is the second word of the first line
 		version = fout.split('\n')[0].split()[1]
 		if version < "3.1.9":
 			log.FatalError("NcFTP too old:  Duplicity requires NcFTP version 3.1.9 or later")
