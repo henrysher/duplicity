@@ -51,9 +51,14 @@ def setprevtime(time_in_secs):
 
 def timetostring(timeinseconds):
 	"""Return w3 datetime compliant listing of timeinseconds"""
+
+	# We need to know if DST applies to append the correct offset. So
+	#    1. Save the tuple returned by localtime.
+	#    2. Pass the DST flag into gettzd
+	lcltime = time.localtime(timeinseconds)
 	return time.strftime("%Y-%m-%dT%H" + globals.time_separator +
 						 "%M" + globals.time_separator + "%S",
-						 time.localtime(timeinseconds)) + gettzd()
+						 lcltime) + gettzd(lcltime[-1])
 
 def stringtotime(timestring):
 	"""Return time in seconds from w3 timestring
@@ -73,12 +78,22 @@ def stringtotime(timestring):
 		assert 0 <= hour <= 23
 		assert 0 <= minute <= 59
 		assert 0 <= second <= 61  # leap seconds
-		timetuple = (year, month, day, hour, minute, second, -1, -1, -1)
-		if time.daylight:
-			utc_in_secs = time.mktime(timetuple) - time.altzone
-		else: utc_in_secs = time.mktime(timetuple) - time.timezone
-
-		return long(utc_in_secs) + tzdtoseconds(timestring[19:])
+		# We want to return the time in units of seconds since the
+		# epoch. Unfortunately the only functin that does this
+		# works in terms of the current timezone and we have a
+		# timezone offset in the string.
+		timetuple = (year, month, day, hour, minute, second, -1, -1, 0)
+		local_in_secs = time.mktime(timetuple)
+		# mktime assumed that the tuple was a local time. Compensate
+		# by subtracting the value for the current timezone.
+		# We don't need to worry about DST here because we turned it
+		# off in the tuple
+		utc_in_secs = local_in_secs - time.timezone
+		# Now apply the offset that we were given in the time string
+		# This gives the correct number of seconds from the epoch
+		# even when we're not in the same timezone that wrote the
+		# string
+		return long (utc_in_secs + tzdtoseconds(timestring[19:]))
 	except (TypeError, ValueError, AssertionError): return None
 
 
@@ -129,14 +144,20 @@ page for more information.
 		interval_string = interval_string[match.end(0):]
 	return total
 
-def gettzd():
+def gettzd(dstflag):
 	"""Return w3's timezone identification string.
 
 	Expresed as [+/-]hh:mm.  For instance, PST is -08:00.  Zone is
 	coincides with what localtime(), etc., use.
 
 	"""
-	if time.daylight: offset = -1 * time.altzone/60
+	# time.daylight doesn't help us. It's a flag that indicates that we
+	# have a dst option for the current timezone. Compensate by allowing
+	# the caller to pass a flag to indicate that DST applies. This flag
+	# is in the same format as the last member of the tuple returned by
+	# time.localtime()
+	
+	if dstflag > 0: offset = -1 * time.altzone/60
 	else: offset = -1 * time.timezone/60
 	if offset > 0: prefix = "+"
 	elif offset < 0: prefix = "-"
@@ -206,7 +227,13 @@ the day).""" % timestr)
 	if _integer_regexp.search(timestr): return int(timestr)
 
 	# Test for w3-datetime format, possibly missing tzd
-	t = stringtotime(timestr) or stringtotime(timestr+gettzd())
+	# This is an ugly hack. We need to know if DST applies when doing
+	# gettzd. However, we don't have the flag to pass. Assume that DST
+	# doesn't apply and pass 0. Getting a reasonable default from
+	# localtime() is a bad idea, since we transition to/from DST between
+	# calls to this method on the same run
+	
+	t = stringtotime(timestr) or stringtotime(timestr+gettzd(0))
 	if t: return t
 
 	try: # test for an interval, like "2 days ago"
@@ -218,7 +245,7 @@ the day).""" % timestr)
 			_genstr_date_regexp2.search(timestr)
 	if not match: error()
 	timestr = "%s-%02d-%02dT00:00:00%s" % (match.group('year'),
-			     int(match.group('month')), int(match.group('day')), gettzd())
+			     int(match.group('month')), int(match.group('day')), gettzd(0))
 	t = stringtotime(timestr)
 	if t: return t
 	else: error()
