@@ -12,7 +12,8 @@ uses --num-retries to retry IO repeatedly if needed.
 Changes to commandline processing to allow non-ambiguous short
 strings for commands, i.e. 'i', 'inc', 'incr' for 'incremental',
 'f' for 'full', etc..  A warning message is printed if the short
-command is not unique.
+command is not unique.  Note: this already works for options, so
+I just applied the same idea to commands.
 
 Applied a patch from Gregory Hartman to correct handling of DST
 in time calculations.  This affects backups made the night of

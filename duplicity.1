@@ -177,7 +177,11 @@ this switch.
 When backing up or restoring, specify the local archive directory.  
 This option is not necessary, but if hash data is found locally in
 .I path
-it will be used in preference to the remote hash data.
+it will be used in preference to the remote hash data. Use of this
+option does not imply that the archive data is no longer stored
+in the backup destination, nor that the local archive directory
+need be kept safe. The local archive directory is a performance
+optimization only, and may safely be discarded at any time.
 .TP
 .BI "--encrypt-key " key
 When backing up, encrypt to the given public key, instead of using
@@ -412,7 +416,7 @@ seconds after the epoch)
 A string like "2002-01-25T07:00:00+02:00" in datetime format 
 .IP 4.
 An interval, which is a number followed by one of the characters s, m,
-h, D, W, M, or Y (indicating seconds, minutes, hourse, days, weeks,
+h, D, W, M, or Y (indicating seconds, minutes, hours, days, weeks,
 months, or years respectively), or a series of such pairs.  In this
 case the string refers to the time that preceded the current time by
 the length of the interval.  For instance, "1h78m" indicates the time
@@ -421,7 +425,7 @@ unsophisticated: a month is always 30 days, a year is always 365 days,
 and a day is always 86400 seconds.
 .IP 5.
 A date format of the form YYYY/MM/DD, YYYY-MM-DD, MM/DD/YYYY, or
-MM/DD/YYYY, which indicates midnight on the day in question, relative
+MM-DD-YYYY, which indicates midnight on the day in question, relative
 to the current timezone settings.  For instance, "2002/3/5",
 "03-05-2002", and "2002-3-05" all mean March 5th, 2002.
 
