@@ -382,11 +382,6 @@ class CollectionsStatus:
 		l = ["Connecting with backend: %s" %
 			 (self.backend.__class__.__name__,),
 			 "Archive dir: %s" % (self.archive_dir,)]
-		if self.matched_chain_pair:
-			l.append("\nFound a complete backup chain with matching "
-					 "signature chain:")
-			l.append(str(self.matched_chain_pair[1]))
-		else: l.append("No backup chains with active signatures found")
 
 		l.append("\nFound %d backup chains without signatures."
 				 % len(self.other_backup_chains))
@@ -395,6 +390,12 @@ class CollectionsStatus:
 					 (i+1, len(self.other_backup_chains)))
 			l.append(str(self.other_backup_chains[i]))
 			l.append("")
+
+		if self.matched_chain_pair:
+			l.append("\nFound a complete backup chain with matching "
+					 "signature chain:")
+			l.append(str(self.matched_chain_pair[1]))
+		else: l.append("No backup chains with active signatures found")
 
 		if self.orphaned_backup_sets or self.incomplete_backup_sets:
 			l.append("Also found %d backup sets not part of any chain,"
@@ -559,8 +560,8 @@ class CollectionsStatus:
 
 		def get_new_sigchain():
 			"""Return new empty signature chain"""
-			if local: return SignatureChain(1, self.archive_dir)
-			else: return SignatureChain(None, self.backend)
+			if local: return SignatureChain(True, self.archive_dir)
+			else: return SignatureChain(False, self.backend)
 
 		# Build initial chains from full sig filenames
 		chains, new_sig_filenames = [], []
