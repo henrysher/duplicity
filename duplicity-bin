@@ -51,6 +51,7 @@ def get_passphrase():
 			continue
 		return pass1
 
+
 def write_multivol(backup_type, tarblock_iter, backend):
 	"""Encrypt volumes of tarblock_iter and write to backend
 
@@ -97,6 +98,7 @@ def write_multivol(backup_type, tarblock_iter, backend):
 	bytes_written += write_manifest(mf, backup_type, backend)
 	return bytes_written
 
+
 def write_manifest(mf, backup_type, backend):
 	"""Write manifest to file in archive_dir and encrypted to backend
 
@@ -118,11 +120,12 @@ def write_manifest(mf, backup_type, backend):
 	remote_fin.close()
 	return sizelist[0]
 
+
 def get_sig_fileobj(sig_type):
 	"""Return a fileobj opened for writing, save results as signature
 
 	If globals.archive_dir is available, save signatures there
-	gzipped.  Otherwise save them on the backend encrypted.
+	gzipped.  Save them on the backend encrypted as needed.
 
 	"""
 	assert sig_type == "full-sig" or sig_type == "new-sig"
@@ -139,6 +142,7 @@ def get_sig_fileobj(sig_type):
 													  local_sig_filename))
 	return fh
 
+
 def full_backup(col_stats):
 	"""Do full backup of directory to backend, using archive_dir"""
 	sig_outfp = get_sig_fileobj("full-sig")
@@ -148,22 +152,24 @@ def full_backup(col_stats):
 	col_stats.set_values(sig_chain_warning = None).cleanup_signatures()
 	print_statistics(diffdir.stats, bytes_written)
 	
+
 def check_sig_chain(col_stats):
 	"""Get last signature chain for inc backup, or None if none available"""
 	if not col_stats.matched_chain_pair:
 		if globals.incremental:
-			log.FatalError(
-"""Fatal Error: Unable to start incremental backup.  Old signatures
-not found and --incremental specified""")
+			log.FatalError("Fatal Error: Unable to start incremental backup.  "
+						   "Old signatures not found and incremental specified")
 		else: log.Warn("No signatures found, switching to full backup.")
 		return None
 	return col_stats.matched_chain_pair[0]
+
 
 def print_statistics(stats, bytes_written):
 	"""If globals.print_statistics, print stats after adding bytes_written"""
 	if globals.print_statistics:
 		diffdir.stats.TotalDestinationSizeChange = bytes_written
 		print diffdir.stats.get_stats_logstring("Backup Statistics")	
+
 
 def incremental_backup(sig_chain):
 	"""Do incremental backup of directory to backend, using archive_dir"""
@@ -197,6 +203,7 @@ def restore(col_stats):
 						   % (globals.restore_dir,))
 		else: log.FatalError("No files found in archive - nothing restored.")
 
+
 def restore_get_patched_rop_iter(col_stats):
 	"""Return iterator of patched ROPaths of desired restore data"""
 	if globals.restore_dir: index = tuple(globals.restore_dir.split("/"))
@@ -218,6 +225,7 @@ def restore_get_patched_rop_iter(col_stats):
 	tarfiles = map(patchdir.TarFile_FromFileobjs, fileobj_iters)
 	return patchdir.tarfiles2rop_iter(tarfiles, index)
 
+
 def restore_get_enc_fileobj(backend, filename, volume_info):
 	"""Return plaintext fileobj from encrypted filename on backend
 
@@ -236,6 +244,7 @@ def restore_get_enc_fileobj(backend, filename, volume_info):
 		restore_add_sig_check(fileobj)
 	return fileobj
 
+
 def restore_check_hash(volume_info, vol_path):
 	"""Check the hash of vol_path path against data in volume_info"""
 	hash_pair = volume_info.get_best_hash()
@@ -246,6 +255,7 @@ def restore_check_hash(volume_info, vol_path):
 						   "Calculated hash: %s\n"
 						   "Manifest hash: %s\n" %
 						   (hash_pair[0], calculated_hash, hash_pair[1]))
+
 
 def restore_add_sig_check(fileobj):
 	"""Require signature when closing fileobj matches sig in gpg_profile"""
@@ -297,6 +307,13 @@ def cleanup(col_stats):
 		log.Warn(filestr + "\nRun duplicity again with the --force "
 				 "option to actually delete.")
 
+def remove_all_but_n_full(col_stats):
+	"Remove backup files older than the last n full backups."
+	assert globals.keep_chains is not None
+
+	globals.remove_time = col_stats.get_nth_last_full_backup_time(globals.keep_chains)
+
+	return remove_old(col_stats)
 
 def remove_old(col_stats):
 	"""Remove backup files older than globals.remove_time from backend"""
@@ -345,6 +362,7 @@ def check_last_manifest(col_stats):
 	last_backup_set = col_stats.all_backup_chains[-1].get_last()
 	last_backup_set.check_manifests()
 
+
 def main():
 	"""Start/end here"""
 	dup_time.setcurtime()
@@ -354,8 +372,9 @@ def main():
 											  globals.archive_dir).set_values()
 	log.Log("Collection Status\n-----------------\n" + str(col_stats), 8)
 
-	log.Log("Last full backup date: " + dup_time.timetopretty(col_stats.get_last_full_backup()), 4)
-	if action == "inc" and col_stats.get_last_full_backup() < globals.full_force_time:
+	last_full_time = col_stats.get_last_full_backup_time()
+	log.Log("Last full backup date: " + dup_time.timetopretty(last_full_time), 4)
+	if action == "inc" and last_full_time < globals.full_force_time:
 		log.Log("Last full backup is too old, forcing full backup", 3)
 		action = "full"
 
@@ -385,6 +404,7 @@ def main():
 	elif action == "collection-status": print str(col_stats)
 	elif action == "cleanup": cleanup(col_stats)
 	elif action == "remove-old": remove_old(col_stats)
+	elif action == "remove-all-but-n-full": remove_all_but_n_full(col_stats)
 	else:
 		assert action == "inc" or action == "full", action
 		if action == "full": full_backup(col_stats)

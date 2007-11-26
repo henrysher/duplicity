@@ -118,7 +118,7 @@ class ROPath:
 
 	def getmtime(self):
 		"""Return mod time of path in seconds"""
-		return self.stat.st_mtime
+		return int(self.stat.st_mtime)
 
 	def get_relative_path(self):
 		"""Return relative path, created from index"""
@@ -179,7 +179,7 @@ class ROPath:
 		try: self.stat.st_gid = tarfile.gname2gid(tarinfo.gname)
 		except KeyError: self.stat.st_gid = tarinfo.gid
 
-		self.stat.st_mtime = tarinfo.mtime
+		self.stat.st_mtime = int(tarinfo.mtime)
 		self.stat.st_size = tarinfo.size
 
 	def get_ropath(self):
@@ -228,7 +228,7 @@ class ROPath:
 				log.Warn("Warning: %s has negative mtime, treating as 0."
 						 % (self.get_relative_path(),))
 				ti.mtime = 0
-			else: ti.mtime = self.stat.st_mtime
+			else: ti.mtime = int(self.stat.st_mtime)
 
 			try: ti.uname = tarfile.uid2uname(ti.uid)
 			except KeyError: pass
@@ -256,7 +256,7 @@ class ROPath:
 			# Don't compare sizes, because we might be comparing
 			# signature size to size of file.
 			if not self.perms_equal(other): return 0
-			if self.stat.st_mtime == other.stat.st_mtime: return 1
+			if int(self.stat.st_mtime) == int(other.stat.st_mtime): return 1
 			# Below, treat negative mtimes as equal to 0
 			return self.stat.st_mtime <= 0 and other.stat.st_mtime <= 0
 		elif self.issym(): # here only symtext matters
@@ -302,8 +302,8 @@ class ROPath:
 			if ((int(self.stat.st_mtime) != int(other.stat.st_mtime)) and
 				(self.stat.st_mtime > 0 or other.stat.st_mtime > 0)):
 				log_diff("File %%s has mtime %s, expected %s" %
-						 (dup_time.timetopretty(other.stat.st_mtime),
-						  dup_time.timetopretty(self.stat.st_mtime)))
+						 (dup_time.timetopretty(int(other.stat.st_mtime)),
+						  dup_time.timetopretty(int(self.stat.st_mtime))))
 				return 0
 			if self.isreg() and include_data:
 				if self.compare_data(other): return 1
@@ -379,7 +379,7 @@ class ROPath:
 			assert isinstance(other, ROPath)
 			stat = StatResult()
 			stat.st_uid, stat.st_gid = self.stat.st_uid, self.stat.st_gid
-			stat.st_mtime = self.stat.st_mtime
+			stat.st_mtime = int(self.stat.st_mtime)
 			other.stat = stat
 			other.mode = self.mode
 

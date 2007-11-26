@@ -35,6 +35,7 @@ commands = ["cleanup",
 			"incremental",
 			"list-current-files",
 			"remove-older-than",
+			"remove-all-but-n-full",
 			"verify",
 			]
 
@@ -249,6 +250,7 @@ Usage:
 	duplicity list-current-files [options] target_url
 	duplicity cleanup [options] target_url
 	duplicity remove-older-than time [options] target_url
+	duplicity remove-all-but-n-full count [options] target_url
 
 Backends and their URL formats:
 	ssh://user@other.host:port/some_dir
@@ -269,6 +271,7 @@ Commands:
 	list-current-files <target_url>
 	restore <target_url> <source_dir>
 	remove-older-than <time> <target_url>
+	remove-all-but-n-full <count> <target_url>
 	verify <target_url> <source_dir>
 
 Options:
@@ -390,7 +393,7 @@ def check_consistency(action):
 			if m: n+=1
 		assert n <= 1, "Invalid syntax, two conflicting modes specified"
 	if action in ["list-current", "collection-status",
-				  "cleanup", "remove-old"]:
+				  "cleanup", "remove-old", "remove-all-but-n-full"]:
 		assert_only_one([list_current, collection_status, cleanup,
 						 globals.remove_time is not None])
 	elif action == "restore" or action == "verify":
@@ -428,6 +431,7 @@ def ProcessCommandLine(cmdline_list):
 		elif collection_status: action = "collection-status"
 		elif cleanup: action = "cleanup"
 		elif globals.remove_time is not None: action = "remove-old"
+		elif globals.keep_chains is not None: action = "remove-all-but-n-full"
 		else: command_line_error("Too few arguments")
 		globals.backend = backends.get_backend(args[0])
 		if not globals.backend: log.FatalError("""Bad URL '%s'.

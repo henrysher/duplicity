@@ -39,6 +39,11 @@ duplicity \- Encrypted backup using rsync algorithm
 .BI [ options ]
 .I target_url
 
+.B duplicity remove-all-but-n-full
+.I count
+.BI [ options ]
+.I target_url
+
 .SH DESCRIPTION
 Duplicity incrementally backs up files and directory
 by encrypting tar-format volumes with GnuPG and uploading them to a
@@ -158,6 +163,15 @@ depend on them.  See the
 .B TIME FORMATS
 section for more information.  Note, this action cannot be combined
 with backup or other actions, such as cleanup.
+.TP
+.BI "remove-all-but-n-full " count
+Delete all backups sets that are older than the count:th last full
+backup (in other words, keep the last
+.I count
+full backups and associated incremental sets).
+.I count
+must be larger than zero. A value of 1 means that only the single most
+recent backup chain will be kept.
 .TP
 .B verify
 Enter verify mode instead of restore.  If the --file-to-restore option

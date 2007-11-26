@@ -42,7 +42,6 @@ def cleanup():
 		p = path.Path(filename)
 		if p.exists(): p.delete()
 
-
 def new_temppath():
 	"""Return a new TempPath"""
 	filename = tempfile.mktemp("","duplicity.")
@@ -61,7 +60,6 @@ class TempPath(path.Path):
 		fh = FileobjHooked(path.Path.open(self, mode))
 		fh.addhook(self.delete)
 		return fh
-
 
 def get_fileobj_duppath(dirpath, filename):
 	"""Return a file object open for writing, will write to filename
@@ -124,8 +122,8 @@ class FileobjHooked:
 	def close(self):
 		"""Close fileobj, running hooks right afterwards"""
 		assert not self.fileobj.close()
-		for hook in self.hooklist: hook()
 		if self.second: assert not self.second.close()
+		for hook in self.hooklist: hook()
 
 	def addhook(self, hook):
 		"""Add hook (function taking no arguments) to run upon closing"""

@@ -574,7 +574,7 @@ class ftpBackend(Backend):
 	def put(self, source_path, remote_filename = None):
 		"""Transfer source_path to remote_filename"""
 		pu = ParsedUrl(self.url_string)
-		remote_path = os.path.join (pu.path, remote_filename).rstrip()
+		remote_path = os.path.join(pu.path, remote_filename).rstrip()
 		commandline = "ncftpput %s -V -C '%s'  '%s'" % \
 					  (self.flags, source_path.name, remote_path)
 		self.run_command_persist(commandline)
@@ -613,7 +613,7 @@ class ftpBackend(Backend):
 		pu = ParsedUrl(self.url_string)
 		for filename in filename_list:
 			commandline = "ncftpls %s -X 'DELE %s' '%s'" % \
-						  (self.flags, filename, self.url_string)
+						  (self.flags, filename, "%s/%s" % (self.url_string, filename))
 			self.popen_persist(commandline)
 
 

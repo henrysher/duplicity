@@ -471,8 +471,7 @@ class CollectionsStatus:
 					self.matched_chain_pair = (sig_chains[i], latest_backup_chain)
 				
 				del sig_chains[i]
-				# break     # MDR this way the remote will not be
-					    # deleted if local present
+				break
 							
 		if self.matched_chain_pair:
 			self.other_sig_chains.remove(self.matched_chain_pair[0])
@@ -667,17 +666,43 @@ class CollectionsStatus:
 		assert self.values_set
 		return filter(lambda c: c.end_time < t, self.all_backup_chains)
 	
-	def get_last_full_backup(self):
-		"""Return the time of the last full backup of the collection, or 0"""
-		assert self.values_set
-		# Is there a nicer way to do that with a lambda function?
-		if len(self.all_backup_chains) == 0:
+	def get_last_full_backup_time(self):
+		"""Return the time of the last full backup, or 0 if
+		there is none."""
+		return self.get_nth_last_full_backup_time(1)
+
+	def get_nth_last_full_backup_time(self, n):
+		"""Return the time of the nth to last full backup, or 0
+		if there is none."""
+		chain = self.get_nth_last_backup_chain(n)
+		if chain is None:
 			return 0
-		last = self.all_backup_chains[0]
-		for bc in self.all_backup_chains:
-			if bc.get_first().time > last.get_first().time:
-				last = bc
-		return last.get_first().time
+		else:
+			return chain.get_first().time
+
+	def get_last_backup_chain(self):
+		"""Return the last full backup of the collection, or None
+		if there is no full backup chain."""
+		return self.get_nth_last_backup_chain(1)
+
+	def get_nth_last_backup_chain(self,n):
+		"""Return the nth-to-last full backup of the collection, or None
+		if there is less than n backup chains.
+
+		NOTE: n = 1 -> time of latest available chain (n = 0 is not
+		a valid input). Thus the second-to-last is obtained with n=2
+		rather than n=1."""
+		assert self.values_set
+		assert n > 0
+
+		if len(self.all_backup_chains) < n:
+			return None
+
+		sorted = self.all_backup_chains[:]
+		sorted.sort(reverse = True,
+			    key = lambda chain: chain.get_first().time)
+
+		return sorted[n - 1]
 
 	def get_older_than(self, t):
 		"""Returns a list of backup sets older than the given time t
