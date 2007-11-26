@@ -1,3 +1,18 @@
+New in v0.4.5 (2007/11/23)
+------------------------------
+https://savannah.nongnu.org/bugs/index.php?21646
+Fix to handling of collections when --archive-dir is used.
+Prior to this, duplicity would write the full sig files to
+both local and remote, then delete the remote.  Now, it does
+not delete the remote full sigs.
+
+Applied the following patches from Peter Schuller
+patch #6279, add command 'remove-all-but-n-full'
+patch #6280, clarify --archive-dir option
+patch #6281, --help should print to stdout, not stderr
+patch #6282, collection-status: output in more consistent order
+
+
 New in v0.4.4 (2007/11/23)
 ------------------------------
 All the changes in RC1 through RC4 plus:
