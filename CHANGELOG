@@ -1,4 +1,4 @@
-New in v0.4.5 (2007/11/23)
+New in v0.4.5 (2007/11/26)
 ------------------------------
 https://savannah.nongnu.org/bugs/index.php?21646
 Fix to handling of collections when --archive-dir is used.
