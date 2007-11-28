@@ -666,11 +666,10 @@ class rsyncBackend(Backend):
 		if len (delete_list) > 0:
 			raise BackendException("Files %s not found" % str (delete_list))
 
-		dir = tempfile.mktemp ()
-		exclude_name = tempfile.mktemp ()
-		exclude = open (exclude_name, 'w')
+		dir = tempfile.mkdtemp()
+		exclude_fd, exclude_name = tempfile.mkstemp()
+		exclude = os.fdopen(exclude_fd)
 		to_delete = [exclude_name]
-		os.mkdir (dir)
 		for file in dont_delete_list:
 			path = os.path.join (dir, file)
 			to_delete.append (path)
