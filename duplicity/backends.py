@@ -808,11 +808,12 @@ class webdavBackend(Backend):
 		
 		password = self.get_password()
 
-		if globals.webdav_proto == 'http':
-			self.conn = httplib.HTTPConnection(parsed_url.host)
-		elif globals.webdav_proto == 'https':
-			self.conn = httplib.HTTPSConnection(parsed_url.host)
-		# else: might want to throw an exception
+ 		if parsed_url.protocol == 'webdav':
+ 			self.conn = httplib.HTTPConnection(parsed_url.host)
+ 		elif parsed_url.protocol == 'webdavs':
+ 			self.conn = httplib.HTTPSConnection(parsed_url.host)
+ 		else:
+ 			raise BackendException("Unknown URI scheme: %s" % (parsed_url.protocol))
 
 		self.headers['Authorization'] = 'Basic ' + base64.encodestring(parsed_url.user+':'+ password).strip()
 		
@@ -958,4 +959,5 @@ protocol_class_dict = {"file": LocalBackend,
 					   "scp": sshBackend,
 					   "ssh": sshBackend,
 					   "s3+http": BotoBackend,
-					   "webdav": webdavBackend,}
+					   "webdav": webdavBackend,
+					   "webdavs": webdavBackend,}
