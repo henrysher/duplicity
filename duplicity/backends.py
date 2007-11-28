@@ -704,63 +704,76 @@ class BotoBackend(Backend):
 			raise BackendException("This backend requires the boto library, "
 								   "(http://code.google.com/p/boto/).")
 
-		if not (os.environ.has_key('AWS_ACCESS_KEY_ID') and 
-				os.environ.has_key('AWS_SECRET_ACCESS_KEY')):
-			raise BackendException("The AWS_ACCESS_KEY_ID and "
-								   "AWS_SECRET_ACCESS_KEY environment variables are not set.")
+		if not os.environ.has_key('AWS_ACCESS_KEY_ID'):
+			raise BackendException("The AWS_ACCESS_KEY_ID environment variable is not set.")
 
-		self.bucket_name = parsed_url.suffix
+		if not os.environ.has_key('AWS_SECRET_ACCESS_KEY'):
+			raise BackendException("The AWS_SECRET_ACCESS_KEY environment variable is not set.")
 
-		if '/' in self.bucket_name:
-			raise BackendException("Invalid bucket specification.")
 
+		"""
+		This folds the null prefix and all null parts, which means that:
+		  s3+http://MyBucket/ and s3+http://MyBucket are equivalent.
+		  s3+http://MyBucket//My///My/Prefix/ and s3+http://MyBucket/My/Prefix are equivalent.
+		"""
+		self.url_parts = filter(lambda x: x != '', parsed_url.suffix.split('/'))
+		self.bucket_name = self.url_parts.pop(0)
 		self.key_class = Key
-
 		self.conn = S3Connection()
 		self.bucket = self.conn.create_bucket(self.bucket_name)
+
+		if self.url_parts:
+			self.key_prefix = '%s/' % '/'.join(self.url_parts)
+			self.straight_url = parsed_url.straight_url()
+		else:
+			self.key_prefix = ''
+			self.straight_url = parsed_url.straight_url().rstrip('/')
 
 	def put(self, source_path, remote_filename=None):
 		if not remote_filename:
 			remote_filename = source_path.get_filename()
 		key = self.key_class(self.bucket)
-		key.key = remote_filename
+		key.key = self.key_prefix + remote_filename
 		for n in range(1, globals.num_retries+1):
-			log.Log("Uploading %s to Amazon S3 (attempt #%d)" % (remote_filename, n), 5)
+			log.Log("Uploading %s/%s" % (self.straight_url, remote_filename), 5)
 			try:
-				key.set_contents_from_filename(source_path.name, 
-					{'Content-Type': 'application/octet-stream'})
+				key.set_contents_from_filename(source_path.name, {'Content-Type': 'application/octet-stream'})
 				return
 			except:
 				pass
-			log.Log("Uploading %s failed (attempt #%d)" % (remote_filename, n), 1)
+			log.Log("Upload '%s/%s' failed (attempt #%d)" % (self.straight_url, remote_filename, n), 1)
 			time.sleep(30)
-		log.Log("Giving up trying to upload %s after %d attempts" % (remote_filename, globals.num_retries), 1)
-		raise BackendException("Error uploading %s" % remote_filename)
+		log.Log("Giving up trying to upload %s/%s after %d attempts" % (self.straight_url, remote_filename, globals.num_retries), 1)
+		raise BackendException("Error uploading %s/%s" % (self.straight_url, remote_filename))
 	
 	def get(self, remote_filename, local_path):
 		key = self.key_class(self.bucket)
-		key.key = remote_filename
+		key.key = self.key_prefix + remote_filename
 		for n in range(1, globals.num_retries+1):
-			log.Log("Downloading %s from Amazon S3 (attempt #%d)" % (remote_filename, n), 5)
+			log.Log("Downloading %s/%s" % (self.straight_url, remote_filename), 5)
 			try:
 				key.get_contents_to_filename(local_path.name)
 				local_path.setdata()
 				return
 			except:
 				pass
-			log.Log("Downloading %s failed (attempt #%d)" % (remote_filename, n), 1)
+			log.Log("Download %s/%s failed (attempt #%d)" % (self.straight_url, remote_filename, n), 1)
 			time.sleep(30)
-		log.Log("Giving up trying to download %s after %d attempts" % (remote_filename, globals.num_retries), 1)
-		raise BackendException("Error downloading %s" % remote_filename)
+		log.Log("Giving up trying to download %s/%s after %d attempts" % (self.straight_url, remote_filename, globals.num_retries), 1)
+		raise BackendException("Error downloading %s/%s" % (self.staight_url, remote_filename))
 
 	def list(self):
-		filename_list = [k.key for k in self.bucket]
-		log.Log("Files in bucket:\n%s" % '\n'.join(filename_list), 9)
+		filename_list = []
+		for k in self.bucket.list(prefix = self.key_prefix + 'duplicity-'):
+			filename = k.key.lstrip(self.key_prefix)
+			filename_list.append(filename)
+			log.Log("Listed %s/%s" % (self.straight_url, filename), 9)
 		return filename_list
 
 	def delete(self, filename_list):
 		for filename in filename_list:
-			self.bucket.delete_key(filename)
+			self.bucket.delete_key(self.key_prefix + filename)
+			log.Log("Deleted %s/%s" % (self.straight_url, filename, filename), 9)
 
 
 class webdavBackend(Backend):
