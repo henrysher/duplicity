@@ -592,12 +592,9 @@ class ftpBackend(Backend):
 		"""List files in directory"""
 		pu = ParsedUrl(self.url_string)
 		# we create the directory first so we have target dir
-		commandline = "ncftpls %s -W 'MKD %s' '%s'" % \
-					  (self.flags, pu.path, self.url_string)
-		l = self.popen_persist(commandline).split('\n')
 		# try for a long listing to avoid connection reset
-		commandline = "ncftpls %s -l '%s'" % \
-					  (self.flags, self.url_string)
+		commandline = "ncftpls %s -l -W 'MKD %s' '%s'" % \
+					  (self.flags, pu.path, self.url_string)
 		l = self.popen_persist(commandline).split('\n')
 		l = filter(lambda x: x, l)
 		if not l:
