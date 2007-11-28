@@ -21,7 +21,8 @@
 import gzip, types
 import log, file_naming, path, dup_time, globals, manifest
 
-class CollectionsError(Exception): pass
+class CollectionsError(Exception):
+	pass
 
 class BackupSet:
 	"""Backup set - the backup information produced by one session"""
@@ -48,16 +49,22 @@ class BackupSet:
 
 		"""
 		pr = file_naming.parse(filename)
-		if not pr or not (pr.type == "full" or pr.type == "inc"): return None
+		if not pr or not (pr.type == "full" or pr.type == "inc"):
+			return None
 
-		if not self.info_set: self.set_info(pr)
+		if not self.info_set:
+			self.set_info(pr)
 		else:
-			if pr.type != self.type: return None
-			if pr.time != self.time: return None
+			if pr.type != self.type:
+				return None
+			if pr.time != self.time:
+				return None
 			if (pr.start_time != self.start_time or
-				pr.end_time != self.end_time): return None
+				pr.end_time != self.end_time):
+				return None
 
-		if pr.manifest: self.set_manifest(filename)
+		if pr.manifest:
+			self.set_manifest(filename)
 		else:
 			assert pr.volume_number is not None
 			assert not self.volume_name_dict.has_key(pr.volume_number), \
@@ -80,7 +87,8 @@ class BackupSet:
 											   remote_filename)
 		self.remote_manifest_name = remote_filename
 
-		if not globals.archive_dir: return
+		if not globals.archive_dir:
+			return
 		for local_filename in globals.archive_dir.listdir():
 			pr = file_naming.parse(local_filename)
 			if (pr and pr.manifest and pr.type == self.type and
@@ -111,8 +119,7 @@ class BackupSet:
 	def check_manifests(self):
 		"""Make sure remote manifest is equal to local one"""
 		if not self.remote_manifest_name and not self.local_manifest_path:
-			log.FatalError("Fatal Error: "
-						   "No manifests found for most recent backup")
+			log.FatalError("Fatal Error: No manifests found for most recent backup")
 		assert self.remote_manifest_name, "if only one, should be remote"
 
 		remote_manifest = self.get_remote_manifest()
@@ -123,8 +130,10 @@ class BackupSet:
 				log.FatalError("Fatal Error: Remote manifest does not match local one.  Either the "
 							   "remote backup set or the local archive directory has been corrupted.")
 		if not remote_manifest:
-			if self.local_manifest_path: remote_manifest = local_manifest
-			else: log.FatalError("Fatal Error: Neither remote nor local manifest is readable.")
+			if self.local_manifest_path:
+				remote_manifest = local_manifest
+			else:
+				log.FatalError("Fatal Error: Neither remote nor local manifest is readable.")
 		remote_manifest.check_dirinfo()
 
 	def get_local_manifest(self):
@@ -138,17 +147,21 @@ class BackupSet:
 		assert self.remote_manifest_name
 		# Following by MDR.  Should catch if remote encrypted with
 		# public key w/o secret key
-		try: manifest_buffer = self.backend.get_data(self.remote_manifest_name)
+		try:
+			manifest_buffer = self.backend.get_data(self.remote_manifest_name)
 		except IOError, message:
 			if message.args[0] == "GnuPG exited non-zero, with code 131072":
 				return None
-			else: raise
+			else:
+				raise
 		return manifest.Manifest().from_string(manifest_buffer)
 
 	def get_manifest(self):
 		"""Return manifest object, showing preference for local copy"""
-		if self.local_manifest_path: return self.get_local_manifest()
-		else: return self.get_remote_manifest()
+		if self.local_manifest_path:
+			return self.get_local_manifest()
+		else:
+			return self.get_remote_manifest()
 
 	def get_filenames(self):
 		"""Return sorted list of (remote) filenames of files in set"""
@@ -159,12 +172,15 @@ class BackupSet:
 							   volume_num_list)
 		if self.remote_manifest_name:
 			return [self.remote_manifest_name] + volume_filenames
-		else: return volume_filenames
+		else:
+			return volume_filenames
 		
 	def get_time(self):
 		"""Return time if full backup, or end_time if incremental"""
-		if self.time: return self.time
-		if self.end_time: return self.end_time
+		if self.time:
+			return self.time
+		if self.end_time:
+			return self.end_time
 		assert 0, "Neither self.time nor self.end_time set"
 
 	def __len__(self):
@@ -219,7 +235,8 @@ class BackupChain:
 		"""Delete all sets in chain, in reverse order"""
 		for i in range(len(self.incset_list)-1, -1, -1):
 			self.incset_list[i].delete()
-		if self.fullset: self.fullset.delete()
+		if self.fullset:
+			self.fullset.delete()
 
 	def get_sets_at_time(self, time):
 		"""Return a list of sets in chain earlier or equal to time"""
@@ -228,8 +245,10 @@ class BackupChain:
 
 	def get_last(self):
 		"""Return last BackupSet in chain"""
-		if self.incset_list: return self.incset_list[-1]
-		else: return self.fullset
+		if self.incset_list:
+			return self.incset_list[-1]
+		else:
+			return self.fullset
 
 	def get_first(self):
 		"""Return first BackupSet in chain (ie the full backup)"""
@@ -262,13 +281,16 @@ class BackupChain:
 	def get_num_volumes(self):
 		"""Return the total number of volumes in the chain"""
 		n = 0
-		for s in self.get_all_sets(): n+=len(s)
+		for s in self.get_all_sets():
+			n += len(s)
 		return n
 
 	def get_all_sets(self):
 		"""Return list of all backup sets in chain"""
-		if self.fullset: return [self.fullset] + self.incset_list
-		else: return self.incset_list
+		if self.fullset:
+			return [self.fullset] + self.incset_list
+		else:
+			return self.incset_list
 
 
 class SignatureChain:
@@ -286,11 +308,25 @@ class SignatureChain:
 		globals.backend.
 
 		"""
-		if local: self.archive_dir, self.backend = location, None
-		else: self.archive_dir, self.backend = None, location
+		if local:
+			self.archive_dir, self.backend = location, None
+		else:
+			self.archive_dir, self.backend = None, location
 		self.fullsig = None # filename of full signature
 		self.inclist = [] # list of filenames of incremental signatures
 		self.start_time, self.end_time = None, None
+
+	def __str__(self):
+		"""Local or Remote and List of files in the set"""
+		if self.archive_dir:
+			place = "local"
+		else:
+			place = "remote"
+		filelist = []
+		if self.fullsig:
+			filelist.append(self.fullsig)
+		filelist.extend(self.inclist)
+		return "%s: [%s]" % (place, ", ".join(filelist))
 
 	def check_times(self, time_list):
 		"""Check to make sure times are in whole seconds"""
@@ -300,22 +336,30 @@ class SignatureChain:
 
 	def islocal(self):
 		"""Return true if represents a signature chain in archive_dir"""
-		return self.archive_dir
+		if self.archive_dir:
+			return True
+		else:
+			return False
 
 	def add_filename(self, filename, pr = None):
 		"""Add new sig filename to current chain.  Return true if fits"""
-		if not pr: pr = file_naming.parse(filename)
-		if not pr: return None
+		if not pr:
+			pr = file_naming.parse(filename)
+		if not pr:
+			return None
 
 		if self.fullsig:
-			if pr.type != "new-sig": return None
-			if pr.start_time != self.end_time: return None
+			if pr.type != "new-sig":
+				return None
+			if pr.start_time != self.end_time:
+				return None
 			self.inclist.append(filename)
 			self.check_times([pr.end_time])
 			self.end_time = pr.end_time
 			return 1
 		else:
-			if pr.type != "full-sig": return None
+			if pr.type != "full-sig":
+				return None
 			self.fullsig = filename
 			self.check_times([pr.time, pr.time])
 			self.start_time, self.end_time = pr.time, pr.time
@@ -329,7 +373,8 @@ class SignatureChain:
 				"""Open filename in archive_dir, return filtered fileobj"""
 				sig_dp = path.DupPath(self.archive_dir.name, (filename,))
 				return sig_dp.filtered_open("rb")
-		else: filename_to_fileobj = self.backend.get_fileobj_read
+		else:
+			filename_to_fileobj = self.backend.get_fileobj_read
 		return map(filename_to_fileobj, [self.fullsig] + self.inclist)
 
 	def delete(self):
@@ -348,8 +393,10 @@ class SignatureChain:
 
 	def get_filenames(self):
 		"""Return ordered list of filenames in set"""
-		if self.fullsig: l = [self.fullsig]
-		else: l = []
+		if self.fullsig:
+			l = [self.fullsig]
+		else:
+			l = []
 		l.extend(self.inclist)
 		return l
 
@@ -395,7 +442,8 @@ class CollectionsStatus:
 			l.append("\nFound a complete backup chain with matching "
 					 "signature chain:")
 			l.append(str(self.matched_chain_pair[1]))
-		else: l.append("No backup chains with active signatures found")
+		else:
+			l.append("No backup chains with active signatures found")
 
 		if self.orphaned_backup_sets or self.incomplete_backup_sets:
 			l.append("Also found %d backup sets not part of any chain,"
@@ -404,7 +452,8 @@ class CollectionsStatus:
 					 % (len(self.incomplete_backup_sets),))
 			l.append("These may be deleted by running duplicity with the "
 					 "--cleanup option.")
-		else: l.append("No orphaned or incomplete backup sets found.")
+		else:
+			l.append("No orphaned or incomplete backup sets found.")
 
 		return "\n".join(l)
 
@@ -429,7 +478,8 @@ class CollectionsStatus:
 		if self.archive_dir:
 			local_sig_chains, local_orphaned_sig_names = \
 							  self.get_signature_chains(True)
-		else: local_sig_chains, local_orphaned_sig_names = [], []
+		else:
+			local_sig_chains, local_orphaned_sig_names = [], []
 		remote_sig_chains, remote_orphaned_sig_names = \
 						   self.get_signature_chains(False, filelist = backend_filename_list)
 		self.orphaned_sig_names = (local_orphaned_sig_names +
@@ -460,11 +510,12 @@ class CollectionsStatus:
 				# See if the set before last matches:
 				elif (len(latest_backup_chain.get_all_sets()) >= 2 and
 					  sig_chains[i].end_time == latest_backup_chain.get_all_sets()[-2].end_time):
-						# It matches, remove the last backup set:
-						log.Warn("Warning, discarding last backup set, because of missing signature file.")
-						self.incomplete_backup_sets.append(latest_backup_chain.incset_list[-1])
-						latest_backup_chain.incset_list = latest_backup_chain.incset_list[:-1]
-				else: continue
+					# It matches, remove the last backup set:
+					log.Warn("Warning, discarding last backup set, because of missing signature file.")
+					self.incomplete_backup_sets.append(latest_backup_chain.incset_list[-1])
+					latest_backup_chain.incset_list = latest_backup_chain.incset_list[:-1]
+				else:
+					continue
 
 				# Found a matching pair:
 				if self.matched_chain_pair == None:
@@ -474,7 +525,15 @@ class CollectionsStatus:
 				break
 							
 		if self.matched_chain_pair:
-			self.other_sig_chains.remove(self.matched_chain_pair[0])
+			# if we have local and remote sig chains, remove both from the other_sig_chains list
+			if len(self.other_sig_chains) > 1:
+				matched_sig_chain = self.matched_chain_pair[0]
+				for sig_chain in self.other_sig_chains[1:]:
+					if (sig_chain.islocal() != matched_sig_chain.islocal() and
+						sig_chain.start_time == matched_sig_chain.start_time and
+						sig_chain.end_time == matched_sig_chain.end_time):
+						self.other_sig_chains.remove(sig_chain)
+			self.other_sig_chains.remove(matched_sig_chain)
 			self.other_backup_chains.remove(self.matched_chain_pair[1])
 
 	def warn(self, sig_chain_warning):
@@ -486,8 +545,9 @@ class CollectionsStatus:
 		if self.other_sig_chains and sig_chain_warning:
 			if self.matched_chain_pair:
 				log.Log("Warning, found unnecessary signature chain(s)", 2)
-			else: log.Log("Warning, found signatures but no corresponding "
-								 "backup files", 2)
+			else:
+				log.Log("Warning, found signatures but no corresponding "
+						"backup files", 2)
 
 		if self.incomplete_backup_sets:
 			log.Log("Warning, found incomplete backup sets, probably left "
@@ -511,11 +571,14 @@ class CollectionsStatus:
 		def add_to_sets(filename):
 			"""Try adding filename to existing sets, or make new one"""
 			for set in sets:
-				if set.add_filename(filename): break
+				if set.add_filename(filename):
+					break
 			else:
 				new_set = BackupSet(self.backend)
-				if new_set.add_filename(filename): sets.append(new_set)
-				else: log.Log("Ignoring file '%s'" % filename, 9)
+				if new_set.add_filename(filename):
+					sets.append(new_set)
+				else:
+					log.Log("Ignoring file '%s'" % filename, 9)
 		map(add_to_sets, filename_list)
 		sets, incomplete_sets = self.get_sorted_sets(sets)
 
@@ -529,8 +592,10 @@ class CollectionsStatus:
 			else:
 				assert set.type == "inc"
 				for chain in chains:
-					if chain.add_inc(set): break
-				else: orphaned_sets.append(set)
+					if chain.add_inc(set):
+						break
+				else:
+					orphaned_sets.append(set)
 		map(add_to_chains, sets)
 		return (chains, orphaned_sets, incomplete_sets)
 
@@ -538,9 +603,12 @@ class CollectionsStatus:
 		"""Sort set list by end time, return (sorted list, incomplete)"""
 		time_set_pairs, incomplete_sets = [], []
 		for set in set_list:
-			if not set.is_complete(): incomplete_sets.append(set)
-			elif set.type == "full": time_set_pairs.append((set.time, set))
-			else: time_set_pairs.append((set.end_time, set))
+			if not set.is_complete():
+				incomplete_sets.append(set)
+			elif set.type == "full":
+				time_set_pairs.append((set.time, set))
+			else:
+				time_set_pairs.append((set.end_time, set))
 		time_set_pairs.sort()
 		return (map(lambda p: p[1], time_set_pairs), incomplete_sets)
 
@@ -553,14 +621,19 @@ class CollectionsStatus:
 
 		"""
 		def get_filelist():
-			if filelist is not None: return filelist
-			elif local: return self.archive_dir.listdir()
-			else: return self.backend.list()
+			if filelist is not None:
+				return filelist
+			elif local:
+				return self.archive_dir.listdir()
+			else:
+				return self.backend.list()
 
 		def get_new_sigchain():
 			"""Return new empty signature chain"""
-			if local: return SignatureChain(True, self.archive_dir)
-			else: return SignatureChain(False, self.backend)
+			if local:
+				return SignatureChain(True, self.archive_dir)
+			else:
+				return SignatureChain(False, self.backend)
 
 		# Build initial chains from full sig filenames
 		chains, new_sig_filenames = [], []
@@ -571,15 +644,18 @@ class CollectionsStatus:
 					new_chain = get_new_sigchain()
 					assert new_chain.add_filename(filename, pr)
 					chains.append(new_chain)
-				elif pr.type == "new-sig": new_sig_filenames.append(filename)
+				elif pr.type == "new-sig":
+					new_sig_filenames.append(filename)
 
 		# Try adding new signatures to existing chains
 		orphaned_filenames = []
 		new_sig_filenames.sort()
 		for sig_filename in new_sig_filenames:
 			for chain in chains:
-				if chain.add_filename(sig_filename): break
-			else: orphaned_filenames.append(sig_filename)
+				if chain.add_filename(sig_filename):
+					break
+			else:
+				orphaned_filenames.append(sig_filename)
 		return (chains, orphaned_filenames)
 
 	def get_sorted_chains(self, chain_list):
@@ -589,7 +665,8 @@ class CollectionsStatus:
 		for chain in chain_list:
 			if endtime_chain_dict.has_key(chain.end_time):
 				endtime_chain_dict[chain.end_time].append(chain)
-			else: endtime_chain_dict[chain.end_time] = [chain]
+			else:
+				endtime_chain_dict[chain.end_time] = [chain]
 		
 		# Use dictionary to build final sorted list
 		sorted_end_times = endtime_chain_dict.keys()
@@ -597,7 +674,8 @@ class CollectionsStatus:
 		sorted_chain_list = []
 		for end_time in sorted_end_times:
 			chain_list = endtime_chain_dict[end_time]
-			if len(chain_list) == 1: sorted_chain_list.append(chain_list[0])
+			if len(chain_list) == 1:
+				sorted_chain_list.append(chain_list[0])
 			else:
 				assert len(chain_list) == 2
 				if chain_list[0].backend: # is remote, goes first
@@ -626,12 +704,15 @@ class CollectionsStatus:
 								 self.all_backup_chains)
 		if len(covering_chains) > 1:
 			raise CollectionsError("Two chains cover the given time")
-		elif len(covering_chains) == 1: return covering_chains[0]
+		elif len(covering_chains) == 1:
+			return covering_chains[0]
 
 		old_chains = filter(lambda c: c.end_time < time,
 							self.all_backup_chains)
-		if old_chains: return old_chains[-1]
-		else: return self.all_backup_chains[0] # no chains are old enough
+		if old_chains:
+			return old_chains[-1]
+		else:
+			return self.all_backup_chains[0] # no chains are old enough
 
 	def cleanup_signatures(self):
 		"""Delete unnecessary older signatures"""
