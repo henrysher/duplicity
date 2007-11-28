@@ -526,8 +526,8 @@ class CollectionsStatus:
 							
 		if self.matched_chain_pair:
 			# if we have local and remote sig chains, remove both from the other_sig_chains list
+			matched_sig_chain = self.matched_chain_pair[0]
 			if len(self.other_sig_chains) > 1:
-				matched_sig_chain = self.matched_chain_pair[0]
 				for sig_chain in self.other_sig_chains[1:]:
 					if (sig_chain.islocal() != matched_sig_chain.islocal() and
 						sig_chain.start_time == matched_sig_chain.start_time and
