@@ -795,10 +795,16 @@ class webdavBackend(Backend):
 			self.directory = '/'
 		log.Log("Using WebDAV host %s" % (parsed_url.host,), 5)
 		log.Log("Using WebDAV directory %s" % (self.directory,), 5)
+		log.Log("Using WebDAV protocol %s" % (globals.webdav_proto,), 5)
 		
 		password = self.get_password()
 
-		self.conn = httplib.HTTPConnection(parsed_url.host)
+		if globals.webdav_proto == 'http':
+			self.conn = httplib.HTTPConnection(parsed_url.host)
+		elif globals.webdav_proto == 'https':
+			self.conn = httplib.HTTPSConnection(parsed_url.host)
+		# else: might want to throw an exception
+
 		self.headers['Authorization'] = 'Basic ' + base64.encodestring(parsed_url.user+':'+ password).strip()
 		
 		# check password by connection to the server
