@@ -1,5 +1,34 @@
+New in v0.4.6 (2007/11/??)
+--------------------------
+https://savannah.nongnu.org/bugs/index.php?21508
+bug #21508: Change delete implementation of ftpBackend to 
+only send one "DELE" instead of multiple per delete.
+
+https://savannah.nongnu.org/bugs/index.php?21646
+bug #21646: --archive-dir causes delete of remote full
+sigs and orphaned sig files
+
+https://savannah.nongnu.org/bugs/index.php?21651
+bug #21651, add https support for webdav.
+
+https://savannah.nongnu.org/bugs/index.php?21657
+bug #21657: ncftpls fails to create dir in ver 0.4.5
+
+https://savannah.nongnu.org/patch/?6284
+patch #6284: document TMPDIR and friends
+
+https://savannah.nongnu.org/patch/?6284
+patch #6285: security fix: eliminate use of mktemp()
+
+https://savannah.nongnu.org/patch/index.php?6289
+patch #6289: Amazon S3 key prefix patch for Duplicity 0.4.5
+
+https://savannah.nongnu.org/patch/index.php?6291
+patch #6291: Alternative WebDAV HTTPS patch
+
+
 New in v0.4.5 (2007/11/26)
-------------------------------
+--------------------------
 https://savannah.nongnu.org/bugs/index.php?21646
 Fix to handling of collections when --archive-dir is used.
 Prior to this, duplicity would write the full sig files to

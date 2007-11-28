@@ -48,7 +48,8 @@ duplicity \- Encrypted backup using rsync algorithm
 Duplicity incrementally backs up files and directory
 by encrypting tar-format volumes with GnuPG and uploading them to a
 remote (or local) file server.  Currently local, ftp, ssh/scp, rsync,
-and Amazon S3 backends are available.  Because duplicity uses
+WebDAV, WebDAVs, HSi and Amazon S3 backends are available.  
+Because duplicity uses
 librsync, the incremental archives are space efficient and only record
 the parts of files that have changed since the last backup.  Currently
 duplicity supports deleted files, full unix permissions, directories,
@@ -407,9 +408,6 @@ noisiest).
 Change the volume size to 
 .IR number 
 Mb. Default is 5Mb.
-.TP
-.B --webdav-https
-Use https for the webdav-backend. The default is plain http.
 
 
 .SH TIME FORMATS
@@ -761,7 +759,8 @@ The remote signatures will be encrypted if encryption is enabled.
 The local signatures will not be encrypted
 
 .SH ENVIRONMENT VARIABLES
-.IP TMPDIR,TEMP,TMP
+.TP
+.B TMPDIR, TEMP, TMP
 In decreasing order of importance, specifies the directory to use for
 temporary files (inherited from Python's tempfile module).
 

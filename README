@@ -19,13 +19,15 @@ REQUIREMENTS:
 
  * Python 2.4 or later (http://www.python.org)
  * librsync 0.9.5.1 or later
- * GnuPG (http://www.gnupg.org/)
- * GnuPGInterface 0.3.2 or later (http://py-gnupg.sourceforge.net/)
+ * GnuPG (http://www.gnupg.org)
+ * GnuPGInterface 0.3.2 or later (http://py-gnupg.sourceforge.net)
+ * NcFTP version 3.1.9 or later (http://www.ncftp.com)
  * Boto 0.9b or later (http://code.google.com/p/boto)
+ * pexpect 2.1 or later (http://pexpect.sourceforge.net)
  
 The rdiff-backup homepage at http://rdiff-backup.stanford.edu/ should
 have a recent version of librsync; otherwise see the librsync homepage
-at http://sourceforge.net/projects/librsync/.
+at http://sourceforge.net/projects/librsync.
 
 
 HELP:
