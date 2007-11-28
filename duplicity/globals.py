@@ -107,3 +107,7 @@ timeout = 30
 
 # FTP data connection type
 ftp_connection = 'passive'
+
+# Protocol for webdav
+webdav_proto = 'http'
+

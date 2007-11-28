@@ -79,6 +79,7 @@ options = ["allow-source-mismatch",
 		   "verbosity=",
 		   "version",
 		   "volsize=",
+		   "webdav-https",
 		   ]
 
 def parse_cmdline_options(arglist):
@@ -179,6 +180,9 @@ def parse_cmdline_options(arglist):
 			globals.ftp_connection = 'regular'
 		elif opt == "--gpg-options":
 			gpg.gpg_options = (gpg.gpg_options + ' ' + arg).strip()
+		elif opt == "--help":
+			usage();
+			sys.exit(1);
 		elif opt == "--include-filelist-stdin":
 			select_opts.append(("--include-filelist", "standard input"))
 			select_files.append(sys.stdin)
@@ -222,8 +226,8 @@ def parse_cmdline_options(arglist):
 			log.setverbosity(int(arg))
 		elif opt == "--volsize":
 			globals.volsize = int(arg)*1024*1024
-		elif opt == "--help":
-			usage(); sys.exit(1);
+ 		elif opt == "--webdav-https":
+ 			globals.webdav_proto='https'
 		else:
 			command_line_error("Unknown option %s" % opt)
 
@@ -310,6 +314,7 @@ Options:
 	-t<time>, --restore-time <time>
 	--volsize <number>
 	-v[0-9], --verbosity [0-9]
+	--webdav-https
 """ % (globals.version, sys.platform))
 
 
