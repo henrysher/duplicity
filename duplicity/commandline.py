@@ -133,6 +133,17 @@ def parse_cmdline_options(arglist):
 			command_line_error("Missing time string for remove-older-than")
 		globals.remove_time = dup_time.genstrtotime(arg)
 		num_expect = 1
+	elif cmd == "remove-all-but-n-full":
+		try:
+			arg = arglist.pop(0)
+		except:
+			command_line_error("Missing count for remove-all-but-n-full")
+		globals.keep_chains = int(arg)
+		
+		if not globals.keep_chains > 0:
+			command_line_error("remove-all-but-n-full count must be > 0")
+		
+		num_expect = 1
 	elif cmd == "verify":
 		verify = True
 		num_expect = 2
