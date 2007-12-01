@@ -22,7 +22,6 @@ import os, socket, types, tempfile, time, sys
 import log, path, dup_temp, file_naming, atexit
 import base64, getpass, xml.dom.minidom, httplib, urllib
 import socket, globals, re, string
-import imapbackend
 
 socket.setdefaulttimeout(globals.timeout)
 
@@ -968,6 +967,9 @@ class hsiBackend(Backend):
 			commandline = '%s "rm %s%s"' % (hsi_command, self.remote_prefix, fn)
 			self.run_command(commandline)
 
+# WARNING - circular import if put first.
+# Need to schedule time to clean this up.
+import imapbackend
 
 # Dictionary relating protocol strings to backend_object classes.
 protocol_class_dict = {"file": LocalBackend,
