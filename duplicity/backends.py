@@ -22,8 +22,9 @@ import os, socket, types, tempfile, time, sys
 import log, path, dup_temp, file_naming, atexit
 import base64, getpass, xml.dom.minidom, httplib, urllib
 import socket, globals, re, string
+import imapbackend
 
-#socket.setdefaulttimeout(globals.timeout)
+socket.setdefaulttimeout(globals.timeout)
 
 class BackendException(Exception): pass
 class ParsingException(Exception): pass
@@ -614,8 +615,8 @@ class ftpBackend(Backend):
 		"""Delete files in filename_list"""
 		pu = ParsedUrl(self.url_string)
 		for filename in filename_list:
-			commandline = "ncftpls %s -X 'DELE %s' '%s'" % \
-						  (self.flags, filename, self.url_string)
+			commandline = "ncftpls %s -X 'DELE %s' '%s/%s'" % \
+						  (self.flags, filename, self.url_string, filename)
 			self.popen_persist(commandline)
 
 
@@ -968,10 +969,6 @@ class hsiBackend(Backend):
 			self.run_command(commandline)
 
 
-
-
-import imapbackend
-
 # Dictionary relating protocol strings to backend_object classes.
 protocol_class_dict = {"file": LocalBackend,
 					   "ftp": ftpBackend,
@@ -985,5 +982,5 @@ protocol_class_dict = {"file": LocalBackend,
 					   "webdavs": webdavBackend,
 					   "imap": imapbackend.ImapBackend,
 					   "imaps": imapbackend.ImapsBackend,
-				           "imaps-gmail":imapbackend.Gmail
+					   "imaps-gmail":imapbackend.Gmail,
 					   }
