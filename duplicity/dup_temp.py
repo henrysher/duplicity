@@ -18,7 +18,6 @@
 
 """Manage temporary files"""
 
-import os
 import tempfile
 import log, path, file_naming
 
@@ -45,8 +44,7 @@ def cleanup():
 
 def new_temppath():
 	"""Return a new TempPath"""
-	fd, filename = tempfile.mkstemp("","duplicity.")
-	os.close(fd)
+	filename = tempfile.mktemp("","duplicity.")
 	register_filename(filename)
 	return TempPath(filename)
 
@@ -81,8 +79,7 @@ def get_fileobj_duppath(dirpath, filename):
 
 def new_tempduppath(parseresults):
 	"""Return a new TempDupPath, using settings from parseresults"""
-	fd, filename = tempfile.mkstemp("","duplicity.")
-	os.close(fd)
+	filename = tempfile.mktemp("","duplicity.")
 	register_filename(filename)
 	return TempDupPath(filename, parseresults = parseresults)
 
