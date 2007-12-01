@@ -203,8 +203,13 @@ class Backend:
 			log.Log("Reading results of '%s'" % private, 5)
 			fout = os.popen(commandline)
 			results = fout.read()
-			if not fout.close():
+			result_status = fout.close()
+			if not result_status:
 				return results
+			elif result_status == 1280 and self.parsed_url.protocol == 'ftp':
+				# This squelches the "file not found" result fromm ncftpls when
+				# the ftp backend looks for a collection that does not exist.
+				return ''
 			log.Log("Running '%s' failed (attempt #%d)" % (private, n), 1)
 			time.sleep(30)
 		log.Log("Giving up trying to execute '%s' after %d attempts" % (private, globals.num_retries), 1)
@@ -574,9 +579,9 @@ class ftpBackend(Backend):
 	def put(self, source_path, remote_filename = None):
 		"""Transfer source_path to remote_filename"""
 		pu = ParsedUrl(self.url_string)
-		remote_path = os.path.join(pu.path, remote_filename).rstrip()
-		commandline = "ncftpput %s -V -C '%s'  '%s'" % \
-					  (self.flags, source_path.name, remote_path)
+		remote_path = os.path.join(pu.path.lstrip('/'), remote_filename).rstrip()
+		commandline = "ncftpput %s -m -V -C '%s'  '%s'" % \
+					  (self.flags, source_path.name, urllib.unquote(remote_path))
 		self.run_command_persist(commandline)
 
 	def get(self, remote_filename, local_path):
@@ -584,7 +589,7 @@ class ftpBackend(Backend):
 		pu = ParsedUrl(self.url_string)
 		remote_path = os.path.join(pu.path, remote_filename).rstrip()
 		commandline = "ncftpget %s -V -C '%s' '%s' '%s'" % \
-					  (self.flags, pu.host, remote_path, local_path.name)
+					  (self.flags, pu.host, urllib.unquote(remote_path), local_path.name)
 		self.run_command_persist(commandline)
 		local_path.setdata()
 
@@ -593,8 +598,8 @@ class ftpBackend(Backend):
 		pu = ParsedUrl(self.url_string)
 		# we create the directory first so we have target dir
 		# try for a long listing to avoid connection reset
-		commandline = "ncftpls %s -l -W 'MKD %s' '%s'" % \
-					  (self.flags, pu.path, self.url_string)
+		commandline = "ncftpls %s -l '%s'" % \
+					  (self.flags, self.url_string)
 		l = self.popen_persist(commandline).split('\n')
 		l = filter(lambda x: x, l)
 		if not l:
@@ -610,7 +615,7 @@ class ftpBackend(Backend):
 		pu = ParsedUrl(self.url_string)
 		for filename in filename_list:
 			commandline = "ncftpls %s -X 'DELE %s' '%s'" % \
-						  (self.flags, filename, "%s/%s" % (self.url_string, filename))
+						  (self.flags, filename, self.url_string)
 			self.popen_persist(commandline)
 
 
