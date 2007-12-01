@@ -23,7 +23,7 @@ import log, path, dup_temp, file_naming, atexit
 import base64, getpass, xml.dom.minidom, httplib, urllib
 import socket, globals, re, string
 
-socket.setdefaulttimeout(globals.timeout)
+#socket.setdefaulttimeout(globals.timeout)
 
 class BackendException(Exception): pass
 class ParsingException(Exception): pass
@@ -963,6 +963,10 @@ class hsiBackend(Backend):
 			self.run_command(commandline)
 
 
+
+
+import imapbackend
+
 # Dictionary relating protocol strings to backend_object classes.
 protocol_class_dict = {"file": LocalBackend,
 					   "ftp": ftpBackend,
@@ -973,4 +977,8 @@ protocol_class_dict = {"file": LocalBackend,
 					   "s3": BotoBackend,
 					   "s3+http": BotoBackend,
 					   "webdav": webdavBackend,
-					   "webdavs": webdavBackend,}
+					   "webdavs": webdavBackend,
+					   "imap": imapbackend.ImapBackend,
+					   "imaps": imapbackend.ImapsBackend,
+				           "imaps-gmail":imapbackend.Gmail
+					   }
