@@ -666,16 +666,17 @@ class rsyncBackend(Backend):
 		if len (delete_list) > 0:
 			raise BackendException("Files %s not found" % str (delete_list))
 
-		dir = tempfile.mkdtemp()
-		exclude_fd, exclude_name = tempfile.mkstemp()
-		exclude = os.fdopen(exclude_fd)
+		dir = tempfile.mktemp ()
+		exclude_name = tempfile.mktemp ()
+		exclude = open (exclude_name, 'w')
 		to_delete = [exclude_name]
+		os.mkdir (dir)
 		for file in dont_delete_list:
 			path = os.path.join (dir, file)
 			to_delete.append (path)
 			f = open (path, 'w')
+			print >>f, file
 			f.close ()
-			print >>exclude, file
 		exclude.close ()
 		commandline = ("rsync --recursive --delete --exclude-from=%s %s/ %s" %
 					   (exclude_name, dir, self.url_string))
@@ -773,7 +774,7 @@ class BotoBackend(Backend):
 	def delete(self, filename_list):
 		for filename in filename_list:
 			self.bucket.delete_key(self.key_prefix + filename)
-			log.Log("Deleted %s/%s" % (self.straight_url, filename, filename), 9)
+			log.Log("Deleted %s/%s" % (self.straight_url, filename), 9)
 
 
 class webdavBackend(Backend):
