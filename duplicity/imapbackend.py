@@ -1,26 +1,3 @@
-# Copyright 2002 Ben Escoto
-#
-# This file is part of duplicity.
-#
-# duplicity is free software; you can redistribute it and/or modify
-# under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 3 of the License, or
-# (at your option) any later version.
-#
-# duplicity is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with duplicity; if not, write to the Free Software Foundation,
-# Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-
-"""
-Provides a backend for IMAP/s/gmail protocols.
-
-Written by maho@pagema.net
-"""
 
 import imaplib
 import base64
@@ -29,6 +6,10 @@ import os
 import StringIO
 import rfc822
 import log
+import email.Encoders
+import email.MIMEBase
+import email.MIMEMultipart
+import email.Parser
 
 from  backends import Backend
 
@@ -53,19 +34,18 @@ class ImapBackend(Backend):
         return imaplib.IMAP4
 
     def _prepareBody(self,f,rname):
-        ret="Subject: %s\n\n"%rname
-        body=f.read(-1);
-        body=base64.b64encode(body)
+       
+        mp = email.MIMEMultipart.MIMEMultipart()
+        mp["Subject"]=rname
         
-        fr=0
-        le=75
-        while(True):
-            line=body[fr:fr+le]
-            if line=='':break
-            ret=ret+line
-            fr=fr+75
+        a = email.MIMEBase.MIMEBase("application","binary")
+        a.set_payload(f.read())
 
-        return ret
+        email.Encoders.encode_base64(a)
+
+        mp.attach(a)
+
+        return mp.as_string()
 
     def put(self, source_path, remote_filename = None):
         if not remote_filename: remote_filename = source_path.get_filename()
@@ -89,12 +69,17 @@ class ImapBackend(Backend):
         
         if result != "OK": raise Exception(list[0])
         rawbody=list[0][1]
-        #strip subject
-        m = re.compile("^Subject[^\r\n]*[\r\n]*")
-        b64body=m.sub("",rawbody);
         
+        p = email.Parser.Parser()
+
+        m = p.parsestr(rawbody)
+     
+        mp = m.get_payload(0)
+        
+        body = mp.get_payload(decode=True)
+
         tfile = local_path.open("wb")
-        tfile.write(base64.b64decode(b64body))
+        tfile.write(body)
         local_path.setdata()
         log.Log("IMAP mail with '%s' subject fetched"%remote_filename,5)
 
@@ -134,7 +119,7 @@ class ImapBackend(Backend):
         for filename in filename_list:
             list = self._imapf(self._conn.search,None,"(HEADER Subject %s)"%filename)
             list = list[0].split()
-            if list[0]=="":raise Exception("no such mail with subject '%s'"%filename)
+            if len(list)==0 or list[0]=="":raise Exception("no such mail with subject '%s'"%filename)
             self._delete_single_mail(list[0])
             log.Log("marked %s to be deleted"%filename,4)
         self._expunge()
@@ -161,3 +146,5 @@ class Gmail(ImapsBackend):
         num=list[0]
         list=self._imapf(self._conn.store,"1:%s"%num,"+FLAGS","\\DELETED")
         log.Log("expunged %s mails from [Gmail]/Trash"%len(list),5)
+
+
