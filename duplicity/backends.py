@@ -712,16 +712,24 @@ class BotoBackend(Backend):
 			raise BackendException("The AWS_SECRET_ACCESS_KEY environment variable is not set.")
 
 
-		"""
-		This folds the null prefix and all null parts, which means that:
-		  s3+http://MyBucket/ and s3+http://MyBucket are equivalent.
-		  s3+http://MyBucket//My///My/Prefix/ and s3+http://MyBucket/My/Prefix are equivalent.
-		"""
-		self.url_parts = filter(lambda x: x != '', parsed_url.suffix.split('/'))
-		self.bucket_name = self.url_parts.pop(0)
+		# This folds the null prefix and all null parts, which means that:
+		#  s3+http://MyBucket/ and s3+http://MyBucket are equivalent.
+		#  s3+http://MyBucket//My///My/Prefix/ and s3+http://MyBucket/My/Prefix are equivalent.
+
+ 		if parsed_url.protocol == 's3+http':
+			# Assume the Amazon S3 host.
+ 			parsed_url.server = S3Connection.DefaultHost
+			# Notice how we are using the suffix here instead of the path.
+			self.url_parts = filter(lambda x: x != '', parsed_url.suffix.split('/'))
+ 		else:
+			# Handle the argument like a regular URL.
+			self.url_parts = filter(lambda x: x != '', parsed_url.path.split('/'))
+			
+		self.conn = S3Connection(host=parsed_url.server)
 		self.key_class = Key
-		self.conn = S3Connection()
-		self.bucket = self.conn.create_bucket(self.bucket_name)
+
+		self.bucket_name = self.url_parts.pop(0)
+		self.bucket = self.conn.lookup(self.bucket_name)
 
 		if self.url_parts:
 			self.key_prefix = '%s/' % '/'.join(self.url_parts)
@@ -731,6 +739,8 @@ class BotoBackend(Backend):
 			self.straight_url = parsed_url.straight_url().rstrip('/')
 
 	def put(self, source_path, remote_filename=None):
+		if not self.bucket:
+			self.bucket = self.conn.create_bucket(self.bucket_name)
 		if not remote_filename:
 			remote_filename = source_path.get_filename()
 		key = self.key_class(self.bucket)
@@ -765,10 +775,11 @@ class BotoBackend(Backend):
 
 	def list(self):
 		filename_list = []
-		for k in self.bucket.list(prefix = self.key_prefix + 'duplicity-'):
-			filename = k.key.lstrip(self.key_prefix)
-			filename_list.append(filename)
-			log.Log("Listed %s/%s" % (self.straight_url, filename), 9)
+		if self.bucket:
+			for k in self.bucket.list(prefix = self.key_prefix + 'duplicity-'):
+				filename = k.key.lstrip(self.key_prefix)
+				filename_list.append(filename)
+				log.Log("Listed %s/%s" % (self.straight_url, filename), 9)
 		return filename_list
 
 	def delete(self, filename_list):
@@ -959,6 +970,7 @@ protocol_class_dict = {"file": LocalBackend,
 					   "rsync": rsyncBackend,
 					   "scp": sshBackend,
 					   "ssh": sshBackend,
+					   "s3": BotoBackend,
 					   "s3+http": BotoBackend,
 					   "webdav": webdavBackend,
 					   "webdavs": webdavBackend,}

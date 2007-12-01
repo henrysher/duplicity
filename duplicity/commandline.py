@@ -272,7 +272,8 @@ Backends and their URL formats:
 	file:///some_dir
 	rsync://user@host:/module/some_dir
 	rsync://user@host/some_non_module_path
-	s3+http://bucket_name
+	s3://host/bucket_name[/prefix]
+	s3+http://bucket_name[/prefix]
 	webdav://user@other.host/some_dir
 	webdavs://user@other.host/some_dir
 
