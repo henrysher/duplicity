@@ -23,6 +23,8 @@ import log, path, dup_temp, file_naming, atexit
 import base64, getpass, xml.dom.minidom, httplib, urllib
 import socket, globals, re, string
 
+import duplicity.tempdir as tempdir
+
 socket.setdefaulttimeout(globals.timeout)
 
 class BackendException(Exception): pass
@@ -565,8 +567,7 @@ class ftpBackend(Backend):
 		else:
 			self.conn_opt = '-F'
 
- 		self.tempfile, self.tempname = tempfile.mkstemp("", "duplicity.")
- 		atexit.register(os.unlink, self.tempname)
+ 		self.tempfile, self.tempname = tempdir.default().mkstemp()
 		os.write(self.tempfile, "host %s\n" % parsed_url.host)
  		os.write(self.tempfile, "user %s\n" % parsed_url.user)
  		os.write(self.tempfile, "pass %s\n" % self.password)
@@ -671,18 +672,16 @@ class rsyncBackend(Backend):
 		if len (delete_list) > 0:
 			raise BackendException("Files %s not found" % str (delete_list))
 
-		dir = tempfile.mktemp ()
-		exclude_name = tempfile.mktemp ()
-		exclude = open (exclude_name, 'w')
+		dir = tempfile.mkdtemp()
+		exclude, exclude_name = tempdir.default().mkstemp_file()
 		to_delete = [exclude_name]
-		os.mkdir (dir)
 		for file in dont_delete_list:
 			path = os.path.join (dir, file)
 			to_delete.append (path)
 			f = open (path, 'w')
 			print >>f, file
-			f.close ()
-		exclude.close ()
+			f.close()
+		exclude.close()
 		commandline = ("rsync --recursive --delete --exclude-from=%s %s/ %s" %
 					   (exclude_name, dir, self.url_string))
 		self.run_command(commandline)

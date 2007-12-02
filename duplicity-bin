@@ -28,7 +28,7 @@ from __future__ import generators
 import getpass, gzip, os, sys, time, types
 from duplicity import collections, commandline, diffdir, dup_temp, \
 	 dup_time, file_naming, globals, gpg, log, manifest, patchdir, \
-	 path, robust
+	 path, robust, tempdir
 
 # If exit_val is not None, exit with given value at end.
 exit_val = None
@@ -414,8 +414,12 @@ def main():
 			if not sig_chain: full_backup(col_stats)
 			else: incremental_backup(sig_chain)
 	globals.backend.close()
-	dup_temp.cleanup()
 	if exit_val is not None: sys.exit(exit_val)
 
+def with_tempdir(fn):
+	try:
+		fn()
+	finally:
+		tempdir.default().cleanup()
 
-if __name__ == "__main__": main()
+if __name__ == "__main__": with_tempdir(main)

@@ -21,39 +21,19 @@
 import tempfile
 import log, path, file_naming
 
-tempfile_names = []
-
-def register_filename(filename):
-	"""Add filename to tempfile list"""
-	assert not filename in tempfile_names
-	tempfile_names.append(filename)
-
-def unregister_filename(filename):
-	"""Remove filename from tempfile list"""
-	try: index = tempfile_names.index(filename)
-	except ValueError: log.Log("Warning, %s is not a registered tempfile" %
-							   filename)
-	else: del tempfile_names[index]
-
-def cleanup():
-	"""Delete all existing tempfiles"""
-	for filename in tempfile_names:
-		log.Warn("%s still in tempfile list, deleting" % (filename,))
-		p = path.Path(filename)
-		if p.exists(): p.delete()
+import duplicity.tempdir as tempdir
 
 def new_temppath():
 	"""Return a new TempPath"""
-	filename = tempfile.mktemp("","duplicity.")
-	register_filename(filename)
+	filename = tempdir.default().mktemp()
 	return TempPath(filename)
 
 class TempPath(path.Path):
 	"""Path object used as a temporary file"""
 	def delete(self):
-		"""Unregister and delete"""
+		"""Forget and delete"""
 		path.Path.delete(self)
-		unregister_filename(self.name)
+		tempdir.default().forget(self.name)
 
 	def open_with_delete(self, mode):
 		"""Returns a fileobj.  When that is closed, delete file"""
@@ -67,28 +47,31 @@ def get_fileobj_duppath(dirpath, filename):
 	Data will be processed and written to a temporary file.  When the
 	return fileobject is closed, rename to final position.  filename
 	must be a recognizable duplicity data file.
-
 	"""
-	oldtempdir = tempfile.tempdir
-	tempfile.tempdir = dirpath.name
-	tdp = new_tempduppath(file_naming.parse(filename))
-	tempfile.tempdir = oldtempdir
+	td = tempdir.TemporaryDirectory(dirpath.name)
+	tdpname = td.mktemp()
+	tdp = TempDupPath(tdpname, parseresults = file_naming.parse(filename))
+	
 	fh = FileobjHooked(tdp.filtered_open("wb"))
-	fh.addhook(lambda: tdp.rename(dirpath.append(filename)))
+	def rename_and_forget():
+		tdp.rename(dirpath.append(filename))
+		td.forget(tdpname)
+
+	fh.addhook(rename_and_forget)
+
 	return fh
 
 def new_tempduppath(parseresults):
 	"""Return a new TempDupPath, using settings from parseresults"""
-	filename = tempfile.mktemp("","duplicity.")
-	register_filename(filename)
+	filename = tempdir.default().mktemp()
 	return TempDupPath(filename, parseresults = parseresults)
 
 class TempDupPath(path.DupPath):
 	"""Like TempPath, but build around DupPath"""
 	def delete(self):
-		"""Unregister and delete"""
+		"""Forget and delete"""
 		path.DupPath.delete(self)
-		unregister_filename(self.name)
+		tempdir.default().forget(self.name)
 
 	def filtered_open_with_delete(self, mode):
 		"""Returns a filtered fileobj.  When that is closed, delete file"""
