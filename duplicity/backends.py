@@ -423,6 +423,7 @@ class sshBackend(Backend):
 				if match == 2:
 					if cmdloc < len(commands):
 						command = commands[cmdloc]
+						log.Log("sftp command: '%s'" % (command,), 5)
 						child.sendline(command)
 						cmdloc += 1
 					else:
