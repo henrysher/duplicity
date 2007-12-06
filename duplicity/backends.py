@@ -130,9 +130,16 @@ class Backend:
 			os.environ['FTP_PASSWORD'] = password
 		return password
 
+	def munge_password(self, commandline):
+		"""Remove password from commandline"""
+		if self.parsed_url.password:
+			return re.sub(self.parsed_url.password, '<passwd>', commandline)
+		else:
+			return commandline
+
 	def run_command(self, commandline):
 		"""Run given commandline with logging and error detection"""
-		private = straight_url(self.parsed_url)
+		private = self.munge_password(commandline)
 		log.Log("Running '%s'" % private, 5)
 		if os.system(commandline):
 			raise BackendException("Error running '%s'" % private)
@@ -140,7 +147,7 @@ class Backend:
 	def run_command_persist(self, commandline):
 		"""Run given commandline with logging and error detection
 		repeating it several times if it fails"""
-		private = straight_url(self.parsed_url)
+		private = self.munge_password(commandline)
 		for n in range(1, globals.num_retries+1):
 			log.Log("Running '%s' (attempt #%d)" % (private, n), 5)
 			if not os.system(commandline):
@@ -152,7 +159,7 @@ class Backend:
 
 	def popen(self, commandline):
 		"""Run command and return stdout results"""
-		private = straight_url(self.parsed_url)
+		private = self.munge_password(commandline)
 		log.Log("Reading results of '%s'" % private, 5)
 		fout = os.popen(commandline)
 		results = fout.read()
@@ -162,7 +169,7 @@ class Backend:
 
 	def popen_persist(self, commandline):
 		"""Run command and return stdout results, repeating on failure"""
-		private = straight_url(self.parsed_url)
+		private = self.munge_password(commandline)
 		for n in range(1, globals.num_retries+1):
 			log.Log("Reading results of '%s'" % private, 5)
 			fout = os.popen(commandline)
@@ -551,15 +558,15 @@ class ftpBackend(Backend):
 	def put(self, source_path, remote_filename = None):
 		"""Transfer source_path to remote_filename"""
 		remote_path = os.path.join(urllib.unquote(self.parsed_url.path), remote_filename).rstrip()
-		commandline = "ncftpput %s -m -V -C '%s'  '%s'" % \
-			(self.flags, source_path.name, remote_path)
+		commandline = "ncftpput %s -m -V -C '%s' '%s'" % \
+					  (self.flags, source_path.name, remote_path)
 		self.run_command_persist(commandline)
 
 	def get(self, remote_filename, local_path):
 		"""Get remote filename, saving it to local_path"""
 		remote_path = os.path.join(urllib.unquote(self.parsed_url.path), remote_filename).rstrip()
 		commandline = "ncftpget %s -V -C '%s' '%s' '%s'" % \
-			(self.flags, self.parsed_url.hostname, remote_path, local_path.name)
+					  (self.flags, self.parsed_url.hostname, remote_path, local_path.name)
 		self.run_command_persist(commandline)
 		local_path.setdata()
 
@@ -568,7 +575,7 @@ class ftpBackend(Backend):
 		# we create the directory first so we have target dir
 		# try for a long listing to avoid connection reset
 		commandline = "ncftpls %s -l '%s'" % \
-			(self.flags, self.url_string)
+					  (self.flags, self.url_string)
 		l = self.popen_persist(commandline).split('\n')
 		l = filter(lambda x: x, l)
 		if not l:
