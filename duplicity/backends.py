@@ -936,10 +936,6 @@ class hsiBackend(Backend):
 			commandline = '%s "rm %s%s"' % (hsi_command, self.remote_prefix, fn)
 			self.run_command(commandline)
 
-# WARNING - circular import if put first.
-# Need to schedule time to clean this up.
-import imapbackend
-
 # Dictionary relating protocol strings to backend_object classes.
 protocol_class_dict = {"file": LocalBackend,
 					   "ftp": ftpBackend,
@@ -951,7 +947,4 @@ protocol_class_dict = {"file": LocalBackend,
 					   "s3+http": BotoBackend,
 					   "webdav": webdavBackend,
 					   "webdavs": webdavBackend,
-					   "imap": imapbackend.ImapBackend,
-					   "imaps": imapbackend.ImapsBackend,
-					   "imaps-gmail":imapbackend.Gmail,
 					   }
