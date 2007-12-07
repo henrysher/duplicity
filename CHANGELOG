@@ -1,3 +1,36 @@
+New in v0.4.7 (2007/12/07)
+--------------------------
+Applied patch from Eric Hanchrow to fix logging error in
+botoBackend, and fix delete() in rsyncBackend.
+
+bug #21673: remove-all-but-n-full wrong arg usage
+https://savannah.nongnu.org/bugs/index.php?21673
+
+bug #21686: NcFTPGet 3.2.0 tempfile incompatibility
+https://savannah.nongnu.org/bugs/index.php?21686
+
+patch #6292: Amazon S3 bucket creation deferral
+https://savannah.nongnu.org/patch/?6292
+
+patch #6293: left-over patch from remove-all-but-n-full
+https://savannah.nongnu.org/patch/?6293
+
+patch #6296: Generic S3 url support for Duplicity 0.4.6
+https://savannah.nongnu.org/patch/?6296
+
+patch #6298: URI unquoting patch for FTP backend
+https://savannah.nongnu.org/patch/?6298
+
+patch #6299: re-design tempfile handling
+https://savannah.nongnu.org/patch/?6299
+
+patch #6300: Standard library replacement for ParsedUrl class
+https://savannah.nongnu.org/patch/?6300
+
+patch #6301: log sftp commands at verbosity 5
+https://savannah.nongnu.org/patch/?6301
+
+
 New in v0.4.6 (2007/11/28)
 --------------------------
 https://savannah.nongnu.org/bugs/index.php?21508
