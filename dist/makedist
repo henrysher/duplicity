@@ -88,14 +88,31 @@ def MakeTar():
 
 	os.mkdir(tardir+"/src")
 
-	for filename in ["backends.py", "collections.py", "commandline.py",
-					 "diffdir.py", "dup_temp.py", "dup_time.py",
-					 "file_naming.py", "globals.py",
-					 "gpg.py", "__init__.py",
-					 "lazy.py", "librsync.py", "log.py",
-					 "manifest.py", "misc.py", "patchdir.py",
-					 "path.py", "robust.py", "selection.py",
-					 "static.py", "statistics.py", "tarfile.py"]:
+	for filename in ["__init__.py",
+					 "backends.py",
+					 "collections.py",
+					 "commandline.py",
+					 "diffdir.py",
+					 "dup_temp.py",
+					 "dup_time.py",
+					 "file_naming.py",
+					 "globals.py",
+					 "gpg.py",
+					 "lazy.py",
+					 "librsync.py",
+					 "log.py",
+					 "manifest.py",
+					 "misc.py",
+					 "patchdir.py",
+					 "path.py",
+					 "robust.py",
+					 "selection.py",
+					 "static.py",
+					 "statistics.py",
+					 "tarfile.py",
+					 "tempdir.py",
+					 "urlparse_2_5.py"
+					 ]:
 		assert not os.system("cp %s/%s %s/src" %
 							 (SourceDir, filename, tardir)), filename
 
