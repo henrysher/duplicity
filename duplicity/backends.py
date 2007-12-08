@@ -603,14 +603,18 @@ class rsyncBackend(Backend):
 	def __init__(self, parsed_url):
 		"""rsyncBackend initializer"""
 		Backend.__init__(self, parsed_url)
-		self.url_string = "%s:%s" % (parsed_url.hostname, parsed_url.path)
+		if parsed_url.password:
+			user, host = parsed_url.netloc.split('@')
+			user, pwd = user.split(':')
+			mynetloc = '%s@%s' % (user, host)
+		self.url_string = "%s%s" % (mynetloc, parsed_url.path.lstrip('/'))
 		if self.url_string[-1] != '/':
 			self.url_string += '/'
 
 	def put(self, source_path, remote_filename = None):
 		"""Use rsync to copy source_dir/filename to remote computer"""
 		if not remote_filename: remote_filename = source_path.get_filename()
-		remote_path = os.path.join (self.url_string, remote_filename)
+		remote_path = os.path.join(self.url_string, remote_filename)
 		commandline = "rsync %s %s" % (source_path.name, remote_path)
 		self.run_command(commandline)
 
@@ -679,9 +683,10 @@ class BotoBackend(Backend):
 		try:
 			from boto.s3.connection import S3Connection
 			from boto.s3.key import Key
+			assert hasattr(S3Connection, 'lookup')
 		except ImportError:
-			raise BackendException("This backend requires the boto library, "
-								   "(http://code.google.com/p/boto/).")
+			log.FatalError("This backend requires boto library, version 0.9d or later, "
+						   "(http://code.google.com/p/boto/).")
 
 		if not os.environ.has_key('AWS_ACCESS_KEY_ID'):
 			raise BackendException("The AWS_ACCESS_KEY_ID environment variable is not set.")
