@@ -228,6 +228,7 @@ def parse_cmdline_options(arglist):
 			if arg == '-':
 				command_line_error("Dash ('-') not valid for time-separator.")
 			globals.time_separator = arg
+			dup_time.curtimestr = dup_time.timetostring(dup_time.curtime)
 		elif opt == "-V" or opt == "--version":
 			print "duplicity", str(globals.version)
 			sys.exit(0)
