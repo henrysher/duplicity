@@ -603,10 +603,10 @@ class rsyncBackend(Backend):
 	def __init__(self, parsed_url):
 		"""rsyncBackend initializer"""
 		Backend.__init__(self, parsed_url)
+		user, host = parsed_url.netloc.split('@')
 		if parsed_url.password:
-			user, host = parsed_url.netloc.split('@')
-			user, pwd = user.split(':')
-			mynetloc = '%s@%s' % (user, host)
+			user = user.split(':')[0]
+		mynetloc = '%s@%s' % (user, host)
 		self.url_string = "%s%s" % (mynetloc, parsed_url.path.lstrip('/'))
 		if self.url_string[-1] != '/':
 			self.url_string += '/'
