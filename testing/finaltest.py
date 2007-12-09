@@ -1,11 +1,11 @@
 import sys, os, unittest
-sys.path.insert(0, "../duplicity")
-import path, backends, collections
+sys.path.insert(0, "../")
+from duplicity import path, backends, collections
 
 # This can be changed to select the URL to use
 backend_url = "file://testfiles/output"
-#backend_url = "ftp://Stan Ford@90-92L-imac.stanford.edu/Macintosh HD/temp"
-#backend_url = "scp://localhost//home/ben/prog/python/duplicity/testing/testfiles/output"
+#backend_url = "ftp://ken@xyzzyx/testdup"
+#backend_url = "ssh://ken@xyzzyx/testdup"
 
 # Extra arguments to be passed to duplicity
 other_args = []
@@ -39,7 +39,7 @@ class FinalTest(unittest.TestCase):
 	def backup(self, type, input_dir, options = [], current_time = None):
 		"""Run duplicity backup to default directory"""
 		options = options[:]
-		if type == "full": options.append('--full')
+		if type == "full": options.insert(0, 'full')
 		args = [input_dir, "'%s'" % backend_url]
 		self.run_duplicity(args, options, current_time)
 
@@ -55,8 +55,8 @@ class FinalTest(unittest.TestCase):
 
 	def verify(self, dirname, file_to_verify = None, time = None, options = [],
 			   current_time = None):
-		options = options[:]
-		args = ["--verify", "'%s'" % backend_url, dirname]
+		options = ["verify"] + options[:]
+		args = ["'%s'" % backend_url, dirname]
 		if file_to_verify:
 			options.extend(['--file-to-restore', file_to_verify])
 		if time: options.extend(['--restore-time', str(time)])
@@ -103,10 +103,9 @@ class FinalTest(unittest.TestCase):
 
 	def test_basic_cycle(self, backup_options = [], restore_options = []):
 		"""Run backup/restore test on basic directories"""
-		self.runtest(["testfiles/dir1", "testfiles/dir2",
+		self.runtest(["testfiles/dir1",
+					  "testfiles/dir2",
 					  "testfiles/dir3"],
-					  #"testfiles/various_file_types/regular_file",
-					  #"testfiles/empty_dir"],
 					 backup_options = backup_options,
 					 restore_options = restore_options)
 
@@ -125,8 +124,8 @@ class FinalTest(unittest.TestCase):
 
 	def test_asym_cycle(self):
 		"""Like test_basic_cycle but use asymmetric encryption and signing"""
-		backup_options = ["--encrypt-key AA0E73D2", "--sign-key AA0E73D2"]
-		restore_options = ['--sign-key AA0E73D2']
+		backup_options = ["--encrypt-key 8E4E85A1", "--sign-key 8E4E85A1"]
+		restore_options = ["--encrypt-key 8E4E85A1", "--sign-key 8E4E85A1"]
 		self.test_basic_cycle(backup_options = backup_options,
 							  restore_options = restore_options)
 
@@ -195,7 +194,7 @@ class FinalTest(unittest.TestCase):
 		assert len(cs.all_backup_chains) == 2, cs.all_backup_chains
 		assert cs.matched_chain_pair
 
-		self.run_duplicity(["--remove-older-than 35000 --force", backend_url])
+		self.run_duplicity(["--force", backend_url], options=["remove-older-than 35000"])
 		cs2 = collections.CollectionsStatus(b).set_values()
 		assert len(cs2.all_backup_chains) == 1, cs.all_backup_chains
 		assert cs2.matched_chain_pair
@@ -204,7 +203,7 @@ class FinalTest(unittest.TestCase):
 		assert chain.end_time == 40000, chain.end_time
 
 		# Now check to make sure we can't delete only chain
-		self.run_duplicity(["--remove-older-than 50000 --force", backend_url])
+		self.run_duplicity(["--force", backend_url], options=["remove-older-than 50000"])
 		cs3 = collections.CollectionsStatus(b).set_values()
 		assert len(cs3.all_backup_chains) == 1
 		assert cs3.matched_chain_pair
@@ -213,4 +212,5 @@ class FinalTest(unittest.TestCase):
 		assert chain.end_time == 40000, chain.end_time
 
 
-if __name__ == "__main__": unittest.main()
+if __name__ == "__main__":
+	unittest.main()

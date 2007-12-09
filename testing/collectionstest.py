@@ -1,6 +1,6 @@
 import sys, random, unittest
-sys.path.insert(0, "../duplicity")
-import collections, backends, path, gpg, globals, dup_time
+sys.path.insert(0, "../")
+from duplicity import collections, backends, path, gpg, globals, dup_time
 
 filename_list1 = ["duplicity-full.2002-08-17T16:17:01-07:00.manifest.gpg",
 				  "duplicity-full.2002-08-17T16:17:01-07:00.vol1.difftar.gpg",
