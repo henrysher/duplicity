@@ -1,0 +1,56 @@
+import sys, os
+sys.path.insert(0, "../")
+from duplicity import globals, log
+
+# config for duplicity unit tests
+
+# to test GPG and friends
+# these must be without passwords
+encrypt_key1 = "8C8E60A4"
+encrypt_key2 = "B4FD6A06"
+
+# password required on this one
+sign_key = "522C2581"
+sign_passphrase = "xxxxxxxx"
+
+# URLs for testing
+file_url = "file:///home/ken/testdup"
+file_password = ""
+
+ftp_url = "ftp://ken@xyzzyx/testdup"
+ftp_password = ""
+
+rsync_url = "rsync://ken@xyzzyx:/testdup"
+rsync_password = ""
+
+ssh_url = "ssh://ken@xyzzyx/testdup"
+ssh_password = ""
+
+
+def setup():
+	""" setup for unit tests """
+	log.setverbosity(0)
+	globals.print_statistics = 0
+
+	globals.num_retries = 1
+
+
+def set_password(password):
+	if password:
+		os.environ["FTP_PASSWORD"] = password
+	else:
+		try:
+			del os.environ["FTP_PASSWORD"]
+		except:
+			pass
+
+
+def set_passphrase(passphrase):
+	if passphrase:
+		os.environ["PASSPHRASE"] = passphrase
+	else:
+		try:
+			del os.environ["PASSPHRASE"]
+		except:
+			pass
+
