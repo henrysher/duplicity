@@ -1,8 +1,9 @@
-import sys
+import config
+import sys, os, unittest, gzip
 sys.path.insert(0, "../")
-import os, unittest, gzip
-
 from duplicity import tempdir
+
+config.setup()
 
 class TempDirTest(unittest.TestCase):
 	def test_all(self):

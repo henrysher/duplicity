@@ -1,10 +1,10 @@
-import sys
-sys.path.insert(0, "../duplicity")
-import os, unittest
-import diffdir, patchdir
-from path import *
+import config
+import sys, os, unittest
+sys.path.insert(0, "../")
+from duplicity import diffdir, patchdir
+from duplicity.path import *
 
-log.setverbosity(7)
+config.setup()
 
 class RootTest(unittest.TestCase):
 	"""Test doing operations that only root can"""
@@ -52,4 +52,5 @@ class RootTest(unittest.TestCase):
 
 def runtests(): unittest.main()
 
-if __name__ == "__main__": unittest.main()
+if __name__ == "__main__":
+	unittest.main()

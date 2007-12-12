@@ -1,11 +1,13 @@
 # unittest for the tarfile module
 #
-# $Id: test_tarfile.py,v 1.3 2003/08/08 19:13:36 bescoto Exp $
+# $Id: test_tarfile.py,v 1.4 2007/12/12 17:00:30 loafman Exp $
 
-from __future__ import generators
+import config
 import sys, os, shutil, StringIO, tempfile, unittest, stat, pwd, grp
-sys.path.insert(0, "../duplicity")
-import tarfile
+sys.path.insert(0, "../")
+from duplicity import tarfile
+
+config.setup()
 
 SAMPLETAR = "testtar.tar"
 TEMPDIR   = tempfile.mktemp()
@@ -32,9 +34,11 @@ class BaseTest(unittest.TestCase):
 class Test_All(BaseTest):
     """Allround test.
     """
-    files_in_tempdir = ["tempdir", "tempdir/0length",
+    files_in_tempdir = ["tempdir",
+						"tempdir/0length",
                         "tempdir/large",
-                        "tempdir/hardlinked1", "tempdir/hardlinked2",
+                        "tempdir/hardlinked1",
+						"tempdir/hardlinked2",
                         "tempdir/fifo",
                         "tempdir/symlink"]
 
@@ -115,8 +119,10 @@ class Test_All(BaseTest):
 
     def make_tempdir(self):
         """Make a temp directory with assorted files in it"""
-        try: os.lstat("tempdir")
-        except OSError: pass
+        try:
+			os.lstat("tempdir")
+        except OSError:
+			pass
         else: # assume already exists
             assert not os.system("rm -r tempdir")
         os.mkdir("tempdir")
@@ -146,9 +152,12 @@ class Test_All(BaseTest):
 
     def make_temptar(self):
         """Tar up tempdir, write to "temp2.tar" """
-        try: os.lstat("temp2.tar")
-        except OSError: pass
-        else: assert not os.system("rm temp2.tar")
+        try:
+			os.lstat("temp2.tar")
+        except OSError:
+			pass
+        else:
+			assert not os.system("rm temp2.tar")
 
         self.make_tempdir()
         tf = tarfile.TarFile("temp2.tar", "w")
@@ -158,9 +167,12 @@ class Test_All(BaseTest):
 
     def make_temptar_iterator(self):
         """Tar up tempdir using an iterator"""
-        try: os.lstat("temp2.tar")
-        except OSError: pass
-        else: assert not os.system("rm temp2.tar")
+        try:
+			os.lstat("temp2.tar")
+        except OSError:
+			pass
+        else:
+			assert not os.system("rm temp2.tar")
 
         self.make_tempdir()
         def generate_pairs(tfi_list):
@@ -177,7 +189,8 @@ class Test_All(BaseTest):
                 elif filename == "tempdir/symlink":
                     ti.linkname = os.readlink(filename)
                     yield (ti, None)
-                else: yield (ti, open(filename, "rb"))
+                else:
+					yield (ti, open(filename, "rb"))
         tfi_list = [None]
         tfi = tarfile.TarFromIterator(generate_pairs(tfi_list))
         tfi_list[0] = tfi # now generate_pairs can find tfi
@@ -314,13 +327,13 @@ class FileLogger:
     def __init__(self, infp):
         self.infp = infp
     def read(self, length):
-        print "Reading ", length
+        #print "Reading ", length
         return self.infp.read(length)
     def seek(self, position):
-        print "Seeking to ", position
+        #print "Seeking to ", position
         return self.infp.seek(position)
     def close(self):
-        print "Closing"
+        #print "Closing"
         return self.infp.close()
 
 
@@ -366,5 +379,4 @@ class PasswordTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # Run all tests
     unittest.main()

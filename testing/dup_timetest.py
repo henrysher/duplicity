@@ -1,7 +1,9 @@
-import sys
-sys.path.insert(0, "../duplicity")
-import unittest, time, types
-import globals, dup_time
+import config
+import sys, unittest, time, types
+sys.path.insert(0, "../")
+from duplicity import globals, dup_time
+
+config.setup()
 
 class TimeTest(unittest.TestCase):
 	def testConversion(self):
@@ -134,4 +136,5 @@ class TimeTest(unittest.TestCase):
 		assert 0.2 < time7 - time6 < 0.3, time7 - time6
 
 
-if __name__ == '__main__': unittest.main()
+if __name__ == '__main__':
+	unittest.main()

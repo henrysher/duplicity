@@ -1,6 +1,9 @@
+import config
 import sys, unittest, types
-sys.path.insert(0, "../duplicity")
-import manifest, globals, path
+sys.path.insert(0, "../")
+from duplicity import manifest, globals, path
+
+config.setup()
 
 class VolumeInfoTest(unittest.TestCase):
 	"""Test VolumeInfo"""
@@ -69,4 +72,5 @@ class ManifestTest(unittest.TestCase):
 		assert m == m2
 
 
-if __name__ == "__main__": unittest.main()
+if __name__ == "__main__":
+	unittest.main()

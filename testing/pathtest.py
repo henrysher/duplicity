@@ -1,9 +1,10 @@
-import sys
-sys.path.insert(0, "../duplicity")
-import os, unittest, log
-from path import *
+import config
+import sys, os, unittest
+sys.path.insert(0, "../")
+from duplicity import log
+from duplicity.path import *
 
-#log.setverbosity(4)
+config.setup()
 
 class PathTest(unittest.TestCase):
 	"""Test basic path functions"""
@@ -18,11 +19,10 @@ class PathTest(unittest.TestCase):
 
 	def test_compare(self):
 		"""Test directory comparisons"""
+		assert not os.system("rm -rf testfiles/output")
 		assert not os.system("cp -a testfiles/dir1 testfiles/output")
-		assert Path("testfiles/dir1").compare_recursive(
-			Path("testfiles/output"), 1)
-		assert not Path("testfiles/dir1").compare_recursive(
-			Path("testfiles/dir2"), 1)
+		assert Path("testfiles/dir1").compare_recursive(Path("testfiles/output"), 1)
+		assert not Path("testfiles/dir1").compare_recursive(Path("testfiles/dir2"), 1)
 
 	def test_quote(self):
 		"""Test path quoting"""
@@ -64,4 +64,5 @@ class PathTest(unittest.TestCase):
 		assert file2.compare_verbose(file2)
 		
 
-if __name__ == "__main__": unittest.main()
+if __name__ == "__main__":
+	unittest.main()

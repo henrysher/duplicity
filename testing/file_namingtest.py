@@ -1,9 +1,9 @@
-import sys
-sys.path.insert(0, "../duplicity")
-import unittest
-import dup_time, file_naming, log, globals
+import config
+import sys, unittest
+sys.path.insert(0, "../")
+from duplicity import dup_time, file_naming, log, globals
 
-log.setverbosity(5)
+config.setup()
 
 class Test36(unittest.TestCase):
 	def test_base36(self):
@@ -79,4 +79,5 @@ class FileNamingShort(unittest.TestCase, FileNamingBase):
 	def setUp(self): globals.short_filenames = 1
 
 
-if __name__ == "__main__": unittest.main()
+if __name__ == "__main__":
+	unittest.main()

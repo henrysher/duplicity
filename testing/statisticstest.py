@@ -1,8 +1,10 @@
-import sys
-sys.path.insert(0, "../duplicity")
-import unittest
-from statistics import *
-import path
+import config
+import sys, unittest
+sys.path.insert(0, "../")
+from duplicity.statistics import *
+from duplicity import path
+
+config.setup()
 
 class StatsObjTest(unittest.TestCase):
 	"""Test StatsObj class"""
@@ -140,4 +142,5 @@ TotalDestinationSizeChange 12 (12 bytes)
 		assert s3.SourceFiles == 75
 
 
-if __name__ == "__main__": unittest.main()
+if __name__ == "__main__":
+	unittest.main()

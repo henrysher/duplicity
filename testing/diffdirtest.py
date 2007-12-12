@@ -1,11 +1,10 @@
-from __future__ import generators
-import sys
-sys.path.insert(0, "../duplicity")
-import os, unittest
-from path import *
-import diffdir, selection, tarfile, log
+import config
+import sys, os, unittest
+sys.path.insert(0, "../")
+from duplicity.path import *
+from duplicity import diffdir, selection, tarfile, log
 
-log.setverbosity(7)
+config.setup()
 
 class DDTest(unittest.TestCase):
 	"""Test functions in diffdir.py"""
@@ -157,7 +156,7 @@ class DDTest(unittest.TestCase):
 
 		sigstack = [cur_full_sigs]
 		for dirname in ['dir2', 'dir3', 'dir4']:
-			print "Processing ", dirname
+			#print "Processing ", dirname
 			old_dir = cur_dir
 			cur_dir = Path("testfiles/" + dirname)
 
@@ -180,7 +179,7 @@ class DDTest(unittest.TestCase):
 			sigstack.append(incsig)
 			diffdir.write_block_iter(block_iter, delta2)
 
-			print delta1.name, delta2.name
+			#print delta1.name, delta2.name
 			compare_tar(delta1.open("rb"), delta2.open("rb"))
 			assert not os.system("cmp %s %s" % (delta1.name, delta2.name))
 
@@ -283,4 +282,5 @@ def tarinfo_eq(ti1, ti2):
 		return 0
 	return 1
 
-if __name__ == "__main__": unittest.main()
+if __name__ == "__main__":
+	unittest.main()

@@ -1,6 +1,9 @@
+import config
 import sys, unittest, os
-sys.path.insert(0, "../duplicity")
-import path
+sys.path.insert(0, "../")
+from duplicity import path
+
+config.setup()
 
 class RdiffdirTest(unittest.TestCase):
 	"""Test rdiffdir command line program"""
@@ -64,4 +67,5 @@ class RdiffdirTest(unittest.TestCase):
 						'testfiles/empty_dir'])
 
 
-if __name__ == "__main__": unittest.main()
+if __name__ == "__main__":
+	unittest.main()

@@ -1,5 +1,7 @@
+import config
 import sys, os, time
-sys.path.insert(0, "../duplicity")
+
+config.setup()
 
 import GnuPGInterface, thread
 

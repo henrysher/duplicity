@@ -1,7 +1,9 @@
-import sys
-sys.path.insert(0, "../duplicity")
-import os, unittest, gzip
-import dup_temp, file_naming
+import config
+import sys, os, unittest, gzip
+sys.path.insert(0, "../")
+from duplicity import dup_temp, file_naming
+
+config.setup()
 
 prefix = "testfiles/output"
 
@@ -9,8 +11,8 @@ class TempTest(unittest.TestCase):
 	"""Test various temp files methods"""
 	def del_tmp(self):
 		"""Delete testfiles/output and recreate"""
-		assert not os.system("rm -rf testfiles/output")
-		assert not os.system("mkdir testfiles/output")
+		assert not os.system("rm -rf " + prefix)
+		assert not os.system("mkdir " + prefix)
 
 	def test_temppath(self):
 		"""Allocate new temppath, try open_with_delete"""
@@ -22,8 +24,6 @@ class TempTest(unittest.TestCase):
 		tp.setdata()
 		assert tp.isreg()
 
-		assert tp.name in dup_temp.tempfile_names
-		
 		fin = tp.open_with_delete("rb")
 		buf = fin.read()
 		assert buf == "hello, there", buf
@@ -45,8 +45,6 @@ class TempTest(unittest.TestCase):
 		tdp.setdata()
 		assert tdp.isreg()
 
-		assert tdp.name in dup_temp.tempfile_names
-
 		fin1 = gzip.GzipFile(tdp.name, "rb")
 		buf = fin1.read()
 		assert buf == "hello, there", buf
@@ -59,5 +57,5 @@ class TempTest(unittest.TestCase):
 		assert not tdp.exists()
 
 
-if __name__ == "__main__": unittest.main()
-
+if __name__ == "__main__":
+	unittest.main()

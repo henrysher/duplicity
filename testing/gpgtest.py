@@ -1,8 +1,9 @@
-from __future__ import generators
-import sys
-sys.path.insert(0, "../duplicity")
-import os, unittest, cStringIO, random
-import gpg, path
+import config
+import sys, os, unittest, cStringIO, random
+sys.path.insert(0, "../")
+from duplicity import gpg, path
+
+config.setup()
 
 default_profile = gpg.GPGProfile(passphrase = "foobar")
 
@@ -17,7 +18,8 @@ class GPGTest(unittest.TestCase):
 		"""Test encryption/decryption cycle on string s"""
 		self.deltmp()
 		epath = path.Path("testfiles/output/encrypted_file")
-		if not profile: profile = default_profile
+		if not profile:
+			profile = default_profile
 		encrypted_file = gpg.GPGFile(1, epath, profile)
 		encrypted_file.write(s)
 		encrypted_file.close()
@@ -48,24 +50,23 @@ class GPGTest(unittest.TestCase):
 
 	def test_gpg_asym(self):
 		"""Test GPG asymmetric encryption"""
-		profile = gpg.GPGProfile(passphrase = "foobar",
-								 recipients = ["mpf@stanford.edu",
-											   "duplicity_test@foo.edu"])
+		profile = gpg.GPGProfile(passphrase = config.sign_passphrase,
+								 recipients = [config.encrypt_key1,
+											   config.encrypt_key2])
 		self.gpg_cycle("aoensutha aonetuh saoe", profile)
 
-		profile2 = gpg.GPGProfile(passphrase = "foobar",
-								  recipients = ["duplicity_test@foo.edu"])
+		profile2 = gpg.GPGProfile(passphrase = config.sign_passphrase,
+								  recipients = [config.encrypt_key1])
 		self.gpg_cycle("aoeu" * 10000, profile2)
 
 	def test_gpg_signing(self):
 		"""Test to make sure GPG reports the proper signature key"""
 		self.deltmp()
 		plaintext = "hello" * 50000
-		duplicity_keyid = "AA0E73D2"
 
-		signing_profile = gpg.GPGProfile(passphrase = "foobar",
-										 sign_key = duplicity_keyid,
-										 recipients = [duplicity_keyid])
+		signing_profile = gpg.GPGProfile(passphrase = config.sign_passphrase,
+										 sign_key = config.sign_key,
+										 recipients = [config.encrypt_key1])
 
 		epath = path.Path("testfiles/output/encrypted_file")
 		encrypted_signed_file = gpg.GPGFile(1, epath, signing_profile)
@@ -76,7 +77,7 @@ class GPGTest(unittest.TestCase):
 		assert decrypted_file.read() == plaintext
 		decrypted_file.close()
 		sig = decrypted_file.get_signature()
-		assert sig == duplicity_keyid, sig
+		assert sig == config.sign_key, sig
 
 	def test_GPGWriteFile(self):
 		"""Test GPGWriteFile"""
@@ -146,4 +147,5 @@ class SHATest(unittest.TestCase):
 		assert hash == "886d722999862724e1e62d0ac51c468ee336ef8e", hash
 
 
-if __name__ == "__main__": unittest.main()
+if __name__ == "__main__":
+	unittest.main()

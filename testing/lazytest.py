@@ -1,7 +1,9 @@
-from __future__ import generators
+import config
 import unittest, pickle, sys
-sys.path.insert(0, "../duplicity")
-from lazy import *
+sys.path.insert(0, "../")
+from duplicity.lazy import *
+
+config.setup()
 
 class Iterators(unittest.TestCase):
 	one_to_100 = lambda s: iter(range(1, 101))
@@ -311,4 +313,5 @@ class TreeReducerTest(unittest.TestCase):
 		assert itm2c.root_branch.total == 12, itm2c.root_branch.total
 
 
-if __name__ == "__main__": unittest.main()
+if __name__ == "__main__":
+	unittest.main()

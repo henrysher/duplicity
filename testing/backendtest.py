@@ -1,11 +1,30 @@
+import config
 import sys, unittest, os
-sys.path.insert(0, "../duplicity")
-import backends, path, log, file_naming, dup_time, globals, gpg
+sys.path.insert(0, "../")
+from duplicity import backends, path, log, file_naming, dup_time, globals, gpg
 
-log.setverbosity(7)
+config.setup()
 
 class UnivTest:
 	"""Contains methods that help test any backend"""
+	def del_tmp(self):
+		"""Remove all files from test directory"""
+		config.set_password(self.password)
+		backend = backends.get_backend(self.url_string)
+		backend.delete(backend.list())
+		backend.close()
+
+	def test_basic(self):
+		"""Test basic backend operations"""
+		config.set_password(self.password)
+		self.del_tmp()
+		self.try_basic(backends.get_backend(self.url_string))
+
+	def test_fileobj_ops(self):
+		"""Test fileobj operations"""
+		config.set_password(self.password)
+		self.try_fileobj_ops(backends.get_backend(self.url_string))
+
 	def try_basic(self, backend):
 		"""Try basic operations with given backend.
 
@@ -82,97 +101,58 @@ class UnivTest:
 		assert not os.system("rm -rf testfiles/output")
 		assert not os.system("mkdir testfiles/output")
 
+
 class ParsedUrlTest(unittest.TestCase):
 	"""Test the ParsedUrl class"""
 	def test_basic(self):
 		"""Test various url strings"""
 		pu = backends.ParsedUrl("scp://ben@foo.bar:1234/a/b")
-		assert pu.protocol == "scp", pu.protocol
-		assert pu.suffix == "ben@foo.bar:1234/a/b"
-		assert pu.user == "ben", pu.user
+		assert pu.scheme == "scp", pu.scheme
+		assert pu.netloc == "ben@foo.bar:1234", pu.netloc
+		assert pu.path =="/a/b", pu.path
+		assert pu.username == "ben", pu.username
 		assert pu.port == 1234, pu.port
-		assert pu.host == "foo.bar", pu.host
+		assert pu.hostname == "foo.bar", pu.hostname
 
 		pu = backends.ParsedUrl("ftp://foo.bar:1234/")
-		assert pu.protocol == "ftp", pu.protocol
-		assert pu.suffix == "foo.bar:1234/"
-		assert pu.user is None, pu.user
+		assert pu.scheme == "ftp", pu.scheme
+		assert pu.netloc == "foo.bar:1234", pu.netloc
+		assert pu.path == "/", pu.path
+		assert pu.username is None, pu.username
 		assert pu.port == 1234, pu.port
-		assert pu.host == "foo.bar", pu.host
+		assert pu.hostname == "foo.bar", pu.hostname
 
 		pu = backends.ParsedUrl("file:///home")
-		assert pu.protocol == "file", pu.protocol
-		assert pu.suffix == "/home"
-		assert pu.user is None, pu.user
+		assert pu.scheme == "file", pu.scheme
+		assert pu.netloc == "", pu.netloc
+		assert pu.path == "///home", pu.path
+		assert pu.username is None, pu.username
 		assert pu.port is None, pu.port
 
 
 class LocalTest(unittest.TestCase, UnivTest):
 	"""Test the Local backend"""
-	parsed_url = backends.ParsedUrl("file://testfiles/output")
+	url_string = config.file_url
+	password = config.file_password
 
-	def test_basic(self):
-		"""Test basic backend operations"""
-		self.del_tmp()
-		self.try_basic(backends.LocalBackend(self.parsed_url))
-
-	def test_fileobj_ops(self):
-		"""Test fileobj operations"""
-		self.try_fileobj_ops(backends.LocalBackend(self.parsed_url))
 
 class scpTest(unittest.TestCase, UnivTest):
 	"""Test the SSH backend by logging into local host"""
-	# Change this for your own host
-	url_string = "ssh://localhost//home/ben/prog/" \
-				 "duplicity/testing/testfiles/output"
+	url_string = config.ssh_url
+	password = config.ssh_password
 
-	def test_basic(self):
-		self.del_tmp()
-		self.try_basic(backends.get_backend(self.url_string))
-		
-	def test_fileobj_ops(self):
-		self.try_fileobj_ops(backends.get_backend(self.url_string))
 
 class ftpTest(unittest.TestCase, UnivTest):
 	"""Test the ftp backend"""
-	# This constant should be changed for your own computer
-	url_string = "ftp://Stan Ford@90-92L-imac.stanford.edu/Macintosh HD/temp"
-	parsed_url = backends.ParsedUrl(url_string)
-	globals.short_filenames = 1
-	globals.time_separator = '_'
-
-	def del_tmp(self):
-		"""Remove all files from test directory"""
-		backend = backends.ftpBackend(self.parsed_url)
-		backend.delete(backend.list())
-		backend.close()
-
-	def test_basic(self):
-		self.del_tmp()
-		self.try_basic(backends.get_backend(self.url_string))		
-
-	def test_fileobj_ops(self):
-		self.try_fileobj_ops(backends.get_backend(self.url_string))
+	url_string = config.ftp_url
+	password = config.ftp_password
 
 
 class rsyncTest(unittest.TestCase, UnivTest):
 	"""Test the rsync backend"""
-	# This constant should be changed for your own computer
-	# Call rsync --server --config=rsyncd.conf . with the following
-	# rsyncd.conf and create /tmp/test
-	# [test]
-        #     path = /tmp/test/
-        #     read only = false
-	#     uid = "your loginname"
+	url_string = config.rsync_url
+	password = config.rsync_password
 
-	url_string = "rsync://localhost/test"
 
-	def test_basic(self):
-		self.del_tmp()
-		self.try_basic(backends.get_backend(self.url_string))
-		
-	def test_fileobj_ops(self):
-		self.try_fileobj_ops(backends.get_backend(self.url_string))
-
-if __name__ == "__main__": unittest.main()
-
+if __name__ == "__main__":
+	unittest.main()

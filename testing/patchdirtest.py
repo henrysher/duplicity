@@ -1,12 +1,10 @@
-from __future__ import generators
-import sys, cStringIO
-sys.path.insert(0, "../duplicity")
-import os, unittest
-import diffdir, patchdir, log, selection, tarfile, librsync
-from path import *
+import config
+import sys, cStringIO, os, unittest
+sys.path.insert(0, "../")
+from duplicity import diffdir, patchdir, log, selection, tarfile, librsync
+from duplicity.path import *
 
-log.setverbosity(3)
-		
+config.setup()
 
 class PatchingTest(unittest.TestCase):
 	"""Test patching"""
@@ -299,4 +297,5 @@ class TestInnerFuncs(unittest.TestCase):
 				"3499 34957839485792357 458348573")
 
 
-if __name__ == "__main__": unittest.main()
+if __name__ == "__main__":
+	unittest.main()

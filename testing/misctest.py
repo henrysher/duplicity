@@ -1,10 +1,9 @@
-from __future__ import generators
-import sys
-sys.path.insert(0, "../duplicity")
-import unittest, cStringIO
-import misc, log, os
+import config
+import sys, os, unittest, cStringIO
+sys.path.insert(0, "../")
+from duplicity import misc, log
 
-log.setverbosity(3)
+config.setup()
 
 class MiscTest(unittest.TestCase):
 	"""Test functions/classes in misc.py"""
@@ -61,4 +60,5 @@ class MiscTest(unittest.TestCase):
 
 
 
-if __name__ == "__main__": unittest.main()
+if __name__ == "__main__":
+	unittest.main()

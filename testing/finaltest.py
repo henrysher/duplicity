@@ -1,14 +1,15 @@
+import config
 import sys, os, unittest
 sys.path.insert(0, "../")
 from duplicity import path, backends, collections
 
+config.setup()
+
 # This can be changed to select the URL to use
 backend_url = "file://testfiles/output"
-#backend_url = "ftp://ken@xyzzyx/testdup"
-#backend_url = "ssh://ken@xyzzyx/testdup"
 
 # Extra arguments to be passed to duplicity
-other_args = []
+other_args = ["-v0", "--no-print-statistics"]
 #other_args = ["--short-filenames"]
 #other_args = ["--ssh-command 'ssh -v'", "--scp-command 'scp -C'"]
 #other_args = ['--no-encryption']
@@ -25,12 +26,12 @@ class FinalTest(unittest.TestCase):
 	def run_duplicity(self, arglist, options = [], current_time = None):
 		"""Run duplicity binary with given arguments and options"""
 		cmd_list = ["../duplicity-bin"]
-		cmd_list.extend(options + ["-v3", "--allow-source-mismatch"])
+		cmd_list.extend(options + ["--allow-source-mismatch"])
 		if current_time: cmd_list.append("--current-time %s" % (current_time,))
 		if other_args: cmd_list.extend(other_args)
 		cmd_list.extend(arglist)
 		cmdline = " ".join(cmd_list)
-		print "Running '%s'." % cmdline
+		#print "Running '%s'." % cmdline
 		if not os.environ.has_key('PASSPHRASE'):
 			os.environ['PASSPHRASE'] = 'foobar'
 		return_val = os.system(cmdline)
@@ -124,8 +125,11 @@ class FinalTest(unittest.TestCase):
 
 	def test_asym_cycle(self):
 		"""Like test_basic_cycle but use asymmetric encryption and signing"""
-		backup_options = ["--encrypt-key 8E4E85A1", "--sign-key 8E4E85A1"]
-		restore_options = ["--encrypt-key 8E4E85A1", "--sign-key 8E4E85A1"]
+		backup_options = ["--encrypt-key " + config.encrypt_key1,
+						  "--sign-key " + config.sign_key]
+		restore_options = ["--encrypt-key " + config.encrypt_key1,
+						   "--sign-key " + config.sign_key]
+		config.set_passphrase(config.sign_passphrase)
 		self.test_basic_cycle(backup_options = backup_options,
 							  restore_options = restore_options)
 
@@ -180,14 +184,10 @@ class FinalTest(unittest.TestCase):
 	def test_remove_older_than(self):
 		"""Test removing old backup chains"""
 		self.deltmp()
-		self.backup("full", "testfiles/dir1", current_time = 10000,
-					options = ["--no-print-statistics"])
-		self.backup("inc", "testfiles/dir2", current_time = 20000,
-					options = ["--no-print-statistics"])
-		self.backup("full", "testfiles/dir1", current_time = 30000,
-					options = ["--no-print-statistics"])
-		self.backup("inc", "testfiles/dir3", current_time = 40000,
-					options = ["--no-print-statistics"])
+		self.backup("full", "testfiles/dir1", current_time = 10000)
+		self.backup("inc", "testfiles/dir2", current_time = 20000)
+		self.backup("full", "testfiles/dir1", current_time = 30000)
+		self.backup("inc", "testfiles/dir3", current_time = 40000)
 
 		b = backends.get_backend(backend_url)
 		cs = collections.CollectionsStatus(b).set_values()

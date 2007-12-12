@@ -1,6 +1,9 @@
-import sys, random, unittest
+import config
+import os, sys, random, unittest
 sys.path.insert(0, "../")
 from duplicity import collections, backends, path, gpg, globals, dup_time
+
+config.setup()
 
 filename_list1 = ["duplicity-full.2002-08-17T16:17:01-07:00.manifest.gpg",
 				  "duplicity-full.2002-08-17T16:17:01-07:00.vol1.difftar.gpg",
@@ -49,6 +52,8 @@ archive_dir_backend = backends.get_backend("file://testfiles/collectionstest"
 dummy_backend = None
 real_backend = backends.get_backend("file://%s/%s" %
 									(col_test_dir.name, "remote_dir"))
+assert not os.system("rm -rf testfiles/output")
+assert not os.system("mkdir testfiles/output")
 output_dir = path.Path("testfiles/output") # used as a temp directory
 output_dir_backend = backends.get_backend("file://testfiles/output")
 
@@ -210,4 +215,5 @@ class CollectionTest(unittest.TestCase):
 			   [oldset_times, right_times_required]
 		
 
-if __name__ == "__main__": unittest.main()
+if __name__ == "__main__":
+	unittest.main()

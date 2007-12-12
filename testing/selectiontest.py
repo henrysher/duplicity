@@ -1,11 +1,11 @@
-from __future__ import generators
+import config
 import re, StringIO, unittest, sys
-sys.path.insert(0, "../duplicity")
-import log
-from selection import *
-from lazy import *
+sys.path.insert(0, "../")
+from duplicity import log
+from duplicity.selection import *
+from duplicity.lazy import *
 
-#log.setverbosity(8)
+config.setup()
 
 class MatchingTest(unittest.TestCase):
 	"""Test matching of file names against various selection functions"""
@@ -231,8 +231,6 @@ testfiles/select/1/1
 			   "Assumption: /usr/bin is on the same filesystem as /"
 		assert sf(Path("/proc")) == 0, \
 			   "Assumption: /proc is on a different filesystem"
-		assert sf(Path("/boot")) == 0, \
-			   "Assumption: /boot is on a different filesystem"
 
 class ParseArgsTest(unittest.TestCase):
 	"""Test argument parsing"""
@@ -372,4 +370,5 @@ testfiles/select**/2
 						("--exclude", "/")],
 					   [(), ("home",)])
 
-if __name__ == "__main__": unittest.main()
+if __name__ == "__main__":
+	unittest.main()
