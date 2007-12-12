@@ -22,8 +22,8 @@ import os, socket, types, tempfile, time, sys
 import log, path, dup_temp, file_naming, atexit
 import base64, getpass, xml.dom.minidom, httplib, urllib
 import socket, globals, re, string
+from duplicity import tempdir
 
-import duplicity.tempdir as tempdir
 import inspect
 import urlparse
 
@@ -50,10 +50,7 @@ def straight_url(parsed_url):
 	return parsed_url.geturl().replace(parsed_url.netloc, straight_netloc, 1)
 
 
-def get_backend(url_string):
-	"""Return Backend object from url string, or None if not a url string"""
-	"""If a protocol is unsupported a fatal error will be raised."""
-
+def ParsedUrl(url_string):
 	# These URL schemes have a backend with a notion of an RFC "network location".
 	# The 'file' and 's3+http' schemes should not be in this list.
 	urlparser.uses_netloc = [ 'ftp', 'hsi', 'rsync', 's3', 'scp', 'ssh', 'webdav', 'webdavs' ]
@@ -66,15 +63,28 @@ def get_backend(url_string):
 
 	# This happens for implicit local paths.
 	if not pu.scheme:
-		return None
+		return pu
 
 	# Our backends do not handle implicit hosts.
 	if pu.scheme in urlparser.uses_netloc and not pu.hostname:
-		raise ParsingException('Bad %s:// URL syntax: %s' % (pu.scheme, url_string))
+		log.FatalError('Bad %s:// URL syntax: %s' % (pu.scheme, url_string))
 
 	# Our backends do not handle implicit relative paths.
 	if not pu.scheme in urlparser.uses_netloc and not pu.path.startswith('//'):
-		raise ParsingException('Bad %s:// URL syntax: %s' % (pu.scheme, url_string))
+		log.FatalError('Bad %s:// URL syntax: %s' % (pu.scheme, url_string))
+
+	return pu
+
+
+def get_backend(url_string):
+	"""Return Backend object from url string, or None if not a url string"""
+	"""If a protocol is unsupported a fatal error will be raised."""
+
+	pu = ParsedUrl(url_string)
+
+	# This happens for implicit local paths.
+	if not pu.scheme:
+		return None
 
 	global protocol_class_dict
 	try:
@@ -762,7 +772,7 @@ class BotoBackend(Backend):
 	def list(self):
 		filename_list = []
 		if self.bucket:
-			for k in self.bucket.list(prefix = self.key_prefix + 'duplicity-'):
+			for k in self.bucket.list(prefix = self.key_prefix + 'd', delimiter = '/'):
 				filename = k.key.lstrip(self.key_prefix)
 				filename_list.append(filename)
 				log.Log("Listed %s/%s" % (self.straight_url, filename), 9)
