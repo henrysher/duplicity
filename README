@@ -13,6 +13,8 @@ The default prefix is /usr, so files are put in /usr/bin,
 --prefix=<prefix> option.  For example:
 
 	python setup.py install --prefix=/usr/local
+        export PYTHONPATH='/usr/local/lib/python2.x/site-packages/'
+        /usr/local/bin/duplicity -V
 
 
 REQUIREMENTS:
