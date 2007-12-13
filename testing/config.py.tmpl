@@ -11,20 +11,25 @@ encrypt_key2 = "B4FD6A06"
 
 # password required on this one
 sign_key = "522C2581"
-sign_passphrase = "xxxxxxxx"
+sign_passphrase = "xxxxxxxxxx"
 
 # URLs for testing
+# Note: xxx_password is either None or a string.
+# If its a string, then its put in the process
+# environment.  If None, then its removed.
+
 file_url = "file:///home/ken/testdup"
-file_password = ""
+file_password = None
 
 ftp_url = "ftp://ken@xyzzyx/testdup"
-ftp_password = ""
+ftp_password = None
 
 rsync_url = "rsync://ken@xyzzyx:/testdup"
-rsync_password = ""
+rsync_password = None
 
 ssh_url = "ssh://ken@xyzzyx/testdup"
-ssh_password = ""
+ssh_password = None
+
 
 
 def setup():
@@ -34,23 +39,17 @@ def setup():
 
 	globals.num_retries = 1
 
+	set_environ("FTP_PASSWORD", None)
+	set_environ("PASSPHRASE", None)
+	set_environ("AWS_ACCESS_KEY_ID", None)
+	set_environ("AWS_SECRET_ACCESS_KEY", None)
 
-def set_password(password):
-	if password:
-		os.environ["FTP_PASSWORD"] = password
+
+def set_environ(varname, value):
+	if value is not None:
+		os.environ[varname] = value
 	else:
 		try:
-			del os.environ["FTP_PASSWORD"]
+			del os.environ[varname]
 		except:
 			pass
-
-
-def set_passphrase(passphrase):
-	if passphrase:
-		os.environ["PASSPHRASE"] = passphrase
-	else:
-		try:
-			del os.environ["PASSPHRASE"]
-		except:
-			pass
-

@@ -9,20 +9,23 @@ class UnivTest:
 	"""Contains methods that help test any backend"""
 	def del_tmp(self):
 		"""Remove all files from test directory"""
-		config.set_password(self.password)
+		config.set_environ("FTP_PASSWORD", self.password)
 		backend = backends.get_backend(self.url_string)
 		backend.delete(backend.list())
 		backend.close()
+		"""Delete and create testfiles/output"""
+		assert not os.system("rm -rf testfiles/output")
+		assert not os.system("mkdir testfiles/output")
 
 	def test_basic(self):
 		"""Test basic backend operations"""
-		config.set_password(self.password)
+		config.set_environ("FTP_PASSWORD", self.password)
 		self.del_tmp()
 		self.try_basic(backends.get_backend(self.url_string))
 
 	def test_fileobj_ops(self):
 		"""Test fileobj operations"""
-		config.set_password(self.password)
+		config.set_environ("FTP_PASSWORD", self.password)
 		self.try_fileobj_ops(backends.get_backend(self.url_string))
 
 	def try_basic(self, backend):
@@ -96,11 +99,6 @@ class UnivTest:
 		filename2 = file_naming.get('new-sig', encrypted = 1)
 		self.try_fileobj_filename(backend, filename2)
 
-	def del_tmp(self):
-		"""Delete and create testfiles/output"""
-		assert not os.system("rm -rf testfiles/output")
-		assert not os.system("mkdir testfiles/output")
-
 
 class ParsedUrlTest(unittest.TestCase):
 	"""Test the ParsedUrl class"""
@@ -137,7 +135,7 @@ class LocalTest(unittest.TestCase, UnivTest):
 
 
 class scpTest(unittest.TestCase, UnivTest):
-	"""Test the SSH backend by logging into local host"""
+	"""Test the SSH backend"""
 	url_string = config.ssh_url
 	password = config.ssh_password
 
