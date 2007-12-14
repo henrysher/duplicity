@@ -773,8 +773,11 @@ class BotoBackend(Backend):
 		filename_list = []
 		if self.bucket:
 			for k in self.bucket.list(prefix = self.key_prefix + 'd', delimiter = '/'):
-				filename = k.key.lstrip(self.key_prefix)
-				filename_list.append(filename)
+				try:
+					filename = k.key.replace(self.key_prefix, '', 1)
+					filename_list.append(filename)
+				except AttributeError:
+					pass
 				log.Log("Listed %s/%s" % (self.straight_url, filename), 9)
 		return filename_list
 
