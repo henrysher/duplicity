@@ -469,7 +469,7 @@ class sshBackend(Backend):
 				elif match == 6:
 					log.Log("Remote file or directory '%s' does not exist" % self.remote_dir, 1)
 					break
-			child.close()
+			child.close(force = True)
 			if child.exitstatus == 0:
 				return res
 			log.Log("Running '%s' failed (attempt #%d)" % (commandline, n), 1)
