@@ -1,3 +1,27 @@
+New in v0.4.8 (2007/12/15)
+--------------------------
+First pass at bringing unittest cases up to date.
+All unit tests are working, but more test cases need
+to be added to handle the new protocols, plus there is
+some print leakage even with logging turned off.
+
+Allow pexpect to force the close of the child on sftp
+calls.  We already do that with scp calls.  This cleans
+up that exception.
+
+bug #21751: rsync module urls do not work in 0.4.7
+https://savannah.nongnu.org/bugs/index.php?21751
+
+bug #21752: Boto backend needs version 0.9d or later
+https://savannah.nongnu.org/bugs/index.php?21752
+
+patch #6340: S3 short filename regression
+https://savannah.nongnu.org/patch/?6340
+
+patch #6344: S3 bad bad key key handling
+http://savannah.nongnu.org/patch/?6344
+
+
 New in v0.4.7 (2007/12/07)
 --------------------------
 Applied patch from Eric Hanchrow to fix logging error in

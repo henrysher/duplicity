@@ -25,17 +25,19 @@ alltests=" \
     finaltest.py \
 "
 
+SUDO=sudo
+
 
 cd `dirname $0`
 pwd
 
-sudo tar xzf testfiles.tar.gz
+${SUDO} tar xzf testfiles.tar.gz
 
 for t in ${alltests}; do
     echo "========== Running $t =========="
-    sudo python -u $t 2>&1 | grep -v "unsafe ownership"
+    ${SUDO} python -u $t 2>&1 | grep -v "unsafe ownership"
     echo
     echo
 done
 
-sudo rm -rf testfiles tempdir
+${SUDO} rm -rf testfiles tempdir
