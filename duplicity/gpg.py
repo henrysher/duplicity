@@ -44,14 +44,16 @@ class GPGProfile:
 
 		"""
 		assert passphrase is None or type(passphrase) is types.StringType
-		if sign_key: assert recipients # can only sign with asym encryption
+		if sign_key:
+			assert recipients # can only sign with asym encryption
 
 		self.passphrase = passphrase
 		self.sign_key = sign_key
 		if recipients is not None:
 			assert type(recipients) is types.ListType # must be list, not tuple
 			self.recipients = recipients
-		else: self.recipients = []
+		else:
+			self.recipients = []
 
 
 class GPGFile:
@@ -71,9 +73,11 @@ class GPGFile:
 		"""
 		self.status_fp = None # used to find signature
 		self.closed = None # set to true after file closed
-		if log.verbosity >= 5: # If verbosity low, suppress gpg log messages
+		if log.verbosity >= 5:
+			# If verbosity low, suppress gpg log messages
 			self.logger_fp = sys.stderr
-		else: self.logger_fp = tempfile.TemporaryFile()
+		else:
+			self.logger_fp = tempfile.TemporaryFile()
 		
 		# Start GPG process - copied from GnuPGInterface docstring.
 		gnupg = GnuPGInterface.GnuPG()
@@ -90,7 +94,8 @@ class GPGFile:
 			if profile.recipients:
 				gnupg.options.recipients = profile.recipients
 				cmdlist = ['--encrypt']
-				if profile.sign_key: cmdlist.append("--sign")
+				if profile.sign_key:
+					cmdlist.append("--sign")
 			else:
 				cmdlist = ['--symmetric']
 				# use integrity protection
@@ -113,21 +118,27 @@ class GPGFile:
 		self.gpg_process = p1
 		self.encrypt = encrypt
 
-	def read(self, length = -1): return self.gpg_output.read(length)
-	def write(self, buf): return self.gpg_input.write(buf)
+	def read(self, length = -1):
+		return self.gpg_output.read(length)
+
+	def write(self, buf):
+		return self.gpg_input.write(buf)
 
 	def close(self):
 		if self.encrypt:
 			self.gpg_input.close()
-			if self.status_fp: self.set_signature()
+			if self.status_fp:
+				self.set_signature()
 			self.gpg_process.wait()
 		else:
 			while self.gpg_output.read(blocksize):
 				pass # discard remaining output to avoid GPG error
 			self.gpg_output.close()
-			if self.status_fp: self.set_signature()
+			if self.status_fp:
+				self.set_signature()
 			self.gpg_process.wait()
-		if self.logger_fp is not sys.stderr: self.logger_fp.close()
+		if self.logger_fp is not sys.stderr:
+			self.logger_fp.close()
 		self.closed = 1
 
 	def set_signature(self):
@@ -141,7 +152,8 @@ class GPGFile:
 		status_buf = self.status_fp.read()
 		match = re.search("^\\[GNUPG:\\] GOODSIG ([0-9A-F]*)",
 						  status_buf, re.M)
-		if not match: self.signature = None
+		if not match:
+			self.signature = None
 		else:
 			assert len(match.group(1)) >= 8
 			self.signature = match.group(1)[-8:]
@@ -185,7 +197,8 @@ def GPGWriteFile(block_iter, filename, profile,
 		assert misc.copyfileobj(incompressible_fp, file.gpg_input, bytes) == bytes
 		incompressible_fp.close()
 
-	def get_current_size(): return os.stat(filename).st_size
+	def get_current_size():
+		return os.stat(filename).st_size
 
 	minimum_block_size = 128 * 1024 # don't bother requesting blocks smaller
 	target_size = size - 50 * 1024 # fudge factor, compensate for gpg buffering
@@ -194,17 +207,21 @@ def GPGWriteFile(block_iter, filename, profile,
 	at_end_of_blockiter = 0
 	while 1:
 		bytes_to_go = data_size - get_current_size()
-		if bytes_to_go < minimum_block_size: break
-		try: data = block_iter.next(bytes_to_go).data
+		if bytes_to_go < minimum_block_size:
+			break
+		try:
+			data = block_iter.next(bytes_to_go).data
 		except StopIteration:
 			at_end_of_blockiter = 1
 			break
 		file.write(data)
 		
 	file.write(block_iter.get_footer())
-	if not at_end_of_blockiter: # don't pad last volume
+	if not at_end_of_blockiter:
+		# don't pad last volume
 		cursize = get_current_size()
-		if cursize < target_size: top_off(target_size - cursize, file)
+		if cursize < target_size:
+			top_off(target_size - cursize, file)
 	file.close()
 	return at_end_of_blockiter
 
@@ -230,15 +247,18 @@ def GzipWriteFile(block_iter, filename, size = 5 * 1024 * 1024,
 			result = self.fileobj.write(buf)
 			self.byte_count += len(buf)
 			return result
-		def close(self): return self.fileobj.close()
+		def close(self):
+			return self.fileobj.close()
 
 	file_counted = FileCounted(open(filename, "wb"))
 	gzip_file = gzip.GzipFile(None, "wb", 6, file_counted)
 	at_end_of_blockiter = 0
 	while 1:
 		bytes_to_go = size - file_counted.byte_count
-		if bytes_to_go < 32 * 1024: break
-		try: new_block = block_iter.next(bytes_to_go)
+		if bytes_to_go < 32 * 1024:
+			break
+		try:
+			new_block = block_iter.next(bytes_to_go)
 		except StopIteration:
 			at_end_of_blockiter = 1
 			break
@@ -257,14 +277,20 @@ def get_hash(hash, path, hex = 1):
 	"""
 	assert path.isreg()
 	fp = path.open("rb")
-	if hash == "SHA1": hash_obj = sha.new()
-	elif hash == "MD5": hash_obj = md5.new()
-	else: assert 0, "Unknown hash %s" % (hash,)
+	if hash == "SHA1":
+		hash_obj = sha.new()
+	elif hash == "MD5":
+		hash_obj = md5.new()
+	else:
+		assert 0, "Unknown hash %s" % (hash,)
 
 	while 1:
 		buf = fp.read(blocksize)
-		if not buf: break
+		if not buf:
+			break
 		hash_obj.update(buf)
 	assert not fp.close()
-	if hex: return hash_obj.hexdigest()
-	else: return hash_obj.digest()
+	if hex:
+		return hash_obj.hexdigest()
+	else:
+		return hash_obj.digest()
