@@ -127,6 +127,15 @@ class ParsedUrlTest(unittest.TestCase):
 		assert pu.username is None, pu.username
 		assert pu.port is None, pu.port
 
+		pu = backends.ParsedUrl("ftp://foo@bar:pass@example.com:123/home")
+		assert pu.scheme == "ftp", pu.scheme
+		assert pu.netloc == "foo@bar:pass@example.com:123", pu.netloc
+		assert pu.hostname == "example.com", pu.hostname
+		assert pu.path == "/home", pu.path
+		assert pu.username == "foo@bar", pu.username
+		assert pu.password == "pass"
+		assert pu.port == 123, pu.port
+
 
 class LocalTest(unittest.TestCase, UnivTest):
 	"""Test the Local backend"""
@@ -146,9 +155,21 @@ class ftpTest(unittest.TestCase, UnivTest):
 	password = config.ftp_password
 
 
-class rsyncTest(unittest.TestCase, UnivTest):
-	"""Test the rsync backend"""
-	url_string = config.rsync_url
+class rsyncAbsPathTest(unittest.TestCase, UnivTest):
+	"""Test the rsync abs path backend"""
+	url_string = config.rsync_abspath_url
+	password = config.rsync_password
+
+
+class rsyncRelPathTest(unittest.TestCase, UnivTest):
+	"""Test the rsync relative path backend"""
+	url_string = config.rsync_relpath_url
+	password = config.rsync_password
+
+
+class rsyncModuleTest(unittest.TestCase, UnivTest):
+	"""Test the rsync module backend"""
+	url_string = config.rsync_module_url
 	password = config.rsync_password
 
 

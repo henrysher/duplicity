@@ -24,7 +24,14 @@ file_password = None
 ftp_url = "ftp://ken@xyzzyx/testdup"
 ftp_password = None
 
-rsync_url = "rsync://ken@xyzzyx:/testdup"
+# /etc/rsyncd.conf contains
+# [testdup]
+# path = /home/ken/testdup
+# comment = Test area for duplicity
+
+rsync_abspath_url = "rsync://ken@localhost//home/ken/testdup"
+rsync_relpath_url = "rsync://ken@localhost/testdup"
+rsync_module_url = "rsync://ken@localhost::/testdup"
 rsync_password = None
 
 ssh_url = "ssh://ken@xyzzyx/testdup"
