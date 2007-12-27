@@ -24,15 +24,7 @@ import base64, getpass, xml.dom.minidom, httplib, urllib
 import socket, globals, re, string
 from duplicity import tempdir
 
-import inspect
-import urlparse
-
-if inspect.getmembers(urlparse, inspect.isclass):
-	# Use the system urlparse library.
-	import urlparse as urlparser
-else:
-	# Use the bundled urlparse library.
-	import urlparse_2_5 as urlparser
+import urlparse_2_5 as urlparser
 
 socket.setdefaulttimeout(globals.timeout)
 
@@ -567,7 +559,7 @@ class ftpBackend(Backend):
 
 	def put(self, source_path, remote_filename = None):
 		"""Transfer source_path to remote_filename"""
-		remote_path = os.path.join(urllib.unquote(self.parsed_url.path), remote_filename).rstrip()
+		remote_path = os.path.join(urllib.unquote(self.parsed_url.path.lstrip('/')), remote_filename).rstrip()
 		commandline = "ncftpput %s -m -V -C '%s' '%s'" % \
 					  (self.flags, source_path.name, remote_path)
 		self.run_command_persist(commandline)
@@ -576,30 +568,22 @@ class ftpBackend(Backend):
 		"""Get remote filename, saving it to local_path"""
 		remote_path = os.path.join(urllib.unquote(self.parsed_url.path), remote_filename).rstrip()
 		commandline = "ncftpget %s -V -C '%s' '%s' '%s'" % \
-					  (self.flags, self.parsed_url.hostname, remote_path, local_path.name)
+					  (self.flags, self.parsed_url.hostname, remote_path.lstrip('/'), local_path.name)
 		self.run_command_persist(commandline)
 		local_path.setdata()
 
 	def list(self):
 		"""List files in directory"""
-		# we create the directory first so we have target dir
-		# try for a long listing to avoid connection reset
-		commandline = "ncftpls %s -l '%s'" % \
+		commandline = "ncftpls -x '' %s '%s'" % \
 					  (self.flags, self.url_string)
 		l = self.popen_persist(commandline).split('\n')
-		l = filter(lambda x: x, l)
-		if not l:
-			return l
-		# if long list is not empty, get short list of names only
-		commandline = "ncftpls %s -1 '%s'" % \
-					  (self.flags, self.url_string)
-		l = self.popen_persist(commandline).split('\n')
-		return filter(lambda x: x, l)
+		l = [x.split()[-1] for x in l if x]
+		return l
 
 	def delete(self, filename_list):
 		"""Delete files in filename_list"""
 		for filename in filename_list:
-			commandline = "ncftpls %s -X 'DELE %s' '%s/%s'" % \
+			commandline = "ncftpls -x '' %s -X 'DELE %s' '%s%s'" % \
 						  (self.flags, filename, self.url_string, filename)
 			self.popen_persist(commandline)
 
@@ -617,7 +601,18 @@ class rsyncBackend(Backend):
 		if parsed_url.password:
 			user = user.split(':')[0]
 		mynetloc = '%s@%s' % (user, host)
-		self.url_string = "%s%s" % (mynetloc, parsed_url.path.lstrip('/'))
+		# module url: rsync://user@host::/modname/path
+		# rsync via ssh/rsh: rsync://user@host//some_absolute_path
+		#      -or-          rsync://user@host/some_relative_path
+		if parsed_url.netloc.endswith("::"):
+			# its a module path
+			self.url_string = "%s%s" % (mynetloc, parsed_url.path.lstrip('/'))
+		elif parsed_url.path.startswith("//"):
+			# its an absolute path
+			self.url_string = "%s:/%s" % (mynetloc, parsed_url.path.lstrip('/'))
+		else:
+			# its a relative path
+			self.url_string = "%s:%s" % (mynetloc, parsed_url.path.lstrip('/'))
 		if self.url_string[-1] != '/':
 			self.url_string += '/'
 
@@ -667,7 +662,7 @@ class rsyncBackend(Backend):
 			path = os.path.join (dir, file)
 			to_delete.append (path)
 			f = open (path, 'w')
-			print >>f, file
+			print >>exclude, file
 			f.close()
 		exclude.close()
 		commandline = ("rsync --recursive --delete --exclude-from=%s %s/ %s" %
@@ -767,7 +762,7 @@ class BotoBackend(Backend):
 			log.Log("Download %s/%s failed (attempt #%d)" % (self.straight_url, remote_filename, n), 1)
 			time.sleep(30)
 		log.Log("Giving up trying to download %s/%s after %d attempts" % (self.straight_url, remote_filename, globals.num_retries), 1)
-		raise BackendException("Error downloading %s/%s" % (self.staight_url, remote_filename))
+		raise BackendException("Error downloading %s/%s" % (self.straight_url, remote_filename))
 
 	def list(self):
 		filename_list = []
@@ -776,9 +771,9 @@ class BotoBackend(Backend):
 				try:
 					filename = k.key.replace(self.key_prefix, '', 1)
 					filename_list.append(filename)
+					log.Log("Listed %s/%s" % (self.straight_url, filename), 9)
 				except AttributeError:
 					pass
-				log.Log("Listed %s/%s" % (self.straight_url, filename), 9)
 		return filename_list
 
 	def delete(self, filename_list):
