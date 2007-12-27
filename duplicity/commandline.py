@@ -271,8 +271,9 @@ Backends and their URL formats:
 	ftp://user@other.host/some_dir
 	hsi://user@other.host/some_dir
 	file:///some_dir
-	rsync://user@host:/module/some_dir
-	rsync://user@host/some_non_module_path
+	rsync://user@host::/module/some_dir
+	rsync://user@host/relative_path
+	rsync://user@host//absolute_path
 	s3://host/bucket_name[/prefix]
 	s3+http://bucket_name[/prefix]
 	webdav://user@other.host/some_dir
