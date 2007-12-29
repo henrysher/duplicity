@@ -28,6 +28,7 @@ import threading
 import tempfile
 
 import duplicity.log as log
+import duplicity.globals as globals
 
 # Set up state related to managing the default temporary directory
 # instance
@@ -50,7 +51,7 @@ def default():
     _defaultLock.acquire()
     try:
         if _defaultInstance is None:
-            _defaultInstance = TemporaryDirectory()
+            _defaultInstance = TemporaryDirectory(temproot = globals.temproot)
         return _defaultInstance
     finally:
         _defaultLock.release()

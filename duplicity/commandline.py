@@ -34,6 +34,7 @@ commands = ["cleanup",
 			"full",
 			"incremental",
 			"list-current-files",
+			"restore",
 			"remove-older-than",
 			"remove-all-but-n-full",
 			"verify",
@@ -74,6 +75,7 @@ options = ["allow-source-mismatch",
 		   "sign-key=",
 		   "ssh-askpass",
 		   "ssh-options=",
+		   "tempdir=",
 		   "timeout=",
 		   "time-separator=",
 		   "verbosity=",
@@ -222,6 +224,8 @@ def parse_cmdline_options(arglist):
 			backends.ssh_askpass = True
 		elif opt == "--ssh-options":
 			backends.ssh_options = (backends.ssh_options + ' ' + arg).strip()
+		elif opt == "--tempdir":
+			globals.temproot = arg
 		elif opt == "--timeout":
 			globals.timeout = int(arg)
 		elif opt == "--time-separator":
@@ -322,6 +326,7 @@ Options:
 	--ssh-askpass
 	--ssh-options
 	--short-filenames
+	--tempdir <directory>
 	--timeout <seconds>
 	-t<time>, --restore-time <time>
 	--volsize <number>

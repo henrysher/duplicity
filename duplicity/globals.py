@@ -102,6 +102,9 @@ encryption = 1
 # volume size. default 5M
 volsize = 5*1024*1024
 
+# Working directory for the tempfile module. Defaults to /tmp on most systems.
+temproot = None
+
 # network timeout value
 timeout = 30
 
