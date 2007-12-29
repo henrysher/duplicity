@@ -34,9 +34,9 @@ commands = ["cleanup",
 			"full",
 			"incremental",
 			"list-current-files",
-			"restore",
 			"remove-older-than",
 			"remove-all-but-n-full",
+			"restore",
 			"verify",
 			]
 
