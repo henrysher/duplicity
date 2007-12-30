@@ -609,10 +609,10 @@ class rsyncBackend(Backend):
 			self.url_string = "%s%s" % (mynetloc, parsed_url.path.lstrip('/'))
 		elif parsed_url.path.startswith("//"):
 			# its an absolute path
-			self.url_string = "%s:/%s" % (mynetloc, parsed_url.path.lstrip('/'))
+			self.url_string = "%s:/%s" % (mynetloc.rstrip(':'), parsed_url.path.lstrip('/'))
 		else:
 			# its a relative path
-			self.url_string = "%s:%s" % (mynetloc, parsed_url.path.lstrip('/'))
+			self.url_string = "%s:%s" % (mynetloc.rstrip(':'), parsed_url.path.lstrip('/'))
 		if self.url_string[-1] != '/':
 			self.url_string += '/'
 
