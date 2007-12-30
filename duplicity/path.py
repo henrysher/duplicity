@@ -294,7 +294,7 @@ class ROPath:
 					 (other.type, self.type))
 			return 0
 
-		if self.isreg() or self.isdir or self.isfifo():
+		if self.isreg() or self.isdir() or self.isfifo():
 			if not self.perms_equal(other):
 				log_diff("File %%s has permissions %o, expected %o" %
 						 (other.getperms(), self.getperms()))
