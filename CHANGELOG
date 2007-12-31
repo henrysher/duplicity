@@ -1,3 +1,46 @@
+New in v0.4.9 (2008/01/??)
+--------------------------
+NOTE: URL format correction in rsync://.  The rsync backend
+now properly supports absolute and relative pathnames and 
+module access.  The formats are:
+    rsync://user@host::/module/some_dir
+    rsync://user@host/relative_path
+    rsync://user@host//absolute_path
+
+Fixed regression caused by changeover to new urlparse.py.
+bug #21475: FTP Usernames that contain '@' are not recognized
+https://savannah.nongnu.org/bugs/index.php?21475
+
+Added section URL FORMAT in the duplicity man page.
+
+Added 2nd patch to bug #21475 that forces all versions of
+Python to use the fixed urlparse.py.
+
+Fixed so that remove-older-than and remove-all-but-n-full
+will not request a GPG passphrase.
+
+Fixed issue with Pure-FTPd that would always return an empty
+directory listing and thus force a full backup every time.
+A side effect of the change is that we now only make one call
+to ncftpls to get the listing, thereby reducing the overhead
+on systems with a large number of backup files.
+
+bug #21896: Two problems with rsync under 0.4.8 + patch
+https://savannah.nongnu.org/bugs/index.php?21896
+
+bug #21909: Problematic typo in compare_verbose() method
+https://savannah.nongnu.org/bugs/index.php?21909
+
+patch #6354: S3 staight typo results in a bogus exception
+https://savannah.nongnu.org/patch/?6354
+
+patch #6356: Command line option for the temporary directory root.
+https://savannah.nongnu.org/patch/?6356
+
+patch #6357: Explicit restore action is missing from the command list,
+https://savannah.nongnu.org/patch/?6357
+
+
 New in v0.4.8 (2007/12/15)
 --------------------------
 First pass at bringing unittest cases up to date.
