@@ -270,18 +270,18 @@ Usage:
 	duplicity remove-all-but-n-full count [options] target_url
 
 Backends and their URL formats:
-	ssh://user@other.host:port/some_dir
-	scp://user@other.host:port/some_dir
-	ftp://user@other.host/some_dir
-	hsi://user@other.host/some_dir
+	ssh://user[:password]@other.host[:port]/some_dir
+	scp://user[:password]@other.host[:port]/some_dir
+	ftp://user[:password]@other.host[:port]/some_dir
+	hsi://user[:password]@other.host[:port]/some_dir
 	file:///some_dir
-	rsync://user@host::/module/some_dir
-	rsync://user@host/relative_path
-	rsync://user@host//absolute_path
-	s3://host/bucket_name[/prefix]
+	rsync://user[:password]@other.host[:port]::/module/some_dir
+	rsync://user[:password]@other.host[:port]/relative_path
+	rsync://user[:password]@other.host[:port]//absolute_path
+	s3://other.host/bucket_name[/prefix]
 	s3+http://bucket_name[/prefix]
-	webdav://user@other.host/some_dir
-	webdavs://user@other.host/some_dir
+	webdav://user[:password]@other.host/some_dir
+	webdavs://user[:password]@other.host/some_dir
 
 Commands:
 	cleanup <target_url>
