@@ -1,10 +1,12 @@
-.TH DUPLICITY 1 "NOVEMBER 2007" "Version 2.4.4" "User Manuals" \"  -*- nroff -*-
+.TH DUPLICITY 1 "JANUARY 2008" "Version 0.4.9" "User Manuals" \"  -*- nroff -*-
+
 .SH NAME
 duplicity \- Encrypted backup using rsync algorithm
+
 .SH SYNOPSIS
 .B duplicity
 .BI [ options ]
-.I input_directory destination_url
+.I source_directory target_url
 
 .B duplicity
 .BI [ options ]
@@ -12,11 +14,15 @@ duplicity \- Encrypted backup using rsync algorithm
 
 .B duplicity full
 .BI [ options ]
-.I input_directory destination_url
+.I source_directory target_url
 
 .B duplicity incremental
 .BI [ options ]
-.I input_directory destination_url
+.I source_directory target_url
+
+.B duplicity restore
+.BI [ options ]
+.I source_url target_directory
 
 .B duplicity verify
 .BI [ options ]
@@ -389,7 +395,6 @@ duplicity --ssh-options="-oProtocol=2 -oIdentityFile=/my/backup/id" /home/me scp
 .PP
 .RE
 
-
 .TP
 .BI --short-filenames
 If this option is specified, the names of the files duplicity writes
@@ -409,6 +414,51 @@ Change the volume size to
 .IR number 
 Mb. Default is 5Mb.
 
+
+.SH URL FORMAT
+Duplicity tries to maintain a standard URL format as much as possible.
+The generic format for a URL is:
+.PP
+.RS
+scheme://user[:password]@host[:port]/[/]path
+.PP
+.RE
+It is not recommended to expose the password on the command line since
+it could be revealed to anyone with permissions to do process listings,
+however, it is permitted.
+.PP
+In protocols that support it, the path may be preceeded by a single 
+slash, '/path', to represent a relative path to the target home directory, 
+or preceeded by a double slash, '//path', to represent an absolute 
+filesystem path.
+.PP
+Formats of each of the URL schemes follow:
+.PP
+.RS
+ssh://user[:password]@other.host[:port]/some_dir
+.PP
+scp://user[:password]@other.host[:port]/some_dir
+.PP
+ftp://user[:password]@other.host[:port]/some_dir
+.PP
+hsi://user[:password]@other.host/some_dir
+.PP
+file:///some_dir
+.PP
+rsync://user[:password]@other.host[:port]::/module/some_dir
+.PP
+rsync://user[:password]@other.host[:port]/relative_path
+.PP
+rsync://user[:password]@other.host[:port]//absolute_path
+.PP
+s3://host/bucket_name[/prefix]
+.PP
+s3+http://bucket_name[/prefix]
+.PP
+webdav://user[:password]@other.host/some_dir
+.PP
+webdavs://user[:password]@other.host/some_dir
+.RE
 
 .SH TIME FORMATS
 duplicity uses time strings in two places.  Firstly, many of the files
