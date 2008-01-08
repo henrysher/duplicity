@@ -26,6 +26,11 @@ REQUIREMENTS:
  * NcFTP version 3.1.9 or later (http://www.ncftp.com)
  * Boto 0.9d or later (http://code.google.com/p/boto)
  * pexpect 2.1 or later (http://pexpect.sourceforge.net)
+
+If you install from the source package, you will also need:
+
+ * Python development files, normally found in module 'python-dev'.
+ * librsync development files, normally found in module 'librsync-dev'.
  
 
 HELP:
