@@ -39,10 +39,14 @@ new_sig_re_short = re.compile("^dns\\.(?P<start_time>[0-9a-z]+?)\\.(?P<end_time>
 def to_base36(n):
 	"""Return string representation of n in base 36 (use 0-9 and a-z)"""
 	div, mod = divmod(n, 36)
-	if mod <= 9: last_digit = str(mod)
-	else: last_digit = chr(ord('a') + mod - 10)
-	if n == mod: return last_digit
-	else: return to_base36(div)+last_digit
+	if mod <= 9:
+		last_digit = str(mod)
+	else:
+		last_digit = chr(ord('a') + mod - 10)
+	if n == mod:
+		return last_digit
+	else:
+		return to_base36(div)+last_digit
 
 def from_base36(s):
 	"""Convert string s in base 36 to long int"""
@@ -50,10 +54,12 @@ def from_base36(s):
 	for i in range(len(s)):
 		total *= 36
 		digit_ord = ord(s[i])
-		if ord('0') <= digit_ord <= ord('9'): total += digit_ord - ord('0')
+		if ord('0') <= digit_ord <= ord('9'):
+			total += digit_ord - ord('0')
 		elif ord('a') <= digit_ord <= ord('z'):
 			total += digit_ord - ord('a') + 10
-		else: assert 0, "Digit %s in %s not in proper range" % (s[i], s)
+		else:
+			assert 0, "Digit %s in %s not in proper range" % (s[i], s)
 	return total
 
 
@@ -69,20 +75,26 @@ def get(type, volume_number = None, manifest = None,
 	assert dup_time.curtimestr
 	assert not (encrypted and gzipped)
 	if encrypted:
-		if globals.short_filenames: suffix = '.g'
-		else: suffix = ".gpg"
+		if globals.short_filenames:
+			suffix = '.g'
+		else:
+			suffix = ".gpg"
 	elif gzipped:
-		if globals.short_filenames: suffix = ".z"
-		else: suffix = '.gz'
-	else: suffix = ""
+		if globals.short_filenames:
+			suffix = ".z"
+		else:
+			suffix = '.gz'
+	else:
+		suffix = ""
 
 	if type == "full-sig" or type == "new-sig":
 		assert not volume_number and not manifest
 		if type == "full-sig":
 			if globals.short_filenames:
 				return "dfs.%s.st%s" % (to_base36(dup_time.curtime), suffix)
-			else: return ("duplicity-full-signatures.%s.sigtar%s" %
-						  (dup_time.curtimestr, suffix))
+			else:
+				return ("duplicity-full-signatures.%s.sigtar%s" %
+						(dup_time.curtimestr, suffix))
 		elif type == "new-sig":
 			if globals.short_filenames:
 				return "dns.%s.%s.st%s" % (to_base36(dup_time.prevtime),
@@ -95,23 +107,29 @@ def get(type, volume_number = None, manifest = None,
 		if volume_number:
 			if globals.short_filenames:
 				vol_string = "%s.dt" % to_base36(volume_number)
-			else: vol_string = "vol%d.difftar" % volume_number
+			else:
+				vol_string = "vol%d.difftar" % volume_number
 		else:
-			if globals.short_filenames: vol_string = "m"
-			else: vol_string = "manifest"
+			if globals.short_filenames:
+				vol_string = "m"
+			else:
+				vol_string = "manifest"
 		if type == "full":
 			if globals.short_filenames:
 				return "df.%s.%s%s" % (to_base36(dup_time.curtime),
 									   vol_string, suffix)
-			else: return "duplicity-full.%s.%s%s" % (dup_time.curtimestr,
-													 vol_string, suffix)
+			else:
+				return "duplicity-full.%s.%s%s" % (dup_time.curtimestr,
+												   vol_string, suffix)
 		elif type == "inc":
 			if globals.short_filenames:
 				return "di.%s.%s.%s%s" % (to_base36(dup_time.prevtime),
 						   to_base36(dup_time.curtime), vol_string, suffix)
-			else: return "duplicity-inc.%s.to.%s.%s%s" % \
-			   (dup_time.prevtimestr, dup_time.curtimestr, vol_string, suffix)
-		else: assert 0
+			else:
+				return "duplicity-inc.%s.to.%s.%s%s" % \
+					   (dup_time.prevtimestr, dup_time.curtimestr, vol_string, suffix)
+		else:
+			assert 0
 
 
 def parse(filename):
@@ -119,61 +137,82 @@ def parse(filename):
 	filename = filename.lower()
 	def str2time(timestr):
 		"""Return time in seconds if string can be converted, None otherwise"""
-		if globals.short_filenames: t = from_base36(timestr)
+		if globals.short_filenames:
+			t = from_base36(timestr)
 		else:
-			try: t = dup_time.genstrtotime(timestr.upper())
-			except dup_time.TimeException: return None
+			try:
+				t = dup_time.genstrtotime(timestr.upper())
+			except dup_time.TimeException:
+				return None
 		return t
 
 	def get_vol_num(s):
 		"""Return volume number from volume number string"""
-		if globals.short_filenames: return from_base36(s)
-		else: return int(s)
+		if globals.short_filenames:
+			return from_base36(s)
+		else:
+			return int(s)
 
 	def check_full():
 		"""Return ParseResults if file is from full backup, None otherwise"""
-		if globals.short_filenames: m1 = full_vol_re_short.search(filename)
-		else: m1 = full_vol_re.search(filename)
+		if globals.short_filenames:
+			m1 = full_vol_re_short.search(filename)
+		else:
+			m1 = full_vol_re.search(filename)
 		if globals.short_filenames:
 			m2 = full_manifest_re_short.search(filename)
-		else: m2 = full_manifest_re.search(filename)
+		else:
+			m2 = full_manifest_re.search(filename)
 		if m1 or m2:
 			t = str2time((m1 or m2).group("time"))
 			if t:
-				if m1: return ParseResults("full", time = t,
-							   volume_number = get_vol_num(m1.group("num")))
-				else: return ParseResults("full", time = t, manifest = 1)
+				if m1:
+					return ParseResults("full", time = t,
+										volume_number = get_vol_num(m1.group("num")))
+				else:
+					return ParseResults("full", time = t, manifest = 1)
 		return None
 
 	def check_inc():
 		"""Return ParseResults if file is from inc backup, None otherwise"""
-		if globals.short_filenames: m1 = inc_vol_re_short.search(filename)
-		else: m1 = inc_vol_re.search(filename)
+		if globals.short_filenames:
+			m1 = inc_vol_re_short.search(filename)
+		else:
+			m1 = inc_vol_re.search(filename)
 		if globals.short_filenames:
 			m2 = inc_manifest_re_short.search(filename)
-		else: m2 = inc_manifest_re.search(filename)
+		else:
+			m2 = inc_manifest_re.search(filename)
 
 		if m1 or m2:
 			t1 = str2time((m1 or m2).group("start_time"))
 			t2 = str2time((m1 or m2).group("end_time"))
 			if t1 and t2:
-				if m1: return ParseResults("inc", start_time = t1,
+				if m1:
+					return ParseResults("inc", start_time = t1,
 				  end_time = t2, volume_number = get_vol_num(m1.group("num")))
-				else: return ParseResults("inc", start_time = t1,
-										  end_time = t2, manifest = 1)
+				else:
+					return ParseResults("inc", start_time = t1,
+										end_time = t2, manifest = 1)
 		return None
 
 	def check_sig():
 		"""Return ParseResults if file is a signature, None otherwise"""
-		if globals.short_filenames: m = full_sig_re_short.search(filename)
-		else: m = full_sig_re.search(filename)
+		if globals.short_filenames:
+			m = full_sig_re_short.search(filename)
+		else:
+			m = full_sig_re.search(filename)
 		if m:
 			t = str2time(m.group("time"))
-			if t: return ParseResults("full-sig", time = t)
-			else: return None
+			if t:
+				return ParseResults("full-sig", time = t)
+			else:
+				return None
 
-		if globals.short_filenames: m = new_sig_re_short.search(filename)
-		else: m = new_sig_re.search(filename)
+		if globals.short_filenames:
+			m = new_sig_re_short.search(filename)
+		else:
+			m = new_sig_re.search(filename)
 		if m:
 			t1 = str2time(m.group("start_time"))
 			t2 = str2time(m.group("end_time"))
@@ -186,12 +225,14 @@ def parse(filename):
 		if (globals.short_filenames and filename.endswith('.z') or
 			not globals.short_filenames and filename.endswith('gz')):
 			pr.compressed = 1
-		else: pr.compressed = None
+		else:
+			pr.compressed = None
 
 		if (globals.short_filenames and filename.endswith('.g') or
 			not globals.short_filenames and filename.endswith('.gpg')):
 			pr.encrypted = 1
-		else: pr.encrypted = None
+		else:
+			pr.encrypted = None
 
 	pr = check_full()
 	if not pr:
@@ -212,9 +253,12 @@ class ParseResults:
 		assert (type == "full-sig" or type == "new-sig" or
 				type == "inc" or type == "full")
 		self.type = type
-		if type == "inc" or type == "full": assert manifest or volume_number
-		if type == "inc" or type == "new-sig": assert start_time and end_time
-		else: assert time
+		if type == "inc" or type == "full":
+			assert manifest or volume_number
+		if type == "inc" or type == "new-sig":
+			assert start_time and end_time
+		else:
+			assert time
 
 		self.manifest = manifest
 		self.volume_number = volume_number
