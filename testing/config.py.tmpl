@@ -6,41 +6,43 @@ from duplicity import globals, log
 
 # to test GPG and friends
 # these must be without passwords
-encrypt_key1 = "8C8E60A4"
-encrypt_key2 = "B4FD6A06"
+encrypt_key1 = ""
+encrypt_key2 = ""
 
 # password required on this one
-sign_key = "522C2581"
-sign_passphrase = "xxxxxxxxxx"
+sign_key = ""
+sign_passphrase = ""
 
 # URLs for testing
-# Note: xxx_password is either None or a string.
-# If its a string, then its put in the process
-# environment.  If None, then its removed.
-
 file_url = "file:///home/ken/testdup"
 file_password = None
 
 ftp_url = "ftp://ken@xyzzyx/testdup"
-ftp_password = None
+ftp_password = ""
 
 # /etc/rsyncd.conf contains
 # [testdup]
 # path = /home/ken/testdup
 # comment = Test area for duplicity
+# read only = false
+#
+# NOTE: chmod 777 /home/ken/testdup
 
-rsync_abspath_url = "rsync://ken@localhost//home/ken/testdup"
-rsync_relpath_url = "rsync://ken@localhost/testdup"
-rsync_module_url = "rsync://ken@localhost::/testdup"
+rsync_abspath_url = "rsync://ken@xyzzyx//home/ken/testdup"
+rsync_relpath_url = "rsync://ken@xyzzyx/testdup"
+rsync_module_url = "rsync://ken@xyzzyx::/testdup"
 rsync_password = None
 
 ssh_url = "ssh://ken@xyzzyx/testdup"
 ssh_password = None
 
+s3_url = "s3+http://testdup/test"
+s3_access_key = ""
+s3_secret_key = ""
 
 
 def setup():
-	""" setup for unit tests """
+   	""" setup for unit tests """
 	log.setverbosity(0)
 	globals.print_statistics = 0
 
@@ -48,8 +50,12 @@ def setup():
 
 	set_environ("FTP_PASSWORD", None)
 	set_environ("PASSPHRASE", None)
-	set_environ("AWS_ACCESS_KEY_ID", None)
-	set_environ("AWS_SECRET_ACCESS_KEY", None)
+	if s3_access_key:
+		set_environ("AWS_ACCESS_KEY_ID", s3_access_key)
+		set_environ("AWS_SECRET_ACCESS_KEY", s3_secret_key)
+	else:
+		set_environ("AWS_ACCESS_KEY_ID", None)
+		set_environ("AWS_SECRET_ACCESS_KEY", None)
 
 
 def set_environ(varname, value):
