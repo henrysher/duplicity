@@ -22,16 +22,19 @@ import time, types, re
 import globals
 
 
-class TimeException(Exception): pass
+class TimeException(Exception):
+	pass
 
 _interval_conv_dict = {"s": 1, "m": 60, "h": 3600, "D": 86400,
 					   "W": 7*86400, "M": 30*86400, "Y": 365*86400}
 _integer_regexp = re.compile("^[0-9]+$")
 _interval_regexp = re.compile("^([0-9]+)([smhDWMY])")
 _genstr_date_regexp1 = re.compile("^(?P<year>[0-9]{4})[-/]"
-					   "(?P<month>[0-9]{1,2})[-/](?P<day>[0-9]{1,2})$")
+								  "(?P<month>[0-9]{1,2})[-/]"
+								  "(?P<day>[0-9]{1,2})$")
 _genstr_date_regexp2 = re.compile("^(?P<month>[0-9]{1,2})[-/]"
-					   "(?P<day>[0-9]{1,2})[-/](?P<year>[0-9]{4})$")
+								  "(?P<day>[0-9]{1,2})[-/]"
+								  "(?P<year>[0-9]{4})$")
 curtime = curtimestr = None
 prevtime = prevtimestr = None
 been_awake_since = None # stores last time sleep() was run
@@ -109,18 +112,24 @@ def inttopretty(seconds):
 	"""Convert num of seconds to readable string like "2 hours"."""
 	partlist = []
 	hours, seconds = divmod(seconds, 3600)
-	if hours > 1: partlist.append("%d hours" % hours)
-	elif hours == 1: partlist.append("1 hour")
+	if hours > 1:
+		partlist.append("%d hours" % hours)
+	elif hours == 1:
+		partlist.append("1 hour")
 
 	minutes, seconds = divmod(seconds, 60)
-	if minutes > 1: partlist.append("%d minutes" % minutes)
-	elif minutes == 1: partlist.append("1 minute")
+	if minutes > 1:
+		partlist.append("%d minutes" % minutes)
+	elif minutes == 1:
+		partlist.append("1 minute")
 
-	if seconds == 1: partlist.append("1 second")
+	if seconds == 1:
+		partlist.append("1 second")
 	elif not partlist or seconds > 1:
 		if isinstance(seconds, int) or isinstance(seconds, long):
 			partlist.append("%s seconds" % seconds)
-		else: partlist.append("%.2f seconds" % seconds)
+		else:
+			partlist.append("%.2f seconds" % seconds)
 	return " ".join(partlist)
 
 def intstringtoseconds(interval_string):
@@ -132,14 +141,17 @@ Intervals are specified like 2Y (2 years) or 2h30m (2.5 hours).  The
 allowed special characters are s, m, h, D, W, M, and Y.  See the man
 page for more information.
 """ % interval_string)
-	if len(interval_string) < 2: error()
+	if len(interval_string) < 2:
+		error()
 
 	total = 0
 	while interval_string:
 		match = _interval_regexp.match(interval_string)
-		if not match: error()
+		if not match:
+			error()
 		num, ext = int(match.group(1)), match.group(2)
-		if not ext in _interval_conv_dict or num < 0: error()
+		if not ext in _interval_conv_dict or num < 0:
+			error()
 		total += num*_interval_conv_dict[ext]
 		interval_string = interval_string[match.end(0):]
 	return total
@@ -157,11 +169,16 @@ def gettzd(dstflag):
 	# is in the same format as the last member of the tuple returned by
 	# time.localtime()
 	
-	if dstflag > 0: offset = -1 * time.altzone/60
-	else: offset = -1 * time.timezone/60
-	if offset > 0: prefix = "+"
-	elif offset < 0: prefix = "-"
-	else: return "Z" # time is already in UTC
+	if dstflag > 0:
+		offset = -1 * time.altzone/60
+	else:
+		offset = -1 * time.timezone/60
+	if offset > 0:
+		prefix = "+"
+	elif offset < 0:
+		prefix = "-"
+	else:
+		return "Z" # time is already in UTC
 
 	hours, minutes = map(abs, divmod(offset, 60))
 	assert 0 <= hours <= 23
@@ -170,7 +187,8 @@ def gettzd(dstflag):
 
 def tzdtoseconds(tzd):
 	"""Given w3 compliant TZD, return how far ahead UTC is"""
-	if tzd == "Z": return 0
+	if tzd == "Z":
+		return 0
 	assert len(tzd) == 6 # only accept forms like +08:00 for now
 	assert (tzd[0] == "-" or tzd[0] == "+") and \
 		   tzd[3] == globals.time_separator
@@ -185,33 +203,19 @@ def cmp(time1, time2):
 		time2 = stringtotime(time2)
 		assert time2 is not None
 
-	if time1 < time2: return -1
-	elif time1 == time2: return 0
+	if time1 < time2:
+		return -1
+	elif time1 == time2:
+		return 0
 	else: return 1
 
 
-def sleep(sleep_ratio):
-	"""Sleep for period to maintain given sleep_ratio
-
-	On my system sleeping for periods less than 1/20th of a second
-	doesn't seem to work very accurately, so accumulate at least that
-	much time before sleeping.
-
-	"""
-	global been_awake_since
-	if been_awake_since is None: # first running
-		been_awake_since = time.time()
-	else:
-		elapsed_time = time.time() - been_awake_since
-		sleep_time = elapsed_time * (sleep_ratio/(1-sleep_ratio))
-		if sleep_time >= 0.05:
-			time.sleep(sleep_time)
-			been_awake_since = time.time()
-
 def genstrtotime(timestr, override_curtime = None):
 	"""Convert a generic time string to a time in seconds"""
-	if override_curtime is None: override_curtime = curtime
-	if timestr == "now": return override_curtime
+	if override_curtime is None:
+		override_curtime = curtime
+	if timestr == "now":
+		return override_curtime
 
 	def error():
 		raise TimeException("""Bad time string "%s"
@@ -224,7 +228,8 @@ current time zone), or ordinary dates like 2/4/1997 or 2001-04-23
 the day).""" % timestr)
 
 	# Test for straight integer
-	if _integer_regexp.search(timestr): return int(timestr)
+	if _integer_regexp.search(timestr):
+		return int(timestr)
 
 	# Test for w3-datetime format, possibly missing tzd
 	# This is an ugly hack. We need to know if DST applies when doing
@@ -234,18 +239,25 @@ the day).""" % timestr)
 	# calls to this method on the same run
 	
 	t = stringtotime(timestr) or stringtotime(timestr+gettzd(0))
-	if t: return t
+	if t:
+		return t
 
 	try: # test for an interval, like "2 days ago"
 		return override_curtime - intstringtoseconds(timestr)
-	except TimeException: pass
+	except TimeException:
+		pass
 
 	# Now check for dates like 2001/3/23
 	match = _genstr_date_regexp1.search(timestr) or \
 			_genstr_date_regexp2.search(timestr)
-	if not match: error()
+	if not match:
+		error()
 	timestr = "%s-%02d-%02dT00:00:00%s" % (match.group('year'),
-			     int(match.group('month')), int(match.group('day')), gettzd(0))
+										   int(match.group('month')),
+										   int(match.group('day')),
+										   gettzd(0))
 	t = stringtotime(timestr)
-	if t: return t
-	else: error()
+	if t:
+		return t
+	else:
+		error()
