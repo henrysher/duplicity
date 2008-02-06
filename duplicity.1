@@ -402,6 +402,11 @@ will be shorter (about 30 chars) but less understandable.  This may be
 useful when backing up to MacOS or another OS or FS that doesn't
 support long filenames.
 .TP
+.BI "--tempdir " directory
+Use this existing directory for duplicity temporary files instead of
+the system default, which is usually the /tmp directory. This option
+supercedes any environment variable.
+.TP
 .BI -t time ", --restore-time " time
 When restoring, specify the time to restore to.
 .TP
