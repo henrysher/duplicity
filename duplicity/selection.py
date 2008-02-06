@@ -105,11 +105,14 @@ class Select:
 
 		"""
 		def error_handler(exc, path, filename):
-			mode = os.stat(path.name+"/"+filename)[stat.ST_MODE]
-			if stat.S_ISSOCK(mode):
-				log.Log("Skipping socket %s/%s" % (path.name, filename), 7)
-			else:
-				log.Log("Error initializing file %s/%s" % (path.name, filename), 2)
+			try:
+				mode = os.stat(path.name+"/"+filename)[stat.ST_MODE]
+				if stat.S_ISSOCK(mode):
+					log.Log("Skipping socket %s/%s" % (path.name, filename), 7)
+				else:
+					log.Log("Error initializing file %s/%s" % (path.name, filename), 2)
+			except OSError:
+				log.Log("Error accessing possibly locked file %s/%s" % (path.name, filename), 2);
 			return None
 
 		def diryield(path):
@@ -186,8 +189,7 @@ class Select:
 					filelists_index += 1
 				elif opt == "--exclude-globbing-filelist":
 					map(self.add_selection_func,
-						self.filelist_globbing_get_sfs(
-						           filelists[filelists_index], 0, arg))
+						self.filelist_globbing_get_sfs(filelists[filelists_index], 0, arg))
 					filelists_index += 1
 				elif opt == "--exclude-other-filesystems":
 					self.add_selection_func(self.other_filesystems_get_sf(0))
@@ -201,8 +203,7 @@ class Select:
 					filelists_index += 1
 				elif opt == "--include-globbing-filelist":
 					map(self.add_selection_func,
-						self.filelist_globbing_get_sfs(
-						          filelists[filelists_index], 1, arg))
+						self.filelist_globbing_get_sfs(filelists[filelists_index], 1, arg))
 					filelists_index += 1
 				elif opt == "--include-regexp":
 					self.add_selection_func(self.regexp_get_sf(arg, 1))
