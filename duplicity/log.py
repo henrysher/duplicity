@@ -33,6 +33,18 @@ def Log(s, verb_level):
 			sys.stdout.write(s + "\n")
 			sys.stdout.flush()
 
+def Debug(s):
+	"""Shortcut used for debug message (verbosity 9)."""
+	Log(s, 9)
+
+def Info(s):
+	"""Shortcut used for info messages (verbosity 5)."""
+	Log(s, 5)
+
+def Notice(s):
+	"""Shortcut used for notice messages (verbosity 3, the default)."""
+	Log(s, 3)
+
 def Warn(s):
 	"""Shortcut used for warning messages (verbosity 2)"""
 	Log(s, 2)
