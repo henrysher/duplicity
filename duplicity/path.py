@@ -458,7 +458,11 @@ class Path(ROPath):
 	def mkdir(self):
 		"""Make a directory at specified path"""
 		log.Log("Making directory %s" % (self.name,), 7)
-		os.mkdir(self.name)
+		try:
+			os.mkdir(self.name)
+		except OSError:
+			if (not globals.force):
+				raise PathException("Error creating directory %s" % (self.name,), 7)
 		self.setdata()
 
 	def delete(self):

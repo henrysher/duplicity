@@ -483,7 +483,7 @@ class ROPath_IterWriter(ITRBranch):
 				ropath.copy(new_path)
 
 		self.dir_new_path = self.base_path.new_index(index)
-		if self.dir_new_path.exists(): # base may exist, but nothing else
+		if self.dir_new_path.exists() and not globals.force: # base may exist, but nothing else
 			assert index == (), index
 		else: self.dir_new_path.mkdir()
 		self.dir_diff_ropath = ropath

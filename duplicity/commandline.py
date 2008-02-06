@@ -389,7 +389,7 @@ def process_local_dir(action, local_pathname):
 	"""Check local directory, set globals.local_path"""
 	local_path = path.Path(path.Path(local_pathname).get_canonical())
 	if action == "restore":
-		if local_path.exists() and not local_path.isemptydir():
+		if (local_path.exists() and not local_path.isemptydir()) and not globals.force:
 			log.FatalError("Restore destination directory %s already "
 						   "exists.\nWill not overwrite." % (local_pathname,))
 	elif action == "verify":
