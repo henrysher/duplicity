@@ -173,5 +173,11 @@ class rsyncModuleTest(unittest.TestCase, UnivTest):
 	password = config.rsync_password
 
 
+class s3ModuleTest(unittest.TestCase, UnivTest):
+	"""Test the s3 module backend"""
+	url_string = config.s3_url
+	password = None
+
+
 if __name__ == "__main__":
 	unittest.main()
