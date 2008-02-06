@@ -641,7 +641,7 @@ class rsyncBackend(Backend):
 			else:
 				return None
 		commandline = "rsync %s" % self.url_string
-		return filter (lambda x: x, map (split, self.popen(commandline).split('\n')))
+		return filter(lambda x: x, map (split, self.popen(commandline).split('\n')))
 
 	def delete(self, filename_list):
 		"""Delete files."""
@@ -767,7 +767,7 @@ class BotoBackend(Backend):
 	def list(self):
 		filename_list = []
 		if self.bucket:
-			for k in self.bucket.list(prefix = self.key_prefix + 'd', delimiter = '/'):
+			for k in self.bucket.list(prefix = self.key_prefix, delimiter = '/'):
 				try:
 					filename = k.key.replace(self.key_prefix, '', 1)
 					filename_list.append(filename)
