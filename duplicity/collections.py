@@ -610,7 +610,7 @@ class CollectionsStatus:
 												     chain.short_desc()))
 						break
 				else:
-					log.debug("Found orphaned set %s" % (set.get_timestr(),))
+					log.Debug("Found orphaned set %s" % (set.get_timestr(),))
 					orphaned_sets.append(set)
 		map(add_to_chains, sets)
 		return (chains, orphaned_sets, incomplete_sets)
