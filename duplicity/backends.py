@@ -45,7 +45,10 @@ def straight_url(parsed_url):
 def ParsedUrl(url_string):
 	# These URL schemes have a backend with a notion of an RFC "network location".
 	# The 'file' and 's3+http' schemes should not be in this list.
-	urlparser.uses_netloc = [ 'ftp', 'hsi', 'rsync', 's3', 'scp', 'ssh', 'webdav', 'webdavs' ]
+	# 'http' and 'https' are not actually used for duplicity backend urls, but are needed
+	# in order to properly support urls returned from some webdav servers. adding them here
+	# is a hack. we should instead not stomp on the url parsing module to begin with.
+	urlparser.uses_netloc = [ 'ftp', 'hsi', 'rsync', 's3', 'scp', 'ssh', 'webdav', 'webdavs', 'http', 'https' ]
 
 	# Do not transform or otherwise parse the URL path component.
 	urlparser.uses_query = []
@@ -860,11 +863,48 @@ class webdavBackend(Backend):
 		dom = xml.dom.minidom.parseString(document)
 		result = []
 		for href in dom.getElementsByTagName('D:href'):
-			filename = urllib.unquote(self._getText(href.childNodes).strip())
-			if filename.startswith(self.directory):
-				filename = filename.replace(self.directory,'',1)
+			filename = self.__taste_href(href)
+			if not filename is None:
 				result.append(filename)
 		return result
+
+	def __taste_href(self, href):
+		"""
+		Internal helper to taste the given href node and, if
+		it is a duplicity file, collect it as a result file.
+
+		@returns A matching filename, or None if the href did
+		         not match.
+		"""
+		raw_filename = self._getText(href.childNodes).strip()
+		parsed_url = urlparser.urlparse(urllib.unquote(raw_filename))
+		filename = parsed_url.path
+		log.Debug("webdav path decoding and translation: "\
+			  "%s -> %s" % (raw_filename, filename))
+
+		# at least one WebDAV server returns files in the form
+		# of full URL:s. this may or may not be
+		# according to the standard, but regardless we
+		# feel we want to bail out if the hostname
+		# does not match until someone has looked into
+		# what the WebDAV protocol mandages.
+		if not parsed_url.hostname is None \
+		   and not (parsed_url.hostname == self.parsed_url.hostname):
+			m =  "Received filename was in the form of a "\
+			    "full url, but the hostname (%s) did "\
+			    "not match that of the webdav backend "\
+			    "url (%s) - aborting as a conservative "\
+			    "safety measure. If this happens to you, "\
+			    "please report the problem"\
+			    "" % (parsed_url.hostname,
+				  self.parsed_url.hostname)
+			raise BackendException(m)
+					       
+		if filename.startswith(self.directory):
+			filename = filename.replace(self.directory,'',1)
+			return filename
+		else:
+			return None
 
 	def get(self, remote_filename, local_path):
 		"""Get remote filename, saving it to local_path"""
