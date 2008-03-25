@@ -254,6 +254,12 @@ class BackupChain:
 		"""Return first BackupSet in chain (ie the full backup)"""
 		return self.fullset
 
+	def short_desc(self):
+		"""Return a short one-line description of the chain, suitable
+		for log messages."""
+		return "[%s]-[%s]" % (dup_time.timetopretty(self.start_time),
+				      dup_time.timetopretty(self.end_time))
+
 	def __str__(self):
 		"""Return string representation, for testing purposes"""
 		set_schema = "%20s   %30s   %15s"
@@ -468,12 +474,15 @@ class CollectionsStatus:
 		"""
 		self.values_set = 1
 		backend_filename_list = self.backend.list()
+		log.Debug("%d files exist on backend" % (len(backend_filename_list,)))
 
 		(backup_chains, self.orphaned_backup_sets,
 		         self.incomplete_backup_sets) = \
 				 self.get_backup_chains(backend_filename_list)
 		backup_chains = self.get_sorted_chains(backup_chains)
 		self.all_backup_chains = backup_chains
+		
+		assert len(backup_chains) == len(self.all_backup_chains), "get_sorted_chains() did something more than re-ordering"
 
 		if self.archive_dir:
 			local_sig_chains, local_orphaned_sig_names = \
@@ -566,19 +575,22 @@ class CollectionsStatus:
 		missing files.
 
 		"""
+		log.Debug("Extracting backup chains from list of files: %s" % (filename_list,))
 		# First put filenames in set form
 		sets = []
 		def add_to_sets(filename):
 			"""Try adding filename to existing sets, or make new one"""
 			for set in sets:
 				if set.add_filename(filename):
+					log.Debug("File %s is part of known set" % (filename,))
 					break
 			else:
+				log.Debug("File %s is not part of a known set; creating new set" % (filename,))
 				new_set = BackupSet(self.backend)
 				if new_set.add_filename(filename):
 					sets.append(new_set)
 				else:
-					log.Log("Ignoring file '%s'" % filename, 9)
+					log.Log("Ignoring file (rejected by backup set) '%s'" % filename, 9)
 		map(add_to_sets, filename_list)
 		sets, incomplete_sets = self.get_sorted_sets(sets)
 
@@ -589,12 +601,16 @@ class CollectionsStatus:
 				new_chain = BackupChain(self.backend)
 				new_chain.set_full(set)
 				chains.append(new_chain)
+				log.Debug("Found backup chain %s" % (new_chain.short_desc()))
 			else:
 				assert set.type == "inc"
 				for chain in chains:
 					if chain.add_inc(set):
+						log.Debug("Added set %s to pre-existing chain %s" % (set.get_timestr(),
+												     chain.short_desc()))
 						break
 				else:
+					log.debug("Found orphaned set %s" % (set.get_timestr(),))
 					orphaned_sets.append(set)
 		map(add_to_chains, sets)
 		return (chains, orphaned_sets, incomplete_sets)
