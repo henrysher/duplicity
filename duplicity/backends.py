@@ -577,6 +577,14 @@ class ftpBackend(Backend):
 
 	def list(self):
 		"""List files in directory"""
+		# try for a long listing to avoid connection reset
+		commandline = "ncftpls %s -l '%s'" % \
+					  (self.flags, self.url_string)
+		l = self.popen_persist(commandline).split('\n')
+		l = filter(lambda x: x, l)
+		if not l:
+			return l
+		# if long list is not empty, get short list of names only
 		commandline = "ncftpls -x '' %s '%s'" % \
 					  (self.flags, self.url_string)
 		l = self.popen_persist(commandline).split('\n')
