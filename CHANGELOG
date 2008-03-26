@@ -1,3 +1,33 @@
+New in v0.4.10 (2008/03/27)
+---------------------------
+bug #22728: FTP backend fails on empty directory
+https://savannah.nongnu.org/bugs/?22728
+
+patch #6374: Duplicity --tempdir patch documentation.
+https://savannah.nongnu.org/patch/?6374
+
+patch #6375: Duplicity reports the epoch for a nonexistant last full backup date
+https://savannah.nongnu.org/patch/?6375
+
+patch #6380: add additional named logging levels
+https://savannah.nongnu.org/patch/?6380
+
+patch #6389: Possible Fix for pagefile.sys on Win32 systems
+https://savannah.nongnu.org/patch/?6389
+
+patch #6403: Restore by overwriting files/directories by using --force option
+https://savannah.nongnu.org/patch/?6403
+
+patch #6449: add additional debug level logging
+https://savannah.nongnu.org/patch/?6449
+
+patch #6453: handle absolute urls in webdav backend
+https://savannah.nongnu.org/patch/?6453
+
+Fix problem where S3 prefix was prepended with 'd'.  This caused
+a failure in the regression tests.
+
+
 New in v0.4.9 (2008/01/04)
 --------------------------
 NOTE: URL format correction in rsync://.  The rsync backend
