@@ -778,7 +778,15 @@ class BotoBackend(Backend):
 	def list(self):
 		filename_list = []
 		if self.bucket:
-			for k in self.bucket.list(prefix = self.key_prefix, delimiter = '/'):
+			# We add a 'd' to the prefix to make sure it is not null (for boto) and
+			# to optimize the listing of our filenames, which always begin with 'd'.
+			# This will cause a failure in the regression tests as below:
+			#   FAIL: Test basic backend operations
+			#   <tracback snipped>
+			#   AssertionError: Got list: []
+			#   Wanted: ['testfile']
+			# Because of the need for this optimization, it should be left as is.
+			for k in self.bucket.list(prefix = self.key_prefix + 'd', delimiter = '/'):
 				try:
 					filename = k.key.replace(self.key_prefix, '', 1)
 					filename_list.append(filename)
