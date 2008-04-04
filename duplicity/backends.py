@@ -700,6 +700,15 @@ class BotoBackend(Backend):
 			from boto.s3.connection import S3Connection
 			from boto.s3.key import Key
 			assert hasattr(S3Connection, 'lookup')
+
+			# Newer versions of boto default to using virtual hosting for
+			# buckets. This is bad because it will break backups stored in
+			# buckets that contain upper-case characters in the name.
+			try:
+				from boto.s3.connection import OrdinaryCallingFormat
+				calling_format = OrdinaryCallingFormat()
+			except ImportError:
+				calling_format = None
 		except ImportError:
 			log.FatalError("This backend requires boto library, version 0.9d or later, "
 						   "(http://code.google.com/p/boto/).")
@@ -716,6 +725,9 @@ class BotoBackend(Backend):
  		else:
 			assert parsed_url.scheme == 's3'
 			self.conn = S3Connection(host=parsed_url.hostname)
+
+		if hasattr(self.conn, 'calling_format'):
+			self.conn.calling_format = calling_format
 
 		# This folds the null prefix and all null parts, which means that:
 		#  //MyBucket/ and //MyBucket are equivalent.
