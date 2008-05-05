@@ -35,7 +35,7 @@ ${SUDO} tar xzf testfiles.tar.gz
 
 for t in ${alltests}; do
     echo "========== Running $t =========="
-    ${SUDO} python -u $t 2>&1 | grep -v "unsafe ownership"
+    ${SUDO} python2.3 -u $t 2>&1 | grep -v "unsafe ownership"
     echo
     echo
 done

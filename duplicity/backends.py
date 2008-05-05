@@ -594,8 +594,8 @@ class ftpBackend(Backend):
 	def delete(self, filename_list):
 		"""Delete files in filename_list"""
 		for filename in filename_list:
-			commandline = "ncftpls -x '' %s -X 'DELE %s' '%s%s'" % \
-						  (self.flags, filename, self.url_string, filename)
+			commandline = "ncftpls -x '' %s -X 'DELE %s' '%s'" % \
+						  (self.flags, filename, self.url_string)
 			self.popen_persist(commandline)
 
 
@@ -798,7 +798,8 @@ class BotoBackend(Backend):
 			#   AssertionError: Got list: []
 			#   Wanted: ['testfile']
 			# Because of the need for this optimization, it should be left as is.
-			for k in self.bucket.list(prefix = self.key_prefix + 'd', delimiter = '/'):
+			#for k in self.bucket.list(prefix = self.key_prefix + 'd', delimiter = '/'):
+			for k in self.bucket.list(prefix = self.key_prefix, delimiter = '/'):
 				try:
 					filename = k.key.replace(self.key_prefix, '', 1)
 					filename_list.append(filename)

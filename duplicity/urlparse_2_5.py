@@ -40,6 +40,15 @@ def clear_cache():
     global _parse_cache
     _parse_cache = {}
 
+import string
+def _rsplit(str, delim, numsplit):
+    parts = string.split(str, delim)
+    if len(parts) <= numsplit + 1:
+        return parts
+    else:
+        left = string.join(parts[0:-numsplit], delim)
+        right = string.join(parts[len(parts)-numsplit:], delim)
+        return [left, right]
 
 class BaseResult(tuple):
     """Base class for the parsed result objects.
@@ -55,66 +64,66 @@ class BaseResult(tuple):
 
     # Attributes that access the basic components of the URL:
 
-    @property
-    def scheme(self):
+    def get_scheme(self):
         return self[0]
+    scheme = property(get_scheme)
 
-    @property
-    def netloc(self):
+    def get_netloc(self):
         return self[1]
+    netloc = property(get_netloc)
 
-    @property
-    def path(self):
+    def get_path(self):
         return self[2]
+    path = property(get_path)
 
-    @property
-    def query(self):
+    def get_query(self):
         return self[-2]
+    query = property(get_query)
 
-    @property
-    def fragment(self):
+    def get_fragment(self):
         return self[-1]
+    fragment = property(get_fragment)
 
     # Additional attributes that provide access to parsed-out portions
     # of the netloc:
 
-    @property
-    def username(self):
+    def get_username(self):
         netloc = self.netloc
         if "@" in netloc:
-            userinfo = netloc.rsplit("@", 1)[0]
+            userinfo = _rsplit(netloc, "@", 1)[0]
             if ":" in userinfo:
                 userinfo = userinfo.split(":", 1)[0]
             return userinfo
         return None
+    username = property(get_username)
 
-    @property
-    def password(self):
+    def get_password(self):
         netloc = self.netloc
         if "@" in netloc:
-            userinfo = netloc.rsplit("@", 1)[0]
+            userinfo = _rsplit(netloc, "@", 1)[0]
             if ":" in userinfo:
                 return userinfo.split(":", 1)[1]
         return None
+    password = property(get_password)
 
-    @property
-    def hostname(self):
+    def get_hostname(self):
         netloc = self.netloc
         if "@" in netloc:
-            netloc = netloc.rsplit("@", 1)[1]
+            netloc = _rsplit(netloc, "@", 1)[1]
         if ":" in netloc:
             netloc = netloc.split(":", 1)[0]
         return netloc.lower() or None
+    hostname = property(get_hostname)
 
-    @property
-    def port(self):
+    def get_port(self):
         netloc = self.netloc
         if "@" in netloc:
-            netloc = netloc.rsplit("@", 1)[1]
+            netloc = _rsplit(netloc, "@", 1)[1]
         if ":" in netloc:
             port = netloc.split(":", 1)[1]
             return int(port, 10)
         return None
+    port = property(get_port)
 
 
 class SplitResult(BaseResult):
@@ -137,9 +146,9 @@ class ParseResult(BaseResult):
         return BaseResult.__new__(
             cls, (scheme, netloc, path, params, query, fragment))
 
-    @property
-    def params(self):
+    def get_params(self):
         return self[3]
+    params = property(get_params)
 
     def geturl(self):
         return urlunparse(self)
