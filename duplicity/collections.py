@@ -789,6 +789,10 @@ class CollectionsStatus:
 		NOTE: n = 1 -> time of latest available chain (n = 0 is not
 		a valid input). Thus the second-to-last is obtained with n=2
 		rather than n=1."""
+
+		def mycmp(x, y):
+			return cmp(x.get_first().time, y.get_first().time)
+
 		assert self.values_set
 		assert n > 0
 
@@ -796,9 +800,9 @@ class CollectionsStatus:
 			return None
 
 		sorted = self.all_backup_chains[:]
-		sorted.sort(reverse = True,
-			    key = lambda chain: chain.get_first().time)
+		sorted.sort(mycmp)
 
+		sorted.reverse()
 		return sorted[n - 1]
 
 	def get_older_than(self, t):
