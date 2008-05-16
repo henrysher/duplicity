@@ -331,7 +331,7 @@ class sshBackend(Backend):
 						   "python-pexpect from your distro's repository.")
 		
 		# host string of form user@hostname:port
-		self.host_string = parsed_url.netloc
+		self.host_string = parsed_url.username + "@" + parsed_url.hostname
 		# make sure remote_dir is always valid
 		if parsed_url.path:
 			# remove leading '/'
