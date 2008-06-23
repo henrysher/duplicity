@@ -34,8 +34,13 @@ from duplicity import collections, commandline, diffdir, dup_temp, \
 exit_val = None
 
 
-def get_passphrase():
-	"""Get passphrase from environment or, failing that, from user"""
+def get_passphrase(n):
+	"""Get passphrase from environment or, failing that, from user
+	
+	If n=3, a password is requested and verified. If n=2, the current
+	password is verified. If n=1, a password is requested without
+	verification for the time being."""
+
 	try:
 		return os.environ['PASSPHRASE']
 	except KeyError:
@@ -43,13 +48,23 @@ def get_passphrase():
 
 	log.Log("PASSPHRASE variable not set, asking user.", 5)
 	while 1:
-		pass1 = getpass.getpass("GnuPG passphrase: ")
-		pass2 = getpass.getpass("Retype to confirm: ")
+		if n == 2:
+			pass1 = globals.gpg_profile.passphrase
+		else:
+			pass1 = getpass.getpass("GnuPG passphrase: ")
+
+		if n == 1:
+			pass2 = pass1
+		else:
+			pass2 = getpass.getpass("Retype passphrase to confirm: ")
+
 		if not pass1 == pass2:
 			print "First and second passphrases do not match!  Please try again."
+			n = 3
 			continue
 		if not pass1 and not globals.gpg_profile.recipients:
 			print "Cannot use empty passphrase with symmetric encryption!  Please try again."
+			n = 3
 			continue
 		return pass1
 
@@ -147,6 +162,8 @@ def get_sig_fileobj(sig_type):
 													  local_sig_filename))
 	return fh
 
+def pubkey_only():
+	return not globals.gpg_profile.sign_key and globals.gpg_profile.recipients and globals.encryption
 
 def full_backup(col_stats):
 	"""Do full backup of directory to backend, using archive_dir"""
@@ -402,9 +419,6 @@ def main():
 	os.umask(077)
 	
 	# for public key encryption (without signing!), no passphrase is required.
-	pubkey_only = (not globals.gpg_profile.sign_key and
-				   globals.gpg_profile.recipients and
-				   globals.encryption)
 
 	# cases where we do not need to get a passphrase:
 	# full: with pubkey enc. doesn't depend on old encrypted info
@@ -412,17 +426,16 @@ def main():
 	# with encryption disabled
 	# listing files: needs a manifest, but the archive dir has that
 	# collection status only looks at a repository
-	if ((action == "full" and pubkey_only) or
-		(action == "inc" and pubkey_only and globals.archive_dir) or
-		(not globals.encryption) or
+	# NOTE: both full and inc are handled later
+	if ((not globals.encryption) or
 		(action == "list-current" and globals.archive_dir) or
-		action in ["collection-status",
+		action in ["full", "inc", "collection-status",
 				   "remove-older-then",
 				   "remove-all-but-n-full",
 				   ]):
 		globals.gpg_profile.passphrase = ""
 	else:
-		globals.gpg_profile.passphrase = get_passphrase()
+		globals.gpg_profile.passphrase = get_passphrase(1)
 
 	if action == "restore":
 		restore(col_stats)
@@ -441,11 +454,17 @@ def main():
 	else:
 		assert action == "inc" or action == "full", action
 		if action == "full":
+			if not pubkey_only():
+				globals.gpg_profile.passphrase = get_passphrase(3)
 			full_backup(col_stats)
-		else:
+		else:  # attempt incremental
+			if not (pubkey_only() and globals.archive_dir):
+				globals.gpg_profile.passphrase = get_passphrase(1)
 			check_last_manifest(col_stats) # not needed for full backup
 			sig_chain = check_sig_chain(col_stats)
 			if not sig_chain:
+				if not pubkey_only():
+					globals.gpg_profile.passphrase = get_passphrase(2)
 				full_backup(col_stats)
 			else:
 				incremental_backup(sig_chain)
