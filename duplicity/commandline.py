@@ -329,6 +329,8 @@ Options:
 	--tempdir <directory>
 	--timeout <seconds>
 	-t<time>, --restore-time <time>
+	--time-separator <char>
+	--version
 	--volsize <number>
 	-v[0-9], --verbosity [0-9]
 """ % (globals.version, sys.platform))

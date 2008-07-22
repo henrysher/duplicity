@@ -410,9 +410,17 @@ supercedes any environment variable.
 .BI -t time ", --restore-time " time
 When restoring, specify the time to restore to.
 .TP
+.BI "--time-separator " char
+Use 
+.IR char
+as the time separator in filenames instead of colon (":").
+.TP
 .BI -v [0-9] ", --verbosity " [0-9]
 Specify verbosity level (0 is total silent, 3 is the default, and 9 is
 noisiest).
+.TP
+.BI --version
+Print duplicity's version and quit.
 .TP
 .BI "--volsize " number
 Change the volume size to 
