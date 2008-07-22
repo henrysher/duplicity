@@ -1,3 +1,26 @@
+New in v0.4.12 (2008/07/22)
+---------------------------
+Dan Muresan created a patch to minimize the number of password
+prompts.  To do so, it sometimes requests a password once without
+confirmation; if later it turns out that a full backup is needed,
+the user is prompted for confirmation.
+
+bug #23540: doc bug in man page (environment FTP_PASSWORD)
+https://savannah.nongnu.org/bugs/index.php?23540
+
+bug #23362: Documentation for --version, --time-separator <char>
+https://savannah.nongnu.org/bugs/index.php?23362
+
+bug #23283: interactive passphrase query is suboptimal
+https://savannah.nongnu.org/bugs/index.php?23283
+
+bug #23066 was not actually applied to 0.4.11.  Its here now.
+https://savannah.nongnu.org/bugs/index.php?23066
+
+bug #22826: regressions caused by boto 1.1c
+https://savannah.nongnu.org/bugs/index.php?22826
+
+
 New in v0.4.11 (2008/05/05)
 ---------------------------
 Changes applied to allow duplicity to run under Python 2.3 again.
