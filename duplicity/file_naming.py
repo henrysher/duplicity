@@ -23,16 +23,19 @@ import dup_time, globals
 
 full_vol_re = re.compile("^duplicity-full\\.(?P<time>.*?)\\.vol(?P<num>[0-9]+)\\.difftar($|\\.)")
 full_vol_re_short = re.compile("^df\\.(?P<time>[0-9a-z]+?)\\.(?P<num>[0-9a-z]+)\\.dt($|\\.)")
+
 full_manifest_re = re.compile("^duplicity-full\\.(?P<time>.*?)\\.manifest($|\\.)")
 full_manifest_re_short = re.compile("^df\\.(?P<time>[0-9a-z]+?)\\.m($|\\.)")
 
 inc_vol_re = re.compile("^duplicity-inc\\.(?P<start_time>.*?)\\.to\\.(?P<end_time>.*?)\\.vol(?P<num>[0-9]+)\\.difftar($|\\.)")
 inc_vol_re_short = re.compile("^di\\.(?P<start_time>[0-9a-z]+?)\\.(?P<end_time>[0-9a-z]+?)\\.(?P<num>[0-9a-z]+)\\.dt($|\\.)")
+
 inc_manifest_re = re.compile("^duplicity-inc\\.(?P<start_time>.*?)\\.to\\.(?P<end_time>.*?)\\.manifest(\\.|$)")
 inc_manifest_re_short = re.compile("^di\\.(?P<start_time>[0-9a-z]+?)\\.(?P<end_time>[0-9a-z]+?)\\.m(\\.|$)")
 
 full_sig_re = re.compile("^duplicity-full-signatures\\.(?P<time>.*?)\\.sigtar(\\.|$)")
 full_sig_re_short = re.compile("^dfs\\.(?P<time>[0-9a-z]+?)\\.st(\\.|$)")
+
 new_sig_re = re.compile("^duplicity-new-signatures\\.(?P<start_time>.*?)\\.to\\.(?P<end_time>.*?)\\.sigtar(\\.|$)")
 new_sig_re_short = re.compile("^dns\\.(?P<start_time>[0-9a-z]+?)\\.(?P<end_time>[0-9a-z]+?)\\.st(\\.|$)")
 
@@ -190,7 +193,7 @@ def parse(filename):
 			if t1 and t2:
 				if m1:
 					return ParseResults("inc", start_time = t1,
-				  end_time = t2, volume_number = get_vol_num(m1.group("num")))
+										end_time = t2, volume_number = get_vol_num(m1.group("num")))
 				else:
 					return ParseResults("inc", start_time = t1,
 										end_time = t2, manifest = 1)
