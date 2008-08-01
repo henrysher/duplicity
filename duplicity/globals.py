@@ -113,6 +113,10 @@ ftp_connection = 'passive'
 
 # Protocol for webdav
 webdav_proto = 'http'
+  
+# Asynchronous put/get concurrency limit
+# (default of 0 disables asynchronicity).
+async_concurrency = 0
 
 # Whether to use "new-style" subdomain addressing for S3 buckets. Such
 # use is not backwards-compatible with upper-case buckets, or buckets

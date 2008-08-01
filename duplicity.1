@@ -204,6 +204,16 @@ in the backup destination, nor that the local archive directory
 need be kept safe. The local archive directory is a performance
 optimization only, and may safely be discarded at any time.
 .TP
+.BI "--asynchronous-upload "
+(EXPERIMENTAL) Perform file uploads asynchronously in the background,
+with respect to volume creation. This means that duplicity can upload
+a volume while, at the same time, preparing the next volume for
+upload. The intended end-resuls is a faster backup, because the local
+CPU and your bandwidth can be more consistently utilized. Use of this
+option implies additional need for disk space in the temporary storage
+location; rather than needing to store only one volume at a time,
+enough storage space is required to store two volumes.
+.TP
 .BI "--encrypt-key " key
 When backing up, encrypt to the given public key, instead of using
 symmetric (traditional) encryption.  Can be specified multiple times.

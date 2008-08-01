@@ -26,9 +26,11 @@
 
 from __future__ import generators
 import getpass, gzip, os, sys, time, types
+import traceback
+
 from duplicity import collections, commandline, diffdir, dup_temp, \
 	 dup_time, file_naming, globals, gpg, log, manifest, patchdir, \
-	 path, robust, tempdir
+	 path, robust, tempdir, asyncscheduler
 
 # If exit_val is not None, exit with given value at end.
 exit_val = None
@@ -88,11 +90,35 @@ def write_multivol(backup_type, tarblock_iter, backend):
 			end_index = start_index
 		return start_index, end_index
 
+	def put(tdp, dest_filename):
+		backend.put(tdp, dest_filename)
+		putsize = tdp.getsize()
+		tdp.delete()
+
+		return putsize
+
+	at_end = 0
 	mf = manifest.Manifest().set_dirinfo()
-	vol_num = 1; bytes_written = 0; at_end = 0
+	bytes_written = 0
+	vol_num = 0
+
+	# This assertion must be kept until we have solved the problem
+	# of concurrency at the backend level. Concurrency 1 is fine
+	# because the actual I/O concurrency on backends is limited to
+	# 1 as usual, but we are allowed to perform local CPU
+	# intensive tasks while that single upload is happening. This
+	# is an assert put in place to avoid someone accidentally
+	# enabling concurrency above 1, before adequate work has been
+	# done on the backends to make them support concurrency.
+	assert globals.async_concurrency <= 1
+
+	io_scheduler = asyncscheduler.AsyncScheduler(globals.async_concurrency)
+	async_waiters = []
+
 	while not at_end:
 		# Create volume
 		tarblock_iter.remember_next_index() # keep track of start index
+		vol_num += 1
 		dest_filename = file_naming.get(backup_type, vol_num,
 										encrypted = globals.encryption,
 										gzipped = not globals.encryption)
@@ -111,13 +137,18 @@ def write_multivol(backup_type, tarblock_iter, backend):
 		vi.set_hash("SHA1", gpg.get_hash("SHA1", tdp))
 		mf.add_volume_info(vi)
 
-		backend.put(tdp, dest_filename)
-		vol_num += 1; bytes_written += tdp.getsize()
-		tdp.delete()
+		async_waiters.append(io_scheduler.schedule_task(lambda tdp, dest_filename: put(tdp, dest_filename),
+								(tdp, dest_filename)))
 
+	# Collect byte count from all asynchronous jobs; also implicitly waits
+	# for them all to complete.
+	for waiter in async_waiters:
+		bytes_written += waiter()
+
+	# Upload the collection summary.
 	bytes_written += write_manifest(mf, backup_type, backend)
-	return bytes_written
 
+	return bytes_written
 
 def write_manifest(mf, backup_type, backend):
 	"""Write manifest to file in archive_dir and encrypted to backend

@@ -42,6 +42,7 @@ commands = ["cleanup",
 
 options = ["allow-source-mismatch",
 		   "archive-dir=",
+	   	   "asynchronous-upload",
 		   "current-time=",
 		   "encrypt-key=",
 		   "exclude=",
@@ -163,6 +164,8 @@ def parse_cmdline_options(arglist):
 			globals.allow_source_mismatch = 1
 		elif opt == "--archive-dir":
 			set_archive_dir(arg)
+		elif opt == "--asynchronous-upload":
+			globals.async_concurrency = 1 # (yes 1, this is not a boolean)
 		elif opt == "--current-time":
 			dup_time.setcurtime(get_int(arg, "current-time"))
 		elif opt == "--encrypt-key":
@@ -303,6 +306,7 @@ Commands:
 Options:
 	--allow-source-mismatch
 	--archive-dir <path>
+        --asynchronous-upload
 	--encrypt-key <gpg-key-id>
 	--exclude <shell_pattern>
 	--exclude-device-files
