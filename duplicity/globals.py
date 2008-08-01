@@ -114,3 +114,11 @@ ftp_connection = 'passive'
 # Protocol for webdav
 webdav_proto = 'http'
 
+# Whether to use "new-style" subdomain addressing for S3 buckets. Such
+# use is not backwards-compatible with upper-case buckets, or buckets
+# that are otherwise not expressable in a valid hostname.
+s3_use_new_style = False
+
+# Whether to create European buckets (sorry, hard-coded to only
+# support european for now).
+s3_european_buckets = False

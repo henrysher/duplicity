@@ -701,16 +701,56 @@ class BotoBackend(Backend):
 			from boto.s3.key import Key
 			assert hasattr(S3Connection, 'lookup')
 
-			# Newer versions of boto default to using virtual hosting for
-			# buckets. This is bad because it will break backups stored in
-			# buckets that contain upper-case characters in the name.
+			# Newer versions of boto default to using
+			# virtual hosting for buckets as a result of
+			# upstream deprecation of the old-style access
+			# method by Amazon S3. This change is not
+			# backwards compatible (in particular with
+			# respect to upper case characters in bucket
+			# names); so we default to forcing use of the
+			# old-style method unless the user has
+			# explicitly asked us to use new-style bucket
+			# access.
+			#
+			# Note that if the user wants to use new-style
+			# buckets, we use the subdomain calling form
+			# rather than given the option of both
+			# subdomain and vhost. The reason being that
+			# anything addressable as a vhost, is also
+			# addressable as a subdomain. Seeing as the
+			# latter is mostly a convenience method of
+			# allowing browse:able content semi-invisibly
+			# being hosted on S3, the former format makes
+			# a lot more sense for us to use - being
+			# explicit about what is happening (the fact
+			# that we are talking to S3 servers).
+
 			try:
 				from boto.s3.connection import OrdinaryCallingFormat
+				from boto.s3.connection import SubdomainCallingFormat
+				cfs_supported = True
 				calling_format = OrdinaryCallingFormat()
 			except ImportError:
+				cfs_supported = False
 				calling_format = None
+
+			if globals.s3_use_new_style:
+				if cfs_supported:
+					calling_format = SubdomainCallingFormat()
+				else:
+					log.FataError("Use of new-style (subdomain) S3 bucket addressing was"
+						      "requested, but does not seem to be supported by the "
+						      "boto library. Either you need to upgrade your boto "
+						      "library or duplicity has failed to correctly detect "
+						      "the appropriate support.")
+			else:
+				if cfs_supported:
+					calling_format = OrdinaryCallingFormat()
+				else:
+					calling_format = None
+
 		except ImportError:
-			log.FatalError("This backend requires boto library, version 0.9d or later, "
+			log.FatalError("This backend  (s3) requires boto library, version 0.9d or later, "
 						   "(http://code.google.com/p/boto/).")
 
 		if not os.environ.has_key('AWS_ACCESS_KEY_ID'):
@@ -727,7 +767,12 @@ class BotoBackend(Backend):
 			self.conn = S3Connection(host=parsed_url.hostname)
 
 		if hasattr(self.conn, 'calling_format'):
-			self.conn.calling_format = calling_format
+			if calling_format is None:
+				log.FatalError("It seems we previously failed to detect support for calling "
+					       "formats in the boto library, yet the support is there. This is "
+					       "almost certainly a duplicity bug.")
+			else:
+				self.conn.calling_format = calling_format
 
 		# This folds the null prefix and all null parts, which means that:
 		#  //MyBucket/ and //MyBucket are equivalent.
@@ -751,10 +796,16 @@ class BotoBackend(Backend):
 
 		self.straight_url = straight_url(parsed_url)
 
-
 	def put(self, source_path, remote_filename=None):
 		if not self.bucket:
-			self.bucket = self.conn.create_bucket(self.bucket_name)
+			if globals.s3_european_buckets:
+				if not globals.s3_use_new_style:
+					log.LogFatal("European bucket creation was requested, but not new-style "
+						     "bucket addressing (--s3-use-new-style)")
+				from boto.s3.connection import Location
+				self.bucket = self.conn.create_bucket(self.bucket_name, location = Location.EU)
+			else:
+				self.bucket = self.conn.create_bucket(self.bucket_name)
 		if not remote_filename:
 			remote_filename = source_path.get_filename()
 		key = self.key_class(self.bucket)

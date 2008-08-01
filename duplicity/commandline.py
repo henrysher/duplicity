@@ -69,6 +69,8 @@ options = ["allow-source-mismatch",
 		   "num-retries=",
 		   "restore-dir=",
 		   "restore-time=",
+	           "s3-european-buckets",
+	           "s3-use-new-style",
 		   "scp-command=",
 		   "sftp-command=",
 		   "short-filenames",
@@ -212,6 +214,10 @@ def parse_cmdline_options(arglist):
 		elif (opt == "-t" or
 			  opt == "--restore-time"):
 			globals.restore_time = dup_time.genstrtotime(arg)
+		elif opt == "--s3-european-buckets":
+			globals.s3_european_buckets = True
+		elif opt == "--s3-use-new-style":
+			globals.s3_use_new_style = True
 		elif opt == "--scp-command":
 			backends.scp_command = arg
 		elif opt == "--sftp-command":
@@ -320,6 +326,8 @@ Options:
 	--no-print-statistics
 	--null-separator
 	--num-retries <number>
+        --s3-european-buckets
+        --s3-use-new-style
 	--scp-command <command>
 	--sftp-command <command>
 	--sign-key <gpg-key-id>>
