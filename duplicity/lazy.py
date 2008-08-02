@@ -367,4 +367,5 @@ class ITRBranch:
 		log.Log("Skipping %s because of previous error" % index_str, 2)
 
 
-import robust, log
+import duplicity.log as log
+import duplicity.robust as robust

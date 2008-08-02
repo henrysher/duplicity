@@ -1,7 +1,11 @@
 import config
 import sys, os, unittest
 sys.path.insert(0, "../")
-from duplicity import path, backends, collections
+
+import duplicity.backend
+import duplicity.backends
+
+from duplicity import path, collections
 
 config.setup()
 
@@ -68,7 +72,7 @@ class FinalTest(unittest.TestCase):
 		assert not os.system("rm -rf testfiles/output "
 							 "testfiles/restore_out testfiles/tmp_archive")
 		assert not os.system("mkdir testfiles/output testfiles/tmp_archive")
-		backend = backends.get_backend(backend_url)
+		backend = duplicity.backend.get_backend(backend_url)
 		bl = backend.list()
 		if bl: backend.delete(backend.list())
 		backend.close()
@@ -189,7 +193,7 @@ class FinalTest(unittest.TestCase):
 		self.backup("full", "testfiles/dir1", current_time = 30000)
 		self.backup("inc", "testfiles/dir3", current_time = 40000)
 
-		b = backends.get_backend(backend_url)
+		b = duplicity.backend.get_backend(backend_url)
 		cs = collections.CollectionsStatus(b).set_values()
 		assert len(cs.all_backup_chains) == 2, cs.all_backup_chains
 		assert cs.matched_chain_pair

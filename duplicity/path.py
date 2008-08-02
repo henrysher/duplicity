@@ -480,6 +480,7 @@ class Path(ROPath):
 
 	def deltree(self):
 		"""Remove self by recursively deleting files under it"""
+		import duplicity.selection as selection # todo: avoid circ. dep. issue
 		log.Log("Deleting tree %s" % (self.name,), 7)
 		itr = IterTreeReducer(PathDeleter, [])
 		for path in selection.Select(self).set_iter(): itr(path.index, path)
@@ -546,6 +547,7 @@ class Path(ROPath):
 
 	def compare_recursive(self, other, verbose = None):
 		"""Compare self to other Path, descending down directories"""
+		import duplicity.selection as selection # todo: avoid circ. dep. issue
 		selfsel = selection.Select(self).set_iter()
 		othersel = selection.Select(other).set_iter()
 		return Iter.equal(selfsel, othersel, verbose)
@@ -650,4 +652,8 @@ class PathDeleter(ITRBranch):
 
 	
 # Wait until end to avoid circular module trouble
-import robust, tarfile, log, selection, globals, gpg, file_naming
+import duplicity.file_naming as file_naming
+import duplicity.globals as globals
+import duplicity.gpg as gpg
+import duplicity.log as log
+import duplicity.tarfile as tarfile

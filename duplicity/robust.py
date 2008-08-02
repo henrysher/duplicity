@@ -17,7 +17,7 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import tempfile
-import librsync, errno, log, path
+import errno
 
 tmp_file_index = 1
 
@@ -28,6 +28,9 @@ def check_common_error(error_handler, function, args = ()):
 	enough.
 
 	"""
+	# todo: import here to avoid circular dependency issue
+	import duplicity.path as path
+
 	try: return function(*args)
 	#except (EnvironmentError, SkipFileException, DSRPPermError,
 	#		RPathException, Rdiff.RdiffException,
@@ -53,4 +56,7 @@ def listpath(path):
 	dir_listing = check_common_error(error_handler, path.listdir)
 	dir_listing.sort()
 	return dir_listing
+
+import duplicity.librsync as librsync
+import duplicity.log as log
 

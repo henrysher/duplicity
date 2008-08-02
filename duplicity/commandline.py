@@ -18,8 +18,22 @@
 
 """Parse command line, check for consistency, and set globals"""
 
-import getopt, re, sys, os
-import backends, globals, log, path, selection, gpg, dup_time
+import getopt
+import os
+import re
+import sys
+
+from duplicity import backend
+from duplicity import dup_time
+from duplicity import globals
+from duplicity import gpg
+from duplicity import log
+from duplicity import path
+from duplicity import selection
+
+# Also import the sshbackend module specifically because we stomp on
+# its options.
+import duplicity.backends.sshbackend as sshbackend
 
 select_opts = [] # Will hold all the selection options
 select_files = [] # Will hold file objects when filelist given
@@ -222,17 +236,17 @@ def parse_cmdline_options(arglist):
 		elif opt == "--s3-use-new-style":
 			globals.s3_use_new_style = True
 		elif opt == "--scp-command":
-			backends.scp_command = arg
+			sshbackend.scp_command = arg
 		elif opt == "--sftp-command":
-			backends.sftp_command = arg
+			sshbackend.sftp_command = arg
 		elif opt == "--short-filenames":
 			globals.short_filenames = 1
 		elif opt == "--sign-key":
 			set_sign_key(arg)
 		elif opt == "--ssh-askpass":
-			backends.ssh_askpass = True
+			sshbackend.ssh_askpass = True
 		elif opt == "--ssh-options":
-			backends.ssh_options = (backends.ssh_options + ' ' + arg).strip()
+			sshbackend.ssh_options = (sshbackend.ssh_options + ' ' + arg).strip()
 		elif opt == "--tempdir":
 			globals.temproot = arg
 		elif opt == "--timeout":
@@ -383,7 +397,7 @@ def set_backend(arg1, arg2):
 	path made from arg1.
 
 	"""
-	backend1, backend2 = backends.get_backend(arg1), backends.get_backend(arg2)
+	backend1, backend2 = backend.get_backend(arg1), backend.get_backend(arg2)
 	if not backend1 and not backend2:
 		log.FatalError(
 """One of the arguments must be an URL.  Examples of URL strings are
@@ -468,7 +482,7 @@ def ProcessCommandLine(cmdline_list):
 		elif globals.remove_time is not None: action = "remove-old"
 		elif globals.keep_chains is not None: action = "remove-all-but-n-full"
 		else: command_line_error("Too few arguments")
-		globals.backend = backends.get_backend(args[0])
+		globals.backend = backend.get_backend(args[0])
 		if not globals.backend: log.FatalError("""Bad URL '%s'.
 Examples of URL strings are "scp://user@host.net:1234/path" and
 "file:///usr/local".  See the man page for more information.""" % (args[0],))

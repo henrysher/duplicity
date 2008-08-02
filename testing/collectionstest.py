@@ -1,7 +1,10 @@
 import config
 import os, sys, random, unittest
 sys.path.insert(0, "../")
-from duplicity import collections, backends, path, gpg, globals, dup_time
+
+import duplicity.backends
+
+from duplicity import collections, backend, path, gpg, globals, dup_time
 
 config.setup()
 
@@ -46,16 +49,16 @@ filename_list2 = ["duplicity-full.2001-01-01T16:17:01-07:00.manifest.gpg",
 
 col_test_dir = path.Path("testfiles/collectionstest")
 archive_dir = col_test_dir.append("archive_dir")
-archive_dir_backend = backends.get_backend("file://testfiles/collectionstest"
+archive_dir_backend = backend.get_backend("file://testfiles/collectionstest"
 										   "/archive_dir")
 
 dummy_backend = None
-real_backend = backends.get_backend("file://%s/%s" %
+real_backend = backend.get_backend("file://%s/%s" %
 									(col_test_dir.name, "remote_dir"))
 assert not os.system("rm -rf testfiles/output")
 assert not os.system("mkdir testfiles/output")
 output_dir = path.Path("testfiles/output") # used as a temp directory
-output_dir_backend = backends.get_backend("file://testfiles/output")
+output_dir_backend = backend.get_backend("file://testfiles/output")
 
 
 class CollectionTest(unittest.TestCase):

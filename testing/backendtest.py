@@ -1,7 +1,11 @@
 import config
 import sys, unittest, os
 sys.path.insert(0, "../")
-from duplicity import backends, path, log, file_naming, dup_time, globals, gpg
+
+import duplicity.backend
+import duplicity.backends
+
+from duplicity import path, log, file_naming, dup_time, globals, gpg
 
 config.setup()
 
@@ -10,7 +14,7 @@ class UnivTest:
 	def del_tmp(self):
 		"""Remove all files from test directory"""
 		config.set_environ("FTP_PASSWORD", self.password)
-		backend = backends.get_backend(self.url_string)
+		backend = duplicity.backend.get_backend(self.url_string)
 		backend.delete(backend.list())
 		backend.close()
 		"""Delete and create testfiles/output"""
@@ -21,12 +25,12 @@ class UnivTest:
 		"""Test basic backend operations"""
 		config.set_environ("FTP_PASSWORD", self.password)
 		self.del_tmp()
-		self.try_basic(backends.get_backend(self.url_string))
+		self.try_basic(duplicity.backend.get_backend(self.url_string))
 
 	def test_fileobj_ops(self):
 		"""Test fileobj operations"""
 		config.set_environ("FTP_PASSWORD", self.password)
-		self.try_fileobj_ops(backends.get_backend(self.url_string))
+		self.try_fileobj_ops(duplicity.backend.get_backend(self.url_string))
 
 	def try_basic(self, backend):
 		"""Try basic operations with given backend.
@@ -66,7 +70,7 @@ class UnivTest:
 		assert backendbuf == regfilebuf
 		
 		# Test delete
-		self.assertRaises(backends.BackendException,
+		self.assertRaises(backend.BackendException,
 						  backend.delete, ["aoeuaoeu"])
 		backend.delete([colonfile, normal_file])
 		cmp_list([])
@@ -104,7 +108,7 @@ class ParsedUrlTest(unittest.TestCase):
 	"""Test the ParsedUrl class"""
 	def test_basic(self):
 		"""Test various url strings"""
-		pu = backends.ParsedUrl("scp://ben@foo.bar:1234/a/b")
+		pu = duplicity.backend.ParsedUrl("scp://ben@foo.bar:1234/a/b")
 		assert pu.scheme == "scp", pu.scheme
 		assert pu.netloc == "ben@foo.bar:1234", pu.netloc
 		assert pu.path =="/a/b", pu.path
@@ -112,7 +116,7 @@ class ParsedUrlTest(unittest.TestCase):
 		assert pu.port == 1234, pu.port
 		assert pu.hostname == "foo.bar", pu.hostname
 
-		pu = backends.ParsedUrl("ftp://foo.bar:1234/")
+		pu = duplicity.backend.ParsedUrl("ftp://foo.bar:1234/")
 		assert pu.scheme == "ftp", pu.scheme
 		assert pu.netloc == "foo.bar:1234", pu.netloc
 		assert pu.path == "/", pu.path
@@ -120,14 +124,14 @@ class ParsedUrlTest(unittest.TestCase):
 		assert pu.port == 1234, pu.port
 		assert pu.hostname == "foo.bar", pu.hostname
 
-		pu = backends.ParsedUrl("file:///home")
+		pu = duplicity.backend.ParsedUrl("file:///home")
 		assert pu.scheme == "file", pu.scheme
 		assert pu.netloc == "", pu.netloc
 		assert pu.path == "///home", pu.path
 		assert pu.username is None, pu.username
 		assert pu.port is None, pu.port
 
-		pu = backends.ParsedUrl("ftp://foo@bar:pass@example.com:123/home")
+		pu = duplicity.backend.ParsedUrl("ftp://foo@bar:pass@example.com:123/home")
 		assert pu.scheme == "ftp", pu.scheme
 		assert pu.netloc == "foo@bar:pass@example.com:123", pu.netloc
 		assert pu.hostname == "example.com", pu.hostname

@@ -28,6 +28,9 @@ from __future__ import generators
 import getpass, gzip, os, sys, time, types
 import traceback
 
+import duplicity.backends
+import duplicity.errors
+
 from duplicity import collections, commandline, diffdir, dup_temp, \
 	 dup_time, file_naming, globals, gpg, log, manifest, patchdir, \
 	 path, robust, tempdir, asyncscheduler
@@ -510,4 +513,12 @@ def with_tempdir(fn):
 		tempdir.default().cleanup()
 
 if __name__ == "__main__":
-	with_tempdir(main)
+	try:
+		with_tempdir(main)
+	except duplicity.errors.UserError, e:
+		# For user errors, don't show an ugly stack trace by
+		# default. But do with sufficient verbosity.
+		log.Info("User error detail: %s"
+			 "" % (traceback.format_exception(*sys.exc_info())))
+		log.FatalError("%s: %s" % (e.__class__.__name__,
+					   str(e)))

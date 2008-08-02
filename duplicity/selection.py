@@ -24,11 +24,15 @@ documentation on what this code does can be found on the man page.
 """
 
 from __future__ import generators
-import re
-from path import *
-import robust, log, globals
-import os, stat
 
+import os
+import re
+import stat
+
+from duplicity.path import *
+
+import duplicity.log as log
+import duplicity.globals as globals
 
 class SelectError(Exception):
 	"""Some error dealing with the Select class"""
@@ -123,6 +127,8 @@ class Select:
 			and should be included iff something inside is included.
 
 			"""
+			# todo: get around circular dependency issue by importing here
+			import duplicity.robust as robust
 			for filename in robust.listpath(path):
 				new_path = robust.check_common_error(
 					error_handler, Path.append, (path, filename))
@@ -544,5 +550,4 @@ probably isn't what you meant.""" %
 					res = res + '[' + stuff + ']'
 			else: res = res + re.escape(c)
 		return res
-
 

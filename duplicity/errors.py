@@ -20,10 +20,50 @@
 Error/exception classes that do not fit naturally anywhere else.
 """
 
-class NotSupportedError(Exception):
+class DuplicityError(Exception):
+    pass
+
+class UserError(DuplicityError):
+    """
+    Subclasses use this in their inheritance hierarchy to signal that
+    the error is a user generated one, and that it is therefore
+    typically unsuitable to display a full stack trace.
+    """
+    pass
+
+class NotSupported(DuplicityError):
     """
     Exception raised when an action cannot be completed because some
     particular feature is not supported by the environment.
+    """
+    pass
+
+class ConflictingScheme(DuplicityError):
+    """
+    Raised to indicate an attempt was made to register a backend for a
+    scheme for which there is already a backend registered.
+    """
+    pass
+
+class InvalidBackendURL(UserError):
+    """
+    Raised to indicate a URL was not a valid backend URL.
+    """
+    pass
+
+class UnsupportedBackendScheme(InvalidBackendURL, UserError):
+    """
+    Raised to indicate that a backend URL was parsed successfully as a
+    URL, but was not supported.
+    """
+    def __init__(self, url):
+        InvalidBackendURL.__init__(self,
+                                   ("scheme not supported in url: %s" % (url,)))
+        self.url = url
+
+class BackendException(DuplicityError):
+    """
+    Raised to indicate a backend specific problem.
     """
     pass
 

@@ -1,3 +1,15 @@
+New in v0.5.00 (2008/08/??)
+---------------------------
+patch #6596: re-organize backend module structure
+https://savannah.nongnu.org/patch/index.php?6596
+
+patch #6589: S3 european bucket support
+https://savannah.nongnu.org/patch/index.php?6589
+
+patch #6353: Concurrency for volume encryption and upload.
+https://savannah.nongnu.org/patch/index.php?6353
+
+
 New in v0.4.12 (2008/07/22)
 ---------------------------
 Dan Muresan created a patch to minimize the number of password
