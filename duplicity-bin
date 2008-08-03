@@ -488,16 +488,16 @@ def main():
 	else:
 		assert action == "inc" or action == "full", action
 		if action == "full":
-			if not pubkey_only():
+			if not pubkey_only() and globals.encryption:
 				globals.gpg_profile.passphrase = get_passphrase(3)
 			full_backup(col_stats)
 		else:  # attempt incremental
-			if not (pubkey_only() and globals.archive_dir):
+			if not (pubkey_only() and globals.archive_dir) and globals.encryption:
 				globals.gpg_profile.passphrase = get_passphrase(1)
 			check_last_manifest(col_stats) # not needed for full backup
 			sig_chain = check_sig_chain(col_stats)
 			if not sig_chain:
-				if not pubkey_only():
+				if not pubkey_only() and globals.encryption:
 					globals.gpg_profile.passphrase = get_passphrase(2)
 				full_backup(col_stats)
 			else:
