@@ -1,5 +1,8 @@
 New in v0.5.00 (2008/08/??)
 ---------------------------
+bug #23988: scp destination fails if no username is specified
+https://savannah.nongnu.org/bugs/index.php?23988
+
 bug #23985: --no-encryption option does not work in 0.4.12
 https://savannah.nongnu.org/bugs/index.php?23985
 

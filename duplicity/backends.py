@@ -330,8 +330,11 @@ class sshBackend(Backend):
 						   "You can get pexpect from http://pexpect.sourceforge.net or "
 						   "python-pexpect from your distro's repository.")
 		
-		# host string of form user@hostname:port
-		self.host_string = parsed_url.username + "@" + parsed_url.hostname
+		# host string of form [user@]hostname
+		if parsed_url.username:
+			self.host_string = parsed_url.username + "@" + parsed_url.hostname
+		else:
+			self.host_string = parsed_url.hostname
 		# make sure remote_dir is always valid
 		if parsed_url.path:
 			# remove leading '/'
