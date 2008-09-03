@@ -21,7 +21,7 @@ import os.path
 import tempfile
 
 import duplicity.backend
-
+from duplicity.errors import *
 from duplicity import tempdir
 
 class RsyncBackend(duplicity.backend.Backend):

@@ -25,6 +25,7 @@ import xml.dom.minidom
 import duplicity.backend
 import duplicity.globals as globals
 import duplicity.log as log
+from duplicity.errors import *
 
 class WebDAVBackend(duplicity.backend.Backend):
     """Backend for accessing a WebDAV repository.

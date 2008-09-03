@@ -28,6 +28,7 @@ import time
 import duplicity.backend
 import duplicity.globals as globals
 import duplicity.log as log
+from duplicity.errors import *
 
 scp_command = "scp"
 sftp_command = "sftp"

@@ -5,6 +5,7 @@ sys.path.insert(0, "../")
 import duplicity.backend
 import duplicity.backends
 
+from duplicity.errors import *
 from duplicity import path, log, file_naming, dup_time, globals, gpg
 
 config.setup()
@@ -70,7 +71,7 @@ class UnivTest:
 		assert backendbuf == regfilebuf
 		
 		# Test delete
-		self.assertRaises(backend.BackendException,
+		self.assertRaises(BackendException,
 						  backend.delete, ["aoeuaoeu"])
 		backend.delete([colonfile, normal_file])
 		cmp_list([])

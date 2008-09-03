@@ -19,7 +19,7 @@
 """Functions for patching of directories"""
 
 from __future__ import generators
-import re, tarfile, librsync, log, diffdir, misc
+import re, tarfile, librsync, log, diffdir, misc, selection
 from path import *
 from lazy import *
 

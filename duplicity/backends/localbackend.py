@@ -22,6 +22,7 @@ import types
 import duplicity.backend
 import duplicity.log as log
 import duplicity.path as path
+from duplicity.errors import *
 
 class LocalBackend(duplicity.backend.Backend):
     """Use this backend when saving to local disk

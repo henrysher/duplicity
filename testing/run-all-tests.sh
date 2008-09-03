@@ -27,7 +27,6 @@ alltests=" \
 
 SUDO=sudo
 
-
 cd `dirname $0`
 pwd
 

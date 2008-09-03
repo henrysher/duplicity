@@ -22,6 +22,7 @@ import time
 import duplicity.backend
 import duplicity.globals as globals
 import duplicity.log as log
+from duplicity.errors import *
 
 class BotoBackend(duplicity.backend.Backend):
     """

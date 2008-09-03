@@ -652,8 +652,7 @@ class PathDeleter(ITRBranch):
 
 	
 # Wait until end to avoid circular module trouble
-import duplicity.file_naming as file_naming
-import duplicity.globals as globals
-import duplicity.gpg as gpg
-import duplicity.log as log
-import duplicity.tarfile as tarfile
+from duplicity import file_naming
+from duplicity import globals
+from duplicity import gpg
+from duplicity import tarfile

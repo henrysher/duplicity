@@ -19,6 +19,7 @@
 import os
 
 import duplicity.backend
+from duplicity.errors import *
 
 hsi_command = "hsi"
 class HSIBackend(duplicity.backend.Backend):

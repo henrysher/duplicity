@@ -23,7 +23,7 @@ import urllib
 import duplicity.backend
 import duplicity.globals as globals
 import duplicity.log     as log
-
+from duplicity.errors import *
 from duplicity         import tempdir
 
 class FTPBackend(duplicity.backend.Backend):

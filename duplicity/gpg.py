@@ -19,7 +19,7 @@
 """duplicity's gpg interface, builds upon Frank Tobin's GnuPGInterface"""
 
 import select, os, sys, thread, sha, md5, types, cStringIO, tempfile, re, gzip
-import GnuPGInterface, misc, log, path
+import GnuPGInterface, misc, log
 
 blocksize = 256 * 1024
 
@@ -185,6 +185,10 @@ def GPGWriteFile(block_iter, filename, profile,
 	Returns true if succeeded in writing until end of block_iter.
 
 	"""
+
+	# workaround for circular module imports
+	from duplicity import path
+
 	def top_off(bytes, file):
 		"""Add bytes of incompressible data to to_gpg_fp
 
