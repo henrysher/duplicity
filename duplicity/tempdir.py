@@ -224,6 +224,7 @@ class TemporaryDirectory:
             if not self.__dir is None:
                 for file in self.__pending.keys():
                     try:
+                        log.Log("Removing still remembered temporary file %s" % (file,), 9)
                         os.unlink(file)
                     except:
                         log.Log("Cleanup of temporary file %s failed" % (file,), 7)
