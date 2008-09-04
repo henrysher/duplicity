@@ -1,6 +1,6 @@
 # unittest for the tarfile module
 #
-# $Id: test_tarfile.py,v 1.4 2007/12/12 17:00:30 loafman Exp $
+# $Id: test_tarfile.py,v 1.5 2008/09/04 11:57:54 loafman Exp $
 
 import config
 import sys, os, shutil, StringIO, tempfile, unittest, stat, pwd, grp
@@ -49,12 +49,12 @@ class Test_All(BaseTest):
 
     def test_iteration(self):
         """Test iteration through temp2.tar"""
+        self.make_temptar()
         i = 0
         tf = tarfile.TarFile("none", "r", FileLogger(open("temp2.tar", "rb")))
         tf.debug = 3
         for tarinfo in tf: i += 1
         assert i >= 6, i
-
 
     def _test_extraction(self):
         """Test if regular files and links are extracted correctly.

@@ -39,4 +39,4 @@ for t in ${alltests}; do
     echo
 done
 
-${SUDO} rm -rf testfiles tempdir
+${SUDO} rm -rf testfiles tempdir temp2.tar
