@@ -1,10 +1,18 @@
-New in v0.5.00 (2008/08/??)
+New in v0.5.00 (2008/09/06)
 ---------------------------
+Changes to unit tests:
+  - resolve circular imports after backend reorg
+  - resolve exception error import - now in errors.py
+  - remove need for temp2.tar to be in CVS repository
+
 bug #23988: scp destination fails if no username is specified
 https://savannah.nongnu.org/bugs/index.php?23988
 
 bug #23985: --no-encryption option does not work in 0.4.12
 https://savannah.nongnu.org/bugs/index.php?23985
+
+patch #6623: slightly augment tempdir cleanup logging
+https://savannah.nongnu.org/patch/index.php?6623
 
 patch #6596: re-organize backend module structure
 https://savannah.nongnu.org/patch/index.php?6596
