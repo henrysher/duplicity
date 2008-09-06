@@ -80,40 +80,58 @@ def MakeTar():
 		os.lstat(tardir)
 		os.system("rm -rf " + tardir)
 	except OSError: pass
+
 	os.mkdir(tardir)
 	for filename in ["COPYING", "README", "CHANGELOG",
 					 SourceDir + "/_librsyncmodule.c",
 					 DistDir + "/setup.py"]:
 		assert not os.system("cp %s %s" % (filename, tardir)), filename
 
-	os.mkdir(tardir+"/src")
-
-	for filename in ["__init__.py",
-					 "backends.py",
-					 "collections.py",
-					 "commandline.py",
-					 "diffdir.py",
-					 "dup_temp.py",
-					 "dup_time.py",
-					 "file_naming.py",
-					 "globals.py",
-					 "gpg.py",
-					 "lazy.py",
-					 "librsync.py",
-					 "log.py",
-					 "manifest.py",
-					 "misc.py",
-					 "patchdir.py",
-					 "path.py",
-					 "robust.py",
-					 "selection.py",
-					 "static.py",
-					 "statistics.py",
-					 "tarfile.py",
-					 "tempdir.py",
-					 "urlparse_2_5.py"
-					 ]:
+	os.mkdir(tardir + "/src")
+	for filename in [
+		"asyncscheduler.py",
+		"backend.py",
+		"collections.py",
+		"commandline.py",
+		"diffdir.py",
+		"dup_temp.py",
+		"dup_threading.py",
+		"dup_time.py",
+		"errors.py",
+		"file_naming.py",
+		"globals.py",
+		"gpg.py",
+		"__init__.py",
+		"lazy.py",
+		"librsync.py",
+		"log.py",
+		"manifest.py",
+		"misc.py",
+		"patchdir.py",
+		"path.py",
+		"robust.py",
+		"selection.py",
+		"static.py",
+		"statistics.py",
+		"tarfile.py",
+		"tempdir.py",
+		"urlparse_2_5.py",
+		]:
 		assert not os.system("cp %s/%s %s/src" %
+							 (SourceDir, filename, tardir)), filename
+
+	os.mkdir(tardir + "/src/backends")
+	for filename in [
+		"backends/botobackend.py",
+		"backends/ftpbackend.py",
+		"backends/hsibackend.py",
+		"backends/__init__.py",
+		"backends/localbackend.py",
+		"backends/rsyncbackend.py",
+		"backends/sshbackend.py",
+		"backends/webdavbackend.py",
+		]:
+		assert not os.system("cp %s/%s %s/src/backends" %
 							 (SourceDir, filename, tardir)), filename
 
 	VersionedCopy("%s/globals.py" % (SourceDir,),
