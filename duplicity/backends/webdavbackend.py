@@ -94,6 +94,13 @@ class WebDAVBackend(duplicity.backend.Backend):
             self.conn.request("PROPFIND", self.directory, self.listbody, self.headers)
             del self.headers['Depth']
             response = self.conn.getresponse()
+            # if the target collection does not exist, create it.
+            if response.status == 404:
+                log.Log("Directory '%s' being created." % self.directory, 5)
+                self.conn.request("MKCOL", self.directory, None, self.headers)
+                res = self.conn.getresponse()
+                log.Log("WebDAV MKCOL status: %s %s" % (res.status, res.reason), 5)
+                continue
             if response.status == 207:
                 document = response.read()
                 break
@@ -107,7 +114,7 @@ class WebDAVBackend(duplicity.backend.Backend):
         result = []
         for href in dom.getElementsByTagName('D:href'):
             filename = self.__taste_href(href)
-            if not filename is None:
+            if filename:
                 result.append(filename)
         return result
 
@@ -156,7 +163,7 @@ class WebDAVBackend(duplicity.backend.Backend):
         for n in range(1, globals.num_retries+1):
             log.Log("Retrieving %s from WebDAV server" % (url ,), 5)
             self.conn.request("GET", url, None, self.headers)
-            response = self.conn.getresponse()		
+            response = self.conn.getresponse()      
             if response.status == 200:
                 target_file.write(response.read())
                 assert not target_file.close()
