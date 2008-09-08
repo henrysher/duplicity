@@ -184,5 +184,17 @@ class s3ModuleTest(unittest.TestCase, UnivTest):
 	password = None
 
 
+class webdavModuleTest(unittest.TestCase, UnivTest):
+	"""Test the webdav module backend"""
+	url_string = config.webdav_url
+	password = config.webdav_password
+
+
+class webdavsModuleTest(unittest.TestCase, UnivTest):
+	"""Test the webdavs module backend"""
+	url_string = config.webdavs_url
+	password = config.webdavs_password
+
+
 if __name__ == "__main__":
 	unittest.main()
