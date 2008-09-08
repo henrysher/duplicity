@@ -26,6 +26,7 @@ import duplicity.backend
 import duplicity.globals as globals
 import duplicity.log as log
 from duplicity.errors import *
+import duplicity.urlparse_2_5 as urlparser
 
 class WebDAVBackend(duplicity.backend.Backend):
     """Backend for accessing a WebDAV repository.
