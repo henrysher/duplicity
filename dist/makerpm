@@ -7,8 +7,8 @@ specfile = "duplicity.spec"
 
 if len(sys.argv) == 2: version = sys.argv[1]
 else:
-	print "Syntax:  %s version_number" % sys.argv[0]
-	sys.exit(1)
+    print "Syntax:  %s version_number" % sys.argv[0]
+    sys.exit(1)
 
 base = "duplicity-%s" % (version,)
 fedora_release = 6
@@ -25,8 +25,8 @@ assert not os.system("cp $HOME/rpmbuild/SRPMS/%s ." % source_rpm)
 
 # Old root RPM instructions
 #assert not os.system("install -o root -g root -m 644 %s "
-#					 "/usr/src/redhat/SOURCES" % (tarfile,))
+#                    "/usr/src/redhat/SOURCES" % (tarfile,))
 #assert not os.system("install -o ben -g ben -m 644 "
-#					 "/usr/src/redhat/RPMS/i386/%s ." % i386rpm)
+#                    "/usr/src/redhat/RPMS/i386/%s ." % i386rpm)
 #assert not os.system("install -o ben -g ben -m 644 "
-#					 "/usr/src/redhat/SRPMS/%s ." % source_rpm)
+#                    "/usr/src/redhat/SRPMS/%s ." % source_rpm)

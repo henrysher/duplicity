@@ -17,7 +17,7 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 # The following can be redefined to use different shell commands from
-# ssh or scp or to add more arguments.	However, the replacements must
+# ssh or scp or to add more arguments.  However, the replacements must
 # have the same syntax.  Also these strings will be executed by the
 # shell, so shouldn't have strange characters in them.
 

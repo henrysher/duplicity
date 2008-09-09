@@ -1,6 +1,6 @@
 # unittest for the tarfile module
 #
-# $Id: test_tarfile.py,v 1.5 2008/09/04 11:57:54 loafman Exp $
+# $Id: test_tarfile.py,v 1.6 2008/09/09 19:59:01 loafman Exp $
 
 import config
 import sys, os, shutil, StringIO, tempfile, unittest, stat, pwd, grp
@@ -35,10 +35,10 @@ class Test_All(BaseTest):
     """Allround test.
     """
     files_in_tempdir = ["tempdir",
-						"tempdir/0length",
+                        "tempdir/0length",
                         "tempdir/large",
                         "tempdir/hardlinked1",
-						"tempdir/hardlinked2",
+                        "tempdir/hardlinked2",
                         "tempdir/fifo",
                         "tempdir/symlink"]
 
@@ -120,9 +120,9 @@ class Test_All(BaseTest):
     def make_tempdir(self):
         """Make a temp directory with assorted files in it"""
         try:
-			os.lstat("tempdir")
+            os.lstat("tempdir")
         except OSError:
-			pass
+            pass
         else: # assume already exists
             assert not os.system("rm -r tempdir")
         os.mkdir("tempdir")
@@ -153,11 +153,11 @@ class Test_All(BaseTest):
     def make_temptar(self):
         """Tar up tempdir, write to "temp2.tar" """
         try:
-			os.lstat("temp2.tar")
+            os.lstat("temp2.tar")
         except OSError:
-			pass
+            pass
         else:
-			assert not os.system("rm temp2.tar")
+            assert not os.system("rm temp2.tar")
 
         self.make_tempdir()
         tf = tarfile.TarFile("temp2.tar", "w")
@@ -168,11 +168,11 @@ class Test_All(BaseTest):
     def make_temptar_iterator(self):
         """Tar up tempdir using an iterator"""
         try:
-			os.lstat("temp2.tar")
+            os.lstat("temp2.tar")
         except OSError:
-			pass
+            pass
         else:
-			assert not os.system("rm temp2.tar")
+            assert not os.system("rm temp2.tar")
 
         self.make_tempdir()
         def generate_pairs(tfi_list):
@@ -190,7 +190,7 @@ class Test_All(BaseTest):
                     ti.linkname = os.readlink(filename)
                     yield (ti, None)
                 else:
-					yield (ti, open(filename, "rb"))
+                    yield (ti, open(filename, "rb"))
         tfi_list = [None]
         tfi = tarfile.TarFromIterator(generate_pairs(tfi_list))
         tfi_list[0] = tfi # now generate_pairs can find tfi
@@ -338,44 +338,44 @@ class FileLogger:
 
 
 class PasswordTest(unittest.TestCase):
-	"""Test retrieving, storing password information"""
-	def compare(self, thunk1, thunk2):
-		"""Make sure thunk1 and thunk2 return the same"""
-		try: result1 = thunk1()
-		except KeyError, exc1: keyerror = 1
-		else: keyerror = 0
+    """Test retrieving, storing password information"""
+    def compare(self, thunk1, thunk2):
+        """Make sure thunk1 and thunk2 return the same"""
+        try: result1 = thunk1()
+        except KeyError, exc1: keyerror = 1
+        else: keyerror = 0
 
-		try: result2 = thunk2()
-		except KeyError, exc2:
-			assert keyerror, "Got KeyError vs " + str(result2)
-			return
-		else: assert not keyerror, "Got %s vs KeyError" % (str(result1),)
+        try: result2 = thunk2()
+        except KeyError, exc2:
+            assert keyerror, "Got KeyError vs " + str(result2)
+            return
+        else: assert not keyerror, "Got %s vs KeyError" % (str(result1),)
 
-		assert result1 == result2, (result1, result2)
+        assert result1 == result2, (result1, result2)
 
-	def test_uid2uname(self):
-		"""Test getting unames by uid"""
-		for uid in (0, 500, 789, 0, 0, 500):
-			self.compare(lambda: tarfile.uid2uname(uid),
-						 lambda: pwd.getpwuid(uid)[0])
+    def test_uid2uname(self):
+        """Test getting unames by uid"""
+        for uid in (0, 500, 789, 0, 0, 500):
+            self.compare(lambda: tarfile.uid2uname(uid),
+                         lambda: pwd.getpwuid(uid)[0])
 
-	def test_gid2gname(self):
-		"""Test getting group names by gid"""
-		for gid in (0, 500, 789, 0, 0, 500):
-			self.compare(lambda: tarfile.gid2gname(gid),
-						 lambda: grp.getgrgid(gid)[0])
+    def test_gid2gname(self):
+        """Test getting group names by gid"""
+        for gid in (0, 500, 789, 0, 0, 500):
+            self.compare(lambda: tarfile.gid2gname(gid),
+                         lambda: grp.getgrgid(gid)[0])
 
-	def test_gname2gid(self):
-		"""Test getting gids from gnames"""
-		for gname in ('root', 'ben', 'bin', 'sanothua', 'root', 'root'):
-			self.compare(lambda: tarfile.gname2gid(gname),
-						 lambda: grp.getgrnam(gname)[2])
+    def test_gname2gid(self):
+        """Test getting gids from gnames"""
+        for gname in ('root', 'ben', 'bin', 'sanothua', 'root', 'root'):
+            self.compare(lambda: tarfile.gname2gid(gname),
+                         lambda: grp.getgrnam(gname)[2])
 
-	def test_uname2uid(self):
-		"""Test getting uids from unames"""
-		for uname in ('root', 'ben', 'bin', 'sanothua', 'root', 'root'):
-			self.compare(lambda: tarfile.uname2uid(uname),
-						 lambda: pwd.getpwnam(uname)[2])
+    def test_uname2uid(self):
+        """Test getting uids from unames"""
+        for uname in ('root', 'ben', 'bin', 'sanothua', 'root', 'root'):
+            self.compare(lambda: tarfile.uname2uid(uname),
+                         lambda: pwd.getpwnam(uname)[2])
 
 
 if __name__ == "__main__":

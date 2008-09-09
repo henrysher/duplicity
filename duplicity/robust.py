@@ -22,40 +22,40 @@ import errno
 tmp_file_index = 1
 
 def check_common_error(error_handler, function, args = ()):
-	"""Apply function to args, if error, run error_handler on exception
+    """Apply function to args, if error, run error_handler on exception
 
-	This only catches certain exceptions which seem innocent
-	enough.
+    This only catches certain exceptions which seem innocent
+    enough.
 
-	"""
-	# todo: import here to avoid circular dependency issue
-	import duplicity.path as path
+    """
+    # todo: import here to avoid circular dependency issue
+    import duplicity.path as path
 
-	try: return function(*args)
-	#except (EnvironmentError, SkipFileException, DSRPPermError,
-	#		RPathException, Rdiff.RdiffException,
-	#		librsync.librsyncError, C.UnknownFileTypeError), exc:
-	#	TracebackArchive.add()
-	except (EnvironmentError, librsync.librsyncError, path.PathException), exc:
-		if (not isinstance(exc, EnvironmentError) or
-			(errno.errorcode[exc[0]] in
-			 ['EPERM', 'ENOENT', 'EACCES', 'EBUSY', 'EEXIST',
-			  'ENOTDIR', 'ENAMETOOLONG', 'EINTR', 'ENOTEMPTY',
-			  'EIO', 'ETXTBSY', 'ESRCH', 'EINVAL'])):
-			#Log.exception()
-			if error_handler: return error_handler(exc, *args)
-		else:
-			#Log.exception(1, 2)
-			raise
+    try: return function(*args)
+    #except (EnvironmentError, SkipFileException, DSRPPermError,
+    #       RPathException, Rdiff.RdiffException,
+    #       librsync.librsyncError, C.UnknownFileTypeError), exc:
+    #   TracebackArchive.add()
+    except (EnvironmentError, librsync.librsyncError, path.PathException), exc:
+        if (not isinstance(exc, EnvironmentError) or
+            (errno.errorcode[exc[0]] in
+             ['EPERM', 'ENOENT', 'EACCES', 'EBUSY', 'EEXIST',
+              'ENOTDIR', 'ENAMETOOLONG', 'EINTR', 'ENOTEMPTY',
+              'EIO', 'ETXTBSY', 'ESRCH', 'EINVAL'])):
+            #Log.exception()
+            if error_handler: return error_handler(exc, *args)
+        else:
+            #Log.exception(1, 2)
+            raise
 
 def listpath(path):
-	"""Like path.listdir() but return [] if error, and sort results"""
-	def error_handler(exc):
-		log.Log("Error listing directory %s" % path.name, 2)
-		return []
-	dir_listing = check_common_error(error_handler, path.listdir)
-	dir_listing.sort()
-	return dir_listing
+    """Like path.listdir() but return [] if error, and sort results"""
+    def error_handler(exc):
+        log.Log("Error listing directory %s" % path.name, 2)
+        return []
+    dir_listing = check_common_error(error_handler, path.listdir)
+    dir_listing.sort()
+    return dir_listing
 
 import duplicity.librsync as librsync
 import duplicity.log as log

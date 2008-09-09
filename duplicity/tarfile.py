@@ -37,13 +37,13 @@
 """Read from and write to tar format archives.
 """
 
-__version__ = "$Revision: 1.6 $"
+__version__ = "$Revision: 1.7 $"
 # $Source: /sources/duplicity/duplicity/duplicity/tarfile.py,v $
 
 version     = "0.4.9"
 __author__  = "Lars Gustabel (lars@gustaebel.de)"
-__date__    = "$Date: 2007/05/30 00:30:57 $"
-__cvsid__   = "$Id: tarfile.py,v 1.6 2007/05/30 00:30:57 loafman Exp $"
+__date__    = "$Date: 2008/09/09 19:57:46 $"
+__cvsid__   = "$Id: tarfile.py,v 1.7 2008/09/09 19:57:46 loafman Exp $"
 __credits__ = "Gustavo Niemeyer for his support, " \
               "Detlef Lannert for some early contributions"
 
@@ -1067,8 +1067,8 @@ class TarFile:
         tarinfo.gid = int(buf[116:123],8)
         tarinfo.size = long(buf[124:135], 8)
         tarinfo.mtime = long(buf[136:147], 8)
-		# chksum stored as a six digit octal number with
-		# leading zeroes followed by a nul and then a space
+        # chksum stored as a six digit octal number with
+        # leading zeroes followed by a nul and then a space
         tarinfo.chksum = int(buf[148:154], 8)
         tarinfo.type = buf[156:157]
         tarinfo.linkname = nts(buf[157:257])

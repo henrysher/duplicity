@@ -123,13 +123,13 @@ def ParsedUrl(url_string):
     return pu
 
 def strip_auth_from_url(parsed_url):
-	"""Return a URL from a urlparse object without a username or password."""
+    """Return a URL from a urlparse object without a username or password."""
 
-	# Get a copy of the network location without the username or password.
-	straight_netloc = parsed_url.netloc.split('@')[-1]
+    # Get a copy of the network location without the username or password.
+    straight_netloc = parsed_url.netloc.split('@')[-1]
 
-	# Replace the full network location with the stripped copy.
-	return parsed_url.geturl().replace(parsed_url.netloc, straight_netloc, 1)
+    # Replace the full network location with the stripped copy.
+    return parsed_url.geturl().replace(parsed_url.netloc, straight_netloc, 1)
 
 class Backend:
     """

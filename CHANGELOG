@@ -1,3 +1,12 @@
+New in v0.5.01 (2008/09/??)
+---------------------------
+bug #24223: WebDAV backend broken in 0.5.00
+https://savannah.nongnu.org/bugs/index.php?24223
+
+bug #24226: WebDAV Does Not Create Collection If Needed
+https://savannah.nongnu.org/bugs/index.php?24226
+
+
 New in v0.5.00 (2008/09/06)
 ---------------------------
 Changes to unit tests:

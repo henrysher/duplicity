@@ -3,24 +3,24 @@
 import os, sys, re
 
 def command_line_error():
-	print ("Syntax:  %s [-u|-m|-c] version_number old_version_number"
-		   % sys.argv[0])
-	print
-	print "This program uploads the new files to the web page and moves the"
-	print "old files to the OLD directory."
-	sys.exit(1)
+    print ("Syntax:  %s [-u|-m|-c] version_number old_version_number"
+           % sys.argv[0])
+    print
+    print "This program uploads the new files to the web page and moves the"
+    print "old files to the OLD directory."
+    sys.exit(1)
 
 if len(sys.argv) == 4:
-	version = sys.argv[2]
-	old_version = sys.argv[3]
-	command = sys.argv[1][1:]
+    version = sys.argv[2]
+    old_version = sys.argv[3]
+    command = sys.argv[1][1:]
 elif len(sys.argv) == 3:
-	command = sys.argv[1][1:]
-	if command in ('u', 'm', 'c'): version = old_version = sys.argv[2]
-	else:
-		version = sys.argv[1]
-		old_version = sys.argv[2]
-		command = "all"
+    command = sys.argv[1][1:]
+    if command in ('u', 'm', 'c'): version = old_version = sys.argv[2]
+    else:
+        version = sys.argv[1]
+        old_version = sys.argv[2]
+        command = "all"
 else: command_line_error()
 
 duplicity_mirror = "/home/ben/misc/html/mirror/duplicity"
@@ -34,46 +34,46 @@ old_srcrpm = "duplicity-%s-1.src.rpm" % old_version
 old_i386rpm = "duplicity-%s-1.i386.rpm" % old_version
 
 def run(commandline):
-	print commandline
-	assert not os.system(commandline)
+    print commandline
+    assert not os.system(commandline)
 
 def upload_new():
-	run("scp %s %s %s bescoto@savannah.nongnu.org:/upload/duplicity"
-		% (tarball, srcrpm, i386rpm))
-	run("cp CHANGELOG duplicity.1 rdiffdir.1 %s" % (duplicity_mirror,))
-	run("rman -f html duplicity.1 > %s/duplicity.1.html" % (duplicity_mirror,))
-	run("rman -f html rdiffdir.1 > %s/rdiffdir.1.html" % (duplicity_mirror,))
+    run("scp %s %s %s bescoto@savannah.nongnu.org:/upload/duplicity"
+        % (tarball, srcrpm, i386rpm))
+    run("cp CHANGELOG duplicity.1 rdiffdir.1 %s" % (duplicity_mirror,))
+    run("rman -f html duplicity.1 > %s/duplicity.1.html" % (duplicity_mirror,))
+    run("rman -f html rdiffdir.1 > %s/rdiffdir.1.html" % (duplicity_mirror,))
 
 def move_old():
-	"""Move old files from upload area to OLD directory
+    """Move old files from upload area to OLD directory
 
-	Unfortunately, savannah sftp is broken so apparently there is no
-	way to remove the old files.
+    Unfortunately, savannah sftp is broken so apparently there is no
+    way to remove the old files.
 
-	"""
-	olddir = os.path.join(duplicity_mirror, "OLD", old_version)
-	try: os.stat(olddir)
-	except OSError:
-		os.mkdir(olddir)
-	run("mv %s %s %s %s" % (old_tarball, old_srcrpm, old_i386rpm, olddir))
+    """
+    olddir = os.path.join(duplicity_mirror, "OLD", old_version)
+    try: os.stat(olddir)
+    except OSError:
+        os.mkdir(olddir)
+    run("mv %s %s %s %s" % (old_tarball, old_srcrpm, old_i386rpm, olddir))
 
 def checkin_webpage():
-	"""Check new web page into CVS"""
-	os.chdir(duplicity_mirror)
-	try: run("cvs add OLD/%s" % old_version)
-	except AssertionError: pass
-	run("cvs add -kb OLD/%s/%s OLD/%s/%s OLD/%s/%s" %
-		(old_version, old_tarball, old_version, old_i386rpm,
-		 old_version, old_srcrpm))
-	run("cvs ci")
+    """Check new web page into CVS"""
+    os.chdir(duplicity_mirror)
+    try: run("cvs add OLD/%s" % old_version)
+    except AssertionError: pass
+    run("cvs add -kb OLD/%s/%s OLD/%s/%s OLD/%s/%s" %
+        (old_version, old_tarball, old_version, old_i386rpm,
+         old_version, old_srcrpm))
+    run("cvs ci")
 
 
 if __name__ == "__main__":
-	if command == "u": upload_new()
-	elif command == "m": move_old()
-	elif command == "c": checkin_webpage()
-	elif command == "all":
-		upload_new()
-		move_old()
-		checkin_webpage()
-	else: command_line_error()
+    if command == "u": upload_new()
+    elif command == "m": move_old()
+    elif command == "c": checkin_webpage()
+    elif command == "all":
+        upload_new()
+        move_old()
+        checkin_webpage()
+    else: command_line_error()
