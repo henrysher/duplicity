@@ -1,4 +1,5 @@
 *.pyc
 .cvsignore
 config.py
+run-all-tests.log
 testfiles
