@@ -1,5 +1,8 @@
-New in v0.5.01 (2008/09/??)
+New in v0.5.01 (2008/09/11)
 ---------------------------
+bug #24234: Tabs Present In Source Files
+https://savannah.nongnu.org/bugs/index.php?24234
+
 bug #24223: WebDAV backend broken in 0.5.00
 https://savannah.nongnu.org/bugs/index.php?24223
 
