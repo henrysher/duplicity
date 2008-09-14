@@ -24,7 +24,7 @@ intended to be used by the backends themselves.
 import os
 import socket
 import time
-
+import re
 import getpass
 
 import duplicity.dup_temp as dup_temp
