@@ -34,7 +34,9 @@ from lazy import *
 # run.
 stats = None
 
-class DiffDirException(Exception): pass
+
+class DiffDirException(Exception):
+    pass
 
 
 def DirSig(path_iter):
@@ -53,6 +55,7 @@ def DirFull(path_iter):
     """
     return DirDelta(path_iter, cStringIO.StringIO(""))
 
+
 def DirFull_WriteSig(path_iter, sig_outfp):
     """Return full backup like above, but also write signature to sig_outfp"""
     return DirDelta_WriteSig(path_iter, cStringIO.StringIO(""), sig_outfp)
@@ -68,16 +71,22 @@ def DirDelta(path_iter, dirsig_fileobj_list):
     if type(dirsig_fileobj_list) is types.ListType:
         sig_iter = combine_path_iters(map(sigtar2path_iter,
                                           dirsig_fileobj_list))
-    else: sig_iter = sigtar2path_iter(dirsig_fileobj_list)
+    else:
+        sig_iter = sigtar2path_iter(dirsig_fileobj_list)
     return DeltaTarBlockIter(get_delta_iter(path_iter, sig_iter))
+
 
 def delta_iter_error_handler(exc, new_path, sig_path, sig_tar = None):
     """Called by get_delta_iter, report error in getting delta"""
-    if new_path: index_string = new_path.get_relative_path()
-    elif sig_path: index_string = sig_path.get_relative_path()
-    else: assert 0, "Both new and sig are None for some reason"
+    if new_path:
+        index_string = new_path.get_relative_path()
+    elif sig_path:
+        index_string = sig_path.get_relative_path()
+    else:
+        assert 0, "Both new and sig are None for some reason"
     log.Log("Error %s getting delta for %s" % (str(exc), index_string), 2)
     return None
+
 
 def get_delta_path(new_path, sig_path):
     """Get one delta_path, or None if error"""
@@ -87,7 +96,8 @@ def get_delta_path(new_path, sig_path):
     elif not sig_path or not sig_path.isreg():
         delta_path.difftype = "snapshot"
         delta_path.setfileobj(new_path.open("rb"))
-    else: # both new and sig exist and are regular files
+    else:
+        # both new and sig exist and are regular files
         assert sig_path.difftype == "signature"
         delta_path.difftype = "diff"
         sigfp, newfp = sig_path.open("rb"), new_path.open("rb")
@@ -96,16 +106,20 @@ def get_delta_path(new_path, sig_path):
     delta_path.stat.st_size = new_path.stat.st_size     
     return delta_path
 
+
 def log_delta_path(delta_path, new_path = None, stats = None):
     """Look at delta path and log delta.  Add stats if new_path is set"""
     if delta_path.difftype == "snapshot":
-        if new_path: stats.add_new_file(new_path)
+        if new_path:
+            stats.add_new_file(new_path)
         log.Log("Generating delta - new file: %s" %
                 (delta_path.get_relative_path(),), 5)
     else:
-        if new_path: stats.add_changed_file(new_path)
+        if new_path:
+            stats.add_changed_file(new_path)
         log.Log("Generating delta - changed file: %s" %
-                  (delta_path.get_relative_path(),), 5)
+                (delta_path.get_relative_path(),), 5)
+
 
 def get_delta_iter(new_iter, sig_iter):
     """Generate delta iter from new Path iter and sig Path iter.
@@ -123,14 +137,17 @@ def get_delta_iter(new_iter, sig_iter):
             log.Log("Generating delta - deleted file: %s" %
                     (sig_path.get_relative_path(),), 5)
             yield ROPath(sig_path.index)
-        elif sig_path and new_path == sig_path: pass # no change, skip
+        elif sig_path and new_path == sig_path:
+            pass # no change, skip
         else:
             delta_path = robust.check_common_error(delta_iter_error_handler,
                                                    get_delta_path,
                                                    (new_path, sig_path))
-            if delta_path: # if not, an error must have occurred
+            if delta_path:
+                # if not, an error must have occurred
                 log_delta_path(delta_path)
                 yield delta_path
+
 
 def sigtar2path_iter(sigtarobj):
     """Convert signature tar file object open for reading into path iter"""
@@ -142,18 +159,22 @@ def sigtar2path_iter(sigtarobj):
                 # strip prefix and from name and set it to difftype
                 name, difftype = tarinfo.name[len(prefix):], prefix[:-1]
                 break
-        else: raise DiffDirException("Bad tarinfo name %s" % (tarinfo.name,))
+        else:
+            raise DiffDirException("Bad tarinfo name %s" % (tarinfo.name,))
             
         index = tuple(name.split("/"))
-        if not index[-1]: index = index[:-1] # deal with trailing /, ""
+        if not index[-1]:
+            index = index[:-1] # deal with trailing /, ""
             
         ropath = ROPath(index)
         ropath.difftype = difftype
         if difftype == "signature" or difftype == "snapshot":
             ropath.init_from_tarinfo(tarinfo)
-            if ropath.isreg(): ropath.setfileobj(tf.extractfile(tarinfo))
+            if ropath.isreg():
+                ropath.setfileobj(tf.extractfile(tarinfo))
         yield ropath
     sigtarobj.close()
+
 
 def collate2iters(riter1, riter2):
     """Collate two iterators.
@@ -167,17 +188,23 @@ def collate2iters(riter1, riter2):
     relem1, relem2 = None, None
     while 1:
         if not relem1:
-            try: relem1 = riter1.next()
+            try:
+                relem1 = riter1.next()
             except StopIteration:
-                if relem2: yield (None, relem2)
-                for relem2 in riter2: yield (None, relem2)
+                if relem2:
+                    yield (None, relem2)
+                for relem2 in riter2:
+                    yield (None, relem2)
                 break
             index1 = relem1.index
         if not relem2:
-            try: relem2 = riter2.next()
+            try:
+                relem2 = riter2.next()
             except StopIteration:
-                if relem1: yield (relem1, None)
-                for relem1 in riter1: yield (relem1, None)
+                if relem1:
+                    yield (relem1, None)
+                for relem1 in riter1:
+                    yield (relem1, None)
                 break
             index2 = relem2.index
 
@@ -187,9 +214,11 @@ def collate2iters(riter1, riter2):
         elif index1 == index2:
             yield (relem1, relem2)
             relem1, relem2 = None, None
-        else: # index2 is less
+        else:
+            # index2 is less
             yield (None, relem2)
             relem2 = None
+
 
 def combine_path_iters(path_iter_list):
     """Produce new iterator by combining the iterators in path_iter_list
@@ -208,8 +237,10 @@ def combine_path_iters(path_iter_list):
 
     def get_triple(iter_index):
         """Represent the next element as a triple, to help sorting"""
-        try: path = path_iter_list[iter_index].next()
-        except StopIteration: return None
+        try:
+            path = path_iter_list[iter_index].next()
+        except StopIteration:
+            return None
         return (path.index, iter_index, path)
 
     def refresh_triple_list(triple_list):
@@ -223,8 +254,10 @@ def combine_path_iters(path_iter_list):
                 if new_triple:
                     triple_list[iter_index] = new_triple
                     iter_index += 1
-                else: del triple_list[iter_index]
-            else: break # assumed triple_list sorted, so can exit now
+                else:
+                    del triple_list[iter_index]
+            else:
+                break # assumed triple_list sorted, so can exit now
             
     triple_list = filter(lambda x: x, map(get_triple,
                                           range(len(path_iter_list))))
@@ -246,13 +279,16 @@ def DirDelta_WriteSig(path_iter, sig_infp_list, newsig_outfp):
     stats = statistics.StatsDeltaProcess()
     if type(sig_infp_list) is types.ListType:
         sig_path_iter = get_combined_path_iter(sig_infp_list)
-    else: sig_path_iter = sigtar2path_iter(sig_infp_list)
+    else:
+        sig_path_iter = sigtar2path_iter(sig_infp_list)
     delta_iter = get_delta_iter_w_sig(path_iter, sig_path_iter, newsig_outfp)
     return DeltaTarBlockIter(delta_iter)
+
 
 def get_combined_path_iter(sig_infp_list):
     """Return path iter combining signatures in list of open sig files"""
     return combine_path_iters(map(sigtar2path_iter, sig_infp_list))
+
 
 def get_delta_iter_w_sig(path_iter, sig_path_iter, sig_fileobj):
     """Like get_delta_iter but also write signatures to sig_fileobj"""
@@ -261,8 +297,10 @@ def get_delta_iter_w_sig(path_iter, sig_path_iter, sig_fileobj):
     for new_path, sig_path in collated:
         log.Log("Comparing %s and %s" % (new_path and new_path.index,
                                          sig_path and sig_path.index), 6)
-        if not new_path or not new_path.type: # file doesn't exist
-            if sig_path and sig_path.exists(): # but signature says it did
+        if not new_path or not new_path.type:
+            # file doesn't exist
+            if sig_path and sig_path.exists():
+                # but signature says it did
                 log.Log("Generating delta - deleted file: %s" %
                         (sig_path.get_relative_path(),), 5)
                 ti = ROPath(sig_path.index).get_tarinfo()
@@ -278,10 +316,13 @@ def get_delta_iter_w_sig(path_iter, sig_path_iter, sig_fileobj):
             if delta_path:
                 log_delta_path(delta_path, new_path, stats)
                 yield delta_path
-            else: stats.Errors += 1
-        else: stats.add_unchanged_file(new_path)
+            else:
+                stats.Errors += 1
+        else:
+            stats.add_unchanged_file(new_path)
     stats.close()
     sigTarFile.close()
+
 
 def get_delta_path_w_sig(new_path, sig_path, sigTarFile):
     """Return new delta_path which, when read, writes sig to sig_fileobj"""
@@ -306,10 +347,12 @@ def get_delta_path_w_sig(new_path, sig_path, sigTarFile):
     else:
         delta_path.difftype = "snapshot"
         ti.name = "snapshot/" + "/".join(index) 
-        if not new_path.isreg(): sigTarFile.addfile(ti)
-        else: delta_path.setfileobj(FileWithSignature(new_path.open("rb"),
-                                                      callback,
-                                                      new_path.getsize()))
+        if not new_path.isreg():
+            sigTarFile.addfile(ti)
+        else:
+            delta_path.setfileobj(FileWithSignature(new_path.open("rb"),
+                                                    callback,
+                                                    new_path.getsize()))
     new_path.copy_attribs(delta_path)
     delta_path.stat.st_size = new_path.stat.st_size
     return delta_path
@@ -342,7 +385,8 @@ class FileWithSignature:
     def close(self):
         # Make sure all of infile read
         if not self.activated_callback:
-            while self.read(self.blocksize): pass
+            while self.read(self.blocksize):
+                pass
             self.activated_callback = 1
             self.callback(self.sig_gen.getsig(), *self.extra_args)
         return self.infile.close()
@@ -354,6 +398,7 @@ class TarBlock:
         """TarBlock initializer - just store data"""
         self.index = index
         self.data = data
+
 
 class TarBlockIter:
     """A bit like an iterator, yield tar blocks given input iterator
@@ -381,8 +426,10 @@ class TarBlockIter:
         tarinfo.size = len(file_data)
         headers = self.tf._get_full_headers(tarinfo)
         blocks, remainder = divmod(tarinfo.size, tarfile.BLOCKSIZE)
-        if remainder > 0: filler_data = "\0" * (tarfile.BLOCKSIZE - remainder)
-        else: filler_data = ""
+        if remainder > 0:
+            filler_data = "\0" * (tarfile.BLOCKSIZE - remainder)
+        else:
+            filler_data = ""
         return TarBlock(index, "%s%s%s" % (headers, file_data, filler_data))
 
     def process(self, val, size):
@@ -402,8 +449,10 @@ class TarBlockIter:
 
     def next(self, size = 1024 * 1024):
         """Return next block, no bigger than size, and update offset"""
-        if self.process_waiting: result = self.process_continued(size)
-        else: # Below a StopIteration exception will just be passed upwards
+        if self.process_waiting:
+            result = self.process_continued(size)
+        else:
+            # Below a StopIteration exception will just be passed upwards
             result = self.process(self.input_iter.next(), size)
         self.offset += len(result.data)
         self.previous_index = result.index
@@ -431,7 +480,9 @@ class TarBlockIter:
         self.offset = 0l
         return '\0' * (tarfile.RECORDSIZE - remainder) # remainder can be 0
 
-    def __iter__(self): return self
+    def __iter__(self):
+        return self
+
 
 class SigTarBlockIter(TarBlockIter):
     """TarBlockIter that yields blocks of a signature tar from path_iter"""
@@ -455,6 +506,7 @@ class SigTarBlockIter(TarBlockIter):
             ti.name = "snapshot/" + "/".join(path.index)
             return self.tarinfo2tarblock(path.index, ti)
 
+
 class DeltaTarBlockIter(TarBlockIter):
     """TarBlockIter that yields parts of a deltatar file
 
@@ -467,15 +519,18 @@ class DeltaTarBlockIter(TarBlockIter):
         """Get a tarblock from delta_ropath"""
         def add_prefix(tarinfo, prefix):
             """Add prefix to the name of a tarinfo file"""
-            if tarinfo.name == ".": tarinfo.name = prefix + "/"
-            else: tarinfo.name = "%s/%s" % (prefix, tarinfo.name)
+            if tarinfo.name == ".":
+                tarinfo.name = prefix + "/"
+            else:
+                tarinfo.name = "%s/%s" % (prefix, tarinfo.name)
 
         ti = delta_ropath.get_tarinfo()
         index = delta_ropath.index
 
         # Return blocks of deleted files or fileless snapshots
         if not delta_ropath.type or not delta_ropath.fileobj:
-            if not delta_ropath.type: add_prefix(ti, "deleted")
+            if not delta_ropath.type:
+                add_prefix(ti, "deleted")
             else:
                 assert delta_ropath.difftype == "snapshot"
                 add_prefix(ti, "snapshot")
@@ -485,11 +540,15 @@ class DeltaTarBlockIter(TarBlockIter):
         fp = delta_ropath.open("rb")
         # Below the 512 is the usual length of a tar header
         data, last_block = self.get_data_block(fp, size - 512)
-        if stats: stats.RawDeltaSize += len(data)
+        if stats:
+            stats.RawDeltaSize += len(data)
         if last_block:
-            if delta_ropath.difftype == "snapshot": add_prefix(ti, "snapshot")
-            elif delta_ropath.difftype == "diff": add_prefix(ti, "diff")
-            else: assert 0, "Unknown difftype"
+            if delta_ropath.difftype == "snapshot":
+                add_prefix(ti, "snapshot")
+            elif delta_ropath.difftype == "diff":
+                add_prefix(ti, "diff")
+            else:
+                assert 0, "Unknown difftype"
             return self.tarinfo2tarblock(index, ti, data)
 
         # Finally, do multivol snapshot or diff case
@@ -507,9 +566,11 @@ class DeltaTarBlockIter(TarBlockIter):
         read_size = min(64*1024, max_size)
         buf = fp.read(read_size)
         if len(buf) < read_size:
-            if fp.close(): raise DiffDirException("Error closing file")
+            if fp.close():
+                raise DiffDirException("Error closing file")
             return (buf, 1)
-        else: return (buf, None)
+        else:
+            return (buf, None)
 
     def process_continued(self, size):
         """Return next volume in multivol diff or snapshot"""
@@ -524,20 +585,27 @@ class DeltaTarBlockIter(TarBlockIter):
             self.process_ropath = None
             self.process_waiting = None
             self.process_next_vol_number = None
-        else: self.process_next_vol_number += 1
+        else:
+            self.process_next_vol_number += 1
         return self.tarinfo2tarblock(index, ti, data)
 
 
 def write_block_iter(block_iter, out_obj):
     """Write block_iter to filename, path, or file object"""
-    if isinstance(out_obj, Path): fp = open(out_obj.name, "wb")
-    elif type(out_obj) is types.StringType: fp = open(out_obj, "wb")
-    else: fp = out_obj
-    for block in block_iter: fp.write(block.data)
+    if isinstance(out_obj, Path):
+        fp = open(out_obj.name, "wb")
+    elif type(out_obj) is types.StringType:
+        fp = open(out_obj, "wb")
+    else:
+        fp = out_obj
+    for block in block_iter:
+        fp.write(block.data)
     fp.write(block_iter.get_footer())
     assert not fp.close()
-    if isinstance(out_obj, Path): out_obj.setdata()
+    if isinstance(out_obj, Path):
+        out_obj.setdata()
     
+
 def get_block_size(file_len):
     """Return a reasonable block size to use on files of length file_len
 
@@ -546,6 +614,8 @@ def get_block_size(file_len):
     patching can take a really long time.
 
     """
-    if file_len < 1024000: return 512 # set minimum of 512 bytes
-    else: # Split file into about 2000 pieces, rounding to 512
+    if file_len < 1024000:
+        return 512 # set minimum of 512 bytes
+    else:
+        # Split file into about 2000 pieces, rounding to 512
         return min(long((file_len/(2000*512))*512), 2048)
