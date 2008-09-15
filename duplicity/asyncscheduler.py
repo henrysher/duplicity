@@ -23,6 +23,7 @@ dependency guarantees.
 
 import duplicity
 import duplicity.log as log
+import sys
 
 from duplicity.dup_threading import require_threading
 from duplicity.dup_threading import interruptably_wait
