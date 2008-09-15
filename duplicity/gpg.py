@@ -26,9 +26,11 @@ blocksize = 256 * 1024
 # user options appended by --gpg-options
 gpg_options = ""
 
+
 class GPGError(Exception):
     """Indicate some GPG Error"""
     pass
+
 
 class GPGProfile:
     """Just hold some GPG settings, avoid passing tons of arguments"""
@@ -73,11 +75,7 @@ class GPGFile:
         """
         self.status_fp = None # used to find signature
         self.closed = None # set to true after file closed
-        if log.verbosity >= 5:
-            # If verbosity low, suppress gpg log messages
-            self.logger_fp = sys.stderr
-        else:
-            self.logger_fp = tempfile.TemporaryFile()
+        self.logger_fp = tempfile.TemporaryFile()
         
         # Start GPG process - copied from GnuPGInterface docstring.
         gnupg = GnuPGInterface.GnuPG()
@@ -119,10 +117,25 @@ class GPGFile:
         self.encrypt = encrypt
 
     def read(self, length = -1):
-        return self.gpg_output.read(length)
+        try:
+            res = self.gpg_output.read(length)
+        except:
+            self.print_log()
+            raise
+        return res
 
     def write(self, buf):
-        return self.gpg_input.write(buf)
+        try:
+            res = self.gpg_input.write(buf)
+        except:
+            self.print_log()
+            raise
+        return res
+
+    def print_log(self):
+        self.logger_fp.seek(0)
+        for line in self.logger_fp:
+            print line,
 
     def close(self):
         if self.encrypt:
@@ -137,8 +150,9 @@ class GPGFile:
             if self.status_fp:
                 self.set_signature()
             self.gpg_process.wait()
-        if self.logger_fp is not sys.stderr:
-            self.logger_fp.close()
+        if log.verbosity >= 5:
+            self.print_log()
+        self.logger_fp.close()
         self.closed = 1
 
     def set_signature(self):
@@ -228,6 +242,7 @@ def GPGWriteFile(block_iter, filename, profile,
             top_off(target_size - cursize, file)
     file.close()
     return at_end_of_blockiter
+
 
 def GzipWriteFile(block_iter, filename, size = 5 * 1024 * 1024,
                   max_footer_size = 16 * 1024):
