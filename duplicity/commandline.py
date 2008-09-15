@@ -84,8 +84,8 @@ options = ["allow-source-mismatch",
            "num-retries=",
            "restore-dir=",
            "restore-time=",
-               "s3-european-buckets",
-               "s3-use-new-style",
+           "s3-european-buckets",
+           "s3-use-new-style",
            "scp-command=",
            "sftp-command=",
            "short-filenames",
@@ -169,7 +169,7 @@ def parse_cmdline_options(arglist):
 
     # parse the remaining args
     try:
-        optlist, args = getopt.gnu_getopt(arglist, "rt:v:V", options)
+        optlist, args = getopt.gnu_getopt(arglist, "hrt:v:V", options)
     except getopt.error, e:
         command_line_error("%s" % (str(e),))
 
@@ -184,18 +184,18 @@ def parse_cmdline_options(arglist):
             dup_time.setcurtime(get_int(arg, "current-time"))
         elif opt == "--encrypt-key":
             globals.gpg_profile.recipients.append(arg)
-        elif (opt == "--exclude" or
-              opt == "--exclude-regexp" or
-              opt == "--include" or
-              opt == "--include-regexp"):
+        elif opt in ["--exclude",
+                     "--exclude-regexp",
+                     "--include",
+                     "--include-regexp"]:
             select_opts.append((opt, arg))
-        elif (opt == "--exclude-device-files" or
-              opt == "--exclude-other-filesystems"):
+        elif opt in ["--exclude-device-files",
+                     "--exclude-other-filesystems"]:
             select_opts.append((opt, None))
-        elif (opt == "--exclude-filelist" or
-              opt == "--include-filelist" or
-              opt == "--exclude-globbing-filelist" or
-              opt == "--include-globbing-filelist"):
+        elif opt in ["--exclude-filelist", 
+                     "--include-filelist",
+                     "--exclude-globbing-filelist",
+                     "--include-globbing-filelist"]:
             select_opts.append((opt, arg))
             select_files.append(sel_fl(arg))
         elif opt == "--exclude-filelist-stdin":
@@ -211,7 +211,7 @@ def parse_cmdline_options(arglist):
             globals.ftp_connection = 'regular'
         elif opt == "--gpg-options":
             gpg.gpg_options = (gpg.gpg_options + ' ' + arg).strip()
-        elif opt == "--help":
+        elif opt in ["-h", "--help"]:
             usage();
             sys.exit(1);
         elif opt == "--include-filelist-stdin":
@@ -225,11 +225,9 @@ def parse_cmdline_options(arglist):
             globals.null_separator = 1
         elif opt == "--num-retries":
             globals.num_retries = int(arg)
-        elif (opt == "-r" or
-              opt == "--file-to-restore"):
+        elif opt in ["-r", "--file-to-restore"]:
             globals.restore_dir = arg
-        elif (opt == "-t" or
-              opt == "--restore-time"):
+        elif opt in ["-t", "--restore-time"]:
             globals.restore_time = dup_time.genstrtotime(arg)
         elif opt == "--s3-european-buckets":
             globals.s3_european_buckets = True
@@ -256,11 +254,10 @@ def parse_cmdline_options(arglist):
                 command_line_error("Dash ('-') not valid for time-separator.")
             globals.time_separator = arg
             dup_time.curtimestr = dup_time.timetostring(dup_time.curtime)
-        elif opt == "-V" or opt == "--version":
+        elif opt in ["-V", "--version"]:
             print "duplicity", str(globals.version)
             sys.exit(0)
-        elif (opt == "-v" or
-              opt == "--verbosity"):
+        elif opt in ["-v", "--verbosity"]:
             log.setverbosity(int(arg))
         elif opt == "--volsize":
             globals.volsize = int(arg)*1024*1024
@@ -320,7 +317,7 @@ Commands:
 Options:
     --allow-source-mismatch
     --archive-dir <path>
-        --asynchronous-upload
+    --asynchronous-upload
     --encrypt-key <gpg-key-id>
     --exclude <shell_pattern>
     --exclude-device-files
@@ -344,8 +341,8 @@ Options:
     --no-print-statistics
     --null-separator
     --num-retries <number>
-        --s3-european-buckets
-        --s3-use-new-style
+    --s3-european-buckets
+    --s3-use-new-style
     --scp-command <command>
     --sftp-command <command>
     --sign-key <gpg-key-id>>
