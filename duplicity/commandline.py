@@ -34,6 +34,7 @@ from duplicity import selection
 # Also import the sshbackend module specifically because we stomp on
 # its options.
 import duplicity.backends.sshbackend as sshbackend
+import duplicity.backends.gmailimapbackend as gmailimapbackend
 
 select_opts = [] # Will hold all the selection options
 select_files = [] # Will hold file objects when filelist given
@@ -71,6 +72,7 @@ options = ["allow-source-mismatch",
            "ftp-passive",
            "ftp-regular",
            "full-if-older-than=",
+           "gmail-mailbox=",
            "gpg-options=",
            "help",
            "include=",
@@ -209,6 +211,8 @@ def parse_cmdline_options(arglist):
             globals.ftp_connection = 'passive'
         elif opt == "--ftp-regular":
             globals.ftp_connection = 'regular'
+        elif opt == "--gmail-mailbox":
+            gmailimapbackend.gmail_mailbox = arg.strip()
         elif opt == "--gpg-options":
             gpg.gpg_options = (gpg.gpg_options + ' ' + arg).strip()
         elif opt in ["-h", "--help"]:
@@ -295,6 +299,7 @@ Backends and their URL formats:
     ftp://user[:password]@other.host[:port]/some_dir
     hsi://user[:password]@other.host[:port]/some_dir
     file:///some_dir
+    gmail://user[:password]@other.host[:port]/some_dir
     rsync://user[:password]@other.host[:port]::/module/some_dir
     rsync://user[:password]@other.host[:port]/relative_path
     rsync://user[:password]@other.host[:port]//absolute_path

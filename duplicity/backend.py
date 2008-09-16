@@ -96,7 +96,7 @@ def ParsedUrl(url_string):
     # is a hack. we should instead not stomp on the url parsing module to begin with.
     #
     # todo: eliminate the need for backend specific hacking here completely.
-    urlparser.uses_netloc = [ 'ftp', 'hsi', 'rsync', 's3', 'scp', 'ssh', 'webdav', 'webdavs', 'http', 'https' ]
+    urlparser.uses_netloc = [ 'ftp', 'hsi', 'rsync', 's3', 'scp', 'ssh', 'webdav', 'webdavs', 'http', 'https', 'gmail' ]
 
     # Do not transform or otherwise parse the URL path component.
     urlparser.uses_query = []
