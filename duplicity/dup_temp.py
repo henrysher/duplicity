@@ -23,10 +23,12 @@ import log, path, file_naming
 
 import duplicity.tempdir as tempdir
 
+
 def new_temppath():
     """Return a new TempPath"""
     filename = tempdir.default().mktemp()
     return TempPath(filename)
+
 
 class TempPath(path.Path):
     """Path object used as a temporary file"""
@@ -40,6 +42,7 @@ class TempPath(path.Path):
         fh = FileobjHooked(path.Path.open(self, mode))
         fh.addhook(self.delete)
         return fh
+
 
 def get_fileobj_duppath(dirpath, filename):
     """Return a file object open for writing, will write to filename
@@ -61,10 +64,12 @@ def get_fileobj_duppath(dirpath, filename):
 
     return fh
 
+
 def new_tempduppath(parseresults):
     """Return a new TempDupPath, using settings from parseresults"""
     filename = tempdir.default().mktemp()
     return TempDupPath(filename, parseresults = parseresults)
+
 
 class TempDupPath(path.DupPath):
     """Like TempPath, but build around DupPath"""
@@ -86,6 +91,7 @@ class TempDupPath(path.DupPath):
         fh.addhook(self.delete)
         return fh
 
+
 class FileobjHooked:
     """Simulate a file, but add hook on close"""
     def __init__(self, fileobj):
@@ -93,26 +99,30 @@ class FileobjHooked:
         self.fileobj = fileobj
         self.closed = None
         self.hooklist = [] # fill later with thunks to run on close
-        # self.second by MDR.  Will be filled by addfilehandle -- poor mans tee
+        # self.seconf will be filled by addfilehandle -- poor mans tee
         self.second = None
 
     def write(self, buf):
-        if self.second: self.second.write(buf) # by MDR.  actual tee
+        if self.second:
+            self.second.write(buf)
         return self.fileobj.write(buf)
     
-    def read(self, length = -1): return self.fileobj.read(length)
+    def read(self, length = -1):
+        return self.fileobj.read(length)
 
     def close(self):
         """Close fileobj, running hooks right afterwards"""
         assert not self.fileobj.close()
-        if self.second: assert not self.second.close()
-        for hook in self.hooklist: hook()
+        if self.second:
+            assert not self.second.close()
+        for hook in self.hooklist:
+            hook()
 
     def addhook(self, hook):
         """Add hook (function taking no arguments) to run upon closing"""
         self.hooklist.append(hook)
 
-    def addfilehandle(self, fh): # by MDR
+    def addfilehandle(self, fh):
         """Add a second filehandle for listening to the input
         
         This only works properly for two write handles"""
