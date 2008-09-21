@@ -128,9 +128,9 @@ def write_multivol(backup_type, tarblock_iter, backend):
         tdp = dup_temp.new_tempduppath(file_naming.parse(dest_filename))
         if globals.encryption:
             at_end = gpg.GPGWriteFile(tarblock_iter, tdp.name,
-                                      globals.gpg_profile,globals.volsize)
+                                      globals.gpg_profile, globals.volsize)
         else:
-            at_end = gpg.GzipWriteFile(tarblock_iter, tdp.name,globals.volsize)
+            at_end = gpg.GzipWriteFile(tarblock_iter, tdp.name, globals.volsize)
         tdp.setdata()
 
         # Add volume information to manifest
@@ -152,6 +152,7 @@ def write_multivol(backup_type, tarblock_iter, backend):
     bytes_written += write_manifest(mf, backup_type, backend)
 
     return bytes_written
+
 
 def write_manifest(mf, backup_type, backend):
     """Write manifest to file in archive_dir and encrypted to backend
@@ -196,8 +197,10 @@ def get_sig_fileobj(sig_type):
                                                       local_sig_filename))
     return fh
 
+
 def pubkey_only():
     return not globals.gpg_profile.sign_key and globals.gpg_profile.recipients and globals.encryption
+
 
 def full_backup(col_stats):
     """Do full backup of directory to backend, using archive_dir"""
@@ -373,6 +376,7 @@ def cleanup(col_stats):
         log.Warn(filestr + "\nRun duplicity again with the --force "
                  "option to actually delete.")
 
+
 def remove_all_but_n_full(col_stats):
     "Remove backup files older than the last n full backups."
     assert globals.keep_chains is not None
@@ -380,6 +384,7 @@ def remove_all_but_n_full(col_stats):
     globals.remove_time = col_stats.get_nth_last_full_backup_time(globals.keep_chains)
 
     return remove_old(col_stats)
+
 
 def remove_old(col_stats):
     """Remove backup files older than globals.remove_time from backend"""

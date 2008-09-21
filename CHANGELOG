@@ -1,3 +1,21 @@
+New in v0.5.02 (2008/09/21)
+---------------------------
+- Add -h option for help
+
+- Change gpg logging so that logs are always collected.
+The log is printed in the case of gpg IO errors.  Also,
+verbosity level 5 or above (-v5) will print the logs.
+
+patch #6297: Add IMAP/s/gmail support
+https://savannah.nongnu.org/patch/index.php?6297
+
+bug #24260: backend.py missing re import
+https://savannah.nongnu.org/bugs/index.php?24260
+
+bug #24274: asyncscheduler.py missing sys import
+https://savannah.nongnu.org/bugs/index.php?24274
+
+
 New in v0.5.01 (2008/09/11)
 ---------------------------
 bug #24234: Tabs Present In Source Files
