@@ -292,6 +292,11 @@ out.
 .B --ftp-regular
 Use regular (PORT) data connections.
 .TP
+.BI "--gmail-mailbox " option
+Allows you to specifiy a different mailbox.  The default is 
+"[Gmail]/All Mail".
+Other languages may require a different mailbox than the default.
+.TP
 .BI "--gpg-options " options
 Allows you to pass options to gpg encryption.  The 
 .I options 
@@ -477,6 +482,8 @@ ssh://user[:password]@other.host[:port]/some_dir
 scp://user[:password]@other.host[:port]/some_dir
 .PP
 ftp://user[:password]@other.host[:port]/some_dir
+.PP
+gmail://user[:password]@gmail.com[/from_address_prefix]
 .PP
 hsi://user[:password]@other.host/some_dir
 .PP
@@ -886,6 +893,19 @@ writing it is unclear to what extent this is an expected feature of
 Amazon S3, but in practice you may experience timeouts, socket errors
 or HTTP errors when trying to upload files to your newly created
 bucket. Give it a few minutes and the bucket should function normally.
+.SH GMAIL
+A Gmail account can be used as a target for the upload.  The userid may
+be specified and the password will be requested.  The --volsize must remain
+less than 20 (meg) as that is the (current) maximum attachment size.
+.PP
+The 
+.B from_address_prefix
+may be specified (and probably should be). The text will be used as
+the "From" address in Gmail.  Then on a restore (or list) command
+the 
+.B from_address_prefix
+will distinguish between different backups.
+.PP
 .SH BUGS
 Hard links currently unsupported (they will be treated as non-linked
 regular files).
