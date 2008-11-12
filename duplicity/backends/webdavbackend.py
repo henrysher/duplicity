@@ -16,10 +16,12 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
+import os
 import base64
 import httplib
 import re
 import urllib
+import urllib2
 import xml.dom.minidom
 
 import duplicity.backend
@@ -27,6 +29,20 @@ import duplicity.globals as globals
 import duplicity.log as log
 from duplicity.errors import *
 import duplicity.urlparse_2_5 as urlparser
+
+class CustomMethodRequest(urllib2.Request):
+    """
+    This request subclass allows explicit specification of
+    the HTTP request method. Basic urllib2.Request class
+    chooses GET or POST depending on self.has_data()
+    """
+    def __init__(self, method, *args, **kwargs):
+        self.method = method
+        urllib2.Request.__init__(self, *args, **kwargs)
+
+    def get_method(self):
+        return self.method
+
 
 class WebDAVBackend(duplicity.backend.Backend):
     """Backend for accessing a WebDAV repository.
@@ -44,9 +60,10 @@ class WebDAVBackend(duplicity.backend.Backend):
     """Connect to remote store using WebDAV Protocol"""
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
-        self.headers = {}
+        self.headers = {'Connection': 'keep-alive'}
         self.parsed_url = parsed_url
-
+        self.digest_challenge = None
+        self.digest_auth_handler = None
 
         if parsed_url.path:
             foldpath = re.compile('/+')
@@ -58,23 +75,12 @@ class WebDAVBackend(duplicity.backend.Backend):
         log.Log("Using WebDAV directory %s" % (self.directory,), 5)
         log.Log("Using WebDAV protocol %s" % (globals.webdav_proto,), 5)
 
-        password = self.get_password()
-
         if parsed_url.scheme == 'webdav':
             self.conn = httplib.HTTPConnection(parsed_url.hostname)
         elif parsed_url.scheme == 'webdavs':
             self.conn = httplib.HTTPSConnection(parsed_url.hostname)
         else:
             raise BackendException("Unknown URI scheme: %s" % (parsed_url.scheme))
-
-        self.headers['Authorization'] = 'Basic ' + base64.encodestring(parsed_url.username+':'+ password).strip()
-
-        # check password by connection to the server
-        self.conn.request("OPTIONS", self.directory, None, self.headers)
-        response = self.conn.getresponse()
-        response.read()
-        if response.status !=  200:
-            raise BackendException((response.status, response.reason))
 
     def _getText(self,nodelist):
         rc = ""
@@ -86,19 +92,79 @@ class WebDAVBackend(duplicity.backend.Backend):
     def close(self):
         self.conn.close()
 
+    def request(self, method, path, data=None):
+        """
+        Wraps the connection.request method to retry once if authentication is
+        required
+        """
+        quoted_path = urllib.quote(path)
+
+        if self.digest_challenge is not None:
+            self.headers['Authorization'] = self.get_digest_authorization(path)
+        self.conn.request(method, quoted_path, data, self.headers)
+        response = self.conn.getresponse()
+        if response.status == 401:
+            self.headers['Authorization'] = self.get_authorization(response, quoted_path)
+            self.conn.request(method, quoted_path, data, self.headers)
+            response = self.conn.getresponse()
+            
+        return response
+
+    def get_authorization(self, response, path):
+        """
+        Fetches the auth header based on the requested method (basic or digest)
+        """
+        try:
+            auth_hdr = response.getheader('www-authenticate', '')
+            token, challenge = auth_hdr.split(' ', 1)
+        except ValueError:
+            return None
+        if token.lower() == 'basic':
+            return self.get_basic_authorization()
+        else:
+            self.digest_challenge = self.parse_digest_challenge(challenge)
+            return self.get_digest_authorization(path)
+
+    def parse_digest_challenge(self, challenge_string):
+        return urllib2.parse_keqv_list(urllib2.parse_http_list(challenge_string))
+
+    def get_basic_authorization(self):
+        """
+        Returns the basic auth header
+        """
+        auth_string = '%s:%s' % (self.parsed_urk.username, self.get_password())
+        return 'Basic %s' % base64.encodestring(auth_string).strip()
+
+    def get_digest_authorization(self, path):
+        """
+        Returns the digest auth header
+        """
+        u = self.parsed_url
+        if self.digest_auth_handler is None:
+            pw_manager = urllib2.HTTPPasswordMgrWithDefaultRealm()
+            pw_manager.add_password(None, self.conn.host, u.username, self.get_password())
+            self.digest_auth_handler = urllib2.HTTPDigestAuthHandler(pw_manager)
+
+        # building a dummy request that gets never sent, 
+        # needed for call to auth_handler.get_authorization
+        scheme = u.scheme == 'webdavs' and 'https' or 'http'
+        hostname = u.port and "%s:%s" % (u.hostname, u.port) or u.hostname
+        dummy_url = "%s://%s%s" % (scheme, hostname, path)
+        dummy_req = CustomMethodRequest(self.conn._method, dummy_url)
+        auth_string = self.digest_auth_handler.get_authorization(dummy_req, self.digest_challenge)
+        return 'Digest %s' % auth_string
+
     def list(self):
         """List files in directory"""
         for n in range(1, globals.num_retries+1):
             log.Log("Listing directory %s on WebDAV server" % (self.directory,), 5)
             self.headers['Depth'] = "1"
-            self.conn.request("PROPFIND", self.directory, self.listbody, self.headers)
+            response = self.request("PROPFIND", self.directory, self.listbody)
             del self.headers['Depth']
-            response = self.conn.getresponse()
             # if the target collection does not exist, create it.
             if response.status == 404:
                 log.Log("Directory '%s' being created." % self.directory, 5)
-                self.conn.request("MKCOL", self.directory, None, self.headers)
-                res = self.conn.getresponse()
+                res = self.request("MKCOL", self.directory)
                 log.Log("WebDAV MKCOL status: %s %s" % (res.status, res.reason), 5)
                 continue
             if response.status == 207:
@@ -162,8 +228,7 @@ class WebDAVBackend(duplicity.backend.Backend):
         target_file = local_path.open("wb")
         for n in range(1, globals.num_retries+1):
             log.Log("Retrieving %s from WebDAV server" % (url ,), 5)
-            self.conn.request("GET", url, None, self.headers)
-            response = self.conn.getresponse()      
+            response = self.request("GET", url)
             if response.status == 200:
                 target_file.write(response.read())
                 assert not target_file.close()
@@ -181,8 +246,7 @@ class WebDAVBackend(duplicity.backend.Backend):
         source_file = source_path.open("rb")
         for n in range(1, globals.num_retries+1):
             log.Log("Saving %s on WebDAV server" % (url ,), 5)
-            self.conn.request("PUT", url, source_file.read(), self.headers)
-            response = self.conn.getresponse()
+            response = self.request("PUT", url, source_file.read())
             if response.status == 201:
                 response.read()
                 assert not source_file.close()
@@ -197,8 +261,7 @@ class WebDAVBackend(duplicity.backend.Backend):
             url = self.directory + filename
             for n in range(1, globals.num_retries+1):
                 log.Log("Deleting %s from WebDAV server" % (url ,), 5)
-                self.conn.request("DELETE", url, None, self.headers)
-                response = self.conn.getresponse()
+                response = self.request("DELETE", url)
                 if response.status == 204:
                     response.read()
                     break
