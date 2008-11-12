@@ -58,7 +58,6 @@ class GmailImapBackend(duplicity.backend.Backend):
         log.Log("IMAP connected",5)
         
     def _prepareBody(self,f,rname):
-       
         mp = email.MIMEMultipart.MIMEMultipart()
 
         # I am going to use the remote_dir as the From address so that 
@@ -82,7 +81,7 @@ class GmailImapBackend(duplicity.backend.Backend):
         f=source_path.open("rb")
         self._conn.select(remote_filename)
         body=self._prepareBody(f,remote_filename)
-        self._conn.append(None,None,None,body)
+        self._conn.append(gmail_mailbox,None,None,body)
         log.Log("IMAP mail with '%s' subject stored"%remote_filename,5)
 
     def get(self, remote_filename, local_path):
