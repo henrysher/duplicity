@@ -23,6 +23,7 @@ import duplicity.backend
 import duplicity.globals as globals
 import duplicity.log as log
 from duplicity.errors import *
+from duplicity.util import exception_traceback
 
 class BotoBackend(duplicity.backend.Backend):
     """
@@ -155,9 +156,14 @@ class BotoBackend(duplicity.backend.Backend):
             try:
                 key.set_contents_from_filename(source_path.name, {'Content-Type': 'application/octet-stream'})
                 return
-            except:
-                pass
-            log.Log("Upload '%s/%s' failed (attempt #%d)" % (self.straight_url, remote_filename, n), 1)
+            except Exception, e:
+                log.Log("Upload '%s/%s' failed (attempt #%d, reason: %s: %s)"
+                        "" % (self.straight_url,
+                              remote_filename,
+                              n,
+                              e.__class__.__name__,
+                              str(e)), 1)
+                log.Log("Backtrace of previous error: %s" % (exception_traceback(),), 6)
             time.sleep(30)
         log.Log("Giving up trying to upload %s/%s after %d attempts" % (self.straight_url, remote_filename, globals.num_retries), 1)
         raise BackendException("Error uploading %s/%s" % (self.straight_url, remote_filename))
@@ -171,9 +177,15 @@ class BotoBackend(duplicity.backend.Backend):
                 key.get_contents_to_filename(local_path.name)
                 local_path.setdata()
                 return
-            except:
-                pass
-            log.Log("Download %s/%s failed (attempt #%d)" % (self.straight_url, remote_filename, n), 1)
+            except Exception, e:
+                log.Log("Download %s/%s failed (attempt #%d, reason: %s: %s)"
+                        "" % (self.straight_url,
+                              remote_filename,
+                              n,
+                              e.__class__.__name__,
+                              str(e)), 1)
+                log.Log("Backtrace of previous error: %s" % (exception_traceback(),), 6)
+                
             time.sleep(30)
         log.Log("Giving up trying to download %s/%s after %d attempts" % (self.straight_url, remote_filename, globals.num_retries), 1)
         raise BackendException("Error downloading %s/%s" % (self.straight_url, remote_filename))
