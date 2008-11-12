@@ -150,7 +150,7 @@ class GPGFile:
             if self.status_fp:
                 self.set_signature()
             self.gpg_process.wait()
-        if log.verbosity >= 5:
+        if log.getverbosity() >= 5:
             self.print_log()
         self.logger_fp.close()
         self.closed = 1

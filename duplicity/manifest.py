@@ -62,7 +62,7 @@ Previous directory: %s""" % (self.local_dirname, globals.local_path.name)
 Aborting because you may have accidentally tried to backup two
 different data sets to the same remote location, or using the same
 archive directory.  If this is not a mistake, use the
---allow-source-mismatch switch to avoid seeing this message""")
+--allow-source-mismatch switch to avoid seeing this message""", log.ErrorCode.source_mismatch)
 
     def add_volume_info(self, vi):
         """Add volume info vi to manifest"""

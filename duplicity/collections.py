@@ -549,22 +549,25 @@ class CollectionsStatus:
         """Log various error messages if find incomplete/orphaned files"""
         assert self.values_set
         if self.orphaned_sig_names:
-            log.Log("Warning, found the following orphaned signature files:\n"
-                    + "\n".join(self.orphaned_sig_names), 2)
+            log.Warn("Warning, found the following orphaned signature files:\n"
+                     + "\n".join(self.orphaned_sig_names),
+                     log.WarningCode.orphaned_sig)
         if self.other_sig_chains and sig_chain_warning:
             if self.matched_chain_pair:
-                log.Log("Warning, found unnecessary signature chain(s)", 2)
+                log.Warn("Warning, found unnecessary signature chain(s)",
+                         log.WarningCode.unnecessary_sig)
             else:
-                log.Log("Warning, found signatures but no corresponding "
-                        "backup files", 2)
+                log.Warn("Warning, found signatures but no corresponding "
+                         "backup files", log.WarningCode.unmatched_sig)
 
         if self.incomplete_backup_sets:
-            log.Log("Warning, found incomplete backup sets, probably left "
-                    "from aborted session", 2)
+            log.Warn("Warning, found incomplete backup sets, probably left "
+                     "from aborted session", log.WarningCode.incomplete_backup)
         if self.orphaned_backup_sets:
-            log.Log("Warning, found the following orphaned backup files:\n"
-                    + "\n".join(map(lambda x: str(x),
-                                    self.orphaned_backup_sets)), 2)
+            log.Warn("Warning, found the following orphaned backup files:\n"
+                     + "\n".join(map(lambda x: str(x),
+                                     self.orphaned_backup_sets)),
+                     log.WarningCode.orphaned_backup)
 
     def get_backup_chains(self, filename_list):
         """Split given filename_list into chains

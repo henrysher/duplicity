@@ -441,6 +441,7 @@ def check_last_manifest(col_stats):
 def main():
     """Start/end here"""
     dup_time.setcurtime()
+    log.setup()
     action = commandline.ProcessCommandLine(sys.argv[1:])
     col_stats = collections.CollectionsStatus(globals.backend,
                                               globals.archive_dir).set_values()
@@ -508,6 +509,7 @@ def main():
             else:
                 incremental_backup(sig_chain)
     globals.backend.close()
+    log.shutdown()
     if exit_val is not None:
         sys.exit(exit_val)
 
