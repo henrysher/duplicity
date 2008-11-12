@@ -1,3 +1,27 @@
+New in v0.5.03 (2008/11/??)
+---------------------------
+bug #24731: Documentation error: "if... if" in remove-older-than paragraph
+https://savannah.nongnu.org/bugs/?24731
+
+bug #24775: Digest Auth for WebDAV backend
+https://savannah.nongnu.org/bugs/?24775
+
+patch #6670: Machine Readable Output
+https://savannah.nongnu.org/patch/?6670
+
+patch #6662: improve s3 backend error reporting
+https://savannah.nongnu.org/patch/?6662
+
+patch #6652: improve asynch scheduler (including the synchronous case)
+https://savannah.nongnu.org/patch/?6652
+
+patch #6642: make ParsedUrl() thread-safe with respect to itself
+https://savannah.nongnu.org/patch/?6642
+
+patch #6638: correct typo in reporting lack of sufficiently new boto backend
+https://savannah.nongnu.org/patch/?6638
+
+
 New in v0.5.02 (2008/09/21)
 ---------------------------
 - Add -h option for help
@@ -7,25 +31,25 @@ The log is printed in the case of gpg IO errors.  Also,
 verbosity level 5 or above (-v5) will print the logs.
 
 patch #6297: Add IMAP/s/gmail support
-https://savannah.nongnu.org/patch/index.php?6297
+https://savannah.nongnu.org/patch/?6297
 
 bug #24260: backend.py missing re import
-https://savannah.nongnu.org/bugs/index.php?24260
+https://savannah.nongnu.org/bugs/?24260
 
 bug #24274: asyncscheduler.py missing sys import
-https://savannah.nongnu.org/bugs/index.php?24274
+https://savannah.nongnu.org/bugs/?24274
 
 
 New in v0.5.01 (2008/09/11)
 ---------------------------
 bug #24234: Tabs Present In Source Files
-https://savannah.nongnu.org/bugs/index.php?24234
+https://savannah.nongnu.org/bugs/?24234
 
 bug #24223: WebDAV backend broken in 0.5.00
-https://savannah.nongnu.org/bugs/index.php?24223
+https://savannah.nongnu.org/bugs/?24223
 
 bug #24226: WebDAV Does Not Create Collection If Needed
-https://savannah.nongnu.org/bugs/index.php?24226
+https://savannah.nongnu.org/bugs/?24226
 
 
 New in v0.5.00 (2008/09/06)
@@ -36,22 +60,22 @@ Changes to unit tests:
   - remove need for temp2.tar to be in CVS repository
 
 bug #23988: scp destination fails if no username is specified
-https://savannah.nongnu.org/bugs/index.php?23988
+https://savannah.nongnu.org/bugs/?23988
 
 bug #23985: --no-encryption option does not work in 0.4.12
-https://savannah.nongnu.org/bugs/index.php?23985
+https://savannah.nongnu.org/bugs/?23985
 
 patch #6623: slightly augment tempdir cleanup logging
-https://savannah.nongnu.org/patch/index.php?6623
+https://savannah.nongnu.org/patch/?6623
 
 patch #6596: re-organize backend module structure
-https://savannah.nongnu.org/patch/index.php?6596
+https://savannah.nongnu.org/patch/?6596
 
 patch #6589: S3 european bucket support
-https://savannah.nongnu.org/patch/index.php?6589
+https://savannah.nongnu.org/patch/?6589
 
 patch #6353: Concurrency for volume encryption and upload.
-https://savannah.nongnu.org/patch/index.php?6353
+https://savannah.nongnu.org/patch/?6353
 
 
 New in v0.4.12 (2008/07/22)
@@ -62,19 +86,19 @@ confirmation; if later it turns out that a full backup is needed,
 the user is prompted for confirmation.
 
 bug #23540: doc bug in man page (environment FTP_PASSWORD)
-https://savannah.nongnu.org/bugs/index.php?23540
+https://savannah.nongnu.org/bugs/?23540
 
 bug #23362: Documentation for --version, --time-separator <char>
-https://savannah.nongnu.org/bugs/index.php?23362
+https://savannah.nongnu.org/bugs/?23362
 
 bug #23283: interactive passphrase query is suboptimal
-https://savannah.nongnu.org/bugs/index.php?23283
+https://savannah.nongnu.org/bugs/?23283
 
 bug #23066 was not actually applied to 0.4.11.  Its here now.
-https://savannah.nongnu.org/bugs/index.php?23066
+https://savannah.nongnu.org/bugs/?23066
 
 bug #22826: regressions caused by boto 1.1c
-https://savannah.nongnu.org/bugs/index.php?22826
+https://savannah.nongnu.org/bugs/?22826
 
 
 New in v0.4.11 (2008/05/05)
@@ -82,37 +106,37 @@ New in v0.4.11 (2008/05/05)
 Changes applied to allow duplicity to run under Python 2.3 again.
 
 patch #6485: Reinstate patch #6340 with a detailed explanation.
-https://savannah.nongnu.org/patch/index.php?6485
+https://savannah.nongnu.org/patch/?6485
 
 bug #23066: ssh uris with given portnumbers are not handled correctly
-https://savannah.nongnu.org/bugs/index.php?23066
+https://savannah.nongnu.org/bugs/?23066
 
 
 New in v0.4.10 (2008/03/27)
 ---------------------------
 bug #22728: FTP backend fails on empty directory
-https://savannah.nongnu.org/bugs/index.php?22728
+https://savannah.nongnu.org/bugs/?22728
 
 patch #6374: Duplicity --tempdir patch documentation.
-https://savannah.nongnu.org/patch/index.php?6374
+https://savannah.nongnu.org/patch/?6374
 
 patch #6375: Duplicity reports the epoch for a nonexistant last full backup date
-https://savannah.nongnu.org/patch/index.php?6375
+https://savannah.nongnu.org/patch/?6375
 
 patch #6380: add additional named logging levels
-https://savannah.nongnu.org/patch/index.php?6380
+https://savannah.nongnu.org/patch/?6380
 
 patch #6389: Possible Fix for pagefile.sys on Win32 systems
-https://savannah.nongnu.org/patch/index.php?6389
+https://savannah.nongnu.org/patch/?6389
 
 patch #6403: Restore by overwriting files/directories by using --force option
-https://savannah.nongnu.org/patch/index.php?6403
+https://savannah.nongnu.org/patch/?6403
 
 patch #6449: add additional debug level logging
-https://savannah.nongnu.org/patch/index.php?6449
+https://savannah.nongnu.org/patch/?6449
 
 patch #6453: handle absolute urls in webdav backend
-https://savannah.nongnu.org/patch/index.php?6453
+https://savannah.nongnu.org/patch/?6453
 
 Fix problem where S3 prefix was prepended with 'd'.  This caused
 a failure in the regression tests.
@@ -129,7 +153,7 @@ module access.  The formats are:
 
 Fixed regression caused by changeover to new urlparse.py.
 bug #21475: FTP Usernames that contain '@' are not recognized
-https://savannah.nongnu.org/bugs/index.php?21475
+https://savannah.nongnu.org/bugs/?21475
 
 Added section URL FORMAT in the duplicity man page.
 
@@ -146,19 +170,19 @@ to ncftpls to get the listing, thereby reducing the overhead
 on systems with a large number of backup files.
 
 bug #21896: Two problems with rsync under 0.4.8 + patch
-https://savannah.nongnu.org/bugs/index.php?21896
+https://savannah.nongnu.org/bugs/?21896
 
 bug #21909: Problematic typo in compare_verbose() method
-https://savannah.nongnu.org/bugs/index.php?21909
+https://savannah.nongnu.org/bugs/?21909
 
 patch #6354: S3 staight typo results in a bogus exception
-https://savannah.nongnu.org/patch/index.php?6354
+https://savannah.nongnu.org/patch/?6354
 
 patch #6356: Command line option for the temporary directory root.
-https://savannah.nongnu.org/patch/index.php?6356
+https://savannah.nongnu.org/patch/?6356
 
 patch #6357: Explicit restore action is missing from the command list,
-https://savannah.nongnu.org/patch/index.php?6357
+https://savannah.nongnu.org/patch/?6357
 
 
 New in v0.4.8 (2007/12/15)
@@ -173,16 +197,16 @@ calls.  We already do that with scp calls.  This cleans
 up that exception.
 
 bug #21751: rsync module urls do not work in 0.4.7
-https://savannah.nongnu.org/bugs/index.php?21751
+https://savannah.nongnu.org/bugs/?21751
 
 bug #21752: Boto backend needs version 0.9d or later
-https://savannah.nongnu.org/bugs/index.php?21752
+https://savannah.nongnu.org/bugs/?21752
 
 patch #6340: S3 short filename regression
-https://savannah.nongnu.org/patch/index.php?6340
+https://savannah.nongnu.org/patch/?6340
 
 patch #6344: S3 bad bad key key handling
-http://savannah.nongnu.org/patch/index.php?6344
+http://savannah.nongnu.org/patch/?6344
 
 
 New in v0.4.7 (2007/12/07)
@@ -191,65 +215,65 @@ Applied patch from Eric Hanchrow to fix logging error in
 botoBackend, and fix delete() in rsyncBackend.
 
 bug #21673: remove-all-but-n-full wrong arg usage
-https://savannah.nongnu.org/bugs/index.php?21673
+https://savannah.nongnu.org/bugs/?21673
 
 bug #21686: NcFTPGet 3.2.0 tempfile incompatibility
-https://savannah.nongnu.org/bugs/index.php?21686
+https://savannah.nongnu.org/bugs/?21686
 
 patch #6292: Amazon S3 bucket creation deferral
-https://savannah.nongnu.org/patch/index.php?6292
+https://savannah.nongnu.org/patch/?6292
 
 patch #6293: left-over patch from remove-all-but-n-full
-https://savannah.nongnu.org/patch/index.php?6293
+https://savannah.nongnu.org/patch/?6293
 
 patch #6296: Generic S3 url support for Duplicity 0.4.6
-https://savannah.nongnu.org/patch/index.php?6296
+https://savannah.nongnu.org/patch/?6296
 
 patch #6298: URI unquoting patch for FTP backend
-https://savannah.nongnu.org/patch/index.php?6298
+https://savannah.nongnu.org/patch/?6298
 
 patch #6299: re-design tempfile handling
-https://savannah.nongnu.org/patch/index.php?6299
+https://savannah.nongnu.org/patch/?6299
 
 patch #6300: Standard library replacement for ParsedUrl class
-https://savannah.nongnu.org/patch/index.php?6300
+https://savannah.nongnu.org/patch/?6300
 
 patch #6301: log sftp commands at verbosity 5
-https://savannah.nongnu.org/patch/index.php?6301
+https://savannah.nongnu.org/patch/?6301
 
 
 New in v0.4.6 (2007/11/28)
 --------------------------
-https://savannah.nongnu.org/bugs/index.php?21508
+https://savannah.nongnu.org/bugs/?21508
 bug #21508: Change delete implementation of ftpBackend to 
 only send one "DELE" instead of multiple per delete.
 
-https://savannah.nongnu.org/bugs/index.php?21646
+https://savannah.nongnu.org/bugs/?21646
 bug #21646: --archive-dir causes delete of remote full
 sigs and orphaned sig files
 
-https://savannah.nongnu.org/bugs/index.php?21651
+https://savannah.nongnu.org/bugs/?21651
 bug #21651, add https support for webdav.
 
-https://savannah.nongnu.org/bugs/index.php?21657
+https://savannah.nongnu.org/bugs/?21657
 bug #21657: ncftpls fails to create dir in ver 0.4.5
 
-https://savannah.nongnu.org/patch/index.php?6284
+https://savannah.nongnu.org/patch/?6284
 patch #6284: document TMPDIR and friends
 
-https://savannah.nongnu.org/patch/index.php?6284
+https://savannah.nongnu.org/patch/?6284
 patch #6285: security fix: eliminate use of mktemp()
 
-https://savannah.nongnu.org/patch/index.php?6289
+https://savannah.nongnu.org/patch/?6289
 patch #6289: Amazon S3 key prefix patch for Duplicity 0.4.5
 
-https://savannah.nongnu.org/patch/index.php?6291
+https://savannah.nongnu.org/patch/?6291
 patch #6291: Alternative WebDAV HTTPS patch
 
 
 New in v0.4.5 (2007/11/26)
 --------------------------
-https://savannah.nongnu.org/bugs/index.php?21646
+https://savannah.nongnu.org/bugs/?21646
 Fix to handling of collections when --archive-dir is used.
 Prior to this, duplicity would write the full sig files to
 both local and remote, then delete the remote.  Now, it does
@@ -360,17 +384,17 @@ DP: fixes manual page and usage msg for rsync url and --remove-older-than
 DP: make tempfiles with useful names
 DP: do not ask for a passphrase if none is required!
 
-https://savannah.nongnu.org/bugs/index.php?21123
+https://savannah.nongnu.org/bugs/?21123
 duplicity 0.4.3 ftpBackend did not find backup sets when there was 
 more than 20 files in directory.
 
-https://savannah.nongnu.org/patch/index.php?6212
+https://savannah.nongnu.org/patch/?6212
 Large performance boost for large volume sizes.
 
-https://savannah.nongnu.org/patch/index.php?6211
+https://savannah.nongnu.org/patch/?6211
 Restore strict host checking in sshBackend.
 
-https://savannah.nongnu.org/patch/index.php?6205
+https://savannah.nongnu.org/patch/?6205
 Add option --librsync-dir for when its not found.
 
 
@@ -397,7 +421,7 @@ add the following command line option:
 Note: do not add spaces in the string value.
 
 Fixed bug 20764 - unable to use port in ssh backend.
-https://savannah.nongnu.org/bugs/index.php?20764
+https://savannah.nongnu.org/bugs/?20764
 
 Remove ssh_command option, add ssh_options.  This adds
 options to the scp and sftp commands that are used by
@@ -415,7 +439,7 @@ New in v0.4.3.RC12 (2007/08/09)
 -------------------------------
 Fix index out of range in Bug 20730, triggered when there
 is only one incremental in the list.
-https://savannah.nongnu.org/bugs/index.php?20730
+https://savannah.nongnu.org/bugs/?20730
 
 Changed the file:, ftp:, and ssh: backends so that
 the target directory will be created at start.
@@ -565,7 +589,7 @@ respond gracefully on empty passphrase for symmetric encryption.
 
 dAniel hAhler submitted a patch to change "Error initializing file
 foo" (log level 2), where foo was a socket, to "Skipping socket foo"
-(log level 7).  https://savannah.nongnu.org/patch/index.php?5985
+(log level 7).  https://savannah.nongnu.org/patch/?5985
 
 Change logging to flush after every write, unbuffering stdout and
 stderr, thus producing logs that are coherent.
@@ -592,26 +616,26 @@ New in v0.4.3.RC2 (2007/05/30)
 ------------------------------
 Fixed bug in tarfile.py that was causing ValueError exception.  Thanks
 to dAniel hAhler for the patch that fixed the problem.  Refer to:
-http://savannah.nongnu.org/bugs/index.php?19998
+http://savannah.nongnu.org/bugs/?19998
 
 
 New in v0.4.3.RC1 (2007/05/26)
 ------------------------------
 Applied patches:
-  https://savannah.nongnu.org/patch/index.php?4486
-  https://savannah.nongnu.org/patch/index.php?5183
-  https://savannah.nongnu.org/patch/index.php?5185
-  https://savannah.nongnu.org/patch/index.php?5412
-  https://savannah.nongnu.org/patch/index.php?5413
-  https://savannah.nongnu.org/patch/index.php?5680
-  https://savannah.nongnu.org/patch/index.php?5681
-  https://savannah.nongnu.org/patch/index.php?5682
-  https://savannah.nongnu.org/patch/index.php?5794
-  https://savannah.nongnu.org/patch/index.php?5830
+  https://savannah.nongnu.org/patch/?4486
+  https://savannah.nongnu.org/patch/?5183
+  https://savannah.nongnu.org/patch/?5185
+  https://savannah.nongnu.org/patch/?5412
+  https://savannah.nongnu.org/patch/?5413
+  https://savannah.nongnu.org/patch/?5680
+  https://savannah.nongnu.org/patch/?5681
+  https://savannah.nongnu.org/patch/?5682
+  https://savannah.nongnu.org/patch/?5794
+  https://savannah.nongnu.org/patch/?5830
 
 Fixed bugs:
-  https://savannah.nongnu.org/bugs/index.php?2441
-  https://savannah.nongnu.org/bugs/index.php?16711
+  https://savannah.nongnu.org/bugs/?2441
+  https://savannah.nongnu.org/bugs/?16711
 
 ProFTPD resets the connection after returning 226 when NLSTing an 
 empty directory, so changed code to allow that exception.
