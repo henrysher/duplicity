@@ -4,11 +4,15 @@ CVS README - Notes for people checking out of CVS
 Getting duplicity to run:
 -------------------------
 
-If you want to run a version of duplicity checked out of CVS into your
-$DUP_ROOT directory, change to $DUP_ROOT/duplicity and run the
-./compilec.py file.  With any luck, a _librsync.so library will appear
-in that directory.  Then run duplicity-bin, making sure that all the
-files are in your PYTHONPATH:
+By the numbers:
+1) Do the checkout while in a location called $DUP_ROOT.
+2) cd $DUP_ROOT/duplicity
+3) run "python compilec.py" to create _librsync.so
+4) cd ..
+5) run "./duplicity-bin -V". You will see "duplicity $version" instead
+of the normal version number. Versioning comes during the release.
+
+To run outside this directory, use PYTHONPATH to set the path. 
 
 PYTHONPATH=$DUP_ROOT duplicity-bin
 
