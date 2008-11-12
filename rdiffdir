@@ -170,6 +170,7 @@ def write_tar_and_sig(dirname, outfp, sig_outfp):
 
 def main():
     """Start here"""
+    log.setup()
     args = parse_cmdline_options(sys.argv[1:])
     action, file_args = get_action(args)
     if action == "sig":
