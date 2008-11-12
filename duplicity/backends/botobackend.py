@@ -79,11 +79,11 @@ class BotoBackend(duplicity.backend.Backend):
                 if cfs_supported:
                     calling_format = SubdomainCallingFormat()
                 else:
-                    log.FataError("Use of new-style (subdomain) S3 bucket addressing was"
-                                  "requested, but does not seem to be supported by the "
-                                  "boto library. Either you need to upgrade your boto "
-                                  "library or duplicity has failed to correctly detect "
-                                  "the appropriate support.")
+                    log.FatalError("Use of new-style (subdomain) S3 bucket addressing was"
+                                   "requested, but does not seem to be supported by the "
+                                   "boto library. Either you need to upgrade your boto "
+                                   "library or duplicity has failed to correctly detect "
+                                   "the appropriate support.")
             else:
                 if cfs_supported:
                     calling_format = OrdinaryCallingFormat()
