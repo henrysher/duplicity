@@ -11,6 +11,7 @@ alltests=" \
     gpgtest2.py \
     GnuPGInterfacetest.py \
     lazytest.py \
+    logtest.py \
     manifesttest.py \
     misctest.py \
     patchdirtest.py \
