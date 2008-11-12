@@ -4,3 +4,4 @@
 *.sig
 *.spec
 patch
+run-all-tests.log
