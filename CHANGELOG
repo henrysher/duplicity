@@ -21,6 +21,12 @@ https://savannah.nongnu.org/patch/?6642
 patch #6638: correct typo in reporting lack of sufficiently new boto backend
 https://savannah.nongnu.org/patch/?6638
 
+sr #106496: put install-from-cvs-notes in CVS-README
+https://savannah.nongnu.org/support/?106496
+
+sr #106534: GMail backups aren't stored in the correct location
+https://savannah.nongnu.org/support/?106534
+
 
 New in v0.5.02 (2008/09/21)
 ---------------------------
