@@ -47,27 +47,28 @@ webdavs_url = "webdavs://ken@xyzzyx/testdup"
 webdavs_password = ""
 
 def setup():
-        """ setup for unit tests """
-        log.setverbosity(0)
-        globals.print_statistics = 0
+    """ setup for unit tests """
+    log.setup()
+    log.setverbosity(0)
+    globals.print_statistics = 0
 
-        globals.num_retries = 1
+    globals.num_retries = 2
 
-        set_environ("FTP_PASSWORD", None)
-        set_environ("PASSPHRASE", None)
-        if s3_access_key:
-                set_environ("AWS_ACCESS_KEY_ID", s3_access_key)
-                set_environ("AWS_SECRET_ACCESS_KEY", s3_secret_key)
-        else:
-                set_environ("AWS_ACCESS_KEY_ID", None)
-                set_environ("AWS_SECRET_ACCESS_KEY", None)
+    set_environ("FTP_PASSWORD", None)
+    set_environ("PASSPHRASE", None)
+    if s3_access_key:
+        set_environ("AWS_ACCESS_KEY_ID", s3_access_key)
+        set_environ("AWS_SECRET_ACCESS_KEY", s3_secret_key)
+    else:
+        set_environ("AWS_ACCESS_KEY_ID", None)
+        set_environ("AWS_SECRET_ACCESS_KEY", None)
 
 
 def set_environ(varname, value):
-        if value is not None:
-                os.environ[varname] = value
-        else:
-                try:
-                        del os.environ[varname]
-                except:
-                        pass
+    if value is not None:
+        os.environ[varname] = value
+    else:
+        try:
+            del os.environ[varname]
+        except:
+            pass
