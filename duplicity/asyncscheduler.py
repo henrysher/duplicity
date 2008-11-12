@@ -49,6 +49,10 @@ class AsyncScheduler:
     At concurrency levels above 1, the tasks will end up being
     executed in an order undetermined except insofar as is enforced by
     calls to insert_barrier().
+
+    An AsynchScheduler should be created for any independent process;
+    the scheduler will assume that if any background job fails (raises
+    an exception), it makes further work moot.
     """
 
     def __init__(self, concurrency):
@@ -60,6 +64,8 @@ class AsyncScheduler:
                                                           concurrency))
         assert concurrency >= 0, "%s concurrency level must be >= 0" % (self.__class__.__name__,)
 
+        self.__failed       = False        # has at least one task failed so far?
+        self.__failed_waiter = None        # when __failed, the waiter of the first task that failed
         self.__concurrency  = concurrency
         self.__curconc      = 0            # current concurrency level (number of workers)
         self.__workers      = 0            # number of active workers
@@ -103,6 +109,10 @@ class AsyncScheduler:
 
         This method may block or return immediately, depending on the
         configuration and state of the scheduler.
+
+        This method may also raise an exception in order to trigger
+        failures early, if the task (if run synchronously) or a previous
+        task has already failed.
 
         NOTE: Pay particular attention to the scope in which this is
         called. In particular, since it will execute concurrently in
@@ -150,20 +160,15 @@ class AsyncScheduler:
 
     def __run_synchronously(self, fn, params):
         success = False
-        try:
-            ret = fn(*params)
-            success = True
-        except Exception, e:
-            ex = e
-            bt = sys.exc_info()[2]
+
+        # When running synchronously, we immediately leak any exception raised
+        # for immediate failure reporting to calling code.
+        ret = fn(*params)
 
         def _waiter():
-            if success:
-                return ret
-            else:
-                raise ex, None, bt
+            return ret
 
-        log.Info("%s: task complete" % (self.__class__.__name__,))
+        log.Info("%s: task completed successfully" % (self.__class__.__name__,))
 
         return _waiter
 
@@ -171,9 +176,20 @@ class AsyncScheduler:
         (waiter, caller) = async_split(lambda: fn(*params))
 
         def _sched():
+            if self.__failed:
+                # note that __start_worker() below may block waiting on
+                # task execution; if so we will be one task scheduling too
+                # late triggering the failure. this should be improved.
+                log.Info("%s: a previously scheduled task has failed; "
+                         "propagating the result immediately"
+                         "" % (self.__class__.__name__,))
+                self.__waiter()
+                raise AssertionError("%s: waiter should have raised an exception; "
+                                     "this is a bug" % (self.__class__.__name__,))
+
             self.__q.append(caller)
 
-            free_workers = self.__workers = self.__curconc
+            free_workers = self.__workers - self.__curconc
 
             log.Debug("%s: tasks queue length post-schedule: %d tasks"
                       "" % (self.__class__.__name__,
@@ -192,6 +208,14 @@ class AsyncScheduler:
         """
         Start a new worker; self.__cv must be acquired.
         """
+        while self.__workers >= self.__concurrency:
+            log.Info("%s: no free worker slots (%d workers, and maximum "
+                     "concurrencyis %d) - waiting for a background "
+                     "task to complete" % (self.__class__.__name__,
+                                           self.__workers,
+                                           self.__concurrency))
+            self.__cv.wait()
+
         self.__workers += 1
 
         thread.start_new_thread(lambda: self.__worker_thread(), ())
@@ -245,9 +269,17 @@ class AsyncScheduler:
                 # of an async_split() result, which will not propagate
                 # errors back to us, but rather propagate it back to
                 # the "other half".
-                work()
+                succeeded, waiter = work()
+                if not succeeded:
+                    def _signal_failed():
+                        if not self.__failed:
+                            self.__failed = True
+                            self.__waiter = waiter
+                    with_lock(self.__cv, _signal_failed)
 
-                log.Info("%s: task execution done" % (self.__class__.__name__,))
+                log.Info("%s: task execution done (success: %s)"
+                         "" % (self.__class__.__name__,
+                               succeeded))
 
                 def _postwork():
                     self.__curconc -= 1

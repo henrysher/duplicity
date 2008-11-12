@@ -152,17 +152,20 @@ def interruptably_wait(cv, waitFor):
 
 def async_split(fn):
     """
-    Splits the act of calling the given function into one
-    front-end part for waiting on the result, and a
-    back-end part for performing the work in another
-    thread.
+    Splits the act of calling the given function into one front-end
+    part for waiting on the result, and a back-end part for performing
+    the work in another thread.
     
-    Returns (waiter, caller) where waiter is a function to
-    be called in order to wait for the results of an
-    asynchronous invokation of fn to complete, returning
-    fn's result or propagating it's exception. Caller is
-    the function to call in a background thread in order
-    to execute fn asynchronously.
+    Returns (waiter, caller) where waiter is a function to be called
+    in order to wait for the results of an asynchronous invokation of
+    fn to complete, returning fn's result or propagating it's
+    exception.
+    
+    Caller is the function to call in a background thread in order to
+    execute fn asynchronously. Caller will return (success, waiter)
+    where success is a boolean indicating whether the function
+    suceeded (did NOT raise an exception), and waiter is the waiter
+    that was originally returned by the call to async_split().
     """
     # Implementation notes:
     #
@@ -200,6 +203,8 @@ def async_split(fn):
             state['value'] = value
             cv.notify()
             cv.release()
+
+            return (True, waiter)
         except Exception, e:
             cv.acquire()
             state['done'] = True
@@ -207,6 +212,8 @@ def async_split(fn):
             state['trace'] = sys.exc_info()[2]
             cv.notify()
             cv.release()
+
+            return (False, waiter)
             
     return (waiter, caller)
 
