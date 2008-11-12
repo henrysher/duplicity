@@ -28,6 +28,7 @@ import re
 import getpass
 
 import duplicity.dup_temp as dup_temp
+import duplicity.dup_threading as dup_threading
 import duplicity.file_naming as file_naming
 import duplicity.globals as globals
 import duplicity.log as log
@@ -88,19 +89,47 @@ def get_backend(url_string):
     else:
         return _backends[pu.scheme](pu)
 
-def ParsedUrl(url_string):
-    # These URL schemes have a backend with a notion of an RFC "network location".
-    # The 'file' and 's3+http' schemes should not be in this list.
-    # 'http' and 'https' are not actually used for duplicity backend urls, but are needed
-    # in order to properly support urls returned from some webdav servers. adding them here
-    # is a hack. we should instead not stomp on the url parsing module to begin with.
-    #
-    # todo: eliminate the need for backend specific hacking here completely.
-    urlparser.uses_netloc = [ 'ftp', 'hsi', 'rsync', 's3', 'scp', 'ssh', 'webdav', 'webdavs', 'http', 'https', 'gmail' ]
+_urlparser_initialized = False
+_urlparser_initialized_lock = dup_threading.threading_module().Lock()
 
-    # Do not transform or otherwise parse the URL path component.
-    urlparser.uses_query = []
-    urlparser.uses_fragment = []
+def _ensure_urlparser_initialized():
+    """
+    Ensure that the appropriate clobbering of variables in the
+    urlparser module has been done. In the future, the need for this
+    clobbering to begin with should preferably be eliminated.
+    """
+    def init():
+        global _urlparser_initialized
+
+        if not _urlparser_initialized:
+            # These URL schemes have a backend with a notion of an RFC "network location".
+            # The 'file' and 's3+http' schemes should not be in this list.
+            # 'http' and 'https' are not actually used for duplicity backend urls, but are needed
+            # in order to properly support urls returned from some webdav servers. adding them here
+            # is a hack. we should instead not stomp on the url parsing module to begin with.
+            #
+            # todo: eliminate the need for backend specific hacking here completely.
+            urlparser.uses_netloc = [ 'ftp', 'hsi', 'rsync', 's3', 'scp', 'ssh', 'webdav', 'webdavs', 'http', 'https', 'gmail' ]
+
+            # Do not transform or otherwise parse the URL path component.
+            urlparser.uses_query = []
+            urlparser.uses_fragment = []
+        
+            _urlparser_initialized = True
+    
+    dup_threading.with_lock(_urlparser_initialized_lock,
+                            init)
+
+def ParsedUrl(url_string):
+    """
+    Parse the given URL as a duplicity backend URL.
+
+    @return A parsed URL of the same form as that of the standard
+            urlparse.urlparse().
+
+    @raise InvalidBackendURL
+    """
+    _ensure_urlparser_initialized()
 
     pu = urlparser.urlparse(url_string)
 
