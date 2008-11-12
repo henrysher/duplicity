@@ -132,7 +132,7 @@ class WebDAVBackend(duplicity.backend.Backend):
         """
         Returns the basic auth header
         """
-        auth_string = '%s:%s' % (self.parsed_urk.username, self.get_password())
+        auth_string = '%s:%s' % (self.parsed_url.username, self.get_password())
         return 'Basic %s' % base64.encodestring(auth_string).strip()
 
     def get_digest_authorization(self, path):
