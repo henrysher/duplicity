@@ -116,6 +116,7 @@ def MakeTar():
         "tarfile.py",
         "tempdir.py",
         "urlparse_2_5.py",
+        "util.py",
         ]:
         assert not os.system("cp %s/%s %s/src" %
                              (SourceDir, filename, tardir)), filename
