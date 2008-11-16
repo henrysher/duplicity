@@ -96,6 +96,9 @@ remove_time = None
 # a --remove-all-but-n-full.
 keep_chains = None
 
+# Don't actually do anything, but still report what would be done
+dry_run = False
+
 # If set to false, then do not encrypt files on remote system
 encryption = 1
 

@@ -68,12 +68,18 @@ def DirDelta(path_iter, dirsig_fileobj_list):
     those, sorted so the most recent is last.
 
     """
+    global stats
+    stats = statistics.StatsDeltaProcess()
     if type(dirsig_fileobj_list) is types.ListType:
         sig_iter = combine_path_iters(map(sigtar2path_iter,
                                           dirsig_fileobj_list))
     else:
         sig_iter = sigtar2path_iter(dirsig_fileobj_list)
-    return DeltaTarBlockIter(get_delta_iter(path_iter, sig_iter))
+    delta_iter = get_delta_iter(path_iter, sig_iter)
+    if globals.dry_run:
+        return DummyBlockIter(delta_iter)
+    else:
+        return DeltaTarBlockIter(delta_iter)
 
 
 def delta_iter_error_handler(exc, new_path, sig_path, sig_tar = None):
@@ -136,9 +142,10 @@ def get_delta_iter(new_iter, sig_iter):
         if (not new_path or not new_path.type) and sig_path and sig_path.type:
             log.Log("Generating delta - deleted file: %s" %
                     (sig_path.get_relative_path(),), 5)
+            stats.add_deleted_file()
             yield ROPath(sig_path.index)
         elif sig_path and new_path == sig_path:
-            pass # no change, skip
+            stats.add_unchanged_file(new_path) # no change, skip
         else:
             delta_path = robust.check_common_error(delta_iter_error_handler,
                                                    get_delta_path,
@@ -147,6 +154,9 @@ def get_delta_iter(new_iter, sig_iter):
                 # if not, an error must have occurred
                 log_delta_path(delta_path)
                 yield delta_path
+            else:
+                stats.Errors += 1
+    stats.close()
 
 
 def sigtar2path_iter(sigtarobj):
@@ -282,7 +292,10 @@ def DirDelta_WriteSig(path_iter, sig_infp_list, newsig_outfp):
     else:
         sig_path_iter = sigtar2path_iter(sig_infp_list)
     delta_iter = get_delta_iter_w_sig(path_iter, sig_path_iter, newsig_outfp)
-    return DeltaTarBlockIter(delta_iter)
+    if globals.dry_run:
+        return DummyBlockIter(delta_iter)
+    else:
+        return DeltaTarBlockIter(delta_iter)
 
 
 def get_combined_path_iter(sig_infp_list):
@@ -482,6 +495,22 @@ class TarBlockIter:
 
     def __iter__(self):
         return self
+
+
+class DummyBlockIter(TarBlockIter):
+    """TarBlockIter that does no file reading"""
+    def process(self, delta_ropath, size):
+        """Get a fake tarblock from delta_ropath"""
+        ti = delta_ropath.get_tarinfo()
+        index = delta_ropath.index
+
+        # Return blocks of deleted files or fileless snapshots
+        if not delta_ropath.type or not delta_ropath.fileobj:
+            return self.tarinfo2tarblock(index, ti)
+
+        if stats:
+            stats.RawDeltaSize += delta_ropath.getsize()
+        return self.tarinfo2tarblock(index, ti)
 
 
 class SigTarBlockIter(TarBlockIter):

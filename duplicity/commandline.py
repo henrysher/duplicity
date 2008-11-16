@@ -59,6 +59,7 @@ options = ["allow-source-mismatch",
            "archive-dir=",
            "asynchronous-upload",
            "current-time=",
+           "dry-run",
            "encrypt-key=",
            "exclude=",
            "exclude-device-files",
@@ -186,6 +187,8 @@ def parse_cmdline_options(arglist):
             globals.async_concurrency = 1 # (yes 1, this is not a boolean)
         elif opt == "--current-time":
             dup_time.setcurtime(get_int(arg, "current-time"))
+        elif opt == "--dry-run":
+            globals.dry_run = True
         elif opt == "--encrypt-key":
             globals.gpg_profile.recipients.append(arg)
         elif opt in ["--exclude",
@@ -341,6 +344,7 @@ Options:
     --allow-source-mismatch
     --archive-dir <path>
     --asynchronous-upload
+    --dry-run
     --encrypt-key <gpg-key-id>
     --exclude <shell_pattern>
     --exclude-device-files
