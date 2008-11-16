@@ -1,6 +1,8 @@
+# -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
+#
 # unittest for the tarfile module
 #
-# $Id: test_tarfile.py,v 1.6 2008/09/09 19:59:01 loafman Exp $
+# $Id: test_tarfile.py,v 1.7 2008/11/16 18:48:17 loafman Exp $
 
 import config
 import sys, os, shutil, StringIO, tempfile, unittest, stat, pwd, grp

@@ -1,3 +1,5 @@
+# -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
+
 import config
 import sys, os, unittest, cStringIO, random
 sys.path.insert(0, "../")

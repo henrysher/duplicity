@@ -1,3 +1,5 @@
+# -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
+
 """Parse (absolute and relative) URLs.
 
 See RFC 1808: "Relative Uniform Resource Locators", by R. Fielding,

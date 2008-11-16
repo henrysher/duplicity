@@ -1,4 +1,4 @@
-# -*- Mode: Python; indent-tabs-mode: nil; c-basic-offset: 4; tab-width: 4 -*-
+# -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
 # Copyright 2008 Michael Terry <mike@mterry.name>
 #

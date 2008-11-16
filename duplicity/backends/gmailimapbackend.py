@@ -1,4 +1,4 @@
-# here
+# -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 
 import imaplib
 import base64

@@ -1,3 +1,5 @@
+# -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
+
 import config
 import unittest, types, sys
 sys.path.insert(0, "../")

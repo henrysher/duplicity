@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #-------------------------------------------------------------------
 # tarfile.py
 #
@@ -37,13 +38,13 @@
 """Read from and write to tar format archives.
 """
 
-__version__ = "$Revision: 1.7 $"
+__version__ = "$Revision: 1.8 $"
 # $Source: /sources/duplicity/duplicity/duplicity/tarfile.py,v $
 
 version     = "0.4.9"
 __author__  = "Lars Gustabel (lars@gustaebel.de)"
-__date__    = "$Date: 2008/09/09 19:57:46 $"
-__cvsid__   = "$Id: tarfile.py,v 1.7 2008/09/09 19:57:46 loafman Exp $"
+__date__    = "$Date: 2008/11/16 18:48:15 $"
+__cvsid__   = "$Id: tarfile.py,v 1.8 2008/11/16 18:48:15 loafman Exp $"
 __credits__ = "Gustavo Niemeyer for his support, " \
               "Detlef Lannert for some early contributions"
 

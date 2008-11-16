@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 
 import sys, os, getopt
 from distutils.core import setup, Extension

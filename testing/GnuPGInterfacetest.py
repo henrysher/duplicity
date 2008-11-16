@@ -1,3 +1,5 @@
+# -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
+
 """py-unit tests for GnuPG
 
 COPYRIGHT:
@@ -32,7 +34,7 @@ import GnuPGInterface
 
 __author__   = "Frank J. Tobin, ftobin@neverending.org"
 __version__  = "0.2.2"
-__revision__ = "$Id: GnuPGInterfacetest.py,v 1.3 2007/12/12 17:00:29 loafman Exp $"
+__revision__ = "$Id: GnuPGInterfacetest.py,v 1.4 2008/11/16 18:48:16 loafman Exp $"
 
 class BasicTest(unittest.TestCase):
     """an initializer superclass"""
