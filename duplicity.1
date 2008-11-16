@@ -346,6 +346,15 @@ will be included by this option.  See the
 .B FILE SELECTION
 section for more information.
 .TP
+.BI "--log-fd " number
+Write specially-formatted versions of output messages to the specified file
+descriptor.  The format used is designed to be easily consumable by other
+programs.
+.TP
+.BI "--log-file " filename
+Write specially-formatted versions of output messages to the specified file.
+The format used is designed to be easily consumable by other programs.
+.TP
 .B --no-encryption
 Do not use GnuPG to encrypt files on remote system.  Instead just
 write gzipped volumes.
