@@ -610,6 +610,8 @@ class DeltaTarBlockIter(TarBlockIter):
         ti, index = ropath.get_tarinfo(), ropath.index
         ti.name = "%s/%d" % (self.process_prefix, self.process_next_vol_number)
         data, last_block = self.get_data_block(self.process_fp, size-512)
+        if stats:
+            stats.RawDeltaSize += len(data)
         if last_block:
             self.process_prefix = None
             self.process_fp = None
