@@ -1,10 +1,25 @@
-New in v0.5.03 (2008/11/??)
+New in v0.5.03 (2008/11/17)
 ---------------------------
 bug #24731: Documentation error: "if... if" in remove-older-than paragraph
 https://savannah.nongnu.org/bugs/?24731
 
 bug #24775: Digest Auth for WebDAV backend
 https://savannah.nongnu.org/bugs/?24775
+
+patch #6676: Raw delta stats aren't right for multivolumes
+https://savannah.nongnu.org/patch/?6676
+
+patch #6675: Add modelines
+https://savannah.nongnu.org/patch/?6675
+
+patch #6674: Add --log-* options to man page
+https://savannah.nongnu.org/patch/?6674
+
+patch #6673: Add --dry-run option
+https://savannah.nongnu.org/patch/?6673
+
+patch #6672: makedist doesn't ship util.py
+https://savannah.nongnu.org/patch/?6672
 
 patch #6670: Machine Readable Output
 https://savannah.nongnu.org/patch/?6670
