@@ -261,7 +261,7 @@ class StatsDeltaProcess(StatsObj):
         """Add stats of new file path to statistics"""
         filesize = path.getsize()
         self.SourceFiles += 1
-        self.SourceFileSize += filesize
+        # SourceFileSize is added-to incrementally as read
         self.NewFiles += 1
         self.NewFileSize += filesize
         self.DeltaEntries += 1
@@ -270,7 +270,7 @@ class StatsDeltaProcess(StatsObj):
         """Add stats of file that has changed since last backup"""
         filesize = path.getsize()
         self.SourceFiles += 1
-        self.SourceFileSize += filesize
+        # SourceFileSize is added-to incrementally as read
         self.ChangedFiles += 1
         self.ChangedFileSize += filesize
         self.DeltaEntries += 1

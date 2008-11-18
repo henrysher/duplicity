@@ -45,22 +45,42 @@ def LoggerToDupLevel(verb):
        more severe"""
     return DupToLoggerLevel(verb)
 
-def Log(s, verb_level, code=1):
+def Log(s, verb_level, code=1, extra=None):
     """Write s to stderr if verbosity level low enough"""
     global _logger
-    # currentCode is a terrible hack until duplicity depends on Python 2.5
+    # controlLine is a terrible hack until duplicity depends on Python 2.5
     # and its logging 'extra' keyword that allows a custom record dictionary.
-    _logger.currentCode = code
+    if extra:
+        _logger.controlLine = '%d %s' % (code, extra)
+    else:
+        _logger.controlLine = '%d' % (code)
+    if not s:
+        s = '' # If None is passed, standard logging would render it as 'None'
     _logger.log(DupToLoggerLevel(verb_level), s)
-    _logger.currentCode = 1
+    _logger.controlLine = None
 
 def Debug(s):
     """Shortcut used for debug message (verbosity 9)."""
     Log(s, DEBUG)
 
-def Info(s):
+class InfoCode:
+    """Enumeration class to hold info code values.
+       These values should never change, as frontends rely upon them.
+       Don't use 0 or negative numbers."""
+    generic = 1
+    progress = 2
+
+def Info(s, code=InfoCode.generic):
     """Shortcut used for info messages (verbosity 5)."""
-    Log(s, INFO)
+    Log(s, INFO, code)
+
+def Progress(s, current, total=None):
+    """Shortcut used for progress messages (verbosity 5)."""
+    if total:
+        controlLine = '%d %d' % (current, total)
+    else:
+        controlLine = '%d' % current
+    Log(s, INFO, InfoCode.progress, controlLine)
 
 def Notice(s):
     """Shortcut used for notice messages (verbosity 3, the default)."""
@@ -97,28 +117,28 @@ def FatalError(s, code=ErrorCode.generic):
 
 class DupLogRecord(logging.LogRecord):
     """Custom log record that holds a message code"""
-    def __init__(self, code, *args, **kwargs):
+    def __init__(self, controlLine, *args, **kwargs):
         global _logger
         logging.LogRecord.__init__(self, *args, **kwargs)
-        self.code = code
+        self.controlLine = controlLine
 
 class DupLogger(logging.Logger):
     """Custom logger that creates special code-bearing records"""
-    # currentCode is a terrible hack until duplicity depends on Python 2.5
+    # controlLine is a terrible hack until duplicity depends on Python 2.5
     # and its logging 'extra' keyword that allows a custom record dictionary.
-    currentCode = 1
+    controlLine = None
     def makeRecord(self, name, lvl, fn, lno, msg, args, exc_info, *argv, **kwargs):
-        return DupLogRecord(self.currentCode, name, lvl, fn, lno, msg, args, exc_info)
+        return DupLogRecord(self.controlLine, name, lvl, fn, lno, msg, args, exc_info)
 
 class OutFilter(logging.Filter):
     """Filter that only allows warning or less important messages"""
     def filter(self, record):
-        return record.levelno <= DupToLoggerLevel(WARNING)
+        return record.msg and record.levelno <= DupToLoggerLevel(WARNING)
 
 class ErrFilter(logging.Filter):
     """Filter that only allows messages more important than warnings"""
     def filter(self, record):
-        return record.levelno > DupToLoggerLevel(WARNING)
+        return record.msg and record.levelno > DupToLoggerLevel(WARNING)
 
 def setup():
     """Initialize logging"""
@@ -152,14 +172,15 @@ class MachineFormatter(logging.Formatter):
     """Formatter that creates messages in a syntax easily consumable by other
        processes."""
     def __init__(self):
-        logging.Formatter.__init__(self, "%(levelname)s %(code)s\n%(message)s")
+        logging.Formatter.__init__(self, "%(levelname)s %(controlLine)s\n%(message)s")
     
     def format(self, record):
         s = logging.Formatter.format(self, record)
         # Indent each extra line with a dot and space so that the consumer
         # knows it's a continuation, not a new message.  Add a newline so
         # consumers know the message is over.
-        return s.replace('\n', '\n. ') + '\n'
+        # We rstrip in case 'message' was empty.
+        return s.rstrip().replace('\n', '\n. ') + '\n'
 
 class MachineFilter(logging.Filter):
     """Filter that only allows levels that are consumable by other processes."""

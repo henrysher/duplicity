@@ -101,14 +101,16 @@ def get_delta_path(new_path, sig_path):
     delta_path = new_path.get_ropath()
     if not new_path.isreg():
         delta_path.difftype = "snapshot"
+        if stats:
+            stats.SourceFileSize += delta_path.getsize()
     elif not sig_path or not sig_path.isreg():
         delta_path.difftype = "snapshot"
-        delta_path.setfileobj(new_path.open("rb"))
+        delta_path.setfileobj(FileWithReadCounter(new_path.open("rb")))
     else:
         # both new and sig exist and are regular files
         assert sig_path.difftype == "signature"
         delta_path.difftype = "diff"
-        sigfp, newfp = sig_path.open("rb"), new_path.open("rb")
+        sigfp, newfp = sig_path.open("rb"), FileWithReadCounter(new_path.open("rb"))
         delta_path.setfileobj(librsync.DeltaFile(sigfp, newfp))
     new_path.copy_attribs(delta_path)
     delta_path.stat.st_size = new_path.stat.st_size     
@@ -356,7 +358,8 @@ def get_delta_path_w_sig(new_path, sig_path, sigTarFile):
     if new_path.isreg() and sig_path and sig_path.difftype == "signature":
         delta_path.difftype = "diff"
         old_sigfp = sig_path.open("rb")
-        newfp = FileWithSignature(new_path.open("rb"), callback,
+        counterfp = FileWithReadCounter(new_path.open("rb"))
+        newfp = FileWithSignature(counterfp, callback,
                                   new_path.getsize())
         delta_path.setfileobj(librsync.DeltaFile(old_sigfp, newfp))
     else:
@@ -364,13 +367,32 @@ def get_delta_path_w_sig(new_path, sig_path, sigTarFile):
         ti.name = "snapshot/" + "/".join(index) 
         if not new_path.isreg():
             sigTarFile.addfile(ti)
+            if stats:
+                stats.SourceFileSize += delta_path.getsize()
         else:
-            delta_path.setfileobj(FileWithSignature(new_path.open("rb"),
+            counterfp = FileWithReadCounter(new_path.open("rb"))
+            delta_path.setfileobj(FileWithSignature(counterfp,
                                                     callback,
                                                     new_path.getsize()))
     new_path.copy_attribs(delta_path)
     delta_path.stat.st_size = new_path.stat.st_size
     return delta_path
+
+
+class FileWithReadCounter:
+    """File-like object which also computes amount read as it is read"""
+    def __init__(self, infile):
+        """FileWithReadCounter initializer"""
+        self.infile = infile
+
+    def read(self, length = -1):
+        buf = self.infile.read(length)
+        if stats:
+            stats.SourceFileSize += len(buf)
+        return buf
+
+    def close(self):
+        return self.infile.close()
 
 
 class FileWithSignature:
@@ -511,7 +533,11 @@ class DummyBlockIter(TarBlockIter):
             return self.tarinfo2tarblock(index, ti)
 
         if stats:
-            stats.RawDeltaSize += delta_ropath.getsize()
+            # Since we don't read the source files, we can't analyze them.
+            # Best we can do is count them raw.
+            stats.SourceFiles += 1
+            stats.SourceFileSize += delta_ropath.getsize()
+            log.Progress(None, stats.SourceFileSize)
         return self.tarinfo2tarblock(index, ti)
 
 
