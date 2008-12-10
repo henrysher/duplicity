@@ -106,11 +106,31 @@ class ErrorCode:
        These values should never change, as frontends rely upon them.
        Don't use 0 or negative numbers.  This code is returned by duplicity
        to indicate which error occurred via both exit code and log."""
-    generic = 1
+    generic = 1 # Don't use if possible, please create a new code and use it
     command_line = 2
     source_mismatch = 3
+    no_manifests = 4
+    mismatched_manifests = 5
+    unreadable_manifests = 6
+    cant_open_filelist = 7
+    bad_url = 8
+    bad_archive_dir = 9
+    bad_sign_key = 10
+    restore_dir_exists = 11
+    verify_dir_doesnt_exist = 12
+    backup_dir_doesnt_exist = 13
+    file_prefix_error = 14
+    globbing_error = 15
+    redundant_inclusion = 16
+    inc_without_sigs = 17
+    no_sigs = 18
+    restore_dir_not_found = 19
+    no_restore_files = 20
+    mismatched_hash = 21
+    unsigned_volume = 22
+    user_error = 23
 
-def FatalError(s, code=ErrorCode.generic):
+def FatalError(s, code):
     """Write fatal error message and exit"""
     Log(s, ERROR, code)
     sys.exit(code)

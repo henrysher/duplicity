@@ -238,7 +238,8 @@ def check_sig_chain(col_stats):
     if not col_stats.matched_chain_pair:
         if globals.incremental:
             log.FatalError("Fatal Error: Unable to start incremental backup.  "
-                           "Old signatures not found and incremental specified")
+                           "Old signatures not found and incremental specified",
+                           log.ErrorCode.inc_without_sigs)
         else:
             log.Warn("No signatures found, switching to full backup.")
         return None
@@ -272,7 +273,8 @@ def list_current(col_stats):
     """List the files current in the archive (examining signature only)"""
     sig_chain = check_sig_chain(col_stats)
     if not sig_chain:
-        log.FatalError("No signature data found, unable to list files.")
+        log.FatalError("No signature data found, unable to list files.",
+                       log.ErrorCode.no_sigs)
     path_iter = diffdir.get_combined_path_iter(sig_chain.get_fileobjs())
     for path in path_iter:
         if path.difftype != "deleted":
@@ -288,9 +290,11 @@ def restore(col_stats):
                                   restore_get_patched_rop_iter(col_stats)):
         if globals.restore_dir:
             log.FatalError("%s not found in archive, no files restored."
-                           % (globals.restore_dir,))
+                           % (globals.restore_dir,),
+                           log.ErrorCode.restore_dir_not_found)
         else:
-            log.FatalError("No files found in archive - nothing restored.")
+            log.FatalError("No files found in archive - nothing restored.",
+                           log.ErrorCode.no_restore_files)
 
 
 def restore_get_patched_rop_iter(col_stats):
@@ -349,7 +353,8 @@ def restore_check_hash(volume_info, vol_path):
             log.FatalError("Invalid data - %s hash mismatch:\n"
                            "Calculated hash: %s\n"
                            "Manifest hash: %s\n" %
-                           (hash_pair[0], calculated_hash, hash_pair[1]))
+                           (hash_pair[0], calculated_hash, hash_pair[1]),
+                           log.ErrorCode.mismatched_hash)
 
 
 def restore_add_sig_check(fileobj):
@@ -361,7 +366,8 @@ def restore_add_sig_check(fileobj):
         actual_sig = fileobj.fileobj.get_signature()
         if actual_sig != globals.gpg_profile.sign_key:
             log.FatalError("Volume was not signed by key %s, not %s" %
-                           (actual_sig, globals.gpg_profile.sign_key))
+                           (actual_sig, globals.gpg_profile.sign_key),
+                           log.ErrorCode.unsigned_volume)
     fileobj.addhook(check_signature)
 
 
@@ -564,4 +570,4 @@ if __name__ == "__main__":
         log.Info("User error detail: %s"
              "" % (traceback.format_exception(*sys.exc_info())))
         log.FatalError("%s: %s" % (e.__class__.__name__,
-                       str(e)))
+                       str(e)), log.ErrorCode.user_error) # should be more specific error...

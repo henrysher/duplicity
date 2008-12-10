@@ -3,6 +3,9 @@ New in v0.5.04 (2008/12/??)
 patch #6678: Add progress metering
 https://savannah.nongnu.org/patch/?6678
 
+patch #6686: Add error codes for all fatal errors
+https://savannah.nongnu.org/patch/?6686
+
 
 New in v0.5.03 (2008/11/17)
 ---------------------------

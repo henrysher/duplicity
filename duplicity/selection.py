@@ -230,10 +230,10 @@ cannot match any files in the base directory
     %s
 Useful file specifications begin with the base directory or some
 pattern (such as '**') which matches the base directory.""" %
-            (exc, self.prefix))
+            (exc, self.prefix), log.ErrorCode.file_prefix_error)
         elif isinstance(e, GlobbingError):
             log.FatalError("Fatal Error while processing expression\n"
-                           "%s" % exc)
+                           "%s" % exc, log.ErrorCode.globbing_error)
         else: raise
 
     def parse_last_excludes(self):
@@ -246,7 +246,8 @@ pattern (such as '**') which matches the base directory.""" %
 only specifies that files be included.  Because the default is to
 include all files, the expression is redundant.  Exiting because this
 probably isn't what you meant.""" %
-            (self.selection_functions[-1].name,))
+            (self.selection_functions[-1].name,),
+            log.ErrorCode.redundant_inclusion)
 
     def add_selection_func(self, sel_func, add_to_start = None):
         """Add another selection function at the end or beginning"""

@@ -121,7 +121,8 @@ class BackupSet:
     def check_manifests(self):
         """Make sure remote manifest is equal to local one"""
         if not self.remote_manifest_name and not self.local_manifest_path:
-            log.FatalError("Fatal Error: No manifests found for most recent backup")
+            log.FatalError("Fatal Error: No manifests found for most recent backup",
+                           log.ErrorCode.no_manifests)
         assert self.remote_manifest_name, "if only one, should be remote"
 
         remote_manifest = self.get_remote_manifest()
@@ -130,12 +131,14 @@ class BackupSet:
         if remote_manifest and self.local_manifest_path and local_manifest:
             if remote_manifest != local_manifest:
                 log.FatalError("Fatal Error: Remote manifest does not match local one.  Either the "
-                               "remote backup set or the local archive directory has been corrupted.")
+                               "remote backup set or the local archive directory has been corrupted.",
+                               log.ErrorCode.mismatched_manifests)
         if not remote_manifest:
             if self.local_manifest_path:
                 remote_manifest = local_manifest
             else:
-                log.FatalError("Fatal Error: Neither remote nor local manifest is readable.")
+                log.FatalError("Fatal Error: Neither remote nor local manifest is readable.",
+                               log.ErrorCode.unreadable_manifests)
         remote_manifest.check_dirinfo()
 
     def get_local_manifest(self):
