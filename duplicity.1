@@ -1,4 +1,4 @@
-.TH DUPLICITY 1 "JANUARY 2008" "Version 0.4.9" "User Manuals" \"  -*- nroff -*-
+.TH DUPLICITY 1 "DECEMBER 2008" "Version 0.5.03" "User Manuals" \"  -*- nroff -*-
 
 .SH NAME
 duplicity \- Encrypted backup using rsync algorithm
@@ -54,7 +54,7 @@ duplicity \- Encrypted backup using rsync algorithm
 Duplicity incrementally backs up files and directory
 by encrypting tar-format volumes with GnuPG and uploading them to a
 remote (or local) file server.  Currently local, ftp, ssh/scp, rsync,
-WebDAV, WebDAVs, HSi and Amazon S3 backends are available.  
+WebDAV, WebDAVs, HSi and Amazon S3 backends are available.
 Because duplicity uses
 librsync, the incremental archives are space efficient and only record
 the parts of files that have changed since the last backup.  Currently
@@ -166,7 +166,7 @@ command may not detect it.
 Delete all backup sets older than the given time.  Old backup sets
 will not be deleted if backup sets newer than
 .I time
-depend on them.  See the 
+depend on them.  See the
 .B TIME FORMATS
 section for more information.  Note, this action cannot be combined
 with backup or other actions, such as cleanup.
@@ -195,7 +195,7 @@ to back up different directories.  duplicity will tell you if you need
 this switch.
 .TP
 .BI "--archive-dir " path
-When backing up or restoring, specify the local archive directory.  
+When backing up or restoring, specify the local archive directory.
 This option is not necessary, but if hash data is found locally in
 .I path
 it will be used in preference to the remote hash data. Use of this
@@ -208,7 +208,7 @@ optimization only, and may safely be discarded at any time.
 (EXPERIMENTAL) Perform file uploads asynchronously in the background,
 with respect to volume creation. This means that duplicity can upload
 a volume while, at the same time, preparing the next volume for
-upload. The intended end-resuls is a faster backup, because the local
+upload. The intended end-result is a faster backup, because the local
 CPU and your bandwidth can be more consistently utilized. Use of this
 option implies additional need for disk space in the temporary storage
 location; rather than needing to store only one volume at a time,
@@ -234,7 +234,7 @@ Exclude all device files.  This can be useful for security/permissions
 reasons or if rdiff-backup is not handling device files correctly.
 .TP
 .BI "--exclude-filelist " filename
-Excludes the files listed in 
+Excludes the files listed in
 .IR filename .
 See the
 .B FILE SELECTION
@@ -277,9 +277,9 @@ should be given relative to the root of the directory backed up.
 .TP
 .BI "--full-if-older-than " time
 Perform a full backup if an incremental backup is requested, but the
-latest full backup in the collection is older than the given 
+latest full backup in the collection is older than the given
 .IR time .
-See the 
+See the
 .B TIME FORMATS
 section for more information.
 .TP
@@ -288,7 +288,7 @@ Proceed even if data loss might result.  Duplicity will let the user
 know when this option is required.
 .TP
 .B --ftp-passive
-Use passive (PASV) data connections.  The default is to use passive, 
+Use passive (PASV) data connections.  The default is to use passive,
 but to fallback to regular if the passive connection fails or times
 out.
 .TP
@@ -296,13 +296,13 @@ out.
 Use regular (PORT) data connections.
 .TP
 .BI "--gmail-mailbox " option
-Allows you to specifiy a different mailbox.  The default is 
+Allows you to specify a different mailbox.  The default is
 "[Gmail]/All Mail".
 Other languages may require a different mailbox than the default.
 .TP
 .BI "--gpg-options " options
-Allows you to pass options to gpg encryption.  The 
-.I options 
+Allows you to pass options to gpg encryption.  The
+.I options
 list should be of the form "opt1=parm1 opt2=parm2" where the string is
 quoted and the only spaces allowed are between options.
 .TP
@@ -390,19 +390,19 @@ characters or other characters that are not valid in a hostname.
 .BI "--scp-command " command
 This option only matters when using the ssh/scp backend.  The
 .I command
-will be used instead of scp to send or receive files.  The default 
+will be used instead of scp to send or receive files.  The default
 is "scp". To list and delete existing files, the sftp command is used.  See
-.BR --ssh-options 
-and 
+.BR --ssh-options
+and
 .BR --sftp-command .
 .TP
 .BI "--sftp-command " command
-This option only matters when using the ssh/scp backend.  The 
+This option only matters when using the ssh/scp backend.  The
 .I command
 will be used instead of sftp for listing and deleting files.  The
 default is "sftp". File transfers are done using the scp command. See
-.BR --ssh-options 
-and 
+.BR --ssh-options
+and
 .BR --scp-command .
 .TP
 .BI "--sign-key " key
@@ -420,14 +420,14 @@ or, if that is not present, to prompt the user for the remote system
 password.
 .TP
 .BI "--ssh-options " options
-Allows you to pass options to the ssh/scp/sftp backend.  The 
-.I options 
+Allows you to pass options to the ssh/scp/sftp backend.  The
+.I options
 list should be of the form "opt1=parm1 opt2=parm2" where the option string is
-quoted and the only spaces allowed are between options. The option string 
-will be passed verbatim to both scp and sftp, whose command line syntax 
-differs slightly: options passed with 
+quoted and the only spaces allowed are between options. The option string
+will be passed verbatim to both scp and sftp, whose command line syntax
+differs slightly: options passed with
 .BR --ssh-options
-should therefore be given in the long option format described in 
+should therefore be given in the long option format described in
 .BR ssh_config(5) ,
 like in this example:
 .PP
@@ -446,13 +446,13 @@ support long filenames.
 .BI "--tempdir " directory
 Use this existing directory for duplicity temporary files instead of
 the system default, which is usually the /tmp directory. This option
-supercedes any environment variable.
+supersedes any environment variable.
 .TP
 .BI -t time ", --restore-time " time
 When restoring, specify the time to restore to.
 .TP
 .BI "--time-separator " char
-Use 
+Use
 .IR char
 as the time separator in filenames instead of colon (":").
 .TP
@@ -464,8 +464,8 @@ noisiest).
 Print duplicity's version and quit.
 .TP
 .BI "--volsize " number
-Change the volume size to 
-.IR number 
+Change the volume size to
+.IR number
 Mb. Default is 5Mb.
 
 
@@ -481,9 +481,9 @@ It is not recommended to expose the password on the command line since
 it could be revealed to anyone with permissions to do process listings,
 however, it is permitted.
 .PP
-In protocols that support it, the path may be preceeded by a single 
-slash, '/path', to represent a relative path to the target home directory, 
-or preceeded by a double slash, '//path', to represent an absolute 
+In protocols that support it, the path may be preceded by a single
+slash, '/path', to represent a relative path to the target home directory,
+or preceded by a double slash, '//path', to represent an absolute
 filesystem path.
 .PP
 Formats of each of the URL schemes follow:
@@ -534,7 +534,7 @@ the string "now" (refers to the current time)
 a sequences of digits, like "123456890" (indicating the time in
 seconds after the epoch)
 .IP 3.
-A string like "2002-01-25T07:00:00+02:00" in datetime format 
+A string like "2002-01-25T07:00:00+02:00" in datetime format
 .IP 4.
 An interval, which is a number followed by one of the characters s, m,
 h, D, W, M, or Y (indicating seconds, minutes, hours, days, weeks,
@@ -547,7 +547,7 @@ and a day is always 86400 seconds.
 .IP 5.
 A date format of the form YYYY/MM/DD, YYYY-MM-DD, MM/DD/YYYY, or
 MM-DD-YYYY, which indicates midnight on the day in question, relative
-to the current timezone settings.  For instance, "2002/3/5",
+to the current time zone settings.  For instance, "2002/3/5",
 "03-05-2002", and "2002-3-05" all mean March 5th, 2002.
 
 .SH FILE SELECTION
@@ -836,7 +836,7 @@ while the incremental sets start with
 .BR duplicity-inc .
 When restoring, duplicity applies patches in order, so deleting, for
 instance, a full backup set may make related incremental backup sets
-unuseable.
+unusable.
 
 In order to determine which files have been deleted, and to calculate
 diffs for changed files, duplicity needs to process information about
@@ -881,7 +881,7 @@ attempted. At this point, the bucket will be created in Europe if
 .B --s3-european-buckets
 was given. For reasons having to do with how the Amazon S3 service
 works, this also requires the use of the
-.B --s3-use-new-style 
+.B --s3-use-new-style
 option. This option turns on subdomain based bucket addressing in
 S3. The details are beyond the scope of this man page, but it is
 important to know that your bucket must not contain upper case letters
@@ -910,11 +910,11 @@ A Gmail account can be used as a target for the upload.  The userid may
 be specified and the password will be requested.  The --volsize must remain
 less than 20 (meg) as that is the (current) maximum attachment size.
 .PP
-The 
+The
 .B from_address_prefix
 may be specified (and probably should be). The text will be used as
 the "From" address in Gmail.  Then on a restore (or list) command
-the 
+the
 .B from_address_prefix
 will distinguish between different backups.
 .PP
