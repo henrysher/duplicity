@@ -9,6 +9,9 @@ https://savannah.nongnu.org/patch/?6686
 bug #25090: Typos and trailing whitespace in duplicity manpage
 https://savannah.nongnu.org/bugs/?25090
 
+bug #24889: NCFTP cannot deal with some FTP servers
+https://savannah.nongnu.org/bugs/?24889
+
 
 New in v0.5.03 (2008/11/17)
 ---------------------------

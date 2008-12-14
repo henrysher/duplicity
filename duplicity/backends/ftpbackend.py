@@ -70,7 +70,7 @@ class FTPBackend(duplicity.backend.Backend):
         os.write(self.tempfile, "user %s\n" % self.parsed_url.username)
         os.write(self.tempfile, "pass %s\n" % self.password)
         os.close(self.tempfile)
-        self.flags = "-f %s %s -t %s" % \
+        self.flags = "-f %s %s -t %s -o useCLNT=0,useHELP_SITE=0 " % \
             (self.tempname, self.conn_opt, globals.timeout)
         if parsed_url.port != None and parsed_url.port != 21:
             self.flags += " -P '%s'" % (parsed_url.port)
