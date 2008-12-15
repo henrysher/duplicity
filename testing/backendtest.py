@@ -73,8 +73,6 @@ class UnivTest:
         assert backendbuf == regfilebuf
         
         # Test delete
-        self.assertRaises(BackendException,
-                          backend.delete, ["aoeuaoeu"])
         backend.delete([colonfile, normal_file])
         cmp_list([])
 
