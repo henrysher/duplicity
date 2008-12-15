@@ -84,9 +84,9 @@ class InfoCode:
     patch_file_writing = 7
     patch_file_patching = 8
 
-def Info(s, code=InfoCode.generic):
+def Info(s, code=InfoCode.generic, extra=None):
     """Shortcut used for info messages (verbosity 5)."""
-    Log(s, INFO, code)
+    Log(s, INFO, code, extra)
 
 def Progress(s, current, total=None):
     """Shortcut used for progress messages (verbosity 5)."""
