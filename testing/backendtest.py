@@ -143,55 +143,55 @@ class ParsedUrlTest(unittest.TestCase):
 
 
 class LocalTest(unittest.TestCase, UnivTest):
-    """Test the Local backend"""
+    print "Test the Local backend."
     url_string = config.file_url
     password = config.file_password
 
 
 class scpTest(unittest.TestCase, UnivTest):
-    """Test the SSH backend"""
+    print "Test the SSH backend."
     url_string = config.ssh_url
     password = config.ssh_password
 
 
 class ftpTest(unittest.TestCase, UnivTest):
-    """Test the ftp backend"""
+    print "Test the ftp backend."
     url_string = config.ftp_url
     password = config.ftp_password
 
 
 class rsyncAbsPathTest(unittest.TestCase, UnivTest):
-    """Test the rsync abs path backend"""
+    print "Test the rsync abs path backend."
     url_string = config.rsync_abspath_url
     password = config.rsync_password
 
 
 class rsyncRelPathTest(unittest.TestCase, UnivTest):
-    """Test the rsync relative path backend"""
+    print "Test the rsync relative path backend."
     url_string = config.rsync_relpath_url
     password = config.rsync_password
 
 
 class rsyncModuleTest(unittest.TestCase, UnivTest):
-    """Test the rsync module backend"""
+    print "Test the rsync module backend."
     url_string = config.rsync_module_url
     password = config.rsync_password
 
 
 class s3ModuleTest(unittest.TestCase, UnivTest):
-    """Test the s3 module backend"""
+    print "Test the s3 module backend."
     url_string = config.s3_url
     password = None
 
 
 class webdavModuleTest(unittest.TestCase, UnivTest):
-    """Test the webdav module backend"""
+    print "Test the webdav module backend."
     url_string = config.webdav_url
     password = config.webdav_password
 
 
 class webdavsModuleTest(unittest.TestCase, UnivTest):
-    """Test the webdavs module backend"""
+    print "Test the webdavs module backend."
     url_string = config.webdavs_url
     password = config.webdavs_password
 
