@@ -41,4 +41,7 @@ def exception_traceback(limit = 50):
                                 lines[-1])
 
     return str
-        
+
+def escape(string):
+    return "'%s'" % string.encode("string-escape")
+

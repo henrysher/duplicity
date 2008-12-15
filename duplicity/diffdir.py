@@ -28,7 +28,7 @@ the second, the ROPath iterator is put into tar block form.
 
 from __future__ import generators
 import cStringIO, re, types
-import tarfile, librsync, log, statistics
+import tarfile, librsync, log, statistics, util
 from path import *
 from lazy import *
 
@@ -122,13 +122,17 @@ def log_delta_path(delta_path, new_path = None, stats = None):
     if delta_path.difftype == "snapshot":
         if new_path:
             stats.add_new_file(new_path)
-        log.Log("Generating delta - new file: %s" %
-                (delta_path.get_relative_path(),), 5)
+        log.Info("Generating delta - new file: %s" %
+                 (delta_path.get_relative_path(),),
+                 log.InfoCode.diff_file_new,
+                 util.escape(delta_path.get_relative_path()))
     else:
         if new_path:
             stats.add_changed_file(new_path)
-        log.Log("Generating delta - changed file: %s" %
-                (delta_path.get_relative_path(),), 5)
+        log.Info("Generating delta - changed file: %s" %
+                 (delta_path.get_relative_path(),),
+                 log.InfoCode.diff_file_changed,
+                 util.escape(delta_path.get_relative_path()))
 
 
 def get_delta_iter(new_iter, sig_iter):
@@ -144,8 +148,10 @@ def get_delta_iter(new_iter, sig_iter):
         log.Log("Comparing %s and %s" % (new_path and new_path.index,
                                          sig_path and sig_path.index), 6)
         if (not new_path or not new_path.type) and sig_path and sig_path.type:
-            log.Log("Generating delta - deleted file: %s" %
-                    (sig_path.get_relative_path(),), 5)
+            log.Info("Generating delta - deleted file: %s" %
+                     (sig_path.get_relative_path(),),
+                     log.InfoCode.diff_file_deleted,
+                     util.escape(sig_path.get_relative_path()))
             stats.add_deleted_file()
             yield ROPath(sig_path.index)
         elif sig_path and new_path == sig_path:
@@ -318,8 +324,10 @@ def get_delta_iter_w_sig(path_iter, sig_path_iter, sig_fileobj):
             # file doesn't exist
             if sig_path and sig_path.exists():
                 # but signature says it did
-                log.Log("Generating delta - deleted file: %s" %
-                        (sig_path.get_relative_path(),), 5)
+                log.Info("Generating delta - deleted file: %s" %
+                         (sig_path.get_relative_path(),),
+                         log.InfoCode.diff_file_deleted,
+                         util.escape(sig_path.get_relative_path()))
                 ti = ROPath(sig_path.index).get_tarinfo()
                 ti.name = "deleted/" + "/".join(sig_path.index)
                 sigTarFile.addfile(ti)

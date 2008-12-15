@@ -21,7 +21,7 @@
 """Functions for patching of directories"""
 
 from __future__ import generators
-import re, tarfile, librsync, log, diffdir, misc, selection
+import re, tarfile, librsync, log, diffdir, misc, selection, util
 from path import *
 from lazy import *
 
@@ -57,10 +57,14 @@ def patch_diff_tarfile(base_path, diff_tarfile, restrict_index = ()):
     ITR = IterTreeReducer(PathPatcher, [base_path])
     for basis_path, diff_ropath in collated:
         if basis_path:
-            log.Log("Patching %s" % (basis_path.get_relative_path(),), 5)
+            log.Info("Patching %s" % (basis_path.get_relative_path(),),
+                     log.InfoCode.patch_file_patching,
+                     util.escape(basis_path.get_relative_path()))
             ITR(basis_path.index, basis_path, diff_ropath)
         else:
-            log.Log("Patching %s" % (diff_ropath.get_relative_path(),), 5)
+            log.Info("Patching %s" % (diff_ropath.get_relative_path(),),
+                     log.InfoCode.patch_file_patching,
+                     util.escape(basis_path.get_relative_path()))
             ITR(diff_ropath.index, basis_path, diff_ropath)
     ITR.Finish()
     base_path.setdata()
@@ -497,8 +501,10 @@ class ROPath_IterWriter(ITRBranch):
 
     def can_fast_process(self, index, ropath):
         """Can fast process (no recursion) if ropath isn't a directory"""
-        log.Log("Writing %s of type %s" %
-                (ropath.get_relative_path(), ropath.type), 5)
+        log.Info("Writing %s of type %s" %
+                 (ropath.get_relative_path(), ropath.type),
+                 log.InfoCode.patch_file_writing,
+                 "%s %s" % (util.escape(ropath.get_relative_path()), ropath.type))
         return not ropath.isdir()
 
     def fast_process(self, index, ropath):

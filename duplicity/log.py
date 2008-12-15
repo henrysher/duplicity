@@ -78,6 +78,11 @@ class InfoCode:
     generic = 1
     progress = 2
     collection_status = 3
+    diff_file_new = 4
+    diff_file_changed = 5
+    diff_file_deleted = 6
+    patch_file_writing = 7
+    patch_file_patching = 8
 
 def Info(s, code=InfoCode.generic):
     """Shortcut used for info messages (verbosity 5)."""
