@@ -96,24 +96,47 @@ def delta_iter_error_handler(exc, new_path, sig_path, sig_tar = None):
     return None
 
 
-def get_delta_path(new_path, sig_path):
-    """Get one delta_path, or None if error"""
+def get_delta_path(new_path, sig_path, sigTarFile = None):
+    """Return new delta_path which, when read, writes sig to sig_fileobj,
+       if sigTarFile is not None"""
+    assert new_path
+    if sigTarFile:
+        ti = new_path.get_tarinfo()
+        index = new_path.index
     delta_path = new_path.get_ropath()
-    if not new_path.isreg():
-        delta_path.difftype = "snapshot"
-        if stats:
-            stats.SourceFileSize += delta_path.getsize()
-    elif not sig_path or not sig_path.isreg():
-        delta_path.difftype = "snapshot"
-        delta_path.setfileobj(FileWithReadCounter(new_path.open("rb")))
-    else:
-        # both new and sig exist and are regular files
-        assert sig_path.difftype == "signature"
+    log.Log("Getting delta of %s and %s" % (new_path, sig_path), 7)
+
+    def callback(sig_string):
+        """Callback activated when FileWithSignature read to end"""
+        ti.size = len(sig_string)
+        ti.name = "signature/" + "/".join(index)
+        sigTarFile.addfile(ti, cStringIO.StringIO(sig_string))
+
+    if new_path.isreg() and sig_path and sig_path.difftype == "signature":
         delta_path.difftype = "diff"
-        sigfp, newfp = sig_path.open("rb"), FileWithReadCounter(new_path.open("rb"))
-        delta_path.setfileobj(librsync.DeltaFile(sigfp, newfp))
+        old_sigfp = sig_path.open("rb")
+        newfp = FileWithReadCounter(new_path.open("rb"))
+        if sigTarFile:
+            newfp = FileWithSignature(newfp, callback,
+                                      new_path.getsize())
+        delta_path.setfileobj(librsync.DeltaFile(old_sigfp, newfp))
+    else:
+        delta_path.difftype = "snapshot"
+        if sigTarFile:
+            ti.name = "snapshot/" + "/".join(index) 
+        if not new_path.isreg():
+            if sigTarFile:
+                sigTarFile.addfile(ti)
+            if stats:
+                stats.SourceFileSize += delta_path.getsize()
+        else:
+            newfp = FileWithReadCounter(new_path.open("rb"))
+            if sigTarFile:
+                newfp = FileWithSignature(newfp, callback,
+                                          new_path.getsize())
+            delta_path.setfileobj(newfp)
     new_path.copy_attribs(delta_path)
-    delta_path.stat.st_size = new_path.stat.st_size     
+    delta_path.stat.st_size = new_path.stat.st_size
     return delta_path
 
 
@@ -160,6 +183,23 @@ def get_delta_iter(new_iter, sig_iter):
             delta_path = robust.check_common_error(delta_iter_error_handler,
                                                    get_delta_path,
                                                    (new_path, sig_path))
+        if not new_path or not new_path.type:
+            # file doesn't exist
+            if sig_path and sig_path.exists():
+                # but signature says it did
+                log.Log("Generating delta - deleted file: %s" %
+                        (sig_path.get_relative_path(),), 5)
+                if sigTarFile:
+                    ti = ROPath(sig_path.index).get_tarinfo()
+                    ti.name = "deleted/" + "/".join(sig_path.index)
+                    sigTarFile.addfile(ti)
+                stats.add_deleted_file()
+                yield ROPath(sig_path.index)
+        elif not sig_path or new_path != sig_path:
+            # Must calculate new signature and create delta
+            delta_path = robust.check_common_error(
+                delta_iter_error_handler, get_delta_path,
+                (new_path, sig_path, sigTarFile))
             if delta_path:
                 # if not, an error must have occurred
                 log_delta_path(delta_path)
@@ -301,7 +341,7 @@ def DirDelta_WriteSig(path_iter, sig_infp_list, newsig_outfp):
         sig_path_iter = get_combined_path_iter(sig_infp_list)
     else:
         sig_path_iter = sigtar2path_iter(sig_infp_list)
-    delta_iter = get_delta_iter_w_sig(path_iter, sig_path_iter, newsig_outfp)
+    delta_iter = get_delta_iter(path_iter, sig_path_iter, newsig_outfp)
     if globals.dry_run:
         return DummyBlockIter(delta_iter)
     else:

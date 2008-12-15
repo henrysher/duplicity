@@ -24,6 +24,9 @@ https://savannah.nongnu.org/patch/?6694
 patch #6695: Log filenames
 https://savannah.nongnu.org/patch/?6695
 
+patch #6696: Consolidate get_delta_iter and get_delta_iter_w_sig
+https://savannah.nongnu.org/patch/?6696
+
 
 New in v0.5.03 (2008/11/17)
 ---------------------------
