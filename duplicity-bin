@@ -84,6 +84,7 @@ def dummy_backup(tarblock_iter):
             pass
     except StopIteration:
         pass
+    log.Progress(None, diffdir.stats.SourceFileSize)
     return 0
 
 

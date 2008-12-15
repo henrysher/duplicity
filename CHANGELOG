@@ -27,6 +27,9 @@ https://savannah.nongnu.org/patch/?6695
 patch #6696: Consolidate get_delta_iter and get_delta_iter_w_sig
 https://savannah.nongnu.org/patch/?6696
 
+patch #6697: Always log at least one progress during dry run
+https://savannah.nongnu.org/patch/?6697
+
 
 New in v0.5.03 (2008/11/17)
 ---------------------------
