@@ -15,6 +15,12 @@ https://savannah.nongnu.org/bugs/?24889
 patch #6692: Print collection status in a machine-readable way
 https://savannah.nongnu.org/patch/?6692
 
+patch #6693: Some FatalError's don't have codes still
+https://savannah.nongnu.org/patch/?6693
+
+patch #6694: Log exceptions
+https://savannah.nongnu.org/patch/?6694
+
 
 New in v0.5.03 (2008/11/17)
 ---------------------------

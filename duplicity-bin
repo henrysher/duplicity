@@ -568,6 +568,10 @@ if __name__ == "__main__":
         # For user errors, don't show an ugly stack trace by
         # default. But do with sufficient verbosity.
         log.Info("User error detail: %s"
-             "" % (traceback.format_exception(*sys.exc_info())))
+             "" % (''.join(traceback.format_exception(*sys.exc_info()))))
         log.FatalError("%s: %s" % (e.__class__.__name__,
-                       str(e)), log.ErrorCode.user_error) # should be more specific error...
+                       str(e)), log.ErrorCode.user_error,
+                       e.__class__.__name__)
+    except Exception, e:
+        log.FatalError("%s" % (''.join(traceback.format_exception(*sys.exc_info()))),
+                       log.ErrorCode.exception, e.__class__.__name__)

@@ -149,10 +149,12 @@ class ErrorCode:
     ftp_ncftp_missing = 27
     ftp_ncftp_too_old = 28
     ssh_pexpect_too_old = 29
+    exception = 30
 
-def FatalError(s, code):
+def FatalError(s, code, extra=None):
     """Write fatal error message and exit"""
-    Log(s, ERROR, code)
+    Log(s, ERROR, code, extra)
+    shutdown()
     sys.exit(code)
 
 class DupLogRecord(logging.LogRecord):
