@@ -57,7 +57,8 @@ class SSHBackend(duplicity.backend.Backend):
                 self.pexpect.__version__ >= '2.1'):
             log.FatalError("This backend requires the pexpect module version 2.1 or later."
                            "You can get pexpect from http://pexpect.sourceforge.net or "
-                           "python-pexpect from your distro's repository.")
+                           "python-pexpect from your distro's repository.",
+                           log.ErrorCode.ssh_pexpect_too_old)
 
         # host string of form [user@]hostname
         if parsed_url.username:

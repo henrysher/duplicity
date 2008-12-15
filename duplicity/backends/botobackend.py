@@ -85,7 +85,8 @@ class BotoBackend(duplicity.backend.Backend):
                                    "requested, but does not seem to be supported by the "
                                    "boto library. Either you need to upgrade your boto "
                                    "library or duplicity has failed to correctly detect "
-                                   "the appropriate support.")
+                                   "the appropriate support.",
+                                   log.ErrorCode.boto_old_style)
             else:
                 if cfs_supported:
                     calling_format = OrdinaryCallingFormat()
@@ -94,7 +95,8 @@ class BotoBackend(duplicity.backend.Backend):
 
         except ImportError:
             log.FatalError("This backend  (s3) requires boto library, version 0.9d or later, "
-                           "(http://code.google.com/p/boto/).")
+                           "(http://code.google.com/p/boto/).",
+                           log.ErrorCode.boto_lib_too_old)
 
         if not os.environ.has_key('AWS_ACCESS_KEY_ID'):
             raise BackendException("The AWS_ACCESS_KEY_ID environment variable is not set.")
@@ -113,7 +115,8 @@ class BotoBackend(duplicity.backend.Backend):
             if calling_format is None:
                 log.FatalError("It seems we previously failed to detect support for calling "
                                "formats in the boto library, yet the support is there. This is "
-                               "almost certainly a duplicity bug.")
+                               "almost certainly a duplicity bug.",
+                               log.ErrorCode.boto_calling_format)
             else:
                 self.conn.calling_format = calling_format
 

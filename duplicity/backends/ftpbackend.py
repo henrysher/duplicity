@@ -42,12 +42,14 @@ class FTPBackend(duplicity.backend.Backend):
             pass
         # the expected error is 8 in the high-byte and some output
         if ret != 0x0800 or not fout:
-            log.FatalError("NcFTP not found:  Please install NcFTP version 3.1.9 or later")
+            log.FatalError("NcFTP not found:  Please install NcFTP version 3.1.9 or later",
+                           log.ErrorCode.ftp_ncftp_missing)
 
         # version is the second word of the first line
         version = fout.split('\n')[0].split()[1]
         if version < "3.1.9":
-            log.FatalError("NcFTP too old:  Duplicity requires NcFTP version 3.1.9 or later")
+            log.FatalError("NcFTP too old:  Duplicity requires NcFTP version 3.1.9 or later",
+                           log.ErrorCode.ftp_ncftp_too_old)
         log.Log("NcFTP version is %s" % version, 4)
 
         self.parsed_url = parsed_url

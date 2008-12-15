@@ -143,6 +143,12 @@ class ErrorCode:
     mismatched_hash = 21
     unsigned_volume = 22
     user_error = 23
+    boto_old_style = 24
+    boto_lib_too_old = 25
+    boto_calling_format = 26
+    ftp_ncftp_missing = 27
+    ftp_ncftp_too_old = 28
+    ssh_pexpect_too_old = 29
 
 def FatalError(s, code):
     """Write fatal error message and exit"""
