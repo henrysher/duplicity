@@ -136,24 +136,30 @@ class Select:
                     error_handler, Path.append, (path, filename))
                 if new_path:
                     s = self.Select(new_path)
-                    if s == 1: yield (new_path, 0)
-                    elif s == 2 and new_path.isdir(): yield (new_path, 1)
+                    if s == 1:
+                        yield (new_path, 0)
+                    elif s == 2 and new_path.isdir():
+                        yield (new_path, 1)
 
-        if not path.type: # base doesn't exist
+        if not path.type:
+            # base doesn't exist
             log.Log("Warning: base %s doesn't exist, continuing" %
                     path.name, 2)
             return
         log.Log("Selecting %s" % path.name, 7)
         yield path
-        if not path.isdir(): return
+        if not path.isdir():
+            return
         diryield_stack = [diryield(path)]
         delayed_path_stack = []
 
         while diryield_stack:
-            try: subpath, val = diryield_stack[-1].next()
+            try:
+                subpath, val = diryield_stack[-1].next()
             except StopIteration:
                 diryield_stack.pop()
-                if delayed_path_stack: delayed_path_stack.pop()
+                if delayed_path_stack:
+                    delayed_path_stack.pop()
                 continue
             if val == 0:
                 if delayed_path_stack:
@@ -163,7 +169,8 @@ class Select:
                     del delayed_path_stack[:]
                 log.Log("Selecting %s" % subpath.name, 7)
                 yield subpath
-                if subpath.isdir(): diryield_stack.append(diryield(subpath))
+                if subpath.isdir():
+                    diryield_stack.append(diryield(subpath))
             elif val == 1:
                 delayed_path_stack.append(subpath)
                 diryield_stack.append(diryield(subpath))
@@ -172,7 +179,8 @@ class Select:
         """Run through the selection functions and return dominant val 0/1/2"""
         for sf in self.selection_functions:
             result = sf(path)
-            if result is not None: return result
+            if result is not None:
+                return result
         return 1
 
     def ParseArgs(self, argtuples, filelists):
@@ -215,8 +223,10 @@ class Select:
                     filelists_index += 1
                 elif opt == "--include-regexp":
                     self.add_selection_func(self.regexp_get_sf(arg, 1))
-                else: assert 0, "Bad selection option %s" % opt
-        except SelectError, e: self.parse_catch_error(e)
+                else:
+                    assert 0, "Bad selection option %s" % opt
+        except SelectError, e:
+            self.parse_catch_error(e)
         assert filelists_index == len(filelists)
         self.parse_last_excludes()
 
@@ -234,7 +244,8 @@ pattern (such as '**') which matches the base directory.""" %
         elif isinstance(e, GlobbingError):
             log.FatalError("Fatal Error while processing expression\n"
                            "%s" % exc, log.ErrorCode.globbing_error)
-        else: raise
+        else:
+            raise
 
     def parse_last_excludes(self):
         """Exit with error if last selection function isn't an exclude"""
@@ -251,8 +262,10 @@ probably isn't what you meant.""" %
 
     def add_selection_func(self, sel_func, add_to_start = None):
         """Add another selection function at the end or beginning"""
-        if add_to_start: self.selection_functions.insert(0, sel_func)
-        else: self.selection_functions.append(sel_func)
+        if add_to_start:
+            self.selection_functions.insert(0, sel_func)
+        else:
+            self.selection_functions.append(sel_func)
 
     def filelist_get_sf(self, filelist_fp, inc_default, filelist_name):
         """Return selection function by reading list of files
@@ -273,12 +286,14 @@ probably isn't what you meant.""" %
 
         def selection_function(path):
             while 1:
-                if i[0] >= len(tuple_list): return None
+                if i[0] >= len(tuple_list):
+                    return None
                 include, move_on = \
                          self.filelist_pair_match(path, tuple_list[i[0]])
                 if move_on:
                     i[0] += 1
-                    if include is None: continue # later line may match
+                    if include is None:
+                        continue # later line may match
                 return include
 
         selection_function.exclude = something_excluded or inc_default == 0
@@ -301,13 +316,16 @@ probably isn't what you meant.""" %
         something_excluded, tuple_list = None, []
         separator = globals.null_separator and "\0" or "\n"
         for line in filelist_fp.read().split(separator):
-            if not line: continue # skip blanks
-            try: tuple = self.filelist_parse_line(line, include)
+            if not line:
+                continue # skip blanks
+            try:
+                tuple = self.filelist_parse_line(line, include)
             except FilePrefixError, exc:
                 incr_warnings(exc)
                 continue
             tuple_list.append(tuple)
-            if not tuple[1]: something_excluded = 1
+            if not tuple[1]:
+                something_excluded = 1
         if filelist_fp.close():
             log.Log("Error closing filelist %s" % filelist_name, 2)
         return (tuple_list, something_excluded)
@@ -322,14 +340,16 @@ probably isn't what you meant.""" %
 
         """
         line = line.strip()
-        if line[:2] == "+ ": # Check for "+ "/"- " syntax
+        if line[:2] == "+ ":
+            # Check for "+ "/"- " syntax
             include = 1
             line = line[2:]
         elif line[:2] == "- ":
             include = 0
             line = line[2:]
 
-        if not line.startswith(self.prefix): raise FilePrefixError(line)
+        if not line.startswith(self.prefix):
+            raise FilePrefixError(line)
         line = line[len(self.prefix):] # Discard prefix
         index = tuple(filter(lambda x: x, line.split("/"))) # remove empties
         return (index, include)
@@ -347,17 +367,23 @@ probably isn't what you meant.""" %
         """
         index, include = pair
         if include == 1:
-            if index < path.index: return (None, 1)
-            if index == path.index: return (1, 1)
+            if index < path.index:
+                return (None, 1)
+            if index == path.index:
+                return (1, 1)
             elif index[:len(path.index)] == path.index:
                 return (1, None) # /foo/bar implicitly includes /foo
-            else: return (None, None) # path greater, not initial sequence
+            else:
+                return (None, None) # path greater, not initial sequence
         elif include == 0:
             if path.index[:len(index)] == index:
                 return (0, None) # /foo implicitly excludes /foo/bar
-            elif index < path.index: return (None, 1)
-            else: return (None, None) # path greater, not initial sequence
-        else: assert 0, "Include is %s, should be 0 or 1" % (include,)
+            elif index < path.index:
+                return (None, 1)
+            else:
+                return (None, None) # path greater, not initial sequence
+        else:
+            assert 0, "Include is %s, should be 0 or 1" % (include,)
 
     def filelist_globbing_get_sfs(self, filelist_fp, inc_default, list_name):
         """Return list of selection functions by reading fileobj
@@ -371,10 +397,13 @@ probably isn't what you meant.""" %
         log.Log("Reading globbing filelist %s" % list_name, 4)
         separator = globals.null_separator and "\0" or "\n"
         for line in filelist_fp.read().split(separator):
-            if not line: continue # skip blanks
+            if not line:
+                continue # skip blanks
             if line[:2] == "+ ": yield self.glob_get_sf(line[2:], 1)
-            elif line[:2] == "- ": yield self.glob_get_sf(line[2:], 0)
-            else: yield self.glob_get_sf(line, inc_default)
+            elif line[:2] == "- ":
+                yield self.glob_get_sf(line[2:], 0)
+            else:
+                yield self.glob_get_sf(line, inc_default)
 
     def other_filesystems_get_sf(self, include):
         """Return selection function matching files on other filesystems"""
@@ -383,7 +412,8 @@ probably isn't what you meant.""" %
         def sel_func(path):
             if path.exists() and path.getdevloc() != root_devloc:
                 return include
-            else: return None
+            else:
+                return None
         sel_func.exclude = not include
         sel_func.name = "Match other filesystems"
         return sel_func
@@ -391,14 +421,17 @@ probably isn't what you meant.""" %
     def regexp_get_sf(self, regexp_string, include):
         """Return selection function given by regexp_string"""
         assert include == 0 or include == 1
-        try: regexp = re.compile(regexp_string)
+        try:
+            regexp = re.compile(regexp_string)
         except:
             log.Log("Error compiling regular expression %s" % regexp_string, 1)
             raise
         
         def sel_func(path):
-            if regexp.search(path.name): return include
-            else: return None
+            if regexp.search(path.name):
+                return include
+            else:
+                return None
 
         sel_func.exclude = not include
         sel_func.name = "Regular expression: %s" % regexp_string
@@ -410,8 +443,10 @@ probably isn't what you meant.""" %
             log.Log("Warning: exclude-device-files is not the first "
                     "selector.\nThis may not be what you intended", 3)
         def sel_func(path):
-            if path.isdev(): return 0
-            else: return None
+            if path.isdev():
+                return 0
+            else:
+                return None
         sel_func.exclude = 1
         sel_func.name = "Exclude device files"
         return sel_func
@@ -419,10 +454,13 @@ probably isn't what you meant.""" %
     def glob_get_sf(self, glob_str, include):
         """Return selection function given by glob string"""
         assert include == 0 or include == 1
-        if glob_str == "**": sel_func = lambda path: include
-        elif not self.glob_re.match(glob_str): # normal file
+        if glob_str == "**":
+            sel_func = lambda path: include
+        elif not self.glob_re.match(glob_str):
+            # normal file
             sel_func = self.glob_get_filename_sf(glob_str, include)
-        else: sel_func = self.glob_get_normal_sf(glob_str, include)
+        else:
+            sel_func = self.glob_get_normal_sf(glob_str, include)
 
         sel_func.exclude = not include
         sel_func.name = "Command-line %s glob: %s" % \
@@ -450,15 +488,19 @@ probably isn't what you meant.""" %
             if (path.index == tuple[:len(path.index)] or
                 path.index[:len(tuple)] == tuple):
                 return 1 # /foo/bar implicitly matches /foo, vice-versa
-            else: return None
+            else:
+                return None
 
         def exclude_sel_func(path):
             if path.index[:len(tuple)] == tuple:
                 return 0 # /foo excludes /foo/bar, not vice-versa
-            else: return None
+            else:
+                return None
 
-        if include == 1: sel_func = include_sel_func
-        elif include == 0: sel_func = exclude_sel_func
+        if include == 1:
+            sel_func = include_sel_func
+        elif include == 0:
+            sel_func = exclude_sel_func
         sel_func.exclude = not include
         sel_func.name = "Tuple select %s" % (tuple,)
         return sel_func
@@ -481,7 +523,8 @@ probably isn't what you meant.""" %
         if glob_str.lower().startswith("ignorecase:"):
             re_comp = lambda r: re.compile(r, re.I | re.S)
             glob_str = glob_str[len("ignorecase:"):]
-        else: re_comp = lambda r: re.compile(r, re.S)
+        else:
+            re_comp = lambda r: re.compile(r, re.S)
 
         # matches what glob matches and any files in directory
         glob_comp_re = re_comp("^%s($|/)" % self.glob_to_re(glob_str))
@@ -493,31 +536,41 @@ probably isn't what you meant.""" %
                                "|".join(self.glob_get_prefix_res(glob_str)))
 
         def include_sel_func(path):
-            if glob_comp_re.match(path.name): return 1
-            elif scan_comp_re.match(path.name): return 2
-            else: return None
+            if glob_comp_re.match(path.name):
+                return 1
+            elif scan_comp_re.match(path.name):
+                return 2
+            else:
+                return None
 
         def exclude_sel_func(path):
-            if glob_comp_re.match(path.name): return 0
-            else: return None
+            if glob_comp_re.match(path.name):
+                return 0
+            else:
+                return None
 
         # Check to make sure prefix is ok
-        if not include_sel_func(self.rootpath): raise FilePrefixError(glob_str)
+        if not include_sel_func(self.rootpath):
+            raise FilePrefixError(glob_str)
         
-        if include: return include_sel_func
-        else: return exclude_sel_func
+        if include:
+            return include_sel_func
+        else:
+            return exclude_sel_func
 
     def glob_get_prefix_res(self, glob_str):
         """Return list of regexps equivalent to prefixes of glob_str"""
         glob_parts = glob_str.split("/")
-        if "" in glob_parts[1:-1]: # "" OK if comes first or last, as in /foo/
+        if "" in glob_parts[1:-1]:
+            # "" OK if comes first or last, as in /foo/
             raise GlobbingError("Consecutive '/'s found in globbing string "
                                 + glob_str)
 
         prefixes = map(lambda i: "/".join(glob_parts[:i+1]),
                        range(len(glob_parts)))
         # we must make exception for root "/", only dir to end in slash
-        if prefixes[0] == "": prefixes[0] = "/"
+        if prefixes[0] == "":
+            prefixes[0] = "/"
         return map(self.glob_to_re, prefixes)
 
     def glob_to_re(self, pat):
@@ -538,19 +591,28 @@ probably isn't what you meant.""" %
             if s == '**':
                 res = res + '.*'
                 i = i + 1
-            elif c == '*': res = res + '[^/]*'
-            elif c == '?': res = res + '[^/]'
+            elif c == '*':
+                res = res + '[^/]*'
+            elif c == '?':
+                res = res + '[^/]'
             elif c == '[':
                 j = i
-                if j < n and pat[j] in '!^': j = j+1
-                if j < n and pat[j] == ']': j = j+1
-                while j < n and pat[j] != ']': j = j+1
-                if j >= n: res = res + '\\[' # interpret the [ literally
-                else: # Deal with inside of [..]
+                if j < n and pat[j] in '!^':
+                    j = j+1
+                if j < n and pat[j] == ']':
+                    j = j+1
+                while j < n and pat[j] != ']':
+                    j = j+1
+                if j >= n:
+                    res = res + '\\[' # interpret the [ literally
+                else:
+                    # Deal with inside of [..]
                     stuff = pat[i:j].replace('\\','\\\\')
                     i = j+1
-                    if stuff[0] in '!^': stuff = '^' + stuff[1:]
+                    if stuff[0] in '!^':
+                        stuff = '^' + stuff[1:]
                     res = res + '[' + stuff + ']'
-            else: res = res + re.escape(c)
+            else:
+                res = res + re.escape(c)
         return res
 
