@@ -64,7 +64,7 @@ def patch_diff_tarfile(base_path, diff_tarfile, restrict_index = ()):
         else:
             log.Info("Patching %s" % (diff_ropath.get_relative_path(),),
                      log.InfoCode.patch_file_patching,
-                     util.escape(basis_path.get_relative_path()))
+                     util.escape(diff_ropath.get_relative_path()))
             ITR(diff_ropath.index, basis_path, diff_ropath)
     ITR.Finish()
     base_path.setdata()
