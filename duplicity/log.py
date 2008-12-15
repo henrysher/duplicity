@@ -45,7 +45,7 @@ def LoggerToDupLevel(verb):
        more severe"""
     return DupToLoggerLevel(verb)
 
-def Log(s, verb_level, code=1, extra=None):
+def Log(s, verb_level, code=1, extra=None, force_print=False):
     """Write s to stderr if verbosity level low enough"""
     global _logger
     # controlLine is a terrible hack until duplicity depends on Python 2.5
@@ -56,8 +56,16 @@ def Log(s, verb_level, code=1, extra=None):
         _logger.controlLine = '%d' % (code)
     if not s:
         s = '' # If None is passed, standard logging would render it as 'None'
+    
+    if force_print:
+        initial_level = _logger.getEffectiveLevel()
+        _logger.setLevel(DupToLoggerLevel(MAX))
+    
     _logger.log(DupToLoggerLevel(verb_level), s)
     _logger.controlLine = None
+    
+    if force_print:
+        _logger.setLevel(initial_level)
 
 def Debug(s):
     """Shortcut used for debug message (verbosity 9)."""
@@ -69,6 +77,7 @@ class InfoCode:
        Don't use 0 or negative numbers."""
     generic = 1
     progress = 2
+    collection_status = 3
 
 def Info(s, code=InfoCode.generic):
     """Shortcut used for info messages (verbosity 5)."""
@@ -81,6 +90,11 @@ def Progress(s, current, total=None):
     else:
         controlLine = '%d' % current
     Log(s, INFO, InfoCode.progress, controlLine)
+
+def PrintCollectionStatus(col_stats, force_print=False):
+    """Prints a collection status to the log"""
+    Log(str(col_stats), 8, InfoCode.collection_status,
+        '\n' + '\n'.join(col_stats.to_log_info()), force_print)
 
 def Notice(s):
     """Shortcut used for notice messages (verbosity 3, the default)."""
@@ -170,11 +184,16 @@ def setup():
     _logger = logging.getLogger("duplicity")
     
     # Set up our special level names
-    logging.addLevelName(DupToLoggerLevel(ERROR), "ERROR")
-    logging.addLevelName(DupToLoggerLevel(WARNING), "WARNING")
-    logging.addLevelName(DupToLoggerLevel(NOTICE), "NOTICE")
-    logging.addLevelName(DupToLoggerLevel(INFO), "INFO")
-    logging.addLevelName(DupToLoggerLevel(DEBUG), "DEBUG")
+    logging.addLevelName(DupToLoggerLevel(0), "ERROR")
+    logging.addLevelName(DupToLoggerLevel(1), "WARNING")
+    logging.addLevelName(DupToLoggerLevel(2), "WARNING")
+    logging.addLevelName(DupToLoggerLevel(3), "NOTICE")
+    logging.addLevelName(DupToLoggerLevel(4), "NOTICE")
+    logging.addLevelName(DupToLoggerLevel(5), "INFO")
+    logging.addLevelName(DupToLoggerLevel(6), "INFO")
+    logging.addLevelName(DupToLoggerLevel(7), "INFO")
+    logging.addLevelName(DupToLoggerLevel(8), "INFO")
+    logging.addLevelName(DupToLoggerLevel(9), "DEBUG")
     
     # Default verbosity allows notices and above
     setverbosity(NOTICE)
@@ -192,15 +211,19 @@ class MachineFormatter(logging.Formatter):
     """Formatter that creates messages in a syntax easily consumable by other
        processes."""
     def __init__(self):
-        logging.Formatter.__init__(self, "%(levelname)s %(controlLine)s\n%(message)s")
+        # 'message' will be appended by format()
+        logging.Formatter.__init__(self, "%(levelname)s %(controlLine)s")
     
     def format(self, record):
         s = logging.Formatter.format(self, record)
-        # Indent each extra line with a dot and space so that the consumer
-        # knows it's a continuation, not a new message.  Add a newline so
-        # consumers know the message is over.
-        # We rstrip in case 'message' was empty.
-        return s.rstrip().replace('\n', '\n. ') + '\n'
+        
+        # Add user-text hint of 'message' back in, with each line prefixed by a
+        # dot, so consumers know it's not part of 'controlLine'
+        if record.message:
+            s += ('\n' + record.message).replace('\n', '\n. ')
+        
+        # Add a newline so consumers know the message is over.
+        return s + '\n'
 
 class MachineFilter(logging.Filter):
     """Filter that only allows levels that are consumable by other processes."""

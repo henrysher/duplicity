@@ -265,6 +265,19 @@ class BackupChain:
         return "[%s]-[%s]" % (dup_time.timetopretty(self.start_time),
                       dup_time.timetopretty(self.end_time))
 
+    def to_log_info(self, prefix=''):
+        """Return summary, suitable for printing to log"""
+        l = []
+        for s in self.get_all_sets():
+            if s.time:
+                type = "full"
+                time = s.time
+            else:
+                type = "inc"
+                time = s.end_time
+            l.append("%s%s %s %d" % (prefix, type, dup_time.timetostring(time), (len(s)),))
+        return l
+
     def __str__(self):
         """Return string representation, for testing purposes"""
         set_schema = "%20s   %30s   %15s"
@@ -435,9 +448,29 @@ class CollectionsStatus:
         # True if set_values() below has run
         self.values_set = None
 
+    def to_log_info(self):
+        """Return summary of the collection, suitable for printing to log"""
+        l = ["backend %s" % (self.backend.__class__.__name__,),
+             "archive-dir %s" % (self.archive_dir,)]
+        
+        for i in range(len(self.other_backup_chains)):
+            l.append("chain-no-sig %d" % (i,))
+            l += self.other_backup_chains[i].to_log_info(' ')
+
+        if self.matched_chain_pair:
+            l.append("chain-complete")
+            l += self.matched_chain_pair[1].to_log_info(' ')
+
+        l.append("orphaned-sets-num %d" % (len(self.orphaned_backup_sets),))
+        l.append("incomplete-sets-num %d" % (len(self.incomplete_backup_sets),))
+
+        return l
+
     def __str__(self):
         """Return string summary of the collection"""
-        l = ["Connecting with backend: %s" %
+        l = ["Collection Status",
+             "-----------------",
+             "Connecting with backend: %s" %
              (self.backend.__class__.__name__,),
              "Archive dir: %s" % (self.archive_dir,)]
 

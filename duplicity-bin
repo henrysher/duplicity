@@ -487,7 +487,7 @@ def main():
     action = commandline.ProcessCommandLine(sys.argv[1:])
     col_stats = collections.CollectionsStatus(globals.backend,
                                               globals.archive_dir).set_values()
-    log.Log("Collection Status\n-----------------\n" + str(col_stats), 8)
+    log.PrintCollectionStatus(col_stats)
 
     last_full_time = col_stats.get_last_full_backup_time()
     if last_full_time > 0:
@@ -526,7 +526,7 @@ def main():
     elif action == "list-current":
         list_current(col_stats)
     elif action == "collection-status":
-        print str(col_stats)
+        log.PrintCollectionStatus(col_stats, True)
     elif action == "cleanup":
         cleanup(col_stats)
     elif action == "remove-old":
