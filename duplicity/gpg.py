@@ -78,7 +78,7 @@ class GPGFile:
         self.status_fp = None # used to find signature
         self.closed = None # set to true after file closed
         self.logger_fp = tempfile.TemporaryFile()
-        
+
         # Start GPG process - copied from GnuPGInterface docstring.
         gnupg = GnuPGInterface.GnuPG()
         gnupg.options.meta_interactive = 0
@@ -151,7 +151,11 @@ class GPGFile:
             self.gpg_output.close()
             if self.status_fp:
                 self.set_signature()
-            self.gpg_process.wait()
+            try:
+                self.gpg_process.wait()
+            except IOError, message:
+                if message.args[0] != "GnuPG exited non-zero, with code 131072":
+                    raise
         if log.getverbosity() >= 5:
             self.print_log()
         self.logger_fp.close()
@@ -235,7 +239,7 @@ def GPGWriteFile(block_iter, filename, profile,
             at_end_of_blockiter = 1
             break
         file.write(data)
-        
+
     file.write(block_iter.get_footer())
     if not at_end_of_blockiter:
         # don't pad last volume
