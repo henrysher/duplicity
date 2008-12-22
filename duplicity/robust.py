@@ -53,7 +53,7 @@ def check_common_error(error_handler, function, args = ()):
 def listpath(path):
     """Like path.listdir() but return [] if error, and sort results"""
     def error_handler(exc):
-        log.Log("Error listing directory %s" % path.name, 2)
+        log.Log(_("Error listing directory %s") % path.name, 2)
         return []
     dir_listing = check_common_error(error_handler, path.listdir)
     dir_listing.sort()

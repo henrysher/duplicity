@@ -37,6 +37,9 @@ from duplicity import collections, commandline, diffdir, dup_temp, \
      dup_time, file_naming, globals, gpg, log, manifest, patchdir, \
      path, robust, tempdir, asyncscheduler
 
+import gettext
+gettext.install('duplicity')
+
 # If exit_val is not None, exit with given value at end.
 exit_val = None
 
@@ -238,11 +241,11 @@ def check_sig_chain(col_stats):
     """Get last signature chain for inc backup, or None if none available"""
     if not col_stats.matched_chain_pair:
         if globals.incremental:
-            log.FatalError("Fatal Error: Unable to start incremental backup.  "
-                           "Old signatures not found and incremental specified",
+            log.FatalError(_("Fatal Error: Unable to start incremental backup.  "
+                             "Old signatures not found and incremental specified"),
                            log.ErrorCode.inc_without_sigs)
         else:
-            log.Warn("No signatures found, switching to full backup.")
+            log.Warn(_("No signatures found, switching to full backup."))
         return None
     return col_stats.matched_chain_pair[0]
 
@@ -251,7 +254,7 @@ def print_statistics(stats, bytes_written):
     """If globals.print_statistics, print stats after adding bytes_written"""
     if globals.print_statistics:
         diffdir.stats.TotalDestinationSizeChange = bytes_written
-        print diffdir.stats.get_stats_logstring("Backup Statistics")    
+        print diffdir.stats.get_stats_logstring(_("Backup Statistics"))
 
 
 def incremental_backup(sig_chain):
@@ -274,7 +277,7 @@ def list_current(col_stats):
     """List the files current in the archive (examining signature only)"""
     sig_chain = check_sig_chain(col_stats)
     if not sig_chain:
-        log.FatalError("No signature data found, unable to list files.",
+        log.FatalError(_("No signature data found, unable to list files."),
                        log.ErrorCode.no_sigs)
     path_iter = diffdir.get_combined_path_iter(sig_chain.get_fileobjs())
     for path in path_iter:
@@ -290,11 +293,11 @@ def restore(col_stats):
     if not patchdir.Write_ROPaths(globals.local_path, 
                                   restore_get_patched_rop_iter(col_stats)):
         if globals.restore_dir:
-            log.FatalError("%s not found in archive, no files restored."
+            log.FatalError(_("%s not found in archive, no files restored.")
                            % (globals.restore_dir,),
                            log.ErrorCode.restore_dir_not_found)
         else:
-            log.FatalError("No files found in archive - nothing restored.",
+            log.FatalError(_("No files found in archive - nothing restored."),
                            log.ErrorCode.no_restore_files)
 
 
@@ -318,7 +321,7 @@ def restore_get_patched_rop_iter(col_stats):
             yield restore_get_enc_fileobj(backup_set.backend,
                                           backup_set.volume_name_dict[vol_num],
                                           manifest.volume_info_dict[vol_num])
-            log.Progress('Processed volume %d of %d' % (vol_num, numvols),
+            log.Progress(_('Processed volume %d of %d') % (vol_num, numvols),
                          vol_num, numvols)
 
     fileobj_iters = map(get_fileobj_iter, backup_setlist)
@@ -351,10 +354,10 @@ def restore_check_hash(volume_info, vol_path):
     if hash_pair:
         calculated_hash = gpg.get_hash(hash_pair[0], vol_path)
         if calculated_hash != hash_pair[1]:
-            log.FatalError("Invalid data - %s hash mismatch:\n"
-                           "Calculated hash: %s\n"
-                           "Manifest hash: %s\n" %
-                           (hash_pair[0], calculated_hash, hash_pair[1]),
+            log.FatalError("%s\n%s\n%s\n" %
+                           (_("Invalid data - %s hash mismatch:") % hash_pair[0],
+                            _("Calculated hash: %s") % calculated_hash,
+                            _("Manifest hash: %s") % hash_pair[1]),
                            log.ErrorCode.mismatched_hash)
 
 
@@ -366,7 +369,7 @@ def restore_add_sig_check(fileobj):
         """Thunk run when closing volume file"""
         actual_sig = fileobj.fileobj.get_signature()
         if actual_sig != globals.gpg_profile.sign_key:
-            log.FatalError("Volume was not signed by key %s, not %s" %
+            log.FatalError(_("Volume was signed by key %s, not %s") %
                            (actual_sig, globals.gpg_profile.sign_key),
                            log.ErrorCode.unsigned_volume)
     fileobj.addhook(check_signature)
@@ -386,9 +389,14 @@ def verify(col_stats):
         if not backup_ropath.compare_verbose(current_path):
             diff_count += 1
         total_count += 1
-    log.Log("Verify complete: %s %s compared, %s %s found." %
-            (total_count, total_count == 1 and "file" or "files",
-             diff_count, diff_count == 1 and "difference" or "differences"), 3)
+    # Unfortunately, ngettext doesn't handle multiple number variables, so we
+    # split up the string.
+    log.Log(_("Verify complete: %s, %s.") %
+            (gettext.ngettext("%d file compared",
+                              "%d files compared", total_count) % total_count,
+             gettext.ngettext("%d difference found",
+                              "%d differences found", diff_count) % diff_count),
+            3)
     if diff_count >= 1:
         exit_val = 1
 
@@ -397,24 +405,24 @@ def cleanup(col_stats):
     """Delete the extraneous files in the current backend"""
     extraneous = col_stats.get_extraneous()
     if not extraneous:
-        log.Warn("No extraneous files found, nothing deleted in cleanup.")
+        log.Warn(_("No extraneous files found, nothing deleted in cleanup."))
         return
 
     filestr = "\n".join(extraneous)
     if globals.force:
-        if len(extraneous) > 1:
-            log.Log("Deleting these files from backend:\n"+filestr, 3)
-        else:
-            log.Log("Deleting this file from backend:\n"+filestr, 3)
+        Log.Log(gettext.ngettext("Deleting this file from backend:",
+                                 "Deleting these files from backend:",
+                                 len(extraneous))+"\n"+filestr, 3)
         if not globals.dry_run:
             col_stats.backend.delete(extraneous)
     else:
-        if len(extraneous) > 1:
-            log.Warn("Found the following files to delete:")
-        else:
-            log.Warn("Found the following file to delete:")
-        log.Warn(filestr + "\nRun duplicity again with the --force "
-                 "option to actually delete.")
+        Log.Log("%s\n%s\n%s" %
+                (gettext.ngettext("Found the following file to delete:",
+                                  "Found the following files to delete:",
+                                  len(extraneous)),
+                 filestr,
+                 _("Run duplicity again with the --force option to actually delete.")),
+                3)
 
 
 def remove_all_but_n_full(col_stats):
@@ -436,27 +444,26 @@ def remove_old(col_stats):
 
     req_list = col_stats.get_older_than_required(globals.remove_time)
     if req_list:
-        log.Warn("There are backup set(s) at time(s):\n%s\nWhich can't be "
-                 "deleted because newer sets depend on them." %
-                 set_times_str(req_list))
+        log.Warn("%s\n%s\n%s" %
+                 (_("There are backup set(s) at time(s):"),
+                  set_times_str(req_list),
+                  _("Which can't be deleted because newer sets depend on them.")))
 
     if (col_stats.matched_chain_pair and
         col_stats.matched_chain_pair[1].end_time < globals.remove_time):
-        log.Warn("Current active backup chain is older than specified time.\n"
-             "However, it will not be deleted.  To remove all your backups,\n"
-                 "manually purge the repository.")
+        log.Warn(_("Current active backup chain is older than specified time.  "
+                   "However, it will not be deleted.  To remove all your backups, "
+                   "manually purge the repository."))
 
     setlist = col_stats.get_older_than(globals.remove_time)
     if not setlist:
-        log.Warn("No old backup sets found, nothing deleted.")
+        log.Warn(_("No old backup sets found, nothing deleted."))
         return
     if globals.force:
-        if len(setlist) > 1:
-            log.Log("Deleting backup sets at times:\n" +
-                    set_times_str(setlist), 3)
-        else:
-            log.Log("Deleting backup set at times:\n" +
-                    set_times_str(setlist), 3)
+        log.Log(gettext.ngettext("Deleting backup set at time:",
+                                 "Deleting backup sets at times:",
+                                 len(setlist)) +
+                "\n" + set_times_str(setlist), 3)
         if globals.dry_run:
             col_stats.set_values(sig_chain_warning = None)
         else:
@@ -465,12 +472,11 @@ def remove_old(col_stats):
                 set.delete()
             col_stats.set_values(sig_chain_warning = None).cleanup_signatures()
     else:
-        if len(setlist) > 1:
-            log.Warn("Found old backup sets at the following times:")
-        else:
-            log.Warn("Found old backup set at the following time:")
-        log.Warn(set_times_str(setlist) + 
-                 "\nRerun command with --force option to actually delete.")
+        log.Warn(gettext.ngettext("Found old backup set at the following time:",
+                                  "Found old backup sets at the following times:",
+                                  len(setlist)) +
+                 "\n" + set_times_str(setlist) + "\n" +
+                 _("Rerun command with --force option to actually delete."), 3)
 
 
 def check_last_manifest(col_stats):
@@ -492,11 +498,11 @@ def main():
 
     last_full_time = col_stats.get_last_full_backup_time()
     if last_full_time > 0:
-        log.Log("Last full backup date: " + dup_time.timetopretty(last_full_time), 4)
+        log.Log(_("Last full backup date:") + " " + dup_time.timetopretty(last_full_time), 4)
     else:
-        log.Log("Last full backup date: none", 4)
+        log.Log(_("Last full backup date: none"), 4)
     if action == "inc" and last_full_time < globals.full_force_time:
-        log.Log("Last full backup is too old, forcing full backup", 3)
+        log.Log(_("Last full backup is too old, forcing full backup"), 3)
         action = "full"
 
     os.umask(077)
@@ -568,8 +574,8 @@ if __name__ == "__main__":
     except duplicity.errors.UserError, e:
         # For user errors, don't show an ugly stack trace by
         # default. But do with sufficient verbosity.
-        log.Info("User error detail: %s"
-             "" % (''.join(traceback.format_exception(*sys.exc_info()))))
+        log.Info(_("User error detail: %s")
+                 % (''.join(traceback.format_exception(*sys.exc_info()))))
         log.FatalError("%s: %s" % (e.__class__.__name__,
                        str(e)), log.ErrorCode.user_error,
                        e.__class__.__name__)

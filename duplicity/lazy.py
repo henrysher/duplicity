@@ -286,7 +286,7 @@ class IterTreeReducer:
             return 1
 
         if index <= self.index:
-            log.Log("Warning: oldindex %s >= newindex %s" %
+            log.Log(_("Warning: oldindex %s >= newindex %s") %
                     (self.index, index), 2)
             return 1
 
@@ -360,13 +360,13 @@ class ITRBranch:
             filename = os.path.join(*args[0])
         elif self.index: filename = os.path.join(*self.index)
         else: filename = "."
-        log.Log("Error '%s' processing %s" % (exc, filename), 2)
+        log.Log(_("Error '%s' processing %s") % (exc, filename), 2)
 
     def log_prev_error(self, index):
         """Call function if no pending exception"""
         if not index: index_str = "."
         else: index_str = os.path.join(*index)
-        log.Log("Skipping %s because of previous error" % index_str, 2)
+        log.Log(_("Skipping %s because of previous error") % index_str, 2)
 
 
 import duplicity.log as log

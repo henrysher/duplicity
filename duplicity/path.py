@@ -256,7 +256,7 @@ class ROPath:
             ti.mode = self.mode
             ti.uid, ti.gid = self.stat.st_uid, self.stat.st_gid
             if self.stat.st_mtime < 0:
-                log.Warn("Warning: %s has negative mtime, treating as 0."
+                log.Warn(_("Warning: %s has negative mtime, treating as 0.")
                          % (self.get_relative_path(),))
                 ti.mtime = 0
             else:
@@ -321,30 +321,30 @@ class ROPath:
 
         """
         def log_diff(log_string):
-            log_str = "Difference found: " + log_string
+            log_str = _("Difference found:") + " " + log_string
             log.Log(log_str % (self.get_relative_path(),), 4)
 
         if not self.type and not other.type:
             return 1
         if not self.stat and other.stat:
-            log_diff("New file %s")
+            log_diff(_("New file %s"))
             return 0
         if not other.stat and self.stat:
-            log_diff("File %s is missing")
+            log_diff(_("File %s is missing"))
             return 0
         if self.type != other.type:
-            log_diff("File %%s has type %s, expected %s" %
+            log_diff(_("File %%s has type %s, expected %s") %
                      (other.type, self.type))
             return 0
 
         if self.isreg() or self.isdir() or self.isfifo():
             if not self.perms_equal(other):
-                log_diff("File %%s has permissions %o, expected %o" %
+                log_diff(_("File %%s has permissions %o, expected %o") %
                          (other.getperms(), self.getperms()))
                 return 0
             if ((int(self.stat.st_mtime) != int(other.stat.st_mtime)) and
                 (self.stat.st_mtime > 0 or other.stat.st_mtime > 0)):
-                log_diff("File %%s has mtime %s, expected %s" %
+                log_diff(_("File %%s has mtime %s, expected %s") %
                          (dup_time.timetopretty(int(other.stat.st_mtime)),
                           dup_time.timetopretty(int(self.stat.st_mtime))))
                 return 0
@@ -352,7 +352,7 @@ class ROPath:
                 if self.compare_data(other):
                     return 1
                 else:
-                    log_diff("Data for file %s is different")
+                    log_diff(_("Data for file %s is different"))
                     return 0
             else:
                 return 1
@@ -360,16 +360,16 @@ class ROPath:
             if self.symtext == other.symtext:
                 return 1
             else:
-                log_diff("Symlink %%s points to %s, expected %s" %
+                log_diff(_("Symlink %%s points to %s, expected %s") %
                          (other.symtext, self.symtext))
                 return 0
         elif self.isdev():
             if not self.perms_equal(other):
-                log_diff("File %%s has permissions %o, expected %o" %
+                log_diff(_("File %%s has permissions %o, expected %o") %
                          (other.getperms(), self.getperms()))
                 return 0
             if self.devnums != other.devnums:
-                log_diff("Device file %%s has numbers %s, expected %s"
+                log_diff(_("Device file %%s has numbers %s, expected %s")
                          % (other.devnums, self.devnums))
                 return 0
             return 1
@@ -515,7 +515,7 @@ class Path(ROPath):
 
     def mkdir(self):
         """Make a directory at specified path"""
-        log.Log("Making directory %s" % (self.name,), 7)
+        log.Log(_("Making directory %s") % (self.name,), 7)
         try:
             os.mkdir(self.name)
         except OSError:
@@ -525,7 +525,7 @@ class Path(ROPath):
 
     def delete(self):
         """Remove this file"""
-        log.Log("Deleting %s" % (self.name,), 7)
+        log.Log(_("Deleting %s") % (self.name,), 7)
         if self.isdir():
             os.rmdir(self.name)
         else:
@@ -534,14 +534,14 @@ class Path(ROPath):
 
     def touch(self):
         """Open the file, write 0 bytes, close"""
-        log.Log("Touching %s" % (self.name,), 7)
+        log.Log(_("Touching %s") % (self.name,), 7)
         fp = self.open("wb")
         fp.close()
 
     def deltree(self):
         """Remove self by recursively deleting files under it"""
         import duplicity.selection as selection # todo: avoid circ. dep. issue
-        log.Log("Deleting tree %s" % (self.name,), 7)
+        log.Log(_("Deleting tree %s") % (self.name,), 7)
         itr = IterTreeReducer(PathDeleter, [])
         for path in selection.Select(self).set_iter():
             itr(path.index, path)

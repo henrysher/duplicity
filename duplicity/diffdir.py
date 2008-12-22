@@ -92,7 +92,7 @@ def delta_iter_error_handler(exc, new_path, sig_path, sig_tar = None):
         index_string = sig_path.get_relative_path()
     else:
         assert 0, "Both new and sig are None for some reason"
-    log.Log("Error %s getting delta for %s" % (str(exc), index_string), 2)
+    log.Log(_("Error %s getting delta for %s") % (str(exc), index_string), 2)
     return None
 
 
@@ -104,7 +104,7 @@ def get_delta_path(new_path, sig_path, sigTarFile = None):
         ti = new_path.get_tarinfo()
         index = new_path.index
     delta_path = new_path.get_ropath()
-    log.Log("Getting delta of %s and %s" % (new_path, sig_path), 7)
+    log.Log(_("Getting delta of %s and %s") % (new_path, sig_path), 7)
 
     def callback(sig_string):
         """Callback activated when FileWithSignature read to end"""
@@ -145,14 +145,14 @@ def log_delta_path(delta_path, new_path = None, stats = None):
     if delta_path.difftype == "snapshot":
         if new_path:
             stats.add_new_file(new_path)
-        log.Info("Generating delta - new file: %s" %
+        log.Info(_("Generating delta - new file: %s") %
                  (delta_path.get_relative_path(),),
                  log.InfoCode.diff_file_new,
                  util.escape(delta_path.get_relative_path()))
     else:
         if new_path:
             stats.add_changed_file(new_path)
-        log.Info("Generating delta - changed file: %s" %
+        log.Info(_("Generating delta - changed file: %s") %
                  (delta_path.get_relative_path(),),
                  log.InfoCode.diff_file_changed,
                  util.escape(delta_path.get_relative_path()))
@@ -173,13 +173,13 @@ def get_delta_iter(new_iter, sig_iter, sig_fileobj=None):
     else:
         sigTarFile = None
     for new_path, sig_path in collated:
-        log.Log("Comparing %s and %s" % (new_path and new_path.index,
-                                         sig_path and sig_path.index), 6)
+        log.Log(_("Comparing %s and %s") % (new_path and new_path.index,
+                                            sig_path and sig_path.index), 6)
         if not new_path or not new_path.type:
             # file doesn't exist
             if sig_path and sig_path.exists():
                 # but signature says it did
-                log.Info("Generating delta - deleted file: %s" %
+                log.Info(_("Generating delta - deleted file: %s") %
                          (sig_path.get_relative_path(),),
                          log.InfoCode.diff_file_deleted,
                          util.escape(sig_path.get_relative_path()))

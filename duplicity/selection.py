@@ -114,11 +114,11 @@ class Select:
             try:
                 mode = os.stat(path.name+"/"+filename)[stat.ST_MODE]
                 if stat.S_ISSOCK(mode):
-                    log.Log("Skipping socket %s/%s" % (path.name, filename), 7)
+                    log.Log(_("Skipping socket %s/%s") % (path.name, filename), 7)
                 else:
-                    log.Log("Error initializing file %s/%s" % (path.name, filename), 2)
+                    log.Log(_("Error initializing file %s/%s") % (path.name, filename), 2)
             except OSError:
-                log.Log("Error accessing possibly locked file %s/%s" % (path.name, filename), 2);
+                log.Log(_("Error accessing possibly locked file %s/%s") % (path.name, filename), 2);
             return None
 
         def diryield(path):
@@ -143,10 +143,10 @@ class Select:
 
         if not path.type:
             # base doesn't exist
-            log.Log("Warning: base %s doesn't exist, continuing" %
+            log.Log(_("Warning: base %s doesn't exist, continuing") %
                     path.name, 2)
             return
-        log.Log("Selecting %s" % path.name, 7)
+        log.Log(_("Selecting %s") % path.name, 7)
         yield path
         if not path.isdir():
             return
@@ -164,10 +164,10 @@ class Select:
             if val == 0:
                 if delayed_path_stack:
                     for delayed_path in delayed_path_stack:
-                        log.Log("Selecting %s" % delayed_path.name, 7)
+                        log.Log(_("Selecting %s") % delayed_path.name, 7)
                         yield delayed_path
                     del delayed_path_stack[:]
-                log.Log("Selecting %s" % subpath.name, 7)
+                log.Log(_("Selecting %s") % subpath.name, 7)
                 yield subpath
                 if subpath.isdir():
                     diryield_stack.append(diryield(subpath))
@@ -233,17 +233,17 @@ class Select:
     def parse_catch_error(self, exc):
         """Deal with selection error exc"""
         if isinstance(exc, FilePrefixError):
-            log.FatalError(
+            log.FatalError(_(
 """Fatal Error: The file specification
     %s
 cannot match any files in the base directory
     %s
 Useful file specifications begin with the base directory or some
-pattern (such as '**') which matches the base directory.""" %
+pattern (such as '**') which matches the base directory.""") %
             (exc, self.prefix), log.ErrorCode.file_prefix_error)
         elif isinstance(e, GlobbingError):
-            log.FatalError("Fatal Error while processing expression\n"
-                           "%s" % exc, log.ErrorCode.globbing_error)
+            log.FatalError(_("Fatal Error while processing expression\n"
+                             "%s") % exc, log.ErrorCode.globbing_error)
         else:
             raise
 
@@ -251,12 +251,12 @@ pattern (such as '**') which matches the base directory.""" %
         """Exit with error if last selection function isn't an exclude"""
         if (self.selection_functions and
             not self.selection_functions[-1].exclude):
-            log.FatalError(
+            log.FatalError(_(
 """Last selection expression:
     %s
 only specifies that files be included.  Because the default is to
 include all files, the expression is redundant.  Exiting because this
-probably isn't what you meant.""" %
+probably isn't what you meant.""") %
             (self.selection_functions[-1].name,),
             log.ErrorCode.redundant_inclusion)
 
@@ -277,10 +277,10 @@ probably isn't what you meant.""" %
         filelist_name is just a string used for logging.
 
         """
-        log.Log("Reading filelist %s" % filelist_name, 4)
+        log.Log(_("Reading filelist %s") % filelist_name, 4)
         tuple_list, something_excluded = \
                     self.filelist_read(filelist_fp, inc_default, filelist_name)
-        log.Log("Sorting filelist %s" % filelist_name, 4)
+        log.Log(_("Sorting filelist %s") % filelist_name, 4)
         tuple_list.sort()
         i = [0] # We have to put index in list because of stupid scoping rules
 
@@ -307,11 +307,11 @@ probably isn't what you meant.""" %
             """Warn if prefix is incorrect"""
             prefix_warnings[0] += 1
             if prefix_warnings[0] < 6:
-                log.Log("Warning: file specification '%s' in filelist %s\n"
-                        "doesn't start with correct prefix %s.  Ignoring." %
+                log.Log(_("Warning: file specification '%s' in filelist %s\n"
+                          "doesn't start with correct prefix %s.  Ignoring.") %
                         (exc, filelist_name, self.prefix), 2)
                 if prefix_warnings[0] == 5:
-                    log.Log("Future prefix errors will not be logged.", 2)
+                    log.Log(_("Future prefix errors will not be logged."), 2)
 
         something_excluded, tuple_list = None, []
         separator = globals.null_separator and "\0" or "\n"
@@ -327,7 +327,7 @@ probably isn't what you meant.""" %
             if not tuple[1]:
                 something_excluded = 1
         if filelist_fp.close():
-            log.Log("Error closing filelist %s" % filelist_name, 2)
+            log.Log(_("Error closing filelist %s") % filelist_name, 2)
         return (tuple_list, something_excluded)
 
     def filelist_parse_line(self, line, include):
@@ -394,7 +394,7 @@ probably isn't what you meant.""" %
         See the man page on --[include/exclude]-globbing-filelist
 
         """
-        log.Log("Reading globbing filelist %s" % list_name, 4)
+        log.Log(_("Reading globbing filelist %s") % list_name, 4)
         separator = globals.null_separator and "\0" or "\n"
         for line in filelist_fp.read().split(separator):
             if not line:
@@ -424,7 +424,7 @@ probably isn't what you meant.""" %
         try:
             regexp = re.compile(regexp_string)
         except:
-            log.Log("Error compiling regular expression %s" % regexp_string, 1)
+            log.Log(_("Error compiling regular expression %s") % regexp_string, 1)
             raise
         
         def sel_func(path):
@@ -440,8 +440,8 @@ probably isn't what you meant.""" %
     def devfiles_get_sf(self):
         """Return a selection function to exclude all dev files"""
         if self.selection_functions:
-            log.Log("Warning: exclude-device-files is not the first "
-                    "selector.\nThis may not be what you intended", 3)
+            log.Log(_("Warning: exclude-device-files is not the first "
+                      "selector.\nThis may not be what you intended"), 3)
         def sel_func(path):
             if path.isdev():
                 return 0

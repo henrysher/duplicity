@@ -26,6 +26,7 @@ dependency guarantees.
 import duplicity
 import duplicity.log as log
 import sys
+import gettext
 
 from duplicity.dup_threading import require_threading
 from duplicity.dup_threading import interruptably_wait
@@ -62,8 +63,9 @@ class AsyncScheduler:
         Create an asynchronous scheduler that executes jobs with the
         given level of concurrency.
         """
-        log.Info("%s: instantiating at concurrency %d" % (self.__class__.__name__,
-                                                          concurrency))
+        log.Info("%s: %s" % (self.__class__.__name__,
+                             _("instantiating at concurrency %d") %
+                               (concurrency)))
         assert concurrency >= 0, "%s concurrency level must be >= 0" % (self.__class__.__name__,)
 
         self.__failed       = False        # has at least one task failed so far?
@@ -89,7 +91,7 @@ class AsyncScheduler:
         barrier must be inserted in between to guarantee that A
         happens before B.
         """
-        log.Debug("%s: inserting barrier" % (self.__class__.__name__),)
+        log.Debug("%s: %s" % (self.__class__.__name__, _("inserting barrier")))
         # With concurrency 0 it's a NOOP, and due to the special case in
         # task scheduling we do not want to append to the queue (will never
         # be popped).
@@ -138,11 +140,13 @@ class AsyncScheduler:
         if self.__concurrency == 0:
             # special case this to not require any platform support for
             # threading at all
-            log.Info("%s: running task synchronously (asynchronicity disabled)" % (self.__class__.__name__),)
+            log.Info("%s: %s" % (self.__class__.__name__,
+                     _("running task synchronously (asynchronicity disabled)")))
 
             return self.__run_synchronously(fn, params)
         else:
-            log.Info("%s: scheduling task for asynchronous execution" % (self.__class__.__name__),)
+            log.Info("%s: %s" % (self.__class__.__name__,
+                     _("scheduling task for asynchronous execution")))
 
             return self.__run_asynchronously(fn, params)
 
@@ -170,7 +174,8 @@ class AsyncScheduler:
         def _waiter():
             return ret
 
-        log.Info("%s: task completed successfully" % (self.__class__.__name__,))
+        log.Info("%s: %s" % (self.__class__.__name__,
+                 _("task completed successfully")))
 
         return _waiter
 
@@ -182,9 +187,9 @@ class AsyncScheduler:
                 # note that __start_worker() below may block waiting on
                 # task execution; if so we will be one task scheduling too
                 # late triggering the failure. this should be improved.
-                log.Info("%s: a previously scheduled task has failed; "
-                         "propagating the result immediately"
-                         "" % (self.__class__.__name__,))
+                log.Info("%s: %s" % (self.__class__.__name__,
+                         _("a previously scheduled task has failed; "
+                           "propagating the result immediately")))
                 self.__waiter()
                 raise AssertionError("%s: waiter should have raised an exception; "
                                      "this is a bug" % (self.__class__.__name__,))
@@ -193,9 +198,10 @@ class AsyncScheduler:
 
             free_workers = self.__workers - self.__curconc
 
-            log.Debug("%s: tasks queue length post-schedule: %d tasks"
-                      "" % (self.__class__.__name__,
-                            len(self.__q)))
+            log.Debug("%s: %s" % (self.__class__.__name__,
+                      gettext.ngettext("tasks queue length post-schedule: %d task",
+                                       "tasks queue length post-schedule: %d tasks",
+                                       len(self.__q)) % len(self.__q)))
             
             assert free_workers >= 0
 
@@ -211,11 +217,14 @@ class AsyncScheduler:
         Start a new worker; self.__cv must be acquired.
         """
         while self.__workers >= self.__concurrency:
-            log.Info("%s: no free worker slots (%d workers, and maximum "
-                     "concurrencyis %d) - waiting for a background "
-                     "task to complete" % (self.__class__.__name__,
-                                           self.__workers,
-                                           self.__concurrency))
+            log.Info("%s: %s" % (self.__class__.__name__,
+                     gettext.ngettext("no free worker slots (%d worker, and maximum "
+                                      "concurrency is %d) - waiting for a background "
+                                      "task to complete",
+                                      "no free worker slots (%d workers, and maximum "
+                                      "concurrency is %d) - waiting for a background "
+                                      "task to complete", self.__workers) %
+                                      (self.__workers, self.__concurrency)))
             self.__cv.wait()
 
         self.__workers += 1
@@ -254,9 +263,10 @@ class AsyncScheduler:
                 # there is work to do
                 work = self.__q.pop(0)
 
-                log.Debug("%s: tasks queue length post-grab: %d tasks"
-                          "" % (self.__class__.__name__,
-                                len(self.__q)))
+                log.Debug("%s: %s" % (self.__class__.__name__,
+                          gettext.ngettext("tasks queue length post-grab: %d task",
+                                           "tasks queue length post-grab: %d tasks",
+                                           len(self.__q)) % len(self.__q)))
 
                 if work: # real work, not just barrier
                     self.__curconc += 1
@@ -279,9 +289,8 @@ class AsyncScheduler:
                             self.__waiter = waiter
                     with_lock(self.__cv, _signal_failed)
 
-                log.Info("%s: task execution done (success: %s)"
-                         "" % (self.__class__.__name__,
-                               succeeded))
+                log.Info("%s: %s" % (self.__class__.__name__,
+                         _("task execution done (success: %s)") % succeeded))
 
                 def _postwork():
                     self.__curconc -= 1

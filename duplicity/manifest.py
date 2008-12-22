@@ -59,12 +59,13 @@ Current directory: %s
 Previous directory: %s""" % (self.local_dirname, globals.local_path.name)
         else: return
 
-        log.FatalError(errmsg + """
-
-Aborting because you may have accidentally tried to backup two
-different data sets to the same remote location, or using the same
-archive directory.  If this is not a mistake, use the
---allow-source-mismatch switch to avoid seeing this message""", log.ErrorCode.source_mismatch)
+        log.FatalError(errmsg + "\n\n" +
+                       _("Aborting because you may have accidentally tried to "
+                         "backup two different data sets to the same remote "
+                         "location, or using the same archive directory.  If "
+                         "this is not a mistake, use the "
+                         "--allow-source-mismatch switch to avoid seeing this "
+                         "message"), log.ErrorCode.source_mismatch)
 
     def add_volume_info(self, vi):
         """Add volume info vi to manifest"""
@@ -116,7 +117,7 @@ archive directory.  If this is not a mistake, use the
         vi_list2 = other.volume_info_dict.keys()
         vi_list2.sort()
         if vi_list1 != vi_list2:
-            log.Log("Manifests not equal because different volume numbers", 3)
+            log.Log(_("Manifests not equal because different volume numbers"), 3)
             return None
         for i in range(len(vi_list1)):
             if not vi_list1[i] == vi_list2[i]: return None
@@ -229,7 +230,7 @@ class VolumeInfo:
             field_name = line_split[0].lower()
             other_fields = line_split[1:]
             if field_name == "Volume":
-                log.Log("Warning, found extra Volume identifier", 2)
+                log.Log(_("Warning, found extra Volume identifier"), 2)
                 break
             elif field_name == "startingpath":
                 self.start_index = string_to_index(other_fields[0])
@@ -245,23 +246,23 @@ class VolumeInfo:
     def __eq__(self, other):
         """Used in test suite"""
         if not isinstance(other, VolumeInfo):
-            log.Log("Other is not VolumeInfo", 3)
+            log.Log(_("Other is not VolumeInfo"), 3)
             return None
         if self.volume_number != other.volume_number:
-            log.Log("Volume numbers don't match", 3)
+            log.Log(_("Volume numbers don't match"), 3)
             return None
         if self.start_index != other.start_index:
-            log.Log("start_indicies don't match", 3)
+            log.Log(_("start_indicies don't match"), 3)
             return None
         if self.end_index != other.end_index:
-            log.Log("end_index don't match", 3)
+            log.Log(_("end_index don't match"), 3)
             return None
         hash_list1 = self.hashes.items()
         hash_list1.sort()
         hash_list2 = other.hashes.items()
         hash_list2.sort()
         if hash_list1 != hash_list2:
-            log.Log("Hashes don't match", 3)
+            log.Log(_("Hashes don't match"), 3)
             return None
         return 1
 

@@ -89,14 +89,14 @@ class FileVolumeWriter:
         if self.finished: raise StopIteration
 
         filename = "%s.%d" % (self.prefix, self.current_index)
-        log.Log("Starting to write %s" % filename, 5)
+        log.Log(_("Starting to write %s") % filename, 5)
         outfp = open(filename, "wb")
 
         if not self.write_volume(outfp): # end of input
             self.finished = 1
             if self.current_index == 1: # special case first index
-                log.Log("One only volume required.\n"
-                        "Renaming %s to %s" % (filename, self.prefix), 4)
+                log.Log(_("One only volume required.\n"
+                          "Renaming %s to %s") % (filename, self.prefix), 4)
                 os.rename(filename, self.prefix)
                 return self.prefix
         else: self.current_index += 1

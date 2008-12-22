@@ -3,6 +3,7 @@
 
 import sys, os, getopt
 from distutils.core import setup, Extension
+from DistUtilsExtra.command import *
 
 version_string = "$version"
 
@@ -41,6 +42,8 @@ setup(name="duplicity",
       maintainer="Kenneth Loafman",
       maintainer_email="kenneth@loafman.com",
       url="http://duplicity.nongnu.org/index.html",
+      cmdclass = { "build" : build_extra.build_extra,
+                   "build_i18n" :  build_i18n.build_i18n },
       packages = ['duplicity', 'duplicity.backends'],
       package_dir = {"duplicity" : "src",
                      "duplicity.backends" : "src/backends"},

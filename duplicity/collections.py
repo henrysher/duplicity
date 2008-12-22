@@ -22,6 +22,7 @@
 
 import gzip, types
 import log, file_naming, path, dup_time, globals, manifest
+import gettext
 
 class CollectionsError(Exception):
     pass
@@ -121,7 +122,7 @@ class BackupSet:
     def check_manifests(self):
         """Make sure remote manifest is equal to local one"""
         if not self.remote_manifest_name and not self.local_manifest_path:
-            log.FatalError("Fatal Error: No manifests found for most recent backup",
+            log.FatalError(_("Fatal Error: No manifests found for most recent backup"),
                            log.ErrorCode.no_manifests)
         assert self.remote_manifest_name, "if only one, should be remote"
 
@@ -130,14 +131,16 @@ class BackupSet:
             local_manifest = self.get_local_manifest()
         if remote_manifest and self.local_manifest_path and local_manifest:
             if remote_manifest != local_manifest:
-                log.FatalError("Fatal Error: Remote manifest does not match local one.  Either the "
-                               "remote backup set or the local archive directory has been corrupted.",
+                log.FatalError(_("Fatal Error: Remote manifest does not match "
+                                 "local one.  Either the remote backup set or "
+                                 "the local archive directory has been corrupted."),
                                log.ErrorCode.mismatched_manifests)
         if not remote_manifest:
             if self.local_manifest_path:
                 remote_manifest = local_manifest
             else:
-                log.FatalError("Fatal Error: Neither remote nor local manifest is readable.",
+                log.FatalError(_("Fatal Error: Neither remote nor local "
+                                 "manifest is readable."),
                                log.ErrorCode.unreadable_manifests)
         remote_manifest.check_dirinfo()
 
@@ -222,15 +225,15 @@ class BackupChain:
             if (self.incset_list
                 and incset.start_time == self.incset_list[-1].start_time
                 and incset.end_time > self.incset_list[-1]):
-                log.Log("Preferring Backupset over previous one!", 8)
+                log.Log(_("Preferring Backupset over previous one!"), 8)
                 self.incset_list[-1] = incset
             else:
-                log.Log("Ignoring incremental Backupset (start_time: %s; needed: %s)" %
+                log.Log(_("Ignoring incremental Backupset (start_time: %s; needed: %s)") %
                         (dup_time.timetopretty(incset.start_time),
                          dup_time.timetopretty(self.end_time)), 8)
                 return None
         self.end_time = incset.end_time
-        log.Log("Added incremental Backupset (start_time: %s / end_time: %s)" %
+        log.Log(_("Added incremental Backupset (start_time: %s / end_time: %s)") %
                 (dup_time.timetopretty(incset.start_time),
                  dup_time.timetopretty(incset.end_time)), 8)
         assert self.end_time
@@ -282,20 +285,20 @@ class BackupChain:
         """Return string representation, for testing purposes"""
         set_schema = "%20s   %30s   %15s"
         l = ["-------------------------",
-             "Chain start time: " + dup_time.timetopretty(self.start_time),
-             "Chain end time: " + dup_time.timetopretty(self.end_time),
-             "Number of contained backup sets: %d" %
+             _("Chain start time: ") + dup_time.timetopretty(self.start_time),
+             _("Chain end time: ") + dup_time.timetopretty(self.end_time),
+             _("Number of contained backup sets: %d") %
              (len(self.incset_list)+1,),
-             "Total number of contained volumes: %d" %
+             _("Total number of contained volumes: %d") %
              (self.get_num_volumes(),),
-             set_schema % ("Type of backup set:", "Time:", "Num volumes:")]
+             set_schema % (_("Type of backup set:"), _("Time:"), _("Num volumes:"))]
 
         for s in self.get_all_sets():
             if s.time:
-                type = "Full"
+                type = _("Full")
                 time = s.time
             else:
-                type = "Incremental"
+                type = _("Incremental")
                 time = s.end_time
             l.append(set_schema % (type, dup_time.timetopretty(time), len(s)))
 
@@ -343,9 +346,9 @@ class SignatureChain:
     def __str__(self):
         """Local or Remote and List of files in the set"""
         if self.archive_dir:
-            place = "local"
+            place = _("local")
         else:
-            place = "remote"
+            place = _("remote")
         filelist = []
         if self.fullsig:
             filelist.append(self.fullsig)
@@ -468,36 +471,43 @@ class CollectionsStatus:
 
     def __str__(self):
         """Return string summary of the collection"""
-        l = ["Collection Status",
+        l = [_("Collection Status"),
              "-----------------",
-             "Connecting with backend: %s" %
+             _("Connecting with backend: %s") %
              (self.backend.__class__.__name__,),
-             "Archive dir: %s" % (self.archive_dir,)]
+             _("Archive dir: %s") % (self.archive_dir,)]
 
-        l.append("\nFound %d backup chains without signatures."
+        l.append("\n" +
+                 gettext.ngettext("Found %d backup chain without signatures.",
+                                  "Found %d backup chains without signatures.",
+                                  len(self.other_backup_chains))
                  % len(self.other_backup_chains))
         for i in range(len(self.other_backup_chains)):
-            l.append("Signature-less chain %d of %d:" %
+            l.append(_("Signature-less chain %d of %d:") %
                      (i+1, len(self.other_backup_chains)))
             l.append(str(self.other_backup_chains[i]))
             l.append("")
 
         if self.matched_chain_pair:
-            l.append("\nFound a complete backup chain with matching "
-                     "signature chain:")
+            l.append("\n" + _("Found a complete backup chain with matching "
+                     "signature chain:"))
             l.append(str(self.matched_chain_pair[1]))
         else:
-            l.append("No backup chains with active signatures found")
+            l.append(_("No backup chains with active signatures found"))
 
         if self.orphaned_backup_sets or self.incomplete_backup_sets:
-            l.append("Also found %d backup sets not part of any chain,"
+            l.append(gettext.ngettext("Also found %d backup set not part of any chain,",
+                                      "Also found %d backup sets not part of any chain,",
+                                      len(self.orphaned_backup_sets))
                      % (len(self.orphaned_backup_sets),))
-            l.append("and %d incomplete backup sets."
+            l.append(gettext.ngettext("and %d incomplete backup set.",
+                                      "and %d incomplete backup sets.",
+                                      len(self.incomplete_backup_sets))
                      % (len(self.incomplete_backup_sets),))
-            l.append("These may be deleted by running duplicity with the "
-                     "--cleanup option.")
+            l.append(_("These may be deleted by running duplicity with the "
+                       "--cleanup option."))
         else:
-            l.append("No orphaned or incomplete backup sets found.")
+            l.append(_("No orphaned or incomplete backup sets found."))
 
         return "\n".join(l)
 
@@ -512,7 +522,10 @@ class CollectionsStatus:
         """
         self.values_set = 1
         backend_filename_list = self.backend.list()
-        log.Debug("%d files exist on backend" % (len(backend_filename_list,)))
+        log.Debug(gettext.ngettext("%d file exists on backend",
+                                   "%d files exist on backend",
+                                   len(backend_filename_list)) % 
+                  len(backend_filename_list))
 
         (backup_chains, self.orphaned_backup_sets,
                  self.incomplete_backup_sets) = \
@@ -558,7 +571,8 @@ class CollectionsStatus:
                 elif (len(latest_backup_chain.get_all_sets()) >= 2 and
                       sig_chains[i].end_time == latest_backup_chain.get_all_sets()[-2].end_time):
                     # It matches, remove the last backup set:
-                    log.Warn("Warning, discarding last backup set, because of missing signature file.")
+                    log.Warn(_("Warning, discarding last backup set, because "
+                               "of missing signature file."))
                     self.incomplete_backup_sets.append(latest_backup_chain.incset_list[-1])
                     latest_backup_chain.incset_list = latest_backup_chain.incset_list[:-1]
                 else:
@@ -587,23 +601,35 @@ class CollectionsStatus:
         """Log various error messages if find incomplete/orphaned files"""
         assert self.values_set
         if self.orphaned_sig_names:
-            log.Warn("Warning, found the following orphaned signature files:\n"
-                     + "\n".join(self.orphaned_sig_names),
+            log.Warn(gettext.ngettext("Warning, found the following orphaned "
+                                      "signature file:",
+                                      "Warning, found the following orphaned "
+                                      "signature file:",
+                                      len(self.orphaned_sig_names))
+                     + "\n" + "\n".join(self.orphaned_sig_names),
                      log.WarningCode.orphaned_sig)
         if self.other_sig_chains and sig_chain_warning:
             if self.matched_chain_pair:
-                log.Warn("Warning, found unnecessary signature chain(s)",
+                log.Warn(gettext.ngettext("Warning, found an unnecessary "
+                                          "signature chain",
+                                          "Warning, found unnecessary "
+                                          "signature chains",
+                                          len(self.other_sig_chains)),
                          log.WarningCode.unnecessary_sig)
             else:
-                log.Warn("Warning, found signatures but no corresponding "
-                         "backup files", log.WarningCode.unmatched_sig)
+                log.Warn(_("Warning, found signatures but no corresponding "
+                           "backup files"), log.WarningCode.unmatched_sig)
 
         if self.incomplete_backup_sets:
-            log.Warn("Warning, found incomplete backup sets, probably left "
-                     "from aborted session", log.WarningCode.incomplete_backup)
+            log.Warn(_("Warning, found incomplete backup sets, probably left "
+                       "from aborted session"), log.WarningCode.incomplete_backup)
         if self.orphaned_backup_sets:
-            log.Warn("Warning, found the following orphaned backup files:\n"
-                     + "\n".join(map(lambda x: str(x),
+            log.Warn(gettext.ngettext("Warning, found the following orphaned "
+                                      "backup file:",
+                                      "Warning, found the following orphaned "
+                                      "backup files:",
+                                      len(self.orphaned_backup_sets))
+                     + "\n" + "\n".join(map(lambda x: str(x),
                                      self.orphaned_backup_sets)),
                      log.WarningCode.orphaned_backup)
 
@@ -616,22 +642,23 @@ class CollectionsStatus:
         missing files.
 
         """
-        log.Debug("Extracting backup chains from list of files: %s" % (filename_list,))
+        log.Debug(_("Extracting backup chains from list of files: %s")
+                  % filename_list)
         # First put filenames in set form
         sets = []
         def add_to_sets(filename):
             """Try adding filename to existing sets, or make new one"""
             for set in sets:
                 if set.add_filename(filename):
-                    log.Debug("File %s is part of known set" % (filename,))
+                    log.Debug(_("File %s is part of known set") % (filename,))
                     break
             else:
-                log.Debug("File %s is not part of a known set; creating new set" % (filename,))
+                log.Debug(_("File %s is not part of a known set; creating new set") % (filename,))
                 new_set = BackupSet(self.backend)
                 if new_set.add_filename(filename):
                     sets.append(new_set)
                 else:
-                    log.Log("Ignoring file (rejected by backup set) '%s'" % filename, 9)
+                    log.Log(_("Ignoring file (rejected by backup set) '%s'") % filename, 9)
         map(add_to_sets, filename_list)
         sets, incomplete_sets = self.get_sorted_sets(sets)
 
@@ -642,16 +669,16 @@ class CollectionsStatus:
                 new_chain = BackupChain(self.backend)
                 new_chain.set_full(set)
                 chains.append(new_chain)
-                log.Debug("Found backup chain %s" % (new_chain.short_desc()))
+                log.Debug(_("Found backup chain %s") % (new_chain.short_desc()))
             else:
                 assert set.type == "inc"
                 for chain in chains:
                     if chain.add_inc(set):
-                        log.Debug("Added set %s to pre-existing chain %s" % (set.get_timestr(),
+                        log.Debug(_("Added set %s to pre-existing chain %s") % (set.get_timestr(),
                                                      chain.short_desc()))
                         break
                 else:
-                    log.Debug("Found orphaned set %s" % (set.get_timestr(),))
+                    log.Debug(_("Found orphaned set %s") % (set.get_timestr(),))
                     orphaned_sets.append(set)
         map(add_to_chains, sets)
         return (chains, orphaned_sets, incomplete_sets)

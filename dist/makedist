@@ -88,6 +88,10 @@ def MakeTar():
                      DistDir + "/setup.py"]:
         assert not os.system("cp %s %s" % (filename, tardir)), filename
 
+    os.mkdir(tardir + "/po")
+    for filename in ["POTFILES.in", "Makevars", "*.po"]:
+        os.system("cp po/%s %s/po" % (filename, tardir)), filename
+
     os.mkdir(tardir + "/src")
     for filename in [
         "asyncscheduler.py",

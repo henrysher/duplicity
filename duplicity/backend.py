@@ -28,6 +28,7 @@ import socket
 import time
 import re
 import getpass
+import gettext
 
 import duplicity.dup_temp as dup_temp
 import duplicity.dup_threading as dup_threading
@@ -242,7 +243,7 @@ class Backend:
         raise a BackendException.
         """
         private = self.munge_password(commandline)
-        log.Log("Running '%s'" % private, 5)
+        log.Log(_("Running '%s'") % private, 5)
         if os.system(commandline):
             raise BackendException("Error running '%s'" % private)
 
@@ -253,12 +254,19 @@ class Backend:
         """
         private = self.munge_password(commandline)
         for n in range(1, globals.num_retries+1):
-            log.Log("Running '%s' (attempt #%d)" % (private, n), 5)
+            log.Log(gettext.ngettext("Running '%s' (attempt #%d)",
+                                     "Running '%s' (attempt #%d)", n) %
+                                     (private, n), 5)
             if not os.system(commandline):
                 return
-            log.Log("Running '%s' failed (attempt #%d)" % (private, n), 1)
+            log.Log(gettext.ngettext("Running '%s' failed (attempt #%d)",
+                                     "Running '%s' failed (attempt #%d)", n) %
+                                     (private, n), 1)
             time.sleep(30)
-        log.Log("Giving up trying to execute '%s' after %d attempts" % (private, globals.num_retries), 1)
+        log.Log(gettext.ngettext("Giving up trying to execute '%s' after %d attempt",
+                                 "Giving up trying to execute '%s' after %d attempts",
+                                 globals.num_retries) % (private, globals.num_retries),
+                1)
         raise BackendException("Error running '%s'" % private)
 
     def popen(self, commandline):
@@ -267,7 +275,7 @@ class Backend:
         contents read from stdout) as a string.
         """
         private = self.munge_password(commandline)
-        log.Log("Reading results of '%s'" % private, 5)
+        log.Log(_("Reading results of '%s'") % private, 5)
         fout = os.popen(commandline)
         results = fout.read()
         if fout.close():
@@ -281,7 +289,7 @@ class Backend:
         """
         private = self.munge_password(commandline)
         for n in range(1, globals.num_retries+1):
-            log.Log("Reading results of '%s'" % private, 5)
+            log.Log(_("Reading results of '%s'") % private, 5)
             fout = os.popen(commandline)
             results = fout.read()
             result_status = fout.close()
@@ -291,9 +299,14 @@ class Backend:
                 # This squelches the "file not found" result fromm ncftpls when
                 # the ftp backend looks for a collection that does not exist.
                 return ''
-            log.Log("Running '%s' failed (attempt #%d)" % (private, n), 1)
+            log.Log(gettext.ngettext("Running '%s' failed (attempt #%d)",
+                                     "Running '%s' failed (attempt #%d)", n) %
+                                     (private, n), 1)
             time.sleep(30)
-        log.Log("Giving up trying to execute '%s' after %d attempts" % (private, globals.num_retries), 1)
+        log.Log(gettext.ngettext("Giving up trying to execute '%s' after %d attempt",
+                                 "Giving up trying to execute '%s' after %d attempts",
+                                 globals.num_retries) % (private, globals.num_retries),
+                1)
         raise BackendException("Error running '%s'" % private)
 
     def get_fileobj_read(self, filename, parseresults = None):

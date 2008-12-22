@@ -1,0 +1,9 @@
+# Makefile variables for PO directory in any package using GNU gettext.
+
+DOMAIN = duplicity
+subdir = po
+top_builddir = ..
+XGETTEXT_OPTIONS = --keyword=_ --keyword=N_ --from-code=UTF-8 --language=Python
+COPYRIGHT_HOLDER = Kenneth Loafman <kenneth@loafman.com>
+MSGID_BUGS_ADDRESS = Kenneth Loafman <kenneth@loafman.com>
+
