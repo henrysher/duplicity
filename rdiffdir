@@ -27,6 +27,9 @@
 import sys, getopt, gzip, os
 from duplicity import diffdir, patchdir, log, tarfile, globals, selection, path
 
+import gettext
+gettext.install('duplicity')
+
 # If set, compress diff and delta files using gzip
 gzip_compress = None
 

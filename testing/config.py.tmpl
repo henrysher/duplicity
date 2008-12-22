@@ -2,6 +2,9 @@ import sys, os
 sys.path.insert(0, "../")
 from duplicity import globals, log
 
+import gettext
+gettext.install('duplicity')
+
 # config for duplicity unit tests
 
 # to test GPG and friends
