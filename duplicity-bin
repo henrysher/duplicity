@@ -35,7 +35,7 @@ import duplicity.errors
 
 from duplicity import collections, commandline, diffdir, dup_temp, \
      dup_time, file_naming, globals, gpg, log, manifest, patchdir, \
-     path, robust, tempdir, asyncscheduler
+     path, robust, tempdir, asyncscheduler, util
 
 import gettext
 gettext.install('duplicity')
@@ -280,10 +280,16 @@ def list_current(col_stats):
         log.FatalError(_("No signature data found, unable to list files."),
                        log.ErrorCode.no_sigs)
     path_iter = diffdir.get_combined_path_iter(sig_chain.get_fileobjs())
+    userlist = []
+    loglist = []
     for path in path_iter:
         if path.difftype != "deleted":
-            print dup_time.timetopretty(path.getmtime()), \
-                  path.get_relative_path()
+             userlist.append("%s %s" % (dup_time.timetopretty(path.getmtime()),
+                                        path.get_relative_path()))
+             loglist.append("%s %s" % (dup_time.timetostring(path.getmtime()),
+                                       util.escape(path.get_relative_path())))
+    log.Log('\n'.join(userlist), log.INFO, log.InfoCode.file_list,
+            '\n' + '\n'.join(loglist), True)
 
 
 def restore(col_stats):
