@@ -36,6 +36,9 @@ https://savannah.nongnu.org/patch/?6700
 patch #6701: Make current-list command machine-readable
 https://savannah.nongnu.org/patch/?6701
 
+patch #6702: handle unknown errnos in robust.py
+https://savannah.nongnu.org/patch/?6702
+
 GPG was throwing "gpg: [don't know]: invalid packet (ctb=14)" and apparently
 this is non-fatal.  There is a fix for this being rolled into GPG 2.x.
 http://lists.gnupg.org/pipermail/gnupg-devel/2006-September/023180.html
