@@ -32,11 +32,12 @@ hard links.
 
 %install
 %{PYTHON_NAME} setup.py install --prefix=$RPM_BUILD_ROOT/usr
+%find_lang %{name}
 
 %clean
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 
-%files
+%files -f %{name}.lang
 %defattr(-,root,root)
 %{_bindir}/rdiffdir
 %{_bindir}/duplicity
