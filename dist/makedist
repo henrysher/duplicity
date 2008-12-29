@@ -10,64 +10,21 @@ DistDir = "dist"
 # spec template.
 spec_template = "dist/duplicity.spec.template"
 
-def CopyMan(input_name, destination, version):
-    """Create updated man page at the specified location"""
-    fp = open(destination, "w")
-    date = time.strftime("%B %Y", time.localtime(time.time()))
-    version = "Version "+version
-    firstline = ('.TH RDIFFDIR 1 "%s" "%s" "User Manuals"\n' %
-                 (date, version))
-    fp.write(firstline)
-    infp = open(input_name, "r")
-    infp.readline()
-    fp.write(infp.read())
-    fp.close()
-    infp.close()
-
-def MakeFAQ():
-    """Create FAQ.html and FAQ.wml files from FAQ-body.html"""
-    faqbody_fp = open("FAQ-body.html", "r")
-    faqbody_string = faqbody_fp.read()
-    faqbody_fp.close()
-
-    wml_fp = open("FAQ.wml", "w")
-    wml_fp.write(
-"""#include 'template.wml' curpage=faq title="rdiff-backup: FAQ"
-
-<divert body>
-<p><h2>FAQ:</h2>
-
-""")
-    wml_fp.write(faqbody_string)
-    wml_fp.write("\n</divert>\n")
-    wml_fp.close()
-
-    html_fp = open("FAQ.html", "w")
-    html_fp.write(
-"""<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-
-<html>
-  <head>
-    <title>rdiff-backup FAQ</title>
-  </head>
-
-  <body>
-  <h1>rdiff-backup FAQ</h1>
-""")
-    html_fp.write(faqbody_string)
-    html_fp.write("\n</body></html>")
-    html_fp.close()
-
 def VersionedCopy(source, dest):
-    """Copy source to dest, substituting $version with version"""
+    """
+    Copy source to dest, substituting $version with version
+    $reldate with today's date, i.e. December 28, 2008.
+    """
     fin = open(source, "rb")
     inbuf = fin.read()
     assert not fin.close()
 
-    outbuf = re.sub("\$version", Version, inbuf, 1)
-    if outbuf == inbuf: assert 0, "No $version string replaced"
-    assert not re.search("\$version", outbuf), \
-           "Two $version strings found in the same file %s" % (source,)
+    (outbuf, cnt) = re.subn("\$version", Version, inbuf)
+    assert cnt != 0, "No $version string replaced in" + source
+    assert cnt < 2, "Two or more $version strings found in" + source
+
+    inbuf = outbuf
+    (outbuf, cnt) = re.subn("\$reldate", Reldate, inbuf)
 
     fout = open(dest, "wb")
     fout.write(outbuf)
@@ -83,13 +40,24 @@ def MakeTar():
     except OSError: pass
 
     os.mkdir(tardir)
-    for filename in ["COPYING", "README", "CHANGELOG",
-                     SourceDir + "/_librsyncmodule.c",
-                     DistDir + "/setup.py"]:
+    for filename in [
+        "CHANGELOG",
+        "COPYING",
+        "CVS-README",
+        "LOG-README",
+        "README",
+        "tarfile-LICENSE",
+        SourceDir + "/_librsyncmodule.c",
+        DistDir + "/setup.py",
+        ]:
         assert not os.system("cp %s %s" % (filename, tardir)), filename
 
     os.mkdir(tardir + "/po")
-    for filename in ["POTFILES.in", "Makevars", "*.po"]:
+    for filename in [
+         "POTFILES.in",
+         "Makevars",
+         "*.po",
+         ]:
         os.system("cp po/%s %s/po" % (filename, tardir)), filename
 
     os.mkdir(tardir + "/src")
@@ -123,8 +91,7 @@ def MakeTar():
         "urlparse_2_5.py",
         "util.py",
         ]:
-        assert not os.system("cp %s/%s %s/src" %
-                             (SourceDir, filename, tardir)), filename
+        assert not os.system("cp %s/%s %s/src" % (SourceDir, filename, tardir)), filename
 
     os.mkdir(tardir + "/src/backends")
     for filename in [
@@ -141,16 +108,21 @@ def MakeTar():
         assert not os.system("cp %s/%s %s/src/backends" %
                              (SourceDir, filename, tardir)), filename
 
-    VersionedCopy("%s/globals.py" % (SourceDir,),
-                  "%s/src/globals.py" % (tardir,))
-    VersionedCopy("duplicity-bin", "%s/duplicity" % (tardir,))
-    VersionedCopy("rdiffdir", "%s/rdiffdir" % (tardir,))
-    VersionedCopy(DistDir + "/setup.py", "%s/setup.py" % (tardir,))
+    VersionedCopy(os.path.join(SourceDir, "globals.py"),
+                  os.path.join(tardir, "src", "globals.py"))
+    VersionedCopy("duplicity-bin",
+                  os.path.join(tardir, "duplicity"))
+    VersionedCopy("rdiffdir",
+                  os.path.join(tardir, "rdiffdir"))
+    VersionedCopy("duplicity.1",
+                  os.path.join(tardir, "duplicity.1"))
+    VersionedCopy("rdiffdir.1",
+                  os.path.join(tardir, "rdiffdir.1"))
+    VersionedCopy(os.path.join(DistDir, "setup.py"),
+                  os.path.join(tardir, "setup.py"))
 
     os.chmod(os.path.join(tardir, "setup.py"), 0755)
     os.chmod(os.path.join(tardir, "rdiffdir"), 0644)
-    CopyMan("rdiffdir.1", os.path.join(tardir, "rdiffdir.1"), Version)
-    CopyMan("duplicity.1", os.path.join(tardir, "duplicity.1"), Version)
     os.system("tar -cvzf %s %s" % (tarfile, tardir))
     shutil.rmtree(tardir)
     return tarfile
@@ -175,5 +147,6 @@ if __name__ == "__main__" and not globals().has_key('__no_execute__'):
         print "Syntax: makedist [version_number]"
         sys.exit(1)
     Version = sys.argv[1]
+    Reldate = time.strftime("%B %d, %Y", time.localtime())
     Main()
 
