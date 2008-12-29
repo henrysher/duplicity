@@ -3,7 +3,6 @@
 
 import sys, os, getopt
 from distutils.core import setup, Extension
-from DistUtilsExtra.command import *
 
 version_string = "$version"
 
@@ -21,7 +20,7 @@ if not pexpect_version or pexpect_version < "2.1":
     print ("Warning: pexpect version 2.1 or greater is required for the ssh backend.\n"
            "         If you do not plan to use the ssh backend, this is not a problem.")
 
-incdir_list = libdir_list = None 
+incdir_list = libdir_list = None
 
 if os.name == 'posix':
     LIBRSYNC_DIR = os.environ.get('LIBRSYNC_DIR', '')
@@ -42,19 +41,26 @@ setup(name="duplicity",
       maintainer="Kenneth Loafman",
       maintainer_email="kenneth@loafman.com",
       url="http://duplicity.nongnu.org/index.html",
-      cmdclass = { "build" : build_extra.build_extra,
-                   "build_i18n" :  build_i18n.build_i18n },
-      packages = ['duplicity', 'duplicity.backends'],
+      packages = ['duplicity',
+                  'duplicity.backends',],
       package_dir = {"duplicity" : "src",
-                     "duplicity.backends" : "src/backends"},
+                     "duplicity.backends" : "src/backends",},
       ext_modules = [Extension("duplicity._librsync",
                                ["_librsyncmodule.c"],
                                include_dirs=incdir_list,
                                library_dirs=libdir_list,
                                libraries=["rsync"])],
       scripts = ['rdiffdir', 'duplicity'],
-      data_files = [('share/man/man1', ['duplicity.1', 'rdiffdir.1']),
+      data_files = [('share/man/man1',
+                     ['duplicity.1',
+                      'rdiffdir.1']),
                     ('share/doc/duplicity-%s' % version_string,
-                     ['COPYING', 'README', 'CHANGELOG'])])
-
-
+                     ['COPYING',
+                      'CVS-README',
+                      'LOG-README',
+                      'README',
+                      'tarfile-LICENSE',
+                      'CHANGELOG']),
+                    ('share/locale/io/LC_MESSAGES',
+                     ["po/io/duplicity.mo"]),
+                     ])

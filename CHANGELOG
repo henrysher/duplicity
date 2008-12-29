@@ -1,3 +1,9 @@
+New in v0.5.05 (2008/12/??)
+---------------------------
+bug #25194: Duplicity 5.04 requires python-distutils-extra...
+https://savannah.nongnu.org/bugs/?25194
+
+
 New in v0.5.04 (2008/12/27)
 ---------------------------
 patch #6678: Add progress metering

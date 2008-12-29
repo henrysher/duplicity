@@ -1,6 +1,7 @@
 [encoding: UTF-8]
 
 duplicity
+rdiffdir
 _librsyncmodule.c
 src/asyncscheduler.py
 src/backend.py

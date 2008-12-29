@@ -52,15 +52,7 @@ def MakeTar():
         ]:
         assert not os.system("cp %s %s" % (filename, tardir)), filename
 
-    os.mkdir(tardir + "/po")
-    for filename in [
-         "POTFILES.in",
-         "Makevars",
-         "*.po",
-         ]:
-        os.system("cp po/%s %s/po" % (filename, tardir)), filename
-
-    os.mkdir(tardir + "/src")
+    os.mkdir(os.path.join(tardir, "src"))
     for filename in [
         "asyncscheduler.py",
         "backend.py",
@@ -93,7 +85,7 @@ def MakeTar():
         ]:
         assert not os.system("cp %s/%s %s/src" % (SourceDir, filename, tardir)), filename
 
-    os.mkdir(tardir + "/src/backends")
+    os.mkdir(os.path.join(tardir, "src", "backends"))
     for filename in [
         "backends/botobackend.py",
         "backends/ftpbackend.py",
@@ -107,6 +99,11 @@ def MakeTar():
         ]:
         assert not os.system("cp %s/%s %s/src/backends" %
                              (SourceDir, filename, tardir)), filename
+
+    os.mkdir(os.path.join(tardir, "po"))
+    for lang in ["io"]:
+        assert not os.mkdir(os.path.join(tardir, "po", lang)), lang
+        assert not os.system("cp po/%s/duplicity.mo %s/po/%s/duplicity.mo" % (lang, tardir, lang)), lang
 
     VersionedCopy(os.path.join(SourceDir, "globals.py"),
                   os.path.join(tardir, "src", "globals.py"))
@@ -123,7 +120,7 @@ def MakeTar():
 
     os.chmod(os.path.join(tardir, "setup.py"), 0755)
     os.chmod(os.path.join(tardir, "rdiffdir"), 0644)
-    os.system("tar -cvzf %s %s" % (tarfile, tardir))
+    os.system("tar -czf %s %s" % (tarfile, tardir))
     shutil.rmtree(tardir)
     return tarfile
 
@@ -134,13 +131,11 @@ def MakeSpecFile():
     return specfile
 
 def Main():
-    #print "Making FAQ"
-    #MakeFAQ()
     print "Processing version " + Version
     tarfile = MakeTar()
     print "Made tar file " + tarfile
     specfile = MakeSpecFile()
-    print "Made specfile ", specfile
+    print "Made specfile " + specfile
 
 if __name__ == "__main__" and not globals().has_key('__no_execute__'):
     if len(sys.argv) != 2:
@@ -149,4 +144,3 @@ if __name__ == "__main__" and not globals().has_key('__no_execute__'):
     Version = sys.argv[1]
     Reldate = time.strftime("%B %d, %Y", time.localtime())
     Main()
-
