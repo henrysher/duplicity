@@ -2,7 +2,7 @@
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
 # duplicity -- Encrypted bandwidth efficient backup
-# Version $version released September 29, 2002
+# Version $version released $reldate
 #
 # Copyright (C) 2002 Ben Escoto <bescoto@stanford.edu>
 #
@@ -46,7 +46,7 @@ exit_val = None
 
 def get_passphrase(n):
     """Get passphrase from environment or, failing that, from user
-    
+
     If n=3, a password is requested and verified. If n=2, the current
     password is verified. If n=1, a password is requested without
     verification for the time being."""
@@ -235,7 +235,7 @@ def full_backup(col_stats):
         sig_outfp.close()
         col_stats.set_values(sig_chain_warning = None).cleanup_signatures()
     print_statistics(diffdir.stats, bytes_written)
-    
+
 
 def check_sig_chain(col_stats):
     """Get last signature chain for inc backup, or None if none available"""
@@ -296,7 +296,7 @@ def restore(col_stats):
     """Restore archive in globals.backend to globals.local_path"""
     if globals.dry_run:
       return
-    if not patchdir.Write_ROPaths(globals.local_path, 
+    if not patchdir.Write_ROPaths(globals.local_path,
                                   restore_get_patched_rop_iter(col_stats)):
         if globals.restore_dir:
             log.FatalError(_("%s not found in archive, no files restored.")
@@ -347,7 +347,7 @@ def restore_get_enc_fileobj(backend, filename, volume_info):
     tdp = dup_temp.new_tempduppath(parseresults)
     backend.get(filename, tdp)
     restore_check_hash(volume_info, tdp)
-    
+
     fileobj = tdp.filtered_open_with_delete("rb")
     if parseresults.encrypted and globals.gpg_profile.sign_key:
         restore_add_sig_check(fileobj)
@@ -512,7 +512,7 @@ def main():
         action = "full"
 
     os.umask(077)
-    
+
     # for public key encryption (without signing!), no passphrase is required.
 
     # cases where we do not need to get a passphrase:
