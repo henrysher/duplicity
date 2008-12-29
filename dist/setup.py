@@ -4,7 +4,7 @@
 import sys, os, getopt
 from distutils.core import setup, Extension
 
-version_string = "$version"
+version_string = "test"
 
 if sys.version_info[:2] < (2,3):
     print "Sorry, duplicity requires version 2.3 or later of python"
@@ -33,6 +33,28 @@ if os.name == 'posix':
         incdir_list = [os.path.join(LIBRSYNC_DIR, 'include')]
         libdir_list = [os.path.join(LIBRSYNC_DIR, 'lib')]
 
+data_files = [('share/man/man1',
+               ['duplicity.1',
+                'rdiffdir.1']),
+              ('share/doc/duplicity-%s' % version_string,
+               ['COPYING',
+                'CVS-README',
+                'LOG-README',
+                'README',
+                'tarfile-LICENSE',
+                'CHANGELOG']),
+              ]
+
+assert os.path.exists("po"), "Missing 'po' directory."
+for root, dirs, files in os.walk("po"):
+    for file in files:
+        path = os.path.join(root, file)
+        if path.endswith("duplicity.mo"):
+            lang = os.path.split(root)[-1]
+            data_files.append(
+                ('share/locale/%s/LC_MESSAGES' % lang,
+                 ["po/%s/duplicity.mo" % lang]))
+
 setup(name="duplicity",
       version=version_string,
       description="Encrypted backup using rsync algorithm",
@@ -51,16 +73,5 @@ setup(name="duplicity",
                                library_dirs=libdir_list,
                                libraries=["rsync"])],
       scripts = ['rdiffdir', 'duplicity'],
-      data_files = [('share/man/man1',
-                     ['duplicity.1',
-                      'rdiffdir.1']),
-                    ('share/doc/duplicity-%s' % version_string,
-                     ['COPYING',
-                      'CVS-README',
-                      'LOG-README',
-                      'README',
-                      'tarfile-LICENSE',
-                      'CHANGELOG']),
-                    ('share/locale/io/LC_MESSAGES',
-                     ["po/io/duplicity.mo"]),
-                     ])
+      data_files = data_files,
+      )
