@@ -101,9 +101,14 @@ def MakeTar():
                              (SourceDir, filename, tardir)), filename
 
     os.mkdir(os.path.join(tardir, "po"))
+    for filename in [
+        "Makevars",
+        "POTFILES.in",
+        ]:
+        assert not os.system("cp po/%s %s/po" % (filename, tardir)), filename
     for lang in ["io"]:
         assert not os.mkdir(os.path.join(tardir, "po", lang)), lang
-        assert not os.system("cp po/%s/duplicity.mo %s/po/%s/duplicity.mo" % (lang, tardir, lang)), lang
+        assert not os.system("cp po/%s/duplicity.[pm]o %s/po/%s" % (lang, tardir, lang)), lang
 
     VersionedCopy(os.path.join(SourceDir, "globals.py"),
                   os.path.join(tardir, "src", "globals.py"))
