@@ -582,9 +582,10 @@ if __name__ == "__main__":
         # default. But do with sufficient verbosity.
         log.Info(_("User error detail: %s")
                  % (''.join(traceback.format_exception(*sys.exc_info()))))
-        log.FatalError("%s: %s" % (e.__class__.__name__,
-                       str(e)), log.ErrorCode.user_error,
+        log.FatalError("%s: %s" % (e.__class__.__name__, str(e)),
+                       log.ErrorCode.user_error,
                        e.__class__.__name__)
     except Exception, e:
         log.FatalError("%s" % (''.join(traceback.format_exception(*sys.exc_info()))),
-                       log.ErrorCode.exception, e.__class__.__name__)
+                       log.ErrorCode.exception,
+                       e.__class__.__name__)
