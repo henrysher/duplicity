@@ -1,3 +1,9 @@
+New in v0.5.06 (2009/01/??)
+---------------------------
+bug #25239: Error during clean, wrong case in duplcicity
+https://savannah.nongnu.org/bugs/?25239
+
+
 New in v0.5.05 (2008/12/30)
 ---------------------------
 bug #25194: Duplicity 5.04 requires python-distutils-extra...

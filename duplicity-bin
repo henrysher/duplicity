@@ -416,13 +416,13 @@ def cleanup(col_stats):
 
     filestr = "\n".join(extraneous)
     if globals.force:
-        Log.Log(gettext.ngettext("Deleting this file from backend:",
+        log.Log(gettext.ngettext("Deleting this file from backend:",
                                  "Deleting these files from backend:",
                                  len(extraneous))+"\n"+filestr, 3)
         if not globals.dry_run:
             col_stats.backend.delete(extraneous)
     else:
-        Log.Log("%s\n%s\n%s" %
+        log.Log("%s\n%s\n%s" %
                 (gettext.ngettext("Found the following file to delete:",
                                   "Found the following files to delete:",
                                   len(extraneous)),
