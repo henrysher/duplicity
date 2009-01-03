@@ -317,18 +317,22 @@ def restore_get_patched_rop_iter(col_stats):
     backup_chain = col_stats.get_backup_chain_at_time(time)
     assert backup_chain, col_stats.all_backup_chains
     backup_setlist = backup_chain.get_sets_at_time(time)
+    num_vols = 0
+    for s in backup_setlist:
+        num_vols += len(s)
+    cur_vol = [0]
 
     def get_fileobj_iter(backup_set):
         """Get file object iterator from backup_set contain given index"""
         manifest = backup_set.get_manifest()
         volumes = manifest.get_containing_volumes(index)
-        numvols = len(volumes)
         for vol_num in volumes:
             yield restore_get_enc_fileobj(backup_set.backend,
                                           backup_set.volume_name_dict[vol_num],
                                           manifest.volume_info_dict[vol_num])
-            log.Progress(_('Processed volume %d of %d') % (vol_num, numvols),
-                         vol_num, numvols)
+            cur_vol[0] += 1
+            log.Progress(_('Processed volume %d of %d') % (cur_vol[0], num_vols),
+                         cur_vol[0], num_vols)
 
     fileobj_iters = map(get_fileobj_iter, backup_setlist)
     tarfiles = map(patchdir.TarFile_FromFileobjs, fileobj_iters)

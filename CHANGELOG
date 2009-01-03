@@ -3,6 +3,9 @@ New in v0.5.06 (2009/01/??)
 bug #25239: Error during clean, wrong case in duplcicity
 https://savannah.nongnu.org/bugs/?25239
 
+patch #6709: Report correct number of volumes when restoring
+https://savannah.nongnu.org/patch/?6709
+
 
 New in v0.5.05 (2008/12/30)
 ---------------------------
