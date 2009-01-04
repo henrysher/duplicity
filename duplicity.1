@@ -38,16 +38,19 @@ duplicity \- Encrypted backup using rsync algorithm
 
 .B duplicity cleanup
 .BI [ options ]
+.BI [ --force ]
 .I target_url
 
 .B duplicity remove-older-than
 .I time
 .BI [ options ]
+.BI [ --force ]
 .I target_url
 
 .B duplicity remove-all-but-n-full
 .I count
 .BI [ options ]
+.BI [ --force ]
 .I target_url
 
 .SH DESCRIPTION
@@ -139,7 +142,9 @@ FTP_PASSWORD=mypassword duplicity /local/dir ftp://user@other.host/some_dir
 Delete the extraneous duplicity files on the given backend.
 Non-duplicity files, or files in complete data sets will not be
 deleted.  This should only be necessary after a duplicity session
-fails or is aborted prematurely.
+fails or is aborted prematurely.  Note that
+.I --force
+will be needed to delete the files rather than just list them.
 .TP
 .B collection-status
 Summarize the status of the backup repository by printing the chains
@@ -169,7 +174,9 @@ will not be deleted if backup sets newer than
 depend on them.  See the
 .B TIME FORMATS
 section for more information.  Note, this action cannot be combined
-with backup or other actions, such as cleanup.
+with backup or other actions, such as cleanup.  Note also that
+.I --force
+will be needed to delete the files rather than just list them.
 .TP
 .BI "remove-all-but-n-full " count
 Delete all backups sets that are older than the count:th last full
@@ -178,7 +185,9 @@ backup (in other words, keep the last
 full backups and associated incremental sets).
 .I count
 must be larger than zero. A value of 1 means that only the single most
-recent backup chain will be kept.
+recent backup chain will be kept.  Note that
+.I --force
+will be needed to delete the files rather than just list them.
 .TP
 .B verify
 Enter verify mode instead of restore.  If the --file-to-restore option
