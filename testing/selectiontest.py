@@ -140,7 +140,7 @@ testfiles/select/1/1
         sf = self.Select.filelist_get_sf(fp, 1, "test1")
         assert sf(self.makeext("1")) == 1
         assert sf(self.makeext("1/1")) == 1
-        assert sf(self.makeext("1/1/2")) == None                 
+        assert sf(self.makeext("1/1/2")) == None
         assert sf(self.makeext("1/2")) == 0
         assert sf(self.makeext("1/2/3")) == 0
         assert sf(self.makeext("1/3")) == 1
@@ -197,7 +197,7 @@ testfiles/select/1/1
         assert sf(self.makeext("fOo/BaR")) == 1
         self.assertRaises(FilePrefixError, self.Select.glob_get_sf,
                           "ignorecase:tesfiles/sect/foo/bar", 1)
-                          
+
     def testRoot(self):
         """testRoot - / may be a counterexample to several of these.."""
         root = Path("/")
@@ -239,7 +239,8 @@ class ParseArgsTest(unittest.TestCase):
     root = None
     def ParseTest(self, tuplelist, indicies, filelists = []):
         """No error if running select on tuple goes over indicies"""
-        if not self.root: self.root = Path("testfiles/select")
+        if not self.root:
+            self.root = Path("testfiles/select")
         self.Select = Select(self.root)
         self.Select.ParseArgs(tuplelist, self.remake_filelists(filelists))
         self.Select.set_iter()
@@ -252,7 +253,8 @@ class ParseArgsTest(unittest.TestCase):
         for f in filelist:
             if type(f) is types.StringType:
                 new_filelists.append(StringIO.StringIO(f))
-            else: new_filelists.append(f)
+            else:
+                new_filelists.append(f)
         return new_filelists
 
     def testParse(self):
@@ -261,7 +263,7 @@ class ParseArgsTest(unittest.TestCase):
                         ("--exclude", "**")],
                        [(), ('1',), ("1", "1"), ("1", '1', '1'),
                              ('1', '1', '2'), ('1', '1', '3')])
-        
+
     def testParse2(self):
         """Test three level include/exclude"""
         self.ParseTest([("--exclude", "testfiles/select/1/1/1"),
@@ -346,7 +348,7 @@ testfiles/select/1/1
 testfiles/select**/2
 - **
 """])
-                       
+
     def testGlob2(self):
         """Test more globbing functions"""
         self.ParseTest([("--include", "testfiles/select/*foo*/p*"),
@@ -359,6 +361,30 @@ testfiles/select**/2
                         ("--include", "testfiles/select/1"),
                         ("--exclude", "**")],
                        [(), ('1',), ('1', '1'), ('1', '2')])
+
+    def testGlob3(self):
+        """ regression test for bug 25230 """
+        self.ParseTest([("--include", "testfiles/select/**1"),
+                        ("--include", "testfiles/select/**2"),
+                        ("--exclude", "**")],
+                       [(), ('1',), ('1', '1'),
+                        ('1', '1', '1'), ('1', '1', '2'), ('1', '1', '3'),
+                        ('1', '2'),
+                        ('1', '2', '1'), ('1', '2', '2'), ('1', '2', '3'),
+                        ('1', '3'),
+                        ('1', '3', '1'), ('1', '3', '2'), ('1', '3', '3'),
+                        ('2',), ('2', '1'),
+                        ('2', '1', '1'), ('2', '1', '2'), ('2', '1', '3'),
+                        ('2', '2'),
+                        ('2', '2', '1'), ('2', '2', '2'), ('2', '2', '3'),
+                        ('2', '3'),
+                        ('2', '3', '1'), ('2', '3', '2'), ('2', '3', '3'),
+                        ('3',), ('3', '1'),
+                        ('3', '1', '1'), ('3', '1', '2'), ('3', '1', '3'),
+                        ('3', '2'),
+                        ('3', '2', '1'), ('3', '2', '2'), ('3', '2', '3'),
+                        ('3', '3'),
+                        ('3', '3', '1'), ('3', '3', '2')])
 
     def testAlternateRoot(self):
         """Test select with different root"""

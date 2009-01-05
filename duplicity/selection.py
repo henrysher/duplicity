@@ -177,11 +177,21 @@ class Select:
 
     def Select(self, path):
         """Run through the selection functions and return dominant val 0/1/2"""
-        for sf in self.selection_functions:
+        scan_pending = False
+        for sf in self.selection_functions[:-1]:
             result = sf(path)
-            if result is not None:
+            if result is 2:
+                scan_pending = True
+            if result in [0, 1]:
                 return result
-        return 1
+        if scan_pending:
+            return 2
+        sf = self.selection_functions[-1]
+        result = sf(path)
+        if result is not None:
+            return result
+        else:
+            return 1
 
     def ParseArgs(self, argtuples, filelists):
         """Create selection functions based on list of tuples
@@ -368,20 +378,20 @@ probably isn't what you meant.""") %
         index, include = pair
         if include == 1:
             if index < path.index:
-                return (None, 1)
+                return (None, True)
             if index == path.index:
-                return (1, 1)
+                return (1, True)
             elif index[:len(path.index)] == path.index:
-                return (1, None) # /foo/bar implicitly includes /foo
+                return (1, False) # /foo/bar implicitly includes /foo
             else:
-                return (None, None) # path greater, not initial sequence
+                return (None, False) # path greater, not initial sequence
         elif include == 0:
             if path.index[:len(index)] == index:
-                return (0, None) # /foo implicitly excludes /foo/bar
+                return (0, False) # /foo implicitly excludes /foo/bar
             elif index < path.index:
-                return (None, 1)
+                return (None, True)
             else:
-                return (None, None) # path greater, not initial sequence
+                return (None, False) # path greater, not initial sequence
         else:
             assert 0, "Include is %s, should be 0 or 1" % (include,)
 
@@ -426,7 +436,7 @@ probably isn't what you meant.""") %
         except:
             log.Log(_("Error compiling regular expression %s") % regexp_string, 1)
             raise
-        
+
         def sel_func(path):
             if regexp.search(path.name):
                 return include
@@ -552,7 +562,7 @@ probably isn't what you meant.""") %
         # Check to make sure prefix is ok
         if not include_sel_func(self.rootpath):
             raise FilePrefixError(glob_str)
-        
+
         if include:
             return include_sel_func
         else:

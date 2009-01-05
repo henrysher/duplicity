@@ -9,6 +9,9 @@ https://savannah.nongnu.org/patch/?6709
 sr #106583: document the need to use the --force option
 https://savannah.nongnu.org/support/?106583
 
+bug #25230: --include-globbing-filelist only including first entry.
+https://savannah.nongnu.org/bugs/?25230
+
 
 New in v0.5.05 (2008/12/30)
 ---------------------------
