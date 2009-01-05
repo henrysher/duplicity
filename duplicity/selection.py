@@ -177,6 +177,8 @@ class Select:
 
     def Select(self, path):
         """Run through the selection functions and return dominant val 0/1/2"""
+        if not self.selection_functions:
+            return 1
         scan_pending = False
         for sf in self.selection_functions[:-1]:
             result = sf(path)
