@@ -30,6 +30,7 @@ import time
 import duplicity.backend
 import duplicity.globals as globals
 import duplicity.log as log
+import duplicity.pexpect as pexpect
 from duplicity.errors import *
 
 scp_command = "scp"
@@ -46,19 +47,6 @@ class SSHBackend(duplicity.backend.Backend):
     def __init__(self, parsed_url):
         """scpBackend initializer"""
         duplicity.backend.Backend.__init__(self, parsed_url)
-        try:
-            import pexpect
-            self.pexpect = pexpect
-        except ImportError:
-            self.pexpect = None
-
-        if not (self.pexpect and
-                hasattr(self.pexpect, '__version__') and
-                self.pexpect.__version__ >= '2.1'):
-            log.FatalError("This backend requires the pexpect module version 2.1 or later."
-                           "You can get pexpect from http://pexpect.sourceforge.net or "
-                           "python-pexpect from your distro's repository.",
-                           log.ErrorCode.ssh_pexpect_too_old)
 
         # host string of form [user@]hostname
         if parsed_url.username:
@@ -87,7 +75,7 @@ class SSHBackend(duplicity.backend.Backend):
         """ Run an scp command, responding to password prompts """
         for n in range(1, globals.num_retries+1):
             log.Log("Running '%s' (attempt #%d)" % (commandline, n), 5)
-            child = self.pexpect.spawn(commandline, timeout = globals.timeout)
+            child = pexpect.spawn(commandline, timeout = globals.timeout)
             cmdloc = 0
             if ssh_askpass:
                 state = "authorizing"
@@ -95,8 +83,8 @@ class SSHBackend(duplicity.backend.Backend):
                 state = "copying"
             while 1:
                 if state == "authorizing":
-                    match = child.expect([self.pexpect.EOF,
-                                          self.pexpect.TIMEOUT,
+                    match = child.expect([pexpect.EOF,
+                                          pexpect.TIMEOUT,
                                           "(?i)password:",
                                           "(?i)permission denied",
                                           "authenticity"],
@@ -118,8 +106,8 @@ class SSHBackend(duplicity.backend.Backend):
                         log.Log("Remote host authentication failed (missing known_hosts entry?)", 1)
                         break
                 elif state == "copying":
-                    match = child.expect([self.pexpect.EOF,
-                                          self.pexpect.TIMEOUT,
+                    match = child.expect([pexpect.EOF,
+                                          pexpect.TIMEOUT,
                                           "stalled",
                                           "authenticity",
                                           "ETA"],
@@ -136,8 +124,8 @@ class SSHBackend(duplicity.backend.Backend):
                         log.Log("Remote host authentication failed (missing known_hosts entry?)", 1)
                         break
                 elif state == "stalled":
-                    match = child.expect([self.pexpect.EOF,
-                                          self.pexpect.TIMEOUT,
+                    match = child.expect([pexpect.EOF,
+                                          pexpect.TIMEOUT,
                                           "ETA"],
                                          timeout = globals.timeout)
                     log.Log("State = %s, Before = '%s'" % (state, child.before.strip()), 9)
@@ -160,11 +148,11 @@ class SSHBackend(duplicity.backend.Backend):
         """ Run an sftp command, responding to password prompts, passing commands from list """
         for n in range(1, globals.num_retries+1):
             log.Log("Running '%s' (attempt #%d)" % (commandline, n), 5)
-            child = self.pexpect.spawn(commandline, timeout = globals.timeout)
+            child = pexpect.spawn(commandline, timeout = globals.timeout)
             cmdloc = 0
             while 1:
-                match = child.expect([self.pexpect.EOF,
-                                      self.pexpect.TIMEOUT,
+                match = child.expect([pexpect.EOF,
+                                      pexpect.TIMEOUT,
                                       "sftp>",
                                       "(?i)password:",
                                       "(?i)permission denied",

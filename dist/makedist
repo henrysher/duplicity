@@ -74,6 +74,7 @@ def MakeTar():
         "misc.py",
         "patchdir.py",
         "path.py",
+        "pexpect.py",
         "robust.py",
         "selection.py",
         "static.py",

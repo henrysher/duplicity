@@ -31,6 +31,10 @@ SUDO=sudo
 cd `dirname $0`
 pwd
 
+cd ../duplicity
+./compilec.py
+cd -
+
 ${SUDO} tar xzf testfiles.tar.gz
 
 for v in 2.3 2.4 2.5 2.6; do

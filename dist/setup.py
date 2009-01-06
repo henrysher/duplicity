@@ -10,16 +10,6 @@ if sys.version_info[:2] < (2,3):
     print "Sorry, duplicity requires version 2.3 or later of python"
     sys.exit(1)
 
-try:
-    import pexpect
-    pexpect_version = pexpect.__version__
-except ImportError:
-    pexpect_version = None
-
-if not pexpect_version or pexpect_version < "2.1":
-    print ("Warning: pexpect version 2.1 or greater is required for the ssh backend.\n"
-           "         If you do not plan to use the ssh backend, this is not a problem.")
-
 incdir_list = libdir_list = None
 
 if os.name == 'posix':
