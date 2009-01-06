@@ -20,8 +20,15 @@
 
 """duplicity's gpg interface, builds upon Frank Tobin's GnuPGInterface"""
 
-import select, os, sys, thread, sha, md5, types, cStringIO, tempfile, re, gzip
+import select, os, sys, thread, types, cStringIO, tempfile, re, gzip
 import GnuPGInterface, misc, log
+
+try:
+    from hashlib import sha1
+    from hashlib import md5
+except ImportError:
+    from sha import new as sha1
+    from md5 import new as md5
 
 blocksize = 256 * 1024
 
@@ -303,9 +310,9 @@ def get_hash(hash, path, hex = 1):
     assert path.isreg()
     fp = path.open("rb")
     if hash == "SHA1":
-        hash_obj = sha.new()
+        hash_obj = sha1()
     elif hash == "MD5":
-        hash_obj = md5.new()
+        hash_obj = md5()
     else:
         assert 0, "Unknown hash %s" % (hash,)
 
