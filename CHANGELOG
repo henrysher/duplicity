@@ -15,6 +15,9 @@ https://savannah.nongnu.org/bugs/?25230
 Fix to deprecation warnings about sha and md5 modules.
 Uses hashlib if available, otherwise original module.
 
+Added loop to run-all-tests.sh to run all tests against all supported 
+versions of Python if available.  Looks for 2.3, 2.4, 2.5, 2.6.
+
 
 New in v0.5.05 (2008/12/30)
 ---------------------------
