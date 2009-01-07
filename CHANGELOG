@@ -1,17 +1,5 @@
 New in v0.5.06 (2009/01/??)
 ---------------------------
-bug #25239: Error during clean, wrong case in duplcicity
-https://savannah.nongnu.org/bugs/?25239
-
-patch #6709: Report correct number of volumes when restoring
-https://savannah.nongnu.org/patch/?6709
-
-sr #106583: document the need to use the --force option
-https://savannah.nongnu.org/support/?106583
-
-bug #25230: --include-globbing-filelist only including first entry.
-https://savannah.nongnu.org/bugs/?25230
-
 Fix to deprecation warnings about sha and md5 modules.
 Uses hashlib if available, otherwise original module.
 
@@ -20,6 +8,22 @@ versions of Python if available.  Looks for 2.3, 2.4, 2.5, 2.6.
 
 Noah Spurrier has given us permission to distribute pexpect.py along
 with duplicity, so this will no longer be an install requirement.
+
+NcFTP version 3.2.0 will not work with duplicity since we require the
+use of both -f and -C options on ncftpput.  3.1.9, 3.2.1+ work fine.
+I put in error checks for this situation in the FTP backend code.
+
+bug #25230: --include-globbing-filelist only including first entry.
+https://savannah.nongnu.org/bugs/?25230
+
+bug #25239: Error during clean, wrong case in duplcicity
+https://savannah.nongnu.org/bugs/?25239
+
+patch #6709: Report correct number of volumes when restoring
+https://savannah.nongnu.org/patch/?6709
+
+sr #106583: document the need to use the --force option
+https://savannah.nongnu.org/support/?106583
 
 
 New in v0.5.05 (2008/12/30)

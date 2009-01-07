@@ -56,14 +56,14 @@ def Log(s, verb_level, code=1, extra=None, force_print=False):
         _logger.controlLine = '%d' % (code)
     if not s:
         s = '' # If None is passed, standard logging would render it as 'None'
-    
+
     if force_print:
         initial_level = _logger.getEffectiveLevel()
         _logger.setLevel(DupToLoggerLevel(MAX))
-    
+
     _logger.log(DupToLoggerLevel(verb_level), s)
     _logger.controlLine = None
-    
+
     if force_print:
         _logger.setLevel(initial_level)
 
@@ -154,7 +154,7 @@ class ErrorCode:
     boto_calling_format = 26
     ftp_ncftp_missing = 27
     ftp_ncftp_too_old = 28
-    ssh_pexpect_too_old = 29
+    ftp_ncftp_ = 29
     exception = 30
 
 def FatalError(s, code, extra=None):
@@ -193,10 +193,10 @@ def setup():
     global _logger
     if _logger:
         return
-    
+
     logging.setLoggerClass(DupLogger)
     _logger = logging.getLogger("duplicity")
-    
+
     # Set up our special level names
     logging.addLevelName(DupToLoggerLevel(0), "ERROR")
     logging.addLevelName(DupToLoggerLevel(1), "WARNING")
@@ -208,15 +208,15 @@ def setup():
     logging.addLevelName(DupToLoggerLevel(7), "INFO")
     logging.addLevelName(DupToLoggerLevel(8), "INFO")
     logging.addLevelName(DupToLoggerLevel(9), "DEBUG")
-    
+
     # Default verbosity allows notices and above
     setverbosity(NOTICE)
-    
+
     # stdout and stderr are for different logging levels
     outHandler = logging.StreamHandler(sys.stdout)
     outHandler.addFilter(OutFilter())
     _logger.addHandler(outHandler)
-    
+
     errHandler = logging.StreamHandler(sys.stderr)
     errHandler.addFilter(ErrFilter())
     _logger.addHandler(errHandler)
@@ -227,15 +227,15 @@ class MachineFormatter(logging.Formatter):
     def __init__(self):
         # 'message' will be appended by format()
         logging.Formatter.__init__(self, "%(levelname)s %(controlLine)s")
-    
+
     def format(self, record):
         s = logging.Formatter.format(self, record)
-        
+
         # Add user-text hint of 'message' back in, with each line prefixed by a
         # dot, so consumers know it's not part of 'controlLine'
         if record.message:
             s += ('\n' + record.message).replace('\n', '\n. ')
-        
+
         # Add a newline so consumers know the message is over.
         return s + '\n'
 

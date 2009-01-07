@@ -48,8 +48,14 @@ class FTPBackend(duplicity.backend.Backend):
         # version is the second word of the first line
         version = fout.split('\n')[0].split()[1]
         if version < "3.1.9":
-            log.FatalError("NcFTP too old:  Duplicity requires NcFTP version 3.1.9 or later",
+            log.FatalError("NcFTP too old:  Duplicity requires NcFTP version 3.1.9,"
+                           "3.2.1 or later.  Version 3.2.0 will not work properly.",
                            log.ErrorCode.ftp_ncftp_too_old)
+        elif version == "3.2.0":
+            log.FatalError("NcFTP (ncftpput) version 3.2.0 is not usable by duplicity.\n"
+                           "see: http://www.ncftpd.com/ncftp/doc/changelog.html\n"
+                           "Please upgrade to 3.2.1 or later",
+                           log.ErrorCode.ftp_ncftp_v320)
         log.Log("NcFTP version is %s" % version, 4)
 
         self.parsed_url = parsed_url
