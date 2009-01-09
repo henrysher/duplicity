@@ -1,4 +1,4 @@
-New in v0.5.06 (2009/01/??)
+New in v0.5.06 (2009/01/09)
 ---------------------------
 Fix to deprecation warnings about sha and md5 modules.
 Uses hashlib if available, otherwise original module.
