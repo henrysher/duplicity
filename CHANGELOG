@@ -1,3 +1,9 @@
+New in v0.5.06 (2009/01/??)
+---------------------------
+bug #25331: When --archive-dir and --encrypt-key are used together, incremental fails.
+https://savannah.nongnu.org/bugs/index.php?25331
+
+
 New in v0.5.06 (2009/01/09)
 ---------------------------
 Fix to deprecation warnings about sha and md5 modules.
