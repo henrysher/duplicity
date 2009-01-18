@@ -280,16 +280,14 @@ def list_current(col_stats):
         log.FatalError(_("No signature data found, unable to list files."),
                        log.ErrorCode.no_sigs)
     path_iter = diffdir.get_combined_path_iter(sig_chain.get_fileobjs())
-    userlist = []
-    loglist = []
     for path in path_iter:
         if path.difftype != "deleted":
-             userlist.append("%s %s" % (dup_time.timetopretty(path.getmtime()),
-                                        path.get_relative_path()))
-             loglist.append("%s %s" % (dup_time.timetostring(path.getmtime()),
-                                       util.escape(path.get_relative_path())))
-    log.Log('\n'.join(userlist), log.INFO, log.InfoCode.file_list,
-            '\n' + '\n'.join(loglist), True)
+            user_info = "%s %s" % (dup_time.timetopretty(path.getmtime()),
+                                   path.get_relative_path())
+            log_info = "%s %s" % (dup_time.timetostring(path.getmtime()),
+                                  util.escape(path.get_relative_path()))
+            log.Log(user_info, log.INFO, log.InfoCode.file_list,
+                    log_info, True)
 
 
 def restore(col_stats):

@@ -3,6 +3,10 @@ New in v0.5.06 (2009/01/??)
 bug #25331: When --archive-dir and --encrypt-key are used together, incremental fails.
 https://savannah.nongnu.org/bugs/index.php?25331
 
+Reworked patch 6701 to list collection one at a time rather than
+writing all as one huge list.  Was causing memeory problems when
+the collections got large.
+
 
 New in v0.5.06 (2009/01/09)
 ---------------------------

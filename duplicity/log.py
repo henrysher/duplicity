@@ -83,7 +83,8 @@ class InfoCode:
     diff_file_deleted = 6
     patch_file_writing = 7
     patch_file_patching = 8
-    file_list = 9
+    #file_list = 9 # 9 isn't used anymore.  It corresponds to an older syntax for listing files
+    file_list = 10
 
 def Info(s, code=InfoCode.generic, extra=None):
     """Shortcut used for info messages (verbosity 5)."""
