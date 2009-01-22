@@ -104,8 +104,8 @@ dry_run = False
 # If set to false, then do not encrypt files on remote system
 encryption = 1
 
-# volume size. default 5M
-volsize = 5*1024*1024
+# volume size. default 25M
+volsize = 25*1024*1024
 
 # Working directory for the tempfile module. Defaults to /tmp on most systems.
 temproot = None
