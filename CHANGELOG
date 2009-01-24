@@ -13,6 +13,10 @@ Reworked patch 6701 to list collection one at a time rather than
 writing all as one huge list.  Was causing memeory problems when
 the collections got large.
 
+Fix backendtest.py so that empty URL's in config.py cause the
+backend test to be skipped rather than erroring.  Added notes
+in config.py.tmpl explaining the change.
+
 
 New in v0.5.06 (2009/01/09)
 ---------------------------

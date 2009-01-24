@@ -26,12 +26,18 @@ class UnivTest:
 
     def test_basic(self):
         """Test basic backend operations"""
+        if not self.url_string:
+            print "No URL for test %s...skipping... " % self.test_id,
+            return 0
         config.set_environ("FTP_PASSWORD", self.password)
         self.del_tmp()
         self.try_basic(duplicity.backend.get_backend(self.url_string))
 
     def test_fileobj_ops(self):
         """Test fileobj operations"""
+        if not self.url_string:
+            print "No URL for test %s...skipping... " % self.test_id,
+            return 0
         config.set_environ("FTP_PASSWORD", self.password)
         self.try_fileobj_ops(duplicity.backend.get_backend(self.url_string))
 
@@ -49,6 +55,9 @@ class UnivTest:
             l.sort()
             assert blist == l, \
                    ("Got list: %s\nWanted: %s\n" % (repr(blist), repr(l)))
+
+        # Identify test that's running
+        print self.test_id, "... ",
 
         assert not os.system("rm -rf testfiles/backend_tmp")
         assert not os.system("mkdir testfiles/backend_tmp")
@@ -71,7 +80,7 @@ class UnivTest:
         backend.get(colonfile, tmpregpath)
         backendbuf = tmpregpath.open("rb").read()
         assert backendbuf == regfilebuf
-        
+
         # Test delete
         backend.delete([colonfile, normal_file])
         cmp_list([])
@@ -143,55 +152,64 @@ class ParsedUrlTest(unittest.TestCase):
 
 
 class LocalTest(unittest.TestCase, UnivTest):
-    print "Test the Local backend."
+    """ Test the Local backend """
+    test_id = "local"
     url_string = config.file_url
     password = config.file_password
 
 
 class scpTest(unittest.TestCase, UnivTest):
-    print "Test the SSH backend."
+    """ Test the SSH backend """
+    test_id = "ssh/scp"
     url_string = config.ssh_url
     password = config.ssh_password
 
 
 class ftpTest(unittest.TestCase, UnivTest):
-    print "Test the ftp backend."
+    """ Test the ftp backend """
+    test_id = "ftp"
     url_string = config.ftp_url
     password = config.ftp_password
 
 
 class rsyncAbsPathTest(unittest.TestCase, UnivTest):
-    print "Test the rsync abs path backend."
+    """ Test the rsync abs path backend """
+    test_id = "rsync_abspath"
     url_string = config.rsync_abspath_url
     password = config.rsync_password
 
 
 class rsyncRelPathTest(unittest.TestCase, UnivTest):
-    print "Test the rsync relative path backend."
+    """ Test the rsync relative path backend """
+    test_id = "rsync_relpath"
     url_string = config.rsync_relpath_url
     password = config.rsync_password
 
 
 class rsyncModuleTest(unittest.TestCase, UnivTest):
-    print "Test the rsync module backend."
+    """ Test the rsync module backend """
+    test_id = "rsync_module"
     url_string = config.rsync_module_url
     password = config.rsync_password
 
 
 class s3ModuleTest(unittest.TestCase, UnivTest):
-    print "Test the s3 module backend."
+    """ Test the s3 module backend """
+    test_id = "s3/boto"
     url_string = config.s3_url
     password = None
 
 
 class webdavModuleTest(unittest.TestCase, UnivTest):
-    print "Test the webdav module backend."
+    """ Test the webdav module backend """
+    test_id = "webdav"
     url_string = config.webdav_url
     password = config.webdav_password
 
 
 class webdavsModuleTest(unittest.TestCase, UnivTest):
-    print "Test the webdavs module backend."
+    """ Test the webdavs module backend """
+    test_id = "webdavs"
     url_string = config.webdavs_url
     password = config.webdavs_password
 
