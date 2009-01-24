@@ -46,7 +46,7 @@ for v in 2.3 2.4 2.5 2.6; do
         for t in ${alltests}; do
             echo "========== Running $t =========="
             echo "========== Running $t ==========" >> $LOG
-            ${SUDO} python$v -u $t 2>&1 | grep -v "unsafe ownership" >> $LOG
+            ${SUDO} python$v -u $t -v 2>&1 | grep -v "unsafe ownership" >> $LOG
             echo >> $LOG
             echo >> $LOG
         done
