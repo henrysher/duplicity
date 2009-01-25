@@ -191,10 +191,6 @@ class SSHBackend(duplicity.backend.Backend):
                     break
             child.close(force = True)
             if child.exitstatus == 0:
-                # We cut off the first line of res (will be " ls -1" or something)
-                firstend = res.find('\n')
-                if firstend >= 0:
-                    res = res[firstend+1:]
                 return res
             log.Log("Running '%s' failed (attempt #%d)" % (commandline, n), 1)
             time.sleep(30)
