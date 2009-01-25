@@ -1,8 +1,5 @@
 New in v0.5.07 (2009/01/??)
 ---------------------------
-bug #25331: When --archive-dir and --encrypt-key are used together, incremental fails.
-https://savannah.nongnu.org/bugs/?25331
-
 bug #25379: sys.exit() causes traceback and should not
 https://savannah.nongnu.org/bugs/?25379
 
