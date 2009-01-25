@@ -16,24 +16,26 @@ import duplicity.globals as globals
 import duplicity.log as log
 from duplicity.errors import *
 
-#  An option which can be changed by a command line argument
-#  Just in case other languages want something other than
-#  "[Gmail]/All Mail".  Another option is "Inbox" but things may
-#  get archived and we want to make sure that we see all the 
-#  possible archive files.
-gmail_mailbox = "[Gmail]/All Mail"
 
-class GmailImapBackend(duplicity.backend.Backend):
+# Name of the imap folder where we want to store backups.
+# Can be changed with a command line argument.
+imap_mailbox = "INBOX"
+
+class ImapBackend(duplicity.backend.Backend):
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
-        
-        if( parsed_url.scheme == "gmail" ):
-            cl = imaplib.IMAP4_SSL
-            self._conn = cl('imap.gmail.com', 993)
-        else:
-            cl = imaplib.IMAP4
-            self._conn = cl('imap.gmail.com', 143)
+        try:
+            imap_server = os.environ['IMAP_SERVER']
+        except KeyError:
+            imap_server = 'mail.localhost'
+               
 
+        if (parsed_url.scheme == "imap"):
+            cl = imaplib.IMAP4
+            self._conn = cl(imap_server, 143)
+        elif (parsed_url.scheme == "imaps"):
+            cl = imaplib.IMAP4_SSL
+            self._conn = cl(imap_server, 993)
 
         log.Log("type of IMAP class=%s, I'm %s (scheme %s) connecting to %s as %s" %
                 (cl.__name__,self.__class__.__name__, parsed_url.scheme, parsed_url.hostname, parsed_url.get_username()), 9)
@@ -42,26 +44,31 @@ class GmailImapBackend(duplicity.backend.Backend):
 
         #  Set the username
         if ( parsed_url.get_username() is None ):
-            username = raw_input('Enter GMAIL account userid: ')
+            username = raw_input('Enter account userid: ')
         else:
             username = parsed_url.get_username()
        
         #  Set the password
         if ( not parsed_url.get_password() ):
-            password = getpass.getpass("Enter GMAIL account password: ")
+            password = getpass.getpass("Enter account password: ")
         else:
             password = parsed_url.get_password()
 
-        #  Login 
-        self._conn.login(username, password)
-        self._conn.select(gmail_mailbox)
-        log.Log("IMAP connected",5)
+        #  Login
+        if (not(globals.imap_full_address)):
+            self._conn.login(username, password)
+            self._conn.select(imap_mailbox)
+            log.Log("IMAP connected",5)
+        else:
+           self._conn.login(username + "@" + parsed_url.hostname, password)
+           self._conn.select(imap_mailbox)
+           log.Log("IMAP connected",5)
         
     def _prepareBody(self,f,rname):
         mp = email.MIMEMultipart.MIMEMultipart()
 
         # I am going to use the remote_dir as the From address so that 
-        # multiple archives can be stored in a GMail account and can be
+        # multiple archives can be stored in an IMAP account and can be
         # accessed separately
         mp["From"]=self.remote_dir
         mp["Subject"]=rname
@@ -81,13 +88,15 @@ class GmailImapBackend(duplicity.backend.Backend):
         f=source_path.open("rb")
         self._conn.select(remote_filename)
         body=self._prepareBody(f,remote_filename)
-        self._conn.append(gmail_mailbox,None,None,body)
+        # If we don't select the IMAP folder before
+        # append, the message goes into the INBOX.
+        self._conn.select(imap_mailbox)
+        self._conn.append(imap_mailbox,None,None,body)
         log.Log("IMAP mail with '%s' subject stored"%remote_filename,5)
 
     def get(self, remote_filename, local_path):
-        self._conn.select(gmail_mailbox)
-
-        (result,list) = self._conn.search(None,"(HEADER Subject %s)"%remote_filename)
+        self._conn.select(imap_mailbox)
+        (result,list) = self._conn.search(None, 'Subject', remote_filename)
         if result != "OK":
             raise Exception(list[0])
         
@@ -116,11 +125,13 @@ class GmailImapBackend(duplicity.backend.Backend):
 
     def list(self):
         ret = []
-        self._conn.select(gmail_mailbox)
+        self._conn.select(imap_mailbox)
 
         # Going to find all the archives which have remote_dir in the From 
         # address
-        (result,list) = self._conn.search(None,"(From %s)" % self.remote_dir)
+
+        # Search returns an error if you haven't selected an IMAP folder.
+        (result,list) = self._conn.search(None, 'FROM', self.remote_dir)
         if result!="OK":
             raise Exception(list[0])
         if list[0]=='':
@@ -135,11 +146,14 @@ class GmailImapBackend(duplicity.backend.Backend):
             if (len(msg)==1):continue
             io = StringIO.StringIO(msg[1])
             m = rfc822.Message(io)
-            subj = m.getheaders("subject")[0]
-            header_from = m.getheaders("from")[0]
-            if (re.compile("^" + self.remote_dir + "$").match(header_from)):
-                ret.append(subj)
-                log.Log("IMAP LIST: %s %s" % (subj,header_from), 6)
+            subj = m.getheader("subject")
+            header_from = m.getheader("from")
+            
+            # Catch messages with empty headers which cause an exception.
+            if (not (header_from == None)):
+                if (re.compile("^" + self.remote_dir + "$").match(header_from)):
+                    ret.append(subj)
+                    log.Log("IMAP LIST: %s %s" % (subj,header_from), 6)
         return ret
             
     def _imapf(self,fun,*args):
@@ -157,7 +171,7 @@ class GmailImapBackend(duplicity.backend.Backend):
     def delete(self, filename_list):
         assert len(filename_list) > 0
         for filename in filename_list:
-            list = self._imapf(self._conn.search,None,"(HEADER Subject %s)"%filename)
+            list = self._imapf(self._conn.search,None,"(HEADER, Subject %s)"%filename)
             list = list[0].split()
             if len(list)==0 or list[0]=="":raise Exception("no such mail with subject '%s'"%filename)
             self._delete_single_mail(list[0])
@@ -166,8 +180,10 @@ class GmailImapBackend(duplicity.backend.Backend):
         log.Log("IMAP expunged %s files" % len(list), 3)
 
     def close(self):
-        self._conn.select(gmail_mailbox)
+        self._conn.select(imap_mailbox)
         self._conn.close()
         self._conn.logout()
 
-duplicity.backend.register_backend("gmail", GmailImapBackend);
+duplicity.backend.register_backend("imap", ImapBackend);
+duplicity.backend.register_backend("imaps", ImapBackend);
+

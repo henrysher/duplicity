@@ -131,3 +131,8 @@ s3_use_new_style = False
 # Whether to create European buckets (sorry, hard-coded to only
 # support european for now).
 s3_european_buckets = False
+
+# Whether to use the full email address as the user name when
+# logging into an imap server. If false just the user name
+# part of the email address is used.
+imap_full_address = False

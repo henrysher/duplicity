@@ -112,11 +112,11 @@ def _ensure_urlparser_initialized():
             # is a hack. we should instead not stomp on the url parsing module to begin with.
             #
             # todo: eliminate the need for backend specific hacking here completely.
-            urlparser.uses_netloc = [ 'ftp', 'hsi', 'rsync', 's3', 'scp', 'ssh', 'webdav', 'webdavs', 'http', 'https', 'gmail' ]
+            urlparser.uses_netloc = [ 'ftp', 'hsi', 'rsync', 's3', 'scp', 'ssh', 'webdav', 'webdavs', 'http', 'https', 'imap', 'imaps' ]
 
             # Do not transform or otherwise parse the URL path component.
             urlparser.uses_query = []
-            urlparser.uses_fragment = []
+            urlparser.uses_fragm = []
         
             _urlparser_initialized = True
     

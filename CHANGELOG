@@ -6,6 +6,9 @@ https://savannah.nongnu.org/bugs/?25379
 bug #25403: 0.5.06 "manifests not equal because different volume numbers"
 https://savannah.nongnu.org/bugs/?25403
 
+patch #6729: New imap backend. Replaces current gmail backend
+https://savannah.nongnu.org/patch/?6729
+
 Increase default volume size (--volsize) to 25M from 5M.  This
 reduces the number of volumes to accomodate larger backups.
 

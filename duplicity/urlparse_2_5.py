@@ -10,20 +10,20 @@ __all__ = ["urlparse", "urlunparse", "urljoin", "urldefrag",
            "urlsplit", "urlunsplit"]
 
 # A classification of schemes ('' means apply by default)
-uses_relative = ['ftp', 'http', 'gopher', 'nntp', 'gmail',
+uses_relative = ['ftp', 'http', 'gopher', 'nntp',
                  'wais', 'file', 'https', 'shttp', 'mms',
-                 'prospero', 'rtsp', 'rtspu', '', 'sftp']
-uses_netloc = ['ftp', 'http', 'gopher', 'nntp', 'telnet', 'gmail',
+                 'prospero', 'rtsp', 'rtspu', '', 'sftp', 'imap', 'imaps']
+uses_netloc = ['ftp', 'http', 'gopher', 'nntp', 'telnet',
                'wais', 'file', 'mms', 'https', 'shttp',
                'snews', 'prospero', 'rtsp', 'rtspu', 'rsync', '',
-               'svn', 'svn+ssh', 'sftp']
+               'svn', 'svn+ssh', 'sftp', 'imap', 'imaps']
 non_hierarchical = ['gopher', 'hdl', 'mailto', 'news',
-                    'telnet', 'wais', 'gmail', 'snews', 'sip', 'sips']
-uses_params = ['ftp', 'hdl', 'prospero', 'http', 'gmail',
+                    'telnet', 'wais', 'snews', 'sip', 'sips', 'imap', 'imaps']
+uses_params = ['ftp', 'hdl', 'prospero', 'http', 
                'https', 'shttp', 'rtsp', 'rtspu', 'sip', 'sips',
-               'mms', '', 'sftp']
-uses_query = ['http', 'wais', 'gmail', 'https', 'shttp', 'mms',
-              'gopher', 'rtsp', 'rtspu', 'sip', 'sips', '']
+               'mms', '', 'sftp', 'imap', 'imaps']
+uses_query = ['http', 'wais', 'https', 'shttp', 'mms',
+              'gopher', 'rtsp', 'rtspu', 'sip', 'sips', 'imap', 'imaps', '']
 uses_fragment = ['ftp', 'hdl', 'http', 'gopher', 'news',
                  'nntp', 'wais', 'https', 'shttp', 'snews',
                  'file', 'prospero', '']

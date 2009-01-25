@@ -10,7 +10,7 @@ specifically refer to a particular backend.
 
 import duplicity.backends.botobackend
 import duplicity.backends.ftpbackend
-import duplicity.backends.gmailimapbackend
+import duplicity.backends.imapbackend
 import duplicity.backends.hsibackend
 import duplicity.backends.localbackend
 import duplicity.backends.rsyncbackend
