@@ -158,11 +158,7 @@ class GPGFile:
             self.gpg_output.close()
             if self.status_fp:
                 self.set_signature()
-            try:
-                self.gpg_process.wait()
-            except IOError, message:
-                if message.args[0] != "GnuPG exited non-zero, with code 131072":
-                    raise
+            self.gpg_process.wait()
         if log.getverbosity() >= 5:
             self.print_log()
         self.logger_fp.close()
