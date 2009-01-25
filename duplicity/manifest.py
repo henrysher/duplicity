@@ -47,7 +47,8 @@ class Manifest:
         are not available.
 
         """
-        if globals.allow_source_mismatch: return
+        if globals.allow_source_mismatch:
+            return
         if self.hostname and self.hostname != globals.hostname:
             errmsg = """Fatal Error: Backup source host has changed.
 Current hostname: %s
@@ -57,7 +58,8 @@ Previous hostname: %s""" % (globals.hostname, self.hostname)
             errmsg = """Fatal Error: Backup source directory has changed.
 Current directory: %s
 Previous directory: %s""" % (self.local_dirname, globals.local_path.name)
-        else: return
+        else:
+            return
 
         log.FatalError(errmsg + "\n\n" +
                        _("Aborting because you may have accidentally tried to "
@@ -77,7 +79,8 @@ Previous directory: %s""" % (self.local_dirname, globals.local_path.name)
     def to_string(self):
         """Return string version of self (just concatenate vi strings)"""
         result = ""
-        if self.hostname: result += "Hostname %s\n" % self.hostname
+        if self.hostname:
+            result += "Hostname %s\n" % self.hostname
         if self.local_dirname:
             result += "Localdir %s\n" % Quote(self.local_dirname)
 
@@ -95,8 +98,10 @@ Previous directory: %s""" % (self.local_dirname, globals.local_path.name)
         def get_field(fieldname):
             """Return the value of a field by parsing s, or None if no field"""
             m = re.search("(^|\\n)%s\\s(.*?)\n" % fieldname, s, re.I)
-            if not m: return None
-            else: return Unquote(m.group(2))
+            if not m:
+                return None
+            else:
+                return Unquote(m.group(2))
         self.hostname = get_field("hostname")
         self.local_dirname = get_field("localdir")
 
@@ -105,7 +110,8 @@ Previous directory: %s""" % (self.local_dirname, globals.local_path.name)
         starting_s_index = 0
         while 1:
             match = next_vi_string_regexp.search(s[starting_s_index:])
-            if not match: break
+            if not match:
+                break
             self.add_volume_info(VolumeInfo().from_string(match.group(2)))
             starting_s_index += match.end(2)
         return self
@@ -120,10 +126,12 @@ Previous directory: %s""" % (self.local_dirname, globals.local_path.name)
             log.Log(_("Manifests not equal because different volume numbers"), 3)
             return None
         for i in range(len(vi_list1)):
-            if not vi_list1[i] == vi_list2[i]: return None
+            if not vi_list1[i] == vi_list2[i]:
+                return None
 
         if (self.hostname != other.hostname or
-            self.local_dirname != other.local_dirname): return None
+            self.local_dirname != other.local_dirname):
+            return None
         return 1
 
     def __ne__(self, other):
@@ -180,11 +188,16 @@ class VolumeInfo:
         is returned if no hash is available.
 
         """
-        if not self.hashes: return None
-        try: return ("SHA1", self.hashes['SHA1'])
-        except KeyError: pass
-        try: return ("MD5", self.hashes['MD5'])
-        except KeyError: pass
+        if not self.hashes:
+            return None
+        try:
+            return ("SHA1", self.hashes['SHA1'])
+        except KeyError:
+            pass
+        try:
+            return ("MD5", self.hashes['MD5'])
+        except KeyError:
+            pass
         return self.hashes.items()[0]
 
     def to_string(self):
@@ -194,7 +207,8 @@ class VolumeInfo:
             if index:
                 s = "/".join(index)
                 return Quote(s)
-            else: return "."
+            else:
+                return "."
 
         slist = ["Volume %d:" % self.volume_number]
         whitespace = "    "
@@ -213,19 +227,22 @@ class VolumeInfo:
         def string_to_index(s):
             """Return tuple index from string"""
             s = Unquote(s)
-            if s == ".": return ()
+            if s == ".":
+                return ()
             return tuple(s.split("/"))
 
         linelist = s.strip().split("\n")
 
         # Set volume number
         m = re.search("^Volume ([0-9]+):", linelist[0], re.I)
-        if not m: raise VolumeInfoError("Bad first line '%s'" % (linelist[0],))
+        if not m:
+            raise VolumeInfoError("Bad first line '%s'" % (linelist[0],))
         self.volume_number = int(m.group(1))
 
         # Set other fields
         for line in linelist[1:]:
-            if not line: continue
+            if not line:
+                continue
             line_split = line.strip().split()
             field_name = line_split[0].lower()
             other_fields = line_split[1:]
@@ -279,20 +296,24 @@ class VolumeInfo:
         indicies.
 
         """
-        if recursive: return (self.start_index[:len(index_prefix)] <=
-                              index_prefix <= self.end_index)
-        else: return self.start_index <= index_prefix <= self.end_index
+        if recursive:
+            return (self.start_index[:len(index_prefix)] <=
+                    index_prefix <= self.end_index)
+        else:
+            return self.start_index <= index_prefix <= self.end_index
 
 
 nonnormal_char_re = re.compile("(\\s|[\\\\\"'])")
 def Quote(s):
     """Return quoted version of s safe to put in a manifest or volume info"""
-    if not nonnormal_char_re.search(s): return s # no quoting necessary
+    if not nonnormal_char_re.search(s):
+        return s # no quoting necessary
     slist = []
     for char in s:
         if nonnormal_char_re.search(char):
             slist.append("\\x%02x" % ord(char))
-        else: slist.append(char)
+        else:
+            slist.append(char)
     return '"%s"' % "".join(slist)
 
 def Unquote(quoted_string):
@@ -304,7 +325,8 @@ def Unquote(quoted_string):
     i = 1 # skip initial char
     while i < len(quoted_string)-1:
         char = quoted_string[i]
-        if char == "\\": # quoted section
+        if char == "\\":
+            # quoted section
             assert quoted_string[i+1] == "x"
             return_list.append(chr(int(quoted_string[i+2:i+4], 16)))
             i += 4
