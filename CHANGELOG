@@ -9,6 +9,9 @@ https://savannah.nongnu.org/bugs/?25403
 patch #6729: New imap backend. Replaces current gmail backend
 https://savannah.nongnu.org/patch/?6729
 
+patch #6730: Fix timing out for SSH backend
+https://savannah.nongnu.org/patch/?6730
+
 Increase default volume size (--volsize) to 25M from 5M.  This
 reduces the number of volumes to accomodate larger backups.
 

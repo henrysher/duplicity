@@ -65,6 +65,9 @@ class SSHBackend(duplicity.backend.Backend):
             self.ssh_options = ssh_options + " -oPort=%s" % parsed_url.port
         else:
             self.ssh_options = ssh_options
+        # set network timeout.  CountMax is how many retries to do, not how many tries.
+        # Use CountMax=1 just in case there's a tiny network blip.
+        self.ssh_options += " -oServerAliveInterval=%i -oServerAliveCountMax=1" % ((int)(globals.timeout / 2))
         # set up password
         if ssh_askpass:
             self.password = self.get_password()
@@ -75,7 +78,7 @@ class SSHBackend(duplicity.backend.Backend):
         """ Run an scp command, responding to password prompts """
         for n in range(1, globals.num_retries+1):
             log.Log("Running '%s' (attempt #%d)" % (commandline, n), 5)
-            child = pexpect.spawn(commandline, timeout = globals.timeout)
+            child = pexpect.spawn(commandline, timeout = None)
             cmdloc = 0
             if ssh_askpass:
                 state = "authorizing"
@@ -84,11 +87,10 @@ class SSHBackend(duplicity.backend.Backend):
             while 1:
                 if state == "authorizing":
                     match = child.expect([pexpect.EOF,
-                                          pexpect.TIMEOUT,
+                                          "(?i)timeout, server not responding",
                                           "(?i)password:",
                                           "(?i)permission denied",
-                                          "authenticity"],
-                                         timeout = globals.timeout)
+                                          "authenticity"])
                     log.Log("State = %s, Before = '%s'" % (state, child.before.strip()), 9)
                     if match == 0:
                         log.Log("Failed to authenticate", 5)
@@ -107,11 +109,10 @@ class SSHBackend(duplicity.backend.Backend):
                         break
                 elif state == "copying":
                     match = child.expect([pexpect.EOF,
-                                          pexpect.TIMEOUT,
+                                          "(?i)timeout, server not responding",
                                           "stalled",
                                           "authenticity",
-                                          "ETA"],
-                                         timeout = globals.timeout)
+                                          "ETA"])
                     log.Log("State = %s, Before = '%s'" % (state, child.before.strip()), 9)
                     if match == 0:
                         break
@@ -125,9 +126,8 @@ class SSHBackend(duplicity.backend.Backend):
                         break
                 elif state == "stalled":
                     match = child.expect([pexpect.EOF,
-                                          pexpect.TIMEOUT,
-                                          "ETA"],
-                                         timeout = globals.timeout)
+                                          "(?i)timeout, server not responding",
+                                          "ETA"])
                     log.Log("State = %s, Before = '%s'" % (state, child.before.strip()), 9)
                     if match == 0:
                         break
@@ -146,18 +146,22 @@ class SSHBackend(duplicity.backend.Backend):
 
     def run_sftp_command(self, commandline, commands):
         """ Run an sftp command, responding to password prompts, passing commands from list """
+        maxread = 2000 # expect read buffer size
+        responses = ["(?i)timeout, server not responding",
+                     "sftp>",
+                     "(?i)password:",
+                     "(?i)permission denied",
+                     "authenticity",
+                     "(?i)no such file or directory"]
+        max_response_len = max([len(p) for p in responses])
+        responses = [pexpect.EOF] + responses
         for n in range(1, globals.num_retries+1):
             log.Log("Running '%s' (attempt #%d)" % (commandline, n), 5)
-            child = pexpect.spawn(commandline, timeout = globals.timeout)
+            child = pexpect.spawn(commandline, timeout = None, maxread=maxread)
             cmdloc = 0
             while 1:
-                match = child.expect([pexpect.EOF,
-                                      pexpect.TIMEOUT,
-                                      "sftp>",
-                                      "(?i)password:",
-                                      "(?i)permission denied",
-                                      "authenticity",
-                                      "(?i)no such file or directory"])
+                match = child.expect(responses,
+                                     searchwindowsize=maxread+max_response_len)
                 log.Log("State = sftp, Before = '%s'" % (child.before.strip()), 9)
                 if match == 0:
                     break
@@ -187,6 +191,10 @@ class SSHBackend(duplicity.backend.Backend):
                     break
             child.close(force = True)
             if child.exitstatus == 0:
+                # We cut off the first line of res (will be " ls -1" or something)
+                firstend = res.find('\n')
+                if firstend >= 0:
+                    res = res[firstend+1:]
                 return res
             log.Log("Running '%s' failed (attempt #%d)" % (commandline, n), 1)
             time.sleep(30)
