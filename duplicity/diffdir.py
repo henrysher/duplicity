@@ -123,7 +123,7 @@ def get_delta_path(new_path, sig_path, sigTarFile = None):
     else:
         delta_path.difftype = "snapshot"
         if sigTarFile:
-            ti.name = "snapshot/" + "/".join(index) 
+            ti.name = "snapshot/" + "/".join(index)
         if not new_path.isreg():
             if sigTarFile:
                 sigTarFile.addfile(ti)
@@ -219,11 +219,11 @@ def sigtar2path_iter(sigtarobj):
                 break
         else:
             raise DiffDirException("Bad tarinfo name %s" % (tarinfo.name,))
-            
+
         index = tuple(name.split("/"))
         if not index[-1]:
             index = index[:-1] # deal with trailing /, ""
-            
+
         ropath = ROPath(index)
         ropath.difftype = difftype
         if difftype == "signature" or difftype == "snapshot":
@@ -316,7 +316,7 @@ def combine_path_iters(path_iter_list):
                     del triple_list[iter_index]
             else:
                 break # assumed triple_list sorted, so can exit now
-            
+
     triple_list = filter(lambda x: x, map(get_triple,
                                           range(len(path_iter_list))))
     while triple_list:
@@ -377,7 +377,7 @@ class FileWithSignature:
         add infile's data to a SigGenerator object.  When the file has
         been read to the end the callback will be called with the
         calculated signature, and any extra_args if given.
-        
+
         filelen is used to calculate the block size of the signature.
 
         """
@@ -469,7 +469,7 @@ class TarBlockIter:
             self.remember_value = result.index
             self.remember_next = None
         return result
-        
+
     def get_previous_index(self):
         """Return index of last tarblock, or None if no previous index"""
         return self.previous_index
@@ -564,7 +564,7 @@ class DeltaTarBlockIter(TarBlockIter):
                 assert delta_ropath.difftype == "snapshot"
                 add_prefix(ti, "snapshot")
             return self.tarinfo2tarblock(index, ti)
-            
+
         # Now handle single volume block case
         fp = delta_ropath.open("rb")
         # Below the 512 is the usual length of a tar header
@@ -592,7 +592,7 @@ class DeltaTarBlockIter(TarBlockIter):
 
     def get_data_block(self, fp, max_size):
         """Return pair (next data block, boolean last data block)"""
-        read_size = min(64*1024, max_size)
+        read_size = min(64*1024, max(max_size, 512))
         buf = fp.read(read_size)
         if len(buf) < read_size:
             if fp.close():
@@ -607,7 +607,7 @@ class DeltaTarBlockIter(TarBlockIter):
         ropath = self.process_ropath
         ti, index = ropath.get_tarinfo(), ropath.index
         ti.name = "%s/%d" % (self.process_prefix, self.process_next_vol_number)
-        data, last_block = self.get_data_block(self.process_fp, size-512)
+        data, last_block = self.get_data_block(self.process_fp, size - 512)
         if stats:
             stats.RawDeltaSize += len(data)
         if last_block:
@@ -635,7 +635,7 @@ def write_block_iter(block_iter, out_obj):
     assert not fp.close()
     if isinstance(out_obj, Path):
         out_obj.setdata()
-    
+
 
 def get_block_size(file_len):
     """Return a reasonable block size to use on files of length file_len

@@ -1,5 +1,8 @@
 New in v0.5.07 (2009/01/??)
 ---------------------------
+bug #25293: IOError: [Errno 22] Invalid argument
+https://savannah.nongnu.org/bugs/?25293
+
 bug #25379: sys.exit() causes traceback and should not
 https://savannah.nongnu.org/bugs/?25379
 
