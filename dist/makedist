@@ -90,8 +90,8 @@ def MakeTar():
     for filename in [
         "backends/botobackend.py",
         "backends/ftpbackend.py",
-        "backends/gmailimapbackend.py",
         "backends/hsibackend.py",
+        "backends/imapbackend.py",
         "backends/__init__.py",
         "backends/localbackend.py",
         "backends/rsyncbackend.py",
