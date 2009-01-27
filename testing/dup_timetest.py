@@ -1,4 +1,23 @@
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
+#
+# Copyright 2002 Ben Escoto <ben@emerose.org>
+# Copyright 2007 Kenneth Loafman <kenneth@loafman.com>
+#
+# This file is part of duplicity.
+#
+# Duplicity is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 2 of the License, or (at your
+# option) any later version.
+#
+# Duplicity is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with duplicity; if not, write to the Free Software Foundation,
+# Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import config
 import sys, unittest, time, types
@@ -132,7 +151,7 @@ class TimeTest(unittest.TestCase):
 ##      time6 = time.time()
 ##      dup_time.sleep(sleep_ratio)
 ##      time7 = time.time()
-        
+
 ##      assert 0.9 < time3 - time2 < 1.1, time3 - time2
 ##      assert 0.4 < time5 - time4 < 0.6, time5 - time4
 ##      assert 0.2 < time7 - time6 < 0.3, time7 - time6

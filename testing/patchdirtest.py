@@ -1,4 +1,23 @@
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
+#
+# Copyright 2002 Ben Escoto <ben@emerose.org>
+# Copyright 2007 Kenneth Loafman <kenneth@loafman.com>
+#
+# This file is part of duplicity.
+#
+# Duplicity is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 2 of the License, or (at your
+# option) any later version.
+#
+# Duplicity is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with duplicity; if not, write to the Free Software Foundation,
+# Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import config
 import sys, cStringIO, os, unittest
@@ -41,7 +60,7 @@ class PatchingTest(unittest.TestCase):
         self.deltmp()
         sig = Path("testfiles/output/sig.tar")
         diff = Path("testfiles/output/diff.tar")
-        seq_path = Path("testfiles/output/sequence")        
+        seq_path = Path("testfiles/output/sequence")
         new_path, old_path = None, None # set below in for loop
 
         # Write initial full backup to diff.tar
@@ -91,7 +110,7 @@ class PatchingTest(unittest.TestCase):
         deltablock = diffdir.DirFull_WriteSig(self.get_sel(basis_path),
                                               sig_path.open("wb"))
         diffdir.write_block_iter(deltablock, tar_path)
-        
+
     def test_block_tar(self):
         """Test building block tar from a number of files"""
         def get_fileobjs():
@@ -218,7 +237,7 @@ class TestInnerFuncs(unittest.TestCase):
         ss.chmod(0600)
         ss.difftype = "snapshot"
         return ss
-    
+
     def get_delta(self, old_buf, new_buf):
         """Return delta buffer from old to new"""
         sigfile = librsync.SigFile(cStringIO.StringIO(old_buf))
@@ -271,7 +290,7 @@ class TestInnerFuncs(unittest.TestCase):
         seq3 = [de, ss, d1, d2]
         seq4 = [de, ss, d1, d2, ss]
         seq5 = [de, ss, d1, d2, ss, d1, d2]
-        
+
         def try_seq(input_seq, correct_output_seq):
             normed = patchdir.normalize_ps(input_seq)
             assert normed == correct_output_seq, (normed, correct_output_eq)

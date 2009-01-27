@@ -1,4 +1,23 @@
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
+#
+# Copyright 2002 Ben Escoto <ben@emerose.org>
+# Copyright 2007 Kenneth Loafman <kenneth@loafman.com>
+#
+# This file is part of duplicity.
+#
+# Duplicity is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 2 of the License, or (at your
+# option) any later version.
+#
+# Duplicity is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with duplicity; if not, write to the Free Software Foundation,
+# Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import config
 import os, sys, random, unittest
@@ -166,7 +185,7 @@ class CollectionTest(unittest.TestCase):
         """Test getting signature chain fileobjs from archive_dir"""
         self.set_gpg_profile()
         self.sigchain_fileobj_testlist(self.sigchain_fileobj_get(1))
-        self.sigchain_fileobj_testlist(self.sigchain_fileobj_get(None))     
+        self.sigchain_fileobj_testlist(self.sigchain_fileobj_get(None))
 
     def get_filelist2_cs(self):
         """Return set CollectionsStatus object from filelist 2"""
@@ -218,7 +237,7 @@ class CollectionTest(unittest.TestCase):
                                    ['2002-08-17T16:17:01-07:00'])
         assert oldset_times == right_times_required, \
                [oldset_times, right_times_required]
-        
+
 
 if __name__ == "__main__":
     unittest.main()

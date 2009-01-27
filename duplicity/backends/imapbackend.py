@@ -1,4 +1,23 @@
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
+#
+# Copyright 2002 Ben Escoto <ben@emerose.org>
+# Copyright 2007 Kenneth Loafman <kenneth@loafman.com>
+#
+# This file is part of duplicity.
+#
+# Duplicity is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 2 of the License, or (at your
+# option) any later version.
+#
+# Duplicity is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with duplicity; if not, write to the Free Software Foundation,
+# Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import imaplib
 import base64
@@ -28,7 +47,7 @@ class ImapBackend(duplicity.backend.Backend):
             imap_server = os.environ['IMAP_SERVER']
         except KeyError:
             imap_server = 'mail.localhost'
-               
+
 
         if (parsed_url.scheme == "imap"):
             cl = imaplib.IMAP4
@@ -47,7 +66,7 @@ class ImapBackend(duplicity.backend.Backend):
             username = raw_input('Enter account userid: ')
         else:
             username = parsed_url.get_username()
-       
+
         #  Set the password
         if ( not parsed_url.get_password() ):
             password = getpass.getpass("Enter account password: ")
@@ -63,16 +82,16 @@ class ImapBackend(duplicity.backend.Backend):
            self._conn.login(username + "@" + parsed_url.hostname, password)
            self._conn.select(imap_mailbox)
            log.Log("IMAP connected",5)
-        
+
     def _prepareBody(self,f,rname):
         mp = email.MIMEMultipart.MIMEMultipart()
 
-        # I am going to use the remote_dir as the From address so that 
+        # I am going to use the remote_dir as the From address so that
         # multiple archives can be stored in an IMAP account and can be
         # accessed separately
         mp["From"]=self.remote_dir
         mp["Subject"]=rname
-        
+
         a = email.MIMEBase.MIMEBase("application","binary")
         a.set_payload(f.read())
 
@@ -99,23 +118,23 @@ class ImapBackend(duplicity.backend.Backend):
         (result,list) = self._conn.search(None, 'Subject', remote_filename)
         if result != "OK":
             raise Exception(list[0])
-        
+
         #check if there is any result
         if list[0] == '':
             raise Exception("no mail with subject %s")
-        
+
         (result,list) = self._conn.fetch(list[0],"(RFC822)")
-        
+
         if result != "OK":
             raise Exception(list[0])
         rawbody=list[0][1]
-        
+
         p = email.Parser.Parser()
 
         m = p.parsestr(rawbody)
-     
+
         mp = m.get_payload(0)
-        
+
         body = mp.get_payload(decode=True)
 
         tfile = local_path.open("wb")
@@ -127,7 +146,7 @@ class ImapBackend(duplicity.backend.Backend):
         ret = []
         self._conn.select(imap_mailbox)
 
-        # Going to find all the archives which have remote_dir in the From 
+        # Going to find all the archives which have remote_dir in the From
         # address
 
         # Search returns an error if you haven't selected an IMAP folder.
@@ -148,14 +167,14 @@ class ImapBackend(duplicity.backend.Backend):
             m = rfc822.Message(io)
             subj = m.getheader("subject")
             header_from = m.getheader("from")
-            
+
             # Catch messages with empty headers which cause an exception.
             if (not (header_from == None)):
                 if (re.compile("^" + self.remote_dir + "$").match(header_from)):
                     ret.append(subj)
                     log.Log("IMAP LIST: %s %s" % (subj,header_from), 6)
         return ret
-            
+
     def _imapf(self,fun,*args):
         (ret,list)=fun(*args)
         if ret != "OK":
@@ -167,7 +186,7 @@ class ImapBackend(duplicity.backend.Backend):
 
     def _expunge(self):
         list=self._imapf(self._conn.expunge)
-        
+
     def delete(self, filename_list):
         assert len(filename_list) > 0
         for filename in filename_list:

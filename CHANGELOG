@@ -26,6 +26,9 @@ Fix backendtest.py so that empty URL's in config.py cause the
 backend test to be skipped rather than erroring.  Added notes
 in config.py.tmpl explaining the change.
 
+Add/update copyright statements in all distribution source files
+and revert duplicity to GPL version 2 license.
+
 
 New in v0.5.06 (2009/01/09)
 ---------------------------

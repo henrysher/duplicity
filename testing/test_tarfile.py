@@ -1,8 +1,28 @@
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
+# Copyright 2002 Ben Escoto <ben@emerose.org>
+# Copyright 2007 Kenneth Loafman <kenneth@loafman.com>
+#
+# This file is part of duplicity.
+#
+# Duplicity is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 2 of the License, or (at your
+# option) any later version.
+#
+# Duplicity is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with duplicity; if not, write to the Free Software Foundation,
+# Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+#
 # unittest for the tarfile module
 #
-# $Id: test_tarfile.py,v 1.7 2008/11/16 18:48:17 loafman Exp $
+# $Id: test_tarfile.py,v 1.8 2009/01/27 14:24:12 loafman Exp $
 
 import config
 import sys, os, shutil, StringIO, tempfile, unittest, stat, pwd, grp
@@ -196,7 +216,7 @@ class Test_All(BaseTest):
         tfi_list = [None]
         tfi = tarfile.TarFromIterator(generate_pairs(tfi_list))
         tfi_list[0] = tfi # now generate_pairs can find tfi
-  
+
         buf = tfi.read()
         tfi.close()
         fout = open("temp2.tar", "wb")
@@ -244,7 +264,7 @@ class Test_All(BaseTest):
         # Check symlink
         s = os.lstat("tempdir/symlink")
         assert stat.S_ISLNK(s.st_mode)
-        
+
 
 class Test_FObj(BaseTest):
     """Test for read operations via file-object.

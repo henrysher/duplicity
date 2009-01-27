@@ -1,4 +1,23 @@
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
+#
+# Copyright 2002 Ben Escoto <ben@emerose.org>
+# Copyright 2007 Kenneth Loafman <kenneth@loafman.com>
+#
+# This file is part of duplicity.
+#
+# Duplicity is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 2 of the License, or (at your
+# option) any later version.
+#
+# Duplicity is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with duplicity; if not, write to the Free Software Foundation,
+# Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import config
 import sys, os, unittest
@@ -32,7 +51,7 @@ class DDTest(unittest.TestCase):
         select.set_iter()
         sigtar = diffdir.SigTarBlockIter(select)
         diffdir.write_block_iter(sigtar, "testfiles/output/sigtar")
-        
+
         i = 0
         for tarinfo in tarfile.TarFile("testfiles/output/sigtar", "r"):
             i += 1
@@ -252,7 +271,7 @@ def compare_tar(tarfile1, tarfile2):
     except StopIteration: pass
     else: assert 0, ("Premature end to first tarfile, "
                      "ti2.name = %s" % ti2.name)
-          
+
     tarfile1.close()
     tarfile2.close()
 
