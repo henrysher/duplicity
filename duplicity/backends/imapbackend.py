@@ -144,7 +144,9 @@ class ImapBackend(duplicity.backend.Backend):
 
     def list(self):
         ret = []
-        self._conn.select(imap_mailbox)
+        (result,list) = self._conn.select(imap_mailbox)
+        if result != "OK":
+            raise BackendException(list[0])
 
         # Going to find all the archives which have remote_dir in the From
         # address
