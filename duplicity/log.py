@@ -156,7 +156,7 @@ class ErrorCode:
     boto_calling_format = 26
     ftp_ncftp_missing = 27
     ftp_ncftp_too_old = 28
-    ftp_ncftp_ = 29
+    ftp_ncftp_v320 = 29
     exception = 30
 
 def FatalError(s, code, extra=None):

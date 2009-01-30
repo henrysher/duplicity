@@ -1,4 +1,4 @@
-New in v0.5.07 (2009/01/28)
+New in v0.5.07 (2009/01/??)
 ---------------------------
 bug #25293: IOError: [Errno 22] Invalid argument
 https://savannah.nongnu.org/bugs/?25293
@@ -31,6 +31,9 @@ in config.py.tmpl explaining the change.
 
 Add/update copyright statements in all distribution source files
 and revert duplicity to GPL version 2 license.
+
+Original fix to disallow use of ncftpput 3.2.0 mistyped the ErrorCode used
+and resulted in an error rather than an explanation.
 
 
 New in v0.5.06 (2009/01/09)
