@@ -1,3 +1,9 @@
+New in v0.5.08 (2009/02/02)
+---------------------------
+Turns out going backwards in the license is not as easy as
+forwards.  Restoring GPLv3 license until consensus reached.
+
+
 New in v0.5.07 (2009/01/31)
 ---------------------------
 bug #25293: IOError: [Errno 22] Invalid argument

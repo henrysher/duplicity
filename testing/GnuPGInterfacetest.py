@@ -7,7 +7,7 @@
 #
 # Duplicity is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the
-# Free Software Foundation; either version 2 of the License, or (at your
+# Free Software Foundation; either version 3 of the License, or (at your
 # option) any later version.
 #
 # Duplicity is distributed in the hope that it will be useful, but
@@ -53,7 +53,7 @@ import GnuPGInterface
 
 __author__   = "Frank J. Tobin, ftobin@neverending.org"
 __version__  = "0.2.2"
-__revision__ = "$Id: GnuPGInterfacetest.py,v 1.5 2009/01/27 14:24:13 loafman Exp $"
+__revision__ = "$Id: GnuPGInterfacetest.py,v 1.6 2009/02/02 15:36:46 loafman Exp $"
 
 class BasicTest(unittest.TestCase):
     """an initializer superclass"""
