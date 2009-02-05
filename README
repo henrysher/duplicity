@@ -23,7 +23,7 @@ REQUIREMENTS:
  * librsync v0.9.6 or later (http://librsync.sourceforge.net)
  * GnuPG for encryption (http://www.gnupg.org)
  * GnuPGInterface 0.3.2 or later (http://py-gnupg.sourceforge.net)
- * NcFTP version 3.1.9 or later (http://www.ncftp.com)
+ * NcFTP version 3.1.9 or later, but not 3.2.0 (http://www.ncftp.com)
  * Boto 0.9d or later (http://code.google.com/p/boto)
 
 If you install from the source package, you will also need:
