@@ -1,3 +1,8 @@
+New in v0.5.09 (2009/02/??)
+---------------------------
+Split parsedurl test from backendtest and add test cases.
+
+
 New in v0.5.08 (2009/02/02)
 ---------------------------
 Turns out going backwards in the license is not as easy as

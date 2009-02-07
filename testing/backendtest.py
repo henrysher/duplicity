@@ -133,43 +133,6 @@ class UnivTest:
         self.try_fileobj_filename(backend, filename2)
 
 
-class ParsedUrlTest(unittest.TestCase):
-    """Test the ParsedUrl class"""
-    def test_basic(self):
-        """Test various url strings"""
-        pu = duplicity.backend.ParsedUrl("scp://ben@foo.bar:1234/a/b")
-        assert pu.scheme == "scp", pu.scheme
-        assert pu.netloc == "ben@foo.bar:1234", pu.netloc
-        assert pu.path =="/a/b", pu.path
-        assert pu.username == "ben", pu.username
-        assert pu.port == 1234, pu.port
-        assert pu.hostname == "foo.bar", pu.hostname
-
-        pu = duplicity.backend.ParsedUrl("ftp://foo.bar:1234/")
-        assert pu.scheme == "ftp", pu.scheme
-        assert pu.netloc == "foo.bar:1234", pu.netloc
-        assert pu.path == "/", pu.path
-        assert pu.username is None, pu.username
-        assert pu.port == 1234, pu.port
-        assert pu.hostname == "foo.bar", pu.hostname
-
-        pu = duplicity.backend.ParsedUrl("file:///home")
-        assert pu.scheme == "file", pu.scheme
-        assert pu.netloc == "", pu.netloc
-        assert pu.path == "///home", pu.path
-        assert pu.username is None, pu.username
-        assert pu.port is None, pu.port
-
-        pu = duplicity.backend.ParsedUrl("ftp://foo@bar:pass@example.com:123/home")
-        assert pu.scheme == "ftp", pu.scheme
-        assert pu.netloc == "foo@bar:pass@example.com:123", pu.netloc
-        assert pu.hostname == "example.com", pu.hostname
-        assert pu.path == "/home", pu.path
-        assert pu.username == "foo@bar", pu.username
-        assert pu.password == "pass"
-        assert pu.port == 123, pu.port
-
-
 class LocalTest(unittest.TestCase, UnivTest):
     """ Test the Local backend """
     my_test_id = "local"
