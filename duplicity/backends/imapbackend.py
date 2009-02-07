@@ -2,6 +2,7 @@
 #
 # Copyright 2002 Ben Escoto <ben@emerose.org>
 # Copyright 2007 Kenneth Loafman <kenneth@loafman.com>
+# Copyright 2008 Ian Barton <ian@manor-farm.org>
 #
 # This file is part of duplicity.
 #

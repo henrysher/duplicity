@@ -2,6 +2,7 @@
 #
 # Copyright 2002 Ben Escoto <ben@emerose.org>
 # Copyright 2007 Kenneth Loafman <kenneth@loafman.com>
+# Copyright 2008 Peter Schuller <peter.schuller@infidyne.com>
 #
 # This file is part of duplicity.
 #
@@ -100,7 +101,7 @@ class AsyncScheduler:
             def _insert_barrier():
                 self.__q.append(None) # None in queue indicates barrier
                 self.__cv.notifyAll()
-                
+
             with_lock(self.__cv, _insert_barrier)
 
     def schedule_task(self, fn, params):
@@ -203,12 +204,12 @@ class AsyncScheduler:
                       gettext.ngettext("tasks queue length post-schedule: %d task",
                                        "tasks queue length post-schedule: %d tasks",
                                        len(self.__q)) % len(self.__q)))
-            
+
             assert free_workers >= 0
 
             if free_workers == 0:
                 self.__start_worker()
-        
+
         with_lock(self.__cv, _sched)
 
         return waiter
@@ -250,7 +251,7 @@ class AsyncScheduler:
                     return (self.__curconc > 0)
                 def barrier_pending():
                     return (workorbarrier_pending() and self.__q[0] is None)
-                
+
                 while (not workorbarrier_pending()) or \
                       (barrier_pending() and tasks_running()):
                     if (not workorbarrier_pending()) and (not tasks_running()):
@@ -260,7 +261,7 @@ class AsyncScheduler:
                         self.__cv.notifyAll()
                         return None
                     self.__cv.wait()
-                
+
                 # there is work to do
                 work = self.__q.pop(0)
 
@@ -274,7 +275,7 @@ class AsyncScheduler:
                     self.__cv.notifyAll()
 
                 return work
-            
+
             work = with_lock(self.__cv, _prepwork)
 
             if work:
@@ -298,4 +299,4 @@ class AsyncScheduler:
                     self.__cv.notifyAll()
 
                 with_lock(self.__cv, _postwork)
-        
+
