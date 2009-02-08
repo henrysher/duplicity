@@ -24,6 +24,8 @@ import imaplib
 import base64
 import re
 import os
+import time
+import socket
 import StringIO
 import rfc822
 import getpass
@@ -44,24 +46,13 @@ imap_mailbox = "INBOX"
 class ImapBackend(duplicity.backend.Backend):
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
-        try:
-            imap_server = os.environ['IMAP_SERVER']
-        except KeyError:
-            imap_server = 'mail.localhost'
 
+        log.Log("I'm %s (scheme %s) connecting to %s as %s" %
+                (self.__class__.__name__, parsed_url.scheme, parsed_url.hostname, parsed_url.get_username()), 9)
 
-        if (parsed_url.scheme == "imap"):
-            cl = imaplib.IMAP4
-            self._conn = cl(imap_server, 143)
-        elif (parsed_url.scheme == "imaps"):
-            cl = imaplib.IMAP4_SSL
-            self._conn = cl(imap_server, 993)
-
-        log.Log("type of IMAP class=%s, I'm %s (scheme %s) connecting to %s as %s" %
-                (cl.__name__,self.__class__.__name__, parsed_url.scheme, parsed_url.hostname, parsed_url.get_username()), 9)
-
-        self.remote_dir = re.sub(r'^/', r'', parsed_url.path, 1)
-
+        #  Store url for reconnection on error 
+        self._url = parsed_url
+        
         #  Set the username
         if ( parsed_url.get_username() is None ):
             username = raw_input('Enter account userid: ')
@@ -74,15 +65,44 @@ class ImapBackend(duplicity.backend.Backend):
         else:
             password = parsed_url.get_password()
 
+        self._username = username
+        self._password = password
+        self._resetConnection()
+
+    def _resetConnection(self):
+        parsed_url = self._url
+        try:
+            imap_server = os.environ['IMAP_SERVER']
+        except KeyError:
+            imap_server = parsed_url.hostname
+
+        #  Try to close the connection cleanly
+        try:
+            self._conn.close()
+        except:
+            pass
+            
+        if (parsed_url.scheme == "imap"):
+            cl = imaplib.IMAP4
+            self._conn = cl(imap_server, 143)
+        elif (parsed_url.scheme == "imaps"):
+            cl = imaplib.IMAP4_SSL
+            self._conn = cl(imap_server, 993)
+
+        log.Log("Type of imap class: %s" %
+                (cl.__name__), 9)
+        self.remote_dir = re.sub(r'^/', r'', parsed_url.path, 1)
+
         #  Login
         if (not(globals.imap_full_address)):
-            self._conn.login(username, password)
+            self._conn.login(self._username, self._password)
             self._conn.select(imap_mailbox)
             log.Log("IMAP connected",5)
         else:
-           self._conn.login(username + "@" + parsed_url.hostname, password)
+           self._conn.login(self._username + "@" + parsed_url.hostname, self._password)
            self._conn.select(imap_mailbox)
            log.Log("IMAP connected",5)
+        
 
     def _prepareBody(self,f,rname):
         mp = email.MIMEMultipart.MIMEMultipart()
@@ -106,37 +126,62 @@ class ImapBackend(duplicity.backend.Backend):
         if not remote_filename:
             remote_filename = source_path.get_filename()
         f=source_path.open("rb")
-        self._conn.select(remote_filename)
-        body=self._prepareBody(f,remote_filename)
-        # If we don't select the IMAP folder before
-        # append, the message goes into the INBOX.
-        self._conn.select(imap_mailbox)
-        self._conn.append(imap_mailbox,None,None,body)
+        allowedTimeout = (globals.timeout + 29) / 30
+        if (allowedTimeout == 0):
+            # Allow a total timeout of 1 day
+            allowedTimeout = 2880
+        while allowedTimeout > 0:
+            try:
+                self._conn.select(remote_filename)
+                body=self._prepareBody(f,remote_filename)
+                # If we don't select the IMAP folder before
+                # append, the message goes into the INBOX.
+                self._conn.select(imap_mailbox)
+                self._conn.append(imap_mailbox,None,None,body)
+                break
+            except (imaplib.IMAP4.abort, socket.error, socket.sslerror):
+                allowedTimeout -= 1
+                log.Log("Error saving '%s', retrying in 30s " % remote_filename, 5)
+                time.sleep(30)
+                self._resetConnection()
+                
         log.Log("IMAP mail with '%s' subject stored"%remote_filename,5)
 
     def get(self, remote_filename, local_path):
-        self._conn.select(imap_mailbox)
-        (result,list) = self._conn.search(None, 'Subject', remote_filename)
-        if result != "OK":
-            raise Exception(list[0])
+        allowedTimeout = (globals.timeout + 29) / 30
+        if (allowedTimeout == 0):
+            # Allow a total timeout of 1 day
+            allowedTimeout = 2880
+        while allowedTimeout > 0:
+            try:
+                self._conn.select(imap_mailbox)
+                (result,list) = self._conn.search(None, 'Subject', remote_filename)
+                if result != "OK":
+                    raise Exception(list[0])
 
-        #check if there is any result
-        if list[0] == '':
-            raise Exception("no mail with subject %s")
+                #check if there is any result
+                if list[0] == '':
+                    raise Exception("no mail with subject %s")
 
-        (result,list) = self._conn.fetch(list[0],"(RFC822)")
+                (result,list) = self._conn.fetch(list[0],"(RFC822)")
 
-        if result != "OK":
-            raise Exception(list[0])
-        rawbody=list[0][1]
+                if result != "OK":
+                    raise Exception(list[0])
+                rawbody=list[0][1]
 
-        p = email.Parser.Parser()
+                p = email.Parser.Parser()
 
-        m = p.parsestr(rawbody)
+                m = p.parsestr(rawbody)
 
-        mp = m.get_payload(0)
+                mp = m.get_payload(0)
 
-        body = mp.get_payload(decode=True)
+                body = mp.get_payload(decode=True)
+                break
+            except (imaplib.IMAP4.abort, socket.error, socket.sslerror):
+                allowedTimeout -= 1
+                log.Log("Error loading '%s', retrying in 30s " % remote_filename, 5)
+                time.sleep(30)
+                self._resetConnection()
 
         tfile = local_path.open("wb")
         tfile.write(body)

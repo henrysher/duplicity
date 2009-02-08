@@ -2,6 +2,12 @@ New in v0.5.09 (2009/02/??)
 ---------------------------
 Split parsedurl test from backendtest and add test cases.
 
+bug #25509: Logic error in imapbackend.py [IMAP_SERVER]
+https://savannah.nongnu.org/bugs/?25512
+
+bug #25512: [Patch] Retry on Imap failure
+https://savannah.nongnu.org/bugs/?25509
+
 
 New in v0.5.08 (2009/02/02)
 ---------------------------
