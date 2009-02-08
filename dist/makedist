@@ -50,7 +50,7 @@ def VersionedCopy(source, dest):
     assert not fout.close()
 
 def MakeTar():
-    """Create rdiff-backup tar file"""
+    """Create duplicity tar file"""
     tardir = "duplicity-%s" % Version
     tarfile = "duplicity-%s.tar.gz" % Version
     try:

@@ -171,7 +171,7 @@ def gettzd(dstflag):
     # the caller to pass a flag to indicate that DST applies. This flag
     # is in the same format as the last member of the tuple returned by
     # time.localtime()
-    
+
     if dstflag > 0:
         offset = -1 * time.altzone/60
     else:
@@ -225,7 +225,7 @@ def genstrtotime(timestr, override_curtime = None):
 
 The acceptible time strings are intervals (like "3D64s"), w3-datetime
 strings, like "2002-04-26T04:22:01-07:00" (strings like
-"2002-04-26T04:22:01" are also acceptable - rdiff-backup will use the
+"2002-04-26T04:22:01" are also acceptable - duplicity will use the
 current time zone), or ordinary dates like 2/4/1997 or 2001-04-23
 (various combinations are acceptable, but the month always precedes
 the day).""" % timestr)
@@ -240,7 +240,7 @@ the day).""" % timestr)
     # doesn't apply and pass 0. Getting a reasonable default from
     # localtime() is a bad idea, since we transition to/from DST between
     # calls to this method on the same run
-    
+
     t = stringtotime(timestr) or stringtotime(timestr+gettzd(0))
     if t:
         return t
