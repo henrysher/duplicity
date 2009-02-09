@@ -52,7 +52,7 @@ class ImapBackend(duplicity.backend.Backend):
 
         #  Store url for reconnection on error 
         self._url = parsed_url
-        
+
         #  Set the username
         if ( parsed_url.get_username() is None ):
             username = raw_input('Enter account userid: ')
@@ -126,7 +126,7 @@ class ImapBackend(duplicity.backend.Backend):
         if not remote_filename:
             remote_filename = source_path.get_filename()
         f=source_path.open("rb")
-        allowedTimeout = (globals.timeout + 29) / 30
+        allowedTimeout = globals.timeout
         if (allowedTimeout == 0):
             # Allow a total timeout of 1 day
             allowedTimeout = 2880
@@ -143,12 +143,20 @@ class ImapBackend(duplicity.backend.Backend):
                 allowedTimeout -= 1
                 log.Log("Error saving '%s', retrying in 30s " % remote_filename, 5)
                 time.sleep(30)
-                self._resetConnection()
+                while allowedTimeout > 0:
+                    try:
+                        self._resetConnection()
+                        break
+                    except (imaplib.IMAP4.abort, socket.error, socket.sslerror):
+                        allowedTimeout -= 1
+                        log.Log("Error reconnecting, retrying in 30s ", 5)
+                        time.sleep(30)
+                    
                 
         log.Log("IMAP mail with '%s' subject stored"%remote_filename,5)
 
     def get(self, remote_filename, local_path):
-        allowedTimeout = (globals.timeout + 29) / 30
+        allowedTimeout = globals.timeout
         if (allowedTimeout == 0):
             # Allow a total timeout of 1 day
             allowedTimeout = 2880
@@ -181,7 +189,14 @@ class ImapBackend(duplicity.backend.Backend):
                 allowedTimeout -= 1
                 log.Log("Error loading '%s', retrying in 30s " % remote_filename, 5)
                 time.sleep(30)
-                self._resetConnection()
+                while allowedTimeout > 0:
+                    try:
+                        self._resetConnection()
+                        break
+                    except (imaplib.IMAP4.abort, socket.error, socket.sslerror):
+                        allowedTimeout -= 1
+                        log.Log("Error reconnecting, retrying in 30s ", 5)
+                        time.sleep(30)
 
         tfile = local_path.open("wb")
         tfile.write(body)
