@@ -8,6 +8,11 @@ https://savannah.nongnu.org/bugs/?25512
 bug #25512: [Patch] Retry on Imap failure
 https://savannah.nongnu.org/bugs/?25509
 
+FTP is now driven with pexpect rather than NcFTP utilities.
+This closes the following bugs:
+bug #24741: ncftpls -x '' causes failure on Yahoo FTP server
+bug #23516: duplicity/ncftpget not closing unlinked files, ...
+
 
 New in v0.5.08 (2009/02/02)
 ---------------------------
