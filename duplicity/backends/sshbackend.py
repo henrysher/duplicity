@@ -47,6 +47,7 @@ class SSHBackend(duplicity.backend.Backend):
     """This backend copies files using scp.  List not supported"""
     def __init__(self, parsed_url):
         """scpBackend initializer"""
+        global ssh_askpass
         duplicity.backend.Backend.__init__(self, parsed_url)
 
         # host string of form [user@]hostname
@@ -73,7 +74,11 @@ class SSHBackend(duplicity.backend.Backend):
         if ssh_askpass:
             self.password = self.get_password()
         else:
-            self.password = ''
+            if parsed_url.password:
+                self.password = parsed_url.password
+                ssh_askpass = True
+            else:
+                self.password = ''
 
     def run_scp_command(self, commandline):
         """ Run an scp command, responding to password prompts """
