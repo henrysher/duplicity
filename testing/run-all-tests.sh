@@ -24,16 +24,18 @@ SUDO=sudo
 cd `dirname $0`
 pwd
 
-cd ../duplicity
-./compilec.py
-cd -
-
 ${SUDO} tar xzf testfiles.tar.gz
 
 for v in 2.3 2.4 2.5 2.6; do
     if [ -e /usr/bin/python$v ]; then
         LOG=run-all-tests-$v.log
         rm -f $LOG
+
+        echo "========== Compiling librsync for python$v ==========" | tee -a $LOG
+        pushd ../duplicity
+        python$v ./compilec.py
+        popd
+
         echo "Running tests for python$v" | tee -a $LOG
         for t in `cat alltests`; do
             echo "========== Running $t ==========" | tee -a $LOG

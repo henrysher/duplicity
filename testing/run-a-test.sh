@@ -29,15 +29,16 @@ if [ ! -e $1 ]; then
     exit 1
 fi
 
-cd ../duplicity
-./compilec.py
-cd -
-
 ${SUDO} tar xzf testfiles.tar.gz
 
 for v in 2.3 2.4 2.5 2.6; do
     if [ -e /usr/bin/python$v ]; then
-        echo "Running tests for python$v"
+        echo "========== Compiling librsync for python$v =========="
+        pushd ../duplicity
+        python$v ./compilec.py
+        popd
+
+        echo "Running test $1 for python$v"
         echo "========== Running $1 =========="
         ${SUDO} python$v -u $1 -v 2>&1 | grep -v "unsafe ownership"
     fi

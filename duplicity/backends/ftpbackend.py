@@ -22,12 +22,15 @@
 import os
 import os.path
 import urllib
+import time
+from types import *
 
 import duplicity.backend
-import duplicity.globals as globals
-import duplicity.log     as log
+from duplicity import globals
+from duplicity import log
 from duplicity.errors import *
-from duplicity         import tempdir
+from duplicity import tempdir
+from duplicity import pexpect
 
 class FTPBackend(duplicity.backend.Backend):
     """Connect to remote store using File Transfer Protocol"""
@@ -49,14 +52,8 @@ class FTPBackend(duplicity.backend.Backend):
         # version is the second word of the first line
         version = fout.split('\n')[0].split()[1]
         if version < "3.1.9":
-            log.FatalError("NcFTP too old:  Duplicity requires NcFTP version 3.1.9,"
-                           "3.2.1 or later.  Version 3.2.0 will not work properly.",
+            log.FatalError("NcFTP too old:  Duplicity requires NcFTP version 3.1.9 or later",
                            log.ErrorCode.ftp_ncftp_too_old)
-        elif version == "3.2.0":
-            log.FatalError("NcFTP (ncftpput) version 3.2.0 is not usable by duplicity.\n"
-                           "see: http://www.ncftpd.com/ncftp/doc/changelog.html\n"
-                           "Please upgrade to 3.2.1 or later",
-                           log.ErrorCode.ftp_ncftp_v320)
         log.Log("NcFTP version is %s" % version, 4)
 
         self.parsed_url = parsed_url
@@ -70,57 +67,123 @@ class FTPBackend(duplicity.backend.Backend):
         self.password = self.get_password()
 
         if globals.ftp_connection == 'regular':
-            self.conn_opt = '-E'
+            self.passive = "no"
         else:
-            self.conn_opt = '-F'
+            self.passive = "yes"
 
-        self.tempfile, self.tempname = tempdir.default().mkstemp()
-        os.write(self.tempfile, "host %s\n" % self.parsed_url.hostname)
-        os.write(self.tempfile, "user %s\n" % self.parsed_url.username)
-        os.write(self.tempfile, "pass %s\n" % self.password)
-        os.close(self.tempfile)
-        self.flags = "-f %s %s -t %s -o useCLNT=0,useHELP_SITE=0 " % \
-            (self.tempname, self.conn_opt, globals.timeout)
+        self.flags = "-u %s" % parsed_url.username
+
         if parsed_url.port != None and parsed_url.port != 21:
             self.flags += " -P '%s'" % (parsed_url.port)
 
-    def put(self, source_path, remote_filename = None):
+        self.commandline = "ncftp %s %s" % (self.flags, parsed_url.hostname)
+
+    def run_ftp_command_list(self, commands):
+        """
+        Run an ftp command list, responding to password prompts
+        Each list is prefixed by a cd to the remote dir and
+        suffixed by a quit so each command list runs on a single
+        invocation of the ftp client.
+        """
+        remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/'))
+        prefix = ["set confirm-close no",
+                  "set type binary",
+                  "set passive %s" % self.passive,
+                  "mkdir %s" % remote_dir,
+                  "cd %s" % remote_dir,]
+
+        for n in range(1, globals.num_retries+1):
+            log.Log("Running '%s' (attempt #%d)" % (self.commandline, n), 5)
+            child = pexpect.spawn(self.commandline, timeout = None)
+            cmdloc = 0
+            commands = prefix + commands
+            state = "authorizing"
+            while 1:
+                if state == "authorizing":
+                    match = child.expect([pexpect.EOF,
+                                          pexpect.TIMEOUT,
+                                          "(?i)unknown host",
+                                          "(?i)password:"],
+                                          globals.timeout)
+                    log.Log("State = %s, Before = '%s'" % (state, child.before.strip()), 9)
+                    if match in (0, 1):
+                        log.Log("No response from host", 5)
+                        break
+                    if match == 2:
+                        log.Log("Unknown host %s" % self.parsed_url.hostname, 5)
+                        break
+                    elif match == 3:
+                        child.sendline(self.password)
+                        state = "running"
+                elif state == "running":
+                    match = child.expect([pexpect.EOF,
+                                          pexpect.TIMEOUT,
+                                          "(?i)ncftp.*>",
+                                          "(?i)cannot open local file .* for reading",
+                                          "(?i)cannot open local file .* for writing",
+                                          "(?i)get .*: server said: .*: no such file or directory",
+                                          "(?i)put .*: server said: .*: no such file or directory",
+                                          "(?i)Could not write to control stream: Broken pipe."],
+                                          globals.timeout)
+                    log.Log("State = %s, Before = '%s'" % (state, child.before.strip()), 9)
+                    if match == 0:
+                        break
+                    elif match == 1:
+                        log.Log("Timeout waiting for response", 5)
+                        break
+                    elif match == 2:
+                        if cmdloc < len(commands):
+                            command = commands[cmdloc]
+                            log.Log("ftp command: '%s'" % (command,), 5)
+                            child.sendline(command)
+                            cmdloc += 1
+                        else:
+                            command = 'quit'
+                            child.sendline(command)
+                            res = child.before
+                    elif match in (3, 4):
+                        log.Log("Cannot open local file", 5)
+                        break
+                    elif match in (4, 5):
+                        log.Log("Cannot open remote file", 5)
+                    elif match == 6:
+                        log.Log("Could not write to control stream", 5)
+                        break
+
+            child.close(force = True)
+            if child.exitstatus == 0:
+                return res
+            log.Log("Running '%s' failed (attempt #%d)" % (self.commandline, n), 1)
+            time.sleep(30)
+        log.Log("Giving up trying to execute '%s' after %d attempts" % (self.commandline, globals.num_retries), 1)
+        raise BackendException("Error running '%s'" % self.commandline)
+
+    def put(self, source_path, remote_filename):
         """Transfer source_path to remote_filename"""
-        remote_path = os.path.join(urllib.unquote(self.parsed_url.path.lstrip('/')), remote_filename).rstrip()
-        commandline = "ncftpput %s -m -V -C '%s' '%s'" % \
-            (self.flags, source_path.name, remote_path)
-        self.run_command_persist(commandline)
+        commands = ["put -z %s %s" % (source_path.name, remote_filename),]
+        res = self.run_ftp_command_list(commands)
 
     def get(self, remote_filename, local_path):
         """Get remote filename, saving it to local_path"""
-        remote_path = os.path.join(urllib.unquote(self.parsed_url.path), remote_filename).rstrip()
-        commandline = "ncftpget %s -V -C '%s' '%s' '%s'" % \
-            (self.flags, self.parsed_url.hostname, remote_path.lstrip('/'), local_path.name)
-        self.run_command_persist(commandline)
+        commands = ["get -z %s %s" % (remote_filename, local_path.name),]
+        res = self.run_ftp_command_list(commands)
         local_path.setdata()
 
     def list(self):
         """List files in directory"""
-        # try for a long listing to avoid connection reset
-        commandline = "ncftpls %s -l '%s'" % \
-            (self.flags, self.url_string)
-        l = self.popen_persist(commandline).split('\n')
-        l = filter(lambda x: x, l)
-        if not l:
-            return l
-        # if long list is not empty, get short list of names only
-        commandline = "ncftpls -x '' %s '%s'" % \
-            (self.flags, self.url_string)
-        l = self.popen_persist(commandline).split('\n')
-        l = [x.split()[-1] for x in l if x]
-        return l
+        commands = ["ls -1",]
+        res = self.run_ftp_command_list(commands)
+        lst = [x.strip() for x in res.split('\n') if x]
+        lst = [x for x in lst[1:] if x and x[0] != '\x1b']
+        return lst
 
     def delete(self, filename_list):
         """Delete files in filename_list"""
-        for filename in filename_list:
-            commandline = "ncftpls -x '' %s -X 'DELE %s' '%s'" % \
-                (self.flags, filename, self.url_string)
-            self.popen_persist(commandline)
+        assert type(filename_list) in (TupleType, ListType), type(filename_list)
+        commands = ["rm %s" % fn for fn in filename_list]
+        if commands:
+            res = self.run_ftp_command_list(commands)
+        else:
+            res = ""
 
 duplicity.backend.register_backend("ftp", FTPBackend)
-
