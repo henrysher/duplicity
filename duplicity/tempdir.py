@@ -130,8 +130,9 @@ class TemporaryDirectory:
         """
         Perform cleanup.
         """
-        self.cleanup()
-    
+        if _defaultInstance is not None:
+            self.cleanup()
+
     def mktemp(self):
         """
         Return a unique filename suitable for use for a temporary
