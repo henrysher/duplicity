@@ -23,6 +23,7 @@ import os
 import os.path
 import urllib
 import time
+import re
 from types import *
 
 import duplicity.backend
@@ -85,9 +86,15 @@ class FTPBackend(duplicity.backend.Backend):
         suffixed by a quit so each command list runs on a single
         invocation of the ftp client.
         """
+        def filter_ansi(str):
+            """Filter ANSI control strings used by NcFTP"""
+            str = re.sub("\x0d", '', str)
+            return re.sub("\x1b\[[01]m", '', str)
+
         remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/'))
-        prefix = ["set confirm-close no",
-                  "set type binary",
+        prefix = ["yes-i-know-about-NcFTPd yes",
+                  "set confirm-close no",
+                  "type binary",
                   "set passive %s" % self.passive,
                   "mkdir %s" % remote_dir,
                   "cd %s" % remote_dir,]
@@ -105,7 +112,7 @@ class FTPBackend(duplicity.backend.Backend):
                                           "(?i)unknown host",
                                           "(?i)password:"],
                                           globals.timeout)
-                    log.Log("State = %s, Before = '%s'" % (state, child.before.strip()), 9)
+                    log.Log("State = %s, Before = '%s'" % (state, filter_ansi(child.before)), 9)
                     if match in (0, 1):
                         log.Log("No response from host", 5)
                         break
@@ -123,9 +130,9 @@ class FTPBackend(duplicity.backend.Backend):
                                           "(?i)cannot open local file .* for writing",
                                           "(?i)get .*: server said: .*: no such file or directory",
                                           "(?i)put .*: server said: .*: no such file or directory",
-                                          "(?i)Could not write to control stream: Broken pipe."],
+                                          "(?i)could not write to control stream: Broken pipe."],
                                           globals.timeout)
-                    log.Log("State = %s, Before = '%s'" % (state, child.before.strip()), 9)
+                    log.Log("State = %s, Before = '%s'" % (state, filter_ansi(child.before)), 9)
                     if match == 0:
                         break
                     elif match == 1:
@@ -140,7 +147,7 @@ class FTPBackend(duplicity.backend.Backend):
                         else:
                             command = 'quit'
                             child.sendline(command)
-                            res = child.before
+                            res = filter_ansi(child.before)
                     elif match in (3, 4):
                         log.Log("Cannot open local file", 5)
                         break
