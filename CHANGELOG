@@ -1,6 +1,9 @@
-New in v0.5.09 (2009/02/??)
+New in v0.5.09 (2009/02/17)
 ---------------------------
-Split parsedurltest from backendtest and add test cases.
+FTP is now driven with pexpect rather than NcFTP utilities.
+This closes the following bugs (and solves other problems):
+bug #24741: ncftpls -x '' causes failure on Yahoo FTP server
+bug #23516: duplicity/ncftpget not closing unlinked files, ...
 
 bug #25509: Logic error in imapbackend.py [IMAP_SERVER]
 https://savannah.nongnu.org/bugs/?25509
@@ -10,11 +13,6 @@ https://savannah.nongnu.org/bugs/?25512
 
 bug #25530: commandline passwd not working
 https://savannah.nongnu.org/bugs/?25530
-
-FTP is now driven with pexpect rather than NcFTP utilities.
-This closes the following bugs:
-bug #24741: ncftpls -x '' causes failure on Yahoo FTP server
-bug #23516: duplicity/ncftpget not closing unlinked files, ...
 
 
 New in v0.5.08 (2009/02/02)
