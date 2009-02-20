@@ -25,6 +25,7 @@ sys.path.insert(0, "../")
 
 import duplicity.backend
 import duplicity.backends
+from duplicity.errors import *
 
 config.setup()
 
@@ -99,6 +100,13 @@ class ParsedUrlTest(unittest.TestCase):
         assert pu.username == "foo@bar.com", pu.username
         assert pu.password == None, pu.password
         assert pu.port == None, pu.port
+
+    def test_errors(self):
+        """Test various url errors"""
+        self.assertRaises(InvalidBackendURL, duplicity.backend.ParsedUrl,
+                          "ssh://foo@bar:pass@example.com:/home")
+        self.assertRaises(UnsupportedBackendScheme, duplicity.backend.get_backend,
+                          "foo://foo@bar:pass@example.com/home")
 
 
 if __name__ == "__main__":

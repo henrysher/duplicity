@@ -1,3 +1,9 @@
+New in v0.5.10 (2009/03/??)
+---------------------------
+Bug #229826 duplicity crashed with ValueError in port()
+https://bugs.launchpad.net/duplicity/+bug/229826
+
+
 New in v0.5.09 (2009/02/17)
 ---------------------------
 FTP is now driven with pexpect rather than NcFTP utilities.

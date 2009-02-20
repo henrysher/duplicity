@@ -118,13 +118,13 @@ def _ensure_urlparser_initialized():
             # Do not transform or otherwise parse the URL path component.
             urlparser.uses_query = []
             urlparser.uses_fragm = []
-        
+
             _urlparser_initialized = True
-    
+
     dup_threading.with_lock(_urlparser_initialized_lock,
                             init)
 
-def ParsedUrl(url_string):
+class ParsedUrl:
     """
     Parse the given URL as a duplicity backend URL.
 
@@ -133,27 +133,76 @@ def ParsedUrl(url_string):
 
     @raise InvalidBackendURL
     """
-    _ensure_urlparser_initialized()
+    def __init__(self, url_string):
+        self.url_string = url_string
+        _ensure_urlparser_initialized()
 
-    pu = urlparser.urlparse(url_string)
+        # While useful in some cases, the fact is that the urlparser makes
+        # all the properties in the URL deferred or lazy.  This means that
+        # problems don't get detected till called.  We'll try to trap those
+        # problems here, so they will be caught early.
 
-    # This happens for implicit local paths.
-    if not pu.scheme:
-        return pu
+        try:
+            pu = urlparser.urlparse(url_string)
+        except:
+            raise InvalidBackendURL("Syntax error in: %s" % url_string)
 
-    # Our backends do not handle implicit hosts.
-    if pu.scheme in urlparser.uses_netloc and not pu.hostname:
-        raise InvalidBackendURL("Missing hostname in a backend URL which "
-                                "requires an explicit hostname: %s"
-                                "" % (url_string))
+        try:
+            self.scheme = pu.scheme
+        except:
+            raise InvalidBackendURL("Syntax error (scheme) in: %s" % url_string)
 
-    # Our backends do not handle implicit relative paths.
-    if pu.scheme not in urlparser.uses_netloc and not pu.path.startswith('//'):
-        raise InvalidBackendURL("missing // - relative paths not supported "
-                                "for scheme %s: %s"
-                                "" % (pu.scheme, url_string))
+        try:
+            self.netloc = pu.netloc
+        except:
+            raise InvalidBackendURL("Syntax error (netloc) in: %s" % url_string)
 
-    return pu
+        try:
+            self.path = pu.path
+        except:
+            raise InvalidBackendURL("Syntax error (path) in: %s" % url_string)
+
+        try:
+            self.username = pu.username
+        except:
+            raise InvalidBackendURL("Syntax error (username) in: %s" % url_string)
+
+        try:
+            self.password = pu.password
+        except:
+            raise InvalidBackendURL("Syntax error (password) in: %s" % url_string)
+
+        try:
+            self.hostname = pu.hostname
+        except:
+            raise InvalidBackendURL("Syntax error (hostname) in: %s" % url_string)
+
+        if self.scheme not in ['rsync']:
+            try:
+                self.port = pu.port
+            except:
+                raise InvalidBackendURL("Syntax error (port) in: %s" % url_string)
+        else:
+            self.port = None
+
+        # This happens for implicit local paths.
+        if not pu.scheme:
+            return
+
+        # Our backends do not handle implicit hosts.
+        if pu.scheme in urlparser.uses_netloc and not pu.hostname:
+            raise InvalidBackendURL("Missing hostname in a backend URL which "
+                                    "requires an explicit hostname: %s"
+                                    "" % (url_string))
+
+        # Our backends do not handle implicit relative paths.
+        if pu.scheme not in urlparser.uses_netloc and not pu.path.startswith('//'):
+            raise InvalidBackendURL("missing // - relative paths not supported "
+                                    "for scheme %s: %s"
+                                    "" % (pu.scheme, url_string))
+
+    def geturl(self):
+        return self.url_string
 
 def strip_auth_from_url(parsed_url):
     """Return a URL from a urlparse object without a username or password."""
@@ -168,9 +217,9 @@ class Backend:
     """
     Represents a generic duplicity backend, capable of storing and
     retrieving files.
-    
+
     Concrete sub-classes are expected to implement:
-    
+
       - put
       - get
       - list
@@ -183,7 +232,7 @@ class Backend:
     def put(self, source_path, remote_filename = None):
         """
         Transfer source_path (Path object) to remote_filename (string)
-        
+
         If remote_filename is None, get the filename from the last
         path component of pathname.
         """
@@ -214,7 +263,7 @@ class Backend:
         """
         if self.parsed_url.password:
             return self.parsed_url.password
-        
+
         try:
             password = os.environ['FTP_PASSWORD']
         except KeyError:
@@ -313,7 +362,7 @@ class Backend:
     def get_fileobj_read(self, filename, parseresults = None):
         """
         Return fileobject opened for reading of filename on backend
-        
+
         The file will be downloaded first into a temp file.  When the
         returned fileobj is closed, the temp file will be deleted.
         """
@@ -331,11 +380,11 @@ class Backend:
         """
         Return fileobj opened for writing, which will cause the file
         to be written to the backend on close().
-        
+
         The file will be encoded as specified in parseresults (or as
         read from the filename), and stored in a temp file until it
         can be copied over and deleted.
-        
+
         If sizelist is not None, it should be set to an empty list.
         The number of bytes will be inserted into the list.
         """
