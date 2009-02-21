@@ -103,6 +103,7 @@ options = ["allow-source-mismatch",
            "ssh-askpass",
            "ssh-options=",
            "tempdir=",
+           "time=",
            "timeout=",
            "time-separator=",
            "verbosity=",
@@ -255,7 +256,7 @@ def parse_cmdline_options(arglist):
                 command_line_error("Cannot write to log-file %s." % arg)
         elif opt in ["-r", "--file-to-restore"]:
             globals.restore_dir = arg
-        elif opt in ["-t", "--restore-time"]:
+        elif opt in ["-t", "--time", "--restore-time"]:
             globals.restore_time = dup_time.genstrtotime(arg)
         elif opt == "--s3-european-buckets":
             globals.s3_european_buckets = True
@@ -388,7 +389,7 @@ Options:
     --short-filenames
     --tempdir <directory>
     --timeout <seconds>
-    -t<time>, --restore-time <time>
+    -t<time>, --time <time>, --restore-time <time>
     --time-separator <char>
     --version
     --volsize <number>

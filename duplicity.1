@@ -457,8 +457,8 @@ Use this existing directory for duplicity temporary files instead of
 the system default, which is usually the /tmp directory. This option
 supersedes any environment variable.
 .TP
-.BI -t time ", --restore-time " time
-When restoring, specify the time to restore to.
+.BI -t time ", --time " time ", --restore-time " time
+Specify the time from which to restore or list files.
 .TP
 .BI "--time-separator " char
 Use
@@ -536,7 +536,7 @@ http://www.w3.org/TR/NOTE-datetime.  Basically they look like
 "-07:00" section means the time zone is 7 hours behind UTC.
 .PP
 Secondly, the
-.BR -t ", and " --restore-time
+.BR -t ", " --time ", and " --restore-time
 options take a time string, which can be given in any of several
 formats:
 .IP 1.

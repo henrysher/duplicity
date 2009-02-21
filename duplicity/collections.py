@@ -393,8 +393,9 @@ class SignatureChain:
             self.start_time, self.end_time = pr.time, pr.time
             return 1
         
-    def get_fileobjs(self):
-        """Return ordered list of signature fileobjs opened for reading"""
+    def get_fileobjs(self, time = None):
+        """Return ordered list of signature fileobjs opened for reading,
+           optionally at a certain time"""
         assert self.fullsig
         if self.archive_dir: # local
             def filename_to_fileobj(filename):
@@ -403,7 +404,7 @@ class SignatureChain:
                 return sig_dp.filtered_open("rb")
         else:
             filename_to_fileobj = self.backend.get_fileobj_read
-        return map(filename_to_fileobj, [self.fullsig] + self.inclist)
+        return map(filename_to_fileobj, self.get_filenames(time))
 
     def delete(self):
         """Remove all files in signature set"""
@@ -419,13 +420,19 @@ class SignatureChain:
             inclist_copy.append(self.fullsig)
             self.backend.delete(inclist_copy)
 
-    def get_filenames(self):
-        """Return ordered list of filenames in set"""
+    def get_filenames(self, time = None):
+        """Return ordered list of filenames in set, up to a provided time"""
         if self.fullsig:
             l = [self.fullsig]
         else:
             l = []
-        l.extend(self.inclist)
+
+        inclist = self.inclist
+        if time:
+            inclist = filter(lambda n: file_naming.parse(n).end_time <= time,
+                             inclist)
+
+        l.extend(inclist)
         return l
 
 

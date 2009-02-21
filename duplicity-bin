@@ -280,7 +280,8 @@ def list_current(col_stats):
     if not sig_chain:
         log.FatalError(_("No signature data found, unable to list files."),
                        log.ErrorCode.no_sigs)
-    path_iter = diffdir.get_combined_path_iter(sig_chain.get_fileobjs())
+    time = globals.restore_time # if None, will use latest
+    path_iter = diffdir.get_combined_path_iter(sig_chain.get_fileobjs(time))
     for path in path_iter:
         if path.difftype != "deleted":
             user_info = "%s %s" % (dup_time.timetopretty(path.getmtime()),
