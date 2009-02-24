@@ -6,6 +6,9 @@ https://bugs.launchpad.net/duplicity/+bug/229826
 bug #25097: Allow listing files from any time, not just current time
 https://savannah.nongnu.org/bugs/?25097
 
+bug #25550: Error codes do not propagate from log to exit status
+https://savannah.nongnu.org/bugs/?25550
+
 
 New in v0.5.09 (2009/02/17)
 ---------------------------
