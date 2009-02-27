@@ -25,31 +25,44 @@ import re, time
 import lazy, dup_time, os
 
 
-class StatsException(Exception): pass
+class StatsException(Exception):
+    pass
 
 class StatsObj:
     """Contains various statistics, provide string conversion functions"""
     # used when quoting files in get_stats_line
     space_regex = re.compile(" ")
 
-    stat_file_attrs = ('SourceFiles', 'SourceFileSize',
-                       'NewFiles', 'NewFileSize',
+    stat_file_attrs = ('SourceFiles',
+                       'SourceFileSize',
+                       'NewFiles',
+                       'NewFileSize',
                        'DeletedFiles',
-                       'ChangedFiles', 'ChangedFileSize', 'ChangedDeltaSize',
-                       'DeltaEntries', 'RawDeltaSize')
-    stat_misc_attrs = ('Errors', 'TotalDestinationSizeChange')
-    stat_time_attrs = ('StartTime', 'EndTime', 'ElapsedTime')
+                       'ChangedFiles',
+                       'ChangedFileSize',
+                       'ChangedDeltaSize',
+                       'DeltaEntries',
+                       'RawDeltaSize')
+    stat_misc_attrs = ('Errors',
+                       'TotalDestinationSizeChange')
+    stat_time_attrs = ('StartTime',
+                       'EndTime',
+                       'ElapsedTime')
     stat_attrs = (('Filename',) + stat_time_attrs +
                   stat_misc_attrs + stat_file_attrs)
 
     # Below, the second value in each pair is true iff the value
     # indicates a number of bytes
-    stat_file_pairs = (('SourceFiles', None), ('SourceFileSize', 1),
-                       ('NewFiles', None), ('NewFileSize', 1),
-                       ('DeletedFiles', None),
-                       ('ChangedFiles', None), ('ChangedFileSize', 1),
-                       ('ChangedDeltaSize', 1),
-                       ('DeltaEntries', None), ('RawDeltaSize', 1))
+    stat_file_pairs = (('SourceFiles', False),
+                       ('SourceFileSize', True),
+                       ('NewFiles', False),
+                       ('NewFileSize', True),
+                       ('DeletedFiles', False),
+                       ('ChangedFiles', False),
+                       ('ChangedFileSize', True),
+                       ('ChangedDeltaSize', True),
+                       ('DeltaEntries', False),
+                       ('RawDeltaSize', True))
 
     # This is used in get_byte_summary_string below
     byte_abbrev_list = ((1024*1024*1024*1024, "TB"),
@@ -59,7 +72,8 @@ class StatsObj:
 
     def __init__(self):
         """Set attributes to None"""
-        for attr in self.stat_attrs: self.__dict__[attr] = None
+        for attr in self.stat_attrs:
+            self.__dict__[attr] = None
 
     def get_stat(self, attribute):
         """Get a statistic"""
@@ -86,7 +100,8 @@ class StatsObj:
         """Return one line abbreviated version of full stats string"""
         file_attrs = map(lambda attr: str(self.get_stat(attr)),
                          self.stat_file_attrs)
-        if not index: filename = "."
+        if not index:
+            filename = "."
         else:
             filename = apply(os.path.join, index)
             if use_repr:
@@ -97,16 +112,22 @@ class StatsObj:
 
     def set_stats_from_line(self, line):
         """Set statistics from given line"""
-        def error(): raise StatsException("Bad line '%s'" % line)
-        if line[-1] == "\n": line = line[:-1]
+        def error():
+            raise StatsException("Bad line '%s'" % line)
+        if line[-1] == "\n":
+            line = line[:-1]
         lineparts = line.split(" ")
-        if len(lineparts) < len(stat_file_attrs): error()
+        if len(lineparts) < len(stat_file_attrs):
+            error()
         for attr, val_string in zip(stat_file_attrs,
                                     lineparts[-len(stat_file_attrs):]):
-            try: val = long(val_string)
+            try:
+                val = long(val_string)
             except ValueError:
-                try: val = float(val_string)
-                except ValueError: error()
+                try:
+                    val = float(val_string)
+                except ValueError:
+                    error()
             self.set_stat(attr, val)
         return self
 
@@ -139,11 +160,13 @@ class StatsObj:
             """Return zero or one line of the string"""
             attr, in_bytes = stat_file_pair
             val = self.get_stat(attr)
-            if val is None: return ""
+            if val is None:
+                return ""
             if in_bytes:
                 return "%s %s (%s)\n" % (attr, val,
                                          self.get_byte_summary_string(val))
-            else: return "%s %s\n" % (attr, val)
+            else:
+                return "%s %s\n" % (attr, val)
 
         return "".join(map(fileline, self.stat_file_pairs))
 
@@ -154,7 +177,8 @@ class StatsObj:
         if tdsc is not None:
             misc_string += ("TotalDestinationSizeChange %s (%s)\n" %
                             (tdsc, self.get_byte_summary_string(tdsc)))
-        if self.Errors is not None: misc_string += "Errors %d\n" % self.Errors
+        if self.Errors is not None:
+            misc_string += "Errors %d\n" % self.Errors
         return misc_string
 
     def get_byte_summary_string(self, byte_count):
@@ -162,20 +186,26 @@ class StatsObj:
         if byte_count < 0:
             sign = "-"
             byte_count = -byte_count
-        else: sign = ""
+        else:
+            sign = ""
 
         for abbrev_bytes, abbrev_string in self.byte_abbrev_list:
             if byte_count >= abbrev_bytes:
                 # Now get 3 significant figures
                 abbrev_count = float(byte_count)/abbrev_bytes
-                if abbrev_count >= 100: precision = 0
-                elif abbrev_count >= 10: precision = 1
-                else: precision = 2
+                if abbrev_count >= 100:
+                    precision = 0
+                elif abbrev_count >= 10:
+                    precision = 1
+                else:
+                    precision = 2
                 return "%s%%.%df %s" % (sign, precision, abbrev_string) \
                        % (abbrev_count,)
         byte_count = round(byte_count)
-        if byte_count == 1: return sign + "1 byte"
-        else: return "%s%d bytes" % (sign, byte_count)
+        if byte_count == 1:
+            return sign + "1 byte"
+        else:
+            return "%s%d bytes" % (sign, byte_count)
 
     def get_stats_logstring(self, title):
         """Like get_stats_string, but add header and footer"""
@@ -185,21 +215,30 @@ class StatsObj:
 
     def set_stats_from_string(self, s):
         """Initialize attributes from string, return self for convenience"""
-        def error(line): raise StatsException("Bad line '%s'" % line)
+        def error(line):
+            raise StatsException("Bad line '%s'" % line)
 
         for line in s.split("\n"):
-            if not line: continue
+            if not line:
+                continue
             line_parts = line.split()
-            if len(line_parts) < 2: error(line)
+            if len(line_parts) < 2:
+                error(line)
             attr, value_string = line_parts[:2]
-            if not attr in self.stat_attrs: error(line)
+            if not attr in self.stat_attrs:
+                error(line)
             try:
-                try: val1 = long(value_string)
-                except ValueError: val1 = None
+                try:
+                    val1 = long(value_string)
+                except ValueError:
+                    val1 = None
                 val2 = float(value_string)
-                if val1 == val2: self.set_stat(attr, val1) # use integer val
-                else: self.set_stat(attr, val2) # use float
-            except ValueError: error(line)
+                if val1 == val2:
+                    self.set_stat(attr, val1) # use integer val
+                else:
+                    self.set_stat(attr, val2) # use float
+            except ValueError:
+                error(line)
         return self
 
     def write_stats_to_path(self, path):
@@ -219,20 +258,23 @@ class StatsObj:
         """Return true if s has same statistics as self"""
         assert isinstance(s, StatsObj)
         for attr in self.stat_file_attrs:
-            if self.get_stat(attr) != s.get_stat(attr): return None
+            if self.get_stat(attr) != s.get_stat(attr):
+                return None
         return 1
 
     def set_to_average(self, statobj_list):
         """Set self's attributes to average of those in statobj_list"""
-        for attr in self.stat_attrs: self.set_stat(attr, 0)
+        for attr in self.stat_attrs:
+            self.set_stat(attr, 0)
         for statobj in statobj_list:
             for attr in self.stat_attrs:
-                if statobj.get_stat(attr) is None: self.set_stat(attr, None)
+                if statobj.get_stat(attr) is None:
+                    self.set_stat(attr, None)
                 elif self.get_stat(attr) is not None:
                     self.set_stat(attr, statobj.get_stat(attr) +
                                   self.get_stat(attr))
 
-        # Don't compute average starting/stopping time      
+        # Don't compute average starting/stopping time
         self.StartTime = None
         self.EndTime = None
 
@@ -245,7 +287,8 @@ class StatsObj:
     def get_statsobj_copy(self):
         """Return new StatsObj object with same stats as self"""
         s = StatObj()
-        for attr in self.stat_attrs: s.set_stat(attr, self.get_stat(attr))
+        for attr in self.stat_attrs:
+            s.set_stat(attr, self.get_stat(attr))
         return s
 
 
@@ -254,7 +297,8 @@ class StatsDeltaProcess(StatsObj):
     def __init__(self):
         """StatsDeltaProcess initializer - zero file attributes"""
         StatsObj.__init__(self)
-        for attr in StatsObj.stat_file_attrs: self.__dict__[attr] = 0
+        for attr in StatsObj.stat_file_attrs:
+            self.__dict__[attr] = 0
         self.Errors = 0
         self.StartTime = time.time()
 
