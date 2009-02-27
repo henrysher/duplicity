@@ -31,15 +31,15 @@ from __future__ import generators
 import getpass, gzip, os, sys, time, types
 import traceback
 
+import gettext
+gettext.install('duplicity')
+
 import duplicity.backends
 import duplicity.errors
 
 from duplicity import collections, commandline, diffdir, dup_temp, \
      dup_time, file_naming, globals, gpg, log, manifest, patchdir, \
      path, robust, tempdir, asyncscheduler, util
-
-import gettext
-gettext.install('duplicity')
 
 # If exit_val is not None, exit with given value at end.
 exit_val = None
@@ -261,14 +261,18 @@ def print_statistics(stats, bytes_written):
 def incremental_backup(sig_chain):
     """Do incremental backup of directory to backend, using archive_dir"""
     dup_time.setprevtime(sig_chain.end_time)
+    if dup_time.curtime == dup_time.prevtime:
+        time.sleep(1)
+        dup_time.setcurtime()
     if globals.dry_run:
         tarblock_iter = diffdir.DirDelta(globals.select,
-                                  sig_chain.get_fileobjs())
+                                         sig_chain.get_fileobjs())
         bytes_written = dummy_backup(tarblock_iter)
     else:
         new_sig_outfp = get_sig_fileobj("new-sig")
         tarblock_iter = diffdir.DirDelta_WriteSig(globals.select,
-                                  sig_chain.get_fileobjs(), new_sig_outfp)
+                                                  sig_chain.get_fileobjs(),
+                                                  new_sig_outfp)
         bytes_written = write_multivol("inc", tarblock_iter, globals.backend)
         new_sig_outfp.close()
     print_statistics(diffdir.stats, bytes_written)
@@ -572,11 +576,13 @@ def main():
     if exit_val is not None:
         sys.exit(exit_val)
 
+
 def with_tempdir(fn):
     try:
         fn()
     finally:
         tempdir.default().cleanup()
+
 
 if __name__ == "__main__":
     try:
