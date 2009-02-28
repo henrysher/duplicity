@@ -26,7 +26,8 @@ import re, tarfile, librsync, log, diffdir, misc, selection, util
 from path import *
 from lazy import *
 
-class PatchDirException(Exception): pass
+class PatchDirException(Exception):
+    pass
 
 
 def Patch(base_path, difftar_fileobj):
@@ -47,8 +48,10 @@ def patch_diff_tarfile(base_path, diff_tarfile, restrict_index = ()):
     don't start with restrict_index.
 
     """
-    if base_path.exists(): path_iter = selection.Select(base_path).set_iter()
-    else: path_iter = empty_iter() # probably untarring full backup
+    if base_path.exists():
+        path_iter = selection.Select(base_path).set_iter()
+    else:
+        path_iter = empty_iter() # probably untarring full backup
 
     diff_path_iter = difftar2path_iter(diff_tarfile)
     if restrict_index:
@@ -71,7 +74,8 @@ def patch_diff_tarfile(base_path, diff_tarfile, restrict_index = ()):
     base_path.setdata()
 
 def empty_iter():
-    if 0: yield 1 # this never happens, but fools into generator treatment
+    if 0:
+        yield 1 # this never happens, but fools into generator treatment
 
 def filter_path_iter(path_iter, index):
     """Rewrite path elements of path_iter so they start with index
@@ -99,7 +103,8 @@ def difftar2path_iter(diff_tarfile):
 
     while 1:
         # This section relevant when a multivol diff is last in tar
-        if not tarinfo_list[0]: raise StopIteration
+        if not tarinfo_list[0]:
+            raise StopIteration
         if multivol_fileobj and not multivol_fileobj.at_end:
             multivol_fileobj.close() # aborting in middle of multivol
             continue
@@ -108,7 +113,8 @@ def difftar2path_iter(diff_tarfile):
         ropath = ROPath(index)
         ropath.init_from_tarinfo(tarinfo_list[0])
         ropath.difftype = difftype
-        if difftype == "deleted": ropath.type = None
+        if difftype == "deleted":
+            ropath.type = None
         elif ropath.isreg():
             if multivol:
                 multivol_fileobj = Multivol_Filelike(diff_tarfile, tar_iter,
@@ -116,7 +122,8 @@ def difftar2path_iter(diff_tarfile):
                 ropath.setfileobj(multivol_fileobj)
                 yield ropath
                 continue # Multivol_Filelike will reset tarinfo_list
-            else: ropath.setfileobj(diff_tarfile.extractfile(tarinfo_list[0]))
+            else:
+                ropath.setfileobj(diff_tarfile.extractfile(tarinfo_list[0]))
         yield ropath
         tarinfo_list[0] = tar_iter.next()
 
@@ -127,8 +134,10 @@ def get_index_from_tarinfo(tarinfo):
         if tarinfo.name.startswith(prefix):
             name = tarinfo.name[len(prefix):] # strip prefix
             if prefix.startswith("multivol"):
-                if prefix == "multivol_diff/": difftype = "diff"
-                else: difftype = "snapshot"
+                if prefix == "multivol_diff/":
+                    difftype = "diff"
+                else:
+                    difftype = "snapshot"
                 multivol = 1
                 name, num_subs = \
                       re.subn("^multivol_(diff|snapshot)/(.*)/[0-9]+$",
@@ -139,12 +148,15 @@ def get_index_from_tarinfo(tarinfo):
             else:
                 difftype = prefix[:-1] # strip trailing /
                 name = tarinfo.name[len(prefix):]
-                if name.endswith("/"): name = name[:-1] # strip trailing /'s
+                if name.endswith("/"):
+                    name = name[:-1] # strip trailing /'s
                 multivol = 0
             break
-    else: raise PatchDirException("Unrecognized diff entry %s" %
+    else:
+        raise PatchDirException("Unrecognized diff entry %s" %
                                  (tarinfo.name,))
-    if name == "." or name == "": index = ()
+    if name == "." or name == "":
+        index = ()
     else:
         index = tuple(name.split("/"))
         if '..' in index:
@@ -171,11 +183,13 @@ class Multivol_Filelike:
     def read(self, length = -1):
         """Read length bytes from file"""
         if length < 0:
-            while self.addtobuffer(): pass
+            while self.addtobuffer():
+                pass
             real_len = len(self.buffer)
         else:
             while len(self.buffer) < length:
-                if not self.addtobuffer(): break
+                if not self.addtobuffer():
+                    break
             real_len = min(len(self.buffer), length)
 
         result = self.buffer[:real_len]
@@ -184,10 +198,12 @@ class Multivol_Filelike:
 
     def addtobuffer(self):
         """Add next chunk to buffer"""
-        if self.at_end: return None
+        if self.at_end:
+            return None
         index, difftype, multivol = get_index_from_tarinfo(
             self.tarinfo_list[0])
-        if not multivol or index != self.index: # we've moved on
+        if not multivol or index != self.index:
+            # we've moved on
             # the following communicates next tarinfo to difftar2path_iter
             self.at_end = 1
             return None
@@ -196,7 +212,8 @@ class Multivol_Filelike:
         self.buffer += fp.read()
         fp.close()
 
-        try: self.tarinfo_list[0] = self.tar_iter.next()
+        try:
+            self.tarinfo_list[0] = self.tar_iter.next()
         except StopIteration:
             self.tarinfo_list[0] = None
             self.at_end = 1
@@ -208,7 +225,8 @@ class Multivol_Filelike:
         if not self.at_end:
             while 1:
                 self.buffer = ""
-                if not self.addtobuffer(): break
+                if not self.addtobuffer():
+                    break
         self.at_end = 1
         
 
@@ -247,17 +265,24 @@ class PathPatcher(ITRBranch):
 
     def fast_process(self, index, basis_path, diff_ropath):
         """For use when neither is a directory"""
-        if not diff_ropath: return # no change
+        if not diff_ropath:
+            return # no change
         elif not basis_path:
-            if diff_ropath.difftype == "deleted": pass # already deleted
-            else:  # just copy snapshot over
+            if diff_ropath.difftype == "deleted":
+                pass # already deleted
+            else:
+                # just copy snapshot over
                 diff_ropath.copy(self.base_path.new_index(index))
         elif diff_ropath.difftype == "deleted":
-            if basis_path.isdir(): basis_path.deltree()
-            else: basis_path.delete()
+            if basis_path.isdir():
+                basis_path.deltree()
+            else:
+                basis_path.delete()
         elif not basis_path.isreg():
-            if basis_path.isdir(): basis_path.deltree()
-            else: basis_path.delete()
+            if basis_path.isdir():
+                basis_path.deltree()
+            else:
+                basis_path.delete()
             diff_ropath.copy(basis_path)
         else:
             assert diff_ropath.difftype == "diff", diff_ropath.difftype
@@ -277,18 +302,22 @@ class TarFile_FromFileobjs:
         self.tarfile, self.tar_iter = None, None
         self.current_fp = None
 
-    def __iter__(self): return self
+    def __iter__(self):
+        return self
 
     def set_tarfile(self):
         """Set tarfile from next file object, or raise StopIteration"""
-        if self.current_fp: assert not self.current_fp.close()
+        if self.current_fp:
+            assert not self.current_fp.close()
         self.current_fp = self.fileobj_iter.next()
         self.tarfile = tarfile.TarFile("arbitrary", "r", self.current_fp)
         self.tar_iter = iter(self.tarfile)
 
     def next(self):
-        if not self.tarfile: self.set_tarfile()
-        try: return self.tar_iter.next()
+        if not self.tarfile:
+            self.set_tarfile()
+        try:
+            return self.tar_iter.next()
         except StopIteration:
             assert not self.tarfile.close()
             self.set_tarfile()
@@ -324,7 +353,8 @@ def collate_iters(iter_list):
         """Set the overflow and rorps list"""
         for i in range(iter_num):
             if not overflow[i] and elems[i] is None:
-                try: elems[i] = iter_list[i].next()
+                try:
+                    elems[i] = iter_list[i].next()
                 except StopIteration:
                     overflow[i] = 1
                     elems[i] = None
@@ -336,7 +366,8 @@ def collate_iters(iter_list):
     def yield_tuples(iter_num, overflow, elems):
         while 1:
             setrorps(overflow, elems)
-            if not None in overflow: break
+            if not None in overflow:
+                break
 
             index = getleastindex(elems)
             yieldval = []
@@ -344,7 +375,8 @@ def collate_iters(iter_list):
                 if elems[i] and elems[i].index == index:
                     yieldval.append(elems[i])
                     elems[i] = None
-                else: yieldval.append(None)
+                else:
+                    yieldval.append(None)
             yield tuple(yieldval)
     return yield_tuples(iter_num, overflow, elems)
 
@@ -354,30 +386,40 @@ class IndexedTuple:
         self.index = index
         self.data = tuple(sequence)
 
-    def __len__(self): return len(self.data)
+    def __len__(self):
+        return len(self.data)
 
     def __getitem__(self, key):
         """This only works for numerical keys (easier this way)"""
         return self.data[key]
 
-    def __lt__(self, other): return self.__cmp__(other) == -1
-    def __le__(self, other): return self.__cmp__(other) != 1
-    def __ne__(self, other): return not self.__eq__(other)
-    def __gt__(self, other): return self.__cmp__(other) == 1
-    def __ge__(self, other): return self.__cmp__(other) != -1
+    def __lt__(self, other):
+        return self.__cmp__(other) == -1
+    def __le__(self, other):
+        return self.__cmp__(other) != 1
+    def __ne__(self, other):
+        return not self.__eq__(other)
+    def __gt__(self, other):
+        return self.__cmp__(other) == 1
+    def __ge__(self, other):
+        return self.__cmp__(other) != -1
     
     def __cmp__(self, other):
         assert isinstance(other, IndexedTuple)
-        if self.index < other.index: return -1
-        elif self.index == other.index: return 0
-        else: return 1
+        if self.index < other.index:
+            return -1
+        elif self.index == other.index:
+            return 0
+        else:
+            return 1
 
     def __eq__(self, other):
         if isinstance(other, IndexedTuple):
             return self.index == other.index and self.data == other.data
         elif type(other) is types.TupleType:
             return self.data == other
-        else: return None
+        else:
+            return None
 
     def __str__(self):
         return  "(%s).%s" % (", ".join(map(str, self.data)), self.index)
@@ -395,9 +437,11 @@ def normalize_ps(patch_sequence):
     i = len(patch_sequence)-1
     while i >= 0:
         delta = patch_sequence[i]
-        if delta is not None: # skip blank entries
+        if delta is not None:
+            # skip blank entries
             result_list.insert(0, delta)
-            if delta.difftype != "diff": break
+            if delta.difftype != "diff":
+                break
         i -= 1
     return result_list
 
@@ -405,7 +449,8 @@ def patch_seq2ropath(patch_seq):
     """Apply the patches in patch_seq, return single ropath"""
     first = patch_seq[0]
     assert first.difftype != "diff", patch_seq
-    if not first.isreg(): # No need to bother with data if not regular file
+    if not first.isreg():
+        # No need to bother with data if not regular file
         assert len(patch_seq) == 1, len(patch_seq)
         return first.get_ropath()
 
@@ -413,7 +458,8 @@ def patch_seq2ropath(patch_seq):
 
     for delta_ropath in patch_seq[1:]:
         assert delta_ropath.difftype == "diff", delta_ropath.difftype
-        if not isinstance(current_file, file): # librsync needs true file
+        if not isinstance(current_file, file):
+            # librsync needs true file
             tempfp = os.tmpfile()
             misc.copyfileobj(current_file, tempfp)
             assert not current_file.close()
@@ -436,7 +482,8 @@ def integrate_patch_iters(iter_list):
     collated = collate_iters(iter_list)
     for patch_seq in collated:
         final_ropath = patch_seq2ropath(normalize_ps(patch_seq))
-        if final_ropath.exists(): # otherwise final patch was delete
+        if final_ropath.exists():
+            # otherwise final patch was delete
             yield final_ropath
 
 def tarfiles2rop_iter(tarfile_list, restrict_index = ()):
@@ -447,7 +494,8 @@ def tarfiles2rop_iter(tarfile_list, restrict_index = ()):
 
     """
     diff_iters = map(difftar2path_iter, tarfile_list)
-    if restrict_index: # Apply filter before integration
+    if restrict_index:
+        # Apply filter before integration
         diff_iters = map(lambda i: filter_path_iter(i, restrict_index),
                          diff_iters)
     return integrate_patch_iters(diff_iters)
@@ -482,17 +530,21 @@ class ROPath_IterWriter(ITRBranch):
 
     def start_process(self, index, ropath):
         """Write ropath.  Only handles the directory case"""
-        if not ropath.isdir(): # Base may not be a directory, but rest should
+        if not ropath.isdir():
+            # Base may not be a directory, but rest should
             assert ropath.index == (), ropath.index
             new_path = self.base_path.new_index(index)
             if ropath.exists():
-                if new_path.exists(): new_path.deltree()
+                if new_path.exists():
+                    new_path.deltree()
                 ropath.copy(new_path)
 
         self.dir_new_path = self.base_path.new_index(index)
-        if self.dir_new_path.exists() and not globals.force: # base may exist, but nothing else
+        if self.dir_new_path.exists() and not globals.force:
+            # base may exist, but nothing else
             assert index == (), index
-        else: self.dir_new_path.mkdir()
+        else:
+            self.dir_new_path.mkdir()
         self.dir_diff_ropath = ropath
 
     def end_process(self):
@@ -510,6 +562,7 @@ class ROPath_IterWriter(ITRBranch):
 
     def fast_process(self, index, ropath):
         """Write non-directory ropath to destination"""
-        if ropath.exists(): ropath.copy(self.base_path.new_index(index))
+        if ropath.exists():
+            ropath.copy(self.base_path.new_index(index))
 
 

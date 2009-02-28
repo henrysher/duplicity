@@ -59,7 +59,8 @@ class FileVolumeWriter:
             buf = self.buffer
             self.buffer = ""
             return buf
-        else: return self.infp.read(self.blocksize)
+        else:
+            return self.infp.read(self.blocksize)
 
     def write_volume(self, outfp):
         """Write self.volume_size bytes from self.infp to outfp
@@ -70,10 +71,12 @@ class FileVolumeWriter:
         """
         bytes_written, buf = 0, self.get_initial_buf()
         while len(buf) + bytes_written <= self.volume_size:
-            if not buf: # reached end of input
+            if not buf:
+                # reached end of input
                 outfp.close()
                 return None
-            if len(buf) + bytes_written > self.volume_size: break
+            if len(buf) + bytes_written > self.volume_size:
+                break
             outfp.write(buf)
             bytes_written += len(buf)
             buf = self.infp.read(self.blocksize)
@@ -87,23 +90,28 @@ class FileVolumeWriter:
 
     def next(self):
         """Write next file, return filename"""
-        if self.finished: raise StopIteration
+        if self.finished:
+            raise StopIteration
 
         filename = "%s.%d" % (self.prefix, self.current_index)
         log.Log(_("Starting to write %s") % filename, 5)
         outfp = open(filename, "wb")
 
-        if not self.write_volume(outfp): # end of input
+        if not self.write_volume(outfp):
+            # end of input
             self.finished = 1
-            if self.current_index == 1: # special case first index
+            if self.current_index == 1:
+                # special case first index
                 log.Log(_("One only volume required.\n"
                           "Renaming %s to %s") % (filename, self.prefix), 4)
                 os.rename(filename, self.prefix)
                 return self.prefix
-        else: self.current_index += 1
+        else:
+            self.current_index += 1
         return filename
 
-    def __iter__(self): return self
+    def __iter__(self):
+        return self
 
 
 class BufferedFile:
@@ -123,20 +131,23 @@ class BufferedFile:
         if length < 0:
             while 1:
                 buf = self.fileobj.read(self.blocksize)
-                if not buf: break
+                if not buf:
+                    break
                 self.buffer += buf
             real_length = len(self.buffer)
         else:
             while len(self.buffer) < length:
                 buf = self.fileobj.read(self.blocksize)
-                if not buf: break
+                if not buf:
+                    break
                 self.buffer += buf
             real_length = min(length, len(self.buffer))
         result = self.buffer[:real_length]
         self.buffer = self.buffer[real_length:]
         return result
 
-    def close(self): self.fileobj.close()
+    def close(self):
+        self.fileobj.close()
         
     
 def copyfileobj(infp, outfp, byte_count = -1):
@@ -151,13 +162,15 @@ def copyfileobj(infp, outfp, byte_count = -1):
     if byte_count < 0:
         while 1:
             buf = infp.read(blocksize)
-            if not buf: break
+            if not buf:
+                break
             bytes_written += len(buf)
             outfp.write(buf)
     else:
         while bytes_written + blocksize <= byte_count:
             buf = infp.read(blocksize)
-            if not buf: break
+            if not buf:
+                break
             bytes_written += len(buf)
             outfp.write(buf)
         buf = infp.read(byte_count - bytes_written)
@@ -168,7 +181,9 @@ def copyfileobj(infp, outfp, byte_count = -1):
 def copyfileobj_close(infp, outfp):
     """Copy infp to outfp, closing afterwards"""
     copyfileobj(infp, outfp)
-    if infp.close(): raise MiscError("Error closing input file")
-    if outfp.close(): raise MiscError("Error closing output file")
+    if infp.close():
+        raise MiscError("Error closing input file")
+    if outfp.close():
+        raise MiscError("Error closing output file")
 
 
