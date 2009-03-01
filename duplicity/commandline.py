@@ -112,6 +112,10 @@ options = ["allow-source-mismatch",
            "volsize=",
            ]
 
+def old_fn_deprecation(opt):
+    print >>sys.stderr,_("Warning: Option %s is pending deprecation "
+                         "and will be removed in a future release.") % opt
+
 def parse_cmdline_options(arglist):
     """Parse argument list"""
     global select_opts, select_files, full_backup
@@ -234,16 +238,6 @@ def parse_cmdline_options(arglist):
         elif opt == "--include-filelist-stdin":
             select_opts.append(("--include-filelist", "standard input"))
             select_files.append(sys.stdin)
-        elif opt == "--old-filenames":
-            globals.old_filenames = True
-        elif opt == "--no-encryption":
-            globals.encryption = 0
-        elif opt == "--no-print-statistics":
-            globals.print_statistics = 0
-        elif opt == "--null-separator":
-            globals.null_separator = 1
-        elif opt == "--num-retries":
-            globals.num_retries = int(arg)
         elif opt == "--log-fd":
             log_fd = int(arg)
             if log_fd < 1:
@@ -257,6 +251,17 @@ def parse_cmdline_options(arglist):
                 log.add_file(arg)
             except:
                 command_line_error("Cannot write to log-file %s." % arg)
+        elif opt == "--no-encryption":
+            globals.encryption = 0
+        elif opt == "--no-print-statistics":
+            globals.print_statistics = 0
+        elif opt == "--null-separator":
+            globals.null_separator = 1
+        elif opt == "--num-retries":
+            globals.num_retries = int(arg)
+        elif opt == "--old-filenames":
+            globals.old_filenames = True
+            old_fn_deprecation(opt)
         elif opt in ["-r", "--file-to-restore"]:
             globals.restore_dir = arg
         elif opt in ["-t", "--time", "--restore-time"]:
@@ -271,6 +276,7 @@ def parse_cmdline_options(arglist):
             sshbackend.sftp_command = arg
         elif opt == "--short-filenames":
             globals.short_filenames = 1
+            old_fn_deprecation(opt)
         elif opt == "--sign-key":
             set_sign_key(arg)
         elif opt == "--ssh-askpass":
@@ -286,6 +292,7 @@ def parse_cmdline_options(arglist):
                 command_line_error("Dash ('-') not valid for time-separator.")
             globals.time_separator = arg
             dup_time.curtimestr = dup_time.timetostring(dup_time.curtime)
+            old_fn_deprecation(opt)
         elif opt in ["-V", "--version"]:
             print "duplicity", str(globals.version)
             sys.exit(0)
