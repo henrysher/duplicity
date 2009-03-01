@@ -1,16 +1,37 @@
-New in v0.5.10 (2009/03/??)
+New in v0.5.10 (2009/03/01)
 ---------------------------
+The default filename format has changed from W3 style to a long
+numeric style, YYYYMMDDTHHMMSSZ, with no delimiters, thus is now
+compatible with Windows/Samba filesystems.  The time is UTC, not
+local, so there will be no timezone or daylight savings time issues.
+
+Duplicity still recognizes the old long filename format, and will
+continue incremental backup chains if found.  The old format is
+still available via the --old-filenames option (pending deprecation).
+
+Users of --short-filenames should stop using this option on their next
+full backup.  The new filenames will be compatible with your system.
+
+The following options are pending deprecation and will be removed in a
+future release:
+    --time-separator
+    --short-filenames
+    --old-filenames
+
 bug #19988: Incompatibility to Samba/SMB share
 https://savannah.nongnu.org/bugs/?19988
-
-Bug #229826: duplicity crashed with ValueError in port()
-https://bugs.launchpad.net/duplicity/+bug/229826
 
 bug #25097: Allow listing files from any time, not just current time
 https://savannah.nongnu.org/bugs/?25097
 
 bug #25550: Error codes do not propagate from log to exit status
 https://savannah.nongnu.org/bugs/?25550
+
+bug #25308: Signatures orphaned if from another time zone
+https://savannah.nongnu.org/bugs/?25308
+
+Bug #229826: duplicity crashed with ValueError in port()
+https://bugs.launchpad.net/duplicity/+bug/229826
 
 
 New in v0.5.09 (2009/02/17)

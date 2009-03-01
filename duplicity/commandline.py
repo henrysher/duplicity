@@ -113,8 +113,9 @@ options = ["allow-source-mismatch",
            ]
 
 def old_fn_deprecation(opt):
-    print >>sys.stderr,_("Warning: Option %s is pending deprecation "
-                         "and will be removed in a future release.") % opt
+    print >>sys.stderr, _("Warning: Option %s is pending deprecation "
+                          "and will be removed in a future release.\n"
+                          "Use of default filenames is strongly suggested.") % opt
 
 def parse_cmdline_options(arglist):
     """Parse argument list"""
