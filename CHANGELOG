@@ -9,8 +9,9 @@ Duplicity still recognizes the old long filename format, and will
 continue incremental backup chains if found.  The old format is
 still available via the --old-filenames option (pending deprecation).
 
-Users of --short-filenames should stop using this option on their next
-full backup.  The new filenames will be compatible with your system.
+Users of --short-filenames or --time-separator should stop using these
+options on their next full backup.  The new filenames are compatible
+with your system.
 
 The following options are pending deprecation and will be removed in a
 future release:
