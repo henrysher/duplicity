@@ -26,7 +26,7 @@ sys.path.insert(0, "../")
 import duplicity.backend
 import duplicity.backends
 
-from duplicity import path, collections
+from duplicity import path, collections, globals
 
 config.setup()
 
@@ -46,7 +46,7 @@ class CmdError(Exception):
     """Indicates an error running an external command"""
     pass
 
-class FinalTest(unittest.TestCase):
+class FinalTest:
     """Test backup/restore using duplicity binary"""
     def run_duplicity(self, arglist, options = [], current_time = None):
         """Run duplicity binary with given arguments and options"""
@@ -236,6 +236,11 @@ class FinalTest(unittest.TestCase):
         assert chain.start_time == 30000, chain.start_time
         assert chain.end_time == 40000, chain.end_time
 
+class FinalTest1(FinalTest, unittest.TestCase):
+    globals.old_filenames = False
+
+class FinalTest2(FinalTest, unittest.TestCase):
+    globals.old_filenames = True
 
 if __name__ == "__main__":
     unittest.main()

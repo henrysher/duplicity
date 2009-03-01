@@ -38,9 +38,26 @@ _genstr_date_regexp1 = re.compile("^(?P<year>[0-9]{4})[-/]"
 _genstr_date_regexp2 = re.compile("^(?P<month>[0-9]{1,2})[-/]"
                                   "(?P<day>[0-9]{1,2})[-/]"
                                   "(?P<year>[0-9]{4})$")
+_genstr_date_regexp3 = re.compile("^(?P<year>[0-9]{4})"
+                                  "(?P<month>[0-9]{2})"
+                                  "(?P<day>[0-9]{2})Z$")
 curtime = curtimestr = None
 prevtime = prevtimestr = None
-been_awake_since = None # stores last time sleep() was run
+
+bad_interval_string = _("""Bad interval string "%s"
+
+Intervals are specified like 2Y (2 years) or 2h30m (2.5 hours).  The
+allowed special characters are s, m, h, D, W, M, and Y.  See the man
+page for more information.""")
+
+bad_time_string = _("""Bad time string "%s"
+
+The acceptible time strings are intervals (like "3D64s"), w3-datetime
+strings, like "2002-04-26T04:22:01-07:00" (strings like
+"2002-04-26T04:22:01" are also acceptable - duplicity will use the
+current time zone), or ordinary dates like 2/4/1997 or 2001-04-23
+(various combinations are acceptable, but the month always precedes
+the day).""")
 
 def setcurtime(time_in_secs = None):
     """Sets the current time in curtime and curtimestr"""
@@ -56,28 +73,40 @@ def setprevtime(time_in_secs):
     prevtime, prevtimestr = time_in_secs, timetostring(time_in_secs)
 
 def timetostring(timeinseconds):
-    """Return w3 datetime compliant listing of timeinseconds"""
+    """Return w3 or duplicity datetime compliant listing of timeinseconds"""
 
-    # We need to know if DST applies to append the correct offset. So
-    #    1. Save the tuple returned by localtime.
-    #    2. Pass the DST flag into gettzd
-    lcltime = time.localtime(timeinseconds)
-    return time.strftime("%Y-%m-%dT%H" + globals.time_separator +
-                         "%M" + globals.time_separator + "%S",
-                         lcltime) + gettzd(lcltime[-1])
+    if globals.old_filenames:
+        # We need to know if DST applies to append the correct offset. So
+        #    1. Save the tuple returned by localtime.
+        #    2. Pass the DST flag into gettzd
+        lcltime = time.localtime(timeinseconds)
+        return time.strftime("%Y-%m-%dT%H" + globals.time_separator +
+                             "%M" + globals.time_separator + "%S",
+                             lcltime) + gettzd(lcltime[-1])
+    else:
+        # DST never applies to UTC
+        lcltime = time.gmtime(timeinseconds)
+        return time.strftime("%Y%m%dT%H%M%SZ", lcltime)
 
 def stringtotime(timestring):
-    """Return time in seconds from w3 timestring
+    """Return time in seconds from w3 or duplicity timestring
 
     If there is an error parsing the string, or it doesn't look
-    like a w3 datetime string, return None.
-
+    like a valid datetime string, return None.
     """
     try:
         date, daytime = timestring[:19].split("T")
-        year, month, day = map(int, date.split("-"))
-        hour, minute, second = map(int,
-                                   daytime.split(globals.time_separator))
+        if len(timestring) == 16:
+            # new format for filename time
+            year, month, day = map(int,
+                                   [date[0:4], date[4:6], date[6:8]])
+            hour, minute, second = map(int,
+                                       [daytime[0:2], daytime[2:4], daytime[4:6]])
+        else:
+            # old format for filename time
+            year, month, day = map(int, date.split("-"))
+            hour, minute, second = map(int,
+                                       daytime.split(globals.time_separator))
         assert 1900 < year < 2100, year
         assert 1 <= month <= 12
         assert 1 <= day <= 31
@@ -99,9 +128,12 @@ def stringtotime(timestring):
         # This gives the correct number of seconds from the epoch
         # even when we're not in the same timezone that wrote the
         # string
-        return long (utc_in_secs + tzdtoseconds(timestring[19:]))
-    except (TypeError, ValueError, AssertionError): return None
-
+        if len(timestring) == 16:
+            return long(utc_in_secs)
+        else:
+            return long(utc_in_secs + tzdtoseconds(timestring[19:]))
+    except (TypeError, ValueError, AssertionError):
+        return None
 
 def timetopretty(timeinseconds):
     """Return pretty version of time"""
@@ -138,12 +170,8 @@ def inttopretty(seconds):
 def intstringtoseconds(interval_string):
     """Convert a string expressing an interval (e.g. "4D2s") to seconds"""
     def error():
-        raise TimeException("""Bad interval string "%s"
+        raise TimeException(bad_interval_string % interval_string)
 
-Intervals are specified like 2Y (2 years) or 2h30m (2.5 hours).  The
-allowed special characters are s, m, h, D, W, M, and Y.  See the man
-page for more information.
-""" % interval_string)
     if len(interval_string) < 2:
         error()
 
@@ -210,8 +238,8 @@ def cmp(time1, time2):
         return -1
     elif time1 == time2:
         return 0
-    else: return 1
-
+    else:
+        return 1
 
 def genstrtotime(timestr, override_curtime = None):
     """Convert a generic time string to a time in seconds"""
@@ -221,14 +249,7 @@ def genstrtotime(timestr, override_curtime = None):
         return override_curtime
 
     def error():
-        raise TimeException("""Bad time string "%s"
-
-The acceptible time strings are intervals (like "3D64s"), w3-datetime
-strings, like "2002-04-26T04:22:01-07:00" (strings like
-"2002-04-26T04:22:01" are also acceptable - duplicity will use the
-current time zone), or ordinary dates like 2/4/1997 or 2001-04-23
-(various combinations are acceptable, but the month always precedes
-the day).""" % timestr)
+        raise TimeException(bad_time_string % timestr)
 
     # Test for straight integer
     if _integer_regexp.search(timestr):
@@ -252,7 +273,8 @@ the day).""" % timestr)
 
     # Now check for dates like 2001/3/23
     match = _genstr_date_regexp1.search(timestr) or \
-            _genstr_date_regexp2.search(timestr)
+            _genstr_date_regexp2.search(timestr) or \
+            _genstr_date_regexp3.search(timestr)
     if not match:
         error()
     timestr = "%s-%02d-%02dT00:00:00%s" % (match.group('year'),

@@ -183,7 +183,7 @@ class BackupSet:
             return [self.remote_manifest_name] + volume_filenames
         else:
             return volume_filenames
-        
+
     def get_time(self):
         """Return time if full backup, or end_time if incremental"""
         if self.time:
@@ -392,7 +392,7 @@ class SignatureChain:
             self.check_times([pr.time, pr.time])
             self.start_time, self.end_time = pr.time, pr.time
             return 1
-        
+
     def get_fileobjs(self, time = None):
         """Return ordered list of signature fileobjs opened for reading,
            optionally at a certain time"""
@@ -411,7 +411,7 @@ class SignatureChain:
         # Try to delete in opposite order, so something useful even if aborted
         if self.archive_dir:
             for i in range(len(self.inclist)-1, -1, -1):
-                self.archive_dir.append(self.inclist[i]).delete()       
+                self.archive_dir.append(self.inclist[i]).delete()
             self.archive_dir.append(self.fullsig).delete()
         else:
             assert self.backend
@@ -463,7 +463,7 @@ class CollectionsStatus:
         """Return summary of the collection, suitable for printing to log"""
         l = ["backend %s" % (self.backend.__class__.__name__,),
              "archive-dir %s" % (self.archive_dir,)]
-        
+
         for i in range(len(self.other_backup_chains)):
             l.append("chain-no-sig %d" % (i,))
             l += self.other_backup_chains[i].to_log_info(' ')
@@ -532,7 +532,7 @@ class CollectionsStatus:
         backend_filename_list = self.backend.list()
         log.Debug(gettext.ngettext("%d file exists on backend",
                                    "%d files exist on backend",
-                                   len(backend_filename_list)) % 
+                                   len(backend_filename_list)) %
                   len(backend_filename_list))
 
         (backup_chains, self.orphaned_backup_sets,
@@ -540,7 +540,7 @@ class CollectionsStatus:
                  self.get_backup_chains(backend_filename_list)
         backup_chains = self.get_sorted_chains(backup_chains)
         self.all_backup_chains = backup_chains
-        
+
         assert len(backup_chains) == len(self.all_backup_chains), "get_sorted_chains() did something more than re-ordering"
 
         if self.archive_dir:
@@ -589,10 +589,10 @@ class CollectionsStatus:
                 # Found a matching pair:
                 if self.matched_chain_pair == None:
                     self.matched_chain_pair = (sig_chains[i], latest_backup_chain)
-                
+
                 del sig_chains[i]
                 break
-                            
+
         if self.matched_chain_pair:
             # if we have local and remote sig chains, remove both from the other_sig_chains list
             matched_sig_chain = self.matched_chain_pair[0]
@@ -612,7 +612,7 @@ class CollectionsStatus:
             log.Warn(gettext.ngettext("Warning, found the following orphaned "
                                       "signature file:",
                                       "Warning, found the following orphaned "
-                                      "signature file:",
+                                      "signature files:",
                                       len(self.orphaned_sig_names))
                      + "\n" + "\n".join(self.orphaned_sig_names),
                      log.WarningCode.orphaned_sig)
@@ -623,7 +623,8 @@ class CollectionsStatus:
                                           "Warning, found unnecessary "
                                           "signature chains",
                                           len(self.other_sig_chains)),
-                         log.WarningCode.unnecessary_sig)
+                     + "\n" + "\n".join(self.other_sig_names),
+                     log.WarningCode.unnecessary_sig)
             else:
                 log.Warn(_("Warning, found signatures but no corresponding "
                            "backup files"), log.WarningCode.unmatched_sig)
@@ -638,7 +639,7 @@ class CollectionsStatus:
                                       "backup files:",
                                       len(self.orphaned_backup_sets))
                      + "\n" + "\n".join(map(lambda x: str(x),
-                                     self.orphaned_backup_sets)),
+                                            self.orphaned_backup_sets)),
                      log.WarningCode.orphaned_backup)
 
     def get_backup_chains(self, filename_list):
@@ -739,9 +740,13 @@ class CollectionsStatus:
                 elif pr.type == "new-sig":
                     new_sig_filenames.append(filename)
 
+        # compare by file time
+        def by_start_time(a, b):
+            return int(file_naming.parse(a).start_time) - int(file_naming.parse(b).start_time)
+
         # Try adding new signatures to existing chains
         orphaned_filenames = []
-        new_sig_filenames.sort()
+        new_sig_filenames.sort(by_start_time)
         for sig_filename in new_sig_filenames:
             for chain in chains:
                 if chain.add_filename(sig_filename):
@@ -759,7 +764,7 @@ class CollectionsStatus:
                 endtime_chain_dict[chain.end_time].append(chain)
             else:
                 endtime_chain_dict[chain.end_time] = [chain]
-        
+
         # Use dictionary to build final sorted list
         sorted_end_times = endtime_chain_dict.keys()
         sorted_end_times.sort()
@@ -838,7 +843,7 @@ class CollectionsStatus:
         """Return a list of chains older than time t"""
         assert self.values_set
         return filter(lambda c: c.end_time < t, self.all_backup_chains)
-    
+
     def get_last_full_backup_time(self):
         """Return the time of the last full backup, or 0 if
         there is none."""

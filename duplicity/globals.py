@@ -119,7 +119,7 @@ ftp_connection = 'passive'
 
 # Protocol for webdav
 webdav_proto = 'http'
-  
+
 # Asynchronous put/get concurrency limit
 # (default of 0 disables asynchronicity).
 async_concurrency = 0
@@ -137,3 +137,6 @@ s3_european_buckets = False
 # logging into an imap server. If false just the user name
 # part of the email address is used.
 imap_full_address = False
+
+# Whether the old filename format is in effect.
+old_filenames = False

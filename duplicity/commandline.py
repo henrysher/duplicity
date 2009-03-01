@@ -80,7 +80,7 @@ options = ["allow-source-mismatch",
            "gpg-options=",
            "help",
            "imap-full-address",
-           "imap-mailbox=",           
+           "imap-mailbox=",
            "include=",
            "include-filelist=",
            "include-filelist-stdin",
@@ -92,6 +92,7 @@ options = ["allow-source-mismatch",
            "no-print-statistics",
            "null-separator",
            "num-retries=",
+           "old-filenames",
            "restore-dir=",
            "restore-time=",
            "s3-european-buckets",
@@ -127,7 +128,7 @@ def parse_cmdline_options(arglist):
     # expect no cmd and two positional args
     cmd = ""
     num_expect = 2
-    
+
     # process first arg as command
     if arglist and arglist[0][0] != '-':
         cmd = arglist.pop(0)
@@ -141,7 +142,7 @@ def parse_cmdline_options(arglist):
         # no matches, assume no cmd
         elif not possible:
             arglist.insert(0, cmd)
-        
+
     if cmd == "cleanup":
         cleanup = True
         num_expect = 1
@@ -170,10 +171,10 @@ def parse_cmdline_options(arglist):
         except:
             command_line_error("Missing count for remove-all-but-n-full")
         globals.keep_chains = int(arg)
-        
+
         if not globals.keep_chains > 0:
             command_line_error("remove-all-but-n-full count must be > 0")
-        
+
         num_expect = 1
     elif cmd == "verify":
         verify = True
@@ -206,7 +207,7 @@ def parse_cmdline_options(arglist):
         elif opt in ["--exclude-device-files",
                      "--exclude-other-filesystems"]:
             select_opts.append((opt, None))
-        elif opt in ["--exclude-filelist", 
+        elif opt in ["--exclude-filelist",
                      "--include-filelist",
                      "--exclude-globbing-filelist",
                      "--include-globbing-filelist"]:
@@ -224,7 +225,7 @@ def parse_cmdline_options(arglist):
         elif opt == "--ftp-regular":
             globals.ftp_connection = 'regular'
         elif opt == "--imap-mailbox":
-            imapbackend.imap_mailbox = arg.strip()            
+            imapbackend.imap_mailbox = arg.strip()
         elif opt == "--gpg-options":
             gpg.gpg_options = (gpg.gpg_options + ' ' + arg).strip()
         elif opt in ["-h", "--help"]:
@@ -233,6 +234,8 @@ def parse_cmdline_options(arglist):
         elif opt == "--include-filelist-stdin":
             select_opts.append(("--include-filelist", "standard input"))
             select_files.append(sys.stdin)
+        elif opt == "--old-filenames":
+            globals.old_filenames = True
         elif opt == "--no-encryption":
             globals.encryption = 0
         elif opt == "--no-print-statistics":
@@ -298,6 +301,10 @@ def parse_cmdline_options(arglist):
         else:
             command_line_error("Unknown option %s" % opt)
 
+    # if we change the time format then we need a new curtime
+    if globals.old_filenames:
+        dup_time.curtimestr = dup_time.timetostring(dup_time.curtime)
+
     if len(args) != num_expect:
         command_line_error("Expected %d args, got %d" % (num_expect, len(args)))
 
@@ -329,7 +336,7 @@ Backends and their URL formats:
     ftp://user[:password]@other.host[:port]/some_dir
     hsi://user[:password]@other.host[:port]/some_dir
     file:///some_dir
-    imap://user[:password]@other.host[:port]/some_dir 
+    imap://user[:password]@other.host[:port]/some_dir
     rsync://user[:password]@other.host[:port]::/module/some_dir
     rsync://user[:password]@other.host[:port]/relative_path
     rsync://user[:password]@other.host[:port]//absolute_path
@@ -379,6 +386,7 @@ Options:
     --no-print-statistics
     --null-separator
     --num-retries <number>
+    --old-filenames
     --s3-european-buckets
     --s3-use-new-style
     --scp-command <command>
@@ -469,7 +477,7 @@ def process_local_dir(action, local_pathname):
             log.FatalError(_("Backup source directory %s does not exist.")
                            % (local_path.name,),
                            log.ErrorCode.backup_dir_doesnt_exist)
-    
+
     globals.local_path = local_path
 
 def check_consistency(action):

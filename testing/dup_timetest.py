@@ -26,7 +26,7 @@ from duplicity import globals, dup_time
 
 config.setup()
 
-class TimeTest(unittest.TestCase):
+class TimeTest:
     def testConversion(self):
         """test timetostring and stringtotime"""
         dup_time.setcurtime()
@@ -53,8 +53,10 @@ class TimeTest(unittest.TestCase):
         assert cmp("2001-09-01T21:49:04Z", "2001-08-01T21:49:04Z") == 1
         assert cmp("2001-09-01T04:49:04+03:23", "2001-09-01T21:49:04Z") == -1
         assert cmp("2001-09-01T12:00:00Z", "2001-09-01T04:00:00-08:00") == 0
-        assert cmp("2001-09-01T12:00:00-08:00",
-                   "2001-09-01T12:00:00-07:00") == 1
+        assert cmp("2001-09-01T12:00:00-08:00", "2001-09-01T12:00:00-07:00") == 1
+        assert cmp("2001-09-01T11:00:00Z", "20010901T120000Z") == -1
+        assert cmp("2001-09-01T12:00:00Z", "20010901T120000Z") == 0
+        assert cmp("2001-09-01T13:00:00Z", "20010901T120000Z") == 1
 
     def testCmp_separator(self):
         """Like testCmp but with new separator"""
@@ -66,8 +68,7 @@ class TimeTest(unittest.TestCase):
         assert cmp("2001-09-01T21_49_04Z", "2001-08-01T21_49_04Z") == 1
         assert cmp("2001-09-01T04_49_04+03_23", "2001-09-01T21_49_04Z") == -1
         assert cmp("2001-09-01T12_00_00Z", "2001-09-01T04_00_00-08_00") == 0
-        assert cmp("2001-09-01T12_00_00-08_00",
-                   "2001-09-01T12_00_00-07_00") == 1
+        assert cmp("2001-09-01T12_00_00-08_00", "2001-09-01T12_00_00-07_00") == 1
         globals.time_separator = ":"
 
     def testStringtotime(self):
@@ -132,30 +133,11 @@ class TimeTest(unittest.TestCase):
         self.assertRaises(dup_time.TimeException, g2t, "")
         self.assertRaises(dup_time.TimeException, g2t, "3q")
 
-##  def testSleeping(self):
-##      """Test sleep and sleep ratio"""
-##      sleep_ratio = 0.5
-##      time1 = time.time()
-##      dup_time.sleep(0) # set initial time
-##      time.sleep(1)
-##      time2 = time.time()
-##      dup_time.sleep(sleep_ratio)
-##      time3 = time.time()
-##      time.sleep(0.5)
-##      time4 = time.time()
-##      dup_time.sleep(sleep_ratio)
-##      time5 = time.time()
+class TimeTest1(TimeTest, unittest.TestCase):
+    globals.old_filenames = False
 
-##      sleep_ratio = 0.25
-##      time.sleep(0.75)
-##      time6 = time.time()
-##      dup_time.sleep(sleep_ratio)
-##      time7 = time.time()
-
-##      assert 0.9 < time3 - time2 < 1.1, time3 - time2
-##      assert 0.4 < time5 - time4 < 0.6, time5 - time4
-##      assert 0.2 < time7 - time6 < 0.3, time7 - time6
-
+class TimeTest2(TimeTest, unittest.TestCase):
+    globals.old_filenames = True
 
 if __name__ == '__main__':
     unittest.main()

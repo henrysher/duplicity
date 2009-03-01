@@ -4,5 +4,6 @@
 *.sig
 *.spec
 patch
-run-all-tests.log
 Releases
+duplicity.py
+rdiffdir.py
