@@ -47,22 +47,26 @@ def parse_cmdline_options(arglist):
     global gzip_compress, select_opts, select_files, sig_fileobj
     def sel_fl(filename):
         """Helper function for including/excluding filelists below"""
-        try: return open(filename, "r")
-        except IOError: log.FatalError("Error opening file %s" % filename)
+        try:
+            return open(filename, "r")
+        except IOError:
+            log.FatalError("Error opening file %s" % filename)
 
-    try: optlist, args = getopt.getopt(arglist, "v:Vz",
-         ["gzip-compress", "exclude=", "exclude-device-files",
-          "exclude-filelist=", "exclude-filelist-stdin",
-          "exclude-globbing-filelist", "exclude-other-filesystems",
-          "exclude-regexp=", "include=", "include-filelist=",
-          "include-filelist-stdin", "include-globbing-filelist",
-          "include-regexp=", "null-separator", "verbosity=",
-          "write-sig-to="])
+    try:
+        optlist, args = getopt.getopt(arglist, "v:Vz",
+                                      ["gzip-compress", "exclude=", "exclude-device-files",
+                                       "exclude-filelist=", "exclude-filelist-stdin",
+                                       "exclude-globbing-filelist", "exclude-other-filesystems",
+                                       "exclude-regexp=", "include=", "include-filelist=",
+                                       "include-filelist-stdin", "include-globbing-filelist",
+                                       "include-regexp=", "null-separator", "verbosity=",
+                                       "write-sig-to="])
     except getopt.error, e:
         command_line_error("Bad command line option: %s" % (str(e),))
 
     for opt, arg in optlist:
-        if opt == "--gzip_compress" or opt == "-z": gzip_compress = 1
+        if opt == "--gzip_compress" or opt == "-z":
+            gzip_compress = 1
         elif (opt == "--exclude" or opt == "--exclude-regexp" or
               opt == "--include" or opt == "--include-regexp"):
             select_opts.append((opt, arg))
@@ -80,14 +84,17 @@ def parse_cmdline_options(arglist):
         elif opt == "--include-filelist-stdin":
             select_opts.append(("--include-filelist", "standard input"))
             select_files.append(sys.stdin)
-        elif opt == "--null-separator": globals.null_separator = 1
+        elif opt == "--null-separator":
+            globals.null_separator = 1
         elif opt == "-V":
             print "rdiffdir", str(globals.version)
             sys.exit(0)
-        elif opt == "-v" or opt == "--verbosity": log.setverbosity(int(arg))
+        elif opt == "-v" or opt == "--verbosity":
+            log.setverbosity(int(arg))
         elif opt == "--write-sig-to" or opt == "--write-signature-to":
             sig_fileobj = get_fileobj(arg, "wb")
-        else: command_line_error("Unknown option %s" % opt)
+        else:
+            command_line_error("Unknown option %s" % opt)
 
     return args
 
@@ -99,25 +106,34 @@ def command_line_error(message):
 
 def check_does_not_exist(filename):
     """Exit with error message if filename already exists"""
-    try: os.lstat(filename)
-    except OSError: pass
-    else: log.FatalError("File %s already exists, will not "
-                         "overwrite." % filename)
+    try:
+        os.lstat(filename)
+    except OSError:
+        pass
+    else:
+        log.FatalError("File %s already exists, will not "
+                       "overwrite." % filename)
 
 def get_action(args):
     """Figure out the main action from the arguments"""
     def require_args(num):
-        if len(args)-1 < num: command_line_error("Too few arguments")
-        elif len(args)-1 > num: command_line_error("Too many arguments")
+        if len(args)-1 < num:
+            command_line_error("Too few arguments")
+        elif len(args)-1 > num:
+            command_line_error("Too many arguments")
 
-    if not args: command_line_error("No arguments found")
+    if not args:
+        command_line_error("No arguments found")
     command = args[0]
     if command == "sig" or command == "signature":
         require_args(2)
         command = "sig"
-    elif command == "tar": require_args(2)
-    elif command == "delta": require_args(3)
-    elif command == "patch": require_args(2)
+    elif command == "tar":
+        require_args(2)
+    elif command == "delta":
+        require_args(3)
+    elif command == "patch":
+        require_args(2)
     return command, args[1:]
 
 def get_selection(filename):
@@ -130,17 +146,23 @@ def get_selection(filename):
 def get_fileobj(filename, mode):
     """Get file object or stdin/stdout from filename"""
     if mode == "r" or mode == "rb":
-        if filename == "-": fp = sys.stdin
-        else: fp = open(filename, mode)
+        if filename == "-":
+            fp = sys.stdin
+        else:
+            fp = open(filename, mode)
     elif mode == "w" or mode == "wb":
-        if filename == "-": fp = sys.stdout
+        if filename == "-":
+            fp = sys.stdout
         else:
             check_does_not_exist(filename)
             fp = open(filename, mode)
-    else: assert 0, "Unknown mode " + str(mode)
+    else:
+        assert 0, "Unknown mode " + str(mode)
 
-    if gzip_compress: return gzip.GzipFile(None, fp.mode, 9, fp)
-    else: return fp
+    if gzip_compress:
+        return gzip.GzipFile(None, fp.mode, 9, fp)
+    else:
+        return fp
 
 def write_sig(dirname, outfp):
     """Write signature of dirname into file object outfp"""
@@ -183,17 +205,22 @@ def main():
     elif action == "delta":
         sig_infp = get_fileobj(file_args[0], "rb")
         delta_outfp = get_fileobj(file_args[2], "wb")
-        if sig_fileobj: write_delta_and_sig(file_args[1], sig_infp,
-                                            delta_outfp, sig_fileobj)
-        else: write_delta(file_args[1], sig_infp, delta_outfp)
+        if sig_fileobj:
+            write_delta_and_sig(file_args[1], sig_infp,
+                                delta_outfp, sig_fileobj)
+        else:
+            write_delta(file_args[1], sig_infp, delta_outfp)
     elif action == "patch":
         patch(file_args[0], get_fileobj(file_args[1], "rb"))
     elif action == "tar":
-        if sig_fileobj: write_tar_and_sig(file_args[0],
-                                          get_fileobj(file_args[1], "wb"),
-                                          sig_fileobj)
-        else: write_tar(file_args[0], get_fileobj(file_args[1], "wb"))
-    else: command_line_error("Bad command " + action)
+        if sig_fileobj:
+            write_tar_and_sig(file_args[0],
+                              get_fileobj(file_args[1], "wb"),
+                              sig_fileobj)
+        else:
+            write_tar(file_args[0], get_fileobj(file_args[1], "wb"))
+    else:
+        command_line_error("Bad command " + action)
 
 
 if __name__ == "__main__": main()
