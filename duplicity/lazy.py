@@ -32,29 +32,35 @@ class Iter:
     def filter(predicate, iterator):
         """Like filter in a lazy functional programming language"""
         for i in iterator:
-            if predicate(i): yield i
+            if predicate(i):
+                yield i
 
     def map(function, iterator):
         """Like map in a lazy functional programming language"""
-        for i in iterator: yield function(i)
+        for i in iterator:
+            yield function(i)
 
     def foreach(function, iterator):
         """Run function on each element in iterator"""
-        for i in iterator: function(i)
+        for i in iterator:
+            function(i)
 
     def cat(*iters):
         """Lazily concatenate iterators"""
         for iter in iters:
-            for i in iter: yield i
+            for i in iter:
+                yield i
 
     def cat2(iter_of_iters):
         """Lazily concatenate iterators, iterated by big iterator"""
         for iter in iter_of_iters:
-            for i in iter: yield i
+            for i in iter:
+                yield i
 
     def empty(iter):
         """True if iterator has length 0"""
-        for i in iter: return None
+        for i in iter:
+            return None
         return 1
 
     def equal(iter1, iter2, verbose = None, operator = lambda x, y: x == y):
@@ -64,51 +70,65 @@ class Iter:
 
         """
         for i1 in iter1:
-            try: i2 = iter2.next()
+            try:
+                i2 = iter2.next()
             except StopIteration:
-                if verbose: print "End when i1 = %s" % (i1,)
+                if verbose:
+                    print "End when i1 = %s" % (i1,)
                 return None
             if not operator(i1, i2):
-                if verbose: print "%s not equal to %s" % (i1, i2)
+                if verbose:
+                    print "%s not equal to %s" % (i1, i2)
                 return None
-        try: i2 = iter2.next()
-        except StopIteration: return 1
-        if verbose: print "End when i2 = %s" % (i2,)
+        try:
+            i2 = iter2.next()
+        except StopIteration:
+            return 1
+        if verbose:
+            print "End when i2 = %s" % (i2,)
         return None
 
     def Or(iter):
         """True if any element in iterator is true.  Short circuiting"""
         i = None
         for i in iter:
-            if i: return i
+            if i:
+                return i
         return i
 
     def And(iter):
         """True if all elements in iterator are true.  Short circuiting"""
         i = 1
         for i in iter:
-            if not i: return i
+            if not i:
+                return i
         return i
 
     def len(iter):
         """Return length of iterator"""
         i = 0
         while 1:
-            try: iter.next()
-            except StopIteration: return i
+            try:
+                iter.next()
+            except StopIteration:
+                return i
             i = i+1
 
     def foldr(f, default, iter):
         """foldr the "fundamental list recursion operator"?"""
-        try: next = iter.next()
-        except StopIteration: return default
+        try:
+            next = iter.next()
+        except StopIteration:
+            return default
         return f(next, Iter.foldr(f, default, iter))
 
     def foldl(f, default, iter):
         """the fundamental list iteration operator.."""
         while 1:
-            try: next = iter.next()
-            except StopIteration: return default
+            try:
+                next = iter.next()
+            except StopIteration:
+                return default
             default = f(default, next)
 
     def multiplex(iter, num_of_forks, final_func = None, closing_func = None):
@@ -124,8 +144,10 @@ class Iter:
         if num_of_forks == 2 and not final_func and not closing_func:
             im2 = IterMultiplex2(iter)
             return (im2.yielda(), im2.yieldb())
-        if not final_func: final_func = lambda i: None
-        if not closing_func: closing_func = lambda: None
+        if not final_func:
+            final_func = lambda i: None
+        if not closing_func:
+            closing_func = lambda: None
 
         # buffer is a list of elements that some iterators need and others
         # don't
@@ -140,7 +162,8 @@ class Iter:
         def get_next(fork_num):
             """Return the next element requested by fork_num"""
             if forkposition[fork_num] == -1:
-                try:  buffer.insert(0, iter.next())
+                try:
+                    buffer.insert(0, iter.next())
                 except StopIteration:
                     # call closing_func if necessary
                     if (forkposition == starting_forkposition and
@@ -148,7 +171,8 @@ class Iter:
                         closing_func()
                         called_closing_func[0] = None
                     raise StopIteration
-                for i in range(num_of_forks): forkposition[i] += 1
+                for i in range(num_of_forks):
+                    forkposition[i] += 1
 
             return_val = buffer[forkposition[fork_num]]
             forkposition[fork_num] -= 1
@@ -162,7 +186,8 @@ class Iter:
             return return_val
 
         def make_iterator(fork_num):
-            while(1): yield get_next(fork_num)
+            while(1):
+                yield get_next(fork_num)
 
         return tuple(map(make_iterator, range(num_of_forks)))
 
@@ -186,10 +211,13 @@ class IterMultiplex2:
         """Return first iterator"""
         buf, iter = self.buffer, self.iter
         while(1):
-            if self.a_leading_by >= 0: # a is in front, add new element
+            if self.a_leading_by >= 0:
+                # a is in front, add new element
                 elem = iter.next() # exception will be passed
                 buf.append(elem)
-            else: elem = buf.pop(0) # b is in front, subtract an element
+            else:
+                # b is in front, subtract an element                
+                elem = buf.pop(0)
             self.a_leading_by += 1
             yield elem
 
@@ -197,10 +225,13 @@ class IterMultiplex2:
         """Return second iterator"""
         buf, iter = self.buffer, self.iter
         while(1):
-            if self.a_leading_by <= 0: # b is in front, add new element
+            if self.a_leading_by <= 0:
+                # b is in front, add new element
                 elem = iter.next() # exception will be passed
                 buf.append(elem)
-            else: elem = buf.pop(0) # a is in front, subtract an element
+            else:
+                # a is in front, subtract an element
+                elem = buf.pop(0) 
             self.a_leading_by -= 1
             yield elem
 
@@ -244,9 +275,11 @@ class IterTreeReducer:
                 # out of the tree, finish with to_be_finished
                 to_be_finished.call_end_proc()
                 del branches[-1]
-                if not branches: return None
+                if not branches:
+                    return None
                 branches[-1].branch_process(to_be_finished)
-            else: return 1
+            else:
+                return 1
 
     def add_branch(self):
         """Return branch of type self.branch_class, add to branch list"""
@@ -258,7 +291,8 @@ class IterTreeReducer:
         """Run start_process on latest branch"""
         robust.check_common_error(branch.on_error,
                                   branch.start_process, args)
-        if not branch.caught_exception: branch.start_successful = 1
+        if not branch.caught_exception:
+            branch.start_successful = 1
         branch.base_index = index
 
     def Finish(self):
@@ -266,7 +300,8 @@ class IterTreeReducer:
         while 1:
             to_be_finished = self.branches.pop()
             to_be_finished.call_end_proc()
-            if not self.branches: break
+            if not self.branches:
+                break
             self.branches[-1].branch_process(to_be_finished)
 
     def __call__(self, *args):
@@ -301,7 +336,8 @@ class IterTreeReducer:
             else:
                 branch = self.add_branch()
                 self.process_w_branch(index, branch, args)
-        else: last_branch.log_prev_error(index)
+        else:
+            last_branch.log_prev_error(index)
 
         self.index = index
         return 1
@@ -325,8 +361,6 @@ class ITRBranch:
         if self.finished or not self.start_successful:
             self.caught_exception = 1
 
-        #if self.caught_exception: self.log_prev_error(self.base_index)
-        #else: robust.check_common_error(self.on_error, self.end_process)
         # Since all end_process does is copy over attributes, might as
         # well run it even if we did get errors earlier.
         robust.check_common_error(self.on_error, self.end_process)
@@ -359,14 +393,18 @@ class ITRBranch:
         self.caught_exception = 1
         if args and args[0] and isinstance(args[0], tuple):
             filename = os.path.join(*args[0])
-        elif self.index: filename = os.path.join(*self.index)
-        else: filename = "."
+        elif self.index:
+            filename = os.path.join(*self.index)
+        else:
+            filename = "."
         log.Log(_("Error '%s' processing %s") % (exc, filename), 2)
 
     def log_prev_error(self, index):
         """Call function if no pending exception"""
-        if not index: index_str = "."
-        else: index_str = os.path.join(*index)
+        if not index:
+            index_str = "."
+        else:
+            index_str = os.path.join(*index)
         log.Log(_("Skipping %s because of previous error") % index_str, 2)
 
 
