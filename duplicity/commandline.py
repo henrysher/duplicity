@@ -415,8 +415,10 @@ Options:
 
 def get_int(int_string, description):
     """Require that int_string be an integer, return int value"""
-    try: return int(int_string)
-    except ValueError: command_line_error("Received '%s' for %s, need integer" %
+    try:
+        return int(int_string)
+    except ValueError:
+        command_line_error("Received '%s' for %s, need integer" %
                                           (int_string, description))
 
 def set_archive_dir(dirstring):
@@ -495,7 +497,8 @@ def check_consistency(action):
         """Raises error if two or more of the elements of arglist are true"""
         n = 0
         for m in arglist:
-            if m: n+=1
+            if m:
+                n+=1
         assert n <= 1, "Invalid syntax, two conflicting modes specified"
     if action in ["list-current", "collection-status",
                   "cleanup", "remove-old", "remove-all-but-n-full"]:
@@ -514,7 +517,8 @@ def check_consistency(action):
                                "not restoring.")
     else:
         assert action == "inc" or action == "full"
-        if verify: command_line_error("--verify option cannot be used "
+        if verify:
+            command_line_error("--verify option cannot be used "
                                       "when backing up")
         if globals.restore_dir:
             command_line_error("--restore-dir option incompatible with %s backup"
@@ -530,31 +534,46 @@ def ProcessCommandLine(cmdline_list):
     globals.gpg_profile = gpg.GPGProfile()
 
     args = parse_cmdline_options(cmdline_list)
-    if len(args) < 1: command_line_error("Too few arguments")
+    if len(args) < 1:
+        command_line_error("Too few arguments")
     elif len(args) == 1:
-        if list_current: action = "list-current"
-        elif collection_status: action = "collection-status"
-        elif cleanup: action = "cleanup"
-        elif globals.remove_time is not None: action = "remove-old"
-        elif globals.keep_chains is not None: action = "remove-all-but-n-full"
-        else: command_line_error("Too few arguments")
+        if list_current:
+            action = "list-current"
+        elif collection_status:
+            action = "collection-status"
+        elif cleanup:
+            action = "cleanup"
+        elif globals.remove_time is not None:
+            action = "remove-old"
+        elif globals.keep_chains is not None:
+            action = "remove-all-but-n-full"
+        else:
+            command_line_error("Too few arguments")
         globals.backend = backend.get_backend(args[0])
-        if not globals.backend: log.FatalError(_("""Bad URL '%s'.
+        if not globals.backend:
+            log.FatalError(_("""Bad URL '%s'.
 Examples of URL strings are "scp://user@host.net:1234/path" and
 "file:///usr/local".  See the man page for more information.""") % (args[0],),
                                                log.ErrorCode.bad_url)
-    elif len(args) == 2: # Figure out whether backup or restore
+    elif len(args) == 2:
+        # Figure out whether backup or restore
         backup, local_pathname = set_backend(args[0], args[1])
         if backup:
-            if full_backup: action = "full"
-            else: action = "inc"
+            if full_backup:
+                action = "full"
+            else:
+                action = "inc"
         else:
-            if verify: action = "verify"
-            else: action = "restore"
+            if verify:
+                action = "verify"
+            else:
+                action = "restore"
 
         process_local_dir(action, local_pathname)
-        if action in ['full', 'inc', 'verify']: set_selection()
-    elif len(args) > 2: command_line_error("Too many arguments")
+        if action in ['full', 'inc', 'verify']:
+            set_selection()
+    elif len(args) > 2:
+        command_line_error("Too many arguments")
 
     check_consistency(action)
     log.Log(_("Main action: ") + action, 7)
