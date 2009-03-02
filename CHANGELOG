@@ -1,3 +1,9 @@
+New in v0.5.11 (2009/03/??)
+---------------------------
+patch #6762: Wrong exit() used for 2.3/2.4 Python
+https://savannah.nongnu.org/patch/?6762
+
+
 New in v0.5.10 (2009/03/01)
 ---------------------------
 The default filename format has changed from W3 style to a long

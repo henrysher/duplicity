@@ -596,7 +596,7 @@ if __name__ == "__main__":
                        log.ErrorCode.user_error,
                        e.__class__.__name__)
     except SystemExit, e:
-        exit(e)
+        sys.exit(e)
     except Exception, e:
         log.FatalError("%s" % (''.join(traceback.format_exception(*sys.exc_info()))),
                        log.ErrorCode.exception,
