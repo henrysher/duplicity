@@ -94,7 +94,7 @@ class SSHBackend(duplicity.backend.Backend):
                 if state == "authorizing":
                     match = child.expect([pexpect.EOF,
                                           "(?i)timeout, server not responding",
-                                          "(?i)password:",
+                                          "(?i)pass(word|phrase .*):",
                                           "(?i)permission denied",
                                           "authenticity"])
                     log.Log("State = %s, Before = '%s'" % (state, child.before.strip()), 9)
@@ -155,7 +155,7 @@ class SSHBackend(duplicity.backend.Backend):
         maxread = 2000 # expect read buffer size
         responses = ["(?i)timeout, server not responding",
                      "sftp>",
-                     "(?i)password:",
+                     "(?i)pass(word|phrase .*):",
                      "(?i)permission denied",
                      "authenticity",
                      "(?i)no such file or directory"]

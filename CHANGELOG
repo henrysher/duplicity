@@ -1,5 +1,8 @@
 New in v0.5.11 (2009/03/??)
 ---------------------------
+patch #6761: More robust pexpect handling of SSH authentication
+https://savannah.nongnu.org/patch/?6761
+
 patch #6762: Wrong exit() used for 2.3/2.4 Python
 https://savannah.nongnu.org/patch/?6762
 
