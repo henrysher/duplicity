@@ -1,5 +1,9 @@
 New in v0.5.11 (2009/03/??)
 ---------------------------
+bug #15664: When restoring backup: "OverflowError:
+            long int too large to convert to int"
+https://savannah.nongnu.org/bugs/?15664
+
 patch #6761: More robust pexpect handling of SSH authentication
 https://savannah.nongnu.org/patch/?6761
 

@@ -87,7 +87,7 @@ class ROPath:
         # in later versions of python (>= 2.3 I think)
         if self.type in ("chr", "blk"):
             self.devnums = (self.stat.st_rdev >> 8, self.stat.st_rdev & 0xff)
-        
+
     def blank(self):
         """Black out self - set type and stat to None"""
         self.type, self.stat = None, None
@@ -201,6 +201,10 @@ class ROPath:
             self.stat.st_gid = tarinfo.gid
 
         self.stat.st_mtime = int(tarinfo.mtime)
+        if self.stat.st_mtime < 0:
+            log.Warn(_("Warning: %s has negative mtime, treating as 0.")
+                     % (tarinfo.name,))
+            self.stat.st_mtime = 0
         self.stat.st_size = tarinfo.size
 
     def get_ropath(self):
@@ -375,7 +379,7 @@ class ROPath:
                 return 0
             return 1
         assert 0
-        
+
     def compare_data(self, other):
         """Compare data from two regular files, return true if same"""
         f1 = self.open("rb")
@@ -454,7 +458,7 @@ class Path(ROPath):
     def __init__(self, base, index = ()):
         """Path initializer"""
         # self.opened should be true if the file has been opened, and
-        # self.fileobj can override returned fileobj 
+        # self.fileobj can override returned fileobj
         self.opened, self.fileobj = None, None
         self.base = base
         self.index = index
@@ -730,7 +734,7 @@ class PathDeleter(ITRBranch):
     def fast_process(self, index, path):
         path.delete()
 
-    
+
 # Wait until end to avoid circular module trouble
 from duplicity import file_naming
 from duplicity import globals
