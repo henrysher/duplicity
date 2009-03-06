@@ -146,6 +146,7 @@ class FTPBackend(duplicity.backend.Backend):
                             cmdloc += 1
                         else:
                             command = 'quit'
+                            log.Log("ftp command: '%s'" % (command,), 5)
                             child.sendline(command)
                             res = filter_ansi(child.before)
                     elif match in (3, 4):
