@@ -91,19 +91,22 @@ class FTPBackend(duplicity.backend.Backend):
             str = re.sub("\x0d", '', str)
             return re.sub("\x1b\[[01]m", '', str)
 
+        res = ''
+        err = False
         remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/'))
-        prefix = ["yes-i-know-about-NcFTPd yes",
+        prefix = ["set yes-i-know-about-NcFTPd yes",
+                  "set autosave-bookmark-changes no",
                   "set confirm-close no",
                   "type binary",
                   "set passive %s" % self.passive,
                   "mkdir %s" % remote_dir,
                   "cd %s" % remote_dir,]
+        command_list = prefix + commands
 
         for n in range(1, globals.num_retries+1):
             log.Log("Running '%s' (attempt #%d)" % (self.commandline, n), 5)
             child = pexpect.spawn(self.commandline, timeout = None)
             cmdloc = 0
-            commands = prefix + commands
             state = "authorizing"
             while 1:
                 if state == "authorizing":
@@ -115,9 +118,11 @@ class FTPBackend(duplicity.backend.Backend):
                     log.Log("State = %s, Before = '%s'" % (state, filter_ansi(child.before)), 9)
                     if match in (0, 1):
                         log.Log("No response from host", 5)
+                        err = True
                         break
                     if match == 2:
                         log.Log("Unknown host %s" % self.parsed_url.hostname, 5)
+                        err = True
                         break
                     elif match == 3:
                         child.sendline(self.password)
@@ -137,10 +142,11 @@ class FTPBackend(duplicity.backend.Backend):
                         break
                     elif match == 1:
                         log.Log("Timeout waiting for response", 5)
+                        err = True
                         break
                     elif match == 2:
-                        if cmdloc < len(commands):
-                            command = commands[cmdloc]
+                        if cmdloc < len(command_list):
+                            command = command_list[cmdloc]
                             log.Log("ftp command: '%s'" % (command,), 5)
                             child.sendline(command)
                             cmdloc += 1
@@ -151,18 +157,23 @@ class FTPBackend(duplicity.backend.Backend):
                             res = filter_ansi(child.before)
                     elif match in (3, 4):
                         log.Log("Cannot open local file", 5)
+                        err = True
                         break
                     elif match in (4, 5):
                         log.Log("Cannot open remote file", 5)
+                        err = True
+                        break
                     elif match == 6:
                         log.Log("Could not write to control stream", 5)
+                        err = True
                         break
 
             child.close(force = True)
-            if child.exitstatus == 0:
+            if (not err) and (child.exitstatus == 0):
                 return res
             log.Log("Running '%s' failed (attempt #%d)" % (self.commandline, n), 1)
             time.sleep(30)
+            err = False
         log.Log("Giving up trying to execute '%s' after %d attempts" % (self.commandline, globals.num_retries), 1)
         raise BackendException("Error running '%s'" % self.commandline)
 
