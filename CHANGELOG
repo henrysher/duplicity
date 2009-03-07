@@ -1,6 +1,9 @@
 New in v0.5.11 (2009/03/??)
 ---------------------------
-bug #25696: ncftp error with 0.5.09
+Bug #333057: GnuPGInterface prints exit statuses incorrectly
+https://bugs.launchpad.net/bugs/333057
+
+bug #25696: ncftp error w/0.5.09 -- nested target directories
 https://savannah.nongnu.org/bugs/?25696
 
 bug #15664: When restoring backup: "OverflowError:

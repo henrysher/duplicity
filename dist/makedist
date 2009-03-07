@@ -84,6 +84,7 @@ def MakeTar():
         "errors.py",
         "file_naming.py",
         "globals.py",
+        "GnuPGInterface.py",
         "gpg.py",
         "__init__.py",
         "lazy.py",
