@@ -48,22 +48,22 @@ class ImapBackend(duplicity.backend.Backend):
         duplicity.backend.Backend.__init__(self, parsed_url)
 
         log.Log("I'm %s (scheme %s) connecting to %s as %s" %
-                (self.__class__.__name__, parsed_url.scheme, parsed_url.hostname, parsed_url.get_username()), 9)
+                (self.__class__.__name__, parsed_url.scheme, parsed_url.hostname, parsed_url.username), 9)
 
-        #  Store url for reconnection on error 
+        #  Store url for reconnection on error
         self._url = parsed_url
 
         #  Set the username
-        if ( parsed_url.get_username() is None ):
+        if ( parsed_url.username is None ):
             username = raw_input('Enter account userid: ')
         else:
-            username = parsed_url.get_username()
+            username = parsed_url.username
 
         #  Set the password
-        if ( not parsed_url.get_password() ):
+        if ( not parsed_url.password ):
             password = getpass.getpass("Enter account password: ")
         else:
-            password = parsed_url.get_password()
+            password = parsed_url.password
 
         self._username = username
         self._password = password
@@ -81,7 +81,7 @@ class ImapBackend(duplicity.backend.Backend):
             self._conn.close()
         except:
             pass
-            
+
         if (parsed_url.scheme == "imap"):
             cl = imaplib.IMAP4
             self._conn = cl(imap_server, 143)
@@ -102,7 +102,7 @@ class ImapBackend(duplicity.backend.Backend):
            self._conn.login(self._username + "@" + parsed_url.hostname, self._password)
            self._conn.select(imap_mailbox)
            log.Log("IMAP connected",5)
-        
+
 
     def _prepareBody(self,f,rname):
         mp = email.MIMEMultipart.MIMEMultipart()
@@ -151,8 +151,7 @@ class ImapBackend(duplicity.backend.Backend):
                         allowedTimeout -= 1
                         log.Log("Error reconnecting, retrying in 30s ", 5)
                         time.sleep(30)
-                    
-                
+
         log.Log("IMAP mail with '%s' subject stored"%remote_filename,5)
 
     def get(self, remote_filename, local_path):
