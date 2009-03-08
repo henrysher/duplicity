@@ -159,7 +159,7 @@ class BackupSet:
         try:
             manifest_buffer = self.backend.get_data(self.remote_manifest_name)
         except IOError, message:
-            if message.args[0] == "GnuPG exited non-zero, with code 131072":
+            if message.args[0] == "GnuPG exited non-zero, with code 2":
                 return None
             else:
                 raise
