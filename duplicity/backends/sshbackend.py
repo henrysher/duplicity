@@ -205,7 +205,8 @@ class SSHBackend(duplicity.backend.Backend):
 
     def put(self, source_path, remote_filename = None):
         """Use scp to copy source_dir/filename to remote computer"""
-        if not remote_filename: remote_filename = source_path.get_filename()
+        if not remote_filename:
+            remote_filename = source_path.get_filename()
         commandline = "%s %s %s %s:%s%s" % \
             (scp_command, self.ssh_options, source_path.name, self.host_string,
              self.remote_prefix, remote_filename)
