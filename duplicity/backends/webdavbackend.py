@@ -110,7 +110,7 @@ class WebDAVBackend(duplicity.backend.Backend):
             self.headers['Authorization'] = self.get_authorization(response, quoted_path)
             self.conn.request(method, quoted_path, data, self.headers)
             response = self.conn.getresponse()
-            
+
         return response
 
     def get_authorization(self, response, path):
@@ -148,7 +148,7 @@ class WebDAVBackend(duplicity.backend.Backend):
             pw_manager.add_password(None, self.conn.host, u.username, self.get_password())
             self.digest_auth_handler = urllib2.HTTPDigestAuthHandler(pw_manager)
 
-        # building a dummy request that gets never sent, 
+        # building a dummy request that gets never sent,
         # needed for call to auth_handler.get_authorization
         scheme = u.scheme == 'webdavs' and 'https' or 'http'
         hostname = u.port and "%s:%s" % (u.hostname, u.port) or u.hostname
@@ -192,8 +192,7 @@ class WebDAVBackend(duplicity.backend.Backend):
         Internal helper to taste the given href node and, if
         it is a duplicity file, collect it as a result file.
 
-        @returns A matching filename, or None if the href did
-                 not match.
+        @return: A matching filename, or None if the href did not match.
         """
         raw_filename = self._getText(href.childNodes).strip()
         parsed_url = urlparser.urlparse(urllib.unquote(raw_filename))
@@ -243,7 +242,7 @@ class WebDAVBackend(duplicity.backend.Backend):
 
     def put(self, source_path, remote_filename = None):
         """Transfer source_path to remote_filename"""
-        if not remote_filename: 
+        if not remote_filename:
             remote_filename = source_path.get_filename()
         url = self.directory + remote_filename
         source_file = source_path.open("rb")

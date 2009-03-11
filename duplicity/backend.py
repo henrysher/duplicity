@@ -128,10 +128,12 @@ class ParsedUrl:
     """
     Parse the given URL as a duplicity backend URL.
 
-    @return A parsed URL of the same form as that of the standard
-            urlparse.urlparse().
+    Returns the data of a parsed URL with the same names as that of
+    the standard urlparse.urlparse() except that all values have been
+    resolved rather than deferred.  There are no get_* members.  This
+    makes sure that the URL parsing errors are detected early.
 
-    @raise InvalidBackendURL
+    Raise InvalidBackendURL on invalid URL's
     """
     def __init__(self, url_string):
         self.url_string = url_string

@@ -46,11 +46,18 @@ exit_val = None
 
 
 def get_passphrase(n):
-    """Get passphrase from environment or, failing that, from user
+    """
+    Get passphrase from environment or, failing that, from user
 
     If n=3, a password is requested and verified. If n=2, the current
     password is verified. If n=1, a password is requested without
-    verification for the time being."""
+    verification for the time being.
+
+    @type  n: int
+    @param n: action to perform
+    @rtype: string
+    @return: passphrase
+    """
 
     try:
         return os.environ['PASSPHRASE']
@@ -81,7 +88,15 @@ def get_passphrase(n):
 
 
 def dummy_backup(tarblock_iter):
-    """Fake writing to backend, but do go through all the source paths."""
+    """
+    Fake writing to backend, but do go through all the source paths.
+
+    @type tarblock_iter: tarblock_iter
+    @param tarblock_iter: iterator for current tar block
+
+    @rtype: int
+    @return: constant 0 (zero)
+    """
     try:
         # Just spin our wheels
         while tarblock_iter.next():
@@ -93,14 +108,25 @@ def dummy_backup(tarblock_iter):
 
 
 def write_multivol(backup_type, tarblock_iter, backend):
-    """Encrypt volumes of tarblock_iter and write to backend
+    """
+    Encrypt volumes of tarblock_iter and write to backend
 
     backup_type should be "inc" or "full" and only matters here when
     picking the filenames.  The path_prefix will determine the names
     of the files written to backend.  Also writes manifest file.
     Returns number of bytes written.
 
+    @type backup_type: string
+    @param backup_type: type of backup to perform, either 'inc' or 'full'
+    @type tarblock_iter: tarblock_iter
+    @param tarblock_iter: iterator for current tar block
+    @type backend: callable backend object
+    @param backend: I/O backend for selected protocol
+
+    @rtype: int
+    @return: bytes written
     """
+
     def get_indicies(tarblock_iter):
         """Return start_index and end_index of previous volume"""
         start_index = tarblock_iter.recall_index()
@@ -176,10 +202,18 @@ def write_multivol(backup_type, tarblock_iter, backend):
 
 
 def write_manifest(mf, backup_type, backend):
-    """Write manifest to file in archive_dir and encrypted to backend
+    """
+    Write manifest to file in archive_dir and encrypted to backend
 
-    Returns number of bytes written
+    @type mf: Manifest object
+    @param mf: manifest to write
+    @type backup_type: string
+    @param backup_type: type of backup to perform, either 'inc' or 'full'
+    @type backend: callable backend object
+    @param backend: I/O backend for selected protocol
 
+    @rtype: int
+    @return: bytes written
     """
     mf_string = mf.to_string()
     if globals.archive_dir:
@@ -198,11 +232,17 @@ def write_manifest(mf, backup_type, backend):
 
 
 def get_sig_fileobj(sig_type):
-    """Return a fileobj opened for writing, save results as signature
+    """
+    Return a fileobj opened for writing, save results as signature
 
     If globals.archive_dir is available, save signatures there
     gzipped.  Save them on the backend encrypted as needed.
 
+    @type sig_type: string
+    @param sig_type: either "full-sig" or "new-sig"
+
+    @rtype: fileobj
+    @return: fileobj opened for writing
     """
     assert sig_type == "full-sig" or sig_type == "new-sig"
 
@@ -220,11 +260,25 @@ def get_sig_fileobj(sig_type):
 
 
 def pubkey_only():
+    """
+    Determine if encryption type is public key only style encryption.
+
+    @rtype: bool
+    @return: True for public key only encryption, False otherwise
+    """
     return not globals.gpg_profile.sign_key and globals.gpg_profile.recipients and globals.encryption
 
 
 def full_backup(col_stats):
-    """Do full backup of directory to backend, using archive_dir"""
+    """
+    Do full backup of directory to backend, using archive_dir
+
+    @type col_stats: CollectionStatus object
+    @param col_stats: collection status
+
+    @rtype: void
+    @return: void
+    """
     if globals.dry_run:
         tarblock_iter = diffdir.DirFull(globals.select)
         bytes_written = dummy_backup(tarblock_iter)
@@ -239,7 +293,14 @@ def full_backup(col_stats):
 
 
 def check_sig_chain(col_stats):
-    """Get last signature chain for inc backup, or None if none available"""
+    """
+    Get last signature chain for inc backup, or None if none available
+
+    @type col_stats: CollectionStatus object
+    @param col_stats: collection status
+
+
+    """
     if not col_stats.matched_chain_pair:
         if globals.incremental:
             log.FatalError(_("Fatal Error: Unable to start incremental backup.  "
@@ -252,14 +313,24 @@ def check_sig_chain(col_stats):
 
 
 def print_statistics(stats, bytes_written):
-    """If globals.print_statistics, print stats after adding bytes_written"""
+    """
+    If globals.print_statistics, print stats after adding bytes_written
+
+    @rtype: void
+    @return: void
+    """
     if globals.print_statistics:
         diffdir.stats.TotalDestinationSizeChange = bytes_written
         print diffdir.stats.get_stats_logstring(_("Backup Statistics"))
 
 
 def incremental_backup(sig_chain):
-    """Do incremental backup of directory to backend, using archive_dir"""
+    """
+    Do incremental backup of directory to backend, using archive_dir
+
+    @rtype: void
+    @return: void
+    """
     dup_time.setprevtime(sig_chain.end_time)
     if dup_time.curtime == dup_time.prevtime:
         time.sleep(1)
@@ -279,7 +350,15 @@ def incremental_backup(sig_chain):
 
 
 def list_current(col_stats):
-    """List the files current in the archive (examining signature only)"""
+    """
+    List the files current in the archive (examining signature only)
+
+    @type col_stats: CollectionStatus object
+    @param col_stats: collection status
+
+    @rtype: void
+    @return: void
+    """
     sig_chain = check_sig_chain(col_stats)
     if not sig_chain:
         log.FatalError(_("No signature data found, unable to list files."),
@@ -297,7 +376,15 @@ def list_current(col_stats):
 
 
 def restore(col_stats):
-    """Restore archive in globals.backend to globals.local_path"""
+    """
+    Restore archive in globals.backend to globals.local_path
+
+    @type col_stats: CollectionStatus object
+    @param col_stats: collection status
+
+    @rtype: void
+    @return: void
+    """
     if globals.dry_run:
       return
     if not patchdir.Write_ROPaths(globals.local_path,
@@ -312,7 +399,12 @@ def restore(col_stats):
 
 
 def restore_get_patched_rop_iter(col_stats):
-    """Return iterator of patched ROPaths of desired restore data"""
+    """
+    Return iterator of patched ROPaths of desired restore data
+
+    @type col_stats: CollectionStatus object
+    @param col_stats: collection status
+    """
     if globals.restore_dir:
         index = tuple(globals.restore_dir.split("/"))
     else:
@@ -344,7 +436,8 @@ def restore_get_patched_rop_iter(col_stats):
 
 
 def restore_get_enc_fileobj(backend, filename, volume_info):
-    """Return plaintext fileobj from encrypted filename on backend
+    """
+    Return plaintext fileobj from encrypted filename on backend
 
     If volume_info is set, the hash of the file will be checked,
     assuming some hash is available.  Also, if globals.sign_key is
@@ -363,7 +456,12 @@ def restore_get_enc_fileobj(backend, filename, volume_info):
 
 
 def restore_check_hash(volume_info, vol_path):
-    """Check the hash of vol_path path against data in volume_info"""
+    """
+    Check the hash of vol_path path against data in volume_info
+
+    @rtype: void
+    @return: void
+    """
     hash_pair = volume_info.get_best_hash()
     if hash_pair:
         calculated_hash = gpg.get_hash(hash_pair[0], vol_path)
@@ -376,7 +474,12 @@ def restore_check_hash(volume_info, vol_path):
 
 
 def restore_add_sig_check(fileobj):
-    """Require signature when closing fileobj matches sig in gpg_profile"""
+    """
+    Require signature when closing fileobj matches sig in gpg_profile
+
+    @rtype: void
+    @return: void
+    """
     assert (isinstance(fileobj, dup_temp.FileobjHooked) and
             isinstance(fileobj.fileobj, gpg.GPGFile)), fileobj
     def check_signature():
@@ -390,7 +493,15 @@ def restore_add_sig_check(fileobj):
 
 
 def verify(col_stats):
-    """Verify files, logging differences"""
+    """
+    Verify files, logging differences
+
+    @type col_stats: CollectionStatus object
+    @param col_stats: collection status
+
+    @rtype: void
+    @return: void
+    """
     global exit_val
     collated = diffdir.collate2iters(restore_get_patched_rop_iter(col_stats),
                                      globals.select)
@@ -416,7 +527,15 @@ def verify(col_stats):
 
 
 def cleanup(col_stats):
-    """Delete the extraneous files in the current backend"""
+    """
+    Delete the extraneous files in the current backend
+
+    @type col_stats: CollectionStatus object
+    @param col_stats: collection status
+
+    @rtype: void
+    @return: void
+    """
     extraneous = col_stats.get_extraneous()
     if not extraneous:
         log.Warn(_("No extraneous files found, nothing deleted in cleanup."))
@@ -440,16 +559,32 @@ def cleanup(col_stats):
 
 
 def remove_all_but_n_full(col_stats):
-    "Remove backup files older than the last n full backups."
+    """
+    Remove backup files older than the last n full backups.
+
+    @type col_stats: CollectionStatus object
+    @param col_stats: collection status
+
+    @rtype: void
+    @return: void
+    """
     assert globals.keep_chains is not None
 
     globals.remove_time = col_stats.get_nth_last_full_backup_time(globals.keep_chains)
 
-    return remove_old(col_stats)
+    remove_old(col_stats)
 
 
 def remove_old(col_stats):
-    """Remove backup files older than globals.remove_time from backend"""
+    """
+    Remove backup files older than globals.remove_time from backend
+
+    @type col_stats: CollectionStatus object
+    @param col_stats: collection status
+
+    @rtype: void
+    @return: void
+    """
     assert globals.remove_time is not None
     def set_times_str(setlist):
         """Return string listing times of sets in setlist"""
@@ -494,7 +629,15 @@ def remove_old(col_stats):
 
 
 def check_last_manifest(col_stats):
-    """Check consistency and hostname/directory of last manifest"""
+    """
+    Check consistency and hostname/directory of last manifest
+
+    @type col_stats: CollectionStatus object
+    @param col_stats: collection status
+
+    @rtype: void
+    @return: void
+    """
     if not col_stats.all_backup_chains:
         return
     last_backup_set = col_stats.all_backup_chains[-1].get_last()
@@ -502,7 +645,9 @@ def check_last_manifest(col_stats):
 
 
 def main():
-    """Start/end here"""
+    """
+    Start/end here
+    """
     dup_time.setcurtime()
     log.setup()
     action = commandline.ProcessCommandLine(sys.argv[1:])
@@ -578,6 +723,15 @@ def main():
 
 
 def with_tempdir(fn):
+    """
+    Execute function and guarantee cleanup of tempdir is called
+
+    @type fn: callable function
+    @param fn: function to execute
+
+    @return: void
+    @rtype: void
+    """
     try:
         fn()
     finally:
