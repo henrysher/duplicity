@@ -30,11 +30,14 @@ class HSIBackend(duplicity.backend.Backend):
         duplicity.backend.Backend.__init__(self, parsed_url)
         self.host_string = parsed_url.hostname
         self.remote_dir = parsed_url.path
-        if self.remote_dir: self.remote_prefix = self.remote_dir + "/"
-        else: self.remote_prefix = ""
+        if self.remote_dir:
+            self.remote_prefix = self.remote_dir + "/"
+        else:
+            self.remote_prefix = ""
 
     def put(self, source_path, remote_filename = None):
-        if not remote_filename: remote_filename = source_path.get_filename()
+        if not remote_filename:
+            remote_filename = source_path.get_filename()
         commandline = '%s "put %s : %s%s"' % (hsi_command,source_path.name,self.remote_prefix,remote_filename)
         try:
             self.run_command(commandline)

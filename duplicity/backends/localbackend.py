@@ -43,7 +43,8 @@ class LocalBackend(duplicity.backend.Backend):
 
     def put(self, source_path, remote_filename = None, rename = None):
         """If rename is set, try that first, copying if doesn't work"""
-        if not remote_filename: remote_filename = source_path.get_filename()
+        if not remote_filename:
+            remote_filename = source_path.get_filename()
         target_path = self.remote_pathdir.append(remote_filename)
         log.Log("Writing %s" % target_path.name, 6)
         if rename:
