@@ -1,6 +1,10 @@
 New in v0.5.12 (2009/03/??)
 ---------------------------
 Add Epydoc output to web site and start documentation.
+http://duplicity.nongnu.org/epydoc/index.html
+
+bug #25838: Backup fails / ncftp - remote file already exists
+https://savannah.nongnu.org/bugs/?25838
 
 
 New in v0.5.11 (2009/03/08)

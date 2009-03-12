@@ -97,6 +97,7 @@ class FTPBackend(duplicity.backend.Backend):
         prefix = ["set yes-i-know-about-NcFTPd yes",
                   "set autosave-bookmark-changes no",
                   "set confirm-close no",
+                  "set auto-resume yes",
                   "type binary",
                   "set passive %s" % self.passive,
                   "mkdir %s" % remote_dir,
