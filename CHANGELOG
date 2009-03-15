@@ -4,7 +4,12 @@ Add Epydoc output to web site and start documentation.
 http://duplicity.nongnu.org/epydoc/index.html
 
 bug #25838: Backup fails / ncftp - remote file already exists
-https://savannah.nongnu.org/bugs/?25838
+https://savannah.nongnu.org/bugs/?25838  With this fix we also
+get resume in ftp get/put.  If a put or get fails part of the
+way through, ncftp will resume on the next retry.
+
+bug #25853: duplicity fails with boto passwords coming from ~/.boto
+https://savannah.nongnu.org/bugs/?25853
 
 
 New in v0.5.11 (2009/03/08)

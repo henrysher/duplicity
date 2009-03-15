@@ -33,9 +33,11 @@ class BotoBackend(duplicity.backend.Backend):
     Backend for Amazon's Simple Storage System, (aka Amazon S3), though
     the use of the boto module, (http://code.google.com/p/boto/).
 
-    To make use of this backend you must export the environment variables
-    AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY with your Amazon Web 
-    Services key id and secret respectively.
+    To make use of this backend you must set aws_access_key_id
+    and aws_secret_access_key in your ~/.boto or /etc/boto.cfg 
+    with your Amazon Web Services key id and secret respectively.
+    Alternatively you can export the environment variables	
+    AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY.
     """
 
     def __init__(self, parsed_url):
@@ -98,12 +100,6 @@ class BotoBackend(duplicity.backend.Backend):
             log.FatalError("This backend  (s3) requires boto library, version 0.9d or later, "
                            "(http://code.google.com/p/boto/).",
                            log.ErrorCode.boto_lib_too_old)
-
-        if not os.environ.has_key('AWS_ACCESS_KEY_ID'):
-            raise BackendException("The AWS_ACCESS_KEY_ID environment variable is not set.")
-
-        if not os.environ.has_key('AWS_SECRET_ACCESS_KEY'):
-            raise BackendException("The AWS_SECRET_ACCESS_KEY environment variable is not set.")
 
         if parsed_url.scheme == 's3+http':
             # Use the default Amazon S3 host.
