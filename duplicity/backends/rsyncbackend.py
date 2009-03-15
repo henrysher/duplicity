@@ -36,10 +36,15 @@ class RsyncBackend(duplicity.backend.Backend):
     def __init__(self, parsed_url):
         """rsyncBackend initializer"""
         duplicity.backend.Backend.__init__(self, parsed_url)
-        user, host = parsed_url.netloc.split('@')
-        if parsed_url.password:
-            user = user.split(':')[0]
-        mynetloc = '%s@%s' % (user, host)
+        if parsed_url.netloc.find('@') < 0:
+            user = ""
+            host = parsed_url.netloc
+            mynetloc = host
+        else:
+            user, host = parsed_url.netloc.split('@')
+            if parsed_url.password:
+                user = user.split(':')[0]
+            mynetloc = '%s@%s' % (user, host)
         # module url: rsync://user@host::/modname/path
         # rsync via ssh/rsh: rsync://user@host//some_absolute_path
         #      -or-          rsync://user@host/some_relative_path
