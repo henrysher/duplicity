@@ -158,6 +158,7 @@ class ErrorCode:
     ftp_ncftp_too_old = 28
     ftp_ncftp_v320 = 29
     exception = 30
+    gpg_failed = 31
 
 def FatalError(s, code, extra=None):
     """Write fatal error message and exit"""
