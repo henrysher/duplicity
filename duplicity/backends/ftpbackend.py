@@ -105,7 +105,10 @@ class FTPBackend(duplicity.backend.Backend):
         command_list = prefix + commands
 
         for n in range(1, globals.num_retries+1):
-            log.Log("Running '%s' (attempt #%d)" % (self.commandline, n), 5)
+            if n > 1:
+                # sleep before retry
+                time.sleep(30)
+            log.Log("Running '%s' (attempt #%d)" % (self.commandline, n), 1)
             child = pexpect.spawn(self.commandline, timeout = None)
             cmdloc = 0
             state = "authorizing"
@@ -114,20 +117,21 @@ class FTPBackend(duplicity.backend.Backend):
                     match = child.expect([pexpect.EOF,
                                           pexpect.TIMEOUT,
                                           "(?i)unknown host",
-                                          "(?i)password:"],
+                                          "(?i)password:",],
                                           globals.timeout)
                     log.Log("State = %s, Before = '%s'" % (state, filter_ansi(child.before)), 9)
                     if match in (0, 1):
-                        log.Log("No response from host", 5)
+                        log.Log("No response from host", 1)
                         err = True
                         break
-                    if match == 2:
-                        log.Log("Unknown host %s" % self.parsed_url.hostname, 5)
+                    elif match == 2:
+                        log.Log("Unknown host %s" % self.parsed_url.hostname, 1)
                         err = True
                         break
                     elif match == 3:
                         child.sendline(self.password)
                         state = "running"
+
                 elif state == "running":
                     match = child.expect([pexpect.EOF,
                                           pexpect.TIMEOUT,
@@ -136,13 +140,15 @@ class FTPBackend(duplicity.backend.Backend):
                                           "(?i)cannot open local file .* for writing",
                                           "(?i)get .*: server said: .*: no such file or directory",
                                           "(?i)put .*: server said: .*: no such file or directory",
-                                          "(?i)could not write to control stream: Broken pipe."],
+                                          "(?i)could not write to control stream: Broken pipe.",
+                                          "(?i)login incorrect",
+                                          "(?i)could not open",],
                                           globals.timeout)
                     log.Log("State = %s, Before = '%s'" % (state, filter_ansi(child.before)), 9)
                     if match == 0:
                         break
                     elif match == 1:
-                        log.Log("Timeout waiting for response", 5)
+                        log.Log("Timeout waiting for response", 1)
                         err = True
                         break
                     elif match == 2:
@@ -157,15 +163,19 @@ class FTPBackend(duplicity.backend.Backend):
                             child.sendline(command)
                             res = filter_ansi(child.before)
                     elif match in (3, 4):
-                        log.Log("Cannot open local file", 5)
+                        log.Log("Cannot open local file", 1)
                         err = True
                         break
-                    elif match in (4, 5):
-                        log.Log("Cannot open remote file", 5)
+                    elif match in (5, 6):
+                        log.Log("Cannot open remote file", 1)
                         err = True
                         break
-                    elif match == 6:
-                        log.Log("Could not write to control stream", 5)
+                    elif match == 7:
+                        log.Log("Could not write to control stream", 1)
+                        err = True
+                        break
+                    elif match in (8, 9):
+                        log.Log("Incorrect login / could not open host", 1)
                         err = True
                         break
 
@@ -173,7 +183,6 @@ class FTPBackend(duplicity.backend.Backend):
             if (not err) and (child.exitstatus == 0):
                 return res
             log.Log("Running '%s' failed (attempt #%d)" % (self.commandline, n), 1)
-            time.sleep(30)
             err = False
         log.Log("Giving up trying to execute '%s' after %d attempts" % (self.commandline, globals.num_retries), 1)
         raise BackendException("Error running '%s'" % self.commandline)
