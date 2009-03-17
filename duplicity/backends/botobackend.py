@@ -154,6 +154,9 @@ class BotoBackend(duplicity.backend.Backend):
         key = self.key_class(self.bucket)
         key.key = self.key_prefix + remote_filename
         for n in range(1, globals.num_retries+1):
+            if n > 1:
+                # sleep before retry
+                time.sleep(30)
             log.Log("Uploading %s/%s" % (self.straight_url, remote_filename), 5)
             try:
                 key.set_contents_from_filename(source_path.name, {'Content-Type': 'application/octet-stream'})
@@ -166,7 +169,6 @@ class BotoBackend(duplicity.backend.Backend):
                               e.__class__.__name__,
                               str(e)), 1)
                 log.Log("Backtrace of previous error: %s" % (exception_traceback(),), 6)
-            time.sleep(30)
         log.Log("Giving up trying to upload %s/%s after %d attempts" % (self.straight_url, remote_filename, globals.num_retries), 1)
         raise BackendException("Error uploading %s/%s" % (self.straight_url, remote_filename))
 
@@ -174,6 +176,9 @@ class BotoBackend(duplicity.backend.Backend):
         key = self.key_class(self.bucket)
         key.key = self.key_prefix + remote_filename
         for n in range(1, globals.num_retries+1):
+            if n > 1:
+                # sleep before retry
+                time.sleep(30)
             log.Log("Downloading %s/%s" % (self.straight_url, remote_filename), 5)
             try:
                 key.get_contents_to_filename(local_path.name)
@@ -187,8 +192,6 @@ class BotoBackend(duplicity.backend.Backend):
                               e.__class__.__name__,
                               str(e)), 1)
                 log.Log("Backtrace of previous error: %s" % (exception_traceback(),), 6)
-                
-            time.sleep(30)
         log.Log("Giving up trying to download %s/%s after %d attempts" % (self.straight_url, remote_filename, globals.num_retries), 1)
         raise BackendException("Error downloading %s/%s" % (self.straight_url, remote_filename))
 

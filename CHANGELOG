@@ -1,3 +1,10 @@
+New in v0.5.13 (2009/03/??)
+---------------------------
+Add more error detection to FTP backend.
+
+Fix backends so sleep does not occur after last retry.
+
+
 New in v0.5.12 (2009/03/15)
 ---------------------------
 bug #25838: Backup fails / ncftp - remote file already exists
