@@ -5,7 +5,9 @@ Add more error detection to FTP backend.
 Fix backends so sleep does not occur after last retry.
 
 BackendException does not cause traceback except when
-verbosity is at level 9 (debug).
+verbosity is at level 5 or higher (Info level).
+
+Adjust log levels so errors show up without verbosity.
 
 
 New in v0.5.12 (2009/03/15)

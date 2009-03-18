@@ -108,7 +108,7 @@ class FTPBackend(duplicity.backend.Backend):
             if n > 1:
                 # sleep before retry
                 time.sleep(30)
-            log.Log("Running '%s' (attempt #%d)" % (self.commandline, n), 1)
+            log.Log("Running '%s' (attempt #%d)" % (self.commandline, n), 5)
             child = pexpect.spawn(self.commandline, timeout = None)
             cmdloc = 0
             state = "authorizing"
@@ -182,7 +182,7 @@ class FTPBackend(duplicity.backend.Backend):
             child.close(force = True)
             if (not err) and (child.exitstatus == 0):
                 return res
-            log.Log("Running '%s' failed (attempt #%d)" % (self.commandline, n), 1)
+            log.Log("Running '%s' failed (attempt #%d)" % (self.commandline, n), 5)
             err = False
         log.Log("Giving up trying to execute '%s' after %d attempts" % (self.commandline, globals.num_retries), 1)
         raise BackendException("Error running '%s'" % self.commandline)

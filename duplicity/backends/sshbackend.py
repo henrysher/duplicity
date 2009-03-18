@@ -102,10 +102,10 @@ class SSHBackend(duplicity.backend.Backend):
                                           "authenticity"])
                     log.Log("State = %s, Before = '%s'" % (state, child.before.strip()), 9)
                     if match == 0:
-                        log.Log("Failed to authenticate", 5)
+                        log.Log("Failed to authenticate", 1)
                         break
                     elif match == 1:
-                        log.Log("Timeout waiting to authenticate", 5)
+                        log.Log("Timeout waiting to authenticate", 1)
                         break
                     elif match == 2:
                         child.sendline(self.password)
@@ -126,7 +126,7 @@ class SSHBackend(duplicity.backend.Backend):
                     if match == 0:
                         break
                     elif match == 1:
-                        log.Log("Timeout waiting for response", 5)
+                        log.Log("Timeout waiting for response", 1)
                         break
                     elif match == 2:
                         state = "stalled"
@@ -141,7 +141,7 @@ class SSHBackend(duplicity.backend.Backend):
                     if match == 0:
                         break
                     elif match == 1:
-                        log.Log("Stalled for too long, aborted copy", 5)
+                        log.Log("Stalled for too long, aborted copy", 1)
                         break
                     elif match == 2:
                         state = "copying"
