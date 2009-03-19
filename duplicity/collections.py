@@ -622,8 +622,8 @@ class CollectionsStatus:
                                           "signature chain",
                                           "Warning, found unnecessary "
                                           "signature chains",
-                                          len(self.other_sig_chains)),
-                     + "\n" + "\n".join(self.other_sig_names),
+                                          len(self.other_sig_chains))
+                     + "\n" + "\n".join([f.fullsig for f in self.other_sig_chains]),
                      log.WarningCode.unnecessary_sig)
             else:
                 log.Warn(_("Warning, found signatures but no corresponding "

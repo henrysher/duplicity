@@ -7,7 +7,11 @@ Fix backends so sleep does not occur after last retry.
 BackendException does not cause traceback except when
 verbosity is at level 5 or higher (Info level).
 
-Adjust log levels so errors show up without verbosity.
+Adjust log levels so some errors show up with default verbosity.
+
+Fixed bug where an extra comma caused a traceback during a warning
+about unnecessary sig files.  Plus fixed print so the real filename
+would show up and not a Python object representation.
 
 bug #25787: Usernames with escaped @-sign are not handled properly
 https://savannah.nongnu.org/bugs/?25787
