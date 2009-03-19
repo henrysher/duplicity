@@ -9,6 +9,9 @@ verbosity is at level 5 or higher (Info level).
 
 Adjust log levels so errors show up without verbosity.
 
+bug #25787: Usernames with escaped @-sign are not handled properly
+https://savannah.nongnu.org/bugs/?25787
+
 
 New in v0.5.12 (2009/03/15)
 ---------------------------

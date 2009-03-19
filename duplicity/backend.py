@@ -30,6 +30,7 @@ import time
 import re
 import getpass
 import gettext
+import urllib
 
 import duplicity.dup_temp as dup_temp
 import duplicity.dup_threading as dup_threading
@@ -168,6 +169,10 @@ class ParsedUrl:
             self.username = pu.username
         except:
             raise InvalidBackendURL("Syntax error (username) in: %s" % url_string)
+        if self.username:
+            self.username = urllib.unquote(pu.username)
+        else:
+            self.username = None
 
         try:
             self.password = pu.password

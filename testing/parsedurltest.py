@@ -65,6 +65,15 @@ class ParsedUrlTest(unittest.TestCase):
         assert pu.password == "pass", pu.password
         assert pu.port == 123, pu.port
 
+        pu = duplicity.backend.ParsedUrl("ftp://foo%40bar:pass@example.com:123/home")
+        assert pu.scheme == "ftp", pu.scheme
+        assert pu.netloc == "foo%40bar:pass@example.com:123", pu.netloc
+        assert pu.hostname == "example.com", pu.hostname
+        assert pu.path == "/home", pu.path
+        assert pu.username == "foo@bar", pu.username
+        assert pu.password == "pass", pu.password
+        assert pu.port == 123, pu.port
+
         pu = duplicity.backend.ParsedUrl("imap://foo@bar:pass@example.com:123/home")
         assert pu.scheme == "imap", pu.scheme
         assert pu.netloc == "foo@bar:pass@example.com:123", pu.netloc
@@ -95,6 +104,15 @@ class ParsedUrlTest(unittest.TestCase):
         pu = duplicity.backend.ParsedUrl("imap://foo@bar.com@example.com/home")
         assert pu.scheme == "imap", pu.scheme
         assert pu.netloc == "foo@bar.com@example.com", pu.netloc
+        assert pu.hostname == "example.com", pu.hostname
+        assert pu.path == "/home", pu.path
+        assert pu.username == "foo@bar.com", pu.username
+        assert pu.password == None, pu.password
+        assert pu.port == None, pu.port
+
+        pu = duplicity.backend.ParsedUrl("imap://foo%40bar.com@example.com/home")
+        assert pu.scheme == "imap", pu.scheme
+        assert pu.netloc == "foo%40bar.com@example.com", pu.netloc
         assert pu.hostname == "example.com", pu.hostname
         assert pu.path == "/home", pu.path
         assert pu.username == "foo@bar.com", pu.username
