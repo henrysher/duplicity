@@ -16,6 +16,9 @@ would show up and not a Python object representation.
 bug #25787: Usernames with escaped @-sign are not handled properly
 https://savannah.nongnu.org/bugs/?25787
 
+patch #6787: import duplicity.GnuPGInterface explicitly
+https://savannah.nongnu.org/patch/?6787
+
 
 New in v0.5.12 (2009/03/15)
 ---------------------------

@@ -49,11 +49,11 @@ import os
 import tempfile
 import sys
 
-import GnuPGInterface
+import duplicity.GnuPGInterface as GnuPGInterface
 
 __author__   = "Frank J. Tobin, ftobin@neverending.org"
 __version__  = "0.2.2"
-__revision__ = "$Id: GnuPGInterfacetest.py,v 1.6 2009/02/02 15:36:46 loafman Exp $"
+__revision__ = "$Id: GnuPGInterfacetest.py,v 1.7 2009/03/21 18:58:51 loafman Exp $"
 
 class BasicTest(unittest.TestCase):
     """an initializer superclass"""

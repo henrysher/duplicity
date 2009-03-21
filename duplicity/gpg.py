@@ -22,7 +22,8 @@
 """duplicity's gpg interface, builds upon Frank Tobin's GnuPGInterface"""
 
 import select, os, sys, thread, types, cStringIO, tempfile, re, gzip
-import GnuPGInterface, misc, log
+import misc, log
+import duplicity.GnuPGInterface as GnuPGInterface
 
 try:
     from hashlib import sha1
