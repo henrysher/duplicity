@@ -32,7 +32,8 @@ class Manifest:
     """List of volumes and information about each one"""
     def __init__(self):
         """Create blank Manifest"""
-        self.hostname = None; self.local_dirname = None
+        self.hostname = None;
+        self.local_dirname = None
         self.volume_info_dict = {} # dictionary vol numbers -> vol infos
 
     def set_dirinfo(self):
@@ -50,15 +51,16 @@ class Manifest:
         """
         if globals.allow_source_mismatch:
             return
+
         if self.hostname and self.hostname != globals.hostname:
-            errmsg = """Fatal Error: Backup source host has changed.
-Current hostname: %s
-Previous hostname: %s""" % (globals.hostname, self.hostname)
-        elif (self.local_dirname and
-              self.local_dirname != globals.local_path.name):
-            errmsg = """Fatal Error: Backup source directory has changed.
-Current directory: %s
-Previous directory: %s""" % (self.local_dirname, globals.local_path.name)
+            errmsg = _("Fatal Error: Backup source host has changed.\n"
+                       "Current hostname: %s\n"
+                       "Previous hostname: %s") % (globals.hostname, self.hostname)
+
+        elif (self.local_dirname and self.local_dirname != globals.local_path.name):
+            errmsg = _("Fatal Error: Backup source directory has changed.\n"
+                       "Current directory: %s\n"
+                       "Previous directory: %s") % (self.local_dirname, globals.local_path.name)
         else:
             return
 
@@ -92,6 +94,7 @@ Previous directory: %s""" % (self.local_dirname, globals.local_path.name)
         result = "%s%s\n" % (result,
                              "\n".join(map(vol_num_to_string, vol_num_list)))
         return result
+
     __str__ = to_string
 
     def from_string(self, s):
@@ -123,17 +126,22 @@ Previous directory: %s""" % (self.local_dirname, globals.local_path.name)
         vi_list1.sort()
         vi_list2 = other.volume_info_dict.keys()
         vi_list2.sort()
+
         if vi_list1 != vi_list2:
             log.Log(_("Manifests not equal because different volume numbers"), 3)
-            return None
+            return False
+
         for i in range(len(vi_list1)):
             if not vi_list1[i] == vi_list2[i]:
-                return None
+                log.Log(_("Manifests not equal because volume lists differ"), 3)
+                return False
 
         if (self.hostname != other.hostname or
             self.local_dirname != other.local_dirname):
-            return None
-        return 1
+            log.Log(_("Manifests not equal because hosts or directories differ"), 3)
+            return False
+
+        return True
 
     def __ne__(self, other):
         """Defines !=.  Not doing this always leads to annoying bugs..."""
