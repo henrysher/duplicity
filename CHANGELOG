@@ -1,10 +1,10 @@
-New in v0.5.13 (2009/03/??)
+New in v0.5.13 (2009/03/13)
 ---------------------------
 Add more error detection to FTP backend.
 
 Fix backends so sleep does not occur after last retry.
 
-BackendException does not cause traceback except when
+Fix so BackendException does not cause traceback except when
 verbosity is at level 5 or higher (Info level).
 
 Adjust log levels so some errors show up with default verbosity.
@@ -15,6 +15,9 @@ would show up and not a Python object representation.
 
 bug #25787: Usernames with escaped @-sign are not handled properly
 https://savannah.nongnu.org/bugs/?25787
+
+bug #25976: Signed Backups Now Required
+https://savannah.nongnu.org/bugs/?25976
 
 patch #6787: import duplicity.GnuPGInterface explicitly
 https://savannah.nongnu.org/patch/?6787
