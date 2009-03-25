@@ -137,6 +137,7 @@ password:
 FTP_PASSWORD=mypassword duplicity /local/dir ftp://user@other.host/some_dir
 
 .SH ACTIONS
+
 .TP
 .B cleanup
 Delete the extraneous duplicity files on the given backend.
@@ -145,20 +146,24 @@ deleted.  This should only be necessary after a duplicity session
 fails or is aborted prematurely.  Note that
 .I --force
 will be needed to delete the files rather than just list them.
+
 .TP
 .B collection-status
 Summarize the status of the backup repository by printing the chains
 and sets found, and the number of volumes in each.
+
 .TP
 .B full
 Indicate full backup.  If this is set, perform full backup even if
 signatures are available.
+
 .TP
 .BR incr
 If this is requested an incremental backup will be performed.
 Duplicity will abort if old signatures cannot be
 found.  The default is to switch to full backup under these
 conditions.
+
 .TP
 .B list-current-files
 Lists the files currently backed up in the archive.  The information
@@ -166,6 +171,7 @@ will be extracted from the signature files, not the archive data
 itself.  Thus the whole archive does not have to be downloaded, but on
 the other hand if the archive has been deleted or corrupted, this
 command may not detect it.
+
 .TP
 .BI "remove-older-than " time
 Delete all backup sets older than the given time.  Old backup sets
@@ -177,6 +183,7 @@ section for more information.  Note, this action cannot be combined
 with backup or other actions, such as cleanup.  Note also that
 .I --force
 will be needed to delete the files rather than just list them.
+
 .TP
 .BI "remove-all-but-n-full " count
 Delete all backups sets that are older than the count:th last full
@@ -188,6 +195,7 @@ must be larger than zero. A value of 1 means that only the single most
 recent backup chain will be kept.  Note that
 .I --force
 will be needed to delete the files rather than just list them.
+
 .TP
 .B verify
 Enter verify mode instead of restore.  If the --file-to-restore option
@@ -197,11 +205,13 @@ verbosity level 4 or higher, log a message for each file that has
 changed.
 
 .SH OPTIONS
+
 .TP
 .BI --allow-source-mismatch
 Do not abort on attempts to use the same archive dir or remote backend
 to back up different directories.  duplicity will tell you if you need
 this switch.
+
 .TP
 .BI "--archive-dir " path
 When backing up or restoring, specify the local archive directory.
@@ -212,6 +222,7 @@ option does not imply that the archive data is no longer stored
 in the backup destination, nor that the local archive directory
 need be kept safe. The local archive directory is a performance
 optimization only, and may safely be discarded at any time.
+
 .TP
 .BI "--asynchronous-upload "
 (EXPERIMENTAL) Perform file uploads asynchronously in the background,
@@ -222,13 +233,16 @@ CPU and your bandwidth can be more consistently utilized. Use of this
 option implies additional need for disk space in the temporary storage
 location; rather than needing to store only one volume at a time,
 enough storage space is required to store two volumes.
+
 .TP
 .BI "--dry-run "
 Calculate what would be done, but do not perform any backend actions
+
 .TP
 .BI "--encrypt-key " key
 When backing up, encrypt to the given public key, instead of using
 symmetric (traditional) encryption.  Can be specified multiple times.
+
 .TP
 .BI "--exclude " shell_pattern
 Exclude the file or files matched by
@@ -237,10 +251,12 @@ If a directory is matched, then files under that directory will also
 be matched.  See the
 .B FILE SELECTION
 section for more information.
+
 .TP
 .B "--exclude-device-files"
 Exclude all device files.  This can be useful for security/permissions
 reasons or if rdiff-backup is not handling device files correctly.
+
 .TP
 .BI "--exclude-filelist " filename
 Excludes the files listed in
@@ -248,6 +264,7 @@ Excludes the files listed in
 See the
 .B FILE SELECTION
 section for more information.
+
 .TP
 .B --exclude-filelist-stdin
 Like
@@ -255,6 +272,7 @@ Like
 but the list of files will be read from standard input.  See the
 .B FILE SELECTION
 section for more information.
+
 .TP
 .BR "--exclude-globbing-filelist " filename
 Like
@@ -264,10 +282,12 @@ same rules as
 .B --include
 and
 .B --exclude.
+
 .TP
 .B --exclude-other-filesystems
 Exclude files on file systems (identified by device number) other than
 the file system the root of the source directory is on.
+
 .TP
 .BI "--exclude-regexp " regexp
 Exclude files matching the given regexp.  Unlike the
@@ -276,6 +296,7 @@ option, this option does not match files in a directory it matches.
 See the
 .B FILE SELECTION
 section for more information.
+
 .TP
 .BI "--file-to-restore " path
 This option may be given in restore mode, causing only
@@ -283,6 +304,7 @@ This option may be given in restore mode, causing only
 to be restored instead of the entire contents of the backup archive.
 .I path
 should be given relative to the root of the directory backed up.
+
 .TP
 .BI "--full-if-older-than " time
 Perform a full backup if an incremental backup is requested, but the
@@ -291,29 +313,35 @@ latest full backup in the collection is older than the given
 See the
 .B TIME FORMATS
 section for more information.
+
 .TP
 .B --force
 Proceed even if data loss might result.  Duplicity will let the user
 know when this option is required.
+
 .TP
 .B --ftp-passive
 Use passive (PASV) data connections.  The default is to use passive,
 but to fallback to regular if the passive connection fails or times
 out.
+
 .TP
 .B --ftp-regular
 Use regular (PORT) data connections.
+
 .TP
 .BI "--imap-mailbox " option
 Allows you to specify a different mailbox.  The default is
 "INBOX".
 Other languages may require a different mailbox than the default.
+
 .TP
 .BI "--gpg-options " options
 Allows you to pass options to gpg encryption.  The
 .I options
 list should be of the form "opt1=parm1 opt2=parm2" where the string is
 quoted and the only spaces allowed are between options.
+
 .TP
 .BI "--include " shell_pattern
 Similar to
@@ -324,6 +352,7 @@ this option will also match parent directories of matched files
 (although not necessarily their contents).  See the
 .B FILE SELECTION
 section for more information.
+
 .TP
 .BI "--include-filelist " filename
 Like
@@ -331,11 +360,13 @@ Like
 but include the listed files instead.  See the
 .B FILE SELECTION
 section for more information.
+
 .TP
 .B --include-filelist-stdin
 Like
 .BR --include-filelist ,
 but read the list of included files from standard input.
+
 .TP
 .BI "--include-globbing-filelist " filename
 Like
@@ -345,6 +376,7 @@ same rules as
 .B --include
 and
 .B --exclude.
+
 .TP
 .BI "--include-regexp " regexp
 Include files matching the regular expression
@@ -354,23 +386,28 @@ Only files explicitly matched by
 will be included by this option.  See the
 .B FILE SELECTION
 section for more information.
+
 .TP
 .BI "--log-fd " number
 Write specially-formatted versions of output messages to the specified file
 descriptor.  The format used is designed to be easily consumable by other
 programs.
+
 .TP
 .BI "--log-file " filename
 Write specially-formatted versions of output messages to the specified file.
 The format used is designed to be easily consumable by other programs.
+
 .TP
 .B --no-encryption
 Do not use GnuPG to encrypt files on remote system.  Instead just
 write gzipped volumes.
+
 .TP
 .B --no-print-statistics
 By default duplicity will print statistics about the current session
 after a successful backup.  This switch disables that behavior.
+
 .TP
 .B --null-separator
 Use nulls (\\0) instead of newlines (\\n) as line separators, which
@@ -378,13 +415,16 @@ may help when dealing with filenames containing newlines.  This
 affects the expected format of the files specified by the
 --{include|exclude}-filelist[-stdin] switches as well as the format of
 the directory statistics file.
+
 .TP
 .BI "--num-retries " number
 Number of retries to make on errors before giving up.
+
 .TP
 .B --old-filenames
 Use the old filename format (incompatible with Windows/Samba) rather than
 the new filename format.
+
 .TP
 .BI "--s3-european-buckets"
 When using the Amazon S3 backend, create buckets in Europe instead of
@@ -393,12 +433,14 @@ the default (requires
 ). Also see the
 .B EUROPEAN S3 BUCKETS
 section.
+
 .TP
 .BI "--s3-use-new-style"
 When operating on Amazon S3 buckets, use new-style subdomain bucket
 addressing. This is now the preferred method to access Amazon S3, but
 is not backwards compatible if your bucket name contains upper-case
 characters or other characters that are not valid in a hostname.
+
 .TP
 .BI "--scp-command " command
 This option only matters when using the ssh/scp backend.  The
@@ -408,6 +450,7 @@ is "scp". To list and delete existing files, the sftp command is used.  See
 .BR --ssh-options
 and
 .BR --sftp-command .
+
 .TP
 .BI "--sftp-command " command
 This option only matters when using the ssh/scp backend.  The
@@ -417,6 +460,7 @@ default is "sftp". File transfers are done using the scp command. See
 .BR --ssh-options
 and
 .BR --scp-command .
+
 .TP
 .BI "--sign-key " key
 This option can be used when backing up or restoring.  When backing
@@ -426,11 +470,13 @@ When restoring, duplicity will signal an error if any remote file is
 not signed with the given keyid.
 .I key
 should be an 8 character hex string, like AA0E73D2.
+
 .TP
 .B --ssh-askpass
 Tells the ssh/scp backend to use FTP_PASSWORD from the environment,
 or, if that is not present, to prompt the user for the remote system
 password.
+
 .TP
 .BI "--ssh-options " options
 Allows you to pass options to the ssh/scp/sftp backend.  The
@@ -449,32 +495,51 @@ duplicity --ssh-options="-oProtocol=2 -oIdentityFile=/my/backup/id" /home/me scp
 .PP
 .RE
 
+
 .TP
 .BI --short-filenames
 If this option is specified, the names of the files duplicity writes
 will be shorter (about 30 chars) but less understandable.  This may be
 useful when backing up to MacOS or another OS or FS that doesn't
 support long filenames.
+
 .TP
 .BI "--tempdir " directory
 Use this existing directory for duplicity temporary files instead of
 the system default, which is usually the /tmp directory. This option
 supersedes any environment variable.
+
 .TP
 .BI -t time ", --time " time ", --restore-time " time
 Specify the time from which to restore or list files.
+
 .TP
 .BI "--time-separator " char
 Use
 .IR char
 as the time separator in filenames instead of colon (":").
+
+.TP
+.BI --use-agent
+If this option is specified, then
+.I --use-agent
+is passed to the GnuPG
+encryption process and it will turn off any passphrase interaction with
+the user with respect to
+.I --encrypt-key
+or
+.I --sign-key
+.
+
 .TP
 .BI -v [0-9] ", --verbosity " [0-9]
 Specify verbosity level (0 is total silent, 3 is the default, and 9 is
 noisiest).
+
 .TP
 .BI --version
 Print duplicity's version and quit.
+
 .TP
 .BI "--volsize " number
 Change the volume size to
@@ -653,10 +718,12 @@ before duplicity sees them.
 The
 .BI "--exclude " pattern
 option matches a file iff:
+
 .TP
 .B 1.
 .I pattern
 can be expanded into the file's filename, or
+
 .TP
 .B 2.
 the file is inside a directory matched by the option.
@@ -665,13 +732,16 @@ the file is inside a directory matched by the option.
 Conversely,
 .BI "--include " pattern
 matches a file iff:
+
 .TP
 .B 1.
 .I pattern
 can be expanded into the file's filename,
+
 .TP
 .B 2.
 the file is inside a directory matched by the option, or
+
 .TP
 .B 3.
 the file is a directory which contains a file matched by the option.
@@ -721,6 +791,7 @@ are separated by newlines or nulls, depending on whether the
 interpreted similarly to the way
 .I extended shell patterns
 are, with a few exceptions:
+
 .TP
 .B 1.
 Globbing patterns like
@@ -730,10 +801,12 @@ Globbing patterns like
 and
 .B [...]
 are not expanded.
+
 .TP
 .B 2.
 Include patterns do not match files in a directory that is included.
 So /usr/local in an include file will not match /usr/local/doc.
+
 .TP
 .B 3.
 Lines starting with "+ " are interpreted as include directives, even
@@ -880,6 +953,7 @@ The remote signatures will be encrypted if encryption is enabled.
 The local signatures will not be encrypted
 
 .SH ENVIRONMENT VARIABLES
+
 .TP
 .B TMPDIR, TEMP, TMP
 In decreasing order of importance, specifies the directory to use for
@@ -949,5 +1023,3 @@ Current Maintainer - Kenneth Loafman <kenneth@loafman.com>
 .BR python (1),
 .BR rdiff (1),
 .BR rdiff-backup (1).
-
-

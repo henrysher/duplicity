@@ -107,6 +107,7 @@ options = ["allow-source-mismatch",
            "time=",
            "timeout=",
            "time-separator=",
+           "use-agent",
            "verbosity=",
            "version",
            "volsize=",
@@ -294,6 +295,8 @@ def parse_cmdline_options(arglist):
             globals.time_separator = arg
             dup_time.curtimestr = dup_time.timetostring(dup_time.curtime)
             old_fn_deprecation(opt)
+        elif opt == "--use-agent":
+            globals.use_agent = True
         elif opt in ["-V", "--version"]:
             print "duplicity", str(globals.version)
             sys.exit(0)
@@ -407,6 +410,7 @@ Options:
     --timeout <seconds>
     -t<time>, --time <time>, --restore-time <time>
     --time-separator <char>
+    --use-agent
     --version
     --volsize <number>
     -v[0-9], --verbosity [0-9]

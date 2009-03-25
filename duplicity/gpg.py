@@ -23,6 +23,8 @@
 
 import select, os, sys, thread, types, cStringIO, tempfile, re, gzip
 import misc, log
+
+import duplicity.globals as globals
 import duplicity.GnuPGInterface as GnuPGInterface
 
 try:
@@ -92,6 +94,8 @@ class GPGFile:
         gnupg = GnuPGInterface.GnuPG()
         gnupg.options.meta_interactive = 0
         gnupg.options.extra_args.append('--no-secmem-warning')
+        if globals.use_agent:
+            gnupg.options.extra_args.append('--use-agent')
         if gpg_options:
             for opt in gpg_options.split():
                 gnupg.options.extra_args.append(opt)

@@ -1,4 +1,4 @@
-New in v0.5.13 (2009/03/13)
+New in v0.5.13 (2009/03/??)
 ---------------------------
 Add more error detection to FTP backend.
 
@@ -13,10 +13,18 @@ Fixed bug where an extra comma caused a traceback during a warning
 about unnecessary sig files.  Plus fixed print so the real filename
 would show up and not a Python object representation.
 
+bug #22908: Don't block gpg-agent
+https://savannah.nongnu.org/bugs/?22908
+
+To fix the above, --use-agent was added as a command line option.
+When this is specified and asymetric encryption is enabled, then all
+GnuPG passphrases will come from the gpg-agent or equivalent program
+and no passphrase prompt will be issued.
+
 bug #25787: Usernames with escaped @-sign are not handled properly
 https://savannah.nongnu.org/bugs/?25787
 
-bug #25976: Signed Backups Now Required
+bug #25976: Password requested when not needed.
 https://savannah.nongnu.org/bugs/?25976
 
 patch #6787: import duplicity.GnuPGInterface explicitly
