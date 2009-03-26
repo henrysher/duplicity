@@ -61,6 +61,7 @@ def MakeTar():
     os.mkdir(tardir)
     for filename in [
         "CHANGELOG",
+        "Changelog.GNU",
         "COPYING",
         "CVS-README",
         "LOG-README",

@@ -1,4 +1,4 @@
-New in v0.5.13 (2009/03/??)
+New in v0.5.13 (2009/03/26)
 ---------------------------
 Add more error detection to FTP backend.
 
@@ -12,6 +12,9 @@ Adjust log levels so some errors show up with default verbosity.
 Fixed bug where an extra comma caused a traceback during a warning
 about unnecessary sig files.  Plus fixed print so the real filename
 would show up and not a Python object representation.
+
+Add Changelog.GNU to website and distribution to add a bit of detail
+showing the CVS changes via rcs2log.  Added dist/mkGNUChangelog.sh.
 
 bug #22908: Don't block gpg-agent
 https://savannah.nongnu.org/bugs/?22908
