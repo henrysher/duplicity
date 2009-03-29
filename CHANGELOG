@@ -1,5 +1,14 @@
 New in v0.5.13 (2009/03/26)
 ---------------------------
+Revert to calling NcFTP utilities (ls, get, put) directly
+rather than scripting ncftp via pexpect.  Move fatal error
+regarding version 3.2.0 to a warning message since it has
+been reported that the segfault problem does not occur on
+most distributions.
+
+
+New in v0.5.13 (2009/03/26)
+---------------------------
 Add more error detection to FTP backend.
 
 Fix backends so sleep does not occur after last retry.

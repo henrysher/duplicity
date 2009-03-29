@@ -118,6 +118,7 @@ class WarningCode:
     unmatched_sig = 4
     incomplete_backup = 5
     orphaned_backup = 6
+    ftp_ncftp_v320 = 7 # moved from error
 
 def Warn(s, code=WarningCode.generic):
     """Shortcut used for warning messages (verbosity 2)"""
@@ -156,7 +157,7 @@ class ErrorCode:
     boto_calling_format = 26
     ftp_ncftp_missing = 27
     ftp_ncftp_too_old = 28
-    ftp_ncftp_v320 = 29
+    #ftp_ncftp_v320 = 29 # moved to warning
     exception = 30
     gpg_failed = 31
 
