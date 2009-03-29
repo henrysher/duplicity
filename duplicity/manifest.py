@@ -128,17 +128,17 @@ class Manifest:
         vi_list2.sort()
 
         if vi_list1 != vi_list2:
-            log.Log(_("Manifests not equal because different volume numbers"), 3)
+            log.Notice(_("Manifests not equal because different volume numbers"))
             return False
 
         for i in range(len(vi_list1)):
             if not vi_list1[i] == vi_list2[i]:
-                log.Log(_("Manifests not equal because volume lists differ"), 3)
+                log.Notice(_("Manifests not equal because volume lists differ"))
                 return False
 
         if (self.hostname != other.hostname or
             self.local_dirname != other.local_dirname):
-            log.Log(_("Manifests not equal because hosts or directories differ"), 3)
+            log.Notice(_("Manifests not equal because hosts or directories differ"))
             return False
 
         return True
@@ -256,7 +256,7 @@ class VolumeInfo:
             field_name = line_split[0].lower()
             other_fields = line_split[1:]
             if field_name == "Volume":
-                log.Log(_("Warning, found extra Volume identifier"), 2)
+                log.Warn(_("Warning, found extra Volume identifier"))
                 break
             elif field_name == "startingpath":
                 self.start_index = string_to_index(other_fields[0])
@@ -272,23 +272,23 @@ class VolumeInfo:
     def __eq__(self, other):
         """Used in test suite"""
         if not isinstance(other, VolumeInfo):
-            log.Log(_("Other is not VolumeInfo"), 3)
+            log.Notice(_("Other is not VolumeInfo"))
             return None
         if self.volume_number != other.volume_number:
-            log.Log(_("Volume numbers don't match"), 3)
+            log.Notice(_("Volume numbers don't match"))
             return None
         if self.start_index != other.start_index:
-            log.Log(_("start_indicies don't match"), 3)
+            log.Notice(_("start_indicies don't match"))
             return None
         if self.end_index != other.end_index:
-            log.Log(_("end_index don't match"), 3)
+            log.Notice(_("end_index don't match"))
             return None
         hash_list1 = self.hashes.items()
         hash_list1.sort()
         hash_list2 = other.hashes.items()
         hash_list2.sort()
         if hash_list1 != hash_list2:
-            log.Log(_("Hashes don't match"), 3)
+            log.Notice(_("Hashes don't match"))
             return None
         return 1
 

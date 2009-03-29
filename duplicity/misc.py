@@ -94,7 +94,7 @@ class FileVolumeWriter:
             raise StopIteration
 
         filename = "%s.%d" % (self.prefix, self.current_index)
-        log.Log(_("Starting to write %s") % filename, 5)
+        log.Info(_("Starting to write %s") % filename)
         outfp = open(filename, "wb")
 
         if not self.write_volume(outfp):
@@ -102,8 +102,8 @@ class FileVolumeWriter:
             self.finished = 1
             if self.current_index == 1:
                 # special case first index
-                log.Log(_("One only volume required.\n"
-                          "Renaming %s to %s") % (filename, self.prefix), 4)
+                log.Notice(_("One only volume required.\n"
+                             "Renaming %s to %s") % (filename, self.prefix))
                 os.rename(filename, self.prefix)
                 return self.prefix
         else:
@@ -148,8 +148,8 @@ class BufferedFile:
 
     def close(self):
         self.fileobj.close()
-        
-    
+
+
 def copyfileobj(infp, outfp, byte_count = -1):
     """Copy byte_count bytes from infp to outfp, or all if byte_count < 0
 

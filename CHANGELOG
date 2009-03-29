@@ -6,6 +6,20 @@ regarding version 3.2.0 to a warning message since it has
 been reported that the segfault problem does not occur on
 most distributions.
 
+Changed from log.Log with numbered log levels to log.Debug,
+log.Info, log.Notice, log.Warn, log.FatalError as below:
+    0  log.FatalError
+    1  log.Warn
+    2  log.Warn
+    3  log.Notice
+    4  log.Notice
+    5  log.Info
+    6  log.Info
+    7  log.Info
+    8  log.Info
+    9 log.Debug
+The -vN option has not changed at this point.
+
 
 New in v0.5.13 (2009/03/26)
 ---------------------------

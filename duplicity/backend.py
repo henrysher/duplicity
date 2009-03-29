@@ -300,7 +300,7 @@ class Backend:
         raise a BackendException.
         """
         private = self.munge_password(commandline)
-        log.Log(_("Running '%s'") % private, 5)
+        log.Info(_("Running '%s'") % private)
         if os.system(commandline):
             raise BackendException("Error running '%s'" % private)
 
@@ -314,18 +314,17 @@ class Backend:
             if n > 1:
                 # sleep before retry
                 time.sleep(30)
-            log.Log(gettext.ngettext("Running '%s' (attempt #%d)",
-                                     "Running '%s' (attempt #%d)", n) %
-                                     (private, n), 5)
+            log.Info(gettext.ngettext("Running '%s' (attempt #%d)",
+                                      "Running '%s' (attempt #%d)", n) %
+                                      (private, n))
             if not os.system(commandline):
                 return
-            log.Log(gettext.ngettext("Running '%s' failed (attempt #%d)",
-                                     "Running '%s' failed (attempt #%d)", n) %
-                                     (private, n), 1)
-        log.Log(gettext.ngettext("Giving up trying to execute '%s' after %d attempt",
+            log.Warn(gettext.ngettext("Running '%s' failed (attempt #%d)",
+                                      "Running '%s' failed (attempt #%d)", n) %
+                                      (private, n), 1)
+        log.Warn(gettext.ngettext("Giving up trying to execute '%s' after %d attempt",
                                  "Giving up trying to execute '%s' after %d attempts",
-                                 globals.num_retries) % (private, globals.num_retries),
-                1)
+                                 globals.num_retries) % (private, globals.num_retries))
         raise BackendException("Error running '%s'" % private)
 
     def popen(self, commandline):
@@ -334,7 +333,7 @@ class Backend:
         contents read from stdout) as a string.
         """
         private = self.munge_password(commandline)
-        log.Log(_("Reading results of '%s'") % private, 5)
+        log.Info(_("Reading results of '%s'") % private)
         fout = os.popen(commandline)
         results = fout.read()
         if fout.close():
@@ -351,7 +350,7 @@ class Backend:
             if n > 1:
                 # sleep before retry
                 time.sleep(30)
-            log.Log(_("Reading results of '%s'") % private, 5)
+            log.Info(_("Reading results of '%s'") % private)
             fout = os.popen(commandline)
             results = fout.read()
             result_status = fout.close()
@@ -361,13 +360,12 @@ class Backend:
                 # This squelches the "file not found" result fromm ncftpls when
                 # the ftp backend looks for a collection that does not exist.
                 return ''
-            log.Log(gettext.ngettext("Running '%s' failed (attempt #%d)",
+            log.Warn(gettext.ngettext("Running '%s' failed (attempt #%d)",
                                      "Running '%s' failed (attempt #%d)", n) %
-                                     (private, n), 1)
-        log.Log(gettext.ngettext("Giving up trying to execute '%s' after %d attempt",
-                                 "Giving up trying to execute '%s' after %d attempts",
-                                 globals.num_retries) % (private, globals.num_retries),
-                1)
+                                      (private, n))
+        log.Warn(gettext.ngettext("Giving up trying to execute '%s' after %d attempt",
+                                  "Giving up trying to execute '%s' after %d attempts",
+                                  globals.num_retries) % (private, globals.num_retries))
         raise BackendException("Error running '%s'" % private)
 
     def get_fileobj_read(self, filename, parseresults = None):

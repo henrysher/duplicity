@@ -327,7 +327,7 @@ class ROPath:
         """
         def log_diff(log_string):
             log_str = _("Difference found:") + " " + log_string
-            log.Log(log_str % (self.get_relative_path(),), 4)
+            log.Notice(log_str % (self.get_relative_path(),))
 
         if not self.type and not other.type:
             return 1
@@ -520,7 +520,7 @@ class Path(ROPath):
 
     def mkdir(self):
         """Make a directory at specified path"""
-        log.Log(_("Making directory %s") % (self.name,), 7)
+        log.Info(_("Making directory %s") % (self.name,))
         try:
             os.mkdir(self.name)
         except OSError:
@@ -530,7 +530,7 @@ class Path(ROPath):
 
     def delete(self):
         """Remove this file"""
-        log.Log(_("Deleting %s") % (self.name,), 7)
+        log.Info(_("Deleting %s") % (self.name,))
         if self.isdir():
             os.rmdir(self.name)
         else:
@@ -539,14 +539,14 @@ class Path(ROPath):
 
     def touch(self):
         """Open the file, write 0 bytes, close"""
-        log.Log(_("Touching %s") % (self.name,), 7)
+        log.Info(_("Touching %s") % (self.name,))
         fp = self.open("wb")
         fp.close()
 
     def deltree(self):
         """Remove self by recursively deleting files under it"""
         import duplicity.selection as selection # todo: avoid circ. dep. issue
-        log.Log(_("Deleting tree %s") % (self.name,), 7)
+        log.Info(_("Deleting tree %s") % (self.name,))
         itr = IterTreeReducer(PathDeleter, [])
         for path in selection.Select(self).set_iter():
             itr(path.index, path)

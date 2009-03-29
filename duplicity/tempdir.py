@@ -115,7 +115,7 @@ class TemporaryDirectory:
         """
         self.__dir = tempfile.mkdtemp("-tempdir", "duplicity-", temproot)
 
-        log.Log(_("Using temporary directory %s") % (self.__dir,), 5)
+        log.Info(_("Using temporary directory %s") % (self.__dir,))
 
         # number of mktemp()/mkstemp() calls served so far
         self.__tempcount = 0
@@ -152,7 +152,7 @@ class TemporaryDirectory:
             suffix = "-%d" % (self.__tempcount,)
             filename = tempfile.mktemp(suffix, "mktemp-", self.__dir)
 
-            log.Log(_("Registering (mktemp) temporary file %s") % (filename,), 9)
+            log.Debug(_("Registering (mktemp) temporary file %s") % (filename,))
             self.__pending[filename] = None
         finally:
             self.__lock.release()
@@ -174,7 +174,7 @@ class TemporaryDirectory:
             suffix = "-%d" % (self.__tempcount,)
             fd, filename = tempfile.mkstemp(suffix, "mkstemp-", self.__dir)
 
-            log.Log(_("Registering (mkstemp) temporary file %s") % (filename,), 9)
+            log.Debug(_("Registering (mkstemp) temporary file %s") % (filename,))
             self.__pending[filename] = None
         finally:
             self.__lock.release()
@@ -206,10 +206,10 @@ class TemporaryDirectory:
         self.__lock.acquire()
         try:
             if self.__pending.has_key(fname):
-                log.Log(_("Forgetting temporary file %s") % (fname, ), 9)
+                log.Debug(_("Forgetting temporary file %s") % (fname, ))
                 del(self.__pending[fname])
             else:
-                log.Log(_("Attempt to forget unknown tempfile %s - this is probably a bug.") % (fname,), 1)
+                log.Warn(_("Attempt to forget unknown tempfile %s - this is probably a bug.") % (fname,))
                 pass
         finally:
             self.__lock.release()
@@ -228,15 +228,15 @@ class TemporaryDirectory:
             if not self.__dir is None:
                 for file in self.__pending.keys():
                     try:
-                        log.Log(_("Removing still remembered temporary file %s") % (file,), 9)
+                        log.Debug(_("Removing still remembered temporary file %s") % (file,))
                         os.unlink(file)
                     except:
-                        log.Log(_("Cleanup of temporary file %s failed") % (file,), 7)
+                        log.Info(_("Cleanup of temporary file %s failed") % (file,))
                         pass
                 try:
                     os.rmdir(self.__dir)
                 except:
-                    log.Log(_("Cleanup of temporary directory %s failed - this is probably a bug.") % (self.__dir,), 1)
+                    log.Warn(_("Cleanup of temporary directory %s failed - this is probably a bug.") % (self.__dir,))
                     pass
                 self.__pending = None
                 self.__dir = None

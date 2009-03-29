@@ -160,6 +160,7 @@ class ErrorCode:
     #ftp_ncftp_v320 = 29 # moved to warning
     exception = 30
     gpg_failed = 31
+    s3_bucket_not_style = 32
 
 def FatalError(s, code, extra=None):
     """Write fatal error message and exit"""

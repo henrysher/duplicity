@@ -46,7 +46,7 @@ class LocalBackend(duplicity.backend.Backend):
         if not remote_filename:
             remote_filename = source_path.get_filename()
         target_path = self.remote_pathdir.append(remote_filename)
-        log.Log("Writing %s" % target_path.name, 6)
+        log.Info("Writing %s" % target_path.name)
         if rename:
             try:
                 source_path.rename(target_path)

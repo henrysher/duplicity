@@ -74,9 +74,9 @@ class WebDAVBackend(duplicity.backend.Backend):
         else:
             self.directory = '/'
 
-        log.Log("Using WebDAV host %s" % (parsed_url.hostname,), 5)
-        log.Log("Using WebDAV directory %s" % (self.directory,), 5)
-        log.Log("Using WebDAV protocol %s" % (globals.webdav_proto,), 5)
+        log.Info("Using WebDAV host %s" % (parsed_url.hostname,))
+        log.Info("Using WebDAV directory %s" % (self.directory,))
+        log.Info("Using WebDAV protocol %s" % (globals.webdav_proto,))
 
         if parsed_url.scheme == 'webdav':
             self.conn = httplib.HTTPConnection(parsed_url.hostname)
@@ -160,25 +160,25 @@ class WebDAVBackend(duplicity.backend.Backend):
     def list(self):
         """List files in directory"""
         for n in range(1, globals.num_retries+1):
-            log.Log("Listing directory %s on WebDAV server" % (self.directory,), 5)
+            log.Info("Listing directory %s on WebDAV server" % (self.directory,))
             self.headers['Depth'] = "1"
             response = self.request("PROPFIND", self.directory, self.listbody)
             del self.headers['Depth']
             # if the target collection does not exist, create it.
             if response.status == 404:
-                log.Log("Directory '%s' being created." % self.directory, 5)
+                log.Info("Directory '%s' being created." % self.directory)
                 res = self.request("MKCOL", self.directory)
-                log.Log("WebDAV MKCOL status: %s %s" % (res.status, res.reason), 5)
+                log.Info("WebDAV MKCOL status: %s %s" % (res.status, res.reason))
                 continue
             if response.status == 207:
                 document = response.read()
                 break
-            log.Log("WebDAV PROPFIND attempt #%d failed: %s %s" % (n, response.status, response.reason), 5)
+            log.Info("WebDAV PROPFIND attempt #%d failed: %s %s" % (n, response.status, response.reason))
             if n == globals.num_retries +1:
-                log.Log("WebDAV backend giving up after %d attempts to PROPFIND %s" % (globals.num_retries, self.directory), 1)
+                log.Warn("WebDAV backend giving up after %d attempts to PROPFIND %s" % (globals.num_retries, self.directory))
                 raise BackendException((response.status, response.reason))
 
-        log.Log("%s" % (document,), 6)
+        log.Info("%s" % (document,))
         dom = xml.dom.minidom.parseString(document)
         result = []
         for href in dom.getElementsByTagName('D:href'):
@@ -229,15 +229,15 @@ class WebDAVBackend(duplicity.backend.Backend):
         url = self.directory + remote_filename
         target_file = local_path.open("wb")
         for n in range(1, globals.num_retries+1):
-            log.Log("Retrieving %s from WebDAV server" % (url ,), 5)
+            log.Info("Retrieving %s from WebDAV server" % (url ,))
             response = self.request("GET", url)
             if response.status == 200:
                 target_file.write(response.read())
                 assert not target_file.close()
                 local_path.setdata()
                 return
-            log.Log("WebDAV GET attempt #%d failed: %s %s" % (n, response.status, response.reason), 5)
-        log.Log("WebDAV backend giving up after %d attempts to GET %s" % (globals.num_retries, url), 1)
+            log.Info("WebDAV GET attempt #%d failed: %s %s" % (n, response.status, response.reason))
+        log.Warn("WebDAV backend giving up after %d attempts to GET %s" % (globals.num_retries, url))
         raise BackendException((response.status, response.reason))
 
     def put(self, source_path, remote_filename = None):
@@ -247,14 +247,14 @@ class WebDAVBackend(duplicity.backend.Backend):
         url = self.directory + remote_filename
         source_file = source_path.open("rb")
         for n in range(1, globals.num_retries+1):
-            log.Log("Saving %s on WebDAV server" % (url ,), 5)
+            log.Info("Saving %s on WebDAV server" % (url ,))
             response = self.request("PUT", url, source_file.read())
             if response.status == 201:
                 response.read()
                 assert not source_file.close()
                 return
-            log.Log("WebDAV PUT attempt #%d failed: %s %s" % (n, response.status, response.reason), 5)
-        log.Log("WebDAV backend giving up after %d attempts to PUT %s" % (globals.num_retries, url), 1)
+            log.Info("WebDAV PUT attempt #%d failed: %s %s" % (n, response.status, response.reason))
+        log.Warn("WebDAV backend giving up after %d attempts to PUT %s" % (globals.num_retries, url))
         raise BackendException((response.status, response.reason))
 
     def delete(self, filename_list):
@@ -262,14 +262,14 @@ class WebDAVBackend(duplicity.backend.Backend):
         for filename in filename_list:
             url = self.directory + filename
             for n in range(1, globals.num_retries+1):
-                log.Log("Deleting %s from WebDAV server" % (url ,), 5)
+                log.Info("Deleting %s from WebDAV server" % (url ,))
                 response = self.request("DELETE", url)
                 if response.status == 204:
                     response.read()
                     break
-                log.Log("WebDAV DELETE attempt #%d failed: %s %s" % (n, response.status, response.reason), 5)
+                log.Info("WebDAV DELETE attempt #%d failed: %s %s" % (n, response.status, response.reason))
                 if n == globals.num_retries +1:
-                    log.Log("WebDAV backend giving up after %d attempts to DELETE %s" % (globals.num_retries, url), 1)
+                    log.Warn("WebDAV backend giving up after %d attempts to DELETE %s" % (globals.num_retries, url))
                     raise BackendException((response.status, response.reason))
 
 duplicity.backend.register_backend("webdav", WebDAVBackend)

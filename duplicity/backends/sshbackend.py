@@ -86,7 +86,7 @@ class SSHBackend(duplicity.backend.Backend):
             if n > 1:
                 # sleep before retry
                 time.sleep(30)
-            log.Log("Running '%s' (attempt #%d)" % (commandline, n), 5)
+            log.Info("Running '%s' (attempt #%d)" % (commandline, n))
             child = pexpect.spawn(commandline, timeout = None)
             cmdloc = 0
             if ssh_askpass:
@@ -100,21 +100,21 @@ class SSHBackend(duplicity.backend.Backend):
                                           "(?i)pass(word|phrase .*):",
                                           "(?i)permission denied",
                                           "authenticity"])
-                    log.Log("State = %s, Before = '%s'" % (state, child.before.strip()), 9)
+                    log.Debug("State = %s, Before = '%s'" % (state, child.before.strip()))
                     if match == 0:
-                        log.Log("Failed to authenticate", 1)
+                        log.Warn("Failed to authenticate")
                         break
                     elif match == 1:
-                        log.Log("Timeout waiting to authenticate", 1)
+                        log.Warn("Timeout waiting to authenticate")
                         break
                     elif match == 2:
                         child.sendline(self.password)
                         state = "copying"
                     elif match == 3:
-                        log.Log("Invalid SSH password", 1)
+                        log.Warn("Invalid SSH password")
                         break
                     elif match == 4:
-                        log.Log("Remote host authentication failed (missing known_hosts entry?)", 1)
+                        log.Warn("Remote host authentication failed (missing known_hosts entry?)")
                         break
                 elif state == "copying":
                     match = child.expect([pexpect.EOF,
@@ -122,34 +122,34 @@ class SSHBackend(duplicity.backend.Backend):
                                           "stalled",
                                           "authenticity",
                                           "ETA"])
-                    log.Log("State = %s, Before = '%s'" % (state, child.before.strip()), 9)
+                    log.Debug("State = %s, Before = '%s'" % (state, child.before.strip()))
                     if match == 0:
                         break
                     elif match == 1:
-                        log.Log("Timeout waiting for response", 1)
+                        log.Warn("Timeout waiting for response")
                         break
                     elif match == 2:
                         state = "stalled"
                     elif match == 3:
-                        log.Log("Remote host authentication failed (missing known_hosts entry?)", 1)
+                        log.Warn("Remote host authentication failed (missing known_hosts entry?)")
                         break
                 elif state == "stalled":
                     match = child.expect([pexpect.EOF,
                                           "(?i)timeout, server not responding",
                                           "ETA"])
-                    log.Log("State = %s, Before = '%s'" % (state, child.before.strip()), 9)
+                    log.Debug("State = %s, Before = '%s'" % (state, child.before.strip()))
                     if match == 0:
                         break
                     elif match == 1:
-                        log.Log("Stalled for too long, aborted copy", 1)
+                        log.Warn("Stalled for too long, aborted copy")
                         break
                     elif match == 2:
                         state = "copying"
             child.close(force = True)
             if child.exitstatus == 0:
                 return
-            log.Log("Running '%s' failed (attempt #%d)" % (commandline, n), 1)
-        log.Log("Giving up trying to execute '%s' after %d attempts" % (commandline, globals.num_retries), 1)
+            log.Warn("Running '%s' failed (attempt #%d)" % (commandline, n))
+        log.Warn("Giving up trying to execute '%s' after %d attempts" % (commandline, globals.num_retries))
         raise BackendException("Error running '%s'" % commandline)
 
     def run_sftp_command(self, commandline, commands):
@@ -167,22 +167,22 @@ class SSHBackend(duplicity.backend.Backend):
             if n > 1:
                 # sleep before retry
                 time.sleep(30)
-            log.Log("Running '%s' (attempt #%d)" % (commandline, n), 5)
+            log.Info("Running '%s' (attempt #%d)" % (commandline, n))
             child = pexpect.spawn(commandline, timeout = None, maxread=maxread)
             cmdloc = 0
             while 1:
                 match = child.expect(responses,
                                      searchwindowsize=maxread+max_response_len)
-                log.Log("State = sftp, Before = '%s'" % (child.before.strip()), 9)
+                log.Debug("State = sftp, Before = '%s'" % (child.before.strip()))
                 if match == 0:
                     break
                 elif match == 1:
-                    log.Log("Timeout waiting for response", 5)
+                    log.Info("Timeout waiting for response")
                     break
                 if match == 2:
                     if cmdloc < len(commands):
                         command = commands[cmdloc]
-                        log.Log("sftp command: '%s'" % (command,), 5)
+                        log.Info("sftp command: '%s'" % (command,))
                         child.sendline(command)
                         cmdloc += 1
                     else:
@@ -192,19 +192,19 @@ class SSHBackend(duplicity.backend.Backend):
                 elif match == 3:
                     child.sendline(self.password)
                 elif match == 4:
-                    log.Log("Invalid SSH password", 1)
+                    log.Warn("Invalid SSH password")
                     break
                 elif match == 5:
-                    log.Log("Host key authenticity could not be verified (missing known_hosts entry?)", 1)
+                    log.Warn("Host key authenticity could not be verified (missing known_hosts entry?)")
                     break
                 elif match == 6:
-                    log.Log("Remote file or directory '%s' does not exist" % self.remote_dir, 1)
+                    log.Warn("Remote file or directory '%s' does not exist" % self.remote_dir)
                     break
             child.close(force = True)
             if child.exitstatus == 0:
                 return res
-            log.Log("Running '%s' failed (attempt #%d)" % (commandline, n), 1)
-        log.Log("Giving up trying to execute '%s' after %d attempts" % (commandline, globals.num_retries), 1)
+            log.Warn("Running '%s' failed (attempt #%d)" % (commandline, n))
+        log.Warn("Giving up trying to execute '%s' after %d attempts" % (commandline, globals.num_retries))
         raise BackendException("Error running '%s'" % commandline)
 
     def put(self, source_path, remote_filename = None):

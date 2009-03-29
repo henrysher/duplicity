@@ -93,7 +93,7 @@ def delta_iter_error_handler(exc, new_path, sig_path, sig_tar = None):
         index_string = sig_path.get_relative_path()
     else:
         assert 0, "Both new and sig are None for some reason"
-    log.Log(_("Error %s getting delta for %s") % (str(exc), index_string), 2)
+    log.Warn(_("Error %s getting delta for %s") % (str(exc), index_string))
     return None
 
 
@@ -105,7 +105,7 @@ def get_delta_path(new_path, sig_path, sigTarFile = None):
         ti = new_path.get_tarinfo()
         index = new_path.index
     delta_path = new_path.get_ropath()
-    log.Log(_("Getting delta of %s and %s") % (new_path, sig_path), 7)
+    log.Info(_("Getting delta of %s and %s") % (new_path, sig_path))
 
     def callback(sig_string):
         """Callback activated when FileWithSignature read to end"""
@@ -174,8 +174,8 @@ def get_delta_iter(new_iter, sig_iter, sig_fileobj=None):
     else:
         sigTarFile = None
     for new_path, sig_path in collated:
-        log.Log(_("Comparing %s and %s") % (new_path and new_path.index,
-                                            sig_path and sig_path.index), 6)
+        log.Info(_("Comparing %s and %s") % (new_path and new_path.index,
+                                             sig_path and sig_path.index))
         if not new_path or not new_path.type:
             # file doesn't exist
             if sig_path and sig_path.exists():

@@ -34,9 +34,9 @@ class BotoBackend(duplicity.backend.Backend):
     the use of the boto module, (http://code.google.com/p/boto/).
 
     To make use of this backend you must set aws_access_key_id
-    and aws_secret_access_key in your ~/.boto or /etc/boto.cfg 
+    and aws_secret_access_key in your ~/.boto or /etc/boto.cfg
     with your Amazon Web Services key id and secret respectively.
-    Alternatively you can export the environment variables	
+    Alternatively you can export the environment variables
     AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY.
     """
 
@@ -143,8 +143,9 @@ class BotoBackend(duplicity.backend.Backend):
         if not self.bucket:
             if globals.s3_european_buckets:
                 if not globals.s3_use_new_style:
-                    log.LogFatal("European bucket creation was requested, but not new-style "
-                                 "bucket addressing (--s3-use-new-style)")
+                    log.FatalError("European bucket creation was requested, but not new-style "
+                                   "bucket addressing (--s3-use-new-style)",
+                                   log.ErrorCode.s3_bucket_not_style)
                 from boto.s3.connection import Location
                 self.bucket = self.conn.create_bucket(self.bucket_name, location = Location.EU)
             else:
@@ -157,19 +158,20 @@ class BotoBackend(duplicity.backend.Backend):
             if n > 1:
                 # sleep before retry
                 time.sleep(30)
-            log.Log("Uploading %s/%s" % (self.straight_url, remote_filename), 5)
+            log.Info("Uploading %s/%s" % (self.straight_url, remote_filename))
             try:
                 key.set_contents_from_filename(source_path.name, {'Content-Type': 'application/octet-stream'})
                 return
             except Exception, e:
-                log.Log("Upload '%s/%s' failed (attempt #%d, reason: %s: %s)"
-                        "" % (self.straight_url,
-                              remote_filename,
-                              n,
-                              e.__class__.__name__,
-                              str(e)), 1)
-                log.Log("Backtrace of previous error: %s" % (exception_traceback(),), 6)
-        log.Log("Giving up trying to upload %s/%s after %d attempts" % (self.straight_url, remote_filename, globals.num_retries), 1)
+                log.Warn("Upload '%s/%s' failed (attempt #%d, reason: %s: %s)"
+                         "" % (self.straight_url,
+                               remote_filename,
+                               n,
+                               e.__class__.__name__,
+                               str(e)))
+                log.Debug("Backtrace of previous error: %s" % (exception_traceback(),))
+        log.Warn("Giving up trying to upload %s/%s after %d attempts" %
+                 (self.straight_url, remote_filename, globals.num_retries))
         raise BackendException("Error uploading %s/%s" % (self.straight_url, remote_filename))
 
     def get(self, remote_filename, local_path):
@@ -179,20 +181,21 @@ class BotoBackend(duplicity.backend.Backend):
             if n > 1:
                 # sleep before retry
                 time.sleep(30)
-            log.Log("Downloading %s/%s" % (self.straight_url, remote_filename), 5)
+            log.Info("Downloading %s/%s" % (self.straight_url, remote_filename))
             try:
                 key.get_contents_to_filename(local_path.name)
                 local_path.setdata()
                 return
             except Exception, e:
-                log.Log("Download %s/%s failed (attempt #%d, reason: %s: %s)"
-                        "" % (self.straight_url,
-                              remote_filename,
-                              n,
-                              e.__class__.__name__,
-                              str(e)), 1)
-                log.Log("Backtrace of previous error: %s" % (exception_traceback(),), 6)
-        log.Log("Giving up trying to download %s/%s after %d attempts" % (self.straight_url, remote_filename, globals.num_retries), 1)
+                log.Warn("Download %s/%s failed (attempt #%d, reason: %s: %s)"
+                         "" % (self.straight_url,
+                               remote_filename,
+                               n,
+                               e.__class__.__name__,
+                               str(e)), 1)
+                log.Debug("Backtrace of previous error: %s" % (exception_traceback(),))
+        log.Warn("Giving up trying to download %s/%s after %d attempts" %
+                (self.straight_url, remote_filename, globals.num_retries))
         raise BackendException("Error downloading %s/%s" % (self.straight_url, remote_filename))
 
     def list(self):
@@ -211,7 +214,7 @@ class BotoBackend(duplicity.backend.Backend):
                 try:
                     filename = k.key.replace(self.key_prefix, '', 1)
                     filename_list.append(filename)
-                    log.Log("Listed %s/%s" % (self.straight_url, filename), 9)
+                    log.Debug("Listed %s/%s" % (self.straight_url, filename))
                 except AttributeError:
                     pass
         return filename_list
@@ -219,7 +222,7 @@ class BotoBackend(duplicity.backend.Backend):
     def delete(self, filename_list):
         for filename in filename_list:
             self.bucket.delete_key(self.key_prefix + filename)
-            log.Log("Deleted %s/%s" % (self.straight_url, filename), 9)
+            log.Debug("Deleted %s/%s" % (self.straight_url, filename))
 
 duplicity.backend.register_backend("s3", BotoBackend)
 duplicity.backend.register_backend("s3+http", BotoBackend)

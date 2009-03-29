@@ -57,7 +57,7 @@ class FTPBackend(duplicity.backend.Backend):
                      "see: http://www.ncftpd.com/ncftp/doc/changelog.html\n"
                      "If you have trouble, please upgrade to 3.2.1 or later",
                      log.WarningCode.ftp_ncftp_v320)
-        log.Log("NcFTP version is %s" % version, 4)
+        log.Notice("NcFTP version is %s" % version)
 
         self.parsed_url = parsed_url
 

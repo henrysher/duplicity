@@ -115,11 +115,11 @@ class Select:
             try:
                 mode = os.stat(path.name+"/"+filename)[stat.ST_MODE]
                 if stat.S_ISSOCK(mode):
-                    log.Log(_("Skipping socket %s/%s") % (path.name, filename), 7)
+                    log.Info(_("Skipping socket %s/%s") % (path.name, filename))
                 else:
-                    log.Log(_("Error initializing file %s/%s") % (path.name, filename), 2)
+                    log.Warn(_("Error initializing file %s/%s") % (path.name, filename))
             except OSError:
-                log.Log(_("Error accessing possibly locked file %s/%s") % (path.name, filename), 2);
+                log.Warn(_("Error accessing possibly locked file %s/%s") % (path.name, filename));
             return None
 
         def diryield(path):
@@ -144,10 +144,10 @@ class Select:
 
         if not path.type:
             # base doesn't exist
-            log.Log(_("Warning: base %s doesn't exist, continuing") %
-                    path.name, 2)
+            log.Warn(_("Warning: base %s doesn't exist, continuing") %
+                     path.name)
             return
-        log.Log(_("Selecting %s") % path.name, 7)
+        log.Info(_("Selecting %s") % path.name)
         yield path
         if not path.isdir():
             return
@@ -165,10 +165,10 @@ class Select:
             if val == 0:
                 if delayed_path_stack:
                     for delayed_path in delayed_path_stack:
-                        log.Log(_("Selecting %s") % delayed_path.name, 7)
+                        log.Info(_("Selecting %s") % delayed_path.name)
                         yield delayed_path
                     del delayed_path_stack[:]
-                log.Log(_("Selecting %s") % subpath.name, 7)
+                log.Info(_("Selecting %s") % subpath.name)
                 yield subpath
                 if subpath.isdir():
                     diryield_stack.append(diryield(subpath))
@@ -290,10 +290,10 @@ probably isn't what you meant.""") %
         filelist_name is just a string used for logging.
 
         """
-        log.Log(_("Reading filelist %s") % filelist_name, 4)
+        log.Notice(_("Reading filelist %s") % filelist_name)
         tuple_list, something_excluded = \
                     self.filelist_read(filelist_fp, inc_default, filelist_name)
-        log.Log(_("Sorting filelist %s") % filelist_name, 4)
+        log.Notice(_("Sorting filelist %s") % filelist_name)
         tuple_list.sort()
         i = [0] # We have to put index in list because of stupid scoping rules
 
@@ -320,11 +320,11 @@ probably isn't what you meant.""") %
             """Warn if prefix is incorrect"""
             prefix_warnings[0] += 1
             if prefix_warnings[0] < 6:
-                log.Log(_("Warning: file specification '%s' in filelist %s\n"
-                          "doesn't start with correct prefix %s.  Ignoring.") %
-                        (exc, filelist_name, self.prefix), 2)
+                log.Warn(_("Warning: file specification '%s' in filelist %s\n"
+                           "doesn't start with correct prefix %s.  Ignoring.") %
+                         (exc, filelist_name, self.prefix))
                 if prefix_warnings[0] == 5:
-                    log.Log(_("Future prefix errors will not be logged."), 2)
+                    log.Warn(_("Future prefix errors will not be logged."))
 
         something_excluded, tuple_list = None, []
         separator = globals.null_separator and "\0" or "\n"
@@ -340,7 +340,7 @@ probably isn't what you meant.""") %
             if not tuple[1]:
                 something_excluded = 1
         if filelist_fp.close():
-            log.Log(_("Error closing filelist %s") % filelist_name, 2)
+            log.Warn(_("Error closing filelist %s") % filelist_name)
         return (tuple_list, something_excluded)
 
     def filelist_parse_line(self, line, include):
@@ -407,7 +407,7 @@ probably isn't what you meant.""") %
         See the man page on --[include/exclude]-globbing-filelist
 
         """
-        log.Log(_("Reading globbing filelist %s") % list_name, 4)
+        log.Notice(_("Reading globbing filelist %s") % list_name)
         separator = globals.null_separator and "\0" or "\n"
         for line in filelist_fp.read().split(separator):
             if not line:
@@ -437,7 +437,7 @@ probably isn't what you meant.""") %
         try:
             regexp = re.compile(regexp_string)
         except:
-            log.Log(_("Error compiling regular expression %s") % regexp_string, 1)
+            log.Warn(_("Error compiling regular expression %s") % regexp_string)
             raise
 
         def sel_func(path):
@@ -453,8 +453,8 @@ probably isn't what you meant.""") %
     def devfiles_get_sf(self):
         """Return a selection function to exclude all dev files"""
         if self.selection_functions:
-            log.Log(_("Warning: exclude-device-files is not the first "
-                      "selector.\nThis may not be what you intended"), 3)
+            log.Warn(_("Warning: exclude-device-files is not the first "
+                       "selector.\nThis may not be what you intended"))
         def sel_func(path):
             if path.isdev():
                 return 0

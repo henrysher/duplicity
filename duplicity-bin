@@ -98,7 +98,7 @@ def get_passphrase(n, action):
 
     # Finally, ask the user for the passphrase
     else:
-        log.Log("PASSPHRASE variable not set, asking user.", 5)
+        log.Info("PASSPHRASE variable not set, asking user.")
         while 1:
             if n == 2:
                 pass1 = globals.gpg_profile.passphrase
@@ -540,12 +540,11 @@ def verify(col_stats):
         total_count += 1
     # Unfortunately, ngettext doesn't handle multiple number variables, so we
     # split up the string.
-    log.Log(_("Verify complete: %s, %s.") %
-            (gettext.ngettext("%d file compared",
-                              "%d files compared", total_count) % total_count,
-             gettext.ngettext("%d difference found",
-                              "%d differences found", diff_count) % diff_count),
-            3)
+    log.Notice(_("Verify complete: %s, %s.") %
+               (gettext.ngettext("%d file compared",
+                                 "%d files compared", total_count) % total_count,
+                gettext.ngettext("%d difference found",
+                                 "%d differences found", diff_count) % diff_count))
     if diff_count >= 1:
         exit_val = 1
 
@@ -567,19 +566,18 @@ def cleanup(col_stats):
 
     filestr = "\n".join(extraneous)
     if globals.force:
-        log.Log(gettext.ngettext("Deleting this file from backend:",
-                                 "Deleting these files from backend:",
-                                 len(extraneous))+"\n"+filestr, 3)
+        log.Notice(gettext.ngettext("Deleting this file from backend:",
+                                    "Deleting these files from backend:",
+                                    len(extraneous))+"\n"+filestr)
         if not globals.dry_run:
             col_stats.backend.delete(extraneous)
     else:
-        log.Log("%s\n%s\n%s" %
-                (gettext.ngettext("Found the following file to delete:",
-                                  "Found the following files to delete:",
-                                  len(extraneous)),
-                 filestr,
-                 _("Run duplicity again with the --force option to actually delete.")),
-                3)
+        log.Notice("%s\n%s\n%s" %
+                   (gettext.ngettext("Found the following file to delete:",
+                                     "Found the following files to delete:",
+                                     len(extraneous)),
+                    filestr,
+                    _("Run duplicity again with the --force option to actually delete.")))
 
 
 def remove_all_but_n_full(col_stats):
@@ -633,10 +631,10 @@ def remove_old(col_stats):
         log.Warn(_("No old backup sets found, nothing deleted."))
         return
     if globals.force:
-        log.Log(gettext.ngettext("Deleting backup set at time:",
-                                 "Deleting backup sets at times:",
-                                 len(setlist)) +
-                "\n" + set_times_str(setlist), 3)
+        log.Notice(gettext.ngettext("Deleting backup set at time:",
+                                    "Deleting backup sets at times:",
+                                    len(setlist)) +
+                   "\n" + set_times_str(setlist))
         if globals.dry_run:
             col_stats.set_values(sig_chain_warning = None)
         else:
@@ -645,11 +643,11 @@ def remove_old(col_stats):
                 set.delete()
             col_stats.set_values(sig_chain_warning = None).cleanup_signatures()
     else:
-        log.Warn(gettext.ngettext("Found old backup set at the following time:",
-                                  "Found old backup sets at the following times:",
-                                  len(setlist)) +
-                 "\n" + set_times_str(setlist) + "\n" +
-                 _("Rerun command with --force option to actually delete."), 3)
+        log.Notice(gettext.ngettext("Found old backup set at the following time:",
+                                    "Found old backup sets at the following times:",
+                                    len(setlist)) +
+                   "\n" + set_times_str(setlist) + "\n" +
+                   _("Rerun command with --force option to actually delete."))
 
 
 def check_last_manifest(col_stats):
@@ -681,11 +679,11 @@ def main():
 
     last_full_time = col_stats.get_last_full_backup_time()
     if last_full_time > 0:
-        log.Log(_("Last full backup date:") + " " + dup_time.timetopretty(last_full_time), 4)
+        log.Notice(_("Last full backup date:") + " " + dup_time.timetopretty(last_full_time))
     else:
-        log.Log(_("Last full backup date: none"), 4)
+        log.Notice(_("Last full backup date: none"))
     if action == "inc" and last_full_time < globals.full_force_time:
-        log.Log(_("Last full backup is too old, forcing full backup"), 3)
+        log.Notice(_("Last full backup is too old, forcing full backup"))
         action = "full"
 
     os.umask(077)

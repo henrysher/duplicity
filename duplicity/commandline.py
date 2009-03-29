@@ -580,5 +580,5 @@ Examples of URL strings are "scp://user@host.net:1234/path" and
         command_line_error("Too many arguments")
 
     check_consistency(action)
-    log.Log(_("Main action: ") + action, 7)
+    log.Info(_("Main action: ") + action)
     return action
