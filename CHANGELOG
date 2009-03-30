@@ -1,24 +1,22 @@
-New in v0.5.13 (2009/03/26)
+New in v0.5.14 (2009/03/??)
 ---------------------------
 Revert to calling NcFTP utilities (ls, get, put) directly
-rather than scripting ncftp via pexpect.  Move fatal error
-regarding version 3.2.0 to a warning message since it has
-been reported that the segfault problem does not occur on
-most distributions.
+rather than scripting ncftp via pexpect by reverting to the
+0.5.07 version of ftpbackend.py.
+
+Changed fatal error regarding version 3.2.0 of ncftpput to
+warning level since it has been reported that the problem
+does not occur on most distributions.
 
 Changed from log.Log with numbered log levels to log.Debug,
 log.Info, log.Notice, log.Warn, log.FatalError as below:
-    0  log.FatalError
-    1  log.Warn
-    2  log.Warn
-    3  log.Notice
-    4  log.Notice
-    5  log.Info
-    6  log.Info
-    7  log.Info
-    8  log.Info
+    0    log.FatalError
+    1-2  log.Warn
+    3-4  log.Notice
+    5-8  log.Info
     9 log.Debug
-The -vN option has not changed at this point.
+The -vN option has not changed.  It is suggested that you
+run at log level 3, Notice.  Info and Debug are verbose.
 
 
 New in v0.5.13 (2009/03/26)
