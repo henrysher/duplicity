@@ -161,6 +161,7 @@ class ErrorCode:
     exception = 30
     gpg_failed = 31
     s3_bucket_not_style = 32
+    not_implemented = 33
 
 def FatalError(s, code, extra=None):
     """Write fatal error message and exit"""

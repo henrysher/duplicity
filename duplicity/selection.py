@@ -210,6 +210,8 @@ class Select:
             for opt, arg in argtuples:
                 if opt == "--exclude":
                     self.add_selection_func(self.glob_get_sf(arg, 0))
+                elif opt == "--exclude-if-present":
+                    self.add_selection_func(self.present_get_sf(arg, 0))
                 elif opt == "--exclude-device-files":
                     self.add_selection_func(self.devfiles_get_sf())
                 elif opt == "--exclude-filelist":
@@ -478,6 +480,27 @@ probably isn't what you meant.""") %
         sel_func.exclude = not include
         sel_func.name = "Command-line %s glob: %s" % \
                         (include and "include" or "exclude", glob_str)
+        return sel_func
+
+    def present_get_sf(self, filename, include):
+        """Return selection function given by existence of a file in a directory"""
+        assert include == 0 or include == 1
+
+        def exclude_sel_func(path):
+            if path.append(filename).exists():
+                return 0
+            else:
+                return None
+
+        if include == 0:
+            sel_func = exclude_sel_func
+        else:
+            log.FatalError("--include-if-present not implemented (would it make sense?).",
+                           log.ErrorCode.not_implemented)
+
+        sel_func.exclude = not include
+        sel_func.name = "Command-line %s filename: %s" % \
+                        (include and "include-if-present" or "exclude-if-present", filename)
         return sel_func
 
     def glob_get_filename_sf(self, filename, include):

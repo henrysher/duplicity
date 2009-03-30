@@ -18,6 +18,9 @@ log.Info, log.Notice, log.Warn, log.FatalError as below:
 The -vN option has not changed.  It is suggested that you
 run at log level 3, Notice.  Info and Debug are verbose.
 
+patch #6790: Add --exclude-if-present
+https://savannah.nongnu.org/patch/?6790
+
 
 New in v0.5.13 (2009/03/26)
 ---------------------------

@@ -66,6 +66,7 @@ options = ["allow-source-mismatch",
            "dry-run",
            "encrypt-key=",
            "exclude=",
+           "exclude-if-present=",
            "exclude-device-files",
            "exclude-filelist=",
            "exclude-globbing-filelist=",
@@ -207,6 +208,7 @@ def parse_cmdline_options(arglist):
             globals.gpg_profile.recipients.append(arg)
         elif opt in ["--exclude",
                      "--exclude-regexp",
+                     "--exclude-if-present",
                      "--include",
                      "--include-regexp"]:
             select_opts.append((opt, arg))

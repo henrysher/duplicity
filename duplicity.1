@@ -284,6 +284,11 @@ and
 .B --exclude.
 
 .TP
+.BR "--exclude-if-present " filename
+Exclude directories if filename is present. This option needs to
+come before any other include or exclude options.
+
+.TP
 .B --exclude-other-filesystems
 Exclude files on file systems (identified by device number) other than
 the file system the root of the source directory is on.
