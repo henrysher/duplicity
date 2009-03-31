@@ -303,9 +303,24 @@ def parse_cmdline_options(arglist):
             print "duplicity", str(globals.version)
             sys.exit(0)
         elif opt in ["-v", "--verbosity"]:
-            verb = int(arg)
-            if verb < 0 or verb > 9:
-                command_line_error("verbosity must be between 0 and 9.")
+            arg = arg.lower()
+            if arg in ['e', 'error']:
+                verb = log.ERROR
+            elif arg in ['w', 'warning']:
+                verb = log.WARNING
+            elif arg in ['n', 'notice']:
+                verb = log.NOTICE
+            elif arg in ['i', 'info']:
+                verb = log.INFO
+            elif arg in ['d', 'debug']:
+                verb = log.DEBUG
+            elif arg.isdigit() and (len(arg) == 1):
+                verb = int(arg)
+            else:
+                command_line_error("\nVerbosity must be one of: digit [0-9], character [ewnid],\n"
+                                   "or word ['error', 'warning', 'notice', 'info', 'debug'].\n"
+                                   "The default is 4 (Notice).  It is strongly recommended\n"
+                                   "that verbosity level is set at 2 (Warning) or higher.")
             log.setverbosity(verb)
         elif opt == "--volsize":
             globals.volsize = int(arg)*1024*1024
@@ -416,6 +431,10 @@ Options:
     --version
     --volsize <number>
     -v[0-9], --verbosity [0-9]
+    Verbosity must be one of: digit [0-9], character [ewnid],
+    or word ['error', 'warning', 'notice', 'info', 'debug'].
+    The default is 4 (Notice).  It is strongly recommended
+    that verbosity level is set at 2 (Warning) or higher.
 """) % (globals.version, sys.platform))
 
 

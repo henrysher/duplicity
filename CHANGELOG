@@ -15,8 +15,11 @@ log.Info, log.Notice, log.Warn, log.FatalError as below:
     3-4  log.Notice
     5-8  log.Info
     9 log.Debug
-The -vN option has not changed.  It is suggested that you
-run at log level 3, Notice.  Info and Debug are verbose.
+The -vN option has not changed.  Verbosity may also be one
+of: character [ewnid], or word ['error', 'warning', 'notice',
+ 'info', 'debug'].  The default is 4 (Notice).  The options
+ -v4, -vn, and -vnotice are functionally equivalent, as are
+ the mixed-case versions, -vN, -vNotice, -vNOTICE.
 
 patch #6790: Add --exclude-if-present
 https://savannah.nongnu.org/patch/?6790
