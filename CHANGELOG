@@ -1,5 +1,10 @@
 New in v0.5.14 (2009/03/??)
 ---------------------------
+After email voting among known duplicity contributors, 
+the decision was reached to revert to the GPL Version 2 
+license, so with their consensus, duplicity is now under 
+GPL Version 2.
+
 Revert to calling NcFTP utilities (ls, get, put) directly
 rather than scripting ncftp via pexpect by reverting to the
 0.5.07 version of ftpbackend.py.

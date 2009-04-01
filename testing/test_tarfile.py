@@ -7,7 +7,7 @@
 #
 # Duplicity is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the
-# Free Software Foundation; either version 3 of the License, or (at your
+# Free Software Foundation; either version 2 of the License, or (at your
 # option) any later version.
 #
 # Duplicity is distributed in the hope that it will be useful, but
@@ -22,7 +22,7 @@
 #
 # unittest for the tarfile module
 #
-# $Id: test_tarfile.py,v 1.9 2009/02/02 15:36:45 loafman Exp $
+# $Id: test_tarfile.py,v 1.10 2009/04/01 15:07:45 loafman Exp $
 
 import config
 import sys, os, shutil, StringIO, tempfile, unittest, stat, pwd, grp
