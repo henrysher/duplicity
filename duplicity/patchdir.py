@@ -22,9 +22,17 @@
 """Functions for patching of directories"""
 
 from __future__ import generators
-import re, tarfile, librsync, log, diffdir, misc, selection, util
-from path import *
-from lazy import *
+import re
+
+from duplicity import tarfile
+from duplicity import librsync
+from duplicity import log
+from duplicity import diffdir
+from duplicity import misc
+from duplicity import selection
+from duplicity import util
+from duplicity.path import *
+from duplicity.lazy import *
 
 class PatchDirException(Exception):
     pass
@@ -108,7 +116,7 @@ def difftar2path_iter(diff_tarfile):
         if multivol_fileobj and not multivol_fileobj.at_end:
             multivol_fileobj.close() # aborting in middle of multivol
             continue
-        
+
         index, difftype, multivol = get_index_from_tarinfo(tarinfo_list[0])
         ropath = ROPath(index)
         ropath.init_from_tarinfo(tarinfo_list[0])
@@ -228,7 +236,7 @@ class Multivol_Filelike:
                 if not self.addtobuffer():
                     break
         self.at_end = 1
-        
+
 
 class PathPatcher(ITRBranch):
     """Used by DirPatch, process the given basis and diff"""
@@ -243,7 +251,7 @@ class PathPatcher(ITRBranch):
             assert index == (), str(index) # should only happen for first elem
             self.fast_process(index, basis_path, diff_ropath)
             return
-            
+
         if not basis_path:
             basis_path = self.base_path.new_index(index)
             assert not basis_path.exists()
@@ -403,7 +411,7 @@ class IndexedTuple:
         return self.__cmp__(other) == 1
     def __ge__(self, other):
         return self.__cmp__(other) != -1
-    
+
     def __cmp__(self, other):
         assert isinstance(other, IndexedTuple)
         if self.index < other.index:

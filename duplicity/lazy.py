@@ -23,7 +23,8 @@
 
 from __future__ import generators
 import os, stat, types, sys
-from static import *
+
+from duplicity.static import *
 
 
 class Iter:
@@ -408,5 +409,5 @@ class ITRBranch:
         log.Warn(_("Skipping %s because of previous error") % index_str)
 
 
-import duplicity.log as log
-import duplicity.robust as robust
+from duplicity import log
+from duplicity import robust

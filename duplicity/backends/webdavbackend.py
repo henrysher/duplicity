@@ -28,10 +28,10 @@ import urllib2
 import xml.dom.minidom
 
 import duplicity.backend
-import duplicity.globals as globals
-import duplicity.log as log
+from duplicity import globals
+from duplicity import log
 from duplicity.errors import *
-import duplicity.urlparse_2_5 as urlparser
+from duplicity import urlparse_2_5 as urlparser
 
 class CustomMethodRequest(urllib2.Request):
     """

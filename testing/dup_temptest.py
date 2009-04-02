@@ -22,7 +22,9 @@
 import config
 import sys, os, unittest, gzip
 sys.path.insert(0, "../")
-from duplicity import dup_temp, file_naming
+
+from duplicity import dup_temp
+from duplicity import file_naming
 
 config.setup()
 

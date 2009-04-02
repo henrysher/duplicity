@@ -22,11 +22,12 @@
 #
 # unittest for the tarfile module
 #
-# $Id: test_tarfile.py,v 1.10 2009/04/01 15:07:45 loafman Exp $
+# $Id: test_tarfile.py,v 1.11 2009/04/02 14:47:12 loafman Exp $
 
 import config
 import sys, os, shutil, StringIO, tempfile, unittest, stat, pwd, grp
 sys.path.insert(0, "../")
+
 from duplicity import tarfile
 
 config.setup()

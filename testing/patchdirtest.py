@@ -22,7 +22,13 @@
 import config
 import sys, cStringIO, os, unittest
 sys.path.insert(0, "../")
-from duplicity import diffdir, patchdir, log, selection, tarfile, librsync
+
+from duplicity import diffdir
+from duplicity import patchdir
+from duplicity import log
+from duplicity import selection
+from duplicity import tarfile
+from duplicity import librsync
 from duplicity.path import *
 
 config.setup()

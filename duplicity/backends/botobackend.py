@@ -23,8 +23,8 @@ import os
 import time
 
 import duplicity.backend
-import duplicity.globals as globals
-import duplicity.log as log
+from duplicity import globals
+from duplicity import log
 from duplicity.errors import *
 from duplicity.util import exception_traceback
 

@@ -1,3 +1,61 @@
+2009-04-01  Kenneth Loafman  <kenneth@loafman.com>
+
+    * po/Makevars, CHANGELOG, COPYING, dist/makedist, dist/makerpm, dist/makeweb, dist/setup.py, duplicity-bin, duplicity/__init__.py, duplicity/_librsyncmodule.c, duplicity/asyncscheduler.py, duplicity/backend.py, duplicity/backends/__init__.py, duplicity/backends/botobackend.py, duplicity/backends/ftpbackend.py, duplicity/backends/hsibackend.py, duplicity/backends/imapbackend.py, duplicity/backends/localbackend.py, duplicity/backends/rsyncbackend.py, duplicity/backends/sshbackend.py, duplicity/backends/webdavbackend.py, duplicity/collections.py, duplicity/commandline.py, duplicity/compilec.py, duplicity/diffdir.py, duplicity/dup_temp.py, duplicity/dup_threading.py, duplicity/dup_time.py, duplicity/errors.py, duplicity/file_naming.py, duplicity/globals.py, duplicity/gpg.py, duplicity/lazy.py, duplicity/librsync.py, duplicity/log.py, duplicity/manifest.py, duplicity/misc.py, duplicity/patchdir.py, duplicity/path.py, duplicity/robust.py, duplicity/selection.py, duplicity/static.py, duplicity/statistics.py, duplicity/tempdir.py, duplicity/util.py, rdiffdir, testing/GnuPGInterfacetest.py, testing/backendtest.py, testing/collectionstest.py, testing/config.py.tmpl, testing/diffdirtest.py, testing/dup_temptest.py, testing/dup_timetest.py, testing/file_namingtest.py, testing/finaltest.py, testing/gpgtest.py, testing/gpgtest2.py, testing/lazytest.py, testing/logtest.py, testing/manifesttest.py, testing/misctest.py, testing/parsedurltest.py, testing/patchdirtest.py, testing/pathtest.py, testing/rdiffdirtest.py, testing/roottest.py, testing/run-a-test.sh, testing/run-all-tests.sh, testing/run-coverage.sh, testing/selectiontest.py, testing/statictest.py, testing/statisticstest.py, testing/tempdirtest.py, testing/test_tarfile.py:
+    After email voting among known duplicity contributors,
+    the decision was reached to revert to the GPL Version 2
+    license, so with their consensus, duplicity is now under
+    GPL Version 2.
+
+2009-03-31  Kenneth Loafman  <kenneth@loafman.com>
+
+    * duplicity.1, CHANGELOG, duplicity/commandline.py:
+    The -vN option has not changed.  Verbosity may also be one
+    of: character [ewnid], or word ['error', 'warning', 'notice',
+     'info', 'debug'].  The default is 4 (Notice).  The options
+     -v4, -vn, and -vnotice are functionally equivalent, as are
+     the mixed-case versions, -vN, -vNotice, -vNOTICE.
+
+2009-03-30  Kenneth Loafman  <kenneth@loafman.com>
+
+    * testing/GnuPGInterfacetest.py:
+    Add '../' to Python path so we find our GnuPGInterface and not another.
+
+    * CHANGELOG, duplicity.1, duplicity/commandline.py, duplicity/log.py, duplicity/selection.py:
+    patch #6790: Add --exclude-if-present
+    https://savannah.nongnu.org/patch/?6790
+
+    * CHANGELOG: Clarify recent log entries.
+
+2009-03-29  Kenneth Loafman  <kenneth@loafman.com>
+
+    * CHANGELOG, duplicity-bin, duplicity/backend.py, duplicity/backends/botobackend.py, duplicity/backends/ftpbackend.py, duplicity/backends/imapbackend.py, duplicity/backends/localbackend.py, duplicity/backends/sshbackend.py, duplicity/backends/webdavbackend.py, duplicity/collections.py, duplicity/commandline.py, duplicity/diffdir.py, duplicity/lazy.py, duplicity/log.py, duplicity/manifest.py, duplicity/misc.py, duplicity/path.py, duplicity/robust.py, duplicity/selection.py, duplicity/tempdir.py, testing/file_namingtest.py:
+    Changed from log.Log with numbered log levels to log.Debug,
+    log.Info, log.Notice, log.Warn, log.FatalError as below:
+        0  log.FatalError
+        1  log.Warn
+        2  log.Warn
+        3  log.Notice
+        4  log.Notice
+        5  log.Info
+        6  log.Info
+        7  log.Info
+        8  log.Info
+        9 log.Debug
+    The -vN option has not changed at this point.
+
+    * CHANGELOG, duplicity/backends/ftpbackend.py, duplicity/log.py:
+    Revert to calling NcFTP utilities (ls, get, put) directly
+    rather than scripting ncftp via pexpect.  Move fatal error
+    regarding version 3.2.0 to a warning message since it has
+    been reported that the segfault problem does not occur on
+    most distributions.
+
+2009-03-26  Kenneth Loafman  <kenneth@loafman.com>
+
+    * CHANGELOG, Changelog.GNU, dist/makedist, dist/mkGNUChangelog.sh:
+    Add Changelog.GNU to website and distribution to add a bit of detail
+    showing the CVS changes via rcs2log.  Added dist/mkGNUChangelog.sh.
+
 2009-03-25  Kenneth Loafman  <kenneth@loafman.com>
 
     * testing/.cvsignore: Add testing/manual dir.

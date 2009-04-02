@@ -32,7 +32,7 @@ def check_common_error(error_handler, function, args = ()):
 
     """
     # todo: import here to avoid circular dependency issue
-    import duplicity.path as path
+    from duplicity import path
 
     try: return function(*args)
     #except (EnvironmentError, SkipFileException, DSRPPermError,
@@ -61,6 +61,6 @@ def listpath(path):
     dir_listing.sort()
     return dir_listing
 
-import duplicity.librsync as librsync
-import duplicity.log as log
+from duplicity import librsync
+from duplicity import log
 

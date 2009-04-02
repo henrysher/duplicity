@@ -29,9 +29,9 @@ import string
 import time
 
 import duplicity.backend
-import duplicity.globals as globals
-import duplicity.log as log
-import duplicity.pexpect as pexpect
+from duplicity import globals
+from duplicity import log
+from duplicity import pexpect
 from duplicity.errors import *
 
 scp_command = "scp"

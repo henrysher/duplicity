@@ -22,6 +22,7 @@
 import config
 import unittest, pickle, sys
 sys.path.insert(0, "../")
+
 from duplicity.lazy import *
 
 config.setup()

@@ -45,7 +45,7 @@ except ImportError:
 import sys
 import traceback
 
-import duplicity.errors as errors
+from duplicity import errors
 
 def threading_supported():
     """

@@ -22,7 +22,9 @@
 """Miscellaneous classes and methods"""
 
 import os
-import log
+
+from duplicity import log
+
 
 class MiscError(Exception):
     """Signifies a miscellaneous error..."""

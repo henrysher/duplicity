@@ -23,8 +23,8 @@ import os
 import types
 
 import duplicity.backend
-import duplicity.log as log
-import duplicity.path as path
+from duplicity import log
+from duplicity import path
 from duplicity.errors import *
 
 class LocalBackend(duplicity.backend.Backend):

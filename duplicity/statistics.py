@@ -21,8 +21,10 @@
 
 """Generate and process backup statistics"""
 
-import re, time
-import lazy, dup_time, os
+import re, time, os
+
+from duplicity import lazy
+from duplicity import dup_time
 
 
 class StatsException(Exception):

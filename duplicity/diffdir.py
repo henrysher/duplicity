@@ -29,9 +29,13 @@ the second, the ROPath iterator is put into tar block form.
 
 from __future__ import generators
 import cStringIO, re, types
-import tarfile, librsync, log, statistics, util
-from path import *
-from lazy import *
+from duplicity import tarfile
+from duplicity import librsync
+from duplicity import log
+from duplicity import statistics
+from duplicity import util
+from duplicity.path import *
+from duplicity.lazy import *
 
 # A StatsObj will be written to this whenever DirDelta_WriteSig is
 # run.

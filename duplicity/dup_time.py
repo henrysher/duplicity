@@ -22,7 +22,8 @@
 """Provide time related exceptions and functions"""
 
 import time, types, re
-import globals
+
+from duplicity import globals
 
 
 class TimeException(Exception):

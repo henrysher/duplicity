@@ -36,8 +36,8 @@ from duplicity import selection
 
 # Also import the sshbackend module specifically because we stomp on
 # its options.
-import duplicity.backends.sshbackend as sshbackend
-import duplicity.backends.imapbackend as imapbackend
+from duplicity.backends import sshbackend
+from duplicity.backends import imapbackend
 
 
 select_opts = [] # Will hold all the selection options

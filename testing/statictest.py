@@ -22,6 +22,7 @@
 import config
 import unittest, types, sys
 sys.path.insert(0, "../")
+
 from duplicity.static import *
 
 config.setup()

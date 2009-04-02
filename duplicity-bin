@@ -37,9 +37,22 @@ gettext.install('duplicity')
 import duplicity.backends
 import duplicity.errors
 
-from duplicity import collections, commandline, diffdir, dup_temp, \
-     dup_time, file_naming, globals, gpg, log, manifest, patchdir, \
-     path, robust, tempdir, asyncscheduler, util
+from duplicity import collections
+from duplicity import commandline
+from duplicity import diffdir
+from duplicity import dup_temp
+from duplicity import dup_time
+from duplicity import file_naming
+from duplicity import globals
+from duplicity import gpg
+from duplicity import log
+from duplicity import manifest
+from duplicity import patchdir
+from duplicity import path
+from duplicity import robust
+from duplicity import tempdir
+from duplicity import asyncscheduler
+from duplicity import util
 
 # If exit_val is not None, exit with given value at end.
 exit_val = None

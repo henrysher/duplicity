@@ -22,7 +22,8 @@
 """Produce and parse the names of duplicity's backup files"""
 
 import re
-import dup_time, globals
+from duplicity import dup_time
+from duplicity import globals
 
 full_vol_re = re.compile("^duplicity-full\\.(?P<time>.*?)\\.vol(?P<num>[0-9]+)\\.difftar($|\\.)")
 full_vol_re_short = re.compile("^df\\.(?P<time>[0-9a-z]+?)\\.(?P<num>[0-9a-z]+)\\.dt($|\\.)")

@@ -22,8 +22,14 @@
 """Classes and functions on collections of backup volumes"""
 
 import gzip, types
-import log, file_naming, path, dup_time, globals, manifest
 import gettext
+
+from duplicity import log
+from duplicity import file_naming
+from duplicity import path
+from duplicity import dup_time
+from duplicity import globals
+from duplicity import manifest
 
 class CollectionsError(Exception):
     pass

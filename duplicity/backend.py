@@ -32,12 +32,12 @@ import getpass
 import gettext
 import urllib
 
-import duplicity.dup_temp as dup_temp
-import duplicity.dup_threading as dup_threading
-import duplicity.file_naming as file_naming
-import duplicity.globals as globals
-import duplicity.log as log
-import duplicity.urlparse_2_5 as urlparser
+from duplicity import dup_temp
+from duplicity import dup_threading
+from duplicity import file_naming
+from duplicity import globals
+from duplicity import log
+from duplicity import urlparse_2_5 as urlparser
 
 from duplicity.errors import BackendException
 from duplicity.errors import ConflictingScheme

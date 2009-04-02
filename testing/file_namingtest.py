@@ -22,7 +22,11 @@
 import config
 import sys, unittest
 sys.path.insert(0, "../")
-from duplicity import dup_time, file_naming, log, globals
+
+from duplicity import dup_time
+from duplicity import file_naming
+from duplicity import log
+from duplicity import globals
 
 config.setup()
 

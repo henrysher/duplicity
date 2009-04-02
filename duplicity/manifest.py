@@ -22,7 +22,9 @@
 """Create and edit manifest for session contents"""
 
 import re
-import log, globals
+
+from duplicity import log
+from duplicity import globals
 
 class ManifestError(Exception):
     """Exception raised when problem with manifest"""

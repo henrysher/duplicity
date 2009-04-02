@@ -27,8 +27,11 @@ associates stat information with filenames
 """
 
 import stat, os, errno, socket, time, re, gzip
-import librsync, log, dup_time
-from lazy import *
+
+from duplicity import librsync
+from duplicity import log
+from duplicity import dup_time
+from duplicity.lazy import *
 
 _copy_blocksize = 64 * 1024
 _tmp_path_counter = 1
@@ -545,7 +548,7 @@ class Path(ROPath):
 
     def deltree(self):
         """Remove self by recursively deleting files under it"""
-        import duplicity.selection as selection # todo: avoid circ. dep. issue
+        from duplicity import selection # todo: avoid circ. dep. issue
         log.Info(_("Deleting tree %s") % (self.name,))
         itr = IterTreeReducer(PathDeleter, [])
         for path in selection.Select(self).set_iter():
@@ -617,7 +620,7 @@ class Path(ROPath):
 
     def compare_recursive(self, other, verbose = None):
         """Compare self to other Path, descending down directories"""
-        import duplicity.selection as selection # todo: avoid circ. dep. issue
+        from duplicity import selection # todo: avoid circ. dep. issue
         selfsel = selection.Select(self).set_iter()
         othersel = selection.Select(other).set_iter()
         return Iter.equal(selfsel, othersel, verbose)

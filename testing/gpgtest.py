@@ -22,7 +22,9 @@
 import config
 import sys, os, unittest, cStringIO, random
 sys.path.insert(0, "../")
-from duplicity import gpg, path
+
+from duplicity import gpg
+from duplicity import path
 
 config.setup()
 

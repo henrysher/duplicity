@@ -25,8 +25,9 @@ sys.path.insert(0, "../")
 
 import duplicity.backend
 import duplicity.backends
-
-from duplicity import path, collections, globals
+from duplicity import path
+from duplicity import collections
+from duplicity import globals
 
 config.setup()
 

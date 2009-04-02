@@ -1,8 +1,8 @@
-New in v0.5.14 (2009/03/??)
+New in v0.5.14 (2009/04/??)
 ---------------------------
-After email voting among known duplicity contributors, 
-the decision was reached to revert to the GPL Version 2 
-license, so with their consensus, duplicity is now under 
+After email voting among known duplicity contributors,
+the decision was reached to revert to the GPL Version 2
+license, so with their consensus, duplicity is now under
 GPL Version 2.
 
 Revert to calling NcFTP utilities (ls, get, put) directly
@@ -22,9 +22,12 @@ log.Info, log.Notice, log.Warn, log.FatalError as below:
     9 log.Debug
 The -vN option has not changed.  Verbosity may also be one
 of: character [ewnid], or word ['error', 'warning', 'notice',
- 'info', 'debug'].  The default is 4 (Notice).  The options
- -v4, -vn, and -vnotice are functionally equivalent, as are
- the mixed-case versions, -vN, -vNotice, -vNOTICE.
+'info', 'debug'].  The default is 4 (Notice).  The options
+-v4, -vn, and -vnotice are functionally equivalent, as are
+the mixed-case versions, -vN, -vNotice, -vNOTICE.
+
+Normalized include statements and tried to insure that all
+duplicity includes were from the duplicity module.
 
 patch #6790: Add --exclude-if-present
 https://savannah.nongnu.org/patch/?6790

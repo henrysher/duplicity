@@ -22,7 +22,10 @@
 import config
 import sys, os, unittest
 sys.path.insert(0, "../")
-from duplicity import diffdir, patchdir, selection
+
+from duplicity import diffdir
+from duplicity import patchdir
+from duplicity import selection
 from duplicity.path import *
 
 config.setup()

@@ -34,8 +34,8 @@ import stat
 
 from duplicity.path import *
 
-import duplicity.log as log
-import duplicity.globals as globals
+from duplicity import log
+from duplicity import globals
 
 class SelectError(Exception):
     """Some error dealing with the Select class"""
@@ -131,7 +131,7 @@ class Select:
 
             """
             # todo: get around circular dependency issue by importing here
-            import duplicity.robust as robust
+            from duplicity import robust
             for filename in robust.listpath(path):
                 new_path = robust.check_common_error(
                     error_handler, Path.append, (path, filename))

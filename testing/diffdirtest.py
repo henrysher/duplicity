@@ -22,8 +22,12 @@
 import config
 import sys, os, unittest
 sys.path.insert(0, "../")
+
 from duplicity.path import *
-from duplicity import diffdir, selection, tarfile, log
+from duplicity import diffdir
+from duplicity import selection
+from duplicity import tarfile
+from duplicity import log
 
 config.setup()
 

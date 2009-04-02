@@ -21,11 +21,11 @@
 
 import config
 import sys, os, time
+import thread
+
+from duplicity import GnuPGInterface
 
 config.setup()
-
-import thread
-import duplicity.GnuPGInterface as GnuPGInterface
 
 def main():
     gnupg = GnuPGInterface.GnuPG()

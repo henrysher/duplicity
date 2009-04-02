@@ -25,11 +25,11 @@ Asynchronous job scheduler, for concurrent execution with minimalistic
 dependency guarantees.
 """
 
-import duplicity
-import duplicity.log as log
 import sys
 import gettext
 
+import duplicity
+from duplicity import log
 from duplicity.dup_threading import require_threading
 from duplicity.dup_threading import interruptably_wait
 from duplicity.dup_threading import async_split

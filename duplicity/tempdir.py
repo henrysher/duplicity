@@ -30,8 +30,8 @@ import os
 import threading
 import tempfile
 
-import duplicity.log as log
-import duplicity.globals as globals
+from duplicity import log
+from duplicity import globals
 
 # Set up state related to managing the default temporary directory
 # instance

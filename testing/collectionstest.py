@@ -24,8 +24,12 @@ import os, sys, random, unittest
 sys.path.insert(0, "../")
 
 import duplicity.backends
-
-from duplicity import collections, backend, path, gpg, globals, dup_time
+from duplicity import collections
+from duplicity import backend
+from duplicity import path
+from duplicity import gpg
+from duplicity import globals
+from duplicity import dup_time
 
 config.setup()
 
