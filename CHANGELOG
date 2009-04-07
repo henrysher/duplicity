@@ -6,6 +6,9 @@ that was implemented due to bug #24741.  This fix does
 the ls in one pass by extracting either the first or the
 last entry on the 'ls -l'.  [Standard FTP would be nice!]
 
+If a file is unreadable due to access rights or other non-
+fatal errors, put out error message and continue.
+
 
 New in v0.5.14 (2009/04/02)
 ---------------------------

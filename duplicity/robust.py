@@ -34,12 +34,13 @@ def check_common_error(error_handler, function, args = ()):
     # todo: import here to avoid circular dependency issue
     from duplicity import path
 
-    try: return function(*args)
+    try:
+        return function(*args)
     #except (EnvironmentError, SkipFileException, DSRPPermError,
     #       RPathException, Rdiff.RdiffException,
     #       librsync.librsyncError, C.UnknownFileTypeError), exc:
     #   TracebackArchive.add()
-    except (EnvironmentError, librsync.librsyncError, path.PathException), exc:
+    except (IOError, EnvironmentError, librsync.librsyncError, path.PathException), exc:
         if (not isinstance(exc, EnvironmentError) or
             ((exc[0] in errno.errorcode)
              and errno.errorcode[exc[0]] in
@@ -47,7 +48,8 @@ def check_common_error(error_handler, function, args = ()):
               'ENOTDIR', 'ENAMETOOLONG', 'EINTR', 'ENOTEMPTY',
               'EIO', 'ETXTBSY', 'ESRCH', 'EINVAL'])):
             #Log.exception()
-            if error_handler: return error_handler(exc, *args)
+            if error_handler:
+                return error_handler(exc, *args)
         else:
             #Log.exception(1, 2)
             raise
