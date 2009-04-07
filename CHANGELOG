@@ -3,11 +3,12 @@ New in v0.5.15 (2009/04/??)
 FTP backend was failing on PureFTPd when the "-x ''"
 option was removed from the second ncftpls popen, a fix
 that was implemented due to bug #24741.  This fix does
-the ls in one pass by extracting either the first or the
-last entry on the 'ls -l'.  [Standard FTP would be nice!]
+the ls in one pass by extracting the last entry on the
+'ls -l' listing.
 
 If a file is unreadable due to access rights or other non-
-fatal errors, put out error message and continue.
+fatal errors, put out error message and continue rather
+than dying messily with a traceback.
 
 
 New in v0.5.14 (2009/04/02)

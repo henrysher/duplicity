@@ -85,11 +85,6 @@ class FTPBackend(duplicity.backend.Backend):
         if parsed_url.port != None and parsed_url.port != 21:
             self.flags += " -P '%s'" % (parsed_url.port)
 
-        if not globals.short_filenames:
-            self.filename_re = re.compile("duplicity-[^\s]+")
-        else:
-            self.filename_re = re.compile("(?:df|di|dfs|dns)\\.[^\s]+")
-
     def put(self, source_path, remote_filename = None):
         """Transfer source_path to remote_filename"""
         remote_path = os.path.join(urllib.unquote(self.parsed_url.path.lstrip('/')), remote_filename).rstrip()
@@ -111,18 +106,8 @@ class FTPBackend(duplicity.backend.Backend):
         commandline = "ncftpls %s -l '%s'" % (self.flags, self.url_string)
         l = self.popen_persist(commandline).split('\n')
         l = filter(lambda x: x, l)
-        # Look for our files
-        names = []
-        for x in l:
-            parts = x.split()
-            # The name is either the first or the last part
-            # of the line.  Try the last part first since
-            # that's the most common.
-            if self.filename_re.match(parts[-1]):
-                names.append(parts[-1])
-            elif self.filename_re.match(parts[0]):
-                names.append(parts[0])
-        return names
+        # Look for our files as the last element of a long list line
+        return [x.split()[-1] for x in l]
 
     def delete(self, filename_list):
         """Delete files in filename_list"""
