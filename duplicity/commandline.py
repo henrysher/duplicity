@@ -132,6 +132,9 @@ def parse_cmdline_options(arglist):
             log.FatalError(_("Error opening file %s") % filename,
                            log.ErrorCode.cant_open_filelist)
 
+    def expand_fn(filename):
+        return os.path.expanduser(os.path.expandvars(filename))
+
     # expect no cmd and two positional args
     cmd = ""
     num_expect = 2
@@ -197,7 +200,7 @@ def parse_cmdline_options(arglist):
         if opt == "--allow-source-mismatch":
             globals.allow_source_mismatch = 1
         elif opt == "--archive-dir":
-            set_archive_dir(arg)
+            set_archive_dir(expand_fn(arg))
         elif opt == "--asynchronous-upload":
             globals.async_concurrency = 1 # (yes 1, this is not a boolean)
         elif opt == "--current-time":
@@ -211,6 +214,8 @@ def parse_cmdline_options(arglist):
                      "--exclude-if-present",
                      "--include",
                      "--include-regexp"]:
+            if not opt.endswith("regexp"):
+                arg = expand_fn(arg)
             select_opts.append((opt, arg))
         elif opt in ["--exclude-device-files",
                      "--exclude-other-filesystems"]:
@@ -219,6 +224,7 @@ def parse_cmdline_options(arglist):
                      "--include-filelist",
                      "--exclude-globbing-filelist",
                      "--include-globbing-filelist"]:
+            arg = expand_fn(arg)
             select_opts.append((opt, arg))
             select_files.append(sel_fl(arg))
         elif opt == "--exclude-filelist-stdin":
@@ -251,6 +257,7 @@ def parse_cmdline_options(arglist):
             except:
                 command_line_error("Cannot write to log-fd %s." % arg)
         elif opt == "--log-file":
+            arg = expand_fn(arg)
             try:
                 log.add_file(arg)
             except:
@@ -267,7 +274,7 @@ def parse_cmdline_options(arglist):
             globals.old_filenames = True
             old_fn_deprecation(opt)
         elif opt in ["-r", "--file-to-restore"]:
-            globals.restore_dir = arg
+            globals.restore_dir = expand_fn(arg)
         elif opt in ["-t", "--time", "--restore-time"]:
             globals.restore_time = dup_time.genstrtotime(arg)
         elif opt == "--s3-european-buckets":
