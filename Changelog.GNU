@@ -1,4 +1,48 @@
+2009-04-09  Kenneth Loafman  <kenneth@loafman.com>
+
+    * CHANGELOG, duplicity/.cvsignore: Changes for 0.5.15.
+
+    * duplicity/selection.py:
+    If a file is unreadable due to access rights or other
+    non-fatal errors, put out error message and continue
+    rather than dying messily with a traceback.
+
+    * duplicity-bin: Move SystemExit function back to the top and put
+    a large note NOT to move it back down, otherwise,
+    Exception gets invoked instead.
+
+    * duplicity/commandline.py: Remove "--restore-dir" from options[].
+     It's not an option and never has been.
+
+    * CHANGELOG, duplicity/commandline.py:
+    Added tilde '~' expansion and variable expansion in the
+    options that require a filename.  You can now have this
+    "--archive-dir=~/ArchDir/$SYSNAME" if you need it.  No
+    expansion is applied to the source or target URL's.
+
+2009-04-07  Kenneth Loafman  <kenneth@loafman.com>
+
+    * CHANGELOG, duplicity/backends/ftpbackend.py:
+    Unit tests were failing for ftp because of the filtering for
+    duplicity-only filenames.  Corrected this and removed
+    the check for the filename in the first element.
+
+    * CHANGELOG, duplicity/robust.py:
+    If a file is unreadable due to access rights or other non-
+    fatal errors, put out error message and continue.
+
+2009-04-03  Kenneth Loafman  <kenneth@loafman.com>
+
+    * CHANGELOG, duplicity/backends/ftpbackend.py:
+    FTP backend was failing on PureFTPd when the "-x ''"
+    option was removed from the second ncftpls popen, a fix
+    that was implemented due to bug #24741.  This fix does
+    the ls in one pass by extracting either the first or the
+    last entry on the 'ls -l'.  [Standard FTP would be nice!]
+
 2009-04-02  Kenneth Loafman  <kenneth@loafman.com>
+
+    * CHANGELOG, Changelog.GNU: Changes for 0.5.14.
 
     * CHANGELOG, Changelog.GNU, duplicity-bin, duplicity/asyncscheduler.py, duplicity/backend.py, duplicity/backends/botobackend.py, duplicity/backends/ftpbackend.py, duplicity/backends/imapbackend.py, duplicity/backends/localbackend.py, duplicity/backends/sshbackend.py, duplicity/backends/webdavbackend.py, duplicity/collections.py, duplicity/commandline.py, duplicity/diffdir.py, duplicity/dup_temp.py, duplicity/dup_threading.py, duplicity/dup_time.py, duplicity/file_naming.py, duplicity/gpg.py, duplicity/lazy.py, duplicity/manifest.py, duplicity/misc.py, duplicity/patchdir.py, duplicity/path.py, duplicity/robust.py, duplicity/selection.py, duplicity/statistics.py, duplicity/tempdir.py, rdiffdir, testing/GnuPGInterfacetest.py, testing/backendtest.py, testing/collectionstest.py, testing/diffdirtest.py, testing/dup_temptest.py, testing/dup_timetest.py, testing/file_namingtest.py, testing/finaltest.py, testing/gpgtest.py, testing/gpgtest2.py, testing/lazytest.py, testing/manifesttest.py, testing/misctest.py, testing/patchdirtest.py, testing/pathtest.py, testing/rdiffdirtest.py, testing/roottest.py, testing/selectiontest.py, testing/statictest.py, testing/statisticstest.py, testing/tempdirtest.py, testing/test_tarfile.py:
     Normalized include statements and tried to insure that all
