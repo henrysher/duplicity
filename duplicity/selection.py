@@ -33,9 +33,9 @@ import re
 import stat
 
 from duplicity.path import *
-
 from duplicity import log
 from duplicity import globals
+from duplicity import diffdir
 
 class SelectError(Exception):
     """Some error dealing with the Select class"""
@@ -119,7 +119,7 @@ class Select:
                 else:
                     log.Warn(_("Error initializing file %s/%s") % (path.name, filename))
             except OSError:
-                log.Warn(_("Error accessing possibly locked file %s/%s") % (path.name, filename));
+                log.Warn(_("Error accessing possibly locked file %s/%s") % (path.name, filename))
             return None
 
         def diryield(path):
@@ -135,7 +135,14 @@ class Select:
             for filename in robust.listpath(path):
                 new_path = robust.check_common_error(
                     error_handler, Path.append, (path, filename))
-                if new_path:
+                # make sure file is read accessible
+                if (new_path and not new_path.type in ["sym"]
+                    and not os.access(new_path.name, os.R_OK)):
+                    log.Warn(_("Error accessing possibly locked file %s") % new_path.name)
+                    if diffdir.stats:
+                        diffdir.stats.Errors +=1
+                    new_path = None
+                elif new_path:
                     s = self.Select(new_path)
                     if s == 1:
                         yield (new_path, 0)
