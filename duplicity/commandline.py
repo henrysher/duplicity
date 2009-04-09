@@ -94,7 +94,6 @@ options = ["allow-source-mismatch",
            "null-separator",
            "num-retries=",
            "old-filenames",
-           "restore-dir=",
            "restore-time=",
            "s3-european-buckets",
            "s3-use-new-style",
@@ -553,7 +552,7 @@ def check_consistency(action):
             command_line_error("--verify option cannot be used "
                                       "when backing up")
         if globals.restore_dir:
-            command_line_error("--restore-dir option incompatible with %s backup"
+            command_line_error("restore option incompatible with %s backup"
                                % (action,))
 
 def ProcessCommandLine(cmdline_list):
