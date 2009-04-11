@@ -148,14 +148,14 @@ def get_delta_path(new_path, sig_path, sigTarFile = None):
 def log_delta_path(delta_path, new_path = None, stats = None):
     """Look at delta path and log delta.  Add stats if new_path is set"""
     if delta_path.difftype == "snapshot":
-        if new_path:
+        if new_path and stats:
             stats.add_new_file(new_path)
         log.Info(_("Generating delta - new file: %s") %
                  (delta_path.get_relative_path(),),
                  log.InfoCode.diff_file_new,
                  util.escape(delta_path.get_relative_path()))
     else:
-        if new_path:
+        if new_path and stats:
             stats.add_changed_file(new_path)
         log.Info(_("Generating delta - changed file: %s") %
                  (delta_path.get_relative_path(),),
@@ -196,14 +196,15 @@ def get_delta_iter(new_iter, sig_iter, sig_fileobj=None):
                 yield ROPath(sig_path.index)
         elif not sig_path or new_path != sig_path:
             # Must calculate new signature and create delta
-            delta_path = robust.check_common_error(
-                delta_iter_error_handler, get_delta_path,
-                (new_path, sig_path, sigTarFile))
+            delta_path = robust.check_common_error(delta_iter_error_handler,
+                                                   get_delta_path,
+                                                   (new_path, sig_path, sigTarFile))
             if delta_path:
-                # if not, an error must have occurred
-                log_delta_path(delta_path)
+                # log and collect stats
+                log_delta_path(delta_path, new_path, stats)
                 yield delta_path
             else:
+                # if not, an error must have occurred
                 stats.Errors += 1
         else:
             stats.add_unchanged_file(new_path)
