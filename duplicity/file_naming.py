@@ -142,9 +142,9 @@ def get(type, volume_number = None, manifest = None,
 def parse(filename):
     """Parse duplicity filename, return None or ParseResults object"""
     filename = filename.lower()
-    def str2time(timestr):
+    def str2time(timestr, short):
         """Return time in seconds if string can be converted, None otherwise"""
-        if globals.short_filenames:
+        if short:
             t = from_base36(timestr)
         else:
             try:
@@ -153,51 +153,48 @@ def parse(filename):
                 return None
         return t
 
-    def get_vol_num(s):
+    def get_vol_num(s, short):
         """Return volume number from volume number string"""
-        if globals.short_filenames:
+        if short:
             return from_base36(s)
         else:
             return int(s)
 
     def check_full():
         """Return ParseResults if file is from full backup, None otherwise"""
-        if globals.short_filenames:
-            m1 = full_vol_re_short.search(filename)
-        else:
+        short = True
+        m1 = full_vol_re_short.search(filename)
+        m2 = full_manifest_re_short.search(filename)
+        if not m1 and not m2 and not globals.short_filenames:
+            short = False
             m1 = full_vol_re.search(filename)
-        if globals.short_filenames:
-            m2 = full_manifest_re_short.search(filename)
-        else:
             m2 = full_manifest_re.search(filename)
         if m1 or m2:
-            t = str2time((m1 or m2).group("time"))
+            t = str2time((m1 or m2).group("time"), short)
             if t:
                 if m1:
                     return ParseResults("full", time = t,
-                                        volume_number = get_vol_num(m1.group("num")))
+                                        volume_number = get_vol_num(m1.group("num"), short))
                 else:
                     return ParseResults("full", time = t, manifest = 1)
         return None
 
     def check_inc():
         """Return ParseResults if file is from inc backup, None otherwise"""
-        if globals.short_filenames:
-            m1 = inc_vol_re_short.search(filename)
-        else:
+        short = True
+        m1 = inc_vol_re_short.search(filename)
+        m2 = inc_manifest_re_short.search(filename)
+        if not m1 and not m2 and not globals.short_filenames:
+            short = False
             m1 = inc_vol_re.search(filename)
-        if globals.short_filenames:
-            m2 = inc_manifest_re_short.search(filename)
-        else:
             m2 = inc_manifest_re.search(filename)
-
         if m1 or m2:
-            t1 = str2time((m1 or m2).group("start_time"))
-            t2 = str2time((m1 or m2).group("end_time"))
+            t1 = str2time((m1 or m2).group("start_time"), short)
+            t2 = str2time((m1 or m2).group("end_time"), short)
             if t1 and t2:
                 if m1:
                     return ParseResults("inc", start_time = t1,
-                                        end_time = t2, volume_number = get_vol_num(m1.group("num")))
+                                        end_time = t2, volume_number = get_vol_num(m1.group("num"), short))
                 else:
                     return ParseResults("inc", start_time = t1,
                                         end_time = t2, manifest = 1)
@@ -205,37 +202,39 @@ def parse(filename):
 
     def check_sig():
         """Return ParseResults if file is a signature, None otherwise"""
-        if globals.short_filenames:
-            m = full_sig_re_short.search(filename)
-        else:
+        short = True
+        m = full_sig_re_short.search(filename)
+        if not m and not globals.short_filenames:
+            short = False
             m = full_sig_re.search(filename)
         if m:
-            t = str2time(m.group("time"))
+            t = str2time(m.group("time"), short)
             if t:
                 return ParseResults("full-sig", time = t)
             else:
                 return None
 
-        if globals.short_filenames:
-            m = new_sig_re_short.search(filename)
-        else:
+        short = True
+        m = new_sig_re_short.search(filename)
+        if not m and not globals.short_filenames:
+            short = False
             m = new_sig_re.search(filename)
         if m:
-            t1 = str2time(m.group("start_time"))
-            t2 = str2time(m.group("end_time"))
+            t1 = str2time(m.group("start_time"), short)
+            t2 = str2time(m.group("end_time"), short)
             if t1 and t2:
                 return ParseResults("new-sig", start_time = t1, end_time = t2)
         return None
 
     def set_encryption_or_compression(pr):
         """Set encryption and compression flags in ParseResults pr"""
-        if (globals.short_filenames and filename.endswith('.z') or
+        if (filename.endswith('.z') or
             not globals.short_filenames and filename.endswith('gz')):
             pr.compressed = 1
         else:
             pr.compressed = None
 
-        if (globals.short_filenames and filename.endswith('.g') or
+        if (filename.endswith('.g') or
             not globals.short_filenames and filename.endswith('.gpg')):
             pr.encrypted = 1
         else:
