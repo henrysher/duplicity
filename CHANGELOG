@@ -3,6 +3,10 @@ New in v0.5.16 (2009/04/??)
 bug #25594: wrong backup statistics
 https://savannah.nongnu.org/bugs/?25594
 
+patch #6806: More graceful handling of old
+             --short-filename files
+https://savannah.nongnu.org/patch/?6806
+
 
 New in v0.5.15 (2009/04/09)
 ---------------------------
