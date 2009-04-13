@@ -34,20 +34,10 @@ from duplicity import log
 from duplicity import pexpect
 from duplicity.errors import *
 
-scp_command = "scp"
-sftp_command = "sftp"
-
-# default to batch mode using public-key encryption
-ssh_askpass = False
-
-# user added ssh options
-ssh_options = ""
-
 class SSHBackend(duplicity.backend.Backend):
     """This backend copies files using scp.  List not supported"""
     def __init__(self, parsed_url):
         """scpBackend initializer"""
-        global ssh_askpass
         duplicity.backend.Backend.__init__(self, parsed_url)
 
         # host string of form [user@]hostname
@@ -64,19 +54,19 @@ class SSHBackend(duplicity.backend.Backend):
         self.remote_prefix = self.remote_dir + '/'
         # maybe use different ssh port
         if parsed_url.port:
-            self.ssh_options = ssh_options + " -oPort=%s" % parsed_url.port
+            globals.ssh_options = globals.ssh_options + " -oPort=%s" % parsed_url.port
         else:
-            self.ssh_options = ssh_options
+            globals.ssh_options = globals.ssh_options
         # set network timeout.  CountMax is how many retries to do, not how many tries.
         # Use CountMax=1 just in case there's a tiny network blip.
-        self.ssh_options += " -oServerAliveInterval=%i -oServerAliveCountMax=1" % ((int)(globals.timeout / 2))
+        globals.ssh_options += " -oServerAliveInterval=%i -oServerAliveCountMax=1" % ((int)(globals.timeout / 2))
         # set up password
-        if ssh_askpass:
+        if globals.ssh_askpass:
             self.password = self.get_password()
         else:
             if parsed_url.password:
                 self.password = parsed_url.password
-                ssh_askpass = True
+                globals.ssh_askpass = True
             else:
                 self.password = ''
 
@@ -89,7 +79,7 @@ class SSHBackend(duplicity.backend.Backend):
             log.Info("Running '%s' (attempt #%d)" % (commandline, n))
             child = pexpect.spawn(commandline, timeout = None)
             cmdloc = 0
-            if ssh_askpass:
+            if globals.ssh_askpass:
                 state = "authorizing"
             else:
                 state = "copying"
@@ -212,14 +202,14 @@ class SSHBackend(duplicity.backend.Backend):
         if not remote_filename:
             remote_filename = source_path.get_filename()
         commandline = "%s %s %s %s:%s%s" % \
-            (scp_command, self.ssh_options, source_path.name, self.host_string,
+            (globals.scp_command, globals.ssh_options, source_path.name, self.host_string,
              self.remote_prefix, remote_filename)
         self.run_scp_command(commandline)
 
     def get(self, remote_filename, local_path):
         """Use scp to get a remote file"""
         commandline = "%s %s %s:%s%s %s" % \
-            (scp_command, self.ssh_options, self.host_string, self.remote_prefix,
+            (globals.scp_command, globals.ssh_options, self.host_string, self.remote_prefix,
              remote_filename, local_path.name)
         self.run_scp_command(commandline)
         local_path.setdata()
@@ -238,8 +228,8 @@ class SSHBackend(duplicity.backend.Backend):
         commands = ["mkdir %s" % (self.remote_dir,),
                     "cd %s" % (self.remote_dir,),
                     "ls -1"]
-        commandline = ("%s %s %s" % (sftp_command,
-                                     self.ssh_options,
+        commandline = ("%s %s %s" % (globals.sftp_command,
+                                     globals.ssh_options,
                                      self.host_string))
 
         l = self.run_sftp_command(commandline, commands).split('\n')[1:]
@@ -253,7 +243,7 @@ class SSHBackend(duplicity.backend.Backend):
         commands = ["cd %s" % (self.remote_dir,)]
         for fn in filename_list:
             commands.append("rm %s" % fn)
-        commandline = ("%s %s %s" % (sftp_command, self.ssh_options, self.host_string))
+        commandline = ("%s %s %s" % (globals.sftp_command, globals.ssh_options, self.host_string))
         self.run_sftp_command(commandline, commands)
 
 duplicity.backend.register_backend("ssh", SSHBackend)

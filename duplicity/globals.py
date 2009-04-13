@@ -138,9 +138,25 @@ s3_european_buckets = False
 # part of the email address is used.
 imap_full_address = False
 
+# Name of the imap folder where we want to store backups.
+# Can be changed with a command line argument.
+imap_mailbox = "INBOX"
+
 # Whether the old filename format is in effect.
 old_filenames = False
 
 # Wheter to specify --use-agent in GnuPG options
 use_agent = False
 
+# ssh commands to use
+scp_command = "scp"
+sftp_command = "sftp"
+
+# default to batch mode using public-key encryption
+ssh_askpass = False
+
+# user added ssh options
+ssh_options = ""
+
+# if recovery in progress
+recovering = False

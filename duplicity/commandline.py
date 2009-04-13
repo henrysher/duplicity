@@ -34,19 +34,15 @@ from duplicity import log
 from duplicity import path
 from duplicity import selection
 
-# Also import the sshbackend module specifically because we stomp on
-# its options.
-from duplicity.backends import sshbackend
-from duplicity.backends import imapbackend
-
 
 select_opts = [] # Will hold all the selection options
 select_files = [] # Will hold file objects when filelist given
-full_backup = None # Will be set to true if -f or --full option given
-list_current = None # Will be set to true if --list-current option given
-collection_status = None # Will be set to true if --collection-status given
-cleanup = None # Set to true if --cleanup option given
-verify = None # Set to true if --verify option given
+
+full_backup = None # Will be set to true if full command given
+list_current = None # Will be set to true if list-current command given
+collection_status = None # Will be set to true if collection-status command given
+cleanup = None # Set to true if cleanup command given
+verify = None # Set to true if verify command given
 
 commands = ["cleanup",
             "collection-status",
@@ -238,7 +234,7 @@ def parse_cmdline_options(arglist):
         elif opt == "--ftp-regular":
             globals.ftp_connection = 'regular'
         elif opt == "--imap-mailbox":
-            imapbackend.imap_mailbox = arg.strip()
+            globals.imap_mailbox = arg.strip()
         elif opt == "--gpg-options":
             gpg.gpg_options = (gpg.gpg_options + ' ' + arg).strip()
         elif opt in ["-h", "--help"]:
@@ -281,18 +277,18 @@ def parse_cmdline_options(arglist):
         elif opt == "--s3-use-new-style":
             globals.s3_use_new_style = True
         elif opt == "--scp-command":
-            sshbackend.scp_command = arg
+            globals.scp_command = arg
         elif opt == "--sftp-command":
-            sshbackend.sftp_command = arg
+            globals.sftp_command = arg
         elif opt == "--short-filenames":
             globals.short_filenames = 1
             old_fn_deprecation(opt)
         elif opt == "--sign-key":
             set_sign_key(arg)
         elif opt == "--ssh-askpass":
-            sshbackend.ssh_askpass = True
+            globals.ssh_askpass = True
         elif opt == "--ssh-options":
-            sshbackend.ssh_options = (sshbackend.ssh_options + ' ' + arg).strip()
+            globals.ssh_options = (globals.ssh_options + ' ' + arg).strip()
         elif opt == "--tempdir":
             globals.temproot = arg
         elif opt == "--timeout":
