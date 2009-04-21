@@ -30,6 +30,7 @@ from duplicity import path
 from duplicity import dup_time
 from duplicity import globals
 from duplicity import manifest
+from duplicity.gpg import GPGError
 
 class CollectionsError(Exception):
     pass
@@ -164,8 +165,8 @@ class BackupSet:
         # public key w/o secret key
         try:
             manifest_buffer = self.backend.get_data(self.remote_manifest_name)
-        except IOError, message:
-            if message.args[0] == "GnuPG exited non-zero, with code 2":
+        except GPGError, message:
+            if "secret key not available" in message.args[0]:
                 return None
             else:
                 raise

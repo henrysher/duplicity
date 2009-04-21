@@ -147,15 +147,13 @@ class GPGFile:
         return res
 
     def gpg_failed(self):
-        self.print_log(0)
-        log.FatalError("GPG Failed, see log above", log.ErrorCode.gpg_failed)
-
-    def print_log(self, level):
-        log.Log("===== Begin GnuPG log =====", level)
+        msg = "GPG Failed, see log below:\n"
+        msg += "===== Begin GnuPG log =====\n"
         self.logger_fp.seek(0)
         for line in self.logger_fp:
-            log.Log(line.strip(), level)
-        log.Log("===== End GnuPG log =====", level)
+            msg += line.strip() + "\n"
+        msg += "===== End GnuPG log =====\n"
+        raise GPGError, msg
 
     def close(self):
         if self.encrypt:
@@ -187,7 +185,6 @@ class GPGFile:
                 self.gpg_process.wait()
             except:
                 self.gpg_failed()
-        self.print_log(5)
         self.logger_fp.close()
         self.closed = 1
 
