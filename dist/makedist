@@ -40,7 +40,6 @@ def VersionedCopy(source, dest):
 
     (outbuf, cnt) = re.subn("\$version", Version, inbuf)
     assert cnt != 0, "No $version string replaced in" + source
-    assert cnt < 2, "Two or more $version strings found in" + source
 
     inbuf = outbuf
     (outbuf, cnt) = re.subn("\$reldate", Reldate, inbuf)
