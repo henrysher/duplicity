@@ -162,6 +162,10 @@ class ErrorCode:
     gpg_failed = 31
     s3_bucket_not_style = 32
     not_implemented = 33
+    get_freespace_failed = 34
+    not_enough_freespace = 35
+    get_ulimit_failed = 36
+    maxopen_too_low = 37
 
 def FatalError(s, code, extra=None):
     """Write fatal error message and exit"""
