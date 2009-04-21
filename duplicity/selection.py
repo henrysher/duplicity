@@ -136,7 +136,7 @@ class Select:
                 new_path = robust.check_common_error(
                     error_handler, Path.append, (path, filename))
                 # make sure file is read accessible
-                if (new_path and not new_path.type in ["sym"]
+                if (new_path and new_path.type in ["reg", "dir"]
                     and not os.access(new_path.name, os.R_OK)):
                     log.Warn(_("Error accessing possibly locked file %s") % new_path.name)
                     if diffdir.stats:
