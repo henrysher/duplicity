@@ -338,6 +338,10 @@ def parse_cmdline_options(arglist):
     if len(args) != num_expect:
         command_line_error("Expected %d args, got %d" % (num_expect, len(args)))
 
+    for loc in range(len(args)):
+        if not '://' in args[loc]:
+            args[loc] = expand_fn(args[loc])
+
     return args
 
 def command_line_error(message):
