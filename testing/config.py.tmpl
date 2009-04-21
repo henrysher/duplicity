@@ -21,12 +21,17 @@
 
 import sys, os
 sys.path.insert(0, "../")
-from duplicity import globals, log
 
 import gettext
 gettext.install('duplicity')
 
+from duplicity import globals
+from duplicity import log
+
 # config for duplicity unit tests
+
+# verbosity, default is log.WARNING
+verbosity = log.WARNING
 
 # to test GPG and friends
 # these must be without passwords
@@ -77,7 +82,7 @@ webdavs_password = None
 def setup():
     """ setup for unit tests """
     log.setup()
-    log.setverbosity(0)
+    log.setverbosity(verbosity)
     globals.print_statistics = 0
 
     globals.num_retries = 2
