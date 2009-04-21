@@ -735,9 +735,9 @@ def check_resources(action):
         else:
             log.FatalError(_("Unable to get max open files (ulimit returned 0x%04X.") % (res,),
                            log.ErrorCode.get_ulimit_failed)
-        if maxopen < 2048:
-            log.FatalError(_("Max open files of %s is too low, should be >= 2048.\n"
-                             "Use 'ulimit -n 2048' or higher to correct.\n") % (maxopen,),
+        if maxopen < 1024:
+            log.FatalError(_("Max open files of %s is too low, should be >= 1024.\n"
+                             "Use 'ulimit -n 1024' or higher to correct.\n") % (maxopen,),
                              log.ErrorCode.maxopen_too_low)
 
 
