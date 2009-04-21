@@ -33,23 +33,36 @@ class ManifestError(Exception):
 class Manifest:
     """List of volumes and information about each one"""
     def __init__(self):
-        """Create blank Manifest"""
+        """
+        Create blank Manifest
+
+        @rtype: Manifest
+        @return: manifest
+        """
         self.hostname = None;
         self.local_dirname = None
         self.volume_info_dict = {} # dictionary vol numbers -> vol infos
 
     def set_dirinfo(self):
-        """Set information about directory from globals"""
+        """
+        Set information about directory from globals
+
+        @rtype: Manifest
+        @return: manifest
+        """
         self.hostname = globals.hostname
         self.local_dirname = globals.local_path.name
         return self
 
     def check_dirinfo(self):
-        """Return None if dirinfo is the same, otherwise error message
+        """
+        Return None if dirinfo is the same, otherwise error message
 
         Does not raise an error message if hostname or local_dirname
         are not available.
 
+        @rtype: string
+        @return: None or error message
         """
         if globals.allow_source_mismatch:
             return
@@ -75,14 +88,26 @@ class Manifest:
                          "message"), log.ErrorCode.source_mismatch)
 
     def add_volume_info(self, vi):
-        """Add volume info vi to manifest"""
+        """
+        Add volume info vi to manifest
+
+        @param vi: volume info to add
+        @type vi: VolumeInfo
+
+        @return: void
+        """
         vol_num = vi.volume_number
         if self.volume_info_dict.has_key(vol_num):
             raise ManifestError("Volume %d already present" % (vol_num,))
         self.volume_info_dict[vol_num] = vi
 
     def to_string(self):
-        """Return string version of self (just concatenate vi strings)"""
+        """
+        Return string version of self (just concatenate vi strings)
+
+        @rtype: string
+        @return: self in string form
+        """
         result = ""
         if self.hostname:
             result += "Hostname %s\n" % self.hostname
