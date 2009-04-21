@@ -1,11 +1,22 @@
-New in v0.5.16 (2009/04/??)
+New in v0.5.16 (2009/04/21)
 ---------------------------
+bug #24825: duplicity warn on insufficient TMPDIR
+            space availability and low max open
+            file limits pre-backup.
+https://savannah.nongnu.org/bugs/?24825
+
 bug #25594: wrong backup statistics
 https://savannah.nongnu.org/bugs/?25594
+
+bug #25976: Password requested when not needed.
+https://savannah.nongnu.org/bugs/?25976
 
 patch #6806: More graceful handling of old
              --short-filename files
 https://savannah.nongnu.org/patch/?6806
+
+Added tilde and variable expansion to the source or
+target argument that is not a URL.
 
 
 New in v0.5.15 (2009/04/09)

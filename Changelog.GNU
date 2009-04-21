@@ -1,6 +1,65 @@
+2009-04-21  Kenneth Loafman  <kenneth@loafman.com>
+
+    * dist/makedist: Remove check for only one $version string.
+
+    * duplicity-bin: Reduce max_open_files limit needed to 1024, was 2048.
+
+    * duplicity-bin: Fix argument list in FatalError call re max open files.
+
+    * duplicity/log.py: bug #24825: duplicity warn on insufficient TMPDIR
+                space availability and low max open
+                file limits pre-backup.
+    https://savannah.nongnu.org/bugs/?24825
+
+    * duplicity/collections.py, duplicity/gpg.py:
+    bug #25976: Password requested when not needed.
+    https://savannah.nongnu.org/bugs/?25976
+
+    * duplicity-bin: bug #24825: duplicity warn on insufficient TMPDIR
+                space availability and low max open
+                file limits pre-backup.
+    https://savannah.nongnu.org/bugs/?24825
+
+    bug #25976: Password requested when not needed.
+    https://savannah.nongnu.org/bugs/?25976
+
+    * testing/config.py.tmpl: Make sure gettext is included first.
+    Add variable at top of file for verbosity.
+
+    * duplicity/selection.py:
+    Use os.access() check on regular files and dirs only.
+
+    * duplicity/manifest.py: Add some documentation.
+
+    * duplicity/commandline.py:
+    Added tilde and variable expansion to the source or
+    target argument that is not a URL.
+
+    * duplicity/__init__.py, duplicity/backends/__init__.py:
+    Make sure gettext is available by importing first.
+
+2009-04-13  Kenneth Loafman  <kenneth@loafman.com>
+
+    * duplicity/backends/imapbackend.py, duplicity/backends/sshbackend.py, duplicity/commandline.py, duplicity/globals.py:
+    Move ssh and imap backend globals to globals.py.
+
+2009-04-12  Kenneth Loafman  <kenneth@loafman.com>
+
+    * CHANGELOG, duplicity/file_naming.py, testing/file_namingtest.py:
+    patch #6806: More graceful handling of old
+                 --short-filename files
+    https://savannah.nongnu.org/patch/?6806
+
+2009-04-10  Kenneth Loafman  <kenneth@loafman.com>
+
+    * CHANGELOG, duplicity/diffdir.py: bug #25594: wrong backup statistics
+    https://savannah.nongnu.org/bugs/?25594
+
+    * .settings/.cvsignore: Not needed.
+
 2009-04-09  Kenneth Loafman  <kenneth@loafman.com>
 
-    * CHANGELOG, duplicity/.cvsignore: Changes for 0.5.15.
+    * Changelog.GNU, CHANGELOG, duplicity/.cvsignore: Changes for 0.5.15.
 
     * duplicity/selection.py:
     If a file is unreadable due to access rights or other
