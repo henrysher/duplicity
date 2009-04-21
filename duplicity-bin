@@ -29,7 +29,7 @@
 
 from __future__ import generators
 import getpass, gzip, os, sys, time, types
-import traceback
+import traceback, platform
 
 import gettext
 gettext.install('duplicity')
@@ -107,6 +107,15 @@ def get_passphrase(n, action):
     elif (action == "full"
           and globals.gpg_profile.recipients
           and not globals.gpg_profile.sign_key):
+        return ""
+
+    # for an inc backup, we don't need a password if
+    # there is no sign_key and there are recipients
+    # and there is an archive-dir specified
+    elif (action == "inc"
+          and globals.gpg_profile.recipients
+          and not globals.gpg_profile.sign_key
+          and globals.archive_dir):
         return ""
 
     # Finally, ask the user for the passphrase
@@ -190,7 +199,6 @@ def write_multivol(backup_type, tarblock_iter, backend):
         backend.put(tdp, dest_filename)
         putsize = tdp.getsize()
         tdp.delete()
-
         return putsize
 
     at_end = 0
@@ -679,6 +687,60 @@ def check_last_manifest(col_stats):
     last_backup_set.check_manifests()
 
 
+def check_resources(action):
+    """
+    Check for sufficient resources:
+      - temp space for volume build
+      - enough max open files
+    Put out fatal error if not sufficient to run
+
+    @type action: string
+    @param action: action in progress
+
+    @rtype: void
+    @return: void
+    """
+    if action in ["full", "inc", "restore"]:
+        # Make sure we have enough resouces to run
+        # First check disk space in temp area.
+        tempfile, tempname = tempdir.default().mkstemp()
+        os.close(tempfile)
+        p = os.popen("df -P %s" % tempname)
+        fout = p.read()
+        res = p.close()
+        if not res:
+            fout = fout.split('\n')
+            freespace = int(fout[1].split()[3]) * 1024
+        else:
+            log.FatalError(_("Unable to get free space on temp (df returned 0x%04X.") % (res,),
+                           log.ErrorCode.get_freespace_failed)
+        # Calculate space we need for at least 2 volumes of full or inc
+        # plus about 30% of one volume for the signature files.
+        needspace = (((globals.async_concurrency + 2) * globals.volsize)
+                     + int(0.30 * globals.volsize))
+        if freespace < needspace:
+            log.FatalError(_("Temp space has %d available, backup needs approx %d.") %
+                           (freespace, needspace), log.ErrorCode.not_enough_freespace)
+        else:
+            log.Info(_("Temp has %d available, backup will use approx %d.") %
+                     (freespace, needspace))
+
+        # Some environments like Cygwin run with an artificially
+        # low value for max open files.  Check for safe number.
+        p = os.popen("ulimit -n")
+        fout = p.read()
+        res = p.close()
+        if not res:
+            maxopen = int(fout)
+        else:
+            log.FatalError(_("Unable to get max open files (ulimit returned 0x%04X.") % (res,),
+                           log.ErrorCode.get_ulimit_failed)
+        if maxopen < 2048:
+            log.FatalError(_("Max open files of %s is too low, should be >= 2048.\n"
+                             "Use 'ulimit -n 2048' or higher to correct.\n"), (maxopen,),
+                             log.ErrorCode.maxopen_too_low)
+
+
 def main():
     """
     Start/end here
@@ -686,6 +748,14 @@ def main():
     dup_time.setcurtime()
     log.setup()
     action = commandline.ProcessCommandLine(sys.argv[1:])
+
+    # log Python, duplicity, and system versions
+    log.Info("%s %s" % (sys.executable or sys.platform, sys.version))
+    log.Info("duplicity $version ($reldate)")
+    log.Info(' '.join(platform.uname()))
+
+    check_resources(action)
+
     col_stats = collections.CollectionsStatus(globals.backend,
                                               globals.archive_dir).set_values()
     log.PrintCollectionStatus(col_stats)
@@ -695,6 +765,7 @@ def main():
         log.Notice(_("Last full backup date:") + " " + dup_time.timetopretty(last_full_time))
     else:
         log.Notice(_("Last full backup date: none"))
+        action = "full"
     if action == "inc" and last_full_time < globals.full_force_time:
         log.Notice(_("Last full backup is too old, forcing full backup"))
         action = "full"
@@ -764,6 +835,15 @@ if __name__ == "__main__":
     except SystemExit, e:
         # No traceback, just get out
         sys.exit(e)
+
+    except gpg.GPGError, e:
+        # For user errors, don't show an ugly stack trace by
+        # default. But do with sufficient verbosity.
+        log.Info(_("GPG error detail: %s")
+                 % (''.join(traceback.format_exception(*sys.exc_info()))))
+        log.FatalError("%s: %s" % (e.__class__.__name__, e.args[0]),
+                       log.ErrorCode.gpg_failed,
+                       e.__class__.__name__)
 
     except duplicity.errors.UserError, e:
         # For user errors, don't show an ugly stack trace by
