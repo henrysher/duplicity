@@ -765,7 +765,6 @@ def main():
         log.Notice(_("Last full backup date:") + " " + dup_time.timetopretty(last_full_time))
     else:
         log.Notice(_("Last full backup date: none"))
-        action = "full"
     if action == "inc" and last_full_time < globals.full_force_time:
         log.Notice(_("Last full backup is too old, forcing full backup"))
         action = "full"
