@@ -419,10 +419,12 @@ probably isn't what you meant.""") %
         log.Notice(_("Reading globbing filelist %s") % list_name)
         separator = globals.null_separator and "\0" or "\n"
         for line in filelist_fp.read().split(separator):
-            if not line:
-                continue # skip blanks
-            if line[0] == "#": continue # skip comments
-            if line[:2] == "+ ": yield self.glob_get_sf(line[2:], 1)
+            if not line: # skip blanks
+                continue
+            if line[0] == "#": # skip comments
+                continue
+            if line[:2] == "+ ":
+                yield self.glob_get_sf(line[2:], 1)
             elif line[:2] == "- ":
                 yield self.glob_get_sf(line[2:], 0)
             else:
