@@ -1,3 +1,20 @@
+New in v0.5.17 (2009/05/??)
+---------------------------
+Removed one line of code left from some testing that I
+did that caused a crash when the target dir was empty
+and collection-status was requested.
+
+Moved from using the df command to get temp space
+availability to Python's os.statvfs() call.  Not all
+df commands work the same way.
+
+patch #6813: Making changelist easy to read
+https://savannah.nongnu.org/patch/?6813
+
+patch #6814: Ignore comments in filelists
+https://savannah.nongnu.org/patch/?6814
+
+
 New in v0.5.16 (2009/04/21)
 ---------------------------
 bug #24825: duplicity warn on insufficient TMPDIR
