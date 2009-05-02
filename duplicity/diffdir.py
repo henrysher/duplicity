@@ -109,7 +109,7 @@ def get_delta_path(new_path, sig_path, sigTarFile = None):
         ti = new_path.get_tarinfo()
         index = new_path.index
     delta_path = new_path.get_ropath()
-    log.Info(_("Getting delta of %s and %s") % (new_path, sig_path))
+    log.Debug(_("Getting delta of %s and %s") % (new_path, sig_path))
 
     def callback(sig_string):
         """Callback activated when FileWithSignature read to end"""
@@ -150,14 +150,14 @@ def log_delta_path(delta_path, new_path = None, stats = None):
     if delta_path.difftype == "snapshot":
         if new_path and stats:
             stats.add_new_file(new_path)
-        log.Info(_("Generating delta - new file: %s") %
+        log.Info(_("A %s") %
                  (delta_path.get_relative_path(),),
                  log.InfoCode.diff_file_new,
                  util.escape(delta_path.get_relative_path()))
     else:
         if new_path and stats:
             stats.add_changed_file(new_path)
-        log.Info(_("Generating delta - changed file: %s") %
+        log.Info(_("M %s") %
                  (delta_path.get_relative_path(),),
                  log.InfoCode.diff_file_changed,
                  util.escape(delta_path.get_relative_path()))
@@ -178,13 +178,13 @@ def get_delta_iter(new_iter, sig_iter, sig_fileobj=None):
     else:
         sigTarFile = None
     for new_path, sig_path in collated:
-        log.Info(_("Comparing %s and %s") % (new_path and new_path.index,
-                                             sig_path and sig_path.index))
+        log.Debug(_("Comparing %s and %s") % (new_path and new_path.index,
+                                              sig_path and sig_path.index))
         if not new_path or not new_path.type:
             # file doesn't exist
             if sig_path and sig_path.exists():
                 # but signature says it did
-                log.Info(_("Generating delta - deleted file: %s") %
+                log.Info(_("D %s") %
                          (sig_path.get_relative_path(),),
                          log.InfoCode.diff_file_deleted,
                          util.escape(sig_path.get_relative_path()))

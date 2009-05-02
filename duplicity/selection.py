@@ -154,7 +154,7 @@ class Select:
             log.Warn(_("Warning: base %s doesn't exist, continuing") %
                      path.name)
             return
-        log.Info(_("Selecting %s") % path.name)
+        log.Debug(_("Selecting %s") % path.name)
         yield path
         if not path.isdir():
             return
@@ -172,10 +172,10 @@ class Select:
             if val == 0:
                 if delayed_path_stack:
                     for delayed_path in delayed_path_stack:
-                        log.Info(_("Selecting %s") % delayed_path.name)
+                        log.Log(_("Selecting %s") % delayed_path.name, 6)
                         yield delayed_path
                     del delayed_path_stack[:]
-                log.Info(_("Selecting %s") % subpath.name)
+                log.Debug(_("Selecting %s") % subpath.name)
                 yield subpath
                 if subpath.isdir():
                     diryield_stack.append(diryield(subpath))
@@ -421,6 +421,7 @@ probably isn't what you meant.""") %
         for line in filelist_fp.read().split(separator):
             if not line:
                 continue # skip blanks
+            if line[0] == "#": continue # skip comments
             if line[:2] == "+ ": yield self.glob_get_sf(line[2:], 1)
             elif line[:2] == "- ":
                 yield self.glob_get_sf(line[2:], 0)
