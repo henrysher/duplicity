@@ -1,4 +1,35 @@
+2009-05-04  Kenneth Loafman  <kenneth@loafman.com>
+
+    * CHANGELOG: Changes for 0.5.17.
+
+2009-05-02  Kenneth Loafman  <kenneth@loafman.com>
+
+    * CHANGELOG: Checkpoint.
+
+    * duplicity/selection.py: The previous revision got the wrong comment, so
+    I cleaned up some code and checked back in.  The
+    correct release comment should be:
+
+    patch #6814: Ignore comments in filelists
+    https://savannah.nongnu.org/patch/?6814
+
+    * duplicity/diffdir.py, duplicity/selection.py:
+    patch #6813: Making changelist easy to read
+    https://savannah.nongnu.org/patch/?6813
+
+    * duplicity-bin: Moved from using the df command to get temp space
+    availability to Python's os.statvfs() call.  Not all df
+    commands work the same way.
+
+2009-04-22  Kenneth Loafman  <kenneth@loafman.com>
+
+    * duplicity-bin:
+    I had put in some trial code that I removed incompletely that forced
+    a full backup action.  This removes the last line of that code.
+
 2009-04-21  Kenneth Loafman  <kenneth@loafman.com>
+
+    * .pydevproject, CHANGELOG, Changelog.GNU: Changes for 0.5.16.
 
     * dist/makedist: Remove check for only one $version string.
 

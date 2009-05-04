@@ -1,4 +1,4 @@
-New in v0.5.17 (2009/05/??)
+New in v0.5.17 (2009/05/04)
 ---------------------------
 Removed one line of code left from some testing that I
 did that caused a crash when the target dir was empty
