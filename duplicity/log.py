@@ -166,7 +166,7 @@ class ErrorCode:
     not_enough_freespace = 35
     get_ulimit_failed = 36
     maxopen_too_low = 37
-    authentication_failed = 38
+    connection_failed = 38
 
 def FatalError(s, code, extra=None):
     """Write fatal error message and exit"""
