@@ -38,14 +38,14 @@ class CloudFilesBackend(duplicity.backend.Backend):
             from cloudfiles.errors import ResponseError
             from cloudfiles import consts
         except ImportError:
-            raise BackendException("This backend requires the cloudfiles " \
+            raise BackendException("This backend requires the cloudfiles "
                                    "library available from Rackspace.")
 
         self.resp_exc = ResponseError
         conn_kwargs = {}
 
         if not os.environ.has_key('CLOUDFILES_USERNAME'):
-            raise BackendException('CLOUDFILES_USERNAME environment variable' \
+            raise BackendException('CLOUDFILES_USERNAME environment variable'
                                    'not set.')
 
         if not os.environ.has_key('CLOUDFILES_APIKEY'):
@@ -63,9 +63,10 @@ class CloudFilesBackend(duplicity.backend.Backend):
 
         try:
             conn = Connection(**conn_kwargs)
-        except:
-            log.FatalError("Authentication failed, please check your credentials.",
-                           log.ErrorCode.authentication_failed)
+        except Exception, e:
+            log.FatalError("Connection failed, please check your credentials: %s %s"
+                           % (e.__class__.__name__, str(e)),
+                           log.ErrorCode.connection_failed)
         self.container = conn.create_container(container)
 
     def put(self, source_path, remote_filename = None):
@@ -79,15 +80,15 @@ class CloudFilesBackend(duplicity.backend.Backend):
                 sobject.load_from_filename(source_path.name)
                 return
             except self.resp_exc, error:
-                log.Warn("Upload of '%s' failed (attempt %d): CloudFiles returned: %s %s" \
+                log.Warn("Upload of '%s' failed (attempt %d): CloudFiles returned: %s %s"
                          % (remote_filename, n, error.status, error.reason))
             except Exception, e:
-                log.Warn("Upload of '%s' failed (attempt %s): %s: %s" \
+                log.Warn("Upload of '%s' failed (attempt %s): %s: %s"
                         % (remote_filename, n, e.__class__.__name__, str(e)))
-                log.Debug("Backtrace of previous error: %s" \
+                log.Debug("Backtrace of previous error: %s"
                           % exception_traceback())
             time.sleep(30)
-        log.Warn("Giving up uploading '%s' after %s attempts" \
+        log.Warn("Giving up uploading '%s' after %s attempts"
                  % (remote_filename, globals.num_retries))
         raise BackendException("Error uploading '%s'" % remote_filename)
 
@@ -102,17 +103,17 @@ class CloudFilesBackend(duplicity.backend.Backend):
                 local_path.setdata()
                 return
             except self.resp_exc, resperr:
-                log.Warn("Download of '%s' failed (attempt %s): CloudFiles returned: %s %s" \
+                log.Warn("Download of '%s' failed (attempt %s): CloudFiles returned: %s %s"
                          % (remote_filename, n, resperr.status, resperr.reason))
             except Exception, e:
-                log.Warn("Download of '%s' failed (attempt %s): %s: %s" \
+                log.Warn("Download of '%s' failed (attempt %s): %s: %s"
                          % (remote_filename, n, e.__class__.__name__, str(e)))
-                log.Debug("Backtrace of previous error: %s" \
+                log.Debug("Backtrace of previous error: %s"
                           % exception_traceback())
             time.sleep(30)
-        log.Warn("Giving up downloading '%s' after %s attempts" \
+        log.Warn("Giving up downloading '%s' after %s attempts"
                  % (remote_filename, globals.num_retries))
-        raise BackendException("Error downloading '%s/%s'" \
+        raise BackendException("Error downloading '%s/%s'"
                                % (self.container, remote_filename))
 
     def list(self):
