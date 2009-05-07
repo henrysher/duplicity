@@ -31,6 +31,7 @@ import gettext
 gettext.install('duplicity')
 
 import duplicity.backends.botobackend
+import duplicity.backends.cloudfilesbackend
 import duplicity.backends.ftpbackend
 import duplicity.backends.imapbackend
 import duplicity.backends.hsibackend

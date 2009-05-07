@@ -376,6 +376,7 @@ Backends and their URL formats:
     rsync://user[:password]@other.host[:port]//absolute_path
     s3://other.host/bucket_name[/prefix]
     s3+http://bucket_name[/prefix]
+    cf+http://container_name
     webdav://user[:password]@other.host/some_dir
     webdavs://user[:password]@other.host/some_dir
 
