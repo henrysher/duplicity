@@ -10,6 +10,9 @@ bug #21792: pipe call fails with an error OSError:
             [Errno 24] Too many open files
 https://savannah.nongnu.org/bugs/?21792
 
+Changed from using ulimit external command to
+resource.getrlimit to check open files limit.
+
 
 New in v0.5.17 (2009/05/04)
 ---------------------------

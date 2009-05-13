@@ -29,7 +29,7 @@
 
 from __future__ import generators
 import getpass, gzip, os, sys, time, types
-import traceback, platform, statvfs
+import traceback, platform, statvfs, resource
 
 import gettext
 gettext.install('duplicity')
@@ -726,14 +726,12 @@ def check_resources(action):
 
         # Some environments like Cygwin run with an artificially
         # low value for max open files.  Check for safe number.
-        p = os.popen("ulimit -n")
-        fout = p.read()
-        res = p.close()
-        if not res:
-            maxopen = int(fout)
-        else:
-            log.FatalError(_("Unable to get max open files (ulimit returned 0x%04X.") % (res,),
+        try:
+            soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+        except resource.error:
+            log.FatalError(_("Unable to get max open files."),
                            log.ErrorCode.get_ulimit_failed)
+        maxopen = min(soft, hard)
         if maxopen < 1024:
             log.FatalError(_("Max open files of %s is too low, should be >= 1024.\n"
                              "Use 'ulimit -n 1024' or higher to correct.\n") % (maxopen,),
@@ -749,6 +747,7 @@ def main():
     action = commandline.ProcessCommandLine(sys.argv[1:])
 
     # log Python, duplicity, and system versions
+    log.Info("Args: %s" % (' '.join(sys.argv),))
     log.Info("%s %s" % (sys.executable or sys.platform, sys.version))
     log.Info("duplicity $version ($reldate)")
     log.Info(' '.join(platform.uname()))
