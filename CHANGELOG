@@ -2,6 +2,9 @@ New in v0.5.18 (2009/05/??)
 ---------------------------
 Added support for RackSpace's CloudFiles, cf+http.
 
+patch #6743: Tahoe backend for duplicity
+https://savannah.nongnu.org/patch/?6743
+
 Only half of this bug is fixed but it's still useful.
 bug #21792: pipe call fails with an error OSError:
             [Errno 24] Too many open files

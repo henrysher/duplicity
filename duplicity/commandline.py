@@ -365,18 +365,19 @@ Usage:
     duplicity remove-all-but-n-full count [options] target_url
 
 Backends and their URL formats:
-    ssh://user[:password]@other.host[:port]/some_dir
-    scp://user[:password]@other.host[:port]/some_dir
+    cf+http://container_name
+    file:///some_dir
     ftp://user[:password]@other.host[:port]/some_dir
     hsi://user[:password]@other.host[:port]/some_dir
-    file:///some_dir
     imap://user[:password]@other.host[:port]/some_dir
     rsync://user[:password]@other.host[:port]::/module/some_dir
     rsync://user[:password]@other.host[:port]/relative_path
     rsync://user[:password]@other.host[:port]//absolute_path
     s3://other.host/bucket_name[/prefix]
     s3+http://bucket_name[/prefix]
-    cf+http://container_name
+    scp://user[:password]@other.host[:port]/some_dir
+    ssh://user[:password]@other.host[:port]/some_dir
+    tahoe://alias/directory
     webdav://user[:password]@other.host/some_dir
     webdavs://user[:password]@other.host/some_dir
 
