@@ -1,7 +1,8 @@
-New in v0.5.18 (2009/05/??)
+New in v0.5.18 (2009/05/20)
 ---------------------------
 Added support for RackSpace's CloudFiles, cf+http.
 
+Added support for Tahoe-LAFS from the patch,
 patch #6743: Tahoe backend for duplicity
 https://savannah.nongnu.org/patch/?6743
 

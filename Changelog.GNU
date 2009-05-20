@@ -1,6 +1,51 @@
+2009-05-14  Kenneth Loafman  <kenneth@loafman.com>
+
+    * duplicity/collections.py, duplicity/diffdir.py:
+    Checkpoint and abandon this approach.  The idea of splitting the signature files was good, however, it will greatly increase the number of open file handles.  Six per sig file, all open at the same time would be way too much.
+
+    I'll look into this again when I rewrite duplicity and untangle the parallel nested iterators it uses.
+
+    * duplicity/backends/cloudfilesbackend.py: Correct copyright.
+
+2009-05-13  Kenneth Loafman  <kenneth@loafman.com>
+
+    * .settings/org.eclipse.core.resources.prefs: Reset file type preferences.
+
+    * CHANGELOG, duplicity-bin: Changed from using ulimit external command to
+    resource.getrlimit to check open files limit.
+
+    * CHANGELOG, duplicity.1, duplicity/backends/tahoebackend.py, duplicity/commandline.py:
+    patch #6743: Tahoe backend for duplicity
+    https://savannah.nongnu.org/patch/?6743
+
+    * CHANGELOG, duplicity/GnuPGInterface.py:
+    Only half of this bug is fixed but it's still useful.
+    bug #21792: pipe call fails with an error OSError:
+                [Errno 24] Too many open files
+    https://savannah.nongnu.org/bugs/?21792
+
+2009-05-07  Kenneth Loafman  <kenneth@loafman.com>
+
+    * .settings/org.eclipse.core.resources.prefs, duplicity/log.py, duplicity.1:
+    Added support for RackSpace's CloudFiles, cf+http.
+
+    * duplicity/backends/cloudfilesbackend.py:
+    Add more detail on connection failure.
+
+    * CHANGELOG, duplicity/backends/__init__.py, duplicity/backends/cloudfilesbackend.py, duplicity/commandline.py, duplicity/log.py:
+    Added support for RackSpace's CloudFiles, cf+http.
+
+2009-05-05  Kenneth Loafman  <kenneth@loafman.com>
+
+    * .project, .pydevproject, CHANGELOG, Changelog.GNU, dist/makedist, duplicity-bin, duplicity/collections.py, duplicity/commandline.py, duplicity/diffdir.py, duplicity/dup_temp.py, duplicity/file_naming.py, duplicity/gpg.py, duplicity/log.py, duplicity/manifest.py, duplicity/selection.py, testing/config.py.tmpl, testing/file_namingtest.py, testing/roottest.py:
+    Merge changes from 0.5.17 and checkpoint current work.
+
 2009-05-04  Kenneth Loafman  <kenneth@loafman.com>
 
-    * CHANGELOG: Changes for 0.5.17.
+    * duplicity/__init__.py, duplicity/backends/__init__.py:
+    Make sure gettext is installed at the module level.
+
+    * Changelog.GNU, CHANGELOG: Changes for 0.5.17.
 
 2009-05-02  Kenneth Loafman  <kenneth@loafman.com>
 
