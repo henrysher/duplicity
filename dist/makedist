@@ -109,6 +109,7 @@ def MakeTar():
     os.mkdir(os.path.join(tardir, "src", "backends"))
     for filename in [
         "backends/botobackend.py",
+        "backends/cloudfilesbackend.py",
         "backends/ftpbackend.py",
         "backends/hsibackend.py",
         "backends/imapbackend.py",
@@ -116,6 +117,7 @@ def MakeTar():
         "backends/localbackend.py",
         "backends/rsyncbackend.py",
         "backends/sshbackend.py",
+        "backends/tahoebackend.py",
         "backends/webdavbackend.py",
         ]:
         assert not os.system("cp %s/%s %s/src/backends" %
