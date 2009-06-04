@@ -131,7 +131,7 @@ class GIOBackend(duplicity.backend.Backend):
                 files.append(info.get_display_name())
                 info = enum.next_file()
             return files
-        except OSError, e:
+        except Exception, e:
             raise BackendException(str(e))
 
     def delete(self, filename_list):
@@ -140,5 +140,5 @@ class GIOBackend(duplicity.backend.Backend):
         try:
                 for filename in filename_list:
                         self.remote_file.get_child_for_display_name(filename).delete()
-        except OSError, e:
+        except Exception, e:
             raise BackendException(str(e))
