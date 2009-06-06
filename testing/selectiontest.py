@@ -31,7 +31,14 @@ config.setup()
 
 class MatchingTest(unittest.TestCase):
     """Test matching of file names against various selection functions"""
-    def makeext(self, path): return self.root.new_index(tuple(path.split("/")))
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+
+    def makeext(self, path):
+        return self.root.new_index(tuple(path.split("/")))
 
     def setUp(self):
         self.root = Path("testfiles/select")
@@ -256,6 +263,12 @@ testfiles/select/1/1
 
 class ParseArgsTest(unittest.TestCase):
     """Test argument parsing"""
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+
     root = None
     def ParseTest(self, tuplelist, indicies, filelists = []):
         """No error if running select on tuple goes over indicies"""

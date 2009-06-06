@@ -53,18 +53,21 @@ class FileNamingBase:
         assert pr.start_time == 10
         assert pr.end_time == 20
         assert pr.volume_number == 23
+        assert not pr.partial
 
         filename = file_naming.get("full-sig")
         log.Info("Full sig filename: " + filename)
         pr = file_naming.parse(filename)
         assert pr.type == "full-sig"
         assert pr.time == 20
+        assert not pr.partial
 
         filename = file_naming.get("new-sig")
         pr = file_naming.parse(filename)
         assert pr.type == "new-sig"
         assert pr.start_time == 10
         assert pr.end_time == 20
+        assert not pr.partial
 
     def test_suffix(self):
         """Test suffix (encrypt/compressed) encoding and generation"""
@@ -96,14 +99,37 @@ class FileNamingBase:
         assert pr.type == "full-sig"
         assert pr.time == 1036954144, repr(pr.time)
 
+    def test_partial(self):
+        """Test addition of partial flag"""
+        pr = file_naming.parse("dns.h112bi.h14rg0.st.p.g")
+        assert pr, pr
+        assert pr.partial
+        assert pr.type == "new-sig"
+        assert pr.end_time == 1029826800L
+
+        if not globals.short_filenames:
+            pr = file_naming.parse("duplicity-new-signatures.2002-08-18T00:04:30-07:00.to.2002-08-20T00:00:00-07:00.sigtar.part.gpg")
+            assert pr, pr
+            assert pr.partial
+            assert pr.type == "new-sig"
+            assert pr.end_time == 1029826800L
+
+        pr = file_naming.parse("dfs.h5dixs.st.p.g")
+        assert pr, pr
+        assert pr.partial
+        assert pr.type == "full-sig"
+        assert pr.time == 1036954144, repr(pr.time)
+
 
 class FileNamingLong(unittest.TestCase, FileNamingBase):
     """Test long filename parsing and generation"""
-    def setUp(self): globals.short_filenames = 0
+    def setUp(self):
+        globals.short_filenames = 0
 
 class FileNamingShort(unittest.TestCase, FileNamingBase):
     """Test short filename parsing and generation"""
-    def setUp(self): globals.short_filenames = 1
+    def setUp(self):
+        globals.short_filenames = 1
 
 
 if __name__ == "__main__":

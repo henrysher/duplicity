@@ -1,3 +1,12 @@
+New in v0.6.00 (2009/05/20)
+---------------------------
+Checkpoint/Restart capability added.  Checkpoint is
+done at every volume written and Restart is done at
+start of the next volume in the set.  Changes to
+normal operations include a permanent duplicity
+archive-dir at ~/.duplicity to save state.
+
+
 New in v0.5.18 (2009/05/20)
 ---------------------------
 Added support for RackSpace's CloudFiles, cf+http.

@@ -29,7 +29,15 @@ config.setup()
 
 class RdiffdirTest(unittest.TestCase):
     """Test rdiffdir command line program"""
-    def run_cmd(self, command): assert not os.system(command)
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+
+    def run_cmd(self, command):
+        assert not os.system(command)
+
     def del_tmp(self):
         """Make new testfiles/output dir"""
         self.run_cmd("rm -rf testfiles/output")

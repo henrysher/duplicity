@@ -19,12 +19,12 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-"""Functions for producing signatures and deltas of directories
+"""
+Functions for producing signatures and deltas of directories
 
 Note that the main processes of this module have two parts.  In the
 first, the signature or delta is constructed of a ROPath iterator.  In
 the second, the ROPath iterator is put into tar block form.
-
 """
 
 from __future__ import generators
@@ -37,8 +37,7 @@ from duplicity import util
 from duplicity.path import *
 from duplicity.lazy import *
 
-# A StatsObj will be written to this whenever DirDelta_WriteSig is
-# run.
+# A StatsObj will be written to this from DirDelta_WriteSig only.
 stats = None
 
 
@@ -47,33 +46,37 @@ class DiffDirException(Exception):
 
 
 def DirSig(path_iter):
-    """Alias for SigTarBlockIter below"""
+    """
+    Alias for SigTarBlockIter below
+    """
     return SigTarBlockIter(path_iter)
 
 
 def DirFull(path_iter):
-    """Return a tarblock full backup of items in path_iter
+    """
+    Return a tarblock full backup of items in path_iter
 
     A full backup is just a diff starting from nothing (it may be less
     elegant than using a standard tar file, but we can be sure that it
     will be easy to split up the tar and make the volumes the same
     sizes).
-
     """
     return DirDelta(path_iter, cStringIO.StringIO(""))
 
 
 def DirFull_WriteSig(path_iter, sig_outfp):
-    """Return full backup like above, but also write signature to sig_outfp"""
+    """
+    Return full backup like above, but also write signature to sig_outfp
+    """
     return DirDelta_WriteSig(path_iter, cStringIO.StringIO(""), sig_outfp)
 
 
 def DirDelta(path_iter, dirsig_fileobj_list):
-    """Produce tarblock diff given dirsig_fileobj_list and pathiter
+    """
+    Produce tarblock diff given dirsig_fileobj_list and pathiter
 
     dirsig_fileobj_list should either be a tar fileobj or a list of
     those, sorted so the most recent is last.
-
     """
     global stats
     stats = statistics.StatsDeltaProcess()
@@ -90,7 +93,9 @@ def DirDelta(path_iter, dirsig_fileobj_list):
 
 
 def delta_iter_error_handler(exc, new_path, sig_path, sig_tar = None):
-    """Called by get_delta_iter, report error in getting delta"""
+    """
+    Called by get_delta_iter, report error in getting delta
+    """
     if new_path:
         index_string = new_path.get_relative_path()
     elif sig_path:
@@ -102,8 +107,10 @@ def delta_iter_error_handler(exc, new_path, sig_path, sig_tar = None):
 
 
 def get_delta_path(new_path, sig_path, sigTarFile = None):
-    """Return new delta_path which, when read, writes sig to sig_fileobj,
-       if sigTarFile is not None"""
+    """
+    Return new delta_path which, when read, writes sig to sig_fileobj,
+    if sigTarFile is not None
+    """
     assert new_path
     if sigTarFile:
         ti = new_path.get_tarinfo()
@@ -112,7 +119,9 @@ def get_delta_path(new_path, sig_path, sigTarFile = None):
     log.Debug(_("Getting delta of %s and %s") % (new_path, sig_path))
 
     def callback(sig_string):
-        """Callback activated when FileWithSignature read to end"""
+        """
+        Callback activated when FileWithSignature read to end
+        """
         ti.size = len(sig_string)
         ti.name = "signature/" + "/".join(index)
         sigTarFile.addfile(ti, cStringIO.StringIO(sig_string))
@@ -146,7 +155,9 @@ def get_delta_path(new_path, sig_path, sigTarFile = None):
 
 
 def log_delta_path(delta_path, new_path = None, stats = None):
-    """Look at delta path and log delta.  Add stats if new_path is set"""
+    """
+    Look at delta path and log delta.  Add stats if new_path is set
+    """
     if delta_path.difftype == "snapshot":
         if new_path and stats:
             stats.add_new_file(new_path)
@@ -164,7 +175,8 @@ def log_delta_path(delta_path, new_path = None, stats = None):
 
 
 def get_delta_iter(new_iter, sig_iter, sig_fileobj=None):
-    """Generate delta iter from new Path iter and sig Path iter.
+    """
+    Generate delta iter from new Path iter and sig Path iter.
 
     For each delta path of regular file type, path.difftype with be
     set to "snapshot", "diff".  sig_iter will probably iterate ROPaths
@@ -214,7 +226,9 @@ def get_delta_iter(new_iter, sig_iter, sig_fileobj=None):
 
 
 def sigtar2path_iter(sigtarobj):
-    """Convert signature tar file object open for reading into path iter"""
+    """
+    Convert signature tar file object open for reading into path iter
+    """
     tf = tarfile.TarFile("Arbitrary Name", "r", sigtarobj)
     tf.debug = 2
     for tarinfo in tf:
@@ -241,13 +255,13 @@ def sigtar2path_iter(sigtarobj):
 
 
 def collate2iters(riter1, riter2):
-    """Collate two iterators.
+    """
+    Collate two iterators.
 
     The elements yielded by each iterator must be have an index
     variable, and this function returns pairs (elem1, elem2), (elem1,
     None), or (None, elem2) two elements in a pair will have the same
     index, and earlier indicies are yielded later than later indicies.
-
     """
     relem1, relem2 = None, None
     while 1:
@@ -285,7 +299,8 @@ def collate2iters(riter1, riter2):
 
 
 def combine_path_iters(path_iter_list):
-    """Produce new iterator by combining the iterators in path_iter_list
+    """
+    Produce new iterator by combining the iterators in path_iter_list
 
     This new iter will iterate every path that is in path_iter_list in
     order of increasing index.  If multiple iterators in
@@ -294,13 +309,14 @@ def combine_path_iters(path_iter_list):
 
     This is used to combine signature iters, as the output will be a
     full up-to-date signature iter.
-
     """
     path_iter_list = path_iter_list[:] # copy before destructive reverse
     path_iter_list.reverse()
 
     def get_triple(iter_index):
-        """Represent the next element as a triple, to help sorting"""
+        """
+        Represent the next element as a triple, to help sorting
+        """
         try:
             path = path_iter_list[iter_index].next()
         except StopIteration:
@@ -308,7 +324,9 @@ def combine_path_iters(path_iter_list):
         return (path.index, iter_index, path)
 
     def refresh_triple_list(triple_list):
-        """Update all elements with path_index same as first element"""
+        """
+        Update all elements with path_index same as first element
+        """
         path_index = triple_list[0][0]
         iter_index = 0
         while iter_index < len(triple_list):
@@ -332,12 +350,12 @@ def combine_path_iters(path_iter_list):
 
 
 def DirDelta_WriteSig(path_iter, sig_infp_list, newsig_outfp):
-    """Like DirDelta but also write signature into sig_fileobj
+    """
+    Like DirDelta but also write signature into sig_fileobj
 
     Like DirDelta, sig_infp_list can be a tar fileobj or a sorted list
     of those.  A signature will only be written to newsig_outfp if it
     is different from (the combined) sig_infp_list.
-
     """
     global stats
     stats = statistics.StatsDeltaProcess()
@@ -353,12 +371,16 @@ def DirDelta_WriteSig(path_iter, sig_infp_list, newsig_outfp):
 
 
 def get_combined_path_iter(sig_infp_list):
-    """Return path iter combining signatures in list of open sig files"""
+    """
+    Return path iter combining signatures in list of open sig files
+    """
     return combine_path_iters(map(sigtar2path_iter, sig_infp_list))
 
 
 class FileWithReadCounter:
-    """File-like object which also computes amount read as it is read"""
+    """
+    File-like object which also computes amount read as it is read
+    """
     def __init__(self, infile):
         """FileWithReadCounter initializer"""
         self.infile = infile
@@ -374,10 +396,13 @@ class FileWithReadCounter:
 
 
 class FileWithSignature:
-    """File-like object which also computes signature as it is read"""
+    """
+    File-like object which also computes signature as it is read
+    """
     blocksize = 32 * 1024
     def __init__(self, infile, callback, filelen, *extra_args):
-        """FileTee initializer
+        """
+        FileTee initializer
 
         The object will act like infile, but whenever it is read it
         add infile's data to a SigGenerator object.  When the file has
@@ -385,7 +410,6 @@ class FileWithSignature:
         calculated signature, and any extra_args if given.
 
         filelen is used to calculate the block size of the signature.
-
         """
         self.infile, self.callback = infile, callback
         self.sig_gen = librsync.SigGenerator(get_block_size(filelen))
@@ -408,36 +432,47 @@ class FileWithSignature:
 
 
 class TarBlock:
-    """Contain information to add next file to tar"""
+    """
+    Contain information to add next file to tar
+    """
     def __init__(self, index, data):
-        """TarBlock initializer - just store data"""
+        """
+        TarBlock initializer - just store data
+        """
         self.index = index
         self.data = data
 
 
 class TarBlockIter:
-    """A bit like an iterator, yield tar blocks given input iterator
+    """
+    A bit like an iterator, yield tar blocks given input iterator
 
     Unlike an iterator, however, control over the maximum size of a
     tarblock is available by passing an argument to next().  Also the
     get_footer() is available.
-
     """
     def __init__(self, input_iter):
-        """TarBlockIter initializer"""
+        """
+        TarBlockIter initializer
+        """
         self.input_iter = input_iter
-        self.offset = 0l # total length of data read
-        self.process_waiting = None # process_continued has more blocks
-        self.previous_index = None # holds index of last block returned
-        self.remember_next = None # see remember_next_index()
-        self.remember_value = None
+        self.offset = 0l                    # total length of data read
+        self.process_waiting = False        # process_continued has more blocks
+        self.process_next_vol_number = None # next volume number to write in multivol
+        self.previous_index = None          # holds index of last block returned
+        self.previous_block = None          # holds block of last block returned
+        self.remember_next = False          # see remember_next_index()
+        self.remember_value = None          # holds index of next block
+        self.remember_block = None          # holds block of next block
 
         # We need to instantiate a dummy TarFile just to get access to
         # some of the functions like _get_full_headers.
         self.tf = tarfile.TarFromIterator(None)
 
     def tarinfo2tarblock(self, index, tarinfo, file_data = ""):
-        """Make tarblock out of tarinfo and file data"""
+        """
+        Make tarblock out of tarinfo and file data
+        """
         tarinfo.size = len(file_data)
         headers = self.tf._get_full_headers(tarinfo)
         blocks, remainder = divmod(tarinfo.size, tarfile.BLOCKSIZE)
@@ -448,49 +483,65 @@ class TarBlockIter:
         return TarBlock(index, "%s%s%s" % (headers, file_data, filler_data))
 
     def process(self, val, size):
-        """Turn next value of input_iter into a TarBlock"""
+        """
+        Turn next value of input_iter into a TarBlock
+        """
         assert not self.process_waiting
-        XXX # this should be overridden in subclass
+        XXX # Override in subclass
 
     def process_continued(self, size):
-        """Get more tarblocks
+        """
+        Get more tarblocks
 
         If processing val above would produce more than one TarBlock,
         get the rest of them by calling process_continue.
-
         """
         assert self.process_waiting
-        XXX # Override this too in subclass
+        XXX # Override in subclass
 
     def next(self, size = 1024 * 1024):
-        """Return next block, no bigger than size, and update offset"""
+        """
+        Return next block, no bigger than size, and update offset
+        """
         if self.process_waiting:
             result = self.process_continued(size)
         else:
             # Below a StopIteration exception will just be passed upwards
             result = self.process(self.input_iter.next(), size)
+        block_number = self.process_next_vol_number
         self.offset += len(result.data)
         self.previous_index = result.index
+        self.previous_block = block_number
         if self.remember_next:
             self.remember_value = result.index
-            self.remember_next = None
+            self.remember_block = block_number
+            self.remember_next = False
         return result
 
     def get_previous_index(self):
-        """Return index of last tarblock, or None if no previous index"""
-        return self.previous_index
+        """
+        Return index of last tarblock, or None if no previous index
+        """
+        return self.previous_index, self.previous_block
 
     def remember_next_index(self):
-        """When called, remember the index of the next block iterated"""
-        self.remember_next = 1
+        """
+        When called, remember the index of the next block iterated
+        """
+        self.remember_next = True
         self.remember_value = None
+        self.remember_block = None
 
     def recall_index(self):
-        """Retrieve index remembered with remember_next_index"""
-        return self.remember_value # or None if no index recalled
+        """
+        Retrieve index remembered with remember_next_index
+        """
+        return self.remember_value, self.remember_block
 
     def get_footer(self):
-        """Return closing string for tarfile, reset offset"""
+        """
+        Return closing string for tarfile, reset offset
+        """
         blocks, remainder = divmod(self.offset, tarfile.RECORDSIZE)
         self.offset = 0l
         return '\0' * (tarfile.RECORDSIZE - remainder) # remainder can be 0
@@ -500,9 +551,13 @@ class TarBlockIter:
 
 
 class DummyBlockIter(TarBlockIter):
-    """TarBlockIter that does no file reading"""
+    """
+    TarBlockIter that does no file reading
+    """
     def process(self, delta_ropath, size):
-        """Get a fake tarblock from delta_ropath"""
+        """
+        Get a fake tarblock from delta_ropath
+        """
         ti = delta_ropath.get_tarinfo()
         index = delta_ropath.index
 
@@ -520,14 +575,16 @@ class DummyBlockIter(TarBlockIter):
 
 
 class SigTarBlockIter(TarBlockIter):
-    """TarBlockIter that yields blocks of a signature tar from path_iter"""
+    """
+    TarBlockIter that yields blocks of a signature tar from path_iter
+    """
     def process(self, path, size):
-        """Return associated signature TarBlock from path
+        """
+        Return associated signature TarBlock from path
 
         Here size is just ignored --- let's hope a signature isn't too
         big.  Also signatures are stored in multiple volumes so it
         doesn't matter.
-
         """
         ti = path.get_tarinfo()
         if path.isreg():
@@ -543,15 +600,17 @@ class SigTarBlockIter(TarBlockIter):
 
 
 class DeltaTarBlockIter(TarBlockIter):
-    """TarBlockIter that yields parts of a deltatar file
+    """
+    TarBlockIter that yields parts of a deltatar file
 
     Unlike SigTarBlockIter, the argument to __init__ is a
     delta_path_iter, so the delta information has already been
     calculated.
-
     """
     def process(self, delta_ropath, size):
-        """Get a tarblock from delta_ropath"""
+        """
+        Get a tarblock from delta_ropath
+        """
         def add_prefix(tarinfo, prefix):
             """Add prefix to the name of a tarinfo file"""
             if tarinfo.name == ".":
@@ -597,18 +656,22 @@ class DeltaTarBlockIter(TarBlockIter):
         return self.tarinfo2tarblock(index, ti, data)
 
     def get_data_block(self, fp, max_size):
-        """Return pair (next data block, boolean last data block)"""
+        """
+        Return pair (next data block, boolean last data block)
+        """
         read_size = min(64*1024, max(max_size, 512))
         buf = fp.read(read_size)
         if len(buf) < read_size:
             if fp.close():
                 raise DiffDirException("Error closing file")
-            return (buf, 1)
+            return (buf, True)
         else:
-            return (buf, None)
+            return (buf, False)
 
     def process_continued(self, size):
-        """Return next volume in multivol diff or snapshot"""
+        """
+        Return next volume in multivol diff or snapshot
+        """
         assert self.process_waiting
         ropath = self.process_ropath
         ti, index = ropath.get_tarinfo(), ropath.index
@@ -628,7 +691,9 @@ class DeltaTarBlockIter(TarBlockIter):
 
 
 def write_block_iter(block_iter, out_obj):
-    """Write block_iter to filename, path, or file object"""
+    """
+    Write block_iter to filename, path, or file object
+    """
     if isinstance(out_obj, Path):
         fp = open(out_obj.name, "wb")
     elif type(out_obj) is types.StringType:
@@ -644,15 +709,16 @@ def write_block_iter(block_iter, out_obj):
 
 
 def get_block_size(file_len):
-    """Return a reasonable block size to use on files of length file_len
+    """
+    Return a reasonable block size to use on files of length file_len
 
     If the block size is too big, deltas will be bigger than is
     necessary.  If the block size is too small, making deltas and
     patching can take a really long time.
-
     """
     if file_len < 1024000:
         return 512 # set minimum of 512 bytes
     else:
         # Split file into about 2000 pieces, rounding to 512
-        return min(long((file_len/(2000*512))*512), 2048)
+        file_blocksize = long((file_len / (2000 * 512)) * 512)
+        return min(file_blocksize, 2048L)

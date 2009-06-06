@@ -62,7 +62,7 @@ def Log(s, verb_level, code=1, extra=None, force_print=False):
         initial_level = _logger.getEffectiveLevel()
         _logger.setLevel(DupToLoggerLevel(MAX))
 
-    _logger.log(DupToLoggerLevel(verb_level), unicode(s, "utf8"))
+    _logger.log(DupToLoggerLevel(verb_level), s)
     _logger.controlLine = None
 
     if force_print:
@@ -167,6 +167,7 @@ class ErrorCode:
     get_ulimit_failed = 36
     maxopen_too_low = 37
     connection_failed = 38
+    restart_file_not_found = 39
 
 def FatalError(s, code, extra=None):
     """Write fatal error message and exit"""

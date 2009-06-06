@@ -27,6 +27,7 @@ import duplicity.backend
 import duplicity.backends
 from duplicity import path
 from duplicity import collections
+from duplicity import commandline
 from duplicity import globals
 
 config.setup()
@@ -51,6 +52,7 @@ class FinalTest:
     """Test backup/restore using duplicity binary"""
     def run_duplicity(self, arglist, options = [], current_time = None):
         """Run duplicity binary with given arguments and options"""
+        options.append("--archive-dir testfiles/tmp_archive")
         cmd_list = ["../duplicity-bin"]
         cmd_list.extend(options + ["--allow-source-mismatch"])
         if current_time: cmd_list.append("--current-time %s" % (current_time,))
@@ -159,11 +161,11 @@ class FinalTest:
         self.test_basic_cycle(backup_options = backup_options,
                               restore_options = restore_options)
 
-    def test_archive_dir(self):
-        """Like test_basic_cycle, but use a local archive dir"""
-        options = ["--archive-dir testfiles/tmp_archive"]
-        self.test_basic_cycle(backup_options = options,
-                              restore_options = options)
+#    def test_archive_dir(self):
+#        """Like test_basic_cycle, but use a local archive dir"""
+#        options = ["--archive-dir testfiles/tmp_archive"]
+#        self.test_basic_cycle(backup_options = options,
+#                              restore_options = options)
 
     def test_single_regfile(self):
         """Test backing and restoring up a single regular file"""
@@ -216,12 +218,13 @@ class FinalTest:
         self.backup("inc", "testfiles/dir3", current_time = 40000)
 
         b = duplicity.backend.get_backend(backend_url)
-        cs = collections.CollectionsStatus(b).set_values()
+        commandline.set_archive_dir("testfiles/tmp_archive")
+        cs = collections.CollectionsStatus(b, globals.archive_dir).set_values()
         assert len(cs.all_backup_chains) == 2, cs.all_backup_chains
         assert cs.matched_chain_pair
 
         self.run_duplicity(["--force", backend_url], options=["remove-older-than 35000"])
-        cs2 = collections.CollectionsStatus(b).set_values()
+        cs2 = collections.CollectionsStatus(b, globals.archive_dir).set_values()
         assert len(cs2.all_backup_chains) == 1, cs.all_backup_chains
         assert cs2.matched_chain_pair
         chain = cs2.all_backup_chains[0]
@@ -230,7 +233,7 @@ class FinalTest:
 
         # Now check to make sure we can't delete only chain
         self.run_duplicity(["--force", backend_url], options=["remove-older-than 50000"])
-        cs3 = collections.CollectionsStatus(b).set_values()
+        cs3 = collections.CollectionsStatus(b, globals.archive_dir).set_values()
         assert len(cs3.all_backup_chains) == 1
         assert cs3.matched_chain_pair
         chain = cs3.all_backup_chains[0]
@@ -238,9 +241,21 @@ class FinalTest:
         assert chain.end_time == 40000, chain.end_time
 
 class FinalTest1(FinalTest, unittest.TestCase):
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+
     globals.old_filenames = False
 
 class FinalTest2(FinalTest, unittest.TestCase):
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+
     globals.old_filenames = True
 
 if __name__ == "__main__":

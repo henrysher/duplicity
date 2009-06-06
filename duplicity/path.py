@@ -450,11 +450,11 @@ class ROPath:
 
 
 class Path(ROPath):
-    """Path class - wrapper around ordinary local files
+    """
+    Path class - wrapper around ordinary local files
 
     Besides caching stat() results, this class organizes various file
     code.
-
     """
     regex_chars_to_quote = re.compile("[\\\\\\\"\\$`]")
 
@@ -501,11 +501,11 @@ class Path(ROPath):
         return self.isdir() and not self.listdir()
 
     def open(self, mode = "rb"):
-        """Return fileobj associated with self
+        """
+        Return fileobj associated with self
 
         Usually this is just the file data on disk, but can be
         replaced with arbitrary data using the setfileobj method.
-
         """
         assert not self.opened
         if self.fileobj:
@@ -630,11 +630,11 @@ class Path(ROPath):
         return "(%s %s %s)" % (self.index, self.name, self.type)
 
     def quote(self, s = None):
-        """Return quoted version of s (defaults to self.name)
+        """
+        Return quoted version of s (defaults to self.name)
 
         The output is meant to be interpreted with shells, so can be
         used with os.system.
-
         """
         if not s:
             s = self.name
@@ -660,12 +660,12 @@ class Path(ROPath):
         return components[-1]
 
     def get_canonical(self):
-        """Return string of canonical version of path
+        """
+        Return string of canonical version of path
 
         Remove ".", and trailing slashes where possible.  Note that
         it's harder to remove "..", as "foo/bar/.." is not necessarily
         "foo", so we can't use path.normpath()
-
         """
         newpath = "/".join(filter(lambda x: x and x != ".",
                                   self.name.split("/")))
@@ -678,14 +678,15 @@ class Path(ROPath):
 
 
 class DupPath(Path):
-    """Represent duplicity data files
+    """
+    Represent duplicity data files
 
     Based on the file name, files that are compressed or encrypted
     will have different open() methods.
-
     """
     def __init__(self, base, index = (), parseresults = None):
-        """DupPath initializer
+        """
+        DupPath initializer
 
         The actual filename (no directory) must be the single element
         of the index, unless parseresults is given.
@@ -701,14 +702,13 @@ class DupPath(Path):
         Path.__init__(self, base, index)
 
     def filtered_open(self, mode = "rb", gpg_profile = None):
-        """Return fileobj with appropriate encryption/compression
+        """
+        Return fileobj with appropriate encryption/compression
 
         If encryption is specified but no gpg_profile, use
         globals.default_profile.
-
         """
         assert not self.opened and not self.fileobj
-        assert mode == "rb" or mode == "wb" # demand binary mode, no appends
         assert not (self.pr.encrypted and self.pr.compressed)
         if gpg_profile:
             assert self.pr.encrypted

@@ -36,43 +36,53 @@ class CollectionsError(Exception):
     pass
 
 class BackupSet:
-    """Backup set - the backup information produced by one session"""
+    """
+    Backup set - the backup information produced by one session
+    """
     def __init__(self, backend):
-        """Initialize new backup set, only backend is required at first"""
+        """
+        Initialize new backup set, only backend is required at first
+        """
         self.backend = backend
-        self.info_set = None
-        self.volume_name_dict = {} # dict from volume number to filename
-        self.remote_manifest_name = None
-        self.local_manifest_path = None
-        self.time = None # will be set if is full backup set
+        self.info_set = False                       # true if fields are set
+        self.volume_name_dict = {}                  # dict from volume number to filename
+        self.remote_manifest_name = None            # full name of remote manifest
+        self.local_manifest_path = None             # full path to local manifest
+        self.time = None                            # will be set if is full backup set
         self.start_time, self.end_time = None, None # will be set if inc
+        self.partial = False                        # true if a partial backup
 
     def is_complete(self):
-        """Assume complete if found manifest file"""
+        """
+        Assume complete if found manifest file
+        """
         return self.remote_manifest_name
 
     def add_filename(self, filename):
-        """Add a filename to given set.  Return true if it fits.
+        """
+        Add a filename to given set.  Return true if it fits.
 
         The filename will match the given set if it has the right
         times and is of the right type.  The information will be set
         from the first filename given.
 
+        @param filename: name of file to add
+        @type filename: string
         """
         pr = file_naming.parse(filename)
         if not pr or not (pr.type == "full" or pr.type == "inc"):
-            return None
+            return False
 
         if not self.info_set:
             self.set_info(pr)
         else:
             if pr.type != self.type:
-                return None
+                return False
             if pr.time != self.time:
-                return None
+                return False
             if (pr.start_time != self.start_time or
                 pr.end_time != self.end_time):
-                return None
+                return False
 
         if pr.manifest:
             self.set_manifest(filename)
@@ -81,25 +91,31 @@ class BackupSet:
             assert not self.volume_name_dict.has_key(pr.volume_number), \
                    (self.volume_name_dict, filename)
             self.volume_name_dict[pr.volume_number] = filename
-        return 1
+        return True
 
     def set_info(self, pr):
-        """Set BackupSet information from ParseResults object"""
+        """
+        Set BackupSet information from ParseResults object
+
+        @param pr: parse results
+        @type pf: ParseResults
+        """
         assert not self.info_set
         self.type = pr.type
         self.time = pr.time
         self.start_time, self.end_time = pr.start_time, pr.end_time
         self.time = pr.time
-        self.info_set = 1
+        self.partial = pr.partial
+        self.info_set = True
 
     def set_manifest(self, remote_filename):
-        """Add local and remote manifest filenames to backup set"""
+        """
+        Add local and remote manifest filenames to backup set
+        """
         assert not self.remote_manifest_name, (self.remote_manifest_name,
                                                remote_filename)
         self.remote_manifest_name = remote_filename
 
-        if not globals.archive_dir:
-            return
         for local_filename in globals.archive_dir.listdir():
             pr = file_naming.parse(local_filename)
             if (pr and pr.manifest and pr.type == self.type and
@@ -110,13 +126,17 @@ class BackupSet:
                 break
 
     def delete(self):
-        """Remove all files in set"""
+        """
+        Remove all files in set
+        """
         l = self.get_filenames()
         l.reverse() # delete starting with manifest
         self.backend.delete(l)
 
     def __str__(self):
-        """For now just list files in set"""
+        """
+        For now just list files in set
+        """
         filelist = []
         if self.remote_manifest_name:
             filelist.append(self.remote_manifest_name)
@@ -124,11 +144,15 @@ class BackupSet:
         return "[%s]" % ", ".join(filelist)
 
     def get_timestr(self):
-        """Return time string suitable for log statements"""
+        """
+        Return time string suitable for log statements
+        """
         return dup_time.timetopretty(self.time or self.end_time)
 
     def check_manifests(self):
-        """Make sure remote manifest is equal to local one"""
+        """
+        Make sure remote manifest is equal to local one
+        """
         if not self.remote_manifest_name and not self.local_manifest_path:
             log.FatalError(_("Fatal Error: No manifests found for most recent backup"),
                            log.ErrorCode.no_manifests)
@@ -153,13 +177,17 @@ class BackupSet:
         remote_manifest.check_dirinfo()
 
     def get_local_manifest(self):
-        """Return manifest object by reading local manifest file"""
+        """
+        Return manifest object by reading local manifest file
+        """
         assert self.local_manifest_path
         manifest_buffer = self.local_manifest_path.get_data()
         return manifest.Manifest().from_string(manifest_buffer)
 
     def get_remote_manifest(self):
-        """Return manifest by reading remote manifest on backend"""
+        """
+        Return manifest by reading remote manifest on backend
+        """
         assert self.remote_manifest_name
         # Following by MDR.  Should catch if remote encrypted with
         # public key w/o secret key
@@ -173,14 +201,18 @@ class BackupSet:
         return manifest.Manifest().from_string(manifest_buffer)
 
     def get_manifest(self):
-        """Return manifest object, showing preference for local copy"""
+        """
+        Return manifest object, showing preference for local copy
+        """
         if self.local_manifest_path:
             return self.get_local_manifest()
         else:
             return self.get_remote_manifest()
 
     def get_filenames(self):
-        """Return sorted list of (remote) filenames of files in set"""
+        """
+        Return sorted list of (remote) filenames of files in set
+        """
         assert self.info_set
         volume_num_list = self.volume_name_dict.keys()
         volume_num_list.sort()
@@ -192,7 +224,9 @@ class BackupSet:
             return volume_filenames
 
     def get_time(self):
-        """Return time if full backup, or end_time if incremental"""
+        """
+        Return time if full backup, or end_time if incremental
+        """
         if self.time:
             return self.time
         if self.end_time:
@@ -200,33 +234,41 @@ class BackupSet:
         assert 0, "Neither self.time nor self.end_time set"
 
     def __len__(self):
-        """Return the number of volumes in the set"""
+        """
+        Return the number of volumes in the set
+        """
         return len(self.volume_name_dict.keys())
 
 
 class BackupChain:
-    """BackupChain - a number of linked BackupSets
+    """
+    BackupChain - a number of linked BackupSets
 
     A BackupChain always starts with a full backup set and continues
     with incremental ones.
-
     """
     def __init__(self, backend):
-        """Initialize new chain, only backend is required at first"""
+        """
+        Initialize new chain, only backend is required at first
+        """
         self.backend = backend
         self.fullset = None
         self.incset_list = [] # sorted list of BackupSets
         self.start_time, self.end_time = None, None
 
     def set_full(self, fullset):
-        """Add full backup set"""
+        """
+        Add full backup set
+        """
         assert not self.fullset and isinstance(fullset, BackupSet)
         self.fullset = fullset
         assert fullset.time
         self.start_time, self.end_time = fullset.time, fullset.time
 
     def add_inc(self, incset):
-        """Add incset to self.  Return None if incset does not match"""
+        """
+        Add incset to self.  Return False if incset does not match
+        """
         if self.end_time == incset.start_time:
             self.incset_list.append(incset)
         else:
@@ -239,45 +281,57 @@ class BackupChain:
                 log.Info(_("Ignoring incremental Backupset (start_time: %s; needed: %s)") %
                          (dup_time.timetopretty(incset.start_time),
                           dup_time.timetopretty(self.end_time)))
-                return None
+                return False
         self.end_time = incset.end_time
         log.Info(_("Added incremental Backupset (start_time: %s / end_time: %s)") %
                  (dup_time.timetopretty(incset.start_time),
                   dup_time.timetopretty(incset.end_time)))
         assert self.end_time
-        return 1
+        return True
 
     def delete(self):
-        """Delete all sets in chain, in reverse order"""
+        """
+        Delete all sets in chain, in reverse order
+        """
         for i in range(len(self.incset_list)-1, -1, -1):
             self.incset_list[i].delete()
         if self.fullset:
             self.fullset.delete()
 
     def get_sets_at_time(self, time):
-        """Return a list of sets in chain earlier or equal to time"""
+        """
+        Return a list of sets in chain earlier or equal to time
+        """
         older_incsets = filter(lambda s: s.end_time <= time, self.incset_list)
         return [self.fullset] + older_incsets
 
     def get_last(self):
-        """Return last BackupSet in chain"""
+        """
+        Return last BackupSet in chain
+        """
         if self.incset_list:
             return self.incset_list[-1]
         else:
             return self.fullset
 
     def get_first(self):
-        """Return first BackupSet in chain (ie the full backup)"""
+        """
+        Return first BackupSet in chain (ie the full backup)
+        """
         return self.fullset
 
     def short_desc(self):
-        """Return a short one-line description of the chain, suitable
-        for log messages."""
+        """
+        Return a short one-line description of the chain,
+        suitable for log messages.
+        """
         return "[%s]-[%s]" % (dup_time.timetopretty(self.start_time),
                       dup_time.timetopretty(self.end_time))
 
     def to_log_info(self, prefix=''):
-        """Return summary, suitable for printing to log"""
+        """
+        Return summary, suitable for printing to log
+        """
         l = []
         for s in self.get_all_sets():
             if s.time:
@@ -290,7 +344,9 @@ class BackupChain:
         return l
 
     def __str__(self):
-        """Return string representation, for testing purposes"""
+        """
+        Return string representation, for testing purposes
+        """
         set_schema = "%20s   %30s   %15s"
         l = ["-------------------------",
              _("Chain start time: ") + dup_time.timetopretty(self.start_time),
@@ -314,14 +370,18 @@ class BackupChain:
         return "\n".join(l)
 
     def get_num_volumes(self):
-        """Return the total number of volumes in the chain"""
+        """
+        Return the total number of volumes in the chain
+        """
         n = 0
         for s in self.get_all_sets():
             n += len(s)
         return n
 
     def get_all_sets(self):
-        """Return list of all backup sets in chain"""
+        """
+        Return list of all backup sets in chain
+        """
         if self.fullset:
             return [self.fullset] + self.incset_list
         else:
@@ -329,19 +389,25 @@ class BackupChain:
 
 
 class SignatureChain:
-    """A number of linked signatures
+    """
+    A number of linked SignatureSets
 
     Analog to BackupChain - start with a full-sig, and continue with
     new-sigs.
-
     """
     def __init__(self, local, location):
-        """Return new SignatureChain.
+        """
+        Return new SignatureChain.
 
         local should be true iff the signature chain resides in
         globals.archive_dir and false if the chain is in
         globals.backend.
 
+        @param local: True if sig chain in globals.archive_dir
+        @type local: Boolean
+
+        @param location: Where the sig chain is located
+        @type location: globals.archive_dir or globals.backend
         """
         if local:
             self.archive_dir, self.backend = location, None
@@ -352,7 +418,9 @@ class SignatureChain:
         self.start_time, self.end_time = None, None
 
     def __str__(self):
-        """Local or Remote and List of files in the set"""
+        """
+        Local or Remote and List of files in the set
+        """
         if self.archive_dir:
             place = _("local")
         else:
@@ -364,20 +432,26 @@ class SignatureChain:
         return "%s: [%s]" % (place, ", ".join(filelist))
 
     def check_times(self, time_list):
-        """Check to make sure times are in whole seconds"""
+        """
+        Check to make sure times are in whole seconds
+        """
         for time in time_list:
             if type(time) not in (types.LongType, types.IntType):
                 assert 0, "Time %s in %s wrong type" % (time, time_list)
 
     def islocal(self):
-        """Return true if represents a signature chain in archive_dir"""
+        """
+        Return true if represents a signature chain in archive_dir
+        """
         if self.archive_dir:
             return True
         else:
             return False
 
     def add_filename(self, filename, pr = None):
-        """Add new sig filename to current chain.  Return true if fits"""
+        """
+        Add new sig filename to current chain.  Return true if fits
+        """
         if not pr:
             pr = file_naming.parse(filename)
         if not pr:
@@ -401,8 +475,10 @@ class SignatureChain:
             return 1
 
     def get_fileobjs(self, time = None):
-        """Return ordered list of signature fileobjs opened for reading,
-           optionally at a certain time"""
+        """
+        Return ordered list of signature fileobjs opened for reading,
+        optionally at a certain time
+        """
         assert self.fullsig
         if self.archive_dir: # local
             def filename_to_fileobj(filename):
@@ -414,7 +490,9 @@ class SignatureChain:
         return map(filename_to_fileobj, self.get_filenames(time))
 
     def delete(self):
-        """Remove all files in signature set"""
+        """
+        Remove all files in signature set
+        """
         # Try to delete in opposite order, so something useful even if aborted
         if self.archive_dir:
             for i in range(len(self.inclist)-1, -1, -1):
@@ -428,7 +506,9 @@ class SignatureChain:
             self.backend.delete(inclist_copy)
 
     def get_filenames(self, time = None):
-        """Return ordered list of filenames in set, up to a provided time"""
+        """
+        Return ordered list of filenames in set, up to a provided time
+        """
         if self.fullsig:
             l = [self.fullsig]
         else:
@@ -444,9 +524,13 @@ class SignatureChain:
 
 
 class CollectionsStatus:
-    """Hold information about available chains and sets"""
-    def __init__(self, backend, archive_dir = None):
-        """Make new object.  Does not set values"""
+    """
+    Hold information about available chains and sets
+    """
+    def __init__(self, backend, archive_dir):
+        """
+        Make new object.  Does not set values
+        """
         self.backend, self.archive_dir = backend, archive_dir
 
         # Will hold (signature chain, backup chain) pair of active
@@ -467,7 +551,9 @@ class CollectionsStatus:
         self.values_set = None
 
     def to_log_info(self):
-        """Return summary of the collection, suitable for printing to log"""
+        """
+        Return summary of the collection, suitable for printing to log
+        """
         l = ["backend %s" % (self.backend.__class__.__name__,),
              "archive-dir %s" % (self.archive_dir,)]
 
@@ -485,7 +571,9 @@ class CollectionsStatus:
         return l
 
     def __str__(self):
-        """Return string summary of the collection"""
+        """
+        Return string summary of the collection
+        """
         l = [_("Collection Status"),
              "-----------------",
              _("Connecting with backend: %s") %
@@ -527,36 +615,48 @@ class CollectionsStatus:
         return "\n".join(l)
 
     def set_values(self, sig_chain_warning = 1):
-        """Set values from archive_dir and backend.
+        """
+        Set values from archive_dir and backend.
 
-        if archive_dir is None, omit any local chains.  Returns self
-        for convenience.  If sig_chain_warning is set to None, do not
-        warn about unnecessary sig chains.  This is because there may
+        Returns self for convenience.  If sig_chain_warning is set to None,
+        do not warn about unnecessary sig chains.  This is because there may
         naturally be some unecessary ones after a full backup.
-
         """
         self.values_set = 1
+
+        # get remote filename list
         backend_filename_list = self.backend.list()
         log.Debug(gettext.ngettext("%d file exists on backend",
                                    "%d files exist on backend",
                                    len(backend_filename_list)) %
                   len(backend_filename_list))
 
+        # get local filename list
+        local_filename_list = self.archive_dir.listdir()
+        log.Debug(gettext.ngettext("%d file exists in cache",
+                                   "%d files exist in cache",
+                                   len(local_filename_list)) %
+                  len(local_filename_list))
+
+        # check for partial backups
+        partials = []
+        for local_filename in local_filename_list:
+            pr = file_naming.parse(local_filename)
+            if pr and pr.partial:
+                partials.append(local_filename)
+
         (backup_chains, self.orphaned_backup_sets,
                  self.incomplete_backup_sets) = \
-                 self.get_backup_chains(backend_filename_list)
+                 self.get_backup_chains(partials + backend_filename_list)
         backup_chains = self.get_sorted_chains(backup_chains)
         self.all_backup_chains = backup_chains
 
         assert len(backup_chains) == len(self.all_backup_chains), "get_sorted_chains() did something more than re-ordering"
 
-        if self.archive_dir:
-            local_sig_chains, local_orphaned_sig_names = \
-                              self.get_signature_chains(True)
-        else:
-            local_sig_chains, local_orphaned_sig_names = [], []
+        local_sig_chains, local_orphaned_sig_names = \
+                            self.get_signature_chains(True)
         remote_sig_chains, remote_orphaned_sig_names = \
-                           self.get_signature_chains(False, filelist = backend_filename_list)
+                            self.get_signature_chains(False, filelist = backend_filename_list)
         self.orphaned_sig_names = (local_orphaned_sig_names +
                                    remote_orphaned_sig_names)
         self.set_matched_chain_pair(local_sig_chains + remote_sig_chains,
@@ -565,13 +665,13 @@ class CollectionsStatus:
         return self
 
     def set_matched_chain_pair(self, sig_chains, backup_chains):
-        """Set self.matched_chain_pair and self.other_sig/backup_chains
+        """
+        Set self.matched_chain_pair and self.other_sig/backup_chains
 
         The latest matched_chain_pair will be set.  If there are both
         remote and local signature chains capable of matching the
         latest backup chain, use the local sig chain (it does not need
         to be downloaded).
-
         """
         self.other_sig_chains = sig_chains
         self.other_backup_chains = backup_chains[:]
@@ -613,7 +713,9 @@ class CollectionsStatus:
             self.other_backup_chains.remove(self.matched_chain_pair[1])
 
     def warn(self, sig_chain_warning):
-        """Log various error messages if find incomplete/orphaned files"""
+        """
+        Log various error messages if find incomplete/orphaned files
+        """
         assert self.values_set
         if self.orphaned_sig_names:
             log.Warn(gettext.ngettext("Warning, found the following orphaned "
@@ -650,20 +752,22 @@ class CollectionsStatus:
                      log.WarningCode.orphaned_backup)
 
     def get_backup_chains(self, filename_list):
-        """Split given filename_list into chains
+        """
+        Split given filename_list into chains
 
         Return value will be pair (list of chains, list of sets, list
         of incomplete sets), where the list of sets will comprise sets
         not fitting into any chain, and the incomplete sets are sets
         missing files.
-
         """
         log.Debug(_("Extracting backup chains from list of files: %s")
                   % filename_list)
         # First put filenames in set form
         sets = []
         def add_to_sets(filename):
-            """Try adding filename to existing sets, or make new one"""
+            """
+            Try adding filename to existing sets, or make new one
+            """
             for set in sets:
                 if set.add_filename(filename):
                     log.Debug(_("File %s is part of known set") % (filename,))
@@ -680,7 +784,9 @@ class CollectionsStatus:
 
         chains, orphaned_sets = [], []
         def add_to_chains(set):
-            """Try adding set to existing chains, or make new one"""
+            """
+            Try adding set to existing chains, or make new one
+            """
             if set.type == "full":
                 new_chain = BackupChain(self.backend)
                 new_chain.set_full(set)
@@ -700,7 +806,9 @@ class CollectionsStatus:
         return (chains, orphaned_sets, incomplete_sets)
 
     def get_sorted_sets(self, set_list):
-        """Sort set list by end time, return (sorted list, incomplete)"""
+        """
+        Sort set list by end time, return (sorted list, incomplete)
+        """
         time_set_pairs, incomplete_sets = [], []
         for set in set_list:
             if not set.is_complete():
@@ -713,12 +821,12 @@ class CollectionsStatus:
         return (map(lambda p: p[1], time_set_pairs), incomplete_sets)
 
     def get_signature_chains(self, local, filelist = None):
-        """Find chains in archive_dir (if local is true) or backend
+        """
+        Find chains in archive_dir (if local is true) or backend
 
         Use filelist if given, otherwise regenerate.  Return value is
         pair (list of chains, list of signature paths not in any
         chains).
-
         """
         def get_filelist():
             if filelist is not None:
@@ -729,7 +837,9 @@ class CollectionsStatus:
                 return self.backend.list()
 
         def get_new_sigchain():
-            """Return new empty signature chain"""
+            """
+            Return new empty signature chain
+            """
             if local:
                 return SignatureChain(True, self.archive_dir)
             else:
@@ -763,7 +873,9 @@ class CollectionsStatus:
         return (chains, orphaned_filenames)
 
     def get_sorted_chains(self, chain_list):
-        """Return chains sorted by end_time.  If tie, local goes last"""
+        """
+        Return chains sorted by end_time.  If tie, local goes last
+        """
         # Build dictionary from end_times to lists of corresponding chains
         endtime_chain_dict = {}
         for chain in chain_list:
@@ -794,12 +906,12 @@ class CollectionsStatus:
         return sorted_chain_list
 
     def get_backup_chain_at_time(self, time):
-        """Return backup chain covering specified time
+        """
+        Return backup chain covering specified time
 
         Tries to find the backup chain covering the given time.  If
         there is none, return the earliest chain before, and failing
         that, the earliest chain.
-
         """
         if not self.all_backup_chains:
             raise CollectionsError("No backup chains found")
@@ -819,16 +931,18 @@ class CollectionsStatus:
             return self.all_backup_chains[0] # no chains are old enough
 
     def cleanup_signatures(self):
-        """Delete unnecessary older signatures"""
+        """
+        Delete unnecessary older signatures
+        """
         map(SignatureChain.delete, self.other_sig_chains)
 
     def get_extraneous(self):
-        """Return list of the names of extraneous duplicity files
+        """
+        Return list of the names of extraneous duplicity files
 
         A duplicity file is considered extraneous if it is
         recognizable as a duplicity file, but isn't part of some
         complete backup set, or current signature chain.
-
         """
         assert self.values_set
         filenames = []
@@ -847,18 +961,24 @@ class CollectionsStatus:
         return map(lambda p: p[1], pairs)
 
     def get_chains_older_than(self, t):
-        """Return a list of chains older than time t"""
+        """
+        Return a list of chains older than time t
+        """
         assert self.values_set
         return filter(lambda c: c.end_time < t, self.all_backup_chains)
 
     def get_last_full_backup_time(self):
-        """Return the time of the last full backup, or 0 if
-        there is none."""
+        """
+        Return the time of the last full backup,
+        or 0 if there is none.
+        """
         return self.get_nth_last_full_backup_time(1)
 
     def get_nth_last_full_backup_time(self, n):
-        """Return the time of the nth to last full backup, or 0
-        if there is none."""
+        """
+        Return the time of the nth to last full backup,
+        or 0 if there is none.
+        """
         chain = self.get_nth_last_backup_chain(n)
         if chain is None:
             return 0
@@ -866,18 +986,21 @@ class CollectionsStatus:
             return chain.get_first().time
 
     def get_last_backup_chain(self):
-        """Return the last full backup of the collection, or None
-        if there is no full backup chain."""
+        """
+        Return the last full backup of the collection,
+        or None if there is no full backup chain.
+        """
         return self.get_nth_last_backup_chain(1)
 
     def get_nth_last_backup_chain(self,n):
-        """Return the nth-to-last full backup of the collection, or None
-        if there is less than n backup chains.
+        """
+        Return the nth-to-last full backup of the collection,
+        or None if there is less than n backup chains.
 
         NOTE: n = 1 -> time of latest available chain (n = 0 is not
         a valid input). Thus the second-to-last is obtained with n=2
-        rather than n=1."""
-
+        rather than n=1.
+        """
         def mycmp(x, y):
             return cmp(x.get_first().time, y.get_first().time)
 
@@ -894,14 +1017,14 @@ class CollectionsStatus:
         return sorted[n - 1]
 
     def get_older_than(self, t):
-        """Returns a list of backup sets older than the given time t
+        """
+        Returns a list of backup sets older than the given time t
 
         All of the times will be associated with an intact chain.
         Furthermore, none of the times will be of a set which a newer
         set may depend on.  For instance, if set A is a full set older
         than t, and set B is an incremental based on A which is newer
         than tt, then the time of set A will not be returned.
-
         """
         old_sets = []
         for chain in self.get_chains_older_than(t):
@@ -912,12 +1035,12 @@ class CollectionsStatus:
         return self.sort_sets(old_sets)
 
     def get_older_than_required(self, t):
-        """Returns list of old backup sets required by new sets
+        """
+        Returns list of old backup sets required by new sets
 
         This function is similar to the previous one, but it only
         returns the times of sets which are old but part of the chains
         where the newer end of the chain is newer than t.
-
         """
         assert self.values_set
         new_chains = filter(lambda c: c.end_time >= t, self.all_backup_chains)

@@ -35,6 +35,12 @@ config.setup()
 
 class PatchingTest(unittest.TestCase):
     """Test patching"""
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+
     def copyfileobj(self, infp, outfp):
         """Copy in fileobj to out, closing afterwards"""
         blocksize = 32 * 1024
@@ -169,13 +175,18 @@ class PatchingTest(unittest.TestCase):
         assert not Path("testfiles/output/warning-security-error").exists()
 
 
-
 class index:
     """Used below to test the iter collation"""
     def __init__(self, index):
         self.index = index
 
 class CollateItersTest(unittest.TestCase):
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+
     def test_collate(self):
         """Test collate_iters function"""
         indicies = map(index, [0,1,2,3])
@@ -226,12 +237,16 @@ class CollateItersTest(unittest.TestCase):
 class TestInnerFuncs(unittest.TestCase):
     """Test some other functions involved in patching"""
     def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
         self.check_output()
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     def check_output(self):
         """Make sure testfiles/output exists"""
         out = Path("testfiles/output")
-        if not out.exists() and out.isdir(): out.mkdir()
+        if not (out.exists() and out.isdir()): out.mkdir()
         self.out = out
 
     def snapshot(self):

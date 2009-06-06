@@ -27,31 +27,46 @@ from duplicity import log
 from duplicity import globals
 
 class ManifestError(Exception):
-    """Exception raised when problem with manifest"""
+    """
+    Exception raised when problem with manifest
+    """
     pass
 
+
 class Manifest:
-    """List of volumes and information about each one"""
-    def __init__(self):
+    """
+    List of volumes and information about each one
+    """
+    def __init__(self, fh = None):
         """
         Create blank Manifest
+
+        @param fh: fileobj for manifest
+        @type fh: DupPath
 
         @rtype: Manifest
         @return: manifest
         """
-        self.hostname = None;
+        self.hostname = None
         self.local_dirname = None
         self.volume_info_dict = {} # dictionary vol numbers -> vol infos
+        self.fh = fh
 
     def set_dirinfo(self):
         """
-        Set information about directory from globals
+        Set information about directory from globals,
+        and write to manifest file.
 
         @rtype: Manifest
         @return: manifest
         """
         self.hostname = globals.hostname
         self.local_dirname = globals.local_path.name
+        if self.fh:
+            if self.hostname:
+                self.fh.write("Hostname %s\n" % self.hostname)
+            if self.local_dirname:
+                self.fh.write("Localdir %s\n" % Quote(self.local_dirname))
         return self
 
     def check_dirinfo(self):
@@ -89,7 +104,7 @@ class Manifest:
 
     def add_volume_info(self, vi):
         """
-        Add volume info vi to manifest
+        Add volume info vi to manifest and write to manifest
 
         @param vi: volume info to add
         @type vi: VolumeInfo
@@ -100,6 +115,8 @@ class Manifest:
         if self.volume_info_dict.has_key(vol_num):
             raise ManifestError("Volume %d already present" % (vol_num,))
         self.volume_info_dict[vol_num] = vi
+        if self.fh:
+            self.fh.write(vi.to_string() + "\n")
 
     def to_string(self):
         """
@@ -125,9 +142,13 @@ class Manifest:
     __str__ = to_string
 
     def from_string(self, s):
-        """Initialize self from string s, return self"""
+        """
+        Initialize self from string s, return self
+        """
         def get_field(fieldname):
-            """Return the value of a field by parsing s, or None if no field"""
+            """
+            Return the value of a field by parsing s, or None if no field
+            """
             m = re.search("(^|\\n)%s\\s(.*?)\n" % fieldname, s, re.I)
             if not m:
                 return None
@@ -148,7 +169,9 @@ class Manifest:
         return self
 
     def __eq__(self, other):
-        """Two manifests are equal if they contain the same volume infos"""
+        """
+        Two manifests are equal if they contain the same volume infos
+        """
         vi_list1 = self.volume_info_dict.keys()
         vi_list1.sort()
         vi_list2 = other.volume_info_dict.keys()
@@ -171,11 +194,15 @@ class Manifest:
         return True
 
     def __ne__(self, other):
-        """Defines !=.  Not doing this always leads to annoying bugs..."""
+        """
+        Defines !=.  Not doing this always leads to annoying bugs...
+        """
         return not self.__eq__(other)
 
     def write_to_path(self, path):
-        """Write string version of manifest to given path"""
+        """
+        Write string version of manifest to given path
+        """
         assert not path.exists()
         fout = path.open("w")
         fout.write(self.to_string())
@@ -183,46 +210,64 @@ class Manifest:
         path.setdata()
 
     def get_containing_volumes(self, index_prefix):
-        """Return list of volume numbers that may contain index_prefix"""
+        """
+        Return list of volume numbers that may contain index_prefix
+        """
         return filter(lambda vol_num:
-                       self.volume_info_dict[vol_num].contains(index_prefix),
+                      self.volume_info_dict[vol_num].contains(index_prefix),
                       self.volume_info_dict.keys())
 
 
 class VolumeInfoError(Exception):
-    """Raised when there is a problem initializing a VolumeInfo from string"""
+    """
+    Raised when there is a problem initializing a VolumeInfo from string
+    """
     pass
 
+
 class VolumeInfo:
-    """Information about a single volume"""
+    """
+    Information about a single volume
+    """
     def __init__(self):
         """VolumeInfo initializer"""
         self.volume_number = None
-        self.start_index, self.end_index = None, None
+        self.start_index = None
+        self.start_block = None
+        self.end_index = None
+        self.end_block = None
         self.hashes = {}
 
-    def set_info(self, vol_number, start_index, end_index):
-        """Set essential VolumeInfo information, return self
+    def set_info(self, vol_number,
+                 start_index, start_block,
+                 end_index, end_block):
+        """
+        Set essential VolumeInfo information, return self
 
         Call with starting and ending paths stored in the volume.  If
         a multivol diff gets split between volumes, count it as being
         part of both volumes.
-
         """
         self.volume_number = vol_number
-        self.start_index, self.end_index = start_index, end_index
+        self.start_index = start_index
+        self.start_block = start_block
+        self.end_index = end_index
+        self.end_block = end_block
+
         return self
 
     def set_hash(self, hash_name, data):
-        """Set the value of hash hash_name (e.g. "MD5") to data"""
+        """
+        Set the value of hash hash_name (e.g. "MD5") to data
+        """
         self.hashes[hash_name] = data
 
     def get_best_hash(self):
-        """Return pair (hash_type, hash_data)
+        """
+        Return pair (hash_type, hash_data)
 
         SHA1 is the best hash, and MD5 is the second best hash.  None
         is returned if no hash is available.
-
         """
         if not self.hashes:
             return None
@@ -237,7 +282,9 @@ class VolumeInfo:
         return self.hashes.items()[0]
 
     def to_string(self):
-        """Return nicely formatted string reporting all information"""
+        """
+        Return nicely formatted string reporting all information
+        """
         def index_to_string(index):
             """Return printable version of index without any whitespace"""
             if index:
@@ -248,20 +295,25 @@ class VolumeInfo:
 
         slist = ["Volume %d:" % self.volume_number]
         whitespace = "    "
-        slist.append("%sStartingPath   %s" %
-                     (whitespace, index_to_string(self.start_index)))
-        slist.append("%sEndingPath     %s" %
-                     (whitespace, index_to_string(self.end_index)))
+        slist.append("%sStartingPath   %s %s" %
+                     (whitespace, index_to_string(self.start_index), (self.start_block or " ")))
+        slist.append("%sEndingPath     %s %s" %
+                     (whitespace, index_to_string(self.end_index), (self.end_block or " ")))
         for key in self.hashes:
             slist.append("%sHash %s %s" %
                          (whitespace, key, self.hashes[key]))
         return "\n".join(slist)
+
     __str__ = to_string
 
     def from_string(self, s):
-        """Initialize self from string s as created by to_string"""
+        """
+        Initialize self from string s as created by to_string
+        """
         def string_to_index(s):
-            """Return tuple index from string"""
+            """
+            Return tuple index from string
+            """
             s = Unquote(s)
             if s == ".":
                 return ()
@@ -287,8 +339,16 @@ class VolumeInfo:
                 break
             elif field_name == "startingpath":
                 self.start_index = string_to_index(other_fields[0])
+                if len(other_fields) > 1:
+                    self.start_block = int(other_fields[1])
+                else:
+                    self.start_block = None
             elif field_name == "endingpath":
                 self.end_index = string_to_index(other_fields[0])
+                if len(other_fields) > 1:
+                    self.end_block = int(other_fields[1])
+                else:
+                    self.end_block = None
             elif field_name == "hash":
                 self.set_hash(other_fields[0], other_fields[1])
 
@@ -297,7 +357,9 @@ class VolumeInfo:
         return self
 
     def __eq__(self, other):
-        """Used in test suite"""
+        """
+        Used in test suite
+        """
         if not isinstance(other, VolumeInfo):
             log.Notice(_("Other is not VolumeInfo"))
             return None
@@ -320,17 +382,19 @@ class VolumeInfo:
         return 1
 
     def __ne__(self, other):
-        """Defines !="""
+        """
+        Defines !=
+        """
         return not self.__eq__(other)
 
     def contains(self, index_prefix, recursive = 1):
-        """Return true if volume might contain index
+        """
+        Return true if volume might contain index
 
         If recursive is true, then return true if any index starting
         with index_prefix could be contained.  Otherwise, just check
         if index_prefix itself is between starting and ending
         indicies.
-
         """
         if recursive:
             return (self.start_index[:len(index_prefix)] <=
@@ -341,7 +405,9 @@ class VolumeInfo:
 
 nonnormal_char_re = re.compile("(\\s|[\\\\\"'])")
 def Quote(s):
-    """Return quoted version of s safe to put in a manifest or volume info"""
+    """
+    Return quoted version of s safe to put in a manifest or volume info
+    """
     if not nonnormal_char_re.search(s):
         return s # no quoting necessary
     slist = []
@@ -352,8 +418,11 @@ def Quote(s):
             slist.append(char)
     return '"%s"' % "".join(slist)
 
+
 def Unquote(quoted_string):
-    """Return original string from quoted_string produced by above"""
+    """
+    Return original string from quoted_string produced by above
+    """
     if not quoted_string[0] == '"' or quoted_string[0] == "'":
         return quoted_string
     assert quoted_string[0] == quoted_string[-1]

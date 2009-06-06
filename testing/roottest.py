@@ -32,6 +32,18 @@ config.setup()
 
 class RootTest(unittest.TestCase):
     """Test doing operations that only root can"""
+
+    def setUp(self):
+        # must run with euid/egid of root
+        assert(os.geteuid() == 0)
+        # make sure uid/gid match euid/egid
+        os.setuid(os.geteuid())
+        os.setgid(os.getegid())
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+
     def copyfileobj(self, infp, outfp):
         """Copy in fileobj to out, closing afterwards"""
         blocksize = 32 * 1024

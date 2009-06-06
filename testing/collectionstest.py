@@ -72,14 +72,17 @@ filename_list2 = ["duplicity-full.2001-01-01T16:17:01-07:00.manifest.gpg",
                   "duplicity-inc.2000-08-17T16:17:01-07:00.to.2000-08-18T00:04:30-07:00.vol1.difftar.gpg",
                   "Extra stuff to be ignored"]
 
+assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
 col_test_dir = path.Path("testfiles/collectionstest")
 archive_dir = col_test_dir.append("archive_dir")
+globals.archive_dir = archive_dir
 archive_dir_backend = backend.get_backend("file://testfiles/collectionstest"
                                            "/archive_dir")
 
 dummy_backend = None
 real_backend = backend.get_backend("file://%s/%s" %
-                                    (col_test_dir.name, "remote_dir"))
+                                   (col_test_dir.name, "remote_dir"))
 assert not os.system("rm -rf testfiles/output")
 assert not os.system("mkdir testfiles/output")
 output_dir = path.Path("testfiles/output") # used as a temp directory
@@ -88,6 +91,12 @@ output_dir_backend = backend.get_backend("file://testfiles/output")
 
 class CollectionTest(unittest.TestCase):
     """Test collections"""
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+
     def del_tmp(self):
         """Reset the testfiles/output directory"""
         output_dir.deltree()
@@ -121,7 +130,7 @@ class CollectionTest(unittest.TestCase):
             assert cs.matched_chain_pair[0].end_time == 1029826800L
             assert len(cs.all_backup_chains) == 1, cs.all_backup_chains
 
-        cs1 = collections.CollectionsStatus(real_backend).set_values()
+        cs1 = collections.CollectionsStatus(real_backend, archive_dir).set_values()
         check_cs(cs1)
         assert not cs1.matched_chain_pair[0].islocal()
 
@@ -144,7 +153,7 @@ class CollectionTest(unittest.TestCase):
 
     def test_sig_chains2(self):
         """Test making signature chains from filename list on backend"""
-        cs = collections.CollectionsStatus(archive_dir_backend)
+        cs = collections.CollectionsStatus(archive_dir_backend, archive_dir)
         chains, orphaned_paths = cs.get_signature_chains(local = None)
         self.sig_chains_helper(chains, orphaned_paths)
 
@@ -199,7 +208,7 @@ class CollectionTest(unittest.TestCase):
             p = output_dir.append(filename)
             p.touch()
 
-        cs = collections.CollectionsStatus(output_dir_backend)
+        cs = collections.CollectionsStatus(output_dir_backend, archive_dir)
         cs.set_values()
         return cs
 

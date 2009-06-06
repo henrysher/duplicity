@@ -69,6 +69,7 @@ options = ["allow-source-mismatch",
            "exclude-filelist-stdin",
            "exclude-other-filesystems",
            "exclude-regexp=",
+           "fail-on-volume=",
            "file-to-restore=",
            "force",
            "ftp-passive",
@@ -109,10 +110,16 @@ options = ["allow-source-mismatch",
            "volsize=",
            ]
 
+
 def old_fn_deprecation(opt):
     print >>sys.stderr, _("Warning: Option %s is pending deprecation "
                           "and will be removed in a future release.\n"
                           "Use of default filenames is strongly suggested.") % opt
+
+
+def expand_fn(filename):
+    return os.path.expanduser(os.path.expandvars(filename))
+
 
 def parse_cmdline_options(arglist):
     """Parse argument list"""
@@ -126,9 +133,6 @@ def parse_cmdline_options(arglist):
         except IOError:
             log.FatalError(_("Error opening file %s") % filename,
                            log.ErrorCode.cant_open_filelist)
-
-    def expand_fn(filename):
-        return os.path.expanduser(os.path.expandvars(filename))
 
     # expect no cmd and two positional args
     cmd = ""
@@ -195,11 +199,11 @@ def parse_cmdline_options(arglist):
         if opt == "--allow-source-mismatch":
             globals.allow_source_mismatch = 1
         elif opt == "--archive-dir":
-            set_archive_dir(expand_fn(arg))
+            globals.archive_dir = arg
         elif opt == "--asynchronous-upload":
             globals.async_concurrency = 1 # (yes 1, this is not a boolean)
         elif opt == "--current-time":
-            dup_time.setcurtime(get_int(arg, "current-time"))
+            dup_time.setcurtime(get_int(arg, opt))
         elif opt == "--dry-run":
             globals.dry_run = True
         elif opt == "--encrypt-key":
@@ -225,6 +229,8 @@ def parse_cmdline_options(arglist):
         elif opt == "--exclude-filelist-stdin":
             select_opts.append(("--exclude-filelist", "standard input"))
             select_files.append(sys.stdin)
+        elif opt == "--fail-on-volume":
+            globals.fail_on_volume = get_int(arg, opt)
         elif opt == "--full-if-older-than":
             globals.full_force_time = dup_time.genstrtotime(arg)
         elif opt == "--force":
@@ -244,7 +250,7 @@ def parse_cmdline_options(arglist):
             select_opts.append(("--include-filelist", "standard input"))
             select_files.append(sys.stdin)
         elif opt == "--log-fd":
-            log_fd = int(arg)
+            log_fd = get_int(arg, opt)
             if log_fd < 1:
                 command_line_error("log-fd must be greater than zero.")
             try:
@@ -264,7 +270,7 @@ def parse_cmdline_options(arglist):
         elif opt == "--null-separator":
             globals.null_separator = 1
         elif opt == "--num-retries":
-            globals.num_retries = int(arg)
+            globals.num_retries = get_int(arg, opt)
         elif opt == "--old-filenames":
             globals.old_filenames = True
             old_fn_deprecation(opt)
@@ -292,7 +298,7 @@ def parse_cmdline_options(arglist):
         elif opt == "--tempdir":
             globals.temproot = arg
         elif opt == "--timeout":
-            globals.timeout = int(arg)
+            globals.timeout = get_int(arg, opt)
         elif opt == "--time-separator":
             if arg == '-':
                 command_line_error("Dash ('-') not valid for time-separator.")
@@ -317,7 +323,7 @@ def parse_cmdline_options(arglist):
             elif arg in ['d', 'debug']:
                 verb = log.DEBUG
             elif arg.isdigit() and (len(arg) == 1):
-                verb = int(arg)
+                verb = get_int(arg, opt)
             else:
                 command_line_error("\nVerbosity must be one of: digit [0-9], character [ewnid],\n"
                                    "or word ['error', 'warning', 'notice', 'info', 'debug'].\n"
@@ -325,7 +331,7 @@ def parse_cmdline_options(arglist):
                                    "that verbosity level is set at 2 (Warning) or higher.")
             log.setverbosity(verb)
         elif opt == "--volsize":
-            globals.volsize = int(arg)*1024*1024
+            globals.volsize = get_int(arg, opt)*1024*1024
         elif opt == "--imap-full-address":
             globals.imap_full_address = True
         else:
@@ -338,17 +344,23 @@ def parse_cmdline_options(arglist):
     if len(args) != num_expect:
         command_line_error("Expected %d args, got %d" % (num_expect, len(args)))
 
+    # expand pathname args, but not URL
     for loc in range(len(args)):
         if not '://' in args[loc]:
             args[loc] = expand_fn(args[loc])
 
+    # set and expand archive dir
+    set_archive_dir(expand_fn(globals.archive_dir))
+
     return args
+
 
 def command_line_error(message):
     """Indicate a command line error and exit"""
     log.FatalError(_("Command line error: %s") % (message,) + "\n" +
                    _("Enter 'duplicity --help' for help screen."),
                    log.ErrorCode.command_line)
+
 
 def usage():
     """Print terse usage info"""
@@ -452,16 +464,22 @@ def get_int(int_string, description):
         return int(int_string)
     except ValueError:
         command_line_error("Received '%s' for %s, need integer" %
-                                          (int_string, description))
+                                          (int_string, description.lstrip('-')))
 
 def set_archive_dir(dirstring):
     """Check archive dir and set global"""
-    archive_dir = path.Path(os.path.expanduser(dirstring))
+    if not os.path.exists(dirstring):
+        try:
+            os.makedirs(dirstring)
+        except:
+            pass
+    archive_dir = path.Path(dirstring)
     if not archive_dir.isdir():
         log.FatalError(_("Specified archive directory '%s' does not exist, "
                          "or is not a directory") % (archive_dir.name,),
                        log.ErrorCode.bad_archive_dir)
     globals.archive_dir = archive_dir
+
 
 def set_sign_key(sign_key):
     """Set globals.sign_key assuming proper key given"""
@@ -471,12 +489,14 @@ def set_sign_key(sign_key):
                        log.ErrorCode.bad_sign_key)
     globals.gpg_profile.sign_key = sign_key
 
+
 def set_selection():
     """Return selection iter starting at filename with arguments applied"""
     global select_opts, select_files
     sel = selection.Select(globals.local_path)
     sel.ParseArgs(select_opts, select_files)
     globals.select = sel.set_iter()
+
 
 def set_backend(arg1, arg2):
     """Figure out which arg is url, set backend
@@ -501,6 +521,7 @@ page for more information.""")
         globals.backend = backend2
         return (1, arg1)
 
+
 def process_local_dir(action, local_pathname):
     """Check local directory, set globals.local_path"""
     local_path = path.Path(path.Path(local_pathname).get_canonical())
@@ -522,6 +543,7 @@ def process_local_dir(action, local_pathname):
                            log.ErrorCode.backup_dir_doesnt_exist)
 
     globals.local_path = local_path
+
 
 def check_consistency(action):
     """Final consistency check, see if something wrong with command line"""
@@ -556,6 +578,7 @@ def check_consistency(action):
         if globals.restore_dir:
             command_line_error("restore option incompatible with %s backup"
                                % (action,))
+
 
 def ProcessCommandLine(cmdline_list):
     """Process command line, set globals, return action

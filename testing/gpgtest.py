@@ -32,6 +32,12 @@ default_profile = gpg.GPGProfile(passphrase = "foobar")
 
 class GPGTest(unittest.TestCase):
     """Test GPGFile"""
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+
     def deltmp(self):
         """Delete testfiles/output and recreate"""
         assert not os.system("rm -rf testfiles/output")
@@ -165,6 +171,12 @@ class GPGWriteFile_Helper:
 
 class SHATest(unittest.TestCase):
     """Test making sha signatures"""
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+
     def test_sha(self):
         hash = gpg.get_hash("SHA1", path.Path("testfiles/various_file_types/regular_file"))
         assert hash == "886d722999862724e1e62d0ac51c468ee336ef8e", hash

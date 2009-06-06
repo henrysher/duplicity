@@ -49,6 +49,7 @@ socket.setdefaulttimeout(globals.timeout)
 
 _backends = {}
 
+
 def register_backend(scheme, backend_factory):
     """
     Register a given backend factory responsible for URL:s with the
@@ -74,6 +75,7 @@ def register_backend(scheme, backend_factory):
 
     _backends[scheme] = backend_factory
 
+
 def get_backend(url_string):
     """
     Instantiate a backend suitable for the given URL, or return None
@@ -93,6 +95,7 @@ def get_backend(url_string):
         raise UnsupportedBackendScheme(url_string)
     else:
         return _backends[pu.scheme](pu)
+
 
 _urlparser_initialized = False
 _urlparser_initialized_lock = dup_threading.threading_module().Lock()
@@ -114,7 +117,14 @@ def _ensure_urlparser_initialized():
             # is a hack. we should instead not stomp on the url parsing module to begin with.
             #
             # todo: eliminate the need for backend specific hacking here completely.
-            urlparser.uses_netloc = [ 'ftp', 'hsi', 'rsync', 's3', 'scp', 'ssh', 'webdav', 'webdavs', 'http', 'https', 'imap', 'imaps' ]
+            urlparser.uses_netloc = ['ftp',
+                                     'hsi',
+                                     'rsync',
+                                     's3',
+                                     'scp', 'ssh',
+                                     'webdav', 'webdavs',
+                                     'http', 'https',
+                                     'imap', 'imaps']
 
             # Do not transform or otherwise parse the URL path component.
             urlparser.uses_query = []
@@ -122,8 +132,7 @@ def _ensure_urlparser_initialized():
 
             _urlparser_initialized = True
 
-    dup_threading.with_lock(_urlparser_initialized_lock,
-                            init)
+    dup_threading.with_lock(_urlparser_initialized_lock, init)
 
 class ParsedUrl:
     """
@@ -211,6 +220,7 @@ class ParsedUrl:
     def geturl(self):
         return self.url_string
 
+
 def strip_auth_from_url(parsed_url):
     """Return a URL from a urlparse object without a username or password."""
 
@@ -219,6 +229,7 @@ def strip_auth_from_url(parsed_url):
 
     # Replace the full network location with the stripped copy.
     return parsed_url.geturl().replace(parsed_url.netloc, straight_netloc, 1)
+
 
 class Backend:
     """

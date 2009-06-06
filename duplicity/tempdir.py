@@ -130,6 +130,7 @@ class TemporaryDirectory:
         """
         Perform cleanup.
         """
+        global _defaultInstance
         if _defaultInstance is not None:
             self.cleanup()
 

@@ -134,6 +134,12 @@ class UnivTest:
 
 class LocalTest(unittest.TestCase, UnivTest):
     """ Test the Local backend """
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar tempdir temp2.tar")
+
     my_test_id = "local"
     url_string = config.file_url
     password = config.file_password
@@ -141,6 +147,12 @@ class LocalTest(unittest.TestCase, UnivTest):
 
 class scpTest(unittest.TestCase, UnivTest):
     """ Test the SSH backend """
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar tempdir temp2.tar")
+
     my_test_id = "ssh/scp"
     url_string = config.ssh_url
     password = config.ssh_password
@@ -148,6 +160,12 @@ class scpTest(unittest.TestCase, UnivTest):
 
 class ftpTest(unittest.TestCase, UnivTest):
     """ Test the ftp backend """
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar tempdir temp2.tar")
+
     my_test_id = "ftp"
     url_string = config.ftp_url
     password = config.ftp_password
@@ -155,6 +173,12 @@ class ftpTest(unittest.TestCase, UnivTest):
 
 class rsyncAbsPathTest(unittest.TestCase, UnivTest):
     """ Test the rsync abs path backend """
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar tempdir temp2.tar")
+
     my_test_id = "rsync_abspath"
     url_string = config.rsync_abspath_url
     password = config.rsync_password
@@ -162,6 +186,12 @@ class rsyncAbsPathTest(unittest.TestCase, UnivTest):
 
 class rsyncRelPathTest(unittest.TestCase, UnivTest):
     """ Test the rsync relative path backend """
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar tempdir temp2.tar")
+
     my_test_id = "rsync_relpath"
     url_string = config.rsync_relpath_url
     password = config.rsync_password
@@ -169,6 +199,12 @@ class rsyncRelPathTest(unittest.TestCase, UnivTest):
 
 class rsyncModuleTest(unittest.TestCase, UnivTest):
     """ Test the rsync module backend """
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar tempdir temp2.tar")
+
     my_test_id = "rsync_module"
     url_string = config.rsync_module_url
     password = config.rsync_password
@@ -176,6 +212,12 @@ class rsyncModuleTest(unittest.TestCase, UnivTest):
 
 class s3ModuleTest(unittest.TestCase, UnivTest):
     """ Test the s3 module backend """
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar tempdir temp2.tar")
+
     my_test_id = "s3/boto"
     url_string = config.s3_url
     password = None
@@ -183,6 +225,12 @@ class s3ModuleTest(unittest.TestCase, UnivTest):
 
 class webdavModuleTest(unittest.TestCase, UnivTest):
     """ Test the webdav module backend """
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar tempdir temp2.tar")
+
     my_test_id = "webdav"
     url_string = config.webdav_url
     password = config.webdav_password
@@ -190,6 +238,12 @@ class webdavModuleTest(unittest.TestCase, UnivTest):
 
 class webdavsModuleTest(unittest.TestCase, UnivTest):
     """ Test the webdavs module backend """
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar tempdir temp2.tar")
+
     my_test_id = "webdavs"
     url_string = config.webdavs_url
     password = config.webdavs_password
