@@ -302,7 +302,6 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
         if vol_num == 1:
             sig_outfp.to_partial()
             man_outfp.to_partial()
-            pass
         else:
             sig_outfp.flush()
             man_outfp.flush()
@@ -833,7 +832,7 @@ def check_resources(action):
         except resource.error:
             log.FatalError(_("Unable to get max open files."),
                            log.ErrorCode.get_ulimit_failed)
-        maxopen = min(soft, hard)
+        maxopen = min([l for l in (soft, hard) if l > -1])
         if maxopen < 1024:
             log.FatalError(_("Max open files of %s is too low, should be >= 1024.\n"
                              "Use 'ulimit -n 1024' or higher to correct.\n") % (maxopen,),
