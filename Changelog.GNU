@@ -1,3 +1,28 @@
+2009-06-08  Kenneth Loafman  <kenneth@loafman.com>
+
+    * duplicity-bin: Some cleanup on the forced assertion test code to allow
+    multiple failures and no traceback for the assert.
+
+    * testing/finaltest.py:
+    Add code for testing of Checkpoint/Restore that I had been doing by hand, both single and multiple failure tests, with verify at the end.
+
+2009-06-07  Kenneth Loafman  <kenneth@loafman.com>
+
+    * duplicity-bin:
+    Fix getrlimit usage for Cygwin, which was returning -1 for the hard limit on max open files.
+
+2009-06-06  Kenneth Loafman  <kenneth@loafman.com>
+
+    * CHANGELOG, duplicity-bin, duplicity/GnuPGInterface.py, duplicity/backend.py, duplicity/collections.py, duplicity/commandline.py, duplicity/diffdir.py, duplicity/dup_temp.py, duplicity/file_naming.py, duplicity/globals.py, duplicity/gpg.py, duplicity/log.py, duplicity/manifest.py, duplicity/path.py, duplicity/tempdir.py, testing/GnuPGInterfacetest.py, testing/backendtest.py, testing/collectionstest.py, testing/diffdirtest.py, testing/dup_temptest.py, testing/file_namingtest.py, testing/finaltest.py, testing/gpgtest.py, testing/manifesttest.py, testing/misctest.py, testing/patchdirtest.py, testing/pathtest.py, testing/rdiffdirtest.py, testing/roottest.py, testing/run-a-test.sh, testing/run-all-tests.sh, testing/run-coverage.sh, testing/selectiontest.py, testing/statisticstest.py:
+    After merge of Checkpoint/Restart.
+
+    * Changelog.GNU: Checkpoint - Prep for merge of duplicity-cprs.
+
+    * duplicity/log.py: Allow handling of unicode filenames in log messages.
+
+    * CHANGELOG, Changelog.GNU:
+    Checkpoint - Prep to merge back into main trunk.
+
 2009-06-05  Kenneth Loafman  <kenneth@loafman.com>
 
     * duplicity-bin, duplicity/collections.py, duplicity/diffdir.py, duplicity/dup_temp.py:
