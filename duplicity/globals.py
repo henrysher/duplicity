@@ -37,7 +37,7 @@ local_path = None
 # contains the signatures and manifests of the relevent backup
 # collection), and for checkpoint state between volumes.
 # NOTE: this gets expanded in duplicity.commandline
-archive_dir = "~/.duplicity"
+archive_dir = "~/.duplicity/%DUPLICITY_ARGS_HASH%"
 
 # Restores will try to bring back the state as of the following time.
 # If it is None, default to current time.

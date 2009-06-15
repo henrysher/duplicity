@@ -22,6 +22,7 @@
 """Parse command line, check for consistency, and set globals"""
 
 import getopt
+import md5 # hashlib requires new python
 import os
 import re
 import sys
@@ -120,6 +121,26 @@ def old_fn_deprecation(opt):
 def expand_fn(filename):
     return os.path.expanduser(os.path.expandvars(filename))
 
+def expand_archive_dir(archdir, args):
+    """
+    Expand ~ (user home) and %DUP_ARGS_HASH% (args hash) in archdir and return the
+    result.
+    """
+    # We exapnd the magic hash substitution into the digest of the
+    # repr() of the args list. We could be smarter and resolve things
+    # like relative paths, but this should actually be a pretty good
+    # compromise. Normally only the destination will matter since you
+    # typically only restart backups of the same thing to a given
+    # destination. The inclusion of the source however, does protect
+    # against most changes of source directory (for whatever reason,
+    # such as /path/to/different/snapshot). If the user happens to
+    # have a case where relative paths are used yet the relative path
+    # is the same (but duplicity is run from a different directory or
+    # similar), then it is simply up to the user to set --archive-dir
+    # properly.
+    argshash = md5.new()
+    argshash.update(repr(args))
+    return expand_fn(archdir).replace('%DUPLICITY_ARGS_HASH%', argshash.hexdigest())
 
 def parse_cmdline_options(arglist):
     """Parse argument list"""
@@ -350,7 +371,7 @@ def parse_cmdline_options(arglist):
             args[loc] = expand_fn(args[loc])
 
     # set and expand archive dir
-    set_archive_dir(expand_fn(globals.archive_dir))
+    set_archive_dir(expand_archive_dir(globals.archive_dir, args))
 
     return args
 

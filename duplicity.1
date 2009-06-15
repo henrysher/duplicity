@@ -221,7 +221,12 @@ it will be used in preference to the remote hash data. Use of this
 option does not imply that the archive data is no longer stored
 in the backup destination, nor that the local archive directory
 need be kept safe. The local archive directory is a performance
-optimization only, and may safely be discarded at any time.
+optimization only, and may safely be discarded at any time. The archive
+dir may contain the special substring %DUPLICITY_ARGS_HASH% which
+will be replaced by a hash of the source/destination arguments. The
+default value contains such a substring, so as to keep the archive
+directory for distinct backup sets apart in almost all typical use
+cases without having to use this option manually.
 
 .TP
 .BI "--asynchronous-upload "
