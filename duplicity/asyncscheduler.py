@@ -188,7 +188,7 @@ class AsyncScheduler:
                 log.Info("%s: %s" % (self.__class__.__name__,
                          _("a previously scheduled task has failed; "
                            "propagating the result immediately")))
-                self.__waiter()
+                self.__failed_waiter()
                 raise AssertionError("%s: waiter should have raised an exception; "
                                      "this is a bug" % (self.__class__.__name__,))
 
