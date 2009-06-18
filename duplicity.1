@@ -214,14 +214,35 @@ this switch.
 
 .TP
 .BI "--archive-dir " path
-When backing up or restoring, specify the local archive directory.
-This option is not necessary, but if hash data is found locally in
-.I path
-it will be used in preference to the remote hash data. Use of this
-option does not imply that the archive data is no longer stored
-in the backup destination, nor that the local archive directory
-need be kept safe. The local archive directory is a performance
-optimization only, and may safely be discarded at any time.
+.B NOTE:
+This option changed in 0.6.0.  The archive directory is now necessary
+in order to manage persistence for current and future enhancements.
+As such, this option is now used only to change the location of the
+archive directory.  The archive directory should
+.B not
+be deleted.
+
+When backing up or restoring, this option specifies that the local
+archive directory is to be created in
+.IR path .
+If the archive directory is not specified, the default will be to
+create the archive directory in
+.IR ~/.duplicity .
+
+If you make backups to multiple target directories, it is
+necessary to specify the
+.I --archive-dir
+option and use a different archive-directory for each target directory.
+For example if you backup to
+.I ftp://example.com/foo
+and
+.I ftp://example.com/bar
+then you could use
+.I --archive-dir=~/.duplicity/foo
+for the first target and
+.I --archive-dir=~/.duplicity/bar
+for the second target.  These are only suggested naming conventions.
+You may use whatever location makes sense in your environment.
 
 .TP
 .BI "--asynchronous-upload "
