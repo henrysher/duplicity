@@ -241,7 +241,7 @@ class SrcIter:
             res = Block(self.fp.read(size))
         except:
             log.FatalError(_("Failed to read %s: %s") %
-                           (src.name, sys.exc_info()),
+                           (self.src.name, sys.exc_info()),
                            log.ErrorCode.generic)
         if not res.data:
             self.fp.close()
