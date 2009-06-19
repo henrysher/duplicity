@@ -75,6 +75,7 @@ options = ["allow-source-mismatch",
            "ftp-passive",
            "ftp-regular",
            "full-if-older-than=",
+           "gio",
            "gpg-options=",
            "help",
            "imap-full-address",
@@ -241,6 +242,9 @@ def parse_cmdline_options(arglist):
             globals.ftp_connection = 'regular'
         elif opt == "--imap-mailbox":
             globals.imap_mailbox = arg.strip()
+        elif opt == "--gio":
+            import duplicity.backends.giobackend
+            backend.force_backend(duplicity.backends.giobackend.GIOBackend)
         elif opt == "--gpg-options":
             gpg.gpg_options = (gpg.gpg_options + ' ' + arg).strip()
         elif opt in ["-h", "--help"]:
@@ -422,6 +426,7 @@ Options:
     --force
     --ftp-passive
     --ftp-regular
+    --gio
     --gpg-options
     --include <shell_pattern>
     --include-filelist <filename>

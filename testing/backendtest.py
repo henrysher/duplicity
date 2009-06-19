@@ -25,6 +25,7 @@ sys.path.insert(0, "../")
 
 import duplicity.backend
 import duplicity.backends
+import duplicity.backends.giobackend
 from duplicity.errors import *
 from duplicity import path, log, file_naming, dup_time, globals, gpg
 
@@ -247,6 +248,36 @@ class webdavsModuleTest(unittest.TestCase, UnivTest):
     my_test_id = "webdavs"
     url_string = config.webdavs_url
     password = config.webdavs_password
+
+
+class GIOTest(UnivTest):
+    """ Generic gio module backend class """
+    def setUp(self):
+        duplicity.backend.force_backend(duplicity.backends.giobackend.GIOBackend)
+
+    def tearDown(self):
+        duplicity.backend.force_backend(None)
+
+
+class gioFileModuleTest(GIOTest, unittest.TestCase):
+    """ Test the gio file module backend """
+    my_test_id = "gio/file"
+    url_string = config.file_url
+    password = config.file_password
+
+
+class gioSSHModuleTest(GIOTest, unittest.TestCase):
+    """ Test the gio ssh module backend """
+    my_test_id = "gio/ssh"
+    url_string = config.ssh_url
+    password = config.ssh_password
+
+
+class gioFTPModuleTest(GIOTest, unittest.TestCase):
+    """ Test the gio ftp module backend """
+    my_test_id = "gio/ftp"
+    url_string = config.ftp_url
+    password = config.ftp_password
 
 
 if __name__ == "__main__":
