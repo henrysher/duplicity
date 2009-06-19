@@ -1,3 +1,33 @@
+New in v0.6.00 (2009/06/08)
+---------------------------
+Checkpoint/Restart capability added.  Checkpoint is
+done at every volume written and Restart is done at
+start of the next volume in the set.  Changes to
+normal operations include a permanent duplicity
+archive-dir at ~/.duplicity to save state.
+
+To accomplish this, the signature and archive files
+in the archive-dir now have three states:
+1) temporary until the first volume has been written,
+2) partial until the final volume has been written and
+   sent to remote storage,
+3) permanent with the same name as always.
+
+Assumptions are made that if a restart is needed, then
+all arguments are the same as before and that no files
+have been removed from the file system between runs.
+
+From now on, the --archive-dir option can be used to
+change the location of the archive dir, but you are
+responsible for moving the files if you change it.
+
+Other fixes:
+Unicode filenames in log messages are now OK.
+
+Fixed problem where Cygwin was returning -1 for the
+hard max open file limit.
+
+
 New in v0.5.18 (2009/05/20)
 ---------------------------
 Added support for RackSpace's CloudFiles, cf+http.

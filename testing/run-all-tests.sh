@@ -24,7 +24,7 @@ SUDO=sudo
 cd `dirname $0`
 pwd
 
-${SUDO} tar xzf testfiles.tar.gz
+#${SUDO} tar xzf testfiles.tar.gz
 
 for v in 2.3 2.4 2.5 2.6; do
     if [ -e /usr/bin/python$v ]; then
@@ -46,4 +46,4 @@ for v in 2.3 2.4 2.5 2.6; do
     fi
 done
 
-${SUDO} rm -rf testfiles tempdir temp2.tar
+#${SUDO} rm -rf testfiles tempdir temp2.tar

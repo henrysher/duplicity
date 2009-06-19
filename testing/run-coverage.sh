@@ -28,7 +28,7 @@ cd ../duplicity
 ./compilec.py
 cd -
 
-${SUDO} tar xzf testfiles.tar.gz
+#${SUDO} tar xzf testfiles.tar.gz
 
 ARGS=`python <<EOF
 import sys
@@ -46,7 +46,7 @@ for t in `cat alltests`; do
     ${CMD} 2>&1 | grep -v "unsafe ownership"
 done
 
-${SUDO} rm -rf testfiles tempdir temp2.tar
+#${SUDO} rm -rf testfiles tempdir temp2.tar
 
 # Gen the coverage maps by file
 python -m trace --report --missing --file=counts --coverdir=coverage

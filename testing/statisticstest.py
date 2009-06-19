@@ -30,6 +30,12 @@ config.setup()
 
 class StatsObjTest(unittest.TestCase):
     """Test StatsObj class"""
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+
     def set_obj(self, s):
         """Set values of s's statistics"""
         s.SourceFiles = 1

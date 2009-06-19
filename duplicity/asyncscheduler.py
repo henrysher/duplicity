@@ -143,14 +143,12 @@ class AsyncScheduler:
             # special case this to not require any platform support for
             # threading at all
             log.Info("%s: %s" % (self.__class__.__name__,
-                     _("running task synchronously (asynchronicity disabled)")),
-                     log.InfoCode.synchronous_upload_begin)
+                     _("running task synchronously (asynchronicity disabled)")))
 
             return self.__run_synchronously(fn, params)
         else:
             log.Info("%s: %s" % (self.__class__.__name__,
-                     _("scheduling task for asynchronous execution")),
-                     log.InfoCode.asynchronous_upload_begin)
+                     _("scheduling task for asynchronous execution")))
 
             return self.__run_asynchronously(fn, params)
 
@@ -179,8 +177,7 @@ class AsyncScheduler:
             return ret
 
         log.Info("%s: %s" % (self.__class__.__name__,
-                 _("task completed successfully")),
-                 log.InfoCode.synchronous_upload_done)
+                 _("task completed successfully")))
 
         return _waiter
 
@@ -194,8 +191,7 @@ class AsyncScheduler:
                 # late triggering the failure. this should be improved.
                 log.Info("%s: %s" % (self.__class__.__name__,
                          _("a previously scheduled task has failed; "
-                           "propagating the result immediately")),
-                         log.InfoCode.asynchronous_upload_done)
+                           "propagating the result immediately")))
                 self.__waiter()
                 raise AssertionError("%s: waiter should have raised an exception; "
                                      "this is a bug" % (self.__class__.__name__,))
@@ -296,8 +292,7 @@ class AsyncScheduler:
                     with_lock(self.__cv, _signal_failed)
 
                 log.Info("%s: %s" % (self.__class__.__name__,
-                         _("task execution done (success: %s)") % succeeded),
-                         log.InfoCode.asynchronous_upload_done)
+                         _("task execution done (success: %s)") % succeeded))
 
                 def _postwork():
                     self.__curconc -= 1

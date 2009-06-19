@@ -30,6 +30,12 @@ config.setup()
 
 class PathTest(unittest.TestCase):
     """Test basic path functions"""
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+
     def test_deltree(self):
         """Test deleting a tree"""
         assert not os.system("rm -rf testfiles/output")

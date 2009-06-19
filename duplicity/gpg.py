@@ -212,7 +212,7 @@ class GPGFile:
 
 
 def GPGWriteFile(block_iter, filename, profile,
-                 size = 5 * 1024 * 1024, max_footer_size = 16 * 1024):
+                 size = 200 * 1024 * 1024, max_footer_size = 16 * 1024):
     """Write GPG compressed file of given size
 
     This function writes a gpg compressed file by reading from the

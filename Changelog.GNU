@@ -1,3 +1,69 @@
+2009-06-08  Kenneth Loafman  <kenneth@loafman.com>
+
+    * duplicity-bin: Some cleanup on the forced assertion test code to allow
+    multiple failures and no traceback for the assert.
+
+    * testing/finaltest.py:
+    Add code for testing of Checkpoint/Restore that I had been doing by hand, both single and multiple failure tests, with verify at the end.
+
+2009-06-07  Kenneth Loafman  <kenneth@loafman.com>
+
+    * duplicity-bin:
+    Fix getrlimit usage for Cygwin, which was returning -1 for the hard limit on max open files.
+
+2009-06-06  Kenneth Loafman  <kenneth@loafman.com>
+
+    * CHANGELOG, duplicity-bin, duplicity/GnuPGInterface.py, duplicity/backend.py, duplicity/collections.py, duplicity/commandline.py, duplicity/diffdir.py, duplicity/dup_temp.py, duplicity/file_naming.py, duplicity/globals.py, duplicity/gpg.py, duplicity/log.py, duplicity/manifest.py, duplicity/path.py, duplicity/tempdir.py, testing/GnuPGInterfacetest.py, testing/backendtest.py, testing/collectionstest.py, testing/diffdirtest.py, testing/dup_temptest.py, testing/file_namingtest.py, testing/finaltest.py, testing/gpgtest.py, testing/manifesttest.py, testing/misctest.py, testing/patchdirtest.py, testing/pathtest.py, testing/rdiffdirtest.py, testing/roottest.py, testing/run-a-test.sh, testing/run-all-tests.sh, testing/run-coverage.sh, testing/selectiontest.py, testing/statisticstest.py:
+    After merge of Checkpoint/Restart.
+
+    * Changelog.GNU: Checkpoint - Prep for merge of duplicity-cprs.
+
+    * duplicity/log.py: Allow handling of unicode filenames in log messages.
+
+    * CHANGELOG, Changelog.GNU:
+    Checkpoint - Prep to merge back into main trunk.
+
+2009-06-05  Kenneth Loafman  <kenneth@loafman.com>
+
+    * duplicity-bin, duplicity/collections.py, duplicity/diffdir.py, duplicity/dup_temp.py:
+    Changes for Checkpoint/Restart.
+
+    * testing/GnuPGInterfacetest.py, testing/backendtest.py, testing/collectionstest.py, testing/diffdirtest.py, testing/dup_temptest.py, testing/finaltest.py, testing/gpgtest.py, testing/manifesttest.py, testing/misctest.py, testing/patchdirtest.py, testing/pathtest.py, testing/rdiffdirtest.py, testing/roottest.py, testing/run-a-test.sh, testing/run-all-tests.sh, testing/run-coverage.sh, testing/selectiontest.py, testing/statisticstest.py:
+    - Make changes for Checkpoint/Restart capability.
+    - Make changes to run as standalone unit tests.
+
+2009-06-04  Kenneth Loafman  <kenneth@loafman.com>
+
+    * .project, duplicity-bin, duplicity/backend.py, duplicity/collections.py, duplicity/commandline.py, duplicity/diffdir.py, duplicity/dup_temp.py, duplicity/file_naming.py, duplicity/globals.py, duplicity/gpg.py, duplicity/log.py, duplicity/manifest.py, duplicity/path.py, duplicity/tempdir.py, testing/collectionstest.py:
+    Checkpoint -- first working checkpoint/restart.
+
+2009-05-26  Kenneth Loafman  <kenneth@loafman.com>
+
+    * testing/file_namingtest.py:
+    Add negative assertions to partial backup names.
+
+2009-05-25  Kenneth Loafman  <kenneth@loafman.com>
+
+    * CHANGELOG, Changelog.GNU, dist/makedist, duplicity.1, duplicity/GnuPGInterface.py, duplicity/backends/__init__.py, duplicity/backends/cloudfilesbackend.py, duplicity/backends/tahoebackend.py, duplicity/commandline.py, duplicity/log.py:
+    After merging 0.5.18 from patch.
+
+2009-05-24  Kenneth Loafman  <kenneth@loafman.com>
+
+    * .project, CHANGELOG, Changelog.GNU, dist/makedist, duplicity-bin, duplicity.1, duplicity/GnuPGInterface.py, duplicity/backends/__init__.py, duplicity/backends/cloudfilesbackend.py, duplicity/backends/tahoebackend.py, duplicity/commandline.py, duplicity/diffdir.py, duplicity/file_naming.py, duplicity/globals.py, testing/file_namingtest.py, testing/roottest.py, duplicity/collections.py, duplicity/dup_temp.py, duplicity/log.py, duplicity/manifest.py, duplicity/path.py:
+    Back out changes applied in cprs_0_5_18.  Merge got reversed.
+
+2009-05-23  Kenneth Loafman  <kenneth@loafman.com>
+
+    * .project, CHANGELOG, Changelog.GNU, dist/makedist, duplicity-bin, duplicity.1, duplicity/GnuPGInterface.py, duplicity/backends/__init__.py, duplicity/backends/cloudfilesbackend.py, duplicity/backends/tahoebackend.py, duplicity/collections.py, duplicity/commandline.py, duplicity/diffdir.py, duplicity/dup_temp.py, duplicity/file_naming.py, duplicity/globals.py, duplicity/log.py, duplicity/manifest.py, duplicity/path.py, testing/file_namingtest.py, testing/roottest.py:
+    After merging 0.5.18.
+
+    * duplicity-bin, duplicity/collections.py, duplicity/commandline.py, duplicity/diffdir.py, duplicity/dup_temp.py, duplicity/file_naming.py, duplicity/globals.py, duplicity/manifest.py, duplicity/path.py, testing/file_namingtest.py:
+    Checkpoint prior to merging 0.5.18.
+
+2009-05-20  Kenneth Loafman  <kenneth@loafman.com>
+
+    * dist/makedist, CHANGELOG, Changelog.GNU: Changes for 0.5.18.
+
 2009-05-14  Kenneth Loafman  <kenneth@loafman.com>
 
     * duplicity/collections.py, duplicity/diffdir.py:
@@ -7,12 +73,18 @@
 
     * duplicity/backends/cloudfilesbackend.py: Correct copyright.
 
+    * duplicity/backends/cloudfilesbackend.py:
+    file cloudfilesbackend.py was added on branch cprs on 2009-05-23 14:48:32 +0000
+
 2009-05-13  Kenneth Loafman  <kenneth@loafman.com>
 
     * .settings/org.eclipse.core.resources.prefs: Reset file type preferences.
 
     * CHANGELOG, duplicity-bin: Changed from using ulimit external command to
     resource.getrlimit to check open files limit.
+
+    * duplicity/backends/tahoebackend.py:
+    file tahoebackend.py was added on branch cprs on 2009-05-23 14:48:33 +0000
 
     * CHANGELOG, duplicity.1, duplicity/backends/tahoebackend.py, duplicity/commandline.py:
     patch #6743: Tahoe backend for duplicity

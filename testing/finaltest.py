@@ -27,6 +27,7 @@ import duplicity.backend
 import duplicity.backends
 from duplicity import path
 from duplicity import collections
+from duplicity import commandline
 from duplicity import globals
 
 config.setup()
@@ -51,22 +52,27 @@ class FinalTest:
     """Test backup/restore using duplicity binary"""
     def run_duplicity(self, arglist, options = [], current_time = None):
         """Run duplicity binary with given arguments and options"""
+        options.append("--archive-dir testfiles/tmp_archive")
         cmd_list = ["../duplicity-bin"]
         cmd_list.extend(options + ["--allow-source-mismatch"])
-        if current_time: cmd_list.append("--current-time %s" % (current_time,))
-        if other_args: cmd_list.extend(other_args)
+        if current_time:
+            cmd_list.append("--current-time %s" % (current_time,))
+        if other_args:
+            cmd_list.extend(other_args)
         cmd_list.extend(arglist)
         cmdline = " ".join(cmd_list)
         #print "Running '%s'." % cmdline
         if not os.environ.has_key('PASSPHRASE'):
             os.environ['PASSPHRASE'] = 'foobar'
         return_val = os.system(cmdline)
-        if return_val: raise CmdError(return_val)
+        if return_val:
+            raise CmdError(return_val)
 
     def backup(self, type, input_dir, options = [], current_time = None):
         """Run duplicity backup to default directory"""
         options = options[:]
-        if type == "full": options.insert(0, 'full')
+        if type == "full":
+            options.insert(0, 'full')
         args = [input_dir, "'%s'" % backend_url]
         self.run_duplicity(args, options, current_time)
 
@@ -77,7 +83,8 @@ class FinalTest:
         args = ["'%s'" % backend_url, "testfiles/restore_out"]
         if file_to_restore:
             options.extend(['--file-to-restore', file_to_restore])
-        if time: options.extend(['--restore-time', str(time)])
+        if time:
+            options.extend(['--restore-time', str(time)])
         self.run_duplicity(args, options, current_time)
 
     def verify(self, dirname, file_to_verify = None, time = None, options = [],
@@ -86,7 +93,8 @@ class FinalTest:
         args = ["'%s'" % backend_url, dirname]
         if file_to_verify:
             options.extend(['--file-to-restore', file_to_verify])
-        if time: options.extend(['--restore-time', str(time)])
+        if time:
+            options.extend(['--restore-time', str(time)])
         self.run_duplicity(args, options, current_time)
 
     def deltmp(self):
@@ -96,7 +104,8 @@ class FinalTest:
         assert not os.system("mkdir testfiles/output testfiles/tmp_archive")
         backend = duplicity.backend.get_backend(backend_url)
         bl = backend.list()
-        if bl: backend.delete(backend.list())
+        if bl:
+            backend.delete(backend.list())
         backend.close()
 
     def runtest(self, dirlist, backup_options = [], restore_options = []):
@@ -159,12 +168,6 @@ class FinalTest:
         self.test_basic_cycle(backup_options = backup_options,
                               restore_options = restore_options)
 
-    def test_archive_dir(self):
-        """Like test_basic_cycle, but use a local archive dir"""
-        options = ["--archive-dir testfiles/tmp_archive"]
-        self.test_basic_cycle(backup_options = options,
-                              restore_options = options)
-
     def test_single_regfile(self):
         """Test backing and restoring up a single regular file"""
         self.runtest(["testfiles/various_file_types/regular_file"])
@@ -177,7 +180,8 @@ class FinalTest:
     def test_long_filenames(self):
         """Test backing up a directory with long filenames in it"""
         lf_dir = path.Path("testfiles/long_filenames")
-        if lf_dir.exists(): lf_dir.deltree()
+        if lf_dir.exists():
+            lf_dir.deltree()
         lf_dir.mkdir()
         lf1 = lf_dir.append("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
         lf1.mkdir()
@@ -216,12 +220,13 @@ class FinalTest:
         self.backup("inc", "testfiles/dir3", current_time = 40000)
 
         b = duplicity.backend.get_backend(backend_url)
-        cs = collections.CollectionsStatus(b).set_values()
+        commandline.set_archive_dir("testfiles/tmp_archive")
+        cs = collections.CollectionsStatus(b, globals.archive_dir).set_values()
         assert len(cs.all_backup_chains) == 2, cs.all_backup_chains
         assert cs.matched_chain_pair
 
         self.run_duplicity(["--force", backend_url], options=["remove-older-than 35000"])
-        cs2 = collections.CollectionsStatus(b).set_values()
+        cs2 = collections.CollectionsStatus(b, globals.archive_dir).set_values()
         assert len(cs2.all_backup_chains) == 1, cs.all_backup_chains
         assert cs2.matched_chain_pair
         chain = cs2.all_backup_chains[0]
@@ -230,17 +235,65 @@ class FinalTest:
 
         # Now check to make sure we can't delete only chain
         self.run_duplicity(["--force", backend_url], options=["remove-older-than 50000"])
-        cs3 = collections.CollectionsStatus(b).set_values()
+        cs3 = collections.CollectionsStatus(b, globals.archive_dir).set_values()
         assert len(cs3.all_backup_chains) == 1
         assert cs3.matched_chain_pair
         chain = cs3.all_backup_chains[0]
         assert chain.start_time == 30000, chain.start_time
         assert chain.end_time == 40000, chain.end_time
 
+    def test_basic_checkpoint_restore(self):
+        """Test basic Checkpoint/Restore"""
+        excludes = ["--exclude **/output",
+                    "--exclude **/tmp_archive",
+                    "--exclude **/root1",
+                    "--exclude **/root2",]
+        self.deltmp()
+        try:
+            self.backup("full", "testfiles", options = ["--vol 1", "--fail 1"] + excludes)
+        except CmdError:
+            pass
+        self.backup("full", "testfiles", options = excludes)
+        self.verify("testfiles", options = excludes)
+
+    def test_multiple_checkpoint_restore(self):
+        """Test multiple Checkpoint/Restore"""
+        excludes = ["--exclude **/output",
+                    "--exclude **/tmp_archive",
+                    "--exclude **/root1",
+                    "--exclude **/root2",]
+        self.deltmp()
+        try:
+            self.backup("full", "testfiles", options = ["--vol 1", "--fail 1"] + excludes)
+        except CmdError:
+            pass
+        try:
+            self.backup("full", "testfiles", options = ["--vol 1", "--fail 2"] + excludes)
+        except CmdError:
+            pass
+        try:
+            self.backup("full", "testfiles", options = ["--vol 1", "--fail 3"] + excludes)
+        except CmdError:
+            pass
+        self.backup("full", "testfiles", options = excludes)
+        self.verify("testfiles", options = excludes)
+
 class FinalTest1(FinalTest, unittest.TestCase):
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+
     globals.old_filenames = False
 
 class FinalTest2(FinalTest, unittest.TestCase):
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+
     globals.old_filenames = True
 
 if __name__ == "__main__":

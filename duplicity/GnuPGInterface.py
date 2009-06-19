@@ -234,7 +234,7 @@ except ImportError:
 
 __author__   = "Frank J. Tobin, ftobin@neverending.org"
 __version__  = "0.3.2"
-__revision__ = "$Id: GnuPGInterface.py,v 1.5 2009/05/13 17:15:44 loafman Exp $"
+__revision__ = "$Id: GnuPGInterface.py,v 1.6 2009/06/06 17:35:19 loafman Exp $"
 
 # "standard" filehandles attached to processes
 _stds = [ 'stdin', 'stdout', 'stderr' ]

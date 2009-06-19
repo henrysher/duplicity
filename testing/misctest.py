@@ -30,6 +30,12 @@ config.setup()
 
 class MiscTest(unittest.TestCase):
     """Test functions/classes in misc.py"""
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+
     def deltmp(self):
         assert not os.system("rm -rf testfiles/output")
         os.mkdir("testfiles/output")

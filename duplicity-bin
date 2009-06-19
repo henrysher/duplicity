@@ -29,7 +29,7 @@
 
 from __future__ import generators
 import getpass, gzip, os, sys, time, types
-import traceback, platform, statvfs, resource
+import traceback, platform, statvfs, resource, re
 
 import gettext
 gettext.install('duplicity')
@@ -91,8 +91,7 @@ def get_passphrase(n, action):
         return ""
 
     # no passphrase if --list-current and --archive-dir
-    elif (action == "list-current"
-          and globals.archive_dir):
+    elif (action == "list-current"):
         return ""
 
     # these commands don't look inside the collection
@@ -111,11 +110,9 @@ def get_passphrase(n, action):
 
     # for an inc backup, we don't need a password if
     # there is no sign_key and there are recipients
-    # and there is an archive-dir specified
     elif (action == "inc"
           and globals.gpg_profile.recipients
-          and not globals.gpg_profile.sign_key
-          and globals.archive_dir):
+          and not globals.gpg_profile.sign_key):
         return ""
 
     # Finally, ask the user for the passphrase
@@ -165,7 +162,40 @@ def dummy_backup(tarblock_iter):
     return 0
 
 
-def write_multivol(backup_type, tarblock_iter, backend):
+def restart_position_iterator(tarblock_iter):
+    """
+    Fake writing to backend, but do go through all the source paths.
+    Stop when we have processed the last file and block from the
+    last backup.  Normal backup will proceed at the start of the
+    next volume in the set.
+
+    @type tarblock_iter: tarblock_iter
+    @param tarblock_iter: iterator for current tar block
+
+    @rtype: int
+    @return: constant 0 (zero)
+    """
+    def whoops():
+        log.FatalError("Unable to locate last file %s and block %d in backup set" %
+                       ("/".join(last_index), last_block),
+                       log.ErrorCode.restart_file_not_found)
+
+    last_index = globals.restart.last_index
+    last_block = globals.restart.last_block
+    try:
+        # Just spin our wheels
+        while tarblock_iter.next():
+            if (tarblock_iter.previous_index == last_index):
+                if (tarblock_iter.previous_block == last_block):
+                    break
+            if tarblock_iter.previous_index > last_index:
+                whoops()
+    except StopIteration:
+        whoops()
+    return 0
+
+
+def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
     """
     Encrypt volumes of tarblock_iter and write to backend
 
@@ -187,13 +217,19 @@ def write_multivol(backup_type, tarblock_iter, backend):
 
     def get_indicies(tarblock_iter):
         """Return start_index and end_index of previous volume"""
-        start_index = tarblock_iter.recall_index()
+        start_index, start_block = tarblock_iter.recall_index()
         if start_index is None:
             start_index = ()
-        end_index = tarblock_iter.get_previous_index()
+            start_block = None
+        if start_block:
+            start_block -= 1
+        end_index, end_block = tarblock_iter.get_previous_index()
         if end_index is None:
             end_index = start_index
-        return start_index, end_index
+            end_block = start_block
+        if end_block:
+            end_block -= 1
+        return start_index, start_block, end_index, end_block
 
     def put(tdp, dest_filename):
         backend.put(tdp, dest_filename)
@@ -201,10 +237,27 @@ def write_multivol(backup_type, tarblock_iter, backend):
         tdp.delete()
         return putsize
 
+    if not globals.restart:
+        # normal backup start
+        vol_num = 0
+        mf = manifest.Manifest(fh = man_outfp)
+        mf.set_dirinfo()
+    else:
+        # restart from last known position
+        mf = globals.restart.last_backup.get_local_manifest()
+        globals.restart.checkManifest(mf)
+        globals.restart.setLastSaved(mf)
+        mf.fh = man_outfp
+        last_block = globals.restart.last_block
+        log.Notice("Restarting after volume %s, file %s, block %s" %
+                   (globals.restart.start_vol,
+                    "/".join(globals.restart.last_index),
+                    globals.restart.last_block))
+        vol_num = globals.restart.start_vol
+        restart_position_iterator(tarblock_iter)
+
     at_end = 0
-    mf = manifest.Manifest().set_dirinfo()
     bytes_written = 0
-    vol_num = 0
 
     # This assertion must be kept until we have solved the problem
     # of concurrency at the backend level. Concurrency 1 is fine
@@ -220,13 +273,17 @@ def write_multivol(backup_type, tarblock_iter, backend):
     async_waiters = []
 
     while not at_end:
-        # Create volume
+        # set up iterator
         tarblock_iter.remember_next_index() # keep track of start index
+
+        # Create volume
         vol_num += 1
         dest_filename = file_naming.get(backup_type, vol_num,
                                         encrypted = globals.encryption,
                                         gzipped = not globals.encryption)
         tdp = dup_temp.new_tempduppath(file_naming.parse(dest_filename))
+
+        # write volume
         if globals.encryption:
             at_end = gpg.GPGWriteFile(tarblock_iter, tdp.name,
                                       globals.gpg_profile, globals.volsize)
@@ -236,16 +293,27 @@ def write_multivol(backup_type, tarblock_iter, backend):
 
         # Add volume information to manifest
         vi = manifest.VolumeInfo()
-        start_index, end_index = get_indicies(tarblock_iter)
-        vi.set_info(vol_num, start_index, end_index)
+        vi.set_info(vol_num, *get_indicies(tarblock_iter))
         vi.set_hash("SHA1", gpg.get_hash("SHA1", tdp))
         mf.add_volume_info(vi)
 
+        # Checkpoint after each volume so restart has a place to restart.
+        # Note that until after the first volume, all files are temporary.
+        if vol_num == 1:
+            sig_outfp.to_partial()
+            man_outfp.to_partial()
+        else:
+            sig_outfp.flush()
+            man_outfp.flush()
+
         async_waiters.append(io_scheduler.schedule_task(lambda tdp, dest_filename: put(tdp, dest_filename),
-                                (tdp, dest_filename)))
+                                                        (tdp, dest_filename)))
 
         # Log human-readable version as well as raw numbers for machine consumers
         log.Progress('Processed volume %d' % vol_num, diffdir.stats.SourceFileSize)
+
+        # for testing purposes only - assert on inc or full
+        assert globals.fail_on_volume != vol_num, "Forced assertion for testing at volume %d" % vol_num
 
     # Collect byte count from all asynchronous jobs; also implicitly waits
     # for them all to complete.
@@ -253,47 +321,48 @@ def write_multivol(backup_type, tarblock_iter, backend):
         bytes_written += waiter()
 
     # Upload the collection summary.
-    bytes_written += write_manifest(mf, backup_type, backend)
+    #bytes_written += write_manifest(mf, backup_type, backend)
 
     return bytes_written
 
 
-def write_manifest(mf, backup_type, backend):
+def get_man_fileobj(backup_type):
     """
-    Write manifest to file in archive_dir and encrypted to backend
+    Return a fileobj opened for writing, save results as manifest
 
-    @type mf: Manifest object
-    @param mf: manifest to write
-    @type backup_type: string
-    @param backup_type: type of backup to perform, either 'inc' or 'full'
-    @type backend: callable backend object
-    @param backend: I/O backend for selected protocol
+    Save manifest in globals.archive_dir gzipped.
+    Save them on the backend encrypted as needed.
 
-    @rtype: int
-    @return: bytes written
+    @type man_type: string
+    @param man_type: either "full" or "new"
+
+    @rtype: fileobj
+    @return: fileobj opened for writing
     """
-    mf_string = mf.to_string()
-    if globals.archive_dir:
-        local_mf_name = file_naming.get(backup_type, manifest = 1)
-        fin = dup_temp.get_fileobj_duppath(globals.archive_dir, local_mf_name)
-        fin.write(mf_string)
-        fin.close()
+    assert backup_type == "full" or backup_type == "inc"
 
-    sizelist = [] # will hold length of file in bytes
-    remote_mf_name = file_naming.get(backup_type, manifest = 1,
-                                     encrypted = globals.encryption)
-    remote_fin = backend.get_fileobj_write(remote_mf_name, sizelist = sizelist)
-    remote_fin.write(mf_string)
-    remote_fin.close()
-    return sizelist[0]
+    part_man_filename = file_naming.get(backup_type,
+                                        manifest = True,
+                                        partial = True)
+    perm_man_filename = file_naming.get(backup_type,
+                                        manifest = True)
+    remote_man_filename = file_naming.get(backup_type,
+                                          manifest = True,
+                                          encrypted = globals.encryption)
+
+    fh = dup_temp.get_fileobj_duppath(globals.archive_dir,
+                                      part_man_filename,
+                                      perm_man_filename,
+                                      remote_man_filename)
+    return fh
 
 
 def get_sig_fileobj(sig_type):
     """
     Return a fileobj opened for writing, save results as signature
 
-    If globals.archive_dir is available, save signatures there
-    gzipped.  Save them on the backend encrypted as needed.
+    Save signatures in globals.archive_dir gzipped.
+    Save them on the backend encrypted as needed.
 
     @type sig_type: string
     @param sig_type: either "full-sig" or "new-sig"
@@ -301,18 +370,20 @@ def get_sig_fileobj(sig_type):
     @rtype: fileobj
     @return: fileobj opened for writing
     """
-    assert sig_type == "full-sig" or sig_type == "new-sig"
+    assert sig_type in ["full-sig", "new-sig"]
 
-    sig_filename = file_naming.get(sig_type, encrypted = globals.encryption,
-                                   gzipped = not globals.encryption)
-    fh = globals.backend.get_fileobj_write(sig_filename)
+    part_sig_filename = file_naming.get(sig_type,
+                                        gzipped = False,
+                                        partial = True)
+    perm_sig_filename = file_naming.get(sig_type,
+                                        gzipped = True)
+    remote_sig_filename = file_naming.get(sig_type, encrypted = globals.encryption,
+                                          gzipped = not globals.encryption)
 
-    # by MDR.  This was changed to use addfilehandle so we get both
-    # remote and local sig files
-    if globals.archive_dir:
-        local_sig_filename = file_naming.get(sig_type, gzipped = 1)
-        fh.addfilehandle(dup_temp.get_fileobj_duppath(globals.archive_dir,
-                                                      local_sig_filename))
+    fh = dup_temp.get_fileobj_duppath(globals.archive_dir,
+                                      part_sig_filename,
+                                      perm_sig_filename,
+                                      remote_sig_filename)
     return fh
 
 
@@ -332,10 +403,25 @@ def full_backup(col_stats):
         col_stats.set_values(sig_chain_warning = None)
     else:
         sig_outfp = get_sig_fileobj("full-sig")
-        tarblock_iter = diffdir.DirFull_WriteSig(globals.select, sig_outfp)
-        bytes_written = write_multivol("full", tarblock_iter, globals.backend)
+        man_outfp = get_man_fileobj("full")
+        tarblock_iter = diffdir.DirFull_WriteSig(globals.select,
+                                                 sig_outfp)
+        bytes_written = write_multivol("full", tarblock_iter,
+                                       man_outfp, sig_outfp,
+                                       globals.backend)
+
+        # close sig file, send to remote, and rename to final
         sig_outfp.close()
+        sig_outfp.to_remote()
+        sig_outfp.to_final()
+
+        # close manifest, send to remote, and rename to final
+        man_outfp.close()
+        man_outfp.to_remote()
+        man_outfp.to_final()
+
         col_stats.set_values(sig_chain_warning = None).cleanup_signatures()
+
     print_statistics(diffdir.stats, bytes_written)
 
 
@@ -386,11 +472,24 @@ def incremental_backup(sig_chain):
         bytes_written = dummy_backup(tarblock_iter)
     else:
         new_sig_outfp = get_sig_fileobj("new-sig")
+        new_man_outfp = get_man_fileobj("inc")
         tarblock_iter = diffdir.DirDelta_WriteSig(globals.select,
                                                   sig_chain.get_fileobjs(),
                                                   new_sig_outfp)
-        bytes_written = write_multivol("inc", tarblock_iter, globals.backend)
+        bytes_written = write_multivol("inc", tarblock_iter,
+                                       new_man_outfp, new_sig_outfp,
+                                       globals.backend)
+
+        # close sig file and rename to final
         new_sig_outfp.close()
+        new_sig_outfp.to_remote()
+        new_sig_outfp.to_final()
+
+        # close manifest and rename to final
+        new_man_outfp.close()
+        new_man_outfp.to_remote()
+        new_man_outfp.to_final()
+
     print_statistics(diffdir.stats, bytes_written)
 
 
@@ -731,11 +830,62 @@ def check_resources(action):
         except resource.error:
             log.FatalError(_("Unable to get max open files."),
                            log.ErrorCode.get_ulimit_failed)
-        maxopen = min(soft, hard)
+        maxopen = min([l for l in (soft, hard) if l > -1])
         if maxopen < 1024:
             log.FatalError(_("Max open files of %s is too low, should be >= 1024.\n"
                              "Use 'ulimit -n 1024' or higher to correct.\n") % (maxopen,),
                              log.ErrorCode.maxopen_too_low)
+
+def log_startup_parms(verbosity = log.INFO):
+    """
+    log Python, duplicity, and system versions
+    """
+    log.Log('=' * 80, verbosity)
+    log.Log("duplicity $version ($reldate)", verbosity)
+    log.Log("Args: %s" % (' '.join(sys.argv),), verbosity)
+    log.Log(' '.join(platform.uname()), verbosity)
+    log.Log("%s %s" % (sys.executable or sys.platform, sys.version), verbosity)
+    log.Log('=' * 80, verbosity)
+
+
+class Restart:
+    """
+    Class to aid in restart of inc or full backup.
+    Instance in globals.restart if restart in progress.
+    """
+    def __init__(self, last_backup):
+        self.type = None
+        self.start_time = None
+        self.end_time = None
+        self.start_vol = None
+        self.last_index = None
+        self.last_block = None
+        self.last_backup = last_backup
+        self.setParms(last_backup)
+
+    def setParms(self, last_backup):
+        if last_backup.time:
+            self.type = "full"
+            self.time = last_backup.time
+        else:
+            self.type = "inc"
+            self.end_time = last_backup.end_time
+            self.start_time = last_backup.start_time
+        self.start_vol = len(last_backup)
+
+    def checkManifest(self, mf):
+        mf_len = len(mf.volume_info_dict)
+        if mf_len != self.start_vol:
+            # TODO: this should not be a fatal error unless the remote has no volumes.
+            # Need to adjust the stored partial manifest to real number of volumes.
+            log.FatalError("Fatal Error: Manifest has %d volumes, remote has %d volumes" %
+                           (mf_len, self.start_vol),
+                           log.ErrorCode.generic)
+
+    def setLastSaved(self, mf):
+        vi = mf.volume_info_dict[self.start_vol]
+        self.last_index = vi.end_index
+        self.last_block = vi.end_block
 
 
 def main():
@@ -746,26 +896,53 @@ def main():
     log.setup()
     action = commandline.ProcessCommandLine(sys.argv[1:])
 
-    # log Python, duplicity, and system versions
-    log.Info("Args: %s" % (' '.join(sys.argv),))
-    log.Info("%s %s" % (sys.executable or sys.platform, sys.version))
-    log.Info("duplicity $version ($reldate)")
-    log.Info(' '.join(platform.uname()))
+    log_startup_parms(log.INFO)
 
     check_resources(action)
 
-    col_stats = collections.CollectionsStatus(globals.backend,
-                                              globals.archive_dir).set_values()
-    log.PrintCollectionStatus(col_stats)
+    while True:
+        # if we have to clean up the last partial, then col_stats are invalidated
+        # and we have to start the process all over again until clean.
+        col_stats = collections.CollectionsStatus(globals.backend,
+                                                  globals.archive_dir).set_values()
+        if action in ["full", "inc"]:
+            last_full_chain = col_stats.get_last_backup_chain()
+            if not last_full_chain:
+                break
+            last_backup = last_full_chain.get_last()
+            if last_backup.partial:
+                if not globals.no_restart:
+                    # set restart parms from last_backup info
+                    globals.restart = Restart(last_backup)
+                    # (possibly) reset action
+                    action = globals.restart.type
+                    # reset the time strings
+                    if action == "full":
+                        dup_time.setcurtime(globals.restart.time)
+                    else:
+                        dup_time.setcurtime(globals.restart.end_time)
+                        dup_time.setprevtime(globals.restart.start_time)
+                    # log it -- main restart heavy lifting is done in write_multivol
+                    log.Notice(_("Last %s backup left a partial set, restarting." % action))
+                    break
+                else:
+                    # remove last partial backup and get new collection status
+                    log.Notice(_("Cleaning up previous partial %s backup set, restarting." % action))
+                    last_backup.delete()
+                    continue
+            break
+        break
 
+    # OK, now we have a stable collection
     last_full_time = col_stats.get_last_full_backup_time()
     if last_full_time > 0:
         log.Notice(_("Last full backup date:") + " " + dup_time.timetopretty(last_full_time))
     else:
         log.Notice(_("Last full backup date: none"))
-    if action == "inc" and last_full_time < globals.full_force_time:
+    if not globals.restart and action == "inc" and last_full_time < globals.full_force_time:
         log.Notice(_("Last full backup is too old, forcing full backup"))
         action = "full"
+    log.PrintCollectionStatus(col_stats)
 
     os.umask(077)
 
@@ -834,7 +1011,7 @@ if __name__ == "__main__":
         sys.exit(e)
 
     except gpg.GPGError, e:
-        # For user errors, don't show an ugly stack trace by
+        # For gpg errors, don't show an ugly stack trace by
         # default. But do with sufficient verbosity.
         log.Info(_("GPG error detail: %s")
                  % (''.join(traceback.format_exception(*sys.exc_info()))))
@@ -859,6 +1036,14 @@ if __name__ == "__main__":
         log.FatalError("%s: %s" % (e.__class__.__name__, str(e)),
                        log.ErrorCode.user_error,
                        e.__class__.__name__)
+
+    except AssertionError, e:
+        if "Forced assertion for testing" in str(e):
+            log.FatalError("%s: %s" % (e.__class__.__name__, str(e)),
+                           log.ErrorCode.generic,
+                           e.__class__.__name__)
+        else:
+            raise
 
     except Exception, e:
         # Traceback and that mess

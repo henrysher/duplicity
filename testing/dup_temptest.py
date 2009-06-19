@@ -32,6 +32,12 @@ prefix = "testfiles/output"
 
 class TempTest(unittest.TestCase):
     """Test various temp files methods"""
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+
     def del_tmp(self):
         """Delete testfiles/output and recreate"""
         assert not os.system("rm -rf " + prefix)

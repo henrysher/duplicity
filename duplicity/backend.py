@@ -47,7 +47,13 @@ from duplicity.errors import UnsupportedBackendScheme
 # todo: this should really NOT be done here
 socket.setdefaulttimeout(globals.timeout)
 
+_forced_backend = None
 _backends = {}
+
+def force_backend(backend):
+    """Forces the use of a particular backend, regardless of schema"""
+    global _forced_backend
+    _forced_backend = backend
 
 def register_backend(scheme, backend_factory):
     """
@@ -74,6 +80,7 @@ def register_backend(scheme, backend_factory):
 
     _backends[scheme] = backend_factory
 
+
 def get_backend(url_string):
     """
     Instantiate a backend suitable for the given URL, or return None
@@ -87,12 +94,15 @@ def get_backend(url_string):
     if not pu.scheme:
         return None
 
-    global _backends
+    global _backends, _forced_backend
 
-    if not pu.scheme in _backends:
+    if _forced_backend:
+        return _forced_backend(pu)
+    elif not pu.scheme in _backends:
         raise UnsupportedBackendScheme(url_string)
     else:
         return _backends[pu.scheme](pu)
+
 
 _urlparser_initialized = False
 _urlparser_initialized_lock = dup_threading.threading_module().Lock()
@@ -114,7 +124,14 @@ def _ensure_urlparser_initialized():
             # is a hack. we should instead not stomp on the url parsing module to begin with.
             #
             # todo: eliminate the need for backend specific hacking here completely.
-            urlparser.uses_netloc = [ 'ftp', 'hsi', 'rsync', 's3', 'scp', 'ssh', 'webdav', 'webdavs', 'http', 'https', 'imap', 'imaps' ]
+            urlparser.uses_netloc = ['ftp',
+                                     'hsi',
+                                     'rsync',
+                                     's3',
+                                     'scp', 'ssh',
+                                     'webdav', 'webdavs',
+                                     'http', 'https',
+                                     'imap', 'imaps']
 
             # Do not transform or otherwise parse the URL path component.
             urlparser.uses_query = []
@@ -122,8 +139,7 @@ def _ensure_urlparser_initialized():
 
             _urlparser_initialized = True
 
-    dup_threading.with_lock(_urlparser_initialized_lock,
-                            init)
+    dup_threading.with_lock(_urlparser_initialized_lock, init)
 
 class ParsedUrl:
     """
@@ -211,6 +227,7 @@ class ParsedUrl:
     def geturl(self):
         return self.url_string
 
+
 def strip_auth_from_url(parsed_url):
     """Return a URL from a urlparse object without a username or password."""
 
@@ -219,6 +236,7 @@ def strip_auth_from_url(parsed_url):
 
     # Replace the full network location with the stripped copy.
     return parsed_url.geturl().replace(parsed_url.netloc, straight_netloc, 1)
+
 
 class Backend:
     """
