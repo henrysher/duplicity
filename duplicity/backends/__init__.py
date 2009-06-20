@@ -38,4 +38,5 @@ import duplicity.backends.hsibackend
 import duplicity.backends.localbackend
 import duplicity.backends.rsyncbackend
 import duplicity.backends.sshbackend
+import duplicity.backends.tahoebackend
 import duplicity.backends.webdavbackend
