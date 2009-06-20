@@ -251,17 +251,17 @@ def GPGWriteFile(block_iter, filename, profile,
     def get_current_size():
         return os.stat(filename).st_size
 
-    minimum_block_size = 128 * 1024 # don't bother requesting blocks smaller
+    block_size = 128 * 1024        # don't bother requesting blocks smaller, but also don't ask for bigger
     target_size = size - 50 * 1024 # fudge factor, compensate for gpg buffering
     data_size = target_size - max_footer_size
     file = GPGFile(True, path.Path(filename), profile)
     at_end_of_blockiter = 0
-    while 1:
+    while True:
         bytes_to_go = data_size - get_current_size()
-        if bytes_to_go < minimum_block_size:
+        if bytes_to_go < block_size:
             break
         try:
-            data = block_iter.next(bytes_to_go).data
+            data = block_iter.next(min(block_size, bytes_to_go)).data
         except StopIteration:
             at_end_of_blockiter = 1
             break
@@ -305,12 +305,12 @@ def GzipWriteFile(block_iter, filename, size = 5 * 1024 * 1024,
     file_counted = FileCounted(open(filename, "wb"))
     gzip_file = gzip.GzipFile(None, "wb", 6, file_counted)
     at_end_of_blockiter = 0
-    while 1:
+    while True:
         bytes_to_go = size - file_counted.byte_count
         if bytes_to_go < 32 * 1024:
             break
         try:
-            new_block = block_iter.next(bytes_to_go)
+            new_block = block_iter.next(min(128*1024, bytes_to_go))
         except StopIteration:
             at_end_of_blockiter = 1
             break
