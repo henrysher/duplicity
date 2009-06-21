@@ -210,7 +210,7 @@ class SSHBackend(duplicity.backend.Backend):
 
     def get(self, remote_filename, local_path):
         """Use sftp to get a remote file"""
-        commands = ["get %s %s%s" %
+        commands = ["get %s%s %s" %
                     (self.remote_prefix, remote_filename, local_path.name)]
         commandline = ("%s %s %s" % (globals.sftp_command,
                                      globals.ssh_options,
