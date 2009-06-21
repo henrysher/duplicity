@@ -172,6 +172,7 @@ class ErrorCode:
     maxopen_too_low = 37
     connection_failed = 38
     restart_file_not_found = 39
+    gio_not_available = 40
 
 def FatalError(s, code, extra=None):
     """Write fatal error message and exit"""

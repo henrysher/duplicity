@@ -243,8 +243,11 @@ def parse_cmdline_options(arglist):
         elif opt == "--imap-mailbox":
             globals.imap_mailbox = arg.strip()
         elif opt == "--gio":
-            import duplicity.backends.giobackend
-            backend.force_backend(duplicity.backends.giobackend.GIOBackend)
+            try:
+                import duplicity.backends.giobackend
+                backend.force_backend(duplicity.backends.giobackend.GIOBackend)
+            except ImportError:
+                log.FatalError(_("Unable to load gio module"), log.ErrorCode.gio_not_available)
         elif opt == "--gpg-options":
             gpg.gpg_options = (gpg.gpg_options + ' ' + arg).strip()
         elif opt in ["-h", "--help"]:
