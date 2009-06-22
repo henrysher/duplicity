@@ -214,10 +214,12 @@ this switch.
 
 .TP
 .BI "--archive-dir " path
-.B ~/.duplicity/%DUPLICITY_ARGS_HASH%
+.B ~/.duplicity/%DUPLICITY_BACKUP_NAME%
 where
-.B %DUPLICITY_ARGS_HASH%
-is a hash of the source/destination arguments.
+.B %DUPLICITY_BACKUP_NAME%
+is the value of the
+.B --name
+parameter (or its default).
 
 .B NOTE:
 This option changed in 0.6.0.  The archive directory is now necessary
@@ -437,6 +439,20 @@ programs.
 .BI "--log-file " filename
 Write specially-formatted versions of output messages to the specified file.
 The format used is designed to be easily consumable by other programs.
+
+.TP
+.BI "--name " symbolicname
+Set the symbolic name of the backup being operated on. The intent is
+to use a separate name for each logically distinct backup. For
+example, someone may use "home_daily_s3" for the daily backup of a
+home directory to Amazon S3. The structure of the name is up to the
+user, it is only important that the names be distinct. The symbolic
+name is currently only used to affect the default
+.B --archive-dir
+, but may be used for additional features in the future. Users running
+more than one distinct backup are encouraged to use this option.
+
+If not specified, the default value is a hash of the command line arguments excluding options and commands.
 
 .TP
 .B --no-encryption

@@ -33,11 +33,14 @@ hostname = socket.getfqdn()
 # up.  For restoring, this is the destination of the restored files.
 local_path = None
 
+# The symbolic name of the backup being operated upon.
+backup_name = None
+
 # Set to the Path of the archive directory (the directory which
 # contains the signatures and manifests of the relevent backup
 # collection), and for checkpoint state between volumes.
 # NOTE: this gets expanded in duplicity.commandline
-archive_dir = "~/.duplicity/%DUPLICITY_ARGS_HASH%"
+archive_dir = "~/.duplicity/%DUPLICITY_BACKUP_NAME%"
 
 # Restores will try to bring back the state as of the following time.
 # If it is None, default to current time.
