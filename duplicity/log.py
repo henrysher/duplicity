@@ -86,6 +86,10 @@ class InfoCode:
     patch_file_patching = 8
     #file_list = 9 # 9 isn't used anymore.  It corresponds to an older syntax for listing files
     file_list = 10
+    synchronous_upload_begin = 11
+    asynchronous_upload_begin = 12
+    synchronous_upload_done = 13
+    asynchronous_upload_done = 14
 
 def Info(s, code=InfoCode.generic, extra=None):
     """Shortcut used for info messages (verbosity 5)."""
@@ -168,6 +172,7 @@ class ErrorCode:
     maxopen_too_low = 37
     connection_failed = 38
     restart_file_not_found = 39
+    gio_not_available = 40
 
 def FatalError(s, code, extra=None):
     """Write fatal error message and exit"""

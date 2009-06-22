@@ -70,15 +70,15 @@ class AsyncScheduler:
                                (concurrency)))
         assert concurrency >= 0, "%s concurrency level must be >= 0" % (self.__class__.__name__,)
 
-        self.__failed       = False        # has at least one task failed so far?
-        self.__failed_waiter = None        # when __failed, the waiter of the first task that failed
-        self.__concurrency  = concurrency
-        self.__curconc      = 0            # current concurrency level (number of workers)
-        self.__workers      = 0            # number of active workers
-        self.__q            = []
-        self.__cv           = threading.Condition() # for simplicity, we use a single cv with its lock
-                                                    # for everything, even if the resulting notifyAll():s
-                                                    # are not technically efficient.
+        self.__failed        = False        # has at least one task failed so far?
+        self.__failed_waiter = None         # when __failed, the waiter of the first task that failed
+        self.__concurrency   = concurrency
+        self.__worker_count  = 0            # number of active workers
+        self.__waiter_count  = 0            # number of threads waiting to submit work
+        self.__barrier       = False        # barrier currently in effect?
+        self.__cv            = threading.Condition() # for simplicity, we use a single cv with its lock
+                                                     # for everything, even if the resulting notifyAll():s
+                                                     # are not technically efficient.
 
         if concurrency > 0:
             require_threading("concurrency > 0 (%d)" % (concurrency,))
@@ -99,8 +99,7 @@ class AsyncScheduler:
         # be popped).
         if self.__concurrency > 0:
             def _insert_barrier():
-                self.__q.append(None) # None in queue indicates barrier
-                self.__cv.notifyAll()
+                self.__barrier = True
 
             with_lock(self.__cv, _insert_barrier)
 
@@ -143,12 +142,14 @@ class AsyncScheduler:
             # special case this to not require any platform support for
             # threading at all
             log.Info("%s: %s" % (self.__class__.__name__,
-                     _("running task synchronously (asynchronicity disabled)")))
+                     _("running task synchronously (asynchronicity disabled)")),
+                     log.InfoCode.synchronous_upload_begin)
 
             return self.__run_synchronously(fn, params)
         else:
             log.Info("%s: %s" % (self.__class__.__name__,
-                     _("scheduling task for asynchronous execution")))
+                     _("scheduling task for asynchronous execution")),
+                     log.InfoCode.asynchronous_upload_begin)
 
             return self.__run_asynchronously(fn, params)
 
@@ -162,7 +163,7 @@ class AsyncScheduler:
         progress or may happen subsequently to the call to wait().
         """
         def _wait():
-            interruptably_wait(self.__cv, lambda: self.__curconc == 0 and len(self.__q) == 0)
+            interruptably_wait(self.__cv, lambda: self.__worker_count == 0 and self.__waiter_count == 0)
 
         with_lock(self.__cv, _wait)
 
@@ -177,126 +178,80 @@ class AsyncScheduler:
             return ret
 
         log.Info("%s: %s" % (self.__class__.__name__,
-                 _("task completed successfully")))
+                 _("task completed successfully")),
+                 log.InfoCode.synchronous_upload_done)
 
         return _waiter
 
     def __run_asynchronously(self, fn, params):
         (waiter, caller) = async_split(lambda: fn(*params))
 
-        def _sched():
+        def check_pending_failure():
             if self.__failed:
-                # note that __start_worker() below may block waiting on
-                # task execution; if so we will be one task scheduling too
-                # late triggering the failure. this should be improved.
                 log.Info("%s: %s" % (self.__class__.__name__,
                          _("a previously scheduled task has failed; "
-                           "propagating the result immediately")))
-                self.__waiter()
+                           "propagating the result immediately")),
+                         log.InfoCode.asynchronous_upload_done)
+                self.__failed_waiter()
                 raise AssertionError("%s: waiter should have raised an exception; "
                                      "this is a bug" % (self.__class__.__name__,))
 
-            self.__q.append(caller)
+        def wait_for_and_register_launch():
+            check_pending_failure()    # raise on fail
+            while self.__worker_count >= self.__concurrency or self.__barrier:
+                if self.__worker_count == 0:
+                    assert self.__barrier, "barrier should be in effect"
+                    self.__barrier = False
+                    self.__cv.notifyAll()
+                else:
+                    self.__waiter_count += 1
+                    self.__cv.wait()
+                    self.__waiter_count -= 1
 
-            free_workers = self.__workers - self.__curconc
+                check_pending_failure() # raise on fail
 
+            self.__worker_count += 1
             log.Debug("%s: %s" % (self.__class__.__name__,
-                      gettext.ngettext("tasks queue length post-schedule: %d task",
-                                       "tasks queue length post-schedule: %d tasks",
-                                       len(self.__q)) % len(self.__q)))
+                                  _("active workers = %d") % (self.__worker_count,)))
+    
+        # simply wait for an OK condition to start, then launch our worker. the worker
+        # never waits on us, we just wait for them.
+        with_lock(self.__cv, wait_for_and_register_launch)
 
-            assert free_workers >= 0
-
-            if free_workers == 0:
-                self.__start_worker()
-
-        with_lock(self.__cv, _sched)
+        self.__start_worker(caller)
 
         return waiter
 
-    def __start_worker(self):
+    def __start_worker(self, caller):
         """
-        Start a new worker; self.__cv must be acquired.
+        Start a new worker.
         """
-        while self.__workers >= self.__concurrency:
-            log.Info("%s: %s" % (self.__class__.__name__,
-                     gettext.ngettext("no free worker slots (%d worker, and maximum "
-                                      "concurrency is %d) - waiting for a background "
-                                      "task to complete",
-                                      "no free worker slots (%d workers, and maximum "
-                                      "concurrency is %d) - waiting for a background "
-                                      "task to complete", self.__workers) %
-                                      (self.__workers, self.__concurrency)))
-            self.__cv.wait()
+        def trampoline():
+            try:
+                self.__execute_caller(caller)
+            finally:
+                def complete_worker():
+                    self.__worker_count -= 1
+                    log.Debug("%s: %s" % (self.__class__.__name__,
+                                          _("active workers = %d") % (self.__worker_count,)))
+                    self.__cv.notifyAll()
+                with_lock(self.__cv, complete_worker)
 
-        self.__workers += 1
+        thread.start_new_thread(trampoline, ())
 
-        thread.start_new_thread(lambda: self.__worker_thread(), ())
-
-    def __worker_thread(self):
-        """
-        The worker thread main loop.
-        """
-        # Each worker loops around waiting for work. The exception is
-        # when there is no work to do right now and there is no work
-        # scheduled - when this happens, all workers shut down. This
-        # is to remove the need for explicit shutdown by calling code.
-
-        done = [False]       # use list for destructive mod. in closure
-        while not done[0]:
-            def _prepwork():
-                def workorbarrier_pending():
-                    return (len(self.__q) > 0)
-                def tasks_running():
-                    return (self.__curconc > 0)
-                def barrier_pending():
-                    return (workorbarrier_pending() and self.__q[0] is None)
-
-                while (not workorbarrier_pending()) or \
-                      (barrier_pending() and tasks_running()):
-                    if (not workorbarrier_pending()) and (not tasks_running()):
-                        # no work, and no tasks in progress - quit as per comments above
-                        done[0] = True
-                        self.__workers -= 1
+    def __execute_caller(self, caller):
+            # The caller half that we get here will not propagate
+            # errors back to us, but rather propagate it back to the
+            # "other half" of the async split.
+            succeeded, waiter = caller()
+            if not succeeded:
+                def _signal_failed():
+                    if not self.__failed:
+                        self.__failed = True
+                        self.__failed_waiter = waiter
                         self.__cv.notifyAll()
-                        return None
-                    self.__cv.wait()
+                with_lock(self.__cv, _signal_failed)
 
-                # there is work to do
-                work = self.__q.pop(0)
-
-                log.Debug("%s: %s" % (self.__class__.__name__,
-                          gettext.ngettext("tasks queue length post-grab: %d task",
-                                           "tasks queue length post-grab: %d tasks",
-                                           len(self.__q)) % len(self.__q)))
-
-                if work: # real work, not just barrier
-                    self.__curconc += 1
-                    self.__cv.notifyAll()
-
-                return work
-
-            work = with_lock(self.__cv, _prepwork)
-
-            if work:
-                # the actual work here is going to be the caller half
-                # of an async_split() result, which will not propagate
-                # errors back to us, but rather propagate it back to
-                # the "other half".
-                succeeded, waiter = work()
-                if not succeeded:
-                    def _signal_failed():
-                        if not self.__failed:
-                            self.__failed = True
-                            self.__waiter = waiter
-                    with_lock(self.__cv, _signal_failed)
-
-                log.Info("%s: %s" % (self.__class__.__name__,
-                         _("task execution done (success: %s)") % succeeded))
-
-                def _postwork():
-                    self.__curconc -= 1
-                    self.__cv.notifyAll()
-
-                with_lock(self.__cv, _postwork)
-
+            log.Info("%s: %s" % (self.__class__.__name__,
+                     _("task execution done (success: %s)") % succeeded),
+                     log.InfoCode.asynchronous_upload_done)

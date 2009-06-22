@@ -47,8 +47,13 @@ from duplicity.errors import UnsupportedBackendScheme
 # todo: this should really NOT be done here
 socket.setdefaulttimeout(globals.timeout)
 
+_forced_backend = None
 _backends = {}
 
+def force_backend(backend):
+    """Forces the use of a particular backend, regardless of schema"""
+    global _forced_backend
+    _forced_backend = backend
 
 def register_backend(scheme, backend_factory):
     """
@@ -89,9 +94,11 @@ def get_backend(url_string):
     if not pu.scheme:
         return None
 
-    global _backends
+    global _backends, _forced_backend
 
-    if not pu.scheme in _backends:
+    if _forced_backend:
+        return _forced_backend(pu)
+    elif not pu.scheme in _backends:
         raise UnsupportedBackendScheme(url_string)
     else:
         return _backends[pu.scheme](pu)
