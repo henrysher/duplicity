@@ -134,9 +134,9 @@ def expand_archive_dir(archdir, args):
     return expand_fn(archdir).replace('%DUPLICITY_BACKUP_NAME%',
                                       globals.backup_name)
 
-def generate_default_backup_name(args):
+def generate_default_backup_name(backend_url):
     """
-    @param All non-option non-command arguments provided to duplicity.
+    @param backend_url: URL to backend.
     @returns A default backup name (string).
     """
     # For default, we hash args to obtain a reasonably safe default.
@@ -150,9 +150,9 @@ def generate_default_backup_name(args):
     # where relative paths are used yet the relative path is the same
     # (but duplicity is run from a different directory or similar),
     # then it is simply up to the user to set --archive-dir properly.
-    argshash = md5.new()
-    argshash.update(repr(args))
-    return argshash.hexdigest()
+    burlhash = md5.new()
+    burlhash.update(backend_url)
+    return burlhash.hexdigest()
 
 def parse_cmdline_options(arglist):
     """Parse argument list"""
@@ -390,8 +390,21 @@ def parse_cmdline_options(arglist):
         if not '://' in args[loc]:
             args[loc] = expand_fn(args[loc])
 
+    # Note that ProcessCommandLine depends on us verifying the arg
+    # count here; do not remove without fixing it. We must make the
+    # checks here in order to make enough sense of args to identify
+    # the backend URL/lpath for args_to_path_backend().
+    if len(args) < 1:
+        command_line_error("Too few arguments")
+    elif len(args) == 1:
+        backend_url = args[0]
+    elif len(args) == 2:
+        lpath, backend_url = args_to_path_backend(args[0], args[1])
+    else:
+        command_line_error("Too many arguments")
+
     if globals.backup_name is None:
-        globals.backup_name = generate_default_backup_name(args)
+        globals.backup_name = generate_default_backup_name(backend_url)
 
     # set and expand archive dir
     set_archive_dir(expand_archive_dir(globals.archive_dir, args))
@@ -546,13 +559,11 @@ def set_selection():
     sel.ParseArgs(select_opts, select_files)
     globals.select = sel.set_iter()
 
-
-def set_backend(arg1, arg2):
-    """Figure out which arg is url, set backend
-
-    Return value is pair (path_first, path) where is_first is true iff
-    path made from arg1.
-
+def args_to_path_backend(arg1, arg2):
+    """
+    Given exactly two arguments, arg1 and arg2, figure out which one
+    is the backend URL and which one is a local path, and return
+    (local, backend).
     """
     backend1, backend2 = backend.get_backend(arg1), backend.get_backend(arg2)
     if not backend1 and not backend2:
@@ -564,11 +575,25 @@ page for more information.""")
         command_line_error("Two URLs specified.  "
                            "One argument should be a path.")
     if backend1:
-        globals.backend = backend1
-        return (None, arg2)
+        return (arg2, arg1)
     elif backend2:
-        globals.backend = backend2
-        return (1, arg1)
+        return (arg1, arg2)
+
+def set_backend(arg1, arg2):
+    """Figure out which arg is url, set backend
+
+    Return value is pair (path_first, path) where is_first is true iff
+    path made from arg1.
+
+    """
+    path, bend = args_to_path_backend(arg1, arg2)
+
+    globals.backend = backend.get_backend(bend)
+
+    if path == arg2:
+        return (None, arg2) # False?
+    else:
+        return (1, arg1) # True?
 
 
 def process_local_dir(action, local_pathname):
@@ -639,9 +664,12 @@ def ProcessCommandLine(cmdline_list):
     globals.gpg_profile = gpg.GPGProfile()
 
     args = parse_cmdline_options(cmdline_list)
-    if len(args) < 1:
-        command_line_error("Too few arguments")
-    elif len(args) == 1:
+
+    # parse_cmdline_options already verified that we got exactly 1 or 2
+    # non-options arguments
+    assert len(args) >= 1 and len(args) <= 2, "arg count should have been checked already"
+
+    if len(args) == 1:
         if list_current:
             action = "list-current"
         elif collection_status:
@@ -678,7 +706,7 @@ Examples of URL strings are "scp://user@host.net:1234/path" and
         if action in ['full', 'inc', 'verify']:
             set_selection()
     elif len(args) > 2:
-        command_line_error("Too many arguments")
+        raise AssertionError("this code should not be reachable")
 
     check_consistency(action)
     log.Info(_("Main action: ") + action)
