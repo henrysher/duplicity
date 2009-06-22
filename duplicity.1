@@ -214,13 +214,7 @@ this switch.
 
 .TP
 .BI "--archive-dir " path
-.B ~/.duplicity/%DUPLICITY_BACKUP_NAME%
-where
-.B %DUPLICITY_BACKUP_NAME%
-is the value of the
-.B --name
-parameter (or its default).
-
+The archive directory.
 .B NOTE:
 This option changed in 0.6.0.  The archive directory is now necessary
 in order to manage persistence for current and future enhancements.
@@ -234,10 +228,11 @@ archive directory is to be created in
 .IR path .
 If the archive directory is not specified, the default will be to
 create the archive directory in
-.IR ~/.duplicity/%DUPLICITY_ARGS_HASH% ,
+.IR ~/.duplicity/%DUPLICITY_BACKUP_NAME% ,
 where
-.B %DUPLICITY_ARGS_HASH%
-is a hash of the source/destination arguments.
+.B %DUPLICITY_BACKUP_NAME%
+is the backup name (see
+.B --name ).
 
 If you manually specify the archive directory, and if you make backups
 to multiple target destinations, it is necessary to specify a
