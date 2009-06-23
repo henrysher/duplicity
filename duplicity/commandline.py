@@ -22,10 +22,14 @@
 """Parse command line, check for consistency, and set globals"""
 
 import getopt
-import md5 # hashlib requires new python
 import os
 import re
 import sys
+
+try:
+    from hashlib import md5
+except ImportError:
+    from md5 import new as md5
 
 from duplicity import backend
 from duplicity import dup_time
@@ -150,7 +154,7 @@ def generate_default_backup_name(backend_url):
     # where relative paths are used yet the relative path is the same
     # (but duplicity is run from a different directory or similar),
     # then it is simply up to the user to set --archive-dir properly.
-    burlhash = md5.new()
+    burlhash = md5()
     burlhash.update(backend_url)
     return burlhash.hexdigest()
 
