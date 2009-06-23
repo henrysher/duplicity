@@ -892,6 +892,13 @@ def main():
     """
     Start/end here
     """
+    # if python is run setuid, it's only partway set,
+    # so make sure to run with euid/egid of root
+    if os.geteuid() == 0:
+        # make sure uid/gid match euid/egid
+        os.setuid(os.geteuid())
+        os.setgid(os.getegid())
+
     dup_time.setcurtime()
     log.setup()
     action = commandline.ProcessCommandLine(sys.argv[1:])
