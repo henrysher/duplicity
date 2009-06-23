@@ -81,6 +81,18 @@ def register_backend(scheme, backend_factory):
     _backends[scheme] = backend_factory
 
 
+def is_backend_url(url_string):
+    """
+    @return Whether the given string looks like a backend URL.
+    """
+    pu = ParsedUrl(url_string)
+
+    # Be verbose to actually return True/False rather than string.
+    if pu.scheme:
+        return True
+    else:
+        return False
+
 def get_backend(url_string):
     """
     Instantiate a backend suitable for the given URL, or return None
@@ -88,11 +100,13 @@ def get_backend(url_string):
 
     Raise InvalidBackendURL if the URL is not a valid URL.
     """
+    if not is_backend_url(url_string):
+        return None
+
     pu = ParsedUrl(url_string)
 
     # Implicit local path
-    if not pu.scheme:
-        return None
+    assert pu.scheme, "should be a backend url according to is_backend_url"
 
     global _backends, _forced_backend
 

@@ -214,6 +214,7 @@ this switch.
 
 .TP
 .BI "--archive-dir " path
+The archive directory.
 .B NOTE:
 This option changed in 0.6.0.  The archive directory is now necessary
 in order to manage persistence for current and future enhancements.
@@ -227,12 +228,18 @@ archive directory is to be created in
 .IR path .
 If the archive directory is not specified, the default will be to
 create the archive directory in
-.IR ~/.duplicity .
+.IR ~/.duplicity/%DUPLICITY_BACKUP_NAME% ,
+where
+.B %DUPLICITY_BACKUP_NAME%
+is the backup name (see
+.B --name ).
 
-If you make backups to multiple target directories, it is
-necessary to specify the
+If you manually specify the archive directory, and if you make backups
+to multiple target destinations, it is necessary to specify a
+different value to the
 .I --archive-dir
-option and use a different archive-directory for each target directory.
+option for each target in order to keep the data apart.
+
 For example if you backup to
 .I ftp://example.com/foo
 and
@@ -427,6 +434,20 @@ programs.
 .BI "--log-file " filename
 Write specially-formatted versions of output messages to the specified file.
 The format used is designed to be easily consumable by other programs.
+
+.TP
+.BI "--name " symbolicname
+Set the symbolic name of the backup being operated on. The intent is
+to use a separate name for each logically distinct backup. For
+example, someone may use "home_daily_s3" for the daily backup of a
+home directory to Amazon S3. The structure of the name is up to the
+user, it is only important that the names be distinct. The symbolic
+name is currently only used to affect the expansion of
+.B --archive-dir
+, but may be used for additional features in the future. Users running
+more than one distinct backup are encouraged to use this option.
+
+If not specified, the default value is a hash of the backend URL.
 
 .TP
 .B --no-encryption
