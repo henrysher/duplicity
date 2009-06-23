@@ -83,8 +83,6 @@ archive_dir_backend = backend.get_backend("file://testfiles/collectionstest"
 dummy_backend = None
 real_backend = backend.get_backend("file://%s/%s" %
                                    (col_test_dir.name, "remote_dir"))
-assert not os.system("rm -rf testfiles/output")
-assert not os.system("mkdir testfiles/output")
 output_dir = path.Path("testfiles/output") # used as a temp directory
 output_dir_backend = backend.get_backend("file://testfiles/output")
 
@@ -93,6 +91,7 @@ class CollectionTest(unittest.TestCase):
     """Test collections"""
     def setUp(self):
         assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+        assert not os.system("mkdir testfiles/output")
 
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
