@@ -40,7 +40,7 @@ backup_name = None
 # contains the signatures and manifests of the relevent backup
 # collection), and for checkpoint state between volumes.
 # NOTE: this gets expanded in duplicity.commandline
-archive_dir = "~/.duplicity/%DUPLICITY_BACKUP_NAME%"
+archive_dir = "~/.duplicity"
 
 # Restores will try to bring back the state as of the following time.
 # If it is None, default to current time.

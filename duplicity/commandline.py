@@ -127,16 +127,16 @@ def old_fn_deprecation(opt):
 def expand_fn(filename):
     return os.path.expanduser(os.path.expandvars(filename))
 
-def expand_archive_dir(archdir, args):
+
+def expand_archive_dir(archdir, backname):
     """
-    Expand ~ (user home) and %DUPLICITY_BACKUP_NAME% in archdir and
-    return the result.
+    Return expanded version of archdir joined with backname.
     """
     assert globals.backup_name is not None, \
         "expand_archive_dir() called prior to globals.backup_name being set"
 
-    return expand_fn(archdir).replace('%DUPLICITY_BACKUP_NAME%',
-                                      globals.backup_name)
+    return expand_fn(os.path.join(archdir, backname))
+
 
 def generate_default_backup_name(backend_url):
     """
@@ -157,6 +157,7 @@ def generate_default_backup_name(backend_url):
     burlhash = md5()
     burlhash.update(backend_url)
     return burlhash.hexdigest()
+
 
 def parse_cmdline_options(arglist):
     """Parse argument list"""
@@ -411,10 +412,11 @@ def parse_cmdline_options(arglist):
         globals.backup_name = generate_default_backup_name(backend_url)
 
     # set and expand archive dir
-    set_archive_dir(expand_archive_dir(globals.archive_dir, args))
+    set_archive_dir(expand_archive_dir(globals.archive_dir,
+                                       globals.backup_name))
 
-    log.Info(_("Using backup name: %s") % (globals.backup_name,))
     log.Info(_("Using archive dir: %s") % (globals.archive_dir,))
+    log.Info(_("Using backup name: %s") % (globals.backup_name,))
 
     return args
 
