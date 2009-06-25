@@ -21,7 +21,7 @@
 
 """Store global configuration information"""
 
-import socket, sys
+import socket, sys, os
 
 # The current version of duplicity
 version = "$version"
@@ -40,7 +40,12 @@ backup_name = None
 # contains the signatures and manifests of the relevent backup
 # collection), and for checkpoint state between volumes.
 # NOTE: this gets expanded in duplicity.commandline
-archive_dir = "~/.duplicity/%DUPLICITY_BACKUP_NAME%"
+os.environ["XDG_CACHE_HOME"] = os.getenv("XDG_CACHE_HOME", os.path.expanduser("~/.cache"))
+archive_dir = os.path.expandvars("$XDG_CACHE_HOME/duplicity")
+
+# config dir for future use
+os.environ["XDG_CONFIG_HOME"] = os.getenv("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
+config_dir = os.path.expandvars("$XDG_CONFIG_HOME/duplicity")
 
 # Restores will try to bring back the state as of the following time.
 # If it is None, default to current time.
