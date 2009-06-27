@@ -87,6 +87,8 @@ class FTPBackend(duplicity.backend.Backend):
 
     def put(self, source_path, remote_filename = None):
         """Transfer source_path to remote_filename"""
+        if not remote_filename:
+            remote_filename = source_path.get_filename()
         remote_path = os.path.join(urllib.unquote(self.parsed_url.path.lstrip('/')), remote_filename).rstrip()
         commandline = "ncftpput %s -m -V -C '%s' '%s'" % \
             (self.flags, source_path.name, remote_path)
