@@ -49,7 +49,8 @@ class BackupSet:
         self.remote_manifest_name = None            # full name of remote manifest
         self.local_manifest_path = None             # full path to local manifest
         self.time = None                            # will be set if is full backup set
-        self.start_time, self.end_time = None, None # will be set if inc
+        self.start_time = None                      # will be set if inc
+        self.end_time = None                        # will be set if inc
         self.partial = False                        # true if a partial backup
 
     def is_complete(self):
@@ -103,7 +104,8 @@ class BackupSet:
         assert not self.info_set
         self.type = pr.type
         self.time = pr.time
-        self.start_time, self.end_time = pr.start_time, pr.end_time
+        self.start_time = pr.start_time
+        self.end_time = pr.end_time
         self.time = pr.time
         self.partial = pr.partial
         self.info_set = True
@@ -531,7 +533,8 @@ class CollectionsStatus:
         """
         Make new object.  Does not set values
         """
-        self.backend, self.archive_dir = backend, archive_dir
+        self.backend = backend
+        self.archive_dir = archive_dir
 
         # Will hold (signature chain, backup chain) pair of active
         # (most recent) chains
@@ -543,7 +546,8 @@ class CollectionsStatus:
         self.other_sig_chains = None
 
         # Other misc paths and sets which shouldn't be there
-        self.orphaned_sig_names = None
+        self.local_orphaned_sig_names = []
+        self.remote_orphaned_sig_names = []
         self.orphaned_backup_sets = None
         self.incomplete_backup_sets = None
 
@@ -645,6 +649,7 @@ class CollectionsStatus:
             if pr and pr.partial:
                 partials.append(local_filename)
 
+        # get various backup sets and chains
         (backup_chains, self.orphaned_backup_sets,
                  self.incomplete_backup_sets) = \
                  self.get_backup_chains(partials + backend_filename_list)
@@ -653,12 +658,10 @@ class CollectionsStatus:
 
         assert len(backup_chains) == len(self.all_backup_chains), "get_sorted_chains() did something more than re-ordering"
 
-        local_sig_chains, local_orphaned_sig_names = \
+        local_sig_chains, self.local_orphaned_sig_names = \
                             self.get_signature_chains(True)
-        remote_sig_chains, remote_orphaned_sig_names = \
+        remote_sig_chains, self.remote_orphaned_sig_names = \
                             self.get_signature_chains(False, filelist = backend_filename_list)
-        self.orphaned_sig_names = (local_orphaned_sig_names +
-                                   remote_orphaned_sig_names)
         self.set_matched_chain_pair(local_sig_chains + remote_sig_chains,
                                     backup_chains)
         self.warn(sig_chain_warning)
@@ -717,14 +720,25 @@ class CollectionsStatus:
         Log various error messages if find incomplete/orphaned files
         """
         assert self.values_set
-        if self.orphaned_sig_names:
-            log.Warn(gettext.ngettext("Warning, found the following orphaned "
+
+        if self.local_orphaned_sig_names:
+            log.Warn(gettext.ngettext("Warning, found the following local orphaned "
                                       "signature file:",
-                                      "Warning, found the following orphaned "
+                                      "Warning, found the following local orphaned "
                                       "signature files:",
-                                      len(self.orphaned_sig_names))
-                     + "\n" + "\n".join(self.orphaned_sig_names),
+                                      len(self.local_orphaned_sig_names))
+                     + "\n" + "\n".join(self.local_orphaned_sig_names),
                      log.WarningCode.orphaned_sig)
+
+        if self.remote_orphaned_sig_names:
+            log.Warn(gettext.ngettext("Warning, found the following remote orphaned "
+                                      "signature file:",
+                                      "Warning, found the following remote orphaned "
+                                      "signature files:",
+                                      len(self.remote_orphaned_sig_names))
+                     + "\n" + "\n".join(self.remote_orphaned_sig_names),
+                     log.WarningCode.orphaned_sig)
+
         if self.other_sig_chains and sig_chain_warning:
             if self.matched_chain_pair:
                 log.Warn(gettext.ngettext("Warning, found an unnecessary "
@@ -741,6 +755,7 @@ class CollectionsStatus:
         if self.incomplete_backup_sets:
             log.Warn(_("Warning, found incomplete backup sets, probably left "
                        "from aborted session"), log.WarningCode.incomplete_backup)
+
         if self.orphaned_backup_sets:
             log.Warn(gettext.ngettext("Warning, found the following orphaned "
                                       "backup file:",
@@ -945,14 +960,19 @@ class CollectionsStatus:
         complete backup set, or current signature chain.
         """
         assert self.values_set
-        filenames = []
+        local_filenames = []
+        remote_filenames = []
         ext_containers = (self.other_sig_chains, self.orphaned_backup_sets,
                           self.incomplete_backup_sets)
         for set_or_chain_list in ext_containers:
             for set_or_chain in set_or_chain_list:
-                filenames.extend(set_or_chain.get_filenames())
-        filenames.extend(self.orphaned_sig_names)
-        return filenames
+                if set_or_chain.backend:
+                    remote_filenames.extend(set_or_chain.get_filenames())
+                else:
+                    local_filenames.extend(set_or_chain.get_filenames())
+        local_filenames += self.local_orphaned_sig_names
+        remote_filenames += self.remote_orphaned_sig_names
+        return local_filenames, remote_filenames
 
     def sort_sets(self, setlist):
         """Return new list containing same elems of setlist, sorted by time"""

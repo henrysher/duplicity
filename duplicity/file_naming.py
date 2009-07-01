@@ -107,6 +107,7 @@ new_sig_re_short = re.compile("^dns"
                               "(?P<partial>(\\.p))?"
                               "(\\.|$)")
 
+
 def to_base36(n):
     """
     Return string representation of n in base 36 (use 0-9 and a-z)
@@ -120,6 +121,7 @@ def to_base36(n):
         return last_digit
     else:
         return to_base36(div)+last_digit
+
 
 def from_base36(s):
     """
@@ -138,16 +140,11 @@ def from_base36(s):
     return total
 
 
-def get(type, volume_number = None, manifest = False,
-        encrypted = False, gzipped = False, partial = False):
+def get_suffix(encrypted, gzipped):
     """
-    Return duplicity filename of specified type
-
-    type can be "full", "inc", "full-sig", or "new-sig". volume_number
-    can be given with the full and inc types.  If manifest is true the
-    filename is of a full or inc manifest file.
+    Return appropriate suffix depending on status of
+    encryption, compression, and short_filenames.
     """
-    assert dup_time.curtimestr
     assert not (encrypted and gzipped)
     if encrypted:
         if globals.short_filenames:
@@ -161,7 +158,21 @@ def get(type, volume_number = None, manifest = False,
             suffix = '.gz'
     else:
         suffix = ""
+    return suffix
 
+
+def get(type, volume_number = None, manifest = False,
+        encrypted = False, gzipped = False, partial = False):
+    """
+    Return duplicity filename of specified type
+
+    type can be "full", "inc", "full-sig", or "new-sig". volume_number
+    can be given with the full and inc types.  If manifest is true the
+    filename is of a full or inc manifest file.
+    """
+    assert dup_time.curtimestr
+    assert not (encrypted and gzipped)
+    suffix = get_suffix(encrypted, gzipped)
     part_string = ""
     if globals.short_filenames:
         if partial:
@@ -175,20 +186,20 @@ def get(type, volume_number = None, manifest = False,
         assert not (volume_number and part_string)
         if type == "full-sig":
             if globals.short_filenames:
-                return "dfs.%s.st%s%s" % \
-                       (to_base36(dup_time.curtime), part_string, suffix)
+                return ("dfs.%s.st%s%s" %
+                        (to_base36(dup_time.curtime), part_string, suffix))
             else:
                 return ("duplicity-full-signatures.%s.sigtar%s%s" %
                         (dup_time.curtimestr, part_string, suffix))
         elif type == "new-sig":
             if globals.short_filenames:
-                return "dns.%s.%s.st%s%s" % \
-                       (to_base36(dup_time.prevtime), to_base36(dup_time.curtime),
-                        part_string, suffix)
+                return ("dns.%s.%s.st%s%s" %
+                        (to_base36(dup_time.prevtime), to_base36(dup_time.curtime),
+                         part_string, suffix))
             else:
-                return "duplicity-new-signatures.%s.to.%s.sigtar%s%s" % \
-                       (dup_time.prevtimestr, dup_time.curtimestr,
-                        part_string, suffix)
+                return ("duplicity-new-signatures.%s.to.%s.sigtar%s%s" %
+                        (dup_time.prevtimestr, dup_time.curtimestr,
+                         part_string, suffix))
     else:
         assert volume_number or manifest
         assert not (volume_number and manifest)
@@ -204,18 +215,20 @@ def get(type, volume_number = None, manifest = False,
                 vol_string = "manifest"
         if type == "full":
             if globals.short_filenames:
-                return "df.%s.%s%s%s" % (to_base36(dup_time.curtime),
-                                         vol_string, part_string, suffix)
+                return ("df.%s.%s%s%s" % (to_base36(dup_time.curtime),
+                                          vol_string, part_string, suffix))
             else:
-                return "duplicity-full.%s.%s%s%s" % (dup_time.curtimestr,
-                                                     vol_string, part_string, suffix)
+                return ("duplicity-full.%s.%s%s%s" % (dup_time.curtimestr,
+                                                      vol_string, part_string, suffix))
         elif type == "inc":
             if globals.short_filenames:
-                return "di.%s.%s.%s%s" % (to_base36(dup_time.prevtime),
-                           to_base36(dup_time.curtime), vol_string, suffix)
+                return ("di.%s.%s.%s%s%s" % (to_base36(dup_time.prevtime),
+                                             to_base36(dup_time.curtime),
+                                             vol_string, part_string, suffix))
             else:
-                return "duplicity-inc.%s.to.%s.%s%s" % \
-                       (dup_time.prevtimestr, dup_time.curtimestr, vol_string, suffix)
+                return ("duplicity-inc.%s.to.%s.%s%s%s" % (dup_time.prevtimestr,
+                                                           dup_time.curtimestr,
+                                                           vol_string, part_string, suffix))
         else:
             assert 0
 

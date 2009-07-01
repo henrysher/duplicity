@@ -522,10 +522,10 @@ class Path(ROPath):
         self.setdata()
 
     def mkdir(self):
-        """Make a directory at specified path"""
+        """Make directory(s) at specified path"""
         log.Info(_("Making directory %s") % (self.name,))
         try:
-            os.mkdir(self.name)
+            os.makedirs(self.name)
         except OSError:
             if (not globals.force):
                 raise PathException("Error creating directory %s" % (self.name,), 7)
@@ -719,9 +719,9 @@ class DupPath(Path):
             if not gpg_profile:
                 gpg_profile = globals.gpg_profile
             if mode == "rb":
-                return gpg.GPGFile(None, self, gpg_profile)
+                return gpg.GPGFile(False, self, gpg_profile)
             elif mode == "wb":
-                return gpg.GPGFile(1, self, gpg_profile)
+                return gpg.GPGFile(True, self, gpg_profile)
         else:
             return self.open(mode)
 

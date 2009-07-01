@@ -679,7 +679,8 @@ def cleanup(col_stats):
     @rtype: void
     @return: void
     """
-    extraneous = col_stats.get_extraneous()
+    ext_local, ext_remote = col_stats.get_extraneous()
+    extraneous = ext_local + ext_remote
     if not extraneous:
         log.Warn(_("No extraneous files found, nothing deleted in cleanup."))
         return
@@ -690,7 +691,9 @@ def cleanup(col_stats):
                                     "Deleting these files from backend:",
                                     len(extraneous))+"\n"+filestr)
         if not globals.dry_run:
-            col_stats.backend.delete(extraneous)
+            col_stats.backend.delete(ext_remote)
+            for fn in ext_local:
+                globals.archive_dir.append(fn).delete()
     else:
         log.Notice("%s\n%s\n%s" %
                    (gettext.ngettext("Found the following file to delete:",
@@ -768,6 +771,130 @@ def remove_old(col_stats):
                                     len(setlist)) +
                    "\n" + set_times_str(setlist) + "\n" +
                    _("Rerun command with --force option to actually delete."))
+
+
+def sync_archive(col_stats):
+    """
+    Synchronize local archive manifest file and sig chains to remote archives.
+    Copy missing files from remote to local as needed to make sure the local
+    archive is synchronized to remote storage.
+
+    @type col_stats: CollectionStatus object
+    @param col_stats: collection status
+
+    @rtype: void
+    @return: void
+    """
+    suffixes = [".g", ".gpg", ".z", ".gz"]
+
+    def get_metafiles(filelist):
+        metafiles = {}
+        for fn in filelist:
+            pr = file_naming.parse(fn)
+            if pr and (pr.type in ["full-sig", "new-sig"] or pr.manifest):
+                base, ext = os.path.splitext(fn)
+                if ext in suffixes:
+                    metafiles[base] = fn
+                else:
+                    metafiles[fn] = fn
+        return metafiles
+
+    def copy_raw(src_iter, filename):
+        """
+        Copy data from src_iter to file at fn
+        """
+        block_size = 128 * 1024
+        file = open(filename, "wb")
+        while True:
+            try:
+                data = src_iter.next(block_size).data
+            except StopIteration:
+                break
+            file.write(data)
+        file.close()
+
+    def copy_to_local(fn):
+        """
+        Copy remote file fn to local cache.
+        """
+        class Block:
+            """
+            Data block to return from SrcIter
+            """
+            def __init__(self, data):
+                self.data = data
+
+        class SrcIter:
+            """
+            Iterate over source and return Block of data.
+            """
+            def __init__(self, fileobj):
+                self.fileobj = fileobj
+
+            def next(self, size):
+                try:
+                    res = Block(self.fileobj.read(size))
+                except:
+                    log.FatalError(_("Failed to read %s: %s") %
+                                   (self.fileobj.name, sys.exc_info()),
+                                   log.ErrorCode.generic)
+                if not res.data:
+                    self.fileobj.close()
+                    raise StopIteration
+                return res
+
+            def get_footer(self):
+                return ""
+
+        log.Notice(_("Copying %s to local cache.") % fn)
+
+        suffix = file_naming.get_suffix(globals.encryption, False)
+        rem_name = fn + suffix
+
+        pr = file_naming.parse(fn)
+        if pr.manifest:
+            suffix = file_naming.get_suffix(False, False)
+        else:
+            suffix = file_naming.get_suffix(False, True)
+        loc_name = fn + suffix
+
+        fileobj = globals.backend.get_fileobj_read(rem_name)
+        src_iter = SrcIter(fileobj)
+        if pr.manifest:
+            copy_raw(src_iter, globals.archive_dir.append(loc_name).name)
+        else:
+            gpg.GzipWriteFile(src_iter, globals.archive_dir.append(loc_name).name)
+
+    # get remote metafile list
+    remlist = globals.backend.list()
+    remote_metafiles = get_metafiles(remlist)
+
+    # get local metafile list
+    loclist = globals.archive_dir.listdir()
+    local_metafiles = get_metafiles(loclist)
+
+    # we have the list of metafiles on both sides, now we remove
+    # the intersection of local and remote metafiles.  What's left
+    # are the missing file names on the other side.
+    local_keys = local_metafiles.keys()
+    for base in local_keys:
+        if remote_metafiles.has_key(base):
+            del local_metafiles[base]
+            del remote_metafiles[base]
+    local_missing = remote_metafiles.keys()
+
+    # finally finish the process
+    if not local_missing:
+        log.Notice(_("Local and Remote metadata are synchronized, no sync needed."))
+    else:
+        local_missing.sort()
+        if not globals.dry_run:
+            log.Notice(_("Synchronizing remote metadata to local cache..."))
+            for fn in local_missing:
+                copy_to_local(fn)
+        else:
+            log.Notice(_("Sync would copy the following from remote to local:")
+                       + "\n" + "\n".join(local_missing))
 
 
 def check_last_manifest(col_stats):
@@ -902,16 +1029,22 @@ def main():
     dup_time.setcurtime()
     log.setup()
     action = commandline.ProcessCommandLine(sys.argv[1:])
+    globals.gpg_profile.passphrase = get_passphrase(1, action)
 
     log_startup_parms(log.INFO)
 
     check_resources(action)
 
+    # get current collection status
+    col_stats = collections.CollectionsStatus(globals.backend,
+                                              globals.archive_dir).set_values()
+
+    # check archive synch with remote, fix if needed
+    sync_archive(col_stats)
+
     while True:
         # if we have to clean up the last partial, then col_stats are invalidated
         # and we have to start the process all over again until clean.
-        col_stats = collections.CollectionsStatus(globals.backend,
-                                                  globals.archive_dir).set_values()
         if action in ["full", "inc"]:
             last_full_chain = col_stats.get_last_backup_chain()
             if not last_full_chain:
@@ -936,6 +1069,8 @@ def main():
                     # remove last partial backup and get new collection status
                     log.Notice(_("Cleaning up previous partial %s backup set, restarting." % action))
                     last_backup.delete()
+                    col_stats = collections.CollectionsStatus(globals.backend,
+                                                              globals.archive_dir).set_values()
                     continue
             break
         break
@@ -953,8 +1088,6 @@ def main():
 
     os.umask(077)
 
-    globals.gpg_profile.passphrase = get_passphrase(1, action)
-
     if action == "restore":
         restore(col_stats)
     elif action == "verify":
@@ -969,6 +1102,8 @@ def main():
         remove_old(col_stats)
     elif action == "remove-all-but-n-full":
         remove_all_but_n_full(col_stats)
+    elif action == "sync":
+        sync_archive(col_stats)
     else:
         assert action == "inc" or action == "full", action
         if action == "full":
@@ -980,7 +1115,8 @@ def main():
                 globals.gpg_profile.passphrase = get_passphrase(2, action)
                 full_backup(col_stats)
             else:
-                check_last_manifest(col_stats) # not needed for full backup
+                if not globals.restart:
+                    check_last_manifest(col_stats) # not needed for full backup
                 incremental_backup(sig_chain)
     globals.backend.close()
     log.shutdown()

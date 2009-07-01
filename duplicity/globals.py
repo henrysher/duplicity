@@ -112,7 +112,7 @@ keep_chains = None
 dry_run = False
 
 # If set to false, then do not encrypt files on remote system
-encryption = 1
+encryption = True
 
 # volume size. default 25M
 volsize = 25*1024*1024

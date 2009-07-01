@@ -40,14 +40,14 @@ from duplicity import path
 from duplicity import selection
 
 
-select_opts = [] # Will hold all the selection options
-select_files = [] # Will hold file objects when filelist given
+select_opts = []            # Will hold all the selection options
+select_files = []           # Will hold file objects when filelist given
 
-full_backup = None # Will be set to true if full command given
-list_current = None # Will be set to true if list-current command given
-collection_status = None # Will be set to true if collection-status command given
-cleanup = None # Set to true if cleanup command given
-verify = None # Set to true if verify command given
+full_backup = None          # Will be set to true if full command given
+list_current = None         # Will be set to true if list-current command given
+collection_status = None    # Will be set to true if collection-status command given
+cleanup = None              # Set to true if cleanup command given
+verify = None               # Set to true if verify command given
 
 commands = ["cleanup",
             "collection-status",
@@ -164,6 +164,7 @@ def parse_cmdline_options(arglist):
     global select_opts, select_files, full_backup
     global list_current, collection_status, cleanup, remove_time, verify
 
+
     def sel_fl(filename):
         """Helper function for including/excluding filelists below"""
         try:
@@ -218,14 +219,11 @@ def parse_cmdline_options(arglist):
         except:
             command_line_error("Missing count for remove-all-but-n-full")
         globals.keep_chains = int(arg)
-
         if not globals.keep_chains > 0:
             command_line_error("remove-all-but-n-full count must be > 0")
-
         num_expect = 1
     elif cmd == "verify":
         verify = True
-        num_expect = 2
 
     # parse the remaining args
     try:
