@@ -1,0 +1,3 @@
+#!/bin/sh
+
+intltool-update --pot -g duplicity
