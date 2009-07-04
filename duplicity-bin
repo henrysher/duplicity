@@ -90,7 +90,7 @@ def get_passphrase(n, action):
     if not globals.encryption or globals.use_agent:
         return ""
 
-    # no passphrase if --list-current and --archive-dir
+    # no passphrase if --list-current
     elif (action == "list-current"):
         return ""
 
@@ -122,7 +122,10 @@ def get_passphrase(n, action):
             if n == 2:
                 pass1 = globals.gpg_profile.passphrase
             else:
-                pass1 = getpass.getpass("GnuPG passphrase: ")
+                if globals.gpg_profile.passphrase:
+                    pass1 = globals.gpg_profile.passphrase
+                else:
+                    pass1 = getpass.getpass("GnuPG passphrase: ")
 
             if n == 1:
                 pass2 = pass1
@@ -773,14 +776,11 @@ def remove_old(col_stats):
                    _("Rerun command with --force option to actually delete."))
 
 
-def sync_archive(col_stats):
+def sync_archive():
     """
     Synchronize local archive manifest file and sig chains to remote archives.
     Copy missing files from remote to local as needed to make sure the local
     archive is synchronized to remote storage.
-
-    @type col_stats: CollectionStatus object
-    @param col_stats: collection status
 
     @rtype: void
     @return: void
@@ -789,15 +789,18 @@ def sync_archive(col_stats):
 
     def get_metafiles(filelist):
         metafiles = {}
+        need_passphrase = False
         for fn in filelist:
             pr = file_naming.parse(fn)
+            if pr.encrypted:
+                need_passphrase = True
             if pr and (pr.type in ["full-sig", "new-sig"] or pr.manifest):
                 base, ext = os.path.splitext(fn)
                 if ext in suffixes:
                     metafiles[base] = fn
                 else:
                     metafiles[fn] = fn
-        return metafiles
+        return metafiles, need_passphrase
 
     def copy_raw(src_iter, filename):
         """
@@ -867,11 +870,14 @@ def sync_archive(col_stats):
 
     # get remote metafile list
     remlist = globals.backend.list()
-    remote_metafiles = get_metafiles(remlist)
+    remote_metafiles, rem_needpass = get_metafiles(remlist)
 
     # get local metafile list
     loclist = globals.archive_dir.listdir()
-    local_metafiles = get_metafiles(loclist)
+    local_metafiles, loc_needpass = get_metafiles(loclist)
+
+    if rem_needpass or loc_needpass:
+        globals.gpg_profile.passphrase = get_passphrase(1, "sync")
 
     # we have the list of metafiles on both sides, now we remove
     # the intersection of local and remote metafiles.  What's left
@@ -1035,12 +1041,12 @@ def main():
 
     check_resources(action)
 
+    # check archive synch with remote, fix if needed
+    sync_archive()
+
     # get current collection status
     col_stats = collections.CollectionsStatus(globals.backend,
                                               globals.archive_dir).set_values()
-
-    # check archive synch with remote, fix if needed
-    sync_archive(col_stats)
 
     while True:
         # if we have to clean up the last partial, then col_stats are invalidated
