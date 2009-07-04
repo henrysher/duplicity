@@ -413,7 +413,7 @@ def parse_cmdline_options(arglist):
     set_archive_dir(expand_archive_dir(globals.archive_dir,
                                        globals.backup_name))
 
-    log.Info(_("Using archive dir: %s") % (globals.archive_dir,))
+    log.Info(_("Using archive dir: %s") % (globals.archive_dir.name,))
     log.Info(_("Using backup name: %s") % (globals.backup_name,))
 
     return args
