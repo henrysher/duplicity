@@ -849,7 +849,7 @@ def sync_archive():
     def copy_to_local(fn):
         """
         Copy remote file fn to local cache.
-        pn"""
+        """
         class Block:
             """
             Data block to return from SrcIter
