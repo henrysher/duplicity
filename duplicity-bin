@@ -818,33 +818,24 @@ def sync_archive():
 
     def resolve_basename(fn):
         """
-        @return (local_name, remote_name)
+        @return (parsedresult, local_name, remote_name)
         """
         suffix = file_naming.get_suffix(globals.encryption, False)
         rem_name = fn + suffix
 
         pr = file_naming.parse(fn)
-        if pr.manifest:
-            suffix = file_naming.get_suffix(False, False)
-        else:
-            suffix = file_naming.get_suffix(False, True)
+        suffix = file_naming.get_suffix(pr.encrypted, pr.compressed)
         loc_name = fn + suffix
 
-        return (loc_name, rem_name)
+        return (pr, loc_name, rem_name)
 
     def remove_local(fn):
-        loc_name, rem_name = resolve_basename(fn)
+        pr, loc_name, rem_name = resolve_basename(fn)
 
-        print '%s -> %s | %s' % (fn, loc_name, rem_name)
-        
-        # using fn directly happens to work in my case, but is probably wrong
-        #del_name = globals.archive_dir.append(fn).name
-        # so do what I think is right, but see TODO below
         del_name = globals.archive_dir.append(loc_name).name
 
         log.Notice(_("Deleting local %s (not authoritative at backend).") % del_name)
-        # XXX/TODO: del_name is wrong (.gz appended) on sigtars (but not manifests)
-        #os.unlink(del_name)
+        os.unlink(del_name)
 
     def copy_to_local(fn):
         """
@@ -881,14 +872,14 @@ def sync_archive():
 
         log.Notice(_("Copying %s to local cache.") % fn)
 
-        loc_name, rem_name = resolve_basename(fn)
+        pr, loc_name, rem_name = resolve_basename(fn)
 
         fileobj = globals.backend.get_fileobj_read(rem_name)
         src_iter = SrcIter(fileobj)
-        if pr.manifest:
-            copy_raw(src_iter, globals.archive_dir.append(loc_name).name)
-        else:
+        if pr.compressed:
             gpg.GzipWriteFile(src_iter, globals.archive_dir.append(loc_name).name)
+        else:
+            copy_raw(src_iter, globals.archive_dir.append(loc_name).name)
 
     # get remote metafile list
     remlist = globals.backend.list()
