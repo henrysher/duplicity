@@ -83,6 +83,7 @@ options = ["allow-source-mismatch",
            "gio",
            "gpg-options=",
            "help",
+           "ignore-errors",
            "imap-full-address",
            "imap-mailbox=",
            "include=",
@@ -376,6 +377,10 @@ def parse_cmdline_options(arglist):
             log.setverbosity(verb)
         elif opt == "--volsize":
             globals.volsize = get_int(arg, opt)*1024*1024
+        elif opt == "--ignore-errors":
+            log.Warn(_("running in 'ignore errors' mode due to --ignore-errors; please "
+                       "re-consider if this was not intended"))
+            globals.ignore_errors = True
         elif opt == "--imap-full-address":
             globals.imap_full_address = True
         else:

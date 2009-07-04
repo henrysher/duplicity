@@ -27,6 +27,9 @@ import string
 import sys
 import traceback
 
+import duplicity.globals as globals
+import duplicity.log as log
+
 def exception_traceback(limit = 50):
     """
     @return A string representation in typical Python format of the
@@ -46,3 +49,21 @@ def exception_traceback(limit = 50):
 def escape(string):
     return "'%s'" % string.encode("string-escape")
 
+def maybe_ignore_errors(fn):
+    """
+    Execute fn. If the global configuration setting ignore_errors is
+    set to True, catch errors and log them but do continue (and return
+    None).
+
+    @param fn: A callable.
+    @return Whatever fn returns when called, or None if it failed and ignore_errors is true.
+    """
+    try:
+        return fn()
+    except Exception, e:
+        if globals.ignore_errors:
+            log.Warn(_("IGNORED_ERROR: Warning: ignoring error as requested: %s: %s")
+                     % (e.__class__.__name__, str(e)))
+            return None
+        else:
+            raise
