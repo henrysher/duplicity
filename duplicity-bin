@@ -788,13 +788,29 @@ def sync_archive():
     suffixes = [".g", ".gpg", ".z", ".gz"]
 
     def get_metafiles(filelist):
+        """
+        Return metafiles of interest from the file list.
+        Files of interest are:
+          sigtar - signature files
+          manifest - signature files
+        Files excluded are:
+          non-duplicity files
+          duplicity partial files
+
+        @rtype: list
+        @return: list of duplicity metadata files
+        """
         metafiles = {}
         need_passphrase = False
         for fn in filelist:
             pr = file_naming.parse(fn)
+            if not pr:
+                continue
+            if pr.partial:
+                continue
             if pr.encrypted:
                 need_passphrase = True
-            if pr and (pr.type in ["full-sig", "new-sig"] or pr.manifest):
+            if pr.type in ["full-sig", "new-sig"] or pr.manifest:
                 base, ext = os.path.splitext(fn)
                 if ext in suffixes:
                     metafiles[base] = fn
@@ -815,6 +831,30 @@ def sync_archive():
                 break
             file.write(data)
         file.close()
+
+    def resolve_basename(fn):
+        """
+        @return: (parsedresult, local_name, remote_name)
+        """
+        suffix = file_naming.get_suffix(globals.encryption, not globals.encryption)
+        rem_name = fn + suffix
+
+        pr = file_naming.parse(fn)
+        if pr.manifest:
+            suffix = file_naming.get_suffix(False, False)
+        else:
+            suffix = file_naming.get_suffix(False, True)
+        loc_name = fn + suffix
+
+        return (pr, loc_name, rem_name)
+
+    def remove_local(fn):
+        pr, loc_name, rem_name = resolve_basename(fn)
+
+        del_name = globals.archive_dir.append(loc_name).name
+
+        log.Notice(_("Deleting local %s (not authoritative at backend).") % del_name)
+        os.unlink(del_name)
 
     def copy_to_local(fn):
         """
@@ -851,15 +891,7 @@ def sync_archive():
 
         log.Notice(_("Copying %s to local cache.") % fn)
 
-        suffix = file_naming.get_suffix(globals.encryption, False)
-        rem_name = fn + suffix
-
-        pr = file_naming.parse(fn)
-        if pr.manifest:
-            suffix = file_naming.get_suffix(False, False)
-        else:
-            suffix = file_naming.get_suffix(False, True)
-        loc_name = fn + suffix
+        pr, loc_name, rem_name = resolve_basename(fn)
 
         fileobj = globals.backend.get_fileobj_read(rem_name)
         src_iter = SrcIter(fileobj)
@@ -879,28 +911,42 @@ def sync_archive():
     if rem_needpass or loc_needpass:
         globals.gpg_profile.passphrase = get_passphrase(1, "sync")
 
-    # we have the list of metafiles on both sides, now we remove
-    # the intersection of local and remote metafiles.  What's left
-    # are the missing file names on the other side.
+    # we have the list of metafiles on both sides. remote is always
+    # authoritative. figure out which are local spurious (should not
+    # be there) and missing (should be there but are not).
     local_keys = local_metafiles.keys()
-    for base in local_keys:
-        if remote_metafiles.has_key(base):
-            del local_metafiles[base]
-            del remote_metafiles[base]
-    local_missing = remote_metafiles.keys()
+    remote_keys = remote_metafiles.keys()
+
+    local_missing = []
+    local_spurious = []
+
+    for key in remote_keys:
+        if not key in local_keys:
+            local_missing.append(key)
+
+    for key in local_keys:
+        if not key in remote_keys:
+            local_spurious.append(key)
 
     # finally finish the process
-    if not local_missing:
+    if not local_missing and not local_spurious:
         log.Notice(_("Local and Remote metadata are synchronized, no sync needed."))
     else:
         local_missing.sort()
+        local_spurious.sort()
         if not globals.dry_run:
             log.Notice(_("Synchronizing remote metadata to local cache..."))
+            for fn in local_spurious:
+                remove_local(fn)
             for fn in local_missing:
                 copy_to_local(fn)
         else:
-            log.Notice(_("Sync would copy the following from remote to local:")
-                       + "\n" + "\n".join(local_missing))
+            if local_missing:
+                log.Notice(_("Sync would copy the following from remote to local:")
+                           + "\n" + "\n".join(local_missing))
+            if local_spurious:
+                log.Notice(_("Sync would remove the following spurious local files:")
+                           + "\n" + "\n".join(local_spurious))
 
 
 def check_last_manifest(col_stats):
