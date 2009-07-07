@@ -179,11 +179,9 @@ class FileobjHooked:
         elif pr.encrypted:
             gpg.GPGWriteFile(src_iter, tgt.name, globals.gpg_profile, size = sys.maxint)
         else:
-            if src.name != tgt.name:
-                assert not os.system("ln -s %s %s" % (src.name, tgt.name))
+            os.system("cp -p %s %s" % (src.name, tgt.name))
         globals.backend.put(tgt)
-        if src.name != tgt.name:
-            os.unlink(tgt.name)
+        os.unlink(tgt.name)
 
     def to_final(self):
         """
