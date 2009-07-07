@@ -896,9 +896,12 @@ def sync_archive():
         fileobj = globals.backend.get_fileobj_read(rem_name)
         src_iter = SrcIter(fileobj)
         if pr.manifest:
-            copy_raw(src_iter, globals.archive_dir.append(loc_name).name)
+            copy_raw(src_iter,
+                     globals.archive_dir.append(loc_name).name)
         else:
-            gpg.GzipWriteFile(src_iter, globals.archive_dir.append(loc_name).name)
+            gpg.GzipWriteFile(src_iter,
+                              globals.archive_dir.append(loc_name).name,
+                              size = sys.maxint)
 
     # get remote metafile list
     remlist = globals.backend.list()
