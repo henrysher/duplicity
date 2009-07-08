@@ -367,6 +367,27 @@ Use regular (PORT) data connections.
 Use the GIO backend and interpret any URLs as GIO would.
 
 .TP
+.B --ignore-errors
+Try to ignore certain errors if they happen. This option is only
+intended to allow the restoration of a backup in the face of certain
+problems that would otherwise cause the backup to fail. It is not ever
+recommended to use this option unless you have a situation where you
+are trying to restore from backup and it is failing because of an
+issue which you want duplicity to ignore. Even then, depending on the
+issue, this option may not have an effect.
+
+Please note that while ignored errors will be logged, there will be no
+summary at the end of the operation to tell you what was ignored, if
+anything. If this is used for emergency restoration of data, it is
+recommended that you run the backup in such a way that you can revisit
+the backup log (look for lines containing the string IGNORED_ERROR).
+
+If you ever have to use this option for reasons that are not
+understood or understood but not your own responsibility, please
+contact duplicity maintainers. The need to use this option under
+production circumstances would normally be considered a bug.
+
+.TP
 .BI "--imap-mailbox " option
 Allows you to specify a different mailbox.  The default is
 "INBOX".

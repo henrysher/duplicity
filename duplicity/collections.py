@@ -582,7 +582,7 @@ class CollectionsStatus:
              "-----------------",
              _("Connecting with backend: %s") %
              (self.backend.__class__.__name__,),
-             _("Archive dir: %s") % (self.archive_dir,)]
+             _("Archive dir: %s") % (self.archive_dir.name,)]
 
         l.append("\n" +
                  gettext.ngettext("Found %d backup chain without signatures.",

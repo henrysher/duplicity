@@ -175,3 +175,9 @@ restart = None
 
 # used in testing only - raises exception after volume
 fail_on_volume = 0
+
+# ignore (some) errors during operations; supposed to make it more
+# likely that you are able to restore data under problematic
+# circumstances. the default should absolutely always be True unless
+# you know what you are doing.
+ignore_errors = False

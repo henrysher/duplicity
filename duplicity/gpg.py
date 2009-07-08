@@ -222,7 +222,8 @@ class GPGFile:
 
 
 def GPGWriteFile(block_iter, filename, profile,
-                 size = 200 * 1024 * 1024, max_footer_size = 16 * 1024):
+                 size = 200 * 1024 * 1024,
+                 max_footer_size = 16 * 1024):
     """
     Write GPG compressed file of given size
 
@@ -287,7 +288,8 @@ def GPGWriteFile(block_iter, filename, profile,
     return at_end_of_blockiter
 
 
-def GzipWriteFile(block_iter, filename, size = 5 * 1024 * 1024,
+def GzipWriteFile(block_iter, filename,
+                  size = 200 * 1024 * 1024,
                   max_footer_size = 16 * 1024):
     """
     Write gzipped compressed file of given size

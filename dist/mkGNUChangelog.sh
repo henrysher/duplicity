@@ -4,4 +4,4 @@
 cd /home/ken/workspace/duplicity-src
 
 # make changelog
-bzr log -v > Changelog.GNU
+bzr log --gnu-changelog > Changelog.GNU
