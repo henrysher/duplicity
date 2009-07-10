@@ -74,9 +74,9 @@ def register_backend(scheme, backend_factory):
     assert callable(backend_factory), "backend factory must be callable"
 
     if scheme in _backends:
-        raise ConflictingSchemeError("the scheme %s already has a backend "
-                                     "associated with it"
-                                     "" % (scheme,))
+        raise ConflictingScheme("the scheme %s already has a backend "
+                                "associated with it"
+                                "" % (scheme,))
 
     _backends[scheme] = backend_factory
 
