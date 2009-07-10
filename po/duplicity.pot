@@ -1,0 +1,1100 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
+"POT-Creation-Date: 2009-07-08 06:58-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: ../duplicity-bin:440
+msgid ""
+"Fatal Error: Unable to start incremental backup.  Old signatures not found "
+"and incremental specified"
+msgstr ""
+
+#: ../duplicity-bin:444
+msgid "No signatures found, switching to full backup."
+msgstr ""
+
+#: ../duplicity-bin:458
+msgid "Backup Statistics"
+msgstr ""
+
+#: ../duplicity-bin:511
+msgid "No signature data found, unable to list files."
+msgstr ""
+
+#: ../duplicity-bin:540
+#, python-format
+msgid "%s not found in archive, no files restored."
+msgstr ""
+
+#: ../duplicity-bin:544
+msgid "No files found in archive - nothing restored."
+msgstr ""
+
+#: ../duplicity-bin:577
+#, python-format
+msgid "Processed volume %d of %d"
+msgstr ""
+
+#: ../duplicity-bin:617
+#, python-format
+msgid "Invalid data - %s hash mismatch:"
+msgstr ""
+
+#: ../duplicity-bin:618
+#, python-format
+msgid "Calculated hash: %s"
+msgstr ""
+
+#: ../duplicity-bin:619
+#, python-format
+msgid "Manifest hash: %s"
+msgstr ""
+
+#: ../duplicity-bin:636
+#, python-format
+msgid "Volume was signed by key %s, not %s"
+msgstr ""
+
+#. Unfortunately, ngettext doesn't handle multiple number variables, so we
+#. split up the string.
+#: ../duplicity-bin:666
+#, python-format
+msgid "Verify complete: %s, %s."
+msgstr ""
+
+#: ../duplicity-bin:667
+#, python-format
+msgid "%d file compared"
+msgid_plural "%d files compared"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../duplicity-bin:669
+#, python-format
+msgid "%d difference found"
+msgid_plural "%d differences found"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../duplicity-bin:688
+msgid "No extraneous files found, nothing deleted in cleanup."
+msgstr ""
+
+#: ../duplicity-bin:693
+msgid "Deleting this file from backend:"
+msgid_plural "Deleting these files from backend:"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../duplicity-bin:702
+msgid "Found the following file to delete:"
+msgid_plural "Found the following files to delete:"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../duplicity-bin:706
+msgid "Run duplicity again with the --force option to actually delete."
+msgstr ""
+
+#: ../duplicity-bin:745
+msgid "There are backup set(s) at time(s):"
+msgstr ""
+
+#: ../duplicity-bin:747
+msgid "Which can't be deleted because newer sets depend on them."
+msgstr ""
+
+#: ../duplicity-bin:751
+msgid ""
+"Current active backup chain is older than specified time.  However, it will "
+"not be deleted.  To remove all your backups, manually purge the repository."
+msgstr ""
+
+#: ../duplicity-bin:757
+msgid "No old backup sets found, nothing deleted."
+msgstr ""
+
+#: ../duplicity-bin:760
+msgid "Deleting backup set at time:"
+msgid_plural "Deleting backup sets at times:"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../duplicity-bin:772
+msgid "Found old backup set at the following time:"
+msgid_plural "Found old backup sets at the following times:"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../duplicity-bin:776
+msgid "Rerun command with --force option to actually delete."
+msgstr ""
+
+#: ../duplicity-bin:856
+#, python-format
+msgid "Deleting local %s (not authoritative at backend)."
+msgstr ""
+
+#: ../duplicity-bin:881 ../duplicity/dup_temp.py:239
+#, python-format
+msgid "Failed to read %s: %s"
+msgstr ""
+
+#: ../duplicity-bin:892
+#, python-format
+msgid "Copying %s to local cache."
+msgstr ""
+
+#: ../duplicity-bin:936
+msgid "Local and Remote metadata are synchronized, no sync needed."
+msgstr ""
+
+#: ../duplicity-bin:941
+msgid "Synchronizing remote metadata to local cache..."
+msgstr ""
+
+#: ../duplicity-bin:948
+msgid "Sync would copy the following from remote to local:"
+msgstr ""
+
+#: ../duplicity-bin:951
+msgid "Sync would remove the following spurious local files:"
+msgstr ""
+
+#: ../duplicity-bin:994
+msgid "Unable to get free space on temp."
+msgstr ""
+
+#: ../duplicity-bin:1002
+#, python-format
+msgid "Temp space has %d available, backup needs approx %d."
+msgstr ""
+
+#: ../duplicity-bin:1005
+#, python-format
+msgid "Temp has %d available, backup will use approx %d."
+msgstr ""
+
+#: ../duplicity-bin:1013
+msgid "Unable to get max open files."
+msgstr ""
+
+#: ../duplicity-bin:1017
+#, python-format
+msgid ""
+"Max open files of %s is too low, should be >= 1024.\n"
+"Use 'ulimit -n 1024' or higher to correct.\n"
+msgstr ""
+
+#. log it -- main restart heavy lifting is done in write_multivol
+#: ../duplicity-bin:1121
+#, python-format
+msgid "Last %s backup left a partial set, restarting."
+msgstr ""
+
+#. remove last partial backup and get new collection status
+#: ../duplicity-bin:1125
+#, python-format
+msgid "Cleaning up previous partial %s backup set, restarting."
+msgstr ""
+
+#: ../duplicity-bin:1136
+msgid "Last full backup date:"
+msgstr ""
+
+#: ../duplicity-bin:1138
+msgid "Last full backup date: none"
+msgstr ""
+
+#: ../duplicity-bin:1140
+msgid "Last full backup is too old, forcing full backup"
+msgstr ""
+
+#. For gpg errors, don't show an ugly stack trace by
+#. default. But do with sufficient verbosity.
+#: ../duplicity-bin:1214
+#, python-format
+msgid "GPG error detail: %s"
+msgstr ""
+
+#. For user errors, don't show an ugly stack trace by
+#. default. But do with sufficient verbosity.
+#: ../duplicity-bin:1223
+#, python-format
+msgid "User error detail: %s"
+msgstr ""
+
+#. For backend errors, don't show an ugly stack trace by
+#. default. But do with sufficient verbosity.
+#: ../duplicity-bin:1232
+#, python-format
+msgid "Backend error detail: %s"
+msgstr ""
+
+#: ../duplicity/asyncscheduler.py:69
+#, python-format
+msgid "instantiating at concurrency %d"
+msgstr ""
+
+#: ../duplicity/asyncscheduler.py:96
+msgid "inserting barrier"
+msgstr ""
+
+#: ../duplicity/asyncscheduler.py:145
+msgid "running task synchronously (asynchronicity disabled)"
+msgstr ""
+
+#: ../duplicity/asyncscheduler.py:151
+msgid "scheduling task for asynchronous execution"
+msgstr ""
+
+#: ../duplicity/asyncscheduler.py:181
+msgid "task completed successfully"
+msgstr ""
+
+#: ../duplicity/asyncscheduler.py:192
+msgid ""
+"a previously scheduled task has failed; propagating the result immediately"
+msgstr ""
+
+#: ../duplicity/asyncscheduler.py:215 ../duplicity/asyncscheduler.py:236
+#, python-format
+msgid "active workers = %d"
+msgstr ""
+
+#: ../duplicity/asyncscheduler.py:256
+#, python-format
+msgid "task execution done (success: %s)"
+msgstr ""
+
+#: ../duplicity/backend.py:335
+#, python-format
+msgid "Running '%s'"
+msgstr ""
+
+#: ../duplicity/backend.py:349
+#, python-format
+msgid "Running '%s' (attempt #%d)"
+msgid_plural "Running '%s' (attempt #%d)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../duplicity/backend.py:354 ../duplicity/backend.py:395
+#, python-format
+msgid "Running '%s' failed (attempt #%d)"
+msgid_plural "Running '%s' failed (attempt #%d)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../duplicity/backend.py:357 ../duplicity/backend.py:398
+#, python-format
+msgid "Giving up trying to execute '%s' after %d attempt"
+msgid_plural "Giving up trying to execute '%s' after %d attempts"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../duplicity/backend.py:368 ../duplicity/backend.py:385
+#, python-format
+msgid "Reading results of '%s'"
+msgstr ""
+
+#: ../duplicity/collections.py:159
+msgid "Fatal Error: No manifests found for most recent backup"
+msgstr ""
+
+#: ../duplicity/collections.py:168
+msgid ""
+"Fatal Error: Remote manifest does not match local one.  Either the remote "
+"backup set or the local archive directory has been corrupted."
+msgstr ""
+
+#: ../duplicity/collections.py:176
+msgid "Fatal Error: Neither remote nor local manifest is readable."
+msgstr ""
+
+#: ../duplicity/collections.py:280
+msgid "Preferring Backupset over previous one!"
+msgstr ""
+
+#: ../duplicity/collections.py:283
+#, python-format
+msgid "Ignoring incremental Backupset (start_time: %s; needed: %s)"
+msgstr ""
+
+#: ../duplicity/collections.py:288
+#, python-format
+msgid "Added incremental Backupset (start_time: %s / end_time: %s)"
+msgstr ""
+
+#: ../duplicity/collections.py:354
+msgid "Chain start time: "
+msgstr ""
+
+#: ../duplicity/collections.py:355
+msgid "Chain end time: "
+msgstr ""
+
+#: ../duplicity/collections.py:356
+#, python-format
+msgid "Number of contained backup sets: %d"
+msgstr ""
+
+#: ../duplicity/collections.py:358
+#, python-format
+msgid "Total number of contained volumes: %d"
+msgstr ""
+
+#: ../duplicity/collections.py:360
+msgid "Type of backup set:"
+msgstr ""
+
+#: ../duplicity/collections.py:360
+msgid "Time:"
+msgstr ""
+
+#: ../duplicity/collections.py:360
+msgid "Num volumes:"
+msgstr ""
+
+#: ../duplicity/collections.py:364
+msgid "Full"
+msgstr ""
+
+#: ../duplicity/collections.py:367
+msgid "Incremental"
+msgstr ""
+
+#: ../duplicity/collections.py:427
+msgid "local"
+msgstr ""
+
+#: ../duplicity/collections.py:429
+msgid "remote"
+msgstr ""
+
+#: ../duplicity/collections.py:581
+msgid "Collection Status"
+msgstr ""
+
+#: ../duplicity/collections.py:583
+#, python-format
+msgid "Connecting with backend: %s"
+msgstr ""
+
+#: ../duplicity/collections.py:585
+#, python-format
+msgid "Archive dir: %s"
+msgstr ""
+
+#: ../duplicity/collections.py:588
+#, python-format
+msgid "Found %d backup chain without signatures."
+msgid_plural "Found %d backup chains without signatures."
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../duplicity/collections.py:593
+#, python-format
+msgid "Signature-less chain %d of %d:"
+msgstr ""
+
+#: ../duplicity/collections.py:599
+msgid "Found a complete backup chain with matching signature chain:"
+msgstr ""
+
+#: ../duplicity/collections.py:603
+msgid "No backup chains with active signatures found"
+msgstr ""
+
+#: ../duplicity/collections.py:606
+#, python-format
+msgid "Also found %d backup set not part of any chain,"
+msgid_plural "Also found %d backup sets not part of any chain,"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../duplicity/collections.py:610
+#, python-format
+msgid "and %d incomplete backup set."
+msgid_plural "and %d incomplete backup sets."
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../duplicity/collections.py:614
+msgid "These may be deleted by running duplicity with the --cleanup option."
+msgstr ""
+
+#: ../duplicity/collections.py:617
+msgid "No orphaned or incomplete backup sets found."
+msgstr ""
+
+#: ../duplicity/collections.py:633
+#, python-format
+msgid "%d file exists on backend"
+msgid_plural "%d files exist on backend"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../duplicity/collections.py:640
+#, python-format
+msgid "%d file exists in cache"
+msgid_plural "%d files exist in cache"
+msgstr[0] ""
+msgstr[1] ""
+
+#. It matches, remove the last backup set:
+#: ../duplicity/collections.py:692
+msgid "Warning, discarding last backup set, because of missing signature file."
+msgstr ""
+
+#: ../duplicity/collections.py:725
+msgid "Warning, found the following local orphaned signature file:"
+msgid_plural "Warning, found the following local orphaned signature files:"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../duplicity/collections.py:734
+msgid "Warning, found the following remote orphaned signature file:"
+msgid_plural "Warning, found the following remote orphaned signature files:"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../duplicity/collections.py:744
+msgid "Warning, found an unnecessary signature chain"
+msgid_plural "Warning, found unnecessary signature chains"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../duplicity/collections.py:752
+msgid "Warning, found signatures but no corresponding backup files"
+msgstr ""
+
+#: ../duplicity/collections.py:756
+msgid ""
+"Warning, found incomplete backup sets, probably left from aborted session"
+msgstr ""
+
+#: ../duplicity/collections.py:760
+msgid "Warning, found the following orphaned backup file:"
+msgid_plural "Warning, found the following orphaned backup files:"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../duplicity/collections.py:778
+#, python-format
+msgid "Extracting backup chains from list of files: %s"
+msgstr ""
+
+#: ../duplicity/collections.py:788
+#, python-format
+msgid "File %s is part of known set"
+msgstr ""
+
+#: ../duplicity/collections.py:791
+#, python-format
+msgid "File %s is not part of a known set; creating new set"
+msgstr ""
+
+#: ../duplicity/collections.py:796
+#, python-format
+msgid "Ignoring file (rejected by backup set) '%s'"
+msgstr ""
+
+#: ../duplicity/collections.py:809
+#, python-format
+msgid "Found backup chain %s"
+msgstr ""
+
+#: ../duplicity/collections.py:814
+#, python-format
+msgid "Added set %s to pre-existing chain %s"
+msgstr ""
+
+#: ../duplicity/collections.py:818
+#, python-format
+msgid "Found orphaned set %s"
+msgstr ""
+
+#: ../duplicity/commandline.py:123
+#, python-format
+msgid ""
+"Warning: Option %s is pending deprecation and will be removed in a future "
+"release.\n"
+"Use of default filenames is strongly suggested."
+msgstr ""
+
+#: ../duplicity/commandline.py:174
+#, python-format
+msgid "Error opening file %s"
+msgstr ""
+
+#: ../duplicity/commandline.py:286
+msgid "Unable to load gio module"
+msgstr ""
+
+#: ../duplicity/commandline.py:381
+msgid ""
+"running in 'ignore errors' mode due to --ignore-errors; please re-consider "
+"if this was not intended"
+msgstr ""
+
+#: ../duplicity/commandline.py:421
+#, python-format
+msgid "Using archive dir: %s"
+msgstr ""
+
+#: ../duplicity/commandline.py:422
+#, python-format
+msgid "Using backup name: %s"
+msgstr ""
+
+#: ../duplicity/commandline.py:429
+#, python-format
+msgid "Command line error: %s"
+msgstr ""
+
+#: ../duplicity/commandline.py:430
+msgid "Enter 'duplicity --help' for help screen."
+msgstr ""
+
+#: ../duplicity/commandline.py:436
+#, python-format
+msgid ""
+"\n"
+"duplicity version %s running on %s.\n"
+"Usage:\n"
+"    duplicity [full|incremental] [options] source_dir target_url\n"
+"    duplicity [restore] [options] source_url target_dir\n"
+"    duplicity verify [options] source_url target_dir\n"
+"    duplicity collection-status [options] target_url\n"
+"    duplicity list-current-files [options] target_url\n"
+"    duplicity cleanup [options] target_url\n"
+"    duplicity remove-older-than time [options] target_url\n"
+"    duplicity remove-all-but-n-full count [options] target_url\n"
+"\n"
+"Backends and their URL formats:\n"
+"    cf+http://container_name\n"
+"    file:///some_dir\n"
+"    ftp://user[:password]@other.host[:port]/some_dir\n"
+"    hsi://user[:password]@other.host[:port]/some_dir\n"
+"    imap://user[:password]@other.host[:port]/some_dir\n"
+"    rsync://user[:password]@other.host[:port]::/module/some_dir\n"
+"    rsync://user[:password]@other.host[:port]/relative_path\n"
+"    rsync://user[:password]@other.host[:port]//absolute_path\n"
+"    s3://other.host/bucket_name[/prefix]\n"
+"    s3+http://bucket_name[/prefix]\n"
+"    scp://user[:password]@other.host[:port]/some_dir\n"
+"    ssh://user[:password]@other.host[:port]/some_dir\n"
+"    tahoe://alias/directory\n"
+"    webdav://user[:password]@other.host/some_dir\n"
+"    webdavs://user[:password]@other.host/some_dir\n"
+"\n"
+"Commands:\n"
+"    cleanup <target_url>\n"
+"    collection-status <target_url>\n"
+"    full <source_dir> <target_url>\n"
+"    incr <source_dir> <target_url>\n"
+"    list-current-files <target_url>\n"
+"    restore <target_url> <source_dir>\n"
+"    remove-older-than <time> <target_url>\n"
+"    remove-all-but-n-full <count> <target_url>\n"
+"    verify <target_url> <source_dir>\n"
+"\n"
+"Options:\n"
+"    --allow-source-mismatch\n"
+"    --archive-dir <path>\n"
+"    --asynchronous-upload\n"
+"    --dry-run\n"
+"    --encrypt-key <gpg-key-id>\n"
+"    --exclude <shell_pattern>\n"
+"    --exclude-device-files\n"
+"    --exclude-filelist <filename>\n"
+"    --exclude-filelist-stdin\n"
+"    --exclude-globbing-filelist <filename>\n"
+"    --exclude-other-filesystems\n"
+"    --exclude-regexp <regexp>\n"
+"    --file-to-restore <path>\n"
+"    --full-if-older-than <time>\n"
+"    --force\n"
+"    --ftp-passive\n"
+"    --ftp-regular\n"
+"    --gio\n"
+"    --gpg-options\n"
+"    --include <shell_pattern>\n"
+"    --include-filelist <filename>\n"
+"    --include-filelist-stdin\n"
+"    --include-globbing-filelist <filename>\n"
+"    --include-regexp <regexp>\n"
+"    --log-fd <fd>\n"
+"    --log-file <filename>\n"
+"    --name <backup name>\n"
+"    --no-encryption\n"
+"    --no-print-statistics\n"
+"    --null-separator\n"
+"    --num-retries <number>\n"
+"    --old-filenames\n"
+"    --s3-european-buckets\n"
+"    --s3-use-new-style\n"
+"    --scp-command <command>\n"
+"    --sftp-command <command>\n"
+"    --sign-key <gpg-key-id>\n"
+"    --ssh-askpass\n"
+"    --ssh-options\n"
+"    --short-filenames\n"
+"    --tempdir <directory>\n"
+"    --timeout <seconds>\n"
+"    -t<time>, --time <time>, --restore-time <time>\n"
+"    --time-separator <char>\n"
+"    --use-agent\n"
+"    --version\n"
+"    --volsize <number>\n"
+"    -v[0-9], --verbosity [0-9]\n"
+"    Verbosity must be one of: digit [0-9], character [ewnid],\n"
+"    or word ['error', 'warning', 'notice', 'info', 'debug'].\n"
+"    The default is 4 (Notice).  It is strongly recommended\n"
+"    that verbosity level is set at 2 (Warning) or higher.\n"
+msgstr ""
+
+#: ../duplicity/commandline.py:549
+#, python-format
+msgid "Specified archive directory '%s' does not exist, or is not a directory"
+msgstr ""
+
+#: ../duplicity/commandline.py:558
+#, python-format
+msgid ""
+"Sign key should be an 8 character hex string, like 'AA0E73D2'.\n"
+"Received '%s' instead."
+msgstr ""
+
+#: ../duplicity/commandline.py:616
+#, python-format
+msgid ""
+"Restore destination directory %s already exists.\n"
+"Will not overwrite."
+msgstr ""
+
+#: ../duplicity/commandline.py:621
+#, python-format
+msgid "Verify directory %s does not exist"
+msgstr ""
+
+#: ../duplicity/commandline.py:627
+#, python-format
+msgid "Backup source directory %s does not exist."
+msgstr ""
+
+#: ../duplicity/commandline.py:699
+#, python-format
+msgid ""
+"Bad URL '%s'.\n"
+"Examples of URL strings are \"scp://user@host.net:1234/path\" and\n"
+"\"file:///usr/local\".  See the man page for more information."
+msgstr ""
+
+#: ../duplicity/commandline.py:724
+msgid "Main action: "
+msgstr ""
+
+#: ../duplicity/diffdir.py:105
+#, python-format
+msgid "Error %s getting delta for %s"
+msgstr ""
+
+#: ../duplicity/diffdir.py:119
+#, python-format
+msgid "Getting delta of %s and %s"
+msgstr ""
+
+#: ../duplicity/diffdir.py:164
+#, python-format
+msgid "A %s"
+msgstr ""
+
+#: ../duplicity/diffdir.py:171
+#, python-format
+msgid "M %s"
+msgstr ""
+
+#: ../duplicity/diffdir.py:193
+#, python-format
+msgid "Comparing %s and %s"
+msgstr ""
+
+#. but signature says it did
+#: ../duplicity/diffdir.py:199
+#, python-format
+msgid "D %s"
+msgstr ""
+
+#: ../duplicity/dup_time.py:48
+#, python-format
+msgid ""
+"Bad interval string \"%s\"\n"
+"\n"
+"Intervals are specified like 2Y (2 years) or 2h30m (2.5 hours).  The\n"
+"allowed special characters are s, m, h, D, W, M, and Y.  See the man\n"
+"page for more information."
+msgstr ""
+
+#: ../duplicity/dup_time.py:54
+#, python-format
+msgid ""
+"Bad time string \"%s\"\n"
+"\n"
+"The acceptible time strings are intervals (like \"3D64s\"), w3-datetime\n"
+"strings, like \"2002-04-26T04:22:01-07:00\" (strings like\n"
+"\"2002-04-26T04:22:01\" are also acceptable - duplicity will use the\n"
+"current time zone), or ordinary dates like 2/4/1997 or 2001-04-23\n"
+"(various combinations are acceptable, but the month always precedes\n"
+"the day)."
+msgstr ""
+
+#: ../duplicity/lazy.py:326
+#, python-format
+msgid "Warning: oldindex %s >= newindex %s"
+msgstr ""
+
+#: ../duplicity/lazy.py:401
+#, python-format
+msgid "Error '%s' processing %s"
+msgstr ""
+
+#: ../duplicity/lazy.py:409
+#, python-format
+msgid "Skipping %s because of previous error"
+msgstr ""
+
+#: ../duplicity/manifest.py:86
+#, python-format
+msgid ""
+"Fatal Error: Backup source host has changed.\n"
+"Current hostname: %s\n"
+"Previous hostname: %s"
+msgstr ""
+
+#: ../duplicity/manifest.py:91
+#, python-format
+msgid ""
+"Fatal Error: Backup source directory has changed.\n"
+"Current directory: %s\n"
+"Previous directory: %s"
+msgstr ""
+
+#: ../duplicity/manifest.py:98
+msgid ""
+"Aborting because you may have accidentally tried to backup two different "
+"data sets to the same remote location, or using the same archive directory.  "
+"If this is not a mistake, use the --allow-source-mismatch switch to avoid "
+"seeing this message"
+msgstr ""
+
+#: ../duplicity/manifest.py:181
+msgid "Manifests not equal because different volume numbers"
+msgstr ""
+
+#: ../duplicity/manifest.py:186
+msgid "Manifests not equal because volume lists differ"
+msgstr ""
+
+#: ../duplicity/manifest.py:191
+msgid "Manifests not equal because hosts or directories differ"
+msgstr ""
+
+#: ../duplicity/manifest.py:338
+msgid "Warning, found extra Volume identifier"
+msgstr ""
+
+#: ../duplicity/manifest.py:364
+msgid "Other is not VolumeInfo"
+msgstr ""
+
+#: ../duplicity/manifest.py:367
+msgid "Volume numbers don't match"
+msgstr ""
+
+#: ../duplicity/manifest.py:370
+msgid "start_indicies don't match"
+msgstr ""
+
+#: ../duplicity/manifest.py:373
+msgid "end_index don't match"
+msgstr ""
+
+#: ../duplicity/manifest.py:380
+msgid "Hashes don't match"
+msgstr ""
+
+#: ../duplicity/misc.py:99
+#, python-format
+msgid "Starting to write %s"
+msgstr ""
+
+#. special case first index
+#: ../duplicity/misc.py:107
+#, python-format
+msgid ""
+"One only volume required.\n"
+"Renaming %s to %s"
+msgstr ""
+
+#: ../duplicity/patchdir.py:72 ../duplicity/patchdir.py:77
+#, python-format
+msgid "Patching %s"
+msgstr ""
+
+#: ../duplicity/patchdir.py:565
+#, python-format
+msgid "Writing %s of type %s"
+msgstr ""
+
+#: ../duplicity/path.py:210 ../duplicity/path.py:269
+#, python-format
+msgid "Warning: %s has negative mtime, treating as 0."
+msgstr ""
+
+#: ../duplicity/path.py:334
+msgid "Difference found:"
+msgstr ""
+
+#: ../duplicity/path.py:340
+#, python-format
+msgid "New file %s"
+msgstr ""
+
+#: ../duplicity/path.py:343
+#, python-format
+msgid "File %s is missing"
+msgstr ""
+
+#: ../duplicity/path.py:346
+#, python-format
+msgid "File %%s has type %s, expected %s"
+msgstr ""
+
+#: ../duplicity/path.py:352 ../duplicity/path.py:378
+#, python-format
+msgid "File %%s has permissions %o, expected %o"
+msgstr ""
+
+#: ../duplicity/path.py:357
+#, python-format
+msgid "File %%s has mtime %s, expected %s"
+msgstr ""
+
+#: ../duplicity/path.py:365
+#, python-format
+msgid "Data for file %s is different"
+msgstr ""
+
+#: ../duplicity/path.py:373
+#, python-format
+msgid "Symlink %%s points to %s, expected %s"
+msgstr ""
+
+#: ../duplicity/path.py:382
+#, python-format
+msgid "Device file %%s has numbers %s, expected %s"
+msgstr ""
+
+#: ../duplicity/path.py:528
+#, python-format
+msgid "Making directory %s"
+msgstr ""
+
+#: ../duplicity/path.py:538
+#, python-format
+msgid "Deleting %s"
+msgstr ""
+
+#: ../duplicity/path.py:547
+#, python-format
+msgid "Touching %s"
+msgstr ""
+
+#. todo: avoid circ. dep. issue
+#: ../duplicity/path.py:554
+#, python-format
+msgid "Deleting tree %s"
+msgstr ""
+
+#: ../duplicity/robust.py:60
+#, python-format
+msgid "Error listing directory %s"
+msgstr ""
+
+#: ../duplicity/selection.py:118
+#, python-format
+msgid "Skipping socket %s/%s"
+msgstr ""
+
+#: ../duplicity/selection.py:120
+#, python-format
+msgid "Error initializing file %s/%s"
+msgstr ""
+
+#: ../duplicity/selection.py:122
+#, python-format
+msgid "Error accessing possibly locked file %s/%s"
+msgstr ""
+
+#: ../duplicity/selection.py:141
+#, python-format
+msgid "Error accessing possibly locked file %s"
+msgstr ""
+
+#. base doesn't exist
+#: ../duplicity/selection.py:154
+#, python-format
+msgid "Warning: base %s doesn't exist, continuing"
+msgstr ""
+
+#: ../duplicity/selection.py:157 ../duplicity/selection.py:175
+#: ../duplicity/selection.py:178
+#, python-format
+msgid "Selecting %s"
+msgstr ""
+
+#: ../duplicity/selection.py:259
+#, python-format
+msgid ""
+"Fatal Error: The file specification\n"
+"    %s\n"
+"cannot match any files in the base directory\n"
+"    %s\n"
+"Useful file specifications begin with the base directory or some\n"
+"pattern (such as '**') which matches the base directory."
+msgstr ""
+
+#: ../duplicity/selection.py:267
+#, python-format
+msgid ""
+"Fatal Error while processing expression\n"
+"%s"
+msgstr ""
+
+#: ../duplicity/selection.py:277
+#, python-format
+msgid ""
+"Last selection expression:\n"
+"    %s\n"
+"only specifies that files be included.  Because the default is to\n"
+"include all files, the expression is redundant.  Exiting because this\n"
+"probably isn't what you meant."
+msgstr ""
+
+#: ../duplicity/selection.py:302
+#, python-format
+msgid "Reading filelist %s"
+msgstr ""
+
+#: ../duplicity/selection.py:305
+#, python-format
+msgid "Sorting filelist %s"
+msgstr ""
+
+#: ../duplicity/selection.py:332
+#, python-format
+msgid ""
+"Warning: file specification '%s' in filelist %s\n"
+"doesn't start with correct prefix %s.  Ignoring."
+msgstr ""
+
+#: ../duplicity/selection.py:336
+msgid "Future prefix errors will not be logged."
+msgstr ""
+
+#: ../duplicity/selection.py:352
+#, python-format
+msgid "Error closing filelist %s"
+msgstr ""
+
+#: ../duplicity/selection.py:419
+#, python-format
+msgid "Reading globbing filelist %s"
+msgstr ""
+
+#: ../duplicity/selection.py:452
+#, python-format
+msgid "Error compiling regular expression %s"
+msgstr ""
+
+#: ../duplicity/selection.py:468
+msgid ""
+"Warning: exclude-device-files is not the first selector.\n"
+"This may not be what you intended"
+msgstr ""
+
+#: ../duplicity/tempdir.py:118
+#, python-format
+msgid "Using temporary directory %s"
+msgstr ""
+
+#: ../duplicity/tempdir.py:156
+#, python-format
+msgid "Registering (mktemp) temporary file %s"
+msgstr ""
+
+#: ../duplicity/tempdir.py:178
+#, python-format
+msgid "Registering (mkstemp) temporary file %s"
+msgstr ""
+
+#: ../duplicity/tempdir.py:210
+#, python-format
+msgid "Forgetting temporary file %s"
+msgstr ""
+
+#: ../duplicity/tempdir.py:213
+#, python-format
+msgid "Attempt to forget unknown tempfile %s - this is probably a bug."
+msgstr ""
+
+#: ../duplicity/tempdir.py:232
+#, python-format
+msgid "Removing still remembered temporary file %s"
+msgstr ""
+
+#: ../duplicity/tempdir.py:235
+#, python-format
+msgid "Cleanup of temporary file %s failed"
+msgstr ""
+
+#: ../duplicity/tempdir.py:240
+#, python-format
+msgid "Cleanup of temporary directory %s failed - this is probably a bug."
+msgstr ""
+
+#: ../duplicity/util.py:65
+#, python-format
+msgid "IGNORED_ERROR: Warning: ignoring error as requested: %s: %s"
+msgstr ""
+
+#: ../duplicity/backends/giobackend.py:87
+#, python-format
+msgid "Connection failed, please check your password: %s"
+msgstr ""
+
+#: ../duplicity/backends/giobackend.py:96
+#, python-format
+msgid "Writing %s"
+msgstr ""
+
+#: ../duplicity/backends/giobackend.py:106
+#, python-format
+msgid "Could not copy %s to %s"
+msgstr ""
