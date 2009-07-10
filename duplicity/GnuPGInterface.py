@@ -668,7 +668,8 @@ def threaded_waitpid(process):
     try:
         process.returned = os.waitpid(process.pid, 0)[1]
     except:
-        process.returned = 255 << 8
+        log.Debug("GPG process %d terminated before wait()" % process.pid)
+        process.returned = 0
 
 
 def _run_doctests():
