@@ -665,7 +665,11 @@ def threaded_waitpid(process):
     will allow us to reap child processes as soon as possible,
     thus freeing resources quickly.
     """
-    process.returned = os.waitpid(process.pid, 0)[1]
+    try:
+        process.returned = os.waitpid(process.pid, 0)[1]
+    except:
+        log.Debug("GPG process %d terminated before wait()" % process.pid)
+        process.returned = 0
 
 
 def _run_doctests():
