@@ -153,7 +153,10 @@ class GPGFile:
         for line in self.logger_fp:
             msg += line.strip() + "\n"
         msg += "===== End GnuPG log =====\n"
-        raise GPGError, msg
+        if not (msg.find("invalid packet (ctb=14)") > -1):
+            raise GPGError, msg
+        else:
+            return ""
 
     def close(self):
         if self.encrypt:
