@@ -62,7 +62,7 @@ def Log(s, verb_level, code=1, extra=None, force_print=False):
         initial_level = _logger.getEffectiveLevel()
         _logger.setLevel(DupToLoggerLevel(MAX))
 
-    _logger.log(DupToLoggerLevel(verb_level), s)
+    _logger.log(DupToLoggerLevel(verb_level), unicode(s, "utf8", errors='ignore'))
     _logger.controlLine = None
 
     if force_print:
