@@ -20,23 +20,7 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 """
-Contains all backends in their respective modules.
-
-This module is responsible for loading all available
-sub-modules. Users need only import this module, unless they want to
-specifically refer to a particular backend.
+Imports of backends should not be done directly in this module.  All
+backend imports are done via import_backends() in backend.py.  This
+file is only to instantiate the duplicity.backends module itself.
 """
-
-import gettext
-gettext.install('duplicity')
-
-import duplicity.backends.botobackend
-import duplicity.backends.cloudfilesbackend
-import duplicity.backends.ftpbackend
-import duplicity.backends.imapbackend
-import duplicity.backends.hsibackend
-import duplicity.backends.localbackend
-import duplicity.backends.rsyncbackend
-import duplicity.backends.sshbackend
-import duplicity.backends.tahoebackend
-import duplicity.backends.webdavbackend

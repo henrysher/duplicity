@@ -31,6 +31,8 @@ try:
 except ImportError:
     from md5 import new as md5
 
+import duplicity.backends
+
 from duplicity import backend
 from duplicity import dup_time
 from duplicity import globals
@@ -676,6 +678,9 @@ def ProcessCommandLine(cmdline_list):
     globals.gpg_profile = gpg.GPGProfile()
 
     args = parse_cmdline_options(cmdline_list)
+
+    # we can now try to import all the backends
+    duplicity.backend.import_backends()
 
     # parse_cmdline_options already verified that we got exactly 1 or 2
     # non-options arguments

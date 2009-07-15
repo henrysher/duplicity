@@ -25,6 +25,7 @@ intended to be used by the backends themselves.
 """
 
 import os
+import sys
 import socket
 import time
 import re
@@ -44,16 +45,49 @@ from duplicity.errors import ConflictingScheme
 from duplicity.errors import InvalidBackendURL
 from duplicity.errors import UnsupportedBackendScheme
 
+import duplicity.backends
+
+
 # todo: this should really NOT be done here
 socket.setdefaulttimeout(globals.timeout)
 
 _forced_backend = None
 _backends = {}
 
+
+def import_backends():
+    """
+    Import files in the duplicity/backends directory where
+    the filename ends in 'backend.py' and ignore the rest.
+
+    @rtype: void
+    @return: void
+    """
+    path = duplicity.backends.__path__[0]
+    assert path.endswith("duplicity/backends"), duplicity.backends.__path__
+
+    files = os.listdir(path)
+    for fn in files:
+        if fn.endswith("backend.py"):
+            fn = fn[:-3]
+            imp = "duplicity.backends.%s" % (fn,)
+            try:
+                __import__(imp)
+                res = "Succeeded"
+            except:
+                res = "Failed: " + str(sys.exc_info()[1])
+            log.Info("Import of %s %s" % (imp, res))
+        else:
+            continue
+
+
 def force_backend(backend):
-    """Forces the use of a particular backend, regardless of schema"""
+    """
+    Forces the use of a particular backend, regardless of schema
+    """
     global _forced_backend
     _forced_backend = backend
+
 
 def register_backend(scheme, backend_factory):
     """
@@ -92,6 +126,7 @@ def is_backend_url(url_string):
         return True
     else:
         return False
+
 
 def get_backend(url_string):
     """

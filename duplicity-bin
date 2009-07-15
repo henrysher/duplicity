@@ -34,7 +34,9 @@ import traceback, platform, statvfs, resource, re
 import gettext
 gettext.install('duplicity')
 
-import duplicity.backends
+from duplicity import log
+log.setup()
+
 import duplicity.errors
 
 from duplicity import collections
@@ -45,7 +47,6 @@ from duplicity import dup_time
 from duplicity import file_naming
 from duplicity import globals
 from duplicity import gpg
-from duplicity import log
 from duplicity import manifest
 from duplicity import patchdir
 from duplicity import path
@@ -1082,8 +1083,8 @@ def main():
         os.setgid(os.getegid())
 
     dup_time.setcurtime()
-    log.setup()
     action = commandline.ProcessCommandLine(sys.argv[1:])
+    import duplicity.backends
     globals.gpg_profile.passphrase = get_passphrase(1, action)
 
     log_startup_parms(log.INFO)
