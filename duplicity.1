@@ -221,35 +221,46 @@ in order to manage persistence for current and future enhancements.
 As such, this option is now used only to change the location of the
 archive directory.  The archive directory should
 .B not
-be deleted.
+be deleted, or duplicity will have to recreate it from
+the remote repository (which may require decrypting the backup contents).
 
 When backing up or restoring, this option specifies that the local
 archive directory is to be created in
 .IR path .
 If the archive directory is not specified, the default will be to
 create the archive directory in
-.IR ~/.duplicity/%DUPLICITY_BACKUP_NAME% ,
-where
-.B %DUPLICITY_BACKUP_NAME%
-is the backup name (see
-.B --name ).
+.IR ~/.cache/duplicity/ .
 
-If you manually specify the archive directory, and if you make backups
-to multiple target destinations, it is necessary to specify a
-different value to the
-.I --archive-dir
-option for each target in order to keep the data apart.
+The archive directory can be shared between backups to multiple targets,
+because a subdirectory of the archive dir is used for individual backups (see 
+.B --name
+).
 
-For example if you backup to
-.I ftp://example.com/foo
-and
-.I ftp://example.com/bar
-then you could use
-.I --archive-dir=~/.duplicity/foo
-for the first target and
-.I --archive-dir=~/.duplicity/bar
-for the second target.  These are only suggested naming conventions.
-You may use whatever location makes sense in your environment.
+The combination of archive directory and backup name must be unique 
+in order to separate the data of different backups.
+
+The interaction between the 
+.B --archive-dir 
+and the 
+.B --name 
+options allows for four possible combinations for the location of the archive dir:
+
+.RS
+.IP 1.
+neither specified (default)
+ ~/.cache/duplicity/\c
+.IR hash-of-url
+.IP 2.
+--archive-dir=/arch, no --name
+ /arch/\c
+.IR hash-of-url
+.IP 3.
+no --archive-dir, --name=foo
+ ~/.cache/duplicity/foo
+.IP 4.
+--archive-dir=/arch, --name=foo
+ /arch/foo
+.RE
 
 .TP
 .BI "--asynchronous-upload "
@@ -1039,11 +1050,11 @@ These start with
 .B duplicity-full-signatures
 and
 .B duplicity-new-signatures
-respectively.  If
-.B --archive-dir
-is used, these signatures will be stored both locally and remotely.
+respectively. These signatures will be stored both locally and remotely.
 The remote signatures will be encrypted if encryption is enabled.
-The local signatures will not be encrypted
+The local signatures will not be encrypted and stored in the archive dir (see
+.B "--archive-dir"
+).
 
 .SH ENVIRONMENT VARIABLES
 
