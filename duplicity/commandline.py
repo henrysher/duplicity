@@ -322,7 +322,7 @@ def parse_cmdline_options(arglist):
             globals.old_filenames = True
             old_fn_deprecation(opt)
         elif opt in ["-r", "--file-to-restore"]:
-            globals.restore_dir = expand_fn(arg)
+            globals.restore_dir = expand_fn(arg.rstrip('/'))
         elif opt in ["-t", "--time", "--restore-time"]:
             globals.restore_time = dup_time.genstrtotime(arg)
         elif opt == "--s3-european-buckets":
