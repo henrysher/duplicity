@@ -770,7 +770,7 @@ class CollectionsStatus:
         """
         Split given filename_list into chains
 
-        Return value will be pair (list of chains, list of sets, list
+        Return value will be tuple (list of chains, list of sets, list
         of incomplete sets), where the list of sets will comprise sets
         not fitting into any chain, and the incomplete sets are sets
         missing files.
