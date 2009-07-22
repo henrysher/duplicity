@@ -87,6 +87,8 @@ def setup():
 
     globals.num_retries = 2
 
+    backend.import_backends()
+
     set_environ("FTP_PASSWORD", None)
     set_environ("PASSPHRASE", None)
     if s3_access_key:
