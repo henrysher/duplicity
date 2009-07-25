@@ -434,101 +434,214 @@ def command_line_error(message):
 
 
 def usage():
-    """Print terse usage info"""
-    sys.stdout.write(_("""
-duplicity version %s running on %s.
-Usage:
-    duplicity [full|incremental] [options] source_dir target_url
-    duplicity [restore] [options] source_url target_dir
-    duplicity verify [options] source_url target_dir
-    duplicity collection-status [options] target_url
-    duplicity list-current-files [options] target_url
-    duplicity cleanup [options] target_url
-    duplicity remove-older-than time [options] target_url
-    duplicity remove-all-but-n-full count [options] target_url
+    """Print terse usage info. The code is broken down into pieces for ease of
+    translation maintenance. Any comments that look extraneous or redundant should
+    be assumed to be for the benefit of translators, since they can get each string
+    (paired with its preceding comment, if any) independently of the others."""
 
-Backends and their URL formats:
-    cf+http://container_name
-    file:///some_dir
-    ftp://user[:password]@other.host[:port]/some_dir
-    hsi://user[:password]@other.host[:port]/some_dir
-    imap://user[:password]@other.host[:port]/some_dir
-    rsync://user[:password]@other.host[:port]::/module/some_dir
-    rsync://user[:password]@other.host[:port]/relative_path
-    rsync://user[:password]@other.host[:port]//absolute_path
-    s3://other.host/bucket_name[/prefix]
-    s3+http://bucket_name[/prefix]
-    scp://user[:password]@other.host[:port]/some_dir
-    ssh://user[:password]@other.host[:port]/some_dir
-    tahoe://alias/directory
-    webdav://user[:password]@other.host/some_dir
-    webdavs://user[:password]@other.host/some_dir
+    # Used in usage help to represent a Unix-style path name. Example:
+    # rsync://user[:password]@other_host[:port]//absolute_path
+    x_absolute_path  = _("absolute_path")
+    # Used in usage help. Example:
+    # tahoe://alias/some_dir
+    x_alias          = _("alias")
+    # Used in usage help (noun)
+    x_backup_name    = _("backup name")
+    # Used in help to represent a "bucket name" for Amazon Web Services' Simple
+    # Storage Service (S3). Example:
+    # s3://other.host/bucket_name[/prefix]
+    x_bucket_name    = _("bucket_name")
+    # Used in usage help, abbreviation for "character" (noun)
+    x_char           = _("char")
+    # Used in usage help (noun)
+    x_command        = _("command")
+    # Used in usage help to represent the name of a container in Amazon Web Services'
+    # Cloudfront. Example:
+    # cf+http://container_name
+    x_container_name = _("container_name")
+    # Used in usage help (noun)
+    x_count          = _("count")
+    # Used in usage help to represent the name of a file directory
+    x_directory      = _("directory")
+    # Used in usage help to represent the name of a file. Example:
+    # --log-file <filename>
+    x_filename       = _("filename")
+    # Used in usage help to represent an ID for a GnuPG key. Example:
+    # --encrypt-key <gpg_key_id>
+    x_gpg_key_id     = _("gpg-key-id")
+    # Used in usage help, e.g. to represent the name of a code module. Example:
+    # rsync://user[:password]@other.host[:port]::/module/some_dir
+    x_module         = _("module")
+    # Used in usage help to represent a desired number of something. Example:
+    # --num-retries <number>
+    x_number         = _("number")
+    # Used in usage help. (Should be consistent with the "Options:" header.)
+    # Example:
+    # duplicity [full|incremental] [options] source_dir target_url
+    x_options        = _("options")
+    # Used in usage help to represent an internet hostname. Example:
+    # ftp://user[:password]@other.host[:port]/some_dir
+    x_other_host     = _("other.host")
+    # Used in usage help. Example:
+    x_password       = _("password")
+    # Used in usage help to represent a Unix-style path name. Example:
+    # --archive-dir <path>
+    x_path           = _("path")
+    # Used in usage help to represent a TCP port number. Example:
+    # ftp://user[:password]@other.host[:port]/some_dir
+    x_port           = _("port")
+    # Used in usage help. This represents a string to be used as a prefix to
+    # names for backup files created by Duplicity. Example:
+    # s3://other.host/bucket_name[/prefix]
+    x_prefix         = _("prefix")
+    # Used in usage help to represent a Unix-style path name. Example:
+    # rsync://user[:password]@other.host[:port]/relative_path
+    x_relative_path  = _("relative_path")
+    # Used in usage help. Example:
+    # --timeout <seconds>
+    x_seconds        = _("seconds")
+    # Used in usage help to represent a "glob" style pattern for matching one or
+    # more files, as described in the documentation. Example:
+    # --exclude <%shell_pattern>
+    x_shell_pattern  = _("shell_pattern")
+    # Used in usage help to represent the name of a single file directory or a
+    # Unix-style path to a directory. Example:
+    # file:///%(x_some_dir)s
+    x_some_dir       = _("some_dir")
+    # Used in usage help to represent the name of a single file directory or a
+    # Unix-style path to a directory where files will be coming FROM. Example:
+    # duplicity [full|incremental] [options] source_dir target_url
+    x_source_dir     = _("source_dir")
+    # Used in usage help to represent a URL files will be coming FROM. Example:
+    # duplicity [restore] [options] source_url target_dir
+    x_source_url     = _("source_url")
+    # Used in usage help to represent the name of a single file directory or a
+    # Unix-style path to a directory. where files will be going TO. Example:
+    # duplicity [restore] [options] source_url target_dir
+    x_target_dir     = _("target_dir")
+    # Used in usage help to represent a URL files will be going TO. Example:
+    # duplicity [full|incremental] [options] source_dir target_url
+    x_target_url     = _("target_url")
+    # Used in usage help to represent a time spec for a previous point in time,
+    # as described in the documentation. Example:
+    # duplicity remove-older-than time [options] target_url
+    x_time           = _("time")
+    # Used in usage help to represent a user name (i.e. login). Example:
+    # ftp://user[:password]@other.host[:port]/some_dir
+    x_user           = _("user")
 
-Commands:
-    cleanup <target_url>
-    collection-status <target_url>
-    full <source_dir> <target_url>
-    incr <source_dir> <target_url>
-    list-current-files <target_url>
-    restore <target_url> <source_dir>
-    remove-older-than <time> <target_url>
-    remove-all-but-n-full <count> <target_url>
-    verify <target_url> <source_dir>
+    msg = _("duplicity version %s running on %s.") % (globals.version, sys.platform)
+    msg = "\n" + msg + "\n"
 
-Options:
+    # Header in usage help
+    msg = msg + _("Usage:") + """
+    duplicity [full|incremental] [%(x_options)s] %(x_source_dir)s %(x_target_url)s
+    duplicity [restore] [%(x_options)s] %(x_source_url)s %(x_target_dir)s
+    duplicity verify [%(x_options)s] %(x_source_url)s %(x_target_dir)s
+    duplicity collection-status [%(x_options)s] %(x_target_url)s
+    duplicity list-current-files [%(x_options)s] %(x_target_url)s
+    duplicity cleanup [%(x_options)s] %(x_target_url)s
+    duplicity remove-older-than %(x_time)s [%(x_options)s] %(x_target_url)s
+    duplicity remove-all-but-n-full %(x_count)s [%(x_options)s] %(x_target_url)s
+
+""" % vars()
+
+    # Header in usage help
+    msg = msg + _("Backends and their URL formats:") + """
+    cf+http://%(x_container_name)s
+    file:///%(x_some_dir)s
+    ftp://%(x_user)s[:%(x_password)s]@%(x_other_host)s[:%(x_port)s]/%(x_some_dir)s
+    hsi://%(x_user)s[:%(x_password)s]@%(x_other_host)s[:%(x_port)s]/%(x_some_dir)s
+    imap://%(x_user)s[:%(x_password)s]@%(x_other_host)s[:%(x_port)s]/%(x_some_dir)s
+    rsync://%(x_user)s[:%(x_password)s]@%(x_other_host)s[:%(x_port)s]::/%(x_module)s/%(x_some_dir)s
+    rsync://%(x_user)s[:%(x_password)s]@%(x_other_host)s[:%(x_port)s]/%(x_relative_path)s
+    rsync://%(x_user)s[:%(x_password)s]@%(x_other_host)s[:%(x_port)s]//%(x_absolute_path)s
+    s3://%(x_other_host)s/%(x_bucket_name)s[/%(x_prefix)s]
+    s3+http://%(x_bucket_name)s[/%(x_prefix)s]
+    scp://%(x_user)s[:%(x_password)s]@%(x_other_host)s[:%(x_port)s]/%(x_some_dir)s
+    ssh://%(x_user)s[:%(x_password)s]@%(x_other_host)s[:%(x_port)s]/%(x_some_dir)s
+    tahoe://%(x_alias)s/%(x_directory)s
+    webdav://%(x_user)s[:%(x_password)s]@%(x_other_host)s/%(x_some_dir)s
+    webdavs://%(x_user)s[:%(x_password)s]@%(x_other_host)s/%(x_some_dir)s
+
+""" % vars()
+
+    # Header in usage help
+    msg = msg + _("Commands:") + """
+    cleanup <%(x_target_url)s>
+    collection-status <%(x_target_url)s>
+    full <%(x_source_dir)s> <%(x_target_url)s>
+    incr <%(x_source_dir)s> <%(x_target_url)s>
+    list-current-files <%(x_target_url)s>
+    restore <%(x_target_url)s> <%(x_source_dir)s>
+    remove-older-than <%(x_time)s> <%(x_target_url)s>
+    remove-all-but-n-full <%(x_count)s> <%(x_target_url)s>
+    verify <%(x_target_url)s> <%(x_source_dir)s>
+
+""" % vars()
+
+    # Header in usage help
+    msg = msg + _("Options:") + """
     --allow-source-mismatch
-    --archive-dir <path>
+    --archive-dir <%(x_path)s>
     --asynchronous-upload
     --dry-run
-    --encrypt-key <gpg-key-id>
-    --exclude <shell_pattern>
+    --encrypt-key <%(x_gpg_key_id)s>
+    --exclude <%(x_shell_pattern)s>
     --exclude-device-files
-    --exclude-filelist <filename>
+    --exclude-filelist <%(x_filename)s>
     --exclude-filelist-stdin
-    --exclude-globbing-filelist <filename>
+    --exclude-globbing-filelist <%(x_filename)s>
     --exclude-other-filesystems
     --exclude-regexp <regexp>
-    --file-to-restore <path>
-    --full-if-older-than <time>
+    --file-to-restore <%(x_path)s>
+    --full-if-older-than <%(x_time)s>
     --force
     --ftp-passive
     --ftp-regular
     --gio
-    --gpg-options
-    --include <shell_pattern>
-    --include-filelist <filename>
+    --gpg-%(x_options)s
+    --include <%(x_shell_pattern)s>
+    --include-filelist <%(x_filename)s>
     --include-filelist-stdin
-    --include-globbing-filelist <filename>
+    --include-globbing-filelist <%(x_filename)s>
     --include-regexp <regexp>
     --log-fd <fd>
-    --log-file <filename>
-    --name <backup name>
+    --log-file <%(x_filename)s>
+    --name <%(x_backup_name)s>
     --no-encryption
     --no-print-statistics
     --null-separator
-    --num-retries <number>
+    --num-retries <%(x_number)s>
     --old-filenames
     --s3-european-buckets
     --s3-use-new-style
-    --scp-command <command>
-    --sftp-command <command>
-    --sign-key <gpg-key-id>
+    --scp-command <%(x_command)s>
+    --sftp-command <%(x_command)s>
+    --sign-key <%(x_gpg_key_id)s>
     --ssh-askpass
     --ssh-options
     --short-filenames
-    --tempdir <directory>
-    --timeout <seconds>
-    -t<time>, --time <time>, --restore-time <time>
-    --time-separator <char>
+    --tempdir <%(x_directory)s>
+    --timeout <%(x_seconds)s>
+    -t<%(x_time)s>, --time <%(x_time)s>, --restore-time <%(x_time)s>
+    --time-separator <%(x_char)s>
     --use-agent
     --version
-    --volsize <number>
+    --volsize <%(x_number)s>
     -v[0-9], --verbosity [0-9]
-    Verbosity must be one of: digit [0-9], character [ewnid],
+""" % vars()
+
+    # In this portion of the usage instructions, "[ewnid]" indicates which
+    # characters are permitted (e, w, n, i, or d); the brackets imply their own
+    # meaning in regex; i.e., only one of the characters is allowed in an instance.
+    msg = msg + _("""    Verbosity must be one of: digit [0-9], character [ewnid],
     or word ['error', 'warning', 'notice', 'info', 'debug'].
     The default is 4 (Notice).  It is strongly recommended
     that verbosity level is set at 2 (Warning) or higher.
-""") % (globals.version, sys.platform))
+""")
+
+    sys.stdout.write(msg)
 
 
 def get_int(int_string, description):

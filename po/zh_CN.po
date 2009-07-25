@@ -1,21 +1,22 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Simplified Chinese translation for duplicity
+# Copyright (c) 2009 Rosetta Contributors and Canonical Ltd 2009
+# This file is distributed under the same license as the duplicity package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2009.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
 "POT-Creation-Date: 2009-07-22 17:34-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2009-07-08 10:43+0000\n"
+"Last-Translator: Careone <zzbusagain@yahoo.com.cn>\n"
+"Language-Team: Simplified Chinese <zh_CN@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Launchpad-Export-Date: 2009-07-21 22:24+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
 
 #: ../duplicity-bin:669
 #, c-format
@@ -1028,3 +1029,21 @@ msgstr ""
 #, python-format
 msgid "Could not copy %s to %s"
 msgstr ""
+
+#~ msgid "No signatures found, switching to full backup."
+#~ msgstr "找不到标记，转换到完全备份。"
+
+#~ msgid "Backup Statistics"
+#~ msgstr "备份统计"
+
+#~ msgid "No signature data found, unable to list files."
+#~ msgstr "找不到标记数据，无法列出文件。"
+
+#~ msgid "No files found in archive - nothing restored."
+#~ msgstr "压缩包中找不到文件 - 没有进行任何还原。"
+
+#~ msgid "Calculated hash: %s"
+#~ msgstr "计算 hash 值： %s"
+
+#~ msgid "Manifest hash: %s"
+#~ msgstr "清单的 hash 值：%s"
