@@ -23,10 +23,9 @@
 duplicity's gpg interface, builds upon Frank Tobin's GnuPGInterface
 """
 
-import select, os, sys, thread, types, cStringIO, tempfile, re, gzip
+import os, types, tempfile, re, gzip
 
 from duplicity import misc
-from duplicity import log
 from duplicity import globals
 from duplicity import GnuPGInterface
 
@@ -98,6 +97,7 @@ class GPGFile:
         self.status_fp = None # used to find signature
         self.closed = None # set to true after file closed
         self.logger_fp = tempfile.TemporaryFile()
+        self.stderr_fp = tempfile.TemporaryFile()
 
         # Start GPG process - copied from GnuPGInterface docstring.
         gnupg = GnuPGInterface.GnuPG()
@@ -124,6 +124,7 @@ class GPGFile:
                 gnupg.options.extra_args.append('--force-mdc')
             p1 = gnupg.run(cmdlist, create_fhs=['stdin', 'passphrase'],
                            attach_fhs={'stdout': encrypt_path.open("wb"),
+                                       'stderr': self.stderr_fp,
                                        'logger': self.logger_fp})
             p1.handles['passphrase'].write(profile.passphrase)
             p1.handles['passphrase'].close()
@@ -133,6 +134,7 @@ class GPGFile:
             p1 = gnupg.run(['--decrypt'], create_fhs=['stdout', 'passphrase'],
                            attach_fhs={'stdin': encrypt_path.open("rb"),
                                        'status': self.status_fp,
+                                       'stderr': self.stderr_fp,
                                        'logger': self.logger_fp})
             p1.handles['passphrase'].write(profile.passphrase)
             p1.handles['passphrase'].close()
@@ -143,7 +145,7 @@ class GPGFile:
     def read(self, length = -1):
         try:
             res = self.gpg_output.read(length)
-        except Exception, e:
+        except Exception:
             self.gpg_failed()
         return res
 
@@ -158,7 +160,8 @@ class GPGFile:
         msg = "GPG Failed, see log below:\n"
         msg += "===== Begin GnuPG log =====\n"
         self.logger_fp.seek(0)
-        for line in self.logger_fp:
+        self.stderr_fp.seek(0)
+        for line in self.logger_fp, self.stderr_fp:
             msg += line.strip() + "\n"
         msg += "===== End GnuPG log =====\n"
         if not (msg.find("invalid packet (ctb=14)") > -1):
@@ -197,6 +200,7 @@ class GPGFile:
             except:
                 self.gpg_failed()
         self.logger_fp.close()
+        self.stderr_fp.close()
         self.closed = 1
 
     def set_signature(self):
