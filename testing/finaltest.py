@@ -24,7 +24,6 @@ import sys, os, unittest
 sys.path.insert(0, "../")
 
 import duplicity.backend
-import duplicity.backends
 from duplicity import path
 from duplicity import collections
 from duplicity import commandline
@@ -49,10 +48,12 @@ class CmdError(Exception):
     pass
 
 class FinalTest:
-    """Test backup/restore using duplicity binary"""
+    """
+    Test backup/restore using duplicity binary
+    """
     def run_duplicity(self, arglist, options = [], current_time = None):
         """Run duplicity binary with given arguments and options"""
-        options.append("--archive-dir testfiles/tmp_archive")
+        options.append("--archive-dir testfiles/cache")
         cmd_list = ["../duplicity-bin"]
         cmd_list.extend(options + ["--allow-source-mismatch"])
         if current_time:
@@ -100,8 +101,8 @@ class FinalTest:
     def deltmp(self):
         """Delete temporary directories"""
         assert not os.system("rm -rf testfiles/output "
-                             "testfiles/restore_out testfiles/tmp_archive")
-        assert not os.system("mkdir testfiles/output testfiles/tmp_archive")
+                             "testfiles/restore_out testfiles/cache")
+        assert not os.system("mkdir testfiles/output testfiles/cache")
         backend = duplicity.backend.get_backend(backend_url)
         bl = backend.list()
         if bl:
@@ -220,7 +221,7 @@ class FinalTest:
         self.backup("inc", "testfiles/dir3", current_time = 40000)
 
         b = duplicity.backend.get_backend(backend_url)
-        commandline.set_archive_dir("testfiles/tmp_archive")
+        commandline.set_archive_dir("testfiles/cache")
         cs = collections.CollectionsStatus(b, globals.archive_dir).set_values()
         assert len(cs.all_backup_chains) == 2, cs.all_backup_chains
         assert cs.matched_chain_pair
@@ -241,42 +242,6 @@ class FinalTest:
         chain = cs3.all_backup_chains[0]
         assert chain.start_time == 30000, chain.start_time
         assert chain.end_time == 40000, chain.end_time
-
-    def test_basic_checkpoint_restore(self):
-        """Test basic Checkpoint/Restore"""
-        excludes = ["--exclude **/output",
-                    "--exclude **/tmp_archive",
-                    "--exclude **/root1",
-                    "--exclude **/root2",]
-        self.deltmp()
-        try:
-            self.backup("full", "testfiles", options = ["--vol 1", "--fail 1"] + excludes)
-        except CmdError:
-            pass
-        self.backup("full", "testfiles", options = excludes)
-        self.verify("testfiles", options = excludes)
-
-    def test_multiple_checkpoint_restore(self):
-        """Test multiple Checkpoint/Restore"""
-        excludes = ["--exclude **/output",
-                    "--exclude **/tmp_archive",
-                    "--exclude **/root1",
-                    "--exclude **/root2",]
-        self.deltmp()
-        try:
-            self.backup("full", "testfiles", options = ["--vol 1", "--fail 1"] + excludes)
-        except CmdError:
-            pass
-        try:
-            self.backup("full", "testfiles", options = ["--vol 1", "--fail 2"] + excludes)
-        except CmdError:
-            pass
-        try:
-            self.backup("full", "testfiles", options = ["--vol 1", "--fail 3"] + excludes)
-        except CmdError:
-            pass
-        self.backup("full", "testfiles", options = excludes)
-        self.verify("testfiles", options = excludes)
 
 class FinalTest1(FinalTest, unittest.TestCase):
     def setUp(self):
