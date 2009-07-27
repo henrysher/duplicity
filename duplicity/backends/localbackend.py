@@ -29,10 +29,10 @@ from duplicity.errors import *
 
 class LocalBackend(duplicity.backend.Backend):
     """Use this backend when saving to local disk
-    
+
     Urls look like file://testfiles/output.  Relative to root can be
     gotten with extra slash (file:///usr/local).
-    
+
     """
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
@@ -72,11 +72,11 @@ class LocalBackend(duplicity.backend.Backend):
     def delete(self, filename_list):
         """Delete all files in filename list"""
         assert type(filename_list) is not types.StringType
-        try:
-                for filename in filename_list:
-                        self.remote_pathdir.append(filename).delete()
-        except OSError, e:
-            raise BackendException(str(e))
+        for filename in filename_list:
+            try:
+                self.remote_pathdir.append(filename).delete()
+            except OSError, e:
+                raise BackendException(str(e))
 
 
 duplicity.backend.register_backend("file", LocalBackend)
