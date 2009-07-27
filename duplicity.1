@@ -61,7 +61,7 @@ WebDAV, WebDAVs, HSi and Amazon S3 backends are available.
 Because duplicity uses
 librsync, the incremental archives are space efficient and only record
 the parts of files that have changed since the last backup.  Currently
-duplicity supports deleted files, full unix permissions, directories,
+duplicity supports deleted files, full Unix permissions, directories,
 symbolic links, fifos, etc., but not hard links.
 
 Duplicity will read the PASSPHRASE environment variable to find the
@@ -1099,13 +1099,13 @@ Amazon S3, but in practice you may experience timeouts, socket errors
 or HTTP errors when trying to upload files to your newly created
 bucket. Give it a few minutes and the bucket should function normally.
 .SH IMAP
-An Imap account can be used as a target for the upload.  The userid may
+An IMAP account can be used as a target for the upload.  The userid may
 be specified and the password will be requested.
 .PP
 The
 .B from_address_prefix
 may be specified (and probably should be). The text will be used as
-the "From" address in the imap server.  Then on a restore (or list) command
+the "From" address in the IMAP server.  Then on a restore (or list) command
 the
 .B from_address_prefix
 will distinguish between different backups.

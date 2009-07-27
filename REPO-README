@@ -1,11 +1,13 @@
-CVS README - Notes for people checking out of CVS
--------------------------------------------------
+REPO README - Notes for people checking out of Launchpad (bzr)
+--------------------------------------------------------------
 
 Getting duplicity to run:
 -------------------------
 
 By the numbers:
-1) Do the checkout while in a location called $DUP_ROOT.
+1) Do the checkout while in a location called $DUP_ROOT:
+        bzr lp:duplicity .          [for the dev branch]
+   -OR- bzr lp:duplicity/stable .   [for the stable branch]
 2) cd $DUP_ROOT/duplicity
 3) run "python compilec.py" to create _librsync.so
 4) cd ..
