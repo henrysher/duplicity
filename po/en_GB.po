@@ -1,21 +1,22 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# English (United Kingdom) translation for duplicity
+# Copyright (c) 2009 Rosetta Contributors and Canonical Ltd 2009
+# This file is distributed under the same license as the duplicity package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2009.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
 "POT-Creation-Date: 2009-07-22 17:34-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2009-07-21 18:30+0000\n"
+"Last-Translator: Larry Gilbert <Unknown>\n"
+"Language-Team: English (United Kingdom) <en_GB@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Launchpad-Export-Date: 2009-07-21 22:24+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
 
 #: ../duplicity-bin:669
 #, c-format
@@ -80,21 +81,22 @@ msgstr ""
 msgid ""
 "a previously scheduled task has failed; propagating the result immediately"
 msgstr ""
+"a previously scheduled task has failed; propagating the result immediately"
 
 #: ../duplicity/asyncscheduler.py:215 ../duplicity/asyncscheduler.py:236
 #, python-format
 msgid "active workers = %d"
-msgstr ""
+msgstr "active workers = %d"
 
 #: ../duplicity/asyncscheduler.py:256
 #, python-format
 msgid "task execution done (success: %s)"
-msgstr ""
+msgstr "task execution done (success: %s)"
 
 #: ../duplicity/backend.py:370
 #, python-format
 msgid "Running '%s'"
-msgstr ""
+msgstr "Running '%s'"
 
 #: ../duplicity/backend.py:384
 #, python-format
@@ -107,15 +109,15 @@ msgstr[1] ""
 #, python-format
 msgid "Running '%s' failed (attempt #%d)"
 msgid_plural "Running '%s' failed (attempt #%d)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Running '%s' failed (attempt #%d)"
+msgstr[1] "Running '%s' failed (attempt #%d)"
 
 #: ../duplicity/backend.py:392 ../duplicity/backend.py:433
 #, python-format
 msgid "Giving up trying to execute '%s' after %d attempt"
 msgid_plural "Giving up trying to execute '%s' after %d attempts"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Giving up trying to execute '%s' after %d attempt"
+msgstr[1] "Giving up trying to execute '%s' after %d attempts"
 
 #: ../duplicity/backend.py:403 ../duplicity/backend.py:420
 #, python-format
@@ -182,19 +184,19 @@ msgstr ""
 
 #: ../duplicity/collections.py:364
 msgid "Full"
-msgstr ""
+msgstr "Full"
 
 #: ../duplicity/collections.py:367
 msgid "Incremental"
-msgstr ""
+msgstr "Incremental"
 
 #: ../duplicity/collections.py:427
 msgid "local"
-msgstr ""
+msgstr "local"
 
 #: ../duplicity/collections.py:429
 msgid "remote"
-msgstr ""
+msgstr "remote"
 
 #: ../duplicity/collections.py:581
 msgid "Collection Status"
