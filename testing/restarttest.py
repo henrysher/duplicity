@@ -55,7 +55,9 @@ class RestartTest(unittest.TestCase):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     def run_duplicity(self, arglist, options = [], current_time = None):
-        """Run duplicity binary with given arguments and options"""
+        """
+        Run duplicity binary with given arguments and options
+        """
         options.append("--archive-dir testfiles/cache")
         cmd_list = ["../duplicity-bin"]
         cmd_list.extend(options + ["--allow-source-mismatch"])
@@ -68,6 +70,7 @@ class RestartTest(unittest.TestCase):
         #print "Running '%s'." % cmdline
         if not os.environ.has_key('PASSPHRASE'):
             os.environ['PASSPHRASE'] = 'foobar'
+#        print "CMD: %s" % cmdline
         return_val = os.system(cmdline)
         if return_val:
             raise CmdError(return_val)
@@ -102,7 +105,9 @@ class RestartTest(unittest.TestCase):
         self.run_duplicity(args, options, current_time)
 
     def deltmp(self):
-        """Delete temporary directories"""
+        """
+        Delete temporary directories
+        """
         assert not os.system("rm -rf testfiles/output "
                              "testfiles/restore_out testfiles/cache")
         assert not os.system("mkdir testfiles/output testfiles/cache")
@@ -113,7 +118,9 @@ class RestartTest(unittest.TestCase):
         backend.close()
 
     def runtest(self, dirlist, backup_options = [], restore_options = []):
-        """Run backup/restore test on directories in dirlist"""
+        """
+        Run backup/restore test on directories in dirlist
+        """
         assert len(dirlist) >= 1
         self.deltmp()
 
@@ -137,31 +144,40 @@ class RestartTest(unittest.TestCase):
                             time = current_time, options = restore_options)
 
     def check_same(self, filename1, filename2):
-        """Verify two filenames are the same"""
+        """
+        Verify two filenames are the same
+        """
         path1, path2 = path.Path(filename1), path.Path(filename2)
         assert path1.compare_recursive(path2, verbose = 1)
 
     def test_basic_checkpoint_restart(self):
-        """Test basic Checkpoint/Restart"""
+        """
+        Test basic Checkpoint/Restart
+        """
         excludes = ["--exclude **/output",
                     "--exclude **/cache",
                     "--exclude **/root1",
                     "--exclude **/root2",]
         self.deltmp()
+        # we know we're going to fail this one, its forced
         try:
             self.backup("full", "testfiles", options = ["--vol 1", "--fail 1"] + excludes)
         except CmdError:
             pass
+        # this one should pass OK
         self.backup("full", "testfiles", options = excludes)
         self.verify("testfiles", options = excludes)
 
     def test_multiple_checkpoint_restart(self):
-        """Test multiple Checkpoint/Restart"""
+        """
+        Test multiple Checkpoint/Restart
+        """
         excludes = ["--exclude **/output",
                     "--exclude **/cache",
                     "--exclude **/root1",
                     "--exclude **/root2",]
         self.deltmp()
+        # we know we're going to fail these, they are forced
         try:
             self.backup("full", "testfiles", options = ["--vol 1", "--fail 1"] + excludes)
         except CmdError:
@@ -174,8 +190,46 @@ class RestartTest(unittest.TestCase):
             self.backup("full", "testfiles", options = ["--vol 1", "--fail 3"] + excludes)
         except CmdError:
             pass
+        # this one should pass OK
         self.backup("full", "testfiles", options = excludes)
         self.verify("testfiles", options = excludes)
+
+    def test_first_volume_failure(self):
+        """
+        Test restart when no volumes are available on the remote.
+        Caused when duplicity fails before the first transfer.
+        """
+        excludes = ["--exclude **/output",
+                    "--exclude **/cache",
+                    "--exclude **/root1",
+                    "--exclude **/root2",]
+        self.deltmp()
+        # we know we're going to fail these, they are forced
+        try:
+            self.backup("full", "testfiles", options = ["--vol 1", "--fail 1"] + excludes)
+        except CmdError:
+            pass
+        assert not os.system("rm testfiles/output/duplicity-full*difftar*")
+        # this one should pass OK
+        self.backup("full", "testfiles", options = excludes)
+        self.verify("testfiles", options = excludes)
+
+    def test_multi_volume_failure(self):
+        """
+        Test restart when fewer volumes are available on the remote
+        than the local manifest has on record.  Caused when duplicity
+        fails the last queued transfer(s).
+        """
+        self.deltmp()
+        # we know we're going to fail these, they are forced
+        try:
+            self.backup("full", "/etc", options = ["--vol 1", "--fail 3"])
+        except CmdError:
+            pass
+        assert not os.system("rm testfiles/output/duplicity-full*vol[23].difftar*")
+        # this one should pass OK
+        self.backup("full", "/etc", options = ["--vol 1"])
+        self.verify("/etc")
 
 if __name__ == "__main__":
     unittest.main()

@@ -112,11 +112,23 @@ class Manifest:
         @return: void
         """
         vol_num = vi.volume_number
-        if self.volume_info_dict.has_key(vol_num):
-            raise ManifestError("Volume %d already present" % (vol_num,))
         self.volume_info_dict[vol_num] = vi
         if self.fh:
             self.fh.write(vi.to_string() + "\n")
+
+    def del_volume_info(self, vol_num):
+        """
+        Remove volume vol_num from the manifest
+
+        @param vol_num: volume number to delete
+        @type vi: int
+
+        @return: void
+        """
+        try:
+            del self.volume_info_dict[vol_num]
+        except:
+            raise ManifestError("Volume %d not present in manifest" % (vol_num,))
 
     def to_string(self):
         """
