@@ -179,11 +179,6 @@ def restart_position_iterator(tarblock_iter):
     @rtype: int
     @return: constant 0 (zero)
     """
-    def whoops():
-        log.FatalError("Unable to locate last file %s and block %d in backup set" %
-                       ("/".join(last_index), last_block),
-                       log.ErrorCode.restart_file_not_found)
-
     last_index = globals.restart.last_index
     last_block = globals.restart.last_block
     try:
@@ -193,9 +188,16 @@ def restart_position_iterator(tarblock_iter):
                 if (tarblock_iter.previous_block == last_block):
                     break
             if tarblock_iter.previous_index > last_index:
-                whoops()
+                log.Warn(_("Unable to locate last file %s and block %d in backup set.\n"
+                           "Attempting restart on the next file %s.") %
+                           ("/".join(last_index), last_block, "/".join(tarblock_iter.previous_index)),
+                           log.ErrorCode.restart_file_not_found)
+                break
     except StopIteration:
-        whoops()
+        log.Warn(_("Unable to locate last file %s and block %d in backup set.\n"
+                   "There are no more files to be backed up.") %
+                   ("/".join(last_index), last_block),
+                   log.ErrorCode.restart_file_not_found)
     return 0
 
 

@@ -231,5 +231,51 @@ class RestartTest(unittest.TestCase):
         self.backup("full", "/etc", options = ["--vol 1"])
         self.verify("/etc")
 
+    def test_last_file_missing_in_middle(self):
+        """
+        Test restart when the last file being backed up is missing on restart.
+        Caused when the user deletes a file after a failure.  This test puts
+        the file in the middle of the backup, with files following.
+        """
+        self.deltmp()
+        # create 3 2M files
+        assert not os.system("mkdir testfiles/largefiles")
+        for n in (1,2,3):
+            assert not os.system("dd if=/dev/urandom of=testfiles/largefiles/file%d bs=1K count=2048 >& /dev/null" % n)
+        # we know we're going to fail, it's forced
+        try:
+            self.backup("full", "testfiles/largefiles", options = ["--vol 1", "--fail 3"])
+        except CmdError:
+            pass
+        assert not os.system("rm testfiles/largefiles/file2")
+        # this one should pass OK
+        self.backup("full", "testfiles/largefiles", options = ["--vol 1"])
+        #TODO: we can't verify but we need to to check for other errors that might show up
+        # there should be 2 differences found, one missing file, one mtime change
+        #self.verify("testfiles/largefiles")
+
+    def test_last_file_missing_at_end(self):
+        """
+        Test restart when the last file being backed up is missing on restart.
+        Caused when the user deletes a file after a failure.  This test puts
+        the file at the end of the backup, with no files following.
+        """
+        self.deltmp()
+        # create 3 2M files
+        assert not os.system("mkdir testfiles/largefiles")
+        for n in (1,2,3):
+            assert not os.system("dd if=/dev/urandom of=testfiles/largefiles/file%d bs=1K count=2048 >& /dev/null" % n)
+        # we know we're going to fail, it's forced
+        try:
+            self.backup("full", "testfiles/largefiles", options = ["--vol 1", "--fail 6"])
+        except CmdError:
+            pass
+        assert not os.system("rm testfiles/largefiles/file3")
+        # this one should pass OK
+        self.backup("full", "testfiles/largefiles", options = ["--vol 1"])
+        #TODO: we can't verify but we need to to check for other errors that might show up
+        # there should be 2 differences found, one missing file, one mtime change
+        #self.verify("testfiles/largefiles")
+
 if __name__ == "__main__":
     unittest.main()
