@@ -1,7 +1,7 @@
 /* ----------------------------------------------------------------------- *
- *   
+ *
  *   Copyright 2002 2003 Ben Escoto <ben@emerose.org>
-# Copyright 2007 Kenneth Loafman <kenneth@loafman.com>
+ *   Copyright 2007 Kenneth Loafman <kenneth@loafman.com>
  *
  *   This file is part of duplicity.
  *
@@ -23,7 +23,7 @@
  * ----------------------------------------------------------------------- */
 
 #include <Python.h>
-#include <librsync.h> 
+#include <librsync.h>
 #define RS_JOB_BLOCKSIZE 65536
 
 static PyObject *librsyncError;
@@ -52,7 +52,7 @@ _librsync_new_sigmaker(PyObject* self, PyObject* args)
 {
   _librsync_SigMakerObject* sm;
   long blocklen;
-  
+
   if (!PyArg_ParseTuple(args, "l:new_sigmaker", &blocklen))
     return NULL;
 
@@ -341,7 +341,7 @@ _librsync_new_patchmaker(PyObject* self, PyObject* args)
     return NULL;
   }
   Py_INCREF(python_file);
-  
+
   pm = PyObject_New(_librsync_PatchMakerObject, &_librsync_PatchMakerType);
   if (pm == NULL) return NULL;
   pm->x_attr = NULL;
