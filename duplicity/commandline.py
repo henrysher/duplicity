@@ -601,7 +601,7 @@ def usage():
     --ftp-passive
     --ftp-regular
     --gio
-    --gpg-%(options)s
+    --gpg-options
     --include <%(shell_pattern)s>
     --include-filelist <%(filename)s>
     --include-filelist-stdin
