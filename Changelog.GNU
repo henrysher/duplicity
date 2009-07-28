@@ -1,3 +1,146 @@
+2009-07-28  Kenneth Loafman  <kenneth@loafman.com>
+
+	Fixed 398230 Deja-dup backup fails with message: "Unable to locate last file"
+
+2009-07-28  Kenneth Loafman  <kenneth@loafman.com>
+
+	Fix bug 405646 Small i18n error.
+
+2009-07-25  Larry Gilbert  <from-launchpad@l2g.to>
+
+	Oops, one too many things in usage() were dictionarified
+
+2009-07-28  Kenneth Loafman  <kenneth@loafman.com>
+
+	Minor header comment correction.
+
+2009-07-28  Kenneth Loafman  <kenneth@loafman.com>
+
+	Adjust to file renames.
+
+2009-07-27  Kenneth Loafman  <kenneth@loafman.com>
+
+	merge of lp:~l2g/duplicity/doc-update.
+
+2009-07-21  Larry Gilbert  <from-launchpad@l2g.to>
+
+	Sorry... I missed the point being made here...
+
+2009-07-21  Larry Gilbert  <lgilbert@digium.com>
+
+	Minor capitalization changes in the manpage
+
+2009-07-21  Larry Gilbert  <lgilbert@digium.com>
+
+	CVS-README changed to REPO-README and updated with Launchpad/bzr info
+
+2009-07-27  Kenneth Loafman  <kenneth@loafman.com>
+
+	merge of lp:~l2g/duplicity/i18n-update-1.
+
+2009-07-25  Larry Gilbert  <from-launchpad@l2g.to>
+
+	Redid dictionary in usage to use a local hash instead of a bunch of local
+	variables, to make things a tad more pleasant.
+
+2009-07-25  Larry Gilbert  <from-launchpad@l2g.to>
+
+	Broke up the usage() help info to simplify translation maintenance.
+	Imported .po files from Launchpad Translation (not sure how necessary
+	they are to have in here, but here they are.)
+
+2009-07-25  Larry Gilbert  <from-launchpad@l2g.to>
+
+	Updated some intltool config info
+
+2009-07-25  Larry Gilbert  <from-launchpad@l2g.to>
+
+	Updated *.po and *.pot files
+
+2009-07-27  Kenneth Loafman  <kenneth@loafman.com>
+
+	Fix restart issues when local manifest does not agree with the contents of the remote system.  In all cases, clean up as needed, and restart the backup at the last known good state.
+
+2009-07-27  Kenneth Loafman  <kenneth@loafman.com>
+
+	Refactor to put loop outside of try/except clause.
+
+2009-07-27  Kenneth Loafman  <kenneth@loafman.com>
+
+	BackupSet.delete() now removes both local and remote files.
+
+2009-07-27  Kenneth Loafman  <kenneth@loafman.com>
+
+	Make testing into a module.
+
+2009-07-25  Kenneth Loafman  <kenneth@loafman.com>
+
+	Capture stderr as well as logger and display stderr with logger only if gpg fails.  Cuts out some of the noise from gpg.
+
+2009-07-25  Kenneth Loafman  <kenneth@loafman.com>
+
+	Split restarttest.py from finaltest.py for ease in debugging.
+
+2009-07-22  Kenneth Loafman  <kenneth@loafman.com>
+
+	* fix test config to import backends (now optional).
+
+2009-07-20  Kenneth Loafman  <kenneth@loafman.com>
+
+	merge of lp:~scode/duplicity/misc.
+
+2009-07-08  Peter Schuller  <peter.schuller@infidyne.com>
+
+	* s/pair/tuple/ (method doc fix)
+
+2009-07-08  Peter Schuller  <peter.schuller@infidyne.com>
+
+	* when doing the "sleep to make sure we have different current time than last backup":
+	- sleep for 2 seconds instead of 1, since it is an expected case that time may be moving
+	slightly slower as a result of adjtime() and such
+	- assert afterwards that current time really does differ from previous time
+
+2009-07-08  Peter Schuller  <peter.schuller@infidyne.com>
+
+	* merge latest trunk
+
+2009-07-20  Kenneth Loafman  <kenneth@loafman.com>
+
+	Update .bzrignore only.
+
+2009-07-19  Kenneth Loafman  <kenneth@loafman.com>
+
+	* fixed 401303 0.6.2 manpage inconsistent wrt. archive-dir/name
+
+2009-07-19  Kenneth Loafman  <kenneth@loafman.com>
+
+	* fix 377528 --file-to-restore doesn't work with trailing slash
+
+2009-07-15  Kenneth Loafman  <kenneth@loafman.com>
+
+	* First pass at bug 394757 - Optional Backends
+	https://bugs.launchpad.net/bugs/394757
+
+2009-07-10  Kenneth Loafman  <kenneth@loafman.com>
+
+	* ignore unicode() translation errors in log messsages.
+
+2009-07-10  Kenneth Loafman  <kenneth@loafman.com>
+
+	* Make sure 'invalid packet (ctb=14)' from gpg is not a fatal error.
+
+2009-07-10  Kenneth Loafman  <kenneth@loafman.com>
+
+	* On processes that complete before waitpid(), log them and return zero as the process.returned value.  They will have already trapped in the main thread if they returned in error.
+
+2009-07-10  Kenneth Loafman  <kenneth@loafman.com>
+
+	* Use correct name of error class ConflictingScheme.
+
+2009-07-08  Kenneth Loafman  <kenneth@loafman.com>
+
+	Make Changelog.GNU close to GNU Changelog format.
+
 2009-07-08  Kenneth Loafman  <kenneth@loafman.com>
 
 	Changes for 0.6.02.

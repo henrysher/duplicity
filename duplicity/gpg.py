@@ -159,10 +159,10 @@ class GPGFile:
     def gpg_failed(self):
         msg = "GPG Failed, see log below:\n"
         msg += "===== Begin GnuPG log =====\n"
-        self.logger_fp.seek(0)
-        self.stderr_fp.seek(0)
-        for line in self.logger_fp, self.stderr_fp:
-            msg += line.strip() + "\n"
+        for fp in (self.logger_fp, self.stderr_fp):
+            fp.seek(0)
+            for line in fp:
+                msg += line.strip() + "\n"
         msg += "===== End GnuPG log =====\n"
         if not (msg.find("invalid packet (ctb=14)") > -1):
             raise GPGError, msg

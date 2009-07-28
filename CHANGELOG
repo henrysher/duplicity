@@ -1,3 +1,18 @@
+New in v0.6.03 (2009/07/??)
+---------------------------
+Lots of small changes and some bug fixes.  Restart error handling has
+been smoothed out a great deal and it "does what is right" in order to
+keep going.  Backends are now optional, if they fail an Info message
+is put out to notify of the failure and why.  There was more work on
+translations and internationalization.  Thanks to everyone!
+
+377528  --file-to-restore doesn't work with trailing slash
+394757  Backend imports should be made optional
+398230  Deja-dup backup fails with message: "Unable to locate last file"
+401303  0.6.2 manpage inconsistent wrt. archive-dir/name
+405646  Small i18n error
+
+
 New in v0.6.02 (2009/07/07)
 ---------------------------
 Duplicity will now remove any spurious files left in the cache from
