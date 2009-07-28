@@ -62,7 +62,7 @@ def MakeTar():
         "CHANGELOG",
         "Changelog.GNU",
         "COPYING",
-        "CVS-README",
+        "REPO-README",
         "LOG-README",
         "README",
         "tarfile-LICENSE",
