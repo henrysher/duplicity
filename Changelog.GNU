@@ -1,3 +1,11 @@
+2009-07-29  Kenneth Loafman  <kenneth@loafman.com>
+
+	Fixed 402794 duplicity public-key-only incompatible with gnupg 2.0.11.
+
+2009-07-28  Kenneth Loafman  <kenneth@loafman.com>
+
+	Fixed 405975 duplicity.gpg.gpg_failed() breaks and spews on GnuPG error.
+
 2009-07-28  Kenneth Loafman  <kenneth@loafman.com>
 
 	Fixed 398230 Deja-dup backup fails with message: "Unable to locate last file"
