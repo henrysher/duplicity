@@ -840,10 +840,13 @@ def sync_archive():
         """
         @return: (parsedresult, local_name, remote_name)
         """
-        suffix = file_naming.get_suffix(globals.encryption, not globals.encryption)
+        pr = file_naming.parse(fn)
+        if pr.manifest:
+            suffix = file_naming.get_suffix(globals.encryption, False)
+        else:
+            suffix = file_naming.get_suffix(globals.encryption, not globals.encryption)
         rem_name = fn + suffix
 
-        pr = file_naming.parse(fn)
         if pr.manifest:
             suffix = file_naming.get_suffix(False, False)
         else:
