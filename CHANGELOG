@@ -1,5 +1,12 @@
-New in v0.6.04 (2009/08/??)
+New in v0.6.04 (2009/08/01)
 ---------------------------
+One major and one minor change.  The "No such file or directory" error
+is bad enough that this should be released quickly.  For those of you
+using encryption, this is not a problem, but for those of you that do
+not use encryption (--no-encryption), then this will manifest itself if
+the local cache gets out of sync with the remote store.
+
+Bugs fixed this release:
 405734  duplicity fails to restore files that contain a newline character
 403790  Backup error: No such file or directory
 
