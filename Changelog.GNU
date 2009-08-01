@@ -1,3 +1,27 @@
+2009-08-01  Kenneth Loafman  <kenneth@loafman.com>
+
+	Changes for 0.6.04.
+
+2009-08-01  Kenneth Loafman  <kenneth@loafman.com>
+
+	Fixed 405734 duplicity fails to restore files that contain a newline character
+
+2009-07-30  Kenneth Loafman  <kenneth@loafman.com>
+
+	Fixed 403790 Backup error: No such file or directory
+
+2009-07-29  Kenneth Loafman  <kenneth@loafman.com>
+
+	Last changes for 0.6.03.
+
+2009-07-29  Kenneth Loafman  <kenneth@loafman.com>
+
+	Changes for 0.6.03.
+
+2009-07-29  Kenneth Loafman  <kenneth@loafman.com>
+
+	Changes for 0.6.03.
+
 2009-07-29  Kenneth Loafman  <kenneth@loafman.com>
 
 	Fixed 402794 duplicity public-key-only incompatible with gnupg 2.0.11.
