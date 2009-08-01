@@ -148,7 +148,7 @@ def get_index_from_tarinfo(tarinfo):
                     difftype = "snapshot"
                 multivol = 1
                 name, num_subs = \
-                      re.subn("^multivol_(diff|snapshot)/(.*)/[0-9]+$",
+                      re.subn("(?s)^multivol_(diff|snapshot)/(.*)/[0-9]+$",
                               "\\2", tarinfo.name)
                 if num_subs != 1:
                     raise PatchDirException("Unrecognized diff entry %s" %

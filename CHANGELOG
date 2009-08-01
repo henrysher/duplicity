@@ -1,3 +1,9 @@
+New in v0.6.04 (2009/08/??)
+---------------------------
+405734  duplicity fails to restore files that contain a newline character
+403790  Backup error: No such file or directory
+
+
 New in v0.6.03 (2009/07/29)
 ---------------------------
 Lots of small changes and some bug fixes.
