@@ -119,6 +119,7 @@ class GIOBackend(duplicity.backend.Backend):
         source_file = self.remote_file.get_child_for_display_name(filename)
         target_file = gio.File(path=local_path.name)
         self.copy_file(source_file, target_file)
+        local_path.setdata()
 
     def list(self):
         """List files in that directory"""
