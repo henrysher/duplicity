@@ -34,7 +34,6 @@ duplicity/util.py
 duplicity/backends/botobackend.py
 duplicity/backends/cloudfilesbackend.py
 duplicity/backends/ftpbackend.py
-duplicity/backends/giobackend.py
 duplicity/backends/hsibackend.py
 duplicity/backends/imapbackend.py
 duplicity/backends/__init__.py

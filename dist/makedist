@@ -62,7 +62,7 @@ def MakeTar():
         "CHANGELOG",
         "Changelog.GNU",
         "COPYING",
-        "CVS-README",
+        "REPO-README",
         "LOG-README",
         "README",
         "tarfile-LICENSE",
@@ -124,14 +124,19 @@ def MakeTar():
                              (SourceDir, filename, tardir)), filename
 
     os.mkdir(os.path.join(tardir, "po"))
+    assert not os.system("cd po && ./update-pot")
     for filename in [
-        "Makevars",
-        "POTFILES.in",
+        "duplicity.pot",
         ]:
         assert not os.system("cp po/%s %s/po" % (filename, tardir)), filename
-    for lang in ["io"]:
-        assert not os.mkdir(os.path.join(tardir, "po", lang)), lang
-        assert not os.system("cp po/%s/duplicity.[pm]o %s/po/%s" % (lang, tardir, lang)), lang
+    linguas = open('po/LINGUAS')
+    for line in linguas:
+        langs = line.split()
+        for lang in langs:
+            assert not os.mkdir(os.path.join(tardir, "po", lang)), lang
+            assert not os.system("cp po/%s.po %s/po/%s" % (lang, tardir, lang)), lang
+            assert not os.system("msgfmt po/%s.po -o %s/po/%s/duplicity.mo" % (lang, tardir, lang)), lang
+    linguas.close()
 
     VersionedCopy(os.path.join(SourceDir, "globals.py"),
                   os.path.join(tardir, "src", "globals.py"))

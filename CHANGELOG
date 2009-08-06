@@ -1,3 +1,21 @@
+New in v0.5.19 (2009/08/06)
+---------------------------
+Fixed problem where Cygwin was returning -1 for the
+hard max open file limit.
+
+On process that complete before waitpid(), log them
+and return zero as the process return status.
+
+Make sure 'invalid packet (ctb=14)' from gpg is not
+a fatal error.
+
+Copy changes from trunk for duplicity translation.
+
+Allow handling of unicode filenames in log messages.
+
+Ignore unicode() translation errors in log messsages.
+
+
 New in v0.5.18 (2009/05/20)
 ---------------------------
 Added support for RackSpace's CloudFiles, cf+http.
