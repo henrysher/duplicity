@@ -1103,11 +1103,11 @@ def main():
     # Adjust the path to your location and version of Eclipse and Pydev.  Comment out
     # to run normally, or this process will hang at pydevd.settrace() waiting for the
     # remote debugger to start.
-    pysrc = "/home/ken/eclipse3.4/plugins/org.python.pydev.debug_1.4.7.2843/pysrc/"
-    if os.path.isdir(pysrc):
-        sys.path.append(pysrc)
-        import pydevd
-        pydevd.settrace()
+#    pysrc = "/home/ken/eclipse3.4/plugins/org.python.pydev.debug_1.4.7.2843/pysrc/"
+#    if os.path.isdir(pysrc):
+#        sys.path.append(pysrc)
+#        import pydevd
+#        pydevd.settrace()
 
     # if python is run setuid, it's only partway set,
     # so make sure to run with euid/egid of root
