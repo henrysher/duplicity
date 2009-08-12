@@ -167,9 +167,6 @@ ssh_askpass = False
 # user added ssh options
 ssh_options = ""
 
-# true if user wants no restart
-no_restart = False
-
 # will be a Restart object if restarting
 restart = None
 

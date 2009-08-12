@@ -246,7 +246,7 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
     if not globals.restart:
         # normal backup start
         vol_num = 0
-        mf = manifest.Manifest(fh = man_outfp)
+        mf = manifest.Manifest(fh=man_outfp)
         mf.set_dirinfo()
     else:
         # restart from last known position
@@ -285,8 +285,8 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
         # Create volume
         vol_num += 1
         dest_filename = file_naming.get(backup_type, vol_num,
-                                        encrypted = globals.encryption,
-                                        gzipped = not globals.encryption)
+                                        encrypted=globals.encryption,
+                                        gzipped=not globals.encryption)
         tdp = dup_temp.new_tempduppath(file_naming.parse(dest_filename))
 
         # write volume
@@ -348,13 +348,13 @@ def get_man_fileobj(backup_type):
     assert backup_type == "full" or backup_type == "inc"
 
     part_man_filename = file_naming.get(backup_type,
-                                        manifest = True,
-                                        partial = True)
+                                        manifest=True,
+                                        partial=True)
     perm_man_filename = file_naming.get(backup_type,
-                                        manifest = True)
+                                        manifest=True)
     remote_man_filename = file_naming.get(backup_type,
-                                          manifest = True,
-                                          encrypted = globals.encryption)
+                                          manifest=True,
+                                          encrypted=globals.encryption)
 
     fh = dup_temp.get_fileobj_duppath(globals.archive_dir,
                                       part_man_filename,
@@ -379,12 +379,12 @@ def get_sig_fileobj(sig_type):
     assert sig_type in ["full-sig", "new-sig"]
 
     part_sig_filename = file_naming.get(sig_type,
-                                        gzipped = False,
-                                        partial = True)
+                                        gzipped=False,
+                                        partial=True)
     perm_sig_filename = file_naming.get(sig_type,
-                                        gzipped = True)
-    remote_sig_filename = file_naming.get(sig_type, encrypted = globals.encryption,
-                                          gzipped = not globals.encryption)
+                                        gzipped=True)
+    remote_sig_filename = file_naming.get(sig_type, encrypted=globals.encryption,
+                                          gzipped=not globals.encryption)
 
     fh = dup_temp.get_fileobj_duppath(globals.archive_dir,
                                       part_sig_filename,
@@ -406,7 +406,7 @@ def full_backup(col_stats):
     if globals.dry_run:
         tarblock_iter = diffdir.DirFull(globals.select)
         bytes_written = dummy_backup(tarblock_iter)
-        col_stats.set_values(sig_chain_warning = None)
+        col_stats.set_values(sig_chain_warning=None)
     else:
         sig_outfp = get_sig_fileobj("full-sig")
         man_outfp = get_man_fileobj("full")
@@ -426,7 +426,7 @@ def full_backup(col_stats):
         man_outfp.to_remote()
         man_outfp.to_final()
 
-        col_stats.set_values(sig_chain_warning = None).cleanup_signatures()
+        col_stats.set_values(sig_chain_warning=None).cleanup_signatures()
 
     print_statistics(diffdir.stats, bytes_written)
 
@@ -696,18 +696,18 @@ def cleanup(col_stats):
     if globals.force:
         log.Notice(gettext.ngettext("Deleting this file from backend:",
                                     "Deleting these files from backend:",
-                                    len(extraneous))+"\n"+filestr)
+                                    len(extraneous))
+                   + "\n" + filestr)
         if not globals.dry_run:
             col_stats.backend.delete(ext_remote)
             for fn in ext_local:
                 globals.archive_dir.append(fn).delete()
     else:
-        log.Notice("%s\n%s\n%s" %
-                   (gettext.ngettext("Found the following file to delete:",
+        log.Notice(gettext.ngettext("Found the following file to delete:",
                                      "Found the following files to delete:",
-                                     len(extraneous)),
-                    filestr,
-                    _("Run duplicity again with the --force option to actually delete.")))
+                                    len(extraneous))
+                   + "\n" + filestr + "\n"
+                   + _("Run duplicity again with the --force option to actually delete."))
 
 
 def remove_all_but_n_full(col_stats):
@@ -766,12 +766,12 @@ def remove_old(col_stats):
                                     len(setlist)) +
                    "\n" + set_times_str(setlist))
         if globals.dry_run:
-            col_stats.set_values(sig_chain_warning = None)
+            col_stats.set_values(sig_chain_warning=None)
         else:
             setlist.reverse() # save oldest for last
             for set in setlist:
                 set.delete()
-            col_stats.set_values(sig_chain_warning = None).cleanup_signatures()
+            col_stats.set_values(sig_chain_warning=None).cleanup_signatures()
     else:
         log.Notice(gettext.ngettext("Found old backup set at the following time:",
                                     "Found old backup sets at the following times:",
@@ -908,7 +908,7 @@ def sync_archive():
         else:
             gpg.GzipWriteFile(src_iter,
                               globals.archive_dir.append(loc_name).name,
-                              size = sys.maxint)
+                              size=sys.maxint)
 
     # get remote metafile list
     remlist = globals.backend.list()
@@ -1025,7 +1025,7 @@ def check_resources(action):
                              "Use 'ulimit -n 1024' or higher to correct.\n") % (maxopen,),
                              log.ErrorCode.maxopen_too_low)
 
-def log_startup_parms(verbosity = log.INFO):
+def log_startup_parms(verbosity=log.INFO):
     """
     log Python, duplicity, and system versions
     """
@@ -1103,11 +1103,11 @@ def main():
     # Adjust the path to your location and version of Eclipse and Pydev.  Comment out
     # to run normally, or this process will hang at pydevd.settrace() waiting for the
     # remote debugger to start.
-#    pysrc = "/home/ken/eclipse3.4/plugins/org.python.pydev.debug_1.4.7.2843/pysrc/"
-#    if os.path.isdir(pysrc):
-#        sys.path.append(pysrc)
-#        import pydevd
-#        pydevd.settrace()
+    pysrc = "/home/ken/eclipse3.4/plugins/org.python.pydev.debug_1.4.7.2843/pysrc/"
+    if os.path.isdir(pysrc):
+        sys.path.append(pysrc)
+        import pydevd
+        pydevd.settrace()
 
     # if python is run setuid, it's only partway set,
     # so make sure to run with euid/egid of root
@@ -1141,13 +1141,13 @@ def main():
     while True:
         # if we have to clean up the last partial, then col_stats are invalidated
         # and we have to start the process all over again until clean.
-        if action in ["full", "inc"]:
+        if action in ["full", "inc", "cleanup"]:
             last_full_chain = col_stats.get_last_backup_chain()
             if not last_full_chain:
                 break
             last_backup = last_full_chain.get_last()
             if last_backup.partial:
-                if not globals.no_restart:
+                if action in ["full", "inc"]:
                     # set restart parms from last_backup info
                     globals.restart = Restart(last_backup)
                     # (possibly) reset action

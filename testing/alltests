@@ -23,3 +23,4 @@ tempdirtest.py
 test_tarfile.py
 finaltest.py
 restarttest.py
+cleanuptest.py
