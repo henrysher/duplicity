@@ -143,7 +143,7 @@ class LocalTest(unittest.TestCase, UnivTest):
         assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
 
     def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar tempdir temp2.tar")
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     my_test_id = "local"
     url_string = config.file_url
@@ -156,7 +156,7 @@ class scpTest(unittest.TestCase, UnivTest):
         assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
 
     def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar tempdir temp2.tar")
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     my_test_id = "ssh/scp"
     url_string = config.ssh_url
@@ -169,7 +169,7 @@ class ftpTest(unittest.TestCase, UnivTest):
         assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
 
     def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar tempdir temp2.tar")
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     my_test_id = "ftp"
     url_string = config.ftp_url
@@ -182,7 +182,7 @@ class rsyncAbsPathTest(unittest.TestCase, UnivTest):
         assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
 
     def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar tempdir temp2.tar")
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     my_test_id = "rsync_abspath"
     url_string = config.rsync_abspath_url
@@ -195,7 +195,7 @@ class rsyncRelPathTest(unittest.TestCase, UnivTest):
         assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
 
     def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar tempdir temp2.tar")
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     my_test_id = "rsync_relpath"
     url_string = config.rsync_relpath_url
@@ -208,7 +208,7 @@ class rsyncModuleTest(unittest.TestCase, UnivTest):
         assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
 
     def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar tempdir temp2.tar")
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     my_test_id = "rsync_module"
     url_string = config.rsync_module_url
@@ -221,7 +221,7 @@ class s3ModuleTest(unittest.TestCase, UnivTest):
         assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
 
     def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar tempdir temp2.tar")
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     my_test_id = "s3/boto"
     url_string = config.s3_url
@@ -234,7 +234,7 @@ class webdavModuleTest(unittest.TestCase, UnivTest):
         assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
 
     def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar tempdir temp2.tar")
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     my_test_id = "webdav"
     url_string = config.webdav_url
@@ -247,7 +247,7 @@ class webdavsModuleTest(unittest.TestCase, UnivTest):
         assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
 
     def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar tempdir temp2.tar")
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     my_test_id = "webdavs"
     url_string = config.webdavs_url
