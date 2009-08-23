@@ -215,16 +215,17 @@ class CollectionTest(unittest.TestCase):
         """Test the listing of extraneous files"""
         cs = self.get_filelist2_cs()
         assert len(cs.orphaned_backup_sets) == 1, cs.orphaned_backup_sets
-        assert len(cs.orphaned_sig_names) == 1, cs.orphaned_sig_names
+        assert len(cs.local_orphaned_sig_names) == 0, cs.local_orphaned_sig_names
+        assert len(cs.remote_orphaned_sig_names) == 1, cs.remote_orphaned_sig_names
         assert len(cs.incomplete_backup_sets) == 1, cs.incomplete_backup_sets
 
         right_list = ["duplicity-new-signatures.2001-08-17T02:05:13-05:00.to.2002-08-17T05:05:14-05:00.sigtar.gpg",
                       "duplicity-full.2002-08-15T01:01:01-07:00.vol1.difftar.gpg",
                       "duplicity-inc.2000-08-17T16:17:01-07:00.to.2000-08-18T00:04:30-07:00.manifest.gpg",
                       "duplicity-inc.2000-08-17T16:17:01-07:00.to.2000-08-18T00:04:30-07:00.vol1.difftar.gpg"]
-        received_list = cs.get_extraneous()
+        local_received_list, remote_received_list = cs.get_extraneous()
         errors = []
-        for filename in received_list:
+        for filename in remote_received_list:
             if filename not in right_list:
                 errors.append("### Got bad extraneous filename " + filename)
             else: right_list.remove(filename)
