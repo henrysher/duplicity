@@ -57,7 +57,7 @@ class RdiffdirTest(unittest.TestCase):
         delta_path = path.Path("testfiles/output/delta.tar")
         sig_path = path.Path("testfiles/output/sig.tar")
 
-        self.run_cmd("cp -pr %s %s" % (new_path.name, seq_path.name))
+        self.run_cmd("cp -pR %s %s" % (new_path.name, seq_path.name))
         seq_path.setdata()
         self.run_rdiffdir("sig %s %s" % (seq_path.name, sig_path.name))
         sig_path.setdata()

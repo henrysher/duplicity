@@ -63,7 +63,7 @@ class RootTest(unittest.TestCase):
         """Test signatures, diffing, and patching on directory list"""
         assert len(filelist) >= 2
         self.deltmp()
-        assert not os.system("cp -pr %s testfiles/output/sequence" %
+        assert not os.system("cp -pR %s testfiles/output/sequence" %
                              (filelist[0],))
         seq_path = Path("testfiles/output/sequence")
         sig = Path("testfiles/output/sig.tar")
