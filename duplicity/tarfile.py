@@ -1084,16 +1084,25 @@ class TarFile:
         if tarinfo.chksum != calc_chksum(buf):
             self._dbg(1, "tarfile: Bad Checksum\n")
         return tarinfo
-
+        
     def _proc_gnulong(self, tarinfo, type):
-        """Evaluate the two blocks that hold a GNU longname
+        """Evaluate the blocks that hold a GNU longname
            or longlink member.
         """
         name = None
         linkname = None
+        #may be some sanity checking should be done here
+        #assert tarinfo.size < 1000 * BLOCKSIZE, "Filename appears to be too long!"
         buf = self.fileobj.read(BLOCKSIZE)
         if not buf: return None
+        namesize = tarinfo.size - BLOCKSIZE
         self.offset += BLOCKSIZE
+        # may be the whole name should be read with one operation?
+        while namesize > 0:
+            buf += self.fileobj.read(BLOCKSIZE)
+            if not buf: return None
+            self.offset += BLOCKSIZE
+            namesize -= BLOCKSIZE
         if type == GNUTYPE_LONGNAME: name = nts(buf)
         if type == GNUTYPE_LONGLINK: linkname = nts(buf)
 
@@ -1109,6 +1118,8 @@ class TarFile:
         self.offset += BLOCKSIZE
         return tarinfo
 
+
+
     def _return_gnulong(self, name, type):
         """Insert a GNU longname/longlink member into the archive.
            It consists of a common tar header, with the length
@@ -1121,8 +1132,9 @@ class TarFile:
         tarinfo.mode = 0
         tarinfo.size = len(name)
 
+        residual = (tarinfo.size % BLOCKSIZE)
         return "%s%s%s" % (tarinfo.getheader(), name,
-                           "\0" * (512 - len(name)))
+                           "\0" * ((BLOCKSIZE - residual) * (residual > 0)))
 
     def _proc_sparse(self, tarinfo):
         """Analyze a GNU sparse header plus extra headers.

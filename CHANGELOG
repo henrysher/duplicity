@@ -1,9 +1,12 @@
 New in v0.6.05 (2009/08/??)
 ---------------------------
 Bugs fixed this release:
-409593  deja-dup (or duplicity) deletes all signatures
 408059  Failure due to _logger.log failure for content with special
         characters: TypeError decoding Unicode not supported
+409593  deja-dup (or duplicity) deletes all signatures
+412667  "duplicity remove-older-than" asks for passphrase even though
+        not required
+418170  [PATCH] file names longer then 512 symbols are not supported
 
 
 New in v0.6.04 (2009/08/01)
