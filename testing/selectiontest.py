@@ -258,8 +258,8 @@ testfiles/select/1/1
         assert sf(root) is None
         assert sf(Path("/usr/bin")) is None, \
                "Assumption: /usr/bin is on the same filesystem as /"
-        assert sf(Path("/proc")) == 0, \
-               "Assumption: /proc is on a different filesystem"
+        assert sf(Path("/dev")) == 0, \
+               "Assumption: /dev is on a different filesystem"
 
 class ParseArgsTest(unittest.TestCase):
     """Test argument parsing"""
