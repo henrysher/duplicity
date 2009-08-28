@@ -93,7 +93,7 @@ class PatchingTest(unittest.TestCase):
     def test_root(self):
         """Test changing uid/gid, devices"""
         self.deltmp()
-        os.system("cp -a testfiles/root1 testfiles/output/sequence")
+        os.system("cp -pR testfiles/root1 testfiles/output/sequence")
         seq_path = Path("testfiles/output/sequence")
         new_path = Path("testfiles/root2")
         sig = Path("testfiles/output/sig.tar")

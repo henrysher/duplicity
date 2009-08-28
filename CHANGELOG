@@ -1,6 +1,11 @@
-New in v0.6.05 (2009/08/??)
+New in v0.6.05 (2009/08/28)
 ---------------------------
+Merged in ~l2g/duplicity/test-compat from Larry Gilbert which made
+the testing compatible across more systems.  Also fixed the remaining
+collectionstest bug which was trying to test with no cache present.
+
 Bugs fixed this release:
+407968  GIO backend can't restore
 408059  Failure due to _logger.log failure for content with special
         characters: TypeError decoding Unicode not supported
 409593  deja-dup (or duplicity) deletes all signatures

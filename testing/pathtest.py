@@ -39,7 +39,7 @@ class PathTest(unittest.TestCase):
     def test_deltree(self):
         """Test deleting a tree"""
         assert not os.system("rm -rf testfiles/output")
-        assert not os.system("cp -a testfiles/deltree testfiles/output")
+        assert not os.system("cp -pR testfiles/deltree testfiles/output")
         p = Path("testfiles/output")
         assert p.isdir()
         p.deltree()
@@ -48,7 +48,7 @@ class PathTest(unittest.TestCase):
     def test_compare(self):
         """Test directory comparisons"""
         assert not os.system("rm -rf testfiles/output")
-        assert not os.system("cp -a testfiles/dir1 testfiles/output")
+        assert not os.system("cp -pR testfiles/dir1 testfiles/output")
         assert Path("testfiles/dir1").compare_recursive(Path("testfiles/output"), 1)
         assert not Path("testfiles/dir1").compare_recursive(Path("testfiles/dir2"), 1)
 

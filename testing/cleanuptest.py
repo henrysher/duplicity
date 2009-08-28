@@ -32,8 +32,8 @@ config.setup()
 backend_url = "file://testfiles/output"
 
 # Extra arguments to be passed to duplicity
-#other_args = ["-v0", "--no-print-statistics"]
-other_args = []
+other_args = ["-v0", "--no-print-statistics"]
+#other_args = []
 
 # If this is set to true, after each backup, verify contents
 verify = 1

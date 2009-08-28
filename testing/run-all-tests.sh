@@ -27,7 +27,7 @@ pwd
 #${SUDO} tar xzf testfiles.tar.gz
 
 for v in 2.3 2.4 2.5 2.6; do
-    if [ -e /usr/bin/python$v ]; then
+    if command -v python$v; then
         LOG=run-all-tests-$v.log
         rm -f $LOG
 

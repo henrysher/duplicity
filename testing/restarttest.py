@@ -241,7 +241,7 @@ class RestartTest(unittest.TestCase):
         # create 3 2M files
         assert not os.system("mkdir testfiles/largefiles")
         for n in (1,2,3):
-            assert not os.system("dd if=/dev/urandom of=testfiles/largefiles/file%d bs=1K count=2048 >& /dev/null" % n)
+            assert not os.system("dd if=/dev/urandom of=testfiles/largefiles/file%d bs=1024 count=2048 >& /dev/null" % n)
         # we know we're going to fail, it's forced
         try:
             self.backup("full", "testfiles/largefiles", options = ["--vol 1", "--fail 3"])
@@ -264,7 +264,7 @@ class RestartTest(unittest.TestCase):
         # create 3 2M files
         assert not os.system("mkdir testfiles/largefiles")
         for n in (1,2,3):
-            assert not os.system("dd if=/dev/urandom of=testfiles/largefiles/file%d bs=1K count=2048 >& /dev/null" % n)
+            assert not os.system("dd if=/dev/urandom of=testfiles/largefiles/file%d bs=1024 count=2048 >& /dev/null" % n)
         # we know we're going to fail, it's forced
         try:
             self.backup("full", "testfiles/largefiles", options = ["--vol 1", "--fail 6"])
