@@ -1,3 +1,115 @@
+2009-08-28  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in ~l2g/duplicity/test-compat from Larry Gilbert which made
+	the testing compatible across more systems.  Also fixed the remaining
+	collectionstest bug which was trying to test with no cache present.
+
+2009-08-26  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	Test separate filesystems using /dev instead of /proc (more widely used)
+
+2009-08-23  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	dd on Darwin (and FreeBSD?) doesn't like e.g. "bs=1K", so changed it to "bs=1024"
+
+2009-08-23  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	"cp -pR" seems to be a better analogue to "cp -a".  This may not be perfect
+	but it won't hang on a fifo copy like "cp -pr".
+
+2009-08-23  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	Got test_get_extraneous working in collectionstests.py
+
+2009-08-19  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	Unpacked testfiles.tar.gz on Mac OS X file system and repacked as new file
+
+2009-08-14  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	Changed options to 'cp' to be compatible with BSD style yet (hopefully)
+	stay compatible with GNU
+
+2009-08-14  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	Took care of some redundancy in tar usage
+
+2009-08-14  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	Use bash "command" command to look for Python binaries beyond /usr/bin
+
+2009-08-25  Kenneth Loafman  <kenneth@loafman.com>
+
+	418170  [PATCH] file names longer then 512 symbols are not supported
+
+2009-08-25  Kenneth Loafman  <kenneth@loafman.com>
+
+	408059  Failure due to _logger.log failure for content with special characters: TypeError decoding Unicode not supported
+
+2009-08-12  Larry Gilbert  <larry+launchpad@L2G.to>
+
+	"remove-older-than" asks for passphrase even though not required; watch for correct internal action name to fix this
+
+2009-08-12  Larry Gilbert  <larry+launchpad@L2G.to>
+
+	"remove-older-than" asks for passphrase even though not required; watch for correct internal action name to fix this
+
+2009-08-11  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	Typo in remove-older-than may have caused unnecessary passphrase prompts?
+
+2009-08-06  Kenneth Loafman  <kenneth@loafman.com>
+
+	Changes for 0.5.19.
+
+2009-07-29  Kenneth Loafman  <kenneth@loafman.com>
+
+	Fix getrlimit usage for Cygwin, which was returning -1 for the hard limit on max open files
+
+2009-07-10  Kenneth Loafman  <kenneth@loafman.com>
+
+	* ignore unicode() translation errors in log messsages.
+
+2009-07-10  Kenneth Loafman  <kenneth@loafman.com>
+
+	* Make sure 'invalid packet (ctb=14)' from gpg is not a fatal error.
+
+2009-07-10  Kenneth Loafman  <kenneth@loafman.com>
+
+	* On processes that complete before waitpid(), log them and return zero as the process.returned value.  They will have already trapped in the main thread if they returned in error.
+
+2009-07-10  Kenneth Loafman  <kenneth@loafman.com>
+
+	* Copy changes from trunk for duplicity translation.
+
+2009-08-12  Kenneth Loafman  <kenneth@loafman.com>
+
+	Comment out Pydev debug startup code.
+
+2009-08-12  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merge from trunk.
+
+2009-08-11  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	Typo in "remove-older-than" may have caused unnecessary passphrase prompts?
+
+2009-08-12  Kenneth Loafman  <kenneth@loafman.com>
+
+	* Fixed #409593 deja-dup (or duplicity) deletes all signatures
+
+2009-08-05  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merge GIO changes from trunk.
+
+2009-08-02  Michael Terry  <michael.terry@canonical.com>
+
+	allow gio backend to restore by setting correct state.  LP: #407968
+
+2009-08-01  Kenneth Loafman  <kenneth@loafman.com>
+
+	Changes for 0.6.04.
+
 2009-08-01  Kenneth Loafman  <kenneth@loafman.com>
 
 	Changes for 0.6.04.
