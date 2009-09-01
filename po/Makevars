@@ -22,7 +22,7 @@
 DOMAIN = duplicity
 subdir = po
 top_builddir = ..
-XGETTEXT_OPTIONS = --keyword=_ --keyword=N_ --from-code=UTF-8 --language=Python
+XGETTEXT_OPTIONS = --keyword=_ --keyword=N_ --from-code=UTF-8 --language=Python --add-comments="TRANSL:"
 COPYRIGHT_HOLDER = Kenneth Loafman <kenneth@loafman.com>
 MSGID_BUGS_ADDRESS = Kenneth Loafman <kenneth@loafman.com>
 
