@@ -1076,8 +1076,8 @@ class TarFile:
         tarinfo.uname = nts(buf[265:297])
         tarinfo.gname = nts(buf[297:329])
         try:
-            tarinfo.devmajor = int(buf[329:337], 8)
-            tarinfo.devminor = int(buf[337:345], 8)
+            tarinfo.devmajor = int(buf[329:336], 8)
+            tarinfo.devminor = int(buf[337:344], 8)
         except ValueError:
             tarinfo.devmajor = tarinfo.devmajor = 0
         tarinfo.prefix = buf[345:500]

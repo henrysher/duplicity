@@ -88,10 +88,9 @@ class ROPath:
             raise PathException("Unknown type")
 
         self.mode = stat.S_IMODE(st_mode)
-        # The following can be replaced with major(), minor() macros
-        # in later versions of python (>= 2.3 I think)
         if self.type in ("chr", "blk"):
-            self.devnums = (self.stat.st_rdev >> 8, self.stat.st_rdev & 0xff)
+            self.devnums = (os.major(self.stat.st_rdev),
+                            os.minor(self.stat.st_rdev))
 
     def blank(self):
         """Black out self - set type and stat to None"""
