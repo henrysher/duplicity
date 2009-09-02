@@ -3,10 +3,13 @@ New in v0.6.06 (2009/09/00)
 Applied patches from Kasper Brand that fixed device file handling.
 http://lists.gnu.org/archive/html/duplicity-talk/2009-09/msg00001.html
 
+Merged in lp:~l2g/duplicity/flag-transl-comments which cleared up how
+translation comments should be passed to the translators cleanly now.
+
 
 New in v0.6.05 (2009/08/28)
 ---------------------------
-Merged in ~l2g/duplicity/test-compat from Larry Gilbert which made
+Merged in lp:~l2g/duplicity/test-compat from Larry Gilbert which made
 the testing compatible across more systems.  Also fixed the remaining
 collectionstest bug which was trying to test with no cache present.
 

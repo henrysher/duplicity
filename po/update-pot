@@ -1,3 +1,4 @@
 #!/bin/sh
 
 intltool-update --pot -g duplicity
+sed -e 's/^#\. TRANSL:/#./' -i '' duplicity.pot
