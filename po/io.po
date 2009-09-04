@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: duplicity 0.5.03\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
 "POT-Creation-Date: 2009-08-30 23:01-0700\n"
-"PO-Revision-Date: 2009-07-03 14:45+0000\n"
+"PO-Revision-Date: 2009-07-27 19:06+0000\n"
 "Last-Translator: Michael Terry <michael.terry@canonical.com>\n"
 "Language-Team: Ido\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-07-21 22:24+0000\n"
+"X-Launchpad-Export-Date: 2009-09-04 00:00+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../duplicity-bin:191
@@ -484,7 +484,8 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: ../duplicity/collections.py:711
-msgid "Warning, discarding last backup set, because of missing signature file."
+msgid ""
+"Warning, discarding last backup set, because of missing signature file."
 msgstr ""
 
 #: ../duplicity/collections.py:744
@@ -821,7 +822,8 @@ msgstr ""
 
 #: ../duplicity/commandline.py:702
 #, python-format
-msgid "Specified archive directory '%s' does not exist, or is not a directory"
+msgid ""
+"Specified archive directory '%s' does not exist, or is not a directory"
 msgstr ""
 
 #: ../duplicity/commandline.py:711
