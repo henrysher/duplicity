@@ -630,8 +630,9 @@ class CollectionsStatus:
                                       "and %d incomplete backup sets.",
                                       len(self.incomplete_backup_sets))
                      % (len(self.incomplete_backup_sets),))
-            l.append(_("These may be deleted by running duplicity with the "
-                       "--cleanup option."))
+            # TRANSL: "cleanup" is a hard-coded command, so do not translate it
+            l.append(_('These may be deleted by running duplicity with the '
+                       '"cleanup" command.'))
         else:
             l.append(_("No orphaned or incomplete backup sets found."))
 
