@@ -1,3 +1,8 @@
+New in v0.7.00 (2009/09/00)
+---------------------------
+422477  [PATCH] IMAP Backend Error in delete()
+
+
 New in v0.6.06 (2009/09/00)
 ---------------------------
 Applied patches from Kasper Brand that fixed device file handling.

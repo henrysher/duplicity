@@ -21,7 +21,6 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import imaplib
-import base64
 import re
 import os
 import time
@@ -29,10 +28,7 @@ import socket
 import StringIO
 import rfc822
 import getpass
-import email.Encoders
-import email.MIMEBase
-import email.MIMEMultipart
-import email.Parser
+import email
 
 import duplicity.backend
 from duplicity import globals
@@ -58,7 +54,10 @@ class ImapBackend(duplicity.backend.Backend):
 
         #  Set the password
         if ( not parsed_url.password ):
-            password = getpass.getpass("Enter account password: ")
+            if os.environ.has_key('IMAP_PASSWORD'):
+                password = os.environ.get('IMAP_PASSWORD')
+            else:
+                password = getpass.getpass("Enter account password: ")
         else:
             password = parsed_url.password
 
@@ -95,9 +94,9 @@ class ImapBackend(duplicity.backend.Backend):
             self._conn.select(globals.imap_mailbox)
             log.Info("IMAP connected")
         else:
-           self._conn.login(self._username + "@" + parsed_url.hostname, self._password)
-           self._conn.select(globals.imap_mailbox)
-           log.Info("IMAP connected")
+            self._conn.login(self._username + "@" + parsed_url.hostname, self._password)
+            self._conn.select(globals.imap_mailbox)
+            log.Info("IMAP connected")
 
 
     def _prepareBody(self,f,rname):
@@ -133,7 +132,7 @@ class ImapBackend(duplicity.backend.Backend):
                 # If we don't select the IMAP folder before
                 # append, the message goes into the INBOX.
                 self._conn.select(globals.imap_mailbox)
-                self._conn.append(globals.imap_mailbox,None,None,body)
+                self._conn.append(globals.imap_mailbox, None, None, body)
                 break
             except (imaplib.IMAP4.abort, socket.error, socket.sslerror):
                 allowedTimeout -= 1
@@ -248,7 +247,7 @@ class ImapBackend(duplicity.backend.Backend):
     def delete(self, filename_list):
         assert len(filename_list) > 0
         for filename in filename_list:
-            list = self._imapf(self._conn.search,None,"(HEADER, Subject %s)"%filename)
+            list = self._imapf(self._conn.search,None,"(SUBJECT %s)"%filename)
             list = list[0].split()
             if len(list)==0 or list[0]=="":raise Exception("no such mail with subject '%s'"%filename)
             self._delete_single_mail(list[0])
