@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>duplicity-src</name>
+	<name>duplicity-0.7-series</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -14,16 +14,4 @@
 	<natures>
 		<nature>org.python.pydev.pythonNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>duplicity.py</name>
-			<type>1</type>
-			<location>/home/ken/workspace/duplicity-src/duplicity-bin</location>
-		</link>
-		<link>
-			<name>rdiffdir.py</name>
-			<type>1</type>
-			<location>/home/ken/workspace/duplicity-src/rdiffdir</location>
-		</link>
-	</linkedResources>
 </projectDescription>
