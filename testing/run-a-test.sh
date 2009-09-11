@@ -19,18 +19,23 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-SUDO=sudo
+# Check permissions
+if [ "`id -ur`" != '0' ]; then
+    echo 'Error: you must be root.'
+    exit 1
+fi
 
+# Go to directory housing this script
 cd `dirname $0`
 pwd
 
+# skip if test does not exist
 if [ ! -e $1 ]; then
     echo "No test named $1"
     exit 1
 fi
 
-#${SUDO} tar xzf testfiles.tar.gz
-
+# run against all supported python versions
 for v in 2.3 2.4 2.5 2.6; do
     if command -v python$v ; then
         echo "========== Compiling librsync for python$v =========="
@@ -40,8 +45,6 @@ for v in 2.3 2.4 2.5 2.6; do
 
         echo "Running test $1 for python$v"
         echo "========== Running $1 =========="
-        ${SUDO} python$v -u $1 -v 2>&1 | grep -v "unsafe ownership"
+        python$v -u $1 -v 2>&1 | grep -v "unsafe ownership"
     fi
 done
-
-#${SUDO} rm -rf testfiles tempdir temp2.tar

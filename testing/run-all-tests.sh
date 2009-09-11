@@ -19,13 +19,17 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-SUDO=sudo
+# Check permissions
+if [ "`id -ur`" != '0' ]; then
+    echo 'Error: you must be root.'
+    exit 1
+fi
 
+# Go to directory housing this script
 cd `dirname $0`
 pwd
 
-#${SUDO} tar xzf testfiles.tar.gz
-
+# run against all supported python versions
 for v in 2.3 2.4 2.5 2.6; do
     if command -v python$v; then
         LOG=run-all-tests-$v.log
@@ -39,11 +43,9 @@ for v in 2.3 2.4 2.5 2.6; do
         echo "Running tests for python$v" | tee -a $LOG
         for t in `cat alltests`; do
             echo "========== Running $t ==========" | tee -a $LOG
-            ${SUDO} python$v -u $t -v 2>&1 | grep -v "unsafe ownership" | tee -a $LOG
+            python$v -u $t -v 2>&1 | grep -v "unsafe ownership" | tee -a $LOG
             echo | tee -a  $LOG
             echo | tee -a  $LOG
         done
     fi
 done
-
-#${SUDO} rm -rf testfiles tempdir temp2.tar
