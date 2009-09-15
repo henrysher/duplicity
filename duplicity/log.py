@@ -90,6 +90,7 @@ class InfoCode:
     asynchronous_upload_begin = 12
     synchronous_upload_done = 13
     asynchronous_upload_done = 14
+    skipping_socket = 15
 
 def Info(s, code=InfoCode.generic, extra=None):
     """Shortcut used for info messages (verbosity 5)."""
@@ -123,10 +124,13 @@ class WarningCode:
     incomplete_backup = 5
     orphaned_backup = 6
     ftp_ncftp_v320 = 7 # moved from error
+    cannot_iterate = 8
+    cannot_stat = 9
+    cannot_read = 10
 
-def Warn(s, code=WarningCode.generic):
+def Warn(s, code=WarningCode.generic, extra=None):
     """Shortcut used for warning messages (verbosity 2)"""
-    Log(s, WARNING, code)
+    Log(s, WARNING, code, extra)
 
 class ErrorCode:
     """Enumeration class to hold error code values.
