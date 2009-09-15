@@ -36,6 +36,7 @@ from duplicity.path import *
 from duplicity import log
 from duplicity import globals
 from duplicity import diffdir
+from duplicity import util
 
 class SelectError(Exception):
     """Some error dealing with the Select class"""
@@ -112,14 +113,21 @@ class Select:
 
         """
         def error_handler(exc, path, filename):
+            fullpath = os.path.join(path.name, filename)
             try:
-                mode = os.stat(path.name+"/"+filename)[stat.ST_MODE]
+                mode = os.stat(fullpath)[stat.ST_MODE]
                 if stat.S_ISSOCK(mode):
-                    log.Info(_("Skipping socket %s/%s") % (path.name, filename))
+                    log.Info(_("Skipping socket %s") % fullpath,
+                             log.InfoCode.skipping_socket,
+                             util.escape(fullpath))
                 else:
-                    log.Warn(_("Error initializing file %s/%s") % (path.name, filename))
+                    log.Warn(_("Error initializing file %s") % fullpath,
+                             log.WarningCode.cannot_iterate,
+                             util.escape(fullpath))
             except OSError:
-                log.Warn(_("Error accessing possibly locked file %s/%s") % (path.name, filename))
+                log.Warn(_("Error accessing possibly locked file %s") % fullpath, 
+                         log.WarningCode.cannot_stat,
+                         util.escape(fullpath))
             return None
 
         def diryield(path):
@@ -138,7 +146,9 @@ class Select:
                 # make sure file is read accessible
                 if (new_path and new_path.type in ["reg", "dir"]
                     and not os.access(new_path.name, os.R_OK)):
-                    log.Warn(_("Error accessing possibly locked file %s") % new_path.name)
+                    log.Warn(_("Error accessing possibly locked file %s") % new_path.name,
+                             log.WarningCode.cannot_read,
+                             util.escape(new_path.name))
                     if diffdir.stats:
                         diffdir.stats.Errors +=1
                     new_path = None
