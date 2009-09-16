@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2009-08-30 23:01-0700\n"
-"PO-Revision-Date: 2009-09-06 12:52+0000\n"
+"POT-Creation-Date: 2009-09-15 06:36-0500\n"
+"PO-Revision-Date: 2009-09-15 03:17+0000\n"
 "Last-Translator: Kenneth Loafman <kenneth@loafman.com>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-09-08 02:56+0000\n"
+"X-Launchpad-Export-Date: 2009-09-16 09:55+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../duplicity-bin:191
@@ -491,105 +491,106 @@ msgid_plural "and %d incomplete backup sets."
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../duplicity/collections.py:633
-msgid "These may be deleted by running duplicity with the --cleanup option."
+#. "cleanup" is a hard-coded command, so do not translate it
+#: ../duplicity/collections.py:634
+msgid ""
+"These may be deleted by running duplicity with the \"cleanup\" command."
 msgstr ""
-"Estes podem ser removidos executando o duplicity com a opção --cleanup."
 
-#: ../duplicity/collections.py:636
+#: ../duplicity/collections.py:637
 msgid "No orphaned or incomplete backup sets found."
 msgstr ""
 "Não foram encontrados conjuntos de cópias de segurança órfãos ou incompletos."
 
-#: ../duplicity/collections.py:652
+#: ../duplicity/collections.py:653
 #, python-format
 msgid "%d file exists on backend"
 msgid_plural "%d files exist on backend"
 msgstr[0] "Existe %d ficheiro no motor de processamento"
 msgstr[1] "Existem %d ficheiros no motor de processamento"
 
-#: ../duplicity/collections.py:659
+#: ../duplicity/collections.py:660
 #, python-format
 msgid "%d file exists in cache"
 msgid_plural "%d files exist in cache"
 msgstr[0] "Existe %d ficheiro na cache"
 msgstr[1] "Existem %d ficheiros na cache"
 
-#: ../duplicity/collections.py:711
+#: ../duplicity/collections.py:712
 msgid ""
 "Warning, discarding last backup set, because of missing signature file."
 msgstr ""
 "Aviso: a eliminar último conjunto de cópia de segurança devido à ausência de "
 "um ficheiro de assinaturas."
 
-#: ../duplicity/collections.py:744
+#: ../duplicity/collections.py:745
 msgid "Warning, found the following local orphaned signature file:"
 msgid_plural "Warning, found the following local orphaned signature files:"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../duplicity/collections.py:753
+#: ../duplicity/collections.py:754
 msgid "Warning, found the following remote orphaned signature file:"
 msgid_plural "Warning, found the following remote orphaned signature files:"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../duplicity/collections.py:763
+#: ../duplicity/collections.py:764
 msgid "Warning, found an unnecessary signature chain"
 msgid_plural "Warning, found unnecessary signature chains"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../duplicity/collections.py:771
+#: ../duplicity/collections.py:772
 msgid "Warning, found signatures but no corresponding backup files"
 msgstr ""
 "Aviso: as assinaturas foram encontradas, mas os ficheiros de cópia de "
 "segurança correspondentes não"
 
-#: ../duplicity/collections.py:775
+#: ../duplicity/collections.py:776
 msgid ""
 "Warning, found incomplete backup sets, probably left from aborted session"
 msgstr ""
 
-#: ../duplicity/collections.py:779
+#: ../duplicity/collections.py:780
 msgid "Warning, found the following orphaned backup file:"
 msgid_plural "Warning, found the following orphaned backup files:"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../duplicity/collections.py:797
+#: ../duplicity/collections.py:798
 #, python-format
 msgid "Extracting backup chains from list of files: %s"
 msgstr ""
 
-#: ../duplicity/collections.py:807
+#: ../duplicity/collections.py:808
 #, python-format
 msgid "File %s is part of known set"
 msgstr "O ficheiro %s pertence a um conjunto conhecido"
 
-#: ../duplicity/collections.py:810
+#: ../duplicity/collections.py:811
 #, python-format
 msgid "File %s is not part of a known set; creating new set"
 msgstr ""
 "O ficheiro %s não pertence a um conjunto conhecido; a criar um novo conjunto"
 
-#: ../duplicity/collections.py:815
+#: ../duplicity/collections.py:816
 #, python-format
 msgid "Ignoring file (rejected by backup set) '%s'"
 msgstr ""
 "A ignorar o ficheiro (rejeitado pelo conjunto de cópia de segurança) '%s'"
 
-#: ../duplicity/collections.py:828
+#: ../duplicity/collections.py:829
 #, python-format
 msgid "Found backup chain %s"
 msgstr ""
 
-#: ../duplicity/collections.py:833
+#: ../duplicity/collections.py:834
 #, python-format
 msgid "Added set %s to pre-existing chain %s"
 msgstr ""
 
-#: ../duplicity/collections.py:837
+#: ../duplicity/collections.py:838
 #, python-format
 msgid "Found orphaned set %s"
 msgstr "Foi encontrado o conjunto órfão %s"
@@ -1051,73 +1052,73 @@ msgstr ""
 msgid "Writing %s of type %s"
 msgstr ""
 
-#: ../duplicity/path.py:210 ../duplicity/path.py:269
+#: ../duplicity/path.py:209 ../duplicity/path.py:268
 #, python-format
 msgid "Warning: %s has negative mtime, treating as 0."
 msgstr "Aviso: %s tem um mtime negativo. A tratar como se fosse 0."
 
-#: ../duplicity/path.py:334
+#: ../duplicity/path.py:333
 msgid "Difference found:"
 msgstr "Diferença encontrada:"
 
-#: ../duplicity/path.py:340
+#: ../duplicity/path.py:339
 #, python-format
 msgid "New file %s"
 msgstr "Novo ficheiro %s"
 
-#: ../duplicity/path.py:343
+#: ../duplicity/path.py:342
 #, python-format
 msgid "File %s is missing"
 msgstr "Não foi possível encontrar o ficheiro %s"
 
-#: ../duplicity/path.py:346
+#: ../duplicity/path.py:345
 #, python-format
 msgid "File %%s has type %s, expected %s"
 msgstr "O ficheiro %%s é do tipo %s. Esperava-se que fosse do tipo %s."
 
-#: ../duplicity/path.py:352 ../duplicity/path.py:378
+#: ../duplicity/path.py:351 ../duplicity/path.py:377
 #, python-format
 msgid "File %%s has permissions %o, expected %o"
 msgstr ""
 "O ficheiro %%s tem permissões %o. Esperava-se que tivesse permissões %o"
 
-#: ../duplicity/path.py:357
+#: ../duplicity/path.py:356
 #, python-format
 msgid "File %%s has mtime %s, expected %s"
 msgstr ""
 
-#: ../duplicity/path.py:365
+#: ../duplicity/path.py:364
 #, python-format
 msgid "Data for file %s is different"
 msgstr ""
 
-#: ../duplicity/path.py:373
+#: ../duplicity/path.py:372
 #, python-format
 msgid "Symlink %%s points to %s, expected %s"
 msgstr ""
 "A ligação simbólica %%s aponta para %s. Esperava-se que apontasse para %s."
 
-#: ../duplicity/path.py:382
+#: ../duplicity/path.py:381
 #, python-format
 msgid "Device file %%s has numbers %s, expected %s"
 msgstr ""
 
-#: ../duplicity/path.py:528
+#: ../duplicity/path.py:527
 #, python-format
 msgid "Making directory %s"
 msgstr "A criar a pasta %s"
 
-#: ../duplicity/path.py:538
+#: ../duplicity/path.py:537
 #, python-format
 msgid "Deleting %s"
 msgstr "A remover %s"
 
-#: ../duplicity/path.py:547
+#: ../duplicity/path.py:546
 #, python-format
 msgid "Touching %s"
 msgstr ""
 
-#: ../duplicity/path.py:554
+#: ../duplicity/path.py:553
 #, python-format
 msgid "Deleting tree %s"
 msgstr ""
@@ -1127,38 +1128,33 @@ msgstr ""
 msgid "Error listing directory %s"
 msgstr "Erro ao tentar listar a pasta %s"
 
-#: ../duplicity/selection.py:118
-#, python-format
-msgid "Skipping socket %s/%s"
-msgstr ""
-
 #: ../duplicity/selection.py:120
 #, python-format
-msgid "Error initializing file %s/%s"
-msgstr "Erro ao inicializar o ficheiro %s/%s"
-
-#: ../duplicity/selection.py:122
-#, python-format
-msgid "Error accessing possibly locked file %s/%s"
+msgid "Skipping socket %s"
 msgstr ""
 
-#: ../duplicity/selection.py:141
+#: ../duplicity/selection.py:124
+#, python-format
+msgid "Error initializing file %s"
+msgstr ""
+
+#: ../duplicity/selection.py:128 ../duplicity/selection.py:149
 #, python-format
 msgid "Error accessing possibly locked file %s"
 msgstr ""
 
-#: ../duplicity/selection.py:154
+#: ../duplicity/selection.py:164
 #, python-format
 msgid "Warning: base %s doesn't exist, continuing"
 msgstr ""
 
-#: ../duplicity/selection.py:157 ../duplicity/selection.py:175
-#: ../duplicity/selection.py:178
+#: ../duplicity/selection.py:167 ../duplicity/selection.py:185
+#: ../duplicity/selection.py:188
 #, python-format
 msgid "Selecting %s"
 msgstr "A seleccionar %s"
 
-#: ../duplicity/selection.py:259
+#: ../duplicity/selection.py:269
 #, python-format
 msgid ""
 "Fatal Error: The file specification\n"
@@ -1169,7 +1165,7 @@ msgid ""
 "pattern (such as '**') which matches the base directory."
 msgstr ""
 
-#: ../duplicity/selection.py:267
+#: ../duplicity/selection.py:277
 #, python-format
 msgid ""
 "Fatal Error while processing expression\n"
@@ -1178,7 +1174,7 @@ msgstr ""
 "Erro fatal ao processar a expressão\n"
 "%s"
 
-#: ../duplicity/selection.py:277
+#: ../duplicity/selection.py:287
 #, python-format
 msgid ""
 "Last selection expression:\n"
@@ -1188,43 +1184,43 @@ msgid ""
 "probably isn't what you meant."
 msgstr ""
 
-#: ../duplicity/selection.py:302
+#: ../duplicity/selection.py:312
 #, python-format
 msgid "Reading filelist %s"
 msgstr "A ler a lista de ficheiros %s"
 
-#: ../duplicity/selection.py:305
+#: ../duplicity/selection.py:315
 #, python-format
 msgid "Sorting filelist %s"
 msgstr "A ordenar a lista de ficheiros %s"
 
-#: ../duplicity/selection.py:332
+#: ../duplicity/selection.py:342
 #, python-format
 msgid ""
 "Warning: file specification '%s' in filelist %s\n"
 "doesn't start with correct prefix %s.  Ignoring."
 msgstr ""
 
-#: ../duplicity/selection.py:336
+#: ../duplicity/selection.py:346
 msgid "Future prefix errors will not be logged."
 msgstr ""
 
-#: ../duplicity/selection.py:352
+#: ../duplicity/selection.py:362
 #, python-format
 msgid "Error closing filelist %s"
 msgstr "Erro ao tentar fechar a lista de ficheiros %s"
 
-#: ../duplicity/selection.py:419
+#: ../duplicity/selection.py:429
 #, python-format
 msgid "Reading globbing filelist %s"
 msgstr ""
 
-#: ../duplicity/selection.py:452
+#: ../duplicity/selection.py:462
 #, python-format
 msgid "Error compiling regular expression %s"
 msgstr "Erro ao compilar a expressão regular %s"
 
-#: ../duplicity/selection.py:468
+#: ../duplicity/selection.py:478
 msgid ""
 "Warning: exclude-device-files is not the first selector.\n"
 "This may not be what you intended"
@@ -1289,3 +1285,11 @@ msgstr "A escrever %s"
 #, python-format
 msgid "Could not copy %s to %s"
 msgstr "Não foi possível copiar %s para %s"
+
+#~ msgid "These may be deleted by running duplicity with the --cleanup option."
+#~ msgstr ""
+#~ "Estes podem ser removidos executando o duplicity com a opção --cleanup."
+
+#, python-format
+#~ msgid "Error initializing file %s/%s"
+#~ msgstr "Erro ao inicializar o ficheiro %s/%s"
