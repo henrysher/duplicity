@@ -20,7 +20,7 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import config
-import sys, unittest, os
+import os, py, sys, unittest
 
 import duplicity.backend
 import duplicity.backends
@@ -33,6 +33,24 @@ from duplicity.errors import *
 from duplicity import path, log, file_naming, dup_time, globals, gpg
 
 config.setup()
+
+class RootTest:
+    """Setup and teardown common to most tests.  Because of the contents
+    of the tarfile, these won't work unless being run as root."""
+
+    def setUp(self):
+        self.skip_me = False
+        self.testfiles_ready = False
+        if os.geteuid() != 0:
+            self.skip_me = 'Must be run as root due to tarfile contents'
+        if not os.system("tar xzf testfiles.tar.gz >& /dev/null"):
+            self.skip_me = 'Error extracting tarfile; no data to test with'
+
+        self.testfiles_ready = True
+
+    def tearDown(self):
+        if self.testfiles_ready:
+            assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
 class UnivTest:
     """Contains methods that help test any backend"""
@@ -48,18 +66,22 @@ class UnivTest:
 
     def test_basic(self):
         """Test basic backend operations"""
+        if self.skip_me:
+            py.test.skip(self.skip_me)
         if not self.url_string:
-            print "No URL for test %s...skipping... " % self.my_test_id,
-            return 0
+            py.test.skip("No URL for test %s" % self.my_test_id)
+
         config.set_environ("FTP_PASSWORD", self.password)
         self.del_tmp()
         self.try_basic(duplicity.backend.get_backend(self.url_string))
 
     def test_fileobj_ops(self):
         """Test fileobj operations"""
+        if self.skip_me:
+            py.test.skip(self.skip_me)
         if not self.url_string:
-            print "No URL for test %s...skipping... " % self.my_test_id,
-            return 0
+            py.test.skip("No URL for test %s" % self.my_test_id)
+
         config.set_environ("FTP_PASSWORD", self.password)
         self.try_fileobj_ops(duplicity.backend.get_backend(self.url_string))
 
@@ -136,117 +158,72 @@ class UnivTest:
         self.try_fileobj_filename(backend, filename2)
 
 
-class LocalTest(unittest.TestCase, UnivTest):
+class LocalTest(RootTest, UnivTest, unittest.TestCase):
     """ Test the Local backend """
-    def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
-
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     my_test_id = "local"
     url_string = config.file_url
     password = config.file_password
 
 
-class scpTest(unittest.TestCase, UnivTest):
+class scpTest(RootTest, UnivTest, unittest.TestCase):
     """ Test the SSH backend """
-    def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
-
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     my_test_id = "ssh/scp"
     url_string = config.ssh_url
     password = config.ssh_password
 
 
-class ftpTest(unittest.TestCase, UnivTest):
+class ftpTest(RootTest, UnivTest, unittest.TestCase):
     """ Test the ftp backend """
-    def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
-
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     my_test_id = "ftp"
     url_string = config.ftp_url
     password = config.ftp_password
 
 
-class rsyncAbsPathTest(unittest.TestCase, UnivTest):
+class rsyncAbsPathTest(RootTest, UnivTest, unittest.TestCase):
     """ Test the rsync abs path backend """
-    def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
-
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     my_test_id = "rsync_abspath"
     url_string = config.rsync_abspath_url
     password = config.rsync_password
 
 
-class rsyncRelPathTest(unittest.TestCase, UnivTest):
+class rsyncRelPathTest(RootTest, UnivTest, unittest.TestCase):
     """ Test the rsync relative path backend """
-    def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
-
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     my_test_id = "rsync_relpath"
     url_string = config.rsync_relpath_url
     password = config.rsync_password
 
 
-class rsyncModuleTest(unittest.TestCase, UnivTest):
+class rsyncModuleTest(RootTest, UnivTest, unittest.TestCase):
     """ Test the rsync module backend """
-    def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
-
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     my_test_id = "rsync_module"
     url_string = config.rsync_module_url
     password = config.rsync_password
 
 
-class s3ModuleTest(unittest.TestCase, UnivTest):
+class s3ModuleTest(RootTest, UnivTest, unittest.TestCase):
     """ Test the s3 module backend """
-    def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
-
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     my_test_id = "s3/boto"
     url_string = config.s3_url
     password = None
 
 
-class webdavModuleTest(unittest.TestCase, UnivTest):
+class webdavModuleTest(RootTest, UnivTest, unittest.TestCase):
     """ Test the webdav module backend """
-    def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
-
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     my_test_id = "webdav"
     url_string = config.webdav_url
     password = config.webdav_password
 
 
-class webdavsModuleTest(unittest.TestCase, UnivTest):
+class webdavsModuleTest(RootTest, UnivTest, unittest.TestCase):
     """ Test the webdavs module backend """
-    def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
-
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     my_test_id = "webdavs"
     url_string = config.webdavs_url
