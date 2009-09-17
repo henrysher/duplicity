@@ -26,7 +26,6 @@
 
 import config
 import sys, os, shutil, StringIO, tempfile, unittest, stat, pwd, grp
-sys.path.insert(0, "../")
 
 from duplicity import tarfile
 

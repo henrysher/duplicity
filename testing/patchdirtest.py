@@ -21,7 +21,6 @@
 
 import config
 import sys, cStringIO, os, unittest
-sys.path.insert(0, "../")
 
 from duplicity import diffdir
 from duplicity import patchdir

@@ -21,7 +21,6 @@
 
 import config
 import os, sys, random, unittest
-sys.path.insert(0, "../")
 
 from duplicity import collections
 from duplicity import backend

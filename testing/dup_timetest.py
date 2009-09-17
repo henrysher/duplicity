@@ -21,7 +21,6 @@
 
 import config
 import sys, unittest, time, types
-sys.path.insert(0, "../")
 
 from duplicity import globals
 from duplicity import dup_time

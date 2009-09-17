@@ -21,7 +21,6 @@
 
 import config
 import sys, os, unittest, gzip
-sys.path.insert(0, "../")
 
 from duplicity import tempdir
 
