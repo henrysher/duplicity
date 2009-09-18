@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
 # Copyright 2002 Ben Escoto <ben@emerose.org>
@@ -238,6 +239,7 @@ def parse(filename):
     Parse duplicity filename, return None or ParseResults object
     """
     filename = filename.lower()
+    is_par2 = filename.endswith(".par2")
     def str2time(timestr, short):
         """
         Return time in seconds if string can be converted, None otherwise
@@ -276,10 +278,10 @@ def parse(filename):
             if t:
                 if m1:
                     return ParseResults("full", time = t,
-                                        volume_number = get_vol_num(m1.group("num"), short))
+                                        volume_number = get_vol_num(m1.group("num"), short), par2 = is_par2)
                 else:
                     return ParseResults("full", time = t, manifest = True,
-                                        partial = (m2.group("partial") != None))
+                                        partial = (m2.group("partial") != None), par2 = is_par2)
         return None
 
     def check_inc():
@@ -299,10 +301,10 @@ def parse(filename):
             if t1 and t2:
                 if m1:
                     return ParseResults("inc", start_time = t1,
-                                        end_time = t2, volume_number = get_vol_num(m1.group("num"), short))
+                                        end_time = t2, volume_number = get_vol_num(m1.group("num"), short), par2 = is_par2)
                 else:
                     return ParseResults("inc", start_time = t1, end_time = t2, manifest = 1,
-                                        partial = (m2.group("partial") != None))
+                                        partial = (m2.group("partial") != None), par2 = is_par2)
         return None
 
     def check_sig():
@@ -318,7 +320,7 @@ def parse(filename):
             t = str2time(m.group("time"), short)
             if t:
                 return ParseResults("full-sig", time = t,
-                                    partial = (m.group("partial") != None))
+                                    partial = (m.group("partial") != None), par2 = is_par2)
             else:
                 return None
 
@@ -332,7 +334,7 @@ def parse(filename):
             t2 = str2time(m.group("end_time"), short)
             if t1 and t2:
                 return ParseResults("new-sig", start_time = t1, end_time = t2,
-                                    partial = (m.group("partial") != None))
+                                    partial = (m.group("partial") != None), par2 = is_par2)
         return None
 
     def set_encryption_or_compression(pr):
@@ -341,15 +343,15 @@ def parse(filename):
         """
         if (filename.endswith('.z') or
             not globals.short_filenames and filename.endswith('gz')):
-            pr.compressed = 1
+            pr.compressed = True
         else:
-            pr.compressed = None
+            pr.compressed = False
 
         if (filename.endswith('.g') or
             not globals.short_filenames and filename.endswith('.gpg')):
-            pr.encrypted = 1
+            pr.encrypted = True
         else:
-            pr.encrypted = None
+            pr.encrypted = False
 
     pr = check_full()
     if not pr:
@@ -368,13 +370,13 @@ class ParseResults:
     """
     def __init__(self, type, manifest = None, volume_number = None,
                  time = None, start_time = None, end_time = None,
-                 encrypted = None, compressed = None, partial = False):
+                 encrypted = None, compressed = None, partial = False, par2 = False):
 
         assert type in ["full-sig", "new-sig", "inc", "full"]
 
         self.type = type
         if type == "inc" or type == "full":
-            assert manifest or volume_number
+            assert manifest or volume_number or par2
         if type == "inc" or type == "new-sig":
             assert start_time and end_time
         else:
@@ -389,3 +391,4 @@ class ParseResults:
         self.encrypted = encrypted # true if gpg encrypted
 
         self.partial = partial
+        self.par2 = par2

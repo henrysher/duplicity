@@ -1,15 +1,11 @@
-New in v0.7.00 (2009/09/00)
+New in v0.7.00 (2009/09/??)
 ---------------------------
 422477  [PATCH] IMAP Backend Error in delete()
 
+426282  [PATCH] create par2 support
 
-New in v0.6.06 (2009/09/00)
----------------------------
-Applied patches from Kasper Brand that fixed device file handling.
-http://lists.gnu.org/archive/html/duplicity-talk/2009-09/msg00001.html
-
-Merged in lp:~l2g/duplicity/flag-transl-comments which cleared up how
-translation comments should be passed to the translators cleanly now.
+Merged in lp:~mterry/duplicity/iterate-warnings
+Add machine codes to various warnings when iterating over source files
 
 
 New in v0.6.05 (2009/08/28)

@@ -142,16 +142,16 @@ class CollectionTest(unittest.TestCase):
     def test_sig_chains(self):
         """Test making signature chains from filename list"""
         cs = collections.CollectionsStatus(dummy_backend, archive_dir)
-        chains, orphaned_paths = cs.get_signature_chains(local = 1)
-        self.sig_chains_helper(chains, orphaned_paths)
+        chains, orphaned_paths, par2_sig = cs.get_signature_chains(local = 1)
+        self.sig_chains_helper(chains, orphaned_paths, par2_sig)
 
     def test_sig_chains2(self):
         """Test making signature chains from filename list on backend"""
         cs = collections.CollectionsStatus(archive_dir_backend, archive_dir)
-        chains, orphaned_paths = cs.get_signature_chains(local = None)
-        self.sig_chains_helper(chains, orphaned_paths)
+        chains, orphaned_paths, par2_sig = cs.get_signature_chains(local = None)
+        self.sig_chains_helper(chains, orphaned_paths, par2_sig)
 
-    def sig_chains_helper(self, chains, orphaned_paths):
+    def sig_chains_helper(self, chains, orphaned_paths, par2_sig):
         """Test chains and orphaned_paths values for two above tests"""
         if orphaned_paths:
             for op in orphaned_paths: print op

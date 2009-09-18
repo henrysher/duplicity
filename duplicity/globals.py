@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
 # Copyright 2002 Ben Escoto <ben@emerose.org>
@@ -21,7 +22,7 @@
 
 """Store global configuration information"""
 
-import socket, sys, os
+import socket, os
 
 # The current version of duplicity
 version = "$version"
@@ -178,3 +179,6 @@ fail_on_volume = 0
 # circumstances. the default should absolutely always be True unless
 # you know what you are doing.
 ignore_errors = False
+
+# if True the par2 recovery files will be created.
+par2 = False

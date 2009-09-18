@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
 # Copyright 2002 Ben Escoto <ben@emerose.org>
@@ -177,6 +178,7 @@ class ErrorCode:
     connection_failed = 38
     restart_file_not_found = 39
     gio_not_available = 40
+    par2_missing = 41
 
 def FatalError(s, code, extra=None):
     """Write fatal error message and exit"""

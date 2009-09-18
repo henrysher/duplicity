@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
 # Copyright 2002 Ben Escoto <ben@emerose.org>
@@ -29,6 +30,7 @@ from duplicity import file_naming
 from duplicity import tempdir
 from duplicity import globals
 from duplicity import gpg
+from duplicity import par2_utils
 
 
 def new_temppath():
@@ -169,10 +171,13 @@ class FileobjHooked:
         """
         We have written the last checkpoint, now encrypt or compress
         and send a copy of it to the remote for final storage.
+        returns the extra bytes uploaded in par2 files
         """
         pr = file_naming.parse(self.remname)
         src = self.dirpath.append(self.partname)
         tgt = self.dirpath.append(self.remname)
+
+        extra_bytes = 0
         src_iter = SrcIter(src)
         if pr.compressed:
             gpg.GzipWriteFile(src_iter, tgt.name, size = sys.maxint)
@@ -180,8 +185,18 @@ class FileobjHooked:
             gpg.GPGWriteFile(src_iter, tgt.name, globals.gpg_profile, size = sys.maxint)
         else:
             os.system("cp -p %s %s" % (src.name, tgt.name))
+        if globals.par2:
+            par = self.dirpath.append(self.remname + ".par2")
+            for path, i in par2_utils.create(par.name, tgt.name):
+                par_vol = self.dirpath.append(i)
+                par_vol.setdata()
+                extra_bytes += par_vol.getsize()
+                globals.backend.put(par_vol)
+        
         globals.backend.put(tgt)
+
         os.unlink(tgt.name)
+        return extra_bytes
 
     def to_final(self):
         """

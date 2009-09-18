@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
 # duplicity -- Encrypted bandwidth efficient backup
@@ -54,6 +55,7 @@ from duplicity import robust
 from duplicity import tempdir
 from duplicity import asyncscheduler
 from duplicity import util
+from duplicity import par2_utils
 
 # If exit_val is not None, exit with given value at end.
 exit_val = None
@@ -238,8 +240,25 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
         return start_index, start_block, end_index, end_block
 
     def put(tdp, dest_filename):
+        putsize = 0
+        if globals.par2:
+            par = dup_temp.new_tempduppath(file_naming.parse(dest_filename + ".par2"))
+            for path, i in par2_utils.create(par.name, tdp.name):
+                dst_name = i.partition(os.path.basename(par.name))[2]
+                par_vol = dup_temp.new_tempduppath(file_naming.parse(dest_filename + dst_name + ".par2"))
+                os.rename(os.path.join(path, i), par_vol.name)
+                par_vol.setdata()
+                putsize += par_vol.getsize();
+                backend.put(par_vol, dest_filename + dst_name)
+                os.rename(par_vol.name, globals.archive_dir.append(dest_filename + dst_name).name)
+
+            backend.put(par, dest_filename + ".par2")
+            par.setdata()
+            putsize += par.getsize()
+            os.rename(par.name, globals.archive_dir.append(dest_filename + ".par2").name)
+
         backend.put(tdp, dest_filename)
-        putsize = tdp.getsize()
+        putsize += tdp.getsize()
         tdp.delete()
         return putsize
 
@@ -418,12 +437,12 @@ def full_backup(col_stats):
 
         # close sig file, send to remote, and rename to final
         sig_outfp.close()
-        sig_outfp.to_remote()
+        bytes_written += sig_outfp.to_remote()
         sig_outfp.to_final()
 
         # close manifest, send to remote, and rename to final
         man_outfp.close()
-        man_outfp.to_remote()
+        bytes_written += man_outfp.to_remote()
         man_outfp.to_final()
 
         col_stats.set_values(sig_chain_warning=None).cleanup_signatures()
@@ -489,12 +508,12 @@ def incremental_backup(sig_chain):
 
         # close sig file and rename to final
         new_sig_outfp.close()
-        new_sig_outfp.to_remote()
+        bytes_written += new_sig_outfp.to_remote()
         new_sig_outfp.to_final()
 
         # close manifest and rename to final
         new_man_outfp.close()
-        new_man_outfp.to_remote()
+        bytes_written += new_man_outfp.to_remote()
         new_man_outfp.to_final()
 
     print_statistics(diffdir.stats, bytes_written)

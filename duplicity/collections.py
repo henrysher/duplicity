@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
 # Copyright 2002 Ben Escoto <ben@emerose.org>
@@ -31,6 +32,7 @@ from duplicity import dup_time
 from duplicity import globals
 from duplicity import manifest
 from duplicity.gpg import GPGError
+from duplicity import par2_utils
 
 class CollectionsError(Exception):
     pass
@@ -52,6 +54,10 @@ class BackupSet:
         self.start_time = None                      # will be set if inc
         self.end_time = None                        # will be set if inc
         self.partial = False                        # true if a partial backup
+        self.par2_volume_name_dict = {}             # the volumes par2 files
+        self.manifest_par2 = None                   # the manifest par2 file
+
+
 
     def is_complete(self):
         """
@@ -84,8 +90,24 @@ class BackupSet:
             if (pr.start_time != self.start_time or
                 pr.end_time != self.end_time):
                 return False
+        if pr.par2:
+            #if the backend has par2 files then we should enable the par2 creation by default, or should we?
+            if par2_utils.is_par2_supported():
+                globals.par2 = True
+            elif not globals.force:
+                log.FatalError(_("Fatal Error: There are remote par2 files but par2 executable is not available.\n"
+                                "Either install par2 or pass --force option to force the operation."),
+                               log.ErrorCode.par2_missing)
 
-        if pr.manifest:
+
+            if pr.manifest:
+                self.manifest_par2 = filename
+            else:
+                assert pr.volume_number is not None
+                if not self.par2_volume_name_dict.has_key(pr.volume_number):
+                    self.par2_volume_name_dict[pr.volume_number] = []
+                self.par2_volume_name_dict[pr.volume_number].append(filename)
+        elif pr.manifest:
             self.set_manifest(filename)
         else:
             assert pr.volume_number is not None
@@ -120,11 +142,11 @@ class BackupSet:
 
         for local_filename in globals.archive_dir.listdir():
             pr = file_naming.parse(local_filename)
-            if (pr and pr.manifest
+            if (pr and pr.manifest and not pr.par2
                 and pr.type == self.type
                 and pr.time == self.time
                 and pr.start_time == self.start_time
-                and pr.end_time == self.end_time):
+                  and pr.end_time == self.end_time):
                 self.local_manifest_path = \
                               globals.archive_dir.append(local_filename)
                 break
@@ -567,6 +589,7 @@ class CollectionsStatus:
         # Other misc paths and sets which shouldn't be there
         self.local_orphaned_sig_names = []
         self.remote_orphaned_sig_names = []
+        self.sig_par2_files = []                    # the signatures par2 file
         self.orphaned_backup_sets = None
         self.incomplete_backup_sets = None
 
@@ -678,9 +701,9 @@ class CollectionsStatus:
 
         assert len(backup_chains) == len(self.all_backup_chains), "get_sorted_chains() did something more than re-ordering"
 
-        local_sig_chains, self.local_orphaned_sig_names = \
+        local_sig_chains, self.local_orphaned_sig_names, self.sig_par2_files = \
                             self.get_signature_chains(True)
-        remote_sig_chains, self.remote_orphaned_sig_names = \
+        remote_sig_chains, self.remote_orphaned_sig_names, self.sig_par2_files = \
                             self.get_signature_chains(False, filelist = backend_filename_list)
         self.set_matched_chain_pair(local_sig_chains + remote_sig_chains,
                                     backup_chains)
@@ -881,18 +904,19 @@ class CollectionsStatus:
                 return SignatureChain(False, self.backend)
 
         # Build initial chains from full sig filenames
-        chains, new_sig_filenames = [], []
+        chains, new_sig_filenames, par2_sig = [], [], []
         for filename in get_filelist():
             pr = file_naming.parse(filename)
             if pr:
-                if pr.type == "full-sig":
+                if pr.par2 and (pr.type == "full-sig" or pr.type == "new-sig"):
+                    par2_sig.append(pr)
+                elif pr.type == "full-sig":
                     new_chain = get_new_sigchain()
                     assert new_chain.add_filename(filename, pr)
                     chains.append(new_chain)
                 elif pr.type == "new-sig":
                     new_sig_filenames.append(filename)
-
-        # compare by file time
+                # compare by file time
         def by_start_time(a, b):
             return int(file_naming.parse(a).start_time) - int(file_naming.parse(b).start_time)
 
@@ -905,7 +929,7 @@ class CollectionsStatus:
                     break
             else:
                 orphaned_filenames.append(sig_filename)
-        return (chains, orphaned_filenames)
+        return (chains, orphaned_filenames, par2_sig)
 
     def get_sorted_chains(self, chain_list):
         """
@@ -918,6 +942,7 @@ class CollectionsStatus:
                 endtime_chain_dict[chain.end_time].append(chain)
             else:
                 endtime_chain_dict[chain.end_time] = [chain]
+
 
         # Use dictionary to build final sorted list
         sorted_end_times = endtime_chain_dict.keys()

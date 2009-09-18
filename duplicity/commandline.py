@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
 # Copyright 2002 Ben Escoto <ben@emerose.org>
@@ -40,6 +41,7 @@ from duplicity import gpg
 from duplicity import log
 from duplicity import path
 from duplicity import selection
+from duplicity import par2_utils
 
 
 select_opts = []            # Will hold all the selection options
@@ -118,6 +120,7 @@ options = ["allow-source-mismatch",
            "verbosity=",
            "version",
            "volsize=",
+           "par2",
            ]
 
 
@@ -385,6 +388,12 @@ def parse_cmdline_options(arglist):
             globals.ignore_errors = True
         elif opt == "--imap-full-address":
             globals.imap_full_address = True
+        elif opt == "--par2":
+            if par2_utils.is_par2_supported():
+                globals.par2 = True;
+            else:
+                command_line_error("Par2 support was requested but par2 executable cannot be found.\n" 
+                                   "Please make the par2 executable availabe in your PATH environment.")
         else:
             command_line_error("Unknown option %s" % opt)
 
