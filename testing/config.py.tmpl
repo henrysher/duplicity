@@ -20,12 +20,20 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import sys, os
-sys.path.insert(0, "../")
+from os import path
+
+# Add this module's grandparent directory to the lib path
+sys.path.insert(0, path.abspath(
+                       path.join(
+                           path.realpath(__file__),
+                           path.pardir,
+                           path.pardir )))
 
 import gettext
 gettext.install('duplicity')
 
 from duplicity import globals
+from duplicity import backend
 from duplicity import log
 
 # config for duplicity unit tests

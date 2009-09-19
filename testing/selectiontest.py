@@ -21,7 +21,6 @@
 
 import config
 import re, StringIO, unittest, sys
-sys.path.insert(0, "../")
 
 from duplicity import log
 from duplicity.selection import *

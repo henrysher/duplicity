@@ -21,7 +21,6 @@
 
 import config
 import sys, unittest, types
-sys.path.insert(0, "../")
 
 from duplicity import manifest
 from duplicity import globals

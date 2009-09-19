@@ -21,7 +21,6 @@
 
 import config
 import sys, os, unittest
-sys.path.insert(0, "../")
 
 import duplicity.backend
 from duplicity import path
