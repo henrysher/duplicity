@@ -21,7 +21,6 @@
 
 import config
 import sys, unittest
-sys.path.insert(0, "../")
 
 from duplicity import dup_time
 from duplicity import file_naming
