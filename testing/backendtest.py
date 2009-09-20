@@ -39,11 +39,13 @@ class RootTest:
     """Setup and teardown common to most tests.  Because of the contents
     of the tarfile, these won't work unless being run as root."""
 
+    skip_me = False
+    test_files_ready = False
+
     def setUp(self):
-        self.skip_me = False
-        self.test_files_ready = False
         if os.geteuid() != 0:
             self.skip_me = 'Must be run as root due to tarfile contents'
+            return
 
         _util.extract_test_files()
         self.test_files_ready = True
