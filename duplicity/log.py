@@ -140,7 +140,7 @@ class ErrorCode:
        to indicate which error occurred via both exit code and log."""
     generic = 1 # Don't use if possible, please create a new code and use it
     command_line = 2
-    source_mismatch = 3
+    hostname_mismatch = 3
     no_manifests = 4
     mismatched_manifests = 5
     unreadable_manifests = 6
@@ -179,6 +179,7 @@ class ErrorCode:
     restart_file_not_found = 39
     gio_not_available = 40
     par2_missing = 41
+    source_dir_mismatch = 42
 
 def FatalError(s, code, extra=None):
     """Write fatal error message and exit"""
