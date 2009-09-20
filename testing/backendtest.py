@@ -20,6 +20,7 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import config
+import _util
 import os, py, sys, unittest
 
 import duplicity.backend
@@ -40,17 +41,16 @@ class RootTest:
 
     def setUp(self):
         self.skip_me = False
-        self.testfiles_ready = False
+        self.test_files_ready = False
         if os.geteuid() != 0:
             self.skip_me = 'Must be run as root due to tarfile contents'
-        if not os.system("tar xzf testfiles.tar.gz >& /dev/null"):
-            self.skip_me = 'Error extracting tarfile; no data to test with'
 
-        self.testfiles_ready = True
+        _util.extract_test_files()
+        self.test_files_ready = True
 
     def tearDown(self):
-        if self.testfiles_ready:
-            assert not os.system("rm -rf testfiles tempdir temp2.tar")
+        if self.test_files_ready:
+            _util.cleanup_test_files()
 
 class UnivTest:
     """Contains methods that help test any backend"""
