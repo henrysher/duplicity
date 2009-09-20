@@ -177,7 +177,7 @@ class ErrorCode:
     connection_failed = 38
     restart_file_not_found = 39
     gio_not_available = 40
-    source_dir_mismatch = 41
+    source_dir_mismatch = 42 # 41 is reserved for par2
 
 def FatalError(s, code, extra=None):
     """Write fatal error message and exit"""
