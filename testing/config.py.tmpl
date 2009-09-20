@@ -22,12 +22,11 @@
 import sys, os
 from os import path
 
-# Add this module's grandparent directory to the lib path
-sys.path.insert(0, path.abspath(
-                       path.join(
-                           path.realpath(__file__),
-                           path.pardir,
-                           path.pardir )))
+# Save the absolute path of the directory where this module is
+test_root = path.abspath( path.join( path.realpath(__file__), path.pardir ))
+
+# Find the duplicity modules under test
+sys.path.insert(0, path.join(test_root, path.pardir))
 
 import gettext
 gettext.install('duplicity')
