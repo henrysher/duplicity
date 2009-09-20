@@ -25,6 +25,7 @@ import re
 
 from duplicity import log
 from duplicity import globals
+from duplicity import util
 
 class ManifestError(Exception):
     """
