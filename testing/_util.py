@@ -38,7 +38,6 @@ def extract_test_files():
     # raises subprocess.CalledProcessError if it fails
 
 def cleanup_test_files():
-    pushdir(config.test_root)
     try:
         os.unlink('temp2.tar')
     except OSError:
@@ -47,7 +46,6 @@ def cleanup_test_files():
     remove_tree('testfiles')
     remove_tree('tempdir')
 
-    popdir()
     return
 
 def pushdir(path):
