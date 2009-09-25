@@ -140,7 +140,7 @@ class UnivTest:
 class LocalTest(unittest.TestCase, UnivTest):
     """ Test the Local backend """
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
 
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
@@ -153,7 +153,7 @@ class LocalTest(unittest.TestCase, UnivTest):
 class scpTest(unittest.TestCase, UnivTest):
     """ Test the SSH backend """
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
 
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
@@ -166,7 +166,7 @@ class scpTest(unittest.TestCase, UnivTest):
 class ftpTest(unittest.TestCase, UnivTest):
     """ Test the ftp backend """
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
 
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
@@ -179,7 +179,7 @@ class ftpTest(unittest.TestCase, UnivTest):
 class rsyncAbsPathTest(unittest.TestCase, UnivTest):
     """ Test the rsync abs path backend """
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
 
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
@@ -192,7 +192,7 @@ class rsyncAbsPathTest(unittest.TestCase, UnivTest):
 class rsyncRelPathTest(unittest.TestCase, UnivTest):
     """ Test the rsync relative path backend """
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
 
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
@@ -205,7 +205,7 @@ class rsyncRelPathTest(unittest.TestCase, UnivTest):
 class rsyncModuleTest(unittest.TestCase, UnivTest):
     """ Test the rsync module backend """
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
 
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
@@ -218,7 +218,7 @@ class rsyncModuleTest(unittest.TestCase, UnivTest):
 class s3ModuleTest(unittest.TestCase, UnivTest):
     """ Test the s3 module backend """
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
 
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
@@ -231,7 +231,7 @@ class s3ModuleTest(unittest.TestCase, UnivTest):
 class webdavModuleTest(unittest.TestCase, UnivTest):
     """ Test the webdav module backend """
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
 
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
@@ -244,7 +244,7 @@ class webdavModuleTest(unittest.TestCase, UnivTest):
 class webdavsModuleTest(unittest.TestCase, UnivTest):
     """ Test the webdavs module backend """
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
 
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
@@ -259,9 +259,11 @@ if gio_available:
         """ Generic gio module backend class """
         def setUp(self):
             duplicity.backend.force_backend(duplicity.backends.giobackend.GIOBackend)
+            assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
 
         def tearDown(self):
             duplicity.backend.force_backend(None)
+            assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
 
     class gioFileModuleTest(GIOTest, unittest.TestCase):

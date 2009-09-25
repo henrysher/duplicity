@@ -26,7 +26,13 @@ which is written in C.  The goal was to use C as little as possible...
 
 """
 
-import _librsync, types, array
+#TODO: remove when librsync upgraded
+try:
+    import _librsync
+except Exception, e:
+    pass
+
+import types, array
 
 blocksize = _librsync.RS_JOB_BLOCKSIZE
 
@@ -78,7 +84,7 @@ class LikeFile:
             while not self.eof and len(self.outbuf) < length:
                 self._add_to_outbuf_once()
             real_len = min(length, len(self.outbuf))
-            
+
         return_val = self.outbuf[:real_len].tostring()
         del self.outbuf[:real_len]
         return return_val
@@ -167,7 +173,7 @@ class PatchedFile(LikeFile):
         try:
             self.maker = _librsync.new_patchmaker(basis_file)
         except _librsync.librsyncError, e:
-            raise librsyncError(str(e))      
+            raise librsyncError(str(e))
 
 
 class SigGenerator:

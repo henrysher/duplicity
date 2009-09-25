@@ -245,7 +245,7 @@ class FinalTest:
 
 class FinalTest1(FinalTest, unittest.TestCase):
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
 
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
@@ -254,7 +254,7 @@ class FinalTest1(FinalTest, unittest.TestCase):
 
 class FinalTest2(FinalTest, unittest.TestCase):
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
 
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")

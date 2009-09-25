@@ -8,6 +8,15 @@ translation comments should be passed to the translators cleanly now.
 
 422477  [PATCH] IMAP Backend Error in delete()
 
+Merged in lp:~mterry/duplicity/iterate-warnings
+Add machine codes to various warnings when iterating over source files
+
+Fix problems with unittests under Jaunty.  It appears that redirection
+in os.system() has changed for the worse, so a workaround for now.
+
+Fix problem in restart where there were no manifest entries and no
+remote volumes stored.  We clean out the partial and restart.
+
 
 New in v0.6.05 (2009/08/28)
 ---------------------------
