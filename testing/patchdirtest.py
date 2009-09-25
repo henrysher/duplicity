@@ -36,7 +36,7 @@ config.setup()
 class PatchingTest(unittest.TestCase):
     """Test patching"""
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
 
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
@@ -182,7 +182,7 @@ class index:
 
 class CollateItersTest(unittest.TestCase):
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
 
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
@@ -237,7 +237,7 @@ class CollateItersTest(unittest.TestCase):
 class TestInnerFuncs(unittest.TestCase):
     """Test some other functions involved in patching"""
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
         self.check_output()
 
     def tearDown(self):

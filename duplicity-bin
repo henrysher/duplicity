@@ -1083,7 +1083,7 @@ class Restart:
 
     def checkManifest(self, mf):
         mf_len = len(mf.volume_info_dict)
-        if mf_len != self.start_vol:
+        if (mf_len != self.start_vol) or not (mf_len and self.start_vol):
             if self.start_vol == 0:
                 # upload of 1st vol failed, clean and restart
                 log.Notice(_("RESTART: The first volume failed to upload before termination.\n"

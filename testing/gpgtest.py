@@ -33,7 +33,7 @@ default_profile = gpg.GPGProfile(passphrase = "foobar")
 class GPGTest(unittest.TestCase):
     """Test GPGFile"""
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
 
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
@@ -172,7 +172,7 @@ class GPGWriteFile_Helper:
 class SHATest(unittest.TestCase):
     """Test making sha signatures"""
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
 
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")

@@ -32,7 +32,7 @@ config.setup()
 class MatchingTest(unittest.TestCase):
     """Test matching of file names against various selection functions"""
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
 
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
@@ -264,7 +264,7 @@ testfiles/select/1/1
 class ParseArgsTest(unittest.TestCase):
     """Test argument parsing"""
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz >& /dev/null")
+        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
 
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
