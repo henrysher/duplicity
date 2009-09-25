@@ -25,6 +25,7 @@ import re
 
 from duplicity import log
 from duplicity import globals
+from duplicity import util
 
 class ManifestError(Exception):
     """
@@ -86,11 +87,15 @@ class Manifest:
             errmsg = _("Fatal Error: Backup source host has changed.\n"
                        "Current hostname: %s\n"
                        "Previous hostname: %s") % (globals.hostname, self.hostname)
+            code = log.ErrorCode.hostname_mismatch
+            code_extra = "%s %s" % (util.escape(globals.hostname), util.escape(self.hostname))
 
         elif (self.local_dirname and self.local_dirname != globals.local_path.name):
             errmsg = _("Fatal Error: Backup source directory has changed.\n"
                        "Current directory: %s\n"
                        "Previous directory: %s") % (self.local_dirname, globals.local_path.name)
+            code = log.ErrorCode.source_dir_mismatch
+            code_extra = "%s %s" % (util.escape(self.local_dirname), util.escape(globals.local_path.name))
         else:
             return
 
@@ -100,7 +105,7 @@ class Manifest:
                          "location, or using the same archive directory.  If "
                          "this is not a mistake, use the "
                          "--allow-source-mismatch switch to avoid seeing this "
-                         "message"), log.ErrorCode.source_mismatch)
+                         "message"), code, code_extra)
 
     def add_volume_info(self, vi):
         """
