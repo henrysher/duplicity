@@ -556,7 +556,7 @@ def restore(col_stats):
     @return: void
     """
     if globals.dry_run:
-      return
+        return
     if not patchdir.Write_ROPaths(globals.local_path,
                                   restore_get_patched_rop_iter(col_stats)):
         if globals.restore_dir:
@@ -937,9 +937,6 @@ def sync_archive():
     loclist = globals.archive_dir.listdir()
     local_metafiles, loc_needpass = get_metafiles(loclist)
 
-    if rem_needpass or loc_needpass:
-        globals.gpg_profile.passphrase = get_passphrase(1, "sync")
-
     # we have the list of metafiles on both sides. remote is always
     # authoritative. figure out which are local spurious (should not
     # be there) and missing (should be there but are not).
@@ -965,6 +962,8 @@ def sync_archive():
         local_spurious.sort()
         if not globals.dry_run:
             log.Notice(_("Synchronizing remote metadata to local cache..."))
+            if local_missing and (rem_needpass or loc_needpass):
+                globals.gpg_profile.passphrase = get_passphrase(1, "sync")
             for fn in local_spurious:
                 remove_local(fn)
             for fn in local_missing:
@@ -1122,7 +1121,7 @@ def main():
     # Adjust the path to your location and version of Eclipse and Pydev.  Comment out
     # to run normally, or this process will hang at pydevd.settrace() waiting for the
     # remote debugger to start.
-#    pysrc = "/home/ken/eclipse3.4/plugins/org.python.pydev.debug_1.4.7.2843/pysrc/"
+#    pysrc = "/home/ken/eclipse3.4/plugins/org.python.pydev.debug_1.5.0.1251989166/pysrc/"
 #    if os.path.isdir(pysrc):
 #        sys.path.append(pysrc)
 #        import pydevd
