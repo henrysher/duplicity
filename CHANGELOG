@@ -6,7 +6,7 @@ http://lists.gnu.org/archive/html/duplicity-talk/2009-09/msg00001.html
 Merged in lp:~l2g/duplicity/flag-transl-comments which cleared up how
 translation comments should be passed to the translators cleanly now.
 
-422477  [PATCH] IMAP Backend Error in delete()
+Applied 422477; [PATCH] IMAP Backend Error in delete()
 
 Merged in lp:~mterry/duplicity/iterate-warnings
 Add machine codes to various warnings when iterating over source files
@@ -16,6 +16,8 @@ in os.system() has changed for the worse, so a workaround for now.
 
 Fix problem in restart where there were no manifest entries and no
 remote volumes stored.  We clean out the partial and restart.
+
+Fixed 435975 gpg asks for password in 0.6.05, but not in 0.5.18
 
 
 New in v0.6.05 (2009/08/28)
