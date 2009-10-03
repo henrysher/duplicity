@@ -256,7 +256,7 @@ class Select:
                 elif opt == "--include-regexp":
                     self.add_selection_func(self.regexp_get_sf(arg, 1))
                 else:
-                    assert 0, "Bad selection option %s" % opt
+                    assert 0, _("Bad selection option %s") % opt
         except SelectError, e:
             self.parse_catch_error(e)
         assert filelists_index == len(filelists)
@@ -415,7 +415,7 @@ probably isn't what you meant.""") %
             else:
                 return (None, False) # path greater, not initial sequence
         else:
-            assert 0, "Include is %s, should be 0 or 1" % (include,)
+            assert 0, _("Include is %s, should be 0 or 1") % (include,)
 
     def filelist_globbing_get_sfs(self, filelist_fp, inc_default, list_name):
         """Return list of selection functions by reading fileobj
@@ -515,8 +515,9 @@ probably isn't what you meant.""") %
         if include == 0:
             sel_func = exclude_sel_func
         else:
-            log.FatalError("--include-if-present not implemented (would it make sense?).",
-                           log.ErrorCode.not_implemented)
+            log.FatalError(_("--include-if-present not implemented "
+                             "(would it make sense?)."),
+                             log.ErrorCode.not_implemented)
 
         sel_func.exclude = not include
         sel_func.name = "Command-line %s filename: %s" % \
@@ -619,8 +620,8 @@ probably isn't what you meant.""") %
         glob_parts = glob_str.split("/")
         if "" in glob_parts[1:-1]:
             # "" OK if comes first or last, as in /foo/
-            raise GlobbingError("Consecutive '/'s found in globbing string "
-                                + glob_str)
+            raise GlobbingError(_("Consecutive '/'s found in globbing "
+                                  "string %s") % glob_str)
 
         prefixes = map(lambda i: "/".join(glob_parts[:i+1]),
                        range(len(glob_parts)))
