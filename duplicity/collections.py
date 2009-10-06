@@ -827,6 +827,11 @@ class CollectionsStatus:
             Try adding filename to existing sets, or make new one
             """
             for set in sets:
+                # SLE: skip par2 files, to avoid getting spurious "incomplete backup sets" messages
+                # with the misleading "These may be deleted by running duplicity with the --cleanup option"
+                # which of course doesn't work and may be frustrating
+                if filename.endswith(".par2"):
+                    return
                 if set.add_filename(filename):
                     log.Debug(_("File %s is part of known set") % (filename,))
                     break
