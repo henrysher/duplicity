@@ -831,6 +831,10 @@ def sync_archive():
                 continue
             if pr.partial:
                 continue
+            # SLE: don't take par2 files into account when syncing metadata to local cache
+            # as they can take several gigabytes for large backups
+            if pr.par2:
+                continue
             if pr.encrypted:
                 need_passphrase = True
             if pr.type in ["full-sig", "new-sig"] or pr.manifest:
