@@ -13,7 +13,10 @@ in os.system() has changed for the worse, so a workaround for now.
 Fix problem in restart where there were no manifest entries and no
 remote volumes stored.  We clean out the partial and restart.
 
-Fixed 435975 gpg asks for password in 0.6.05, but not in 0.5.18
+Fixed 435975 gpg asks for password in 0.6.05, but not in 0.5.18.
+
+Applied patches from Stéphane Lesimple found at:
+https://bugs.launchpad.net/duplicity/+bug/426282/comments/4 & 5
 
 
 New in v0.6.05 (2009/08/28)
