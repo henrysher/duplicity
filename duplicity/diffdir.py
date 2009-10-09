@@ -27,7 +27,6 @@ first, the signature or delta is constructed of a ROPath iterator.  In
 the second, the ROPath iterator is put into tar block form.
 """
 
-from __future__ import generators
 import cStringIO, re, types
 from duplicity import tarfile
 from duplicity import librsync

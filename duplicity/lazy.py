@@ -21,7 +21,6 @@
 
 """Define some lazy data structures and functions acting on them"""
 
-from __future__ import generators
 import os, stat, types, sys
 
 from duplicity.static import *

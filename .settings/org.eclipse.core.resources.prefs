@@ -1,4 +1,4 @@
-#Sat Oct 03 10:20:38 CDT 2009
+#Fri Oct 09 08:40:24 CDT 2009
 eclipse.preferences.version=1
 encoding//duplicity/collections.py=utf-8
 encoding//duplicity/commandline.py=utf-8
@@ -7,3 +7,4 @@ encoding//duplicity/globals.py=utf-8
 encoding//duplicity/log.py=utf-8
 encoding//duplicity/par2_utils.py=utf-8
 encoding/duplicity-bin=utf-8
+encoding/duplicity.py=utf-8

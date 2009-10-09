@@ -26,8 +26,6 @@ documentation on what this code does can be found on the man page.
 
 """
 
-from __future__ import generators
-
 import os
 import re
 import stat
@@ -125,7 +123,7 @@ class Select:
                              log.WarningCode.cannot_iterate,
                              util.escape(fullpath))
             except OSError:
-                log.Warn(_("Error accessing possibly locked file %s") % fullpath, 
+                log.Warn(_("Error accessing possibly locked file %s") % fullpath,
                          log.WarningCode.cannot_stat,
                          util.escape(fullpath))
             return None
