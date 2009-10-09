@@ -70,89 +70,17 @@ class SSHBackend(duplicity.backend.Backend):
             else:
                 self.password = ''
 
-    def run_scp_command(self, commandline):
-        """ Run an scp command, responding to password prompts """
-        for n in range(1, globals.num_retries+1):
-            if n > 1:
-                # sleep before retry
-                time.sleep(30)
-            log.Info("Running '%s' (attempt #%d)" % (commandline, n))
-            child = pexpect.spawn(commandline, timeout = None)
-            cmdloc = 0
-            if globals.ssh_askpass:
-                state = "authorizing"
-            else:
-                state = "copying"
-            while 1:
-                if state == "authorizing":
-                    match = child.expect([pexpect.EOF,
-                                          "(?i)timeout, server not responding",
-                                          "(?i)pass(word|phrase .*):",
-                                          "(?i)permission denied",
-                                          "authenticity"])
-                    log.Debug("State = %s, Before = '%s'" % (state, child.before.strip()))
-                    if match == 0:
-                        log.Warn("Failed to authenticate")
-                        break
-                    elif match == 1:
-                        log.Warn("Timeout waiting to authenticate")
-                        break
-                    elif match == 2:
-                        child.sendline(self.password)
-                        state = "copying"
-                    elif match == 3:
-                        log.Warn("Invalid SSH password")
-                        break
-                    elif match == 4:
-                        log.Warn("Remote host authentication failed (missing known_hosts entry?)")
-                        break
-                elif state == "copying":
-                    match = child.expect([pexpect.EOF,
-                                          "(?i)timeout, server not responding",
-                                          "stalled",
-                                          "authenticity",
-                                          "ETA"])
-                    log.Debug("State = %s, Before = '%s'" % (state, child.before.strip()))
-                    if match == 0:
-                        break
-                    elif match == 1:
-                        log.Warn("Timeout waiting for response")
-                        break
-                    elif match == 2:
-                        state = "stalled"
-                    elif match == 3:
-                        log.Warn("Remote host authentication failed (missing known_hosts entry?)")
-                        break
-                elif state == "stalled":
-                    match = child.expect([pexpect.EOF,
-                                          "(?i)timeout, server not responding",
-                                          "ETA"])
-                    log.Debug("State = %s, Before = '%s'" % (state, child.before.strip()))
-                    if match == 0:
-                        break
-                    elif match == 1:
-                        log.Warn("Stalled for too long, aborted copy")
-                        break
-                    elif match == 2:
-                        state = "copying"
-            child.close(force = True)
-            if child.exitstatus == 0:
-                return
-            log.Warn("Running '%s' failed (attempt #%d)" % (commandline, n))
-        log.Warn("Giving up trying to execute '%s' after %d attempts" % (commandline, globals.num_retries))
-        raise BackendException("Error running '%s'" % commandline)
-
     def run_sftp_command(self, commandline, commands):
         """ Run an sftp command, responding to password prompts, passing commands from list """
         maxread = 2000 # expect read buffer size
-        responses = ["(?i)timeout, server not responding",
+        responses = [pexpect.EOF,
+                     "(?i)timeout, server not responding",
                      "sftp>",
                      "(?i)pass(word|phrase .*):",
                      "(?i)permission denied",
                      "authenticity",
                      "(?i)no such file or directory"]
-        max_response_len = max([len(p) for p in responses])
-        responses = [pexpect.EOF] + responses
+        max_response_len = max([len(p) for p in responses[1:]])
         for n in range(1, globals.num_retries+1):
             if n > 1:
                 # sleep before retry

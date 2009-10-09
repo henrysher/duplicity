@@ -21,7 +21,6 @@
 
 """Functions for patching of directories"""
 
-from __future__ import generators
 import re
 
 from duplicity import tarfile
