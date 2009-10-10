@@ -1,9 +1,0 @@
-*.gz
-*.pyc
-*.rpm
-*.sig
-*.spec
-patch
-Releases
-duplicity.py
-rdiffdir.py
