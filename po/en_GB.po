@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
 "POT-Creation-Date: 2009-09-15 06:36-0500\n"
-"PO-Revision-Date: 2009-09-06 12:51+0000\n"
-"Last-Translator: Kenneth Loafman <kenneth@loafman.com>\n"
+"PO-Revision-Date: 2009-10-16 13:33+0000\n"
+"Last-Translator: Rui Moreira <rui.f.moreira@gmail.com>\n"
 "Language-Team: English (United Kingdom) <en_GB@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-09-23 11:07+0000\n"
+"X-Launchpad-Export-Date: 2009-10-17 07:11+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../duplicity-bin:191
@@ -53,26 +53,26 @@ msgstr ""
 #: ../duplicity-bin:544
 #, python-format
 msgid "%s not found in archive, no files restored."
-msgstr ""
+msgstr "%s não encontrado em arquivo, não foram restaurados ficheiros."
 
 #: ../duplicity-bin:548
 msgid "No files found in archive - nothing restored."
-msgstr ""
+msgstr "Nenhum ficheiro encontrado em arquivo - Nada foi restaurado."
 
 #: ../duplicity-bin:581
 #, python-format
 msgid "Processed volume %d of %d"
-msgstr ""
+msgstr "Processado volume %d de %d"
 
 #: ../duplicity-bin:621
 #, python-format
 msgid "Invalid data - %s hash mismatch:"
-msgstr ""
+msgstr "Dados inválidos - %s hash não corresponde:"
 
 #: ../duplicity-bin:622
 #, python-format
 msgid "Calculated hash: %s"
-msgstr ""
+msgstr "Hash calculado: %s"
 
 #: ../duplicity-bin:623
 #, python-format
@@ -87,25 +87,25 @@ msgstr ""
 #: ../duplicity-bin:670
 #, python-format
 msgid "Verify complete: %s, %s."
-msgstr ""
+msgstr "Verificação completa: %s, %s."
 
 #: ../duplicity-bin:671
 #, python-format
 msgid "%d file compared"
 msgid_plural "%d files compared"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d ficheiro comparado"
+msgstr[1] "%d ficheiros comparados"
 
 #: ../duplicity-bin:673
 #, python-format
 msgid "%d difference found"
 msgid_plural "%d differences found"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d diferença encontrada"
+msgstr[1] "%d diferenças encontradas"
 
 #: ../duplicity-bin:692
 msgid "No extraneous files found, nothing deleted in cleanup."
-msgstr ""
+msgstr "Nenhum ficheiro estranho encontrado, nada foi eliminado."
 
 #: ../duplicity-bin:697
 msgid "Deleting this file from backend:"
@@ -116,12 +116,13 @@ msgstr[1] ""
 #: ../duplicity-bin:706
 msgid "Found the following file to delete:"
 msgid_plural "Found the following files to delete:"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Encontrado o seguinte ficheiro para eliminar:"
+msgstr[1] "Encontrados os seguintes ficheiros para eliminar:"
 
 #: ../duplicity-bin:710
 msgid "Run duplicity again with the --force option to actually delete."
 msgstr ""
+"Correr Duplicity novamente com opção --force para eliminar efectivamente."
 
 #: ../duplicity-bin:749
 msgid "There are backup set(s) at time(s):"
@@ -155,7 +156,7 @@ msgstr[1] ""
 
 #: ../duplicity-bin:780
 msgid "Rerun command with --force option to actually delete."
-msgstr ""
+msgstr "Reiniciar comando com opção --force para eliminar efectivamente."
 
 #: ../duplicity-bin:863
 #, python-format
@@ -165,7 +166,7 @@ msgstr ""
 #: ../duplicity-bin:888 ../duplicity/dup_temp.py:239
 #, python-format
 msgid "Failed to read %s: %s"
-msgstr ""
+msgstr "Falha de leitura %s: %s"
 
 #: ../duplicity-bin:899
 #, python-format
