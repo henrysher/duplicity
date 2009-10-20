@@ -584,7 +584,7 @@ class CollectionsStatus:
         # These should be sorted by end_time
         self.all_backup_chains = None
         self.other_backup_chains = None
-        self.other_sig_chains = None
+        self.all_sig_chains = None
 
         # Other misc paths and sets which shouldn't be there
         self.local_orphaned_sig_names = []
@@ -604,6 +604,7 @@ class CollectionsStatus:
              "archive-dir %s" % (self.archive_dir,)]
 
         for i in range(len(self.other_backup_chains)):
+            # A bit of a misnomer.  Chain might have a sig.
             l.append("chain-no-sig %d" % (i,))
             l += self.other_backup_chains[i].to_log_info(' ')
 
@@ -627,18 +628,18 @@ class CollectionsStatus:
              _("Archive dir: %s") % (self.archive_dir.name,)]
 
         l.append("\n" +
-                 gettext.ngettext("Found %d backup chain without signatures.",
-                                  "Found %d backup chains without signatures.",
+                 gettext.ngettext("Found %d secondary backup chain.",
+                                  "Found %d secondary backup chains.",
                                   len(self.other_backup_chains))
                  % len(self.other_backup_chains))
         for i in range(len(self.other_backup_chains)):
-            l.append(_("Signature-less chain %d of %d:") %
+            l.append(_("Secondary chain %d of %d:") %
                      (i+1, len(self.other_backup_chains)))
             l.append(str(self.other_backup_chains[i]))
             l.append("")
 
         if self.matched_chain_pair:
-            l.append("\n" + _("Found a complete backup chain with matching "
+            l.append("\n" + _("Found primary backup chain with matching "
                      "signature chain:"))
             l.append(str(self.matched_chain_pair[1]))
         else:
@@ -719,12 +720,12 @@ class CollectionsStatus:
         latest backup chain, use the local sig chain (it does not need
         to be downloaded).
         """
-        self.other_sig_chains = sig_chains
+        sig_chains = sig_chains and self.get_sorted_chains(sig_chains)
+        self.all_sig_chains = sig_chains
         self.other_backup_chains = backup_chains[:]
         self.matched_chain_pair = None
         if sig_chains and backup_chains:
             latest_backup_chain = backup_chains[-1]
-            sig_chains = self.get_sorted_chains(sig_chains)
             for i in range(len(sig_chains)-1, -1, -1):
                 if sig_chains[i].end_time == latest_backup_chain.end_time:
                     pass
@@ -743,19 +744,9 @@ class CollectionsStatus:
                 if self.matched_chain_pair == None:
                     self.matched_chain_pair = (sig_chains[i], latest_backup_chain)
 
-                del sig_chains[i]
                 break
 
         if self.matched_chain_pair:
-            # if we have local and remote sig chains, remove both from the other_sig_chains list
-            matched_sig_chain = self.matched_chain_pair[0]
-            if len(self.other_sig_chains) > 1:
-                for sig_chain in self.other_sig_chains[1:]:
-                    if (sig_chain.islocal() != matched_sig_chain.islocal() and
-                        sig_chain.start_time == matched_sig_chain.start_time and
-                        sig_chain.end_time == matched_sig_chain.end_time):
-                        self.other_sig_chains.remove(sig_chain)
-            self.other_sig_chains.remove(matched_sig_chain)
             self.other_backup_chains.remove(self.matched_chain_pair[1])
 
     def warn(self, sig_chain_warning):
@@ -782,18 +773,9 @@ class CollectionsStatus:
                      + "\n" + "\n".join(self.remote_orphaned_sig_names),
                      log.WarningCode.orphaned_sig)
 
-        if self.other_sig_chains and sig_chain_warning:
-            if self.matched_chain_pair:
-                log.Warn(gettext.ngettext("Warning, found an unnecessary "
-                                          "signature chain",
-                                          "Warning, found unnecessary "
-                                          "signature chains",
-                                          len(self.other_sig_chains))
-                     + "\n" + "\n".join([f.fullsig for f in self.other_sig_chains]),
-                     log.WarningCode.unnecessary_sig)
-            else:
-                log.Warn(_("Warning, found signatures but no corresponding "
-                           "backup files"), log.WarningCode.unmatched_sig)
+        if self.all_sig_chains and sig_chain_warning and not self.matched_chain_pair:
+            log.Warn(_("Warning, found signatures but no corresponding "
+                       "backup files"), log.WarningCode.unmatched_sig)
 
         if self.incomplete_backup_sets:
             log.Warn(_("Warning, found incomplete backup sets, probably left "
@@ -995,11 +977,28 @@ class CollectionsStatus:
         else:
             return self.all_backup_chains[0] # no chains are old enough
 
-    def cleanup_signatures(self):
+    def get_signature_chain_at_time(self, time):
         """
-        Delete unnecessary older signatures
+        Return signature chain covering specified time
+
+        Tries to find the signature chain covering the given time.  If
+        there is none, return the earliest chain before, and failing
+        that, the earliest chain.
         """
-        map(SignatureChain.delete, self.other_sig_chains)
+        if not self.all_sig_chains:
+            raise CollectionsError("No signature chains found")
+
+        covering_chains = filter(lambda c: c.start_time <= time <= c.end_time,
+                                 self.all_sig_chains)
+        if covering_chains:
+            return covering_chains[-1] # prefer local if multiple sig chains
+
+        old_chains = filter(lambda c: c.end_time < time,
+                            self.all_sig_chains)
+        if old_chains:
+            return old_chains[-1]
+        else:
+            return self.all_sig_chains[0] # no chains are old enough
 
     def get_extraneous(self):
         """
@@ -1012,7 +1011,7 @@ class CollectionsStatus:
         assert self.values_set
         local_filenames = []
         remote_filenames = []
-        ext_containers = (self.other_sig_chains, self.orphaned_backup_sets,
+        ext_containers = (self.orphaned_backup_sets,
                           self.incomplete_backup_sets)
         for set_or_chain_list in ext_containers:
             for set_or_chain in set_or_chain_list:
