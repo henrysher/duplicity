@@ -182,3 +182,6 @@ ignore_errors = False
 
 # if True the par2 recovery files will be created.
 par2 = False
+
+# If we should be particularly aggressive when cleaning up
+extra_clean = False
