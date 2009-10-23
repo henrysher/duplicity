@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2009-10-22 13:07-0400\n"
+"POT-Creation-Date: 2009-10-23 16:29-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -252,17 +252,17 @@ msgstr ""
 msgid "Last full backup is too old, forcing full backup"
 msgstr ""
 
-#: ../duplicity-bin:1273
+#: ../duplicity-bin:1275
 #, python-format
 msgid "GPG error detail: %s"
 msgstr ""
 
-#: ../duplicity-bin:1282
+#: ../duplicity-bin:1284
 #, python-format
 msgid "User error detail: %s"
 msgstr ""
 
-#: ../duplicity-bin:1291
+#: ../duplicity-bin:1293
 #, python-format
 msgid "Backend error detail: %s"
 msgstr ""
@@ -550,6 +550,13 @@ msgstr ""
 #: ../duplicity/collections.py:848
 #, python-format
 msgid "Found orphaned set %s"
+msgstr ""
+
+#: ../duplicity/collections.py:1004
+#, python-format
+msgid ""
+"No signature chain for the requested time.  Using oldest available chain, "
+"starting at time %s."
 msgstr ""
 
 #: ../duplicity/commandline.py:129

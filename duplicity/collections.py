@@ -998,7 +998,11 @@ class CollectionsStatus:
         if old_chains:
             return old_chains[-1]
         else:
-            return self.all_sig_chains[0] # no chains are old enough
+            # no chains are old enough, give oldest and warn user
+            oldest = self.all_sig_chains[0]
+            if time < oldest.start_time:
+                log.Warn(_("No signature chain for the requested time.  Using oldest available chain, starting at time %s.") % dup_time.timetopretty(oldest.start_time), log.WarningCode.no_sig_for_time, dup_time.timetostring(oldest.start_time))
+            return oldest
 
     def get_extraneous(self, extra_clean):
         """
