@@ -76,6 +76,7 @@ options = ["allow-source-mismatch",
            "exclude-filelist-stdin",
            "exclude-other-filesystems",
            "exclude-regexp=",
+           "extra-clean",
            "fail-on-volume=",
            "file-to-restore=",
            "force",
@@ -268,6 +269,8 @@ def parse_cmdline_options(arglist):
         elif opt == "--exclude-filelist-stdin":
             select_opts.append(("--exclude-filelist", "standard input"))
             select_files.append(sys.stdin)
+        elif opt == "--extra-clean":
+            globals.extra_clean = True
         elif opt == "--fail-on-volume":
             globals.fail_on_volume = get_int(arg, opt)
         elif opt == "--full-if-older-than":
@@ -632,6 +635,7 @@ def usage():
     --exclude-globbing-filelist <%(filename)s>
     --exclude-other-filesystems
     --exclude-regexp <regexp>
+    --extra-clean
     --file-to-restore <%(path)s>
     --full-if-older-than <%(time)s>
     --force
