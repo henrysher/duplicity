@@ -1,5 +1,8 @@
 New in v0.6.06 (2009/09/??)
 ---------------------------
+Merged in lp:~mterry/duplicity/list-old-chains
+List/keep old signature chains
+
 Applied patches from Kasper Brand that fixed device file handling.
 http://lists.gnu.org/archive/html/duplicity-talk/2009-09/msg00001.html
 
