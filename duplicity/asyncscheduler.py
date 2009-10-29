@@ -193,14 +193,15 @@ class AsyncScheduler:
                            "propagating the result immediately")),
                          log.InfoCode.asynchronous_upload_done)
                 self.__failed_waiter()
-                raise AssertionError("%s: waiter should have raised an exception; "
-                                     "this is a bug" % (self.__class__.__name__,))
+                # TRANSL: 'waiter' = thing that waits, not a person who waits tables :-)
+                raise AssertionError(_("%s: waiter should have raised an exception; "
+                                       "this is a bug") % (self.__class__.__name__,))
 
         def wait_for_and_register_launch():
             check_pending_failure()    # raise on fail
             while self.__worker_count >= self.__concurrency or self.__barrier:
                 if self.__worker_count == 0:
-                    assert self.__barrier, "barrier should be in effect"
+                    assert self.__barrier, _("barrier should be in effect")
                     self.__barrier = False
                     self.__cv.notifyAll()
                 else:
