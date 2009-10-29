@@ -92,6 +92,7 @@ def MakeTar():
         "log.py",
         "manifest.py",
         "misc.py",
+        "par2_utils.py",
         "patchdir.py",
         "path.py",
         "pexpect.py",

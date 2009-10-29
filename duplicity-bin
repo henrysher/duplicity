@@ -444,7 +444,7 @@ def full_backup(col_stats):
         bytes_written += man_outfp.to_remote()
         man_outfp.to_final()
 
-        col_stats.set_values(sig_chain_warning=None).cleanup_signatures()
+        col_stats.set_values(sig_chain_warning=None)
 
     print_statistics(diffdir.stats, bytes_written)
 
@@ -528,11 +528,8 @@ def list_current(col_stats):
     @rtype: void
     @return: void
     """
-    sig_chain = check_sig_chain(col_stats)
-    if not sig_chain:
-        log.FatalError(_("No signature data found, unable to list files."),
-                       log.ErrorCode.no_sigs)
-    time = globals.restore_time # if None, will use latest
+    time = globals.restore_time or dup_time.curtime
+    sig_chain = col_stats.get_signature_chain_at_time(time)
     path_iter = diffdir.get_combined_path_iter(sig_chain.get_fileobjs(time))
     for path in path_iter:
         if path.difftype != "deleted":
@@ -704,7 +701,7 @@ def cleanup(col_stats):
     @rtype: void
     @return: void
     """
-    ext_local, ext_remote = col_stats.get_extraneous()
+    ext_local, ext_remote = col_stats.get_extraneous(globals.extra_clean)
     extraneous = ext_local + ext_remote
     if not extraneous:
         log.Warn(_("No extraneous files found, nothing deleted in cleanup."))
@@ -789,7 +786,7 @@ def remove_old(col_stats):
             setlist.reverse() # save oldest for last
             for set in setlist:
                 set.delete()
-            col_stats.set_values(sig_chain_warning=None).cleanup_signatures()
+            col_stats.set_values(sig_chain_warning=None)
     else:
         log.Notice(gettext.ngettext("Found old backup set at the following time:",
                                     "Found old backup sets at the following times:",
