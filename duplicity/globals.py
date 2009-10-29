@@ -178,3 +178,6 @@ fail_on_volume = 0
 # circumstances. the default should absolutely always be True unless
 # you know what you are doing.
 ignore_errors = False
+
+# If we should be particularly aggressive when cleaning up
+extra_clean = False

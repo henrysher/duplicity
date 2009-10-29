@@ -127,6 +127,7 @@ class WarningCode:
     cannot_iterate = 8
     cannot_stat = 9
     cannot_read = 10
+    no_sig_for_time = 11
 
 def Warn(s, code=WarningCode.generic, extra=None):
     """Shortcut used for warning messages (verbosity 2)"""
