@@ -14,16 +14,4 @@
 	<natures>
 		<nature>org.python.pydev.pythonNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>duplicity.py</name>
-			<type>1</type>
-			<location>/home/ken/workspace/duplicity-0.7-series/duplicity-bin</location>
-		</link>
-		<link>
-			<name>rdiffdir.py</name>
-			<type>1</type>
-			<location>/home/ken/workspace/duplicity-0.7-series/rdiffdir</location>
-		</link>
-	</linkedResources>
 </projectDescription>

@@ -1,3 +1,210 @@
+2009-10-29  Kenneth Loafman  <kenneth@loafman.com>
+
+	lp:~duplicity-team/duplicity/po-updates
+
+2009-10-24  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2009-10-29  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merge in lp:~duplicity-team/duplicity/i18n-for-0.7
+
+2009-10-02  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	i18nized a few error messages in duplicity.selection
+
+2009-10-02  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	More strings internationalized in asyncscheduler and commandline
+
+2009-10-29  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merge of lp:~mterry/duplicity/list-old-chains
+
+2009-10-23  Michael Terry  <michael.terry@canonical.com>
+
+	warn if we don't have signatures for the given date period
+
+2009-10-22  Michael Terry  <michael.terry@canonical.com>
+
+	allow deleting old signatures with cleanup --extra-clean
+
+2009-10-19  Michael Terry  <michael.terry@canonical.com>
+
+	don't delete signature chains for old backups; allow listing old backup chain files
+
+2009-10-12  Michael Terry  <michael.terry@canonical.com>
+
+	add missing par2_utils.py to dist tarball
+
+2009-10-19  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~duplicity-team/duplicity/po-updates
+
+2009-10-17  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2009-09-30  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2009-09-23  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2009-09-22  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2009-09-21  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2009-09-20  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2009-09-19  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2009-09-18  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2009-09-17  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2009-09-16  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2009-10-09  Kenneth Loafman  <kenneth@loafman.com>
+
+	Remove unused __future__ imports.
+
+2009-10-06  Kenneth Loafman  <kenneth@loafman.com>
+
+	Add entry for patches from Stéphane Lesimple for par2.
+
+2009-10-06  Kenneth Loafman  <kenneth@loafman.com>
+
+	Applied patch from Stéphane Lesimple found at:
+	https://bugs.launchpad.net/duplicity/+bug/426282/comments/5
+	patch skips the par2 files when building up the sets and chains of backups
+
+2009-10-06  Kenneth Loafman  <kenneth@loafman.com>
+
+	Applied patch from Stéphane Lesimple found at:
+	https://bugs.launchpad.net/duplicity/+bug/426282/comments/4
+	patch avoids storing all the par2 files into the local cache
+
+2009-10-03  Kenneth Loafman  <kenneth@loafman.com>
+
+	Fixed 435975 gpg asks for password in 0.6.05, but not in 0.5.18
+
+2009-09-25  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merge with trunk.
+
+2009-04-11  Michael Terry  <mike@mterry.name>
+
+	modify file name test to test short filenames even when not specifically requested to
+
+2009-04-11  Michael Terry  <mike@mterry.name>
+
+	accept short filenames even if not specifically requested
+
+2009-09-20  Michael Terry  <michael.terry@canonical.com>
+
+	ugh, I'm the worst; add missing import
+
+2009-09-20  Michael Terry  <michael.terry@canonical.com>
+
+	add extra information to the 'hostname changed' log message, split it from the 'source dir changed' message
+
+2009-09-25  Kenneth Loafman  <kenneth@loafman.com>
+
+	Fix problems with unittests under Jaunty.  It appears that redirection
+	in os.system() has changed for the worse, so a workaround for now.
+	
+	Fix problem in restart where there were no manifest entries and no
+	remote volumes stored.  We clean out the partial and restart.
+
+2009-09-18  Kenneth Loafman  <kenneth@loafman.com>
+
+	Applied "426282 [PATCH] par2 creating support", corrected some coding format issues and made sure all unit tests passed.
+
+2009-09-15  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~mterry/duplicity/iterate-warnings
+
+2009-09-14  Michael Terry  <michael.terry@canonical.com>
+
+	add some machine codes to various warnings when iterating over source files
+
+2009-09-11  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~duplicity-team/duplicity/po-updates
+
+2009-09-07  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	Additional Portuguese and brand-new Bulgarian translations
+
+2009-09-07  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	merge latest 0.6
+
+2009-09-11  Kenneth Loafman  <kenneth@loafman.com>
+
+	Clean up testing run scripts.
+
+2009-09-08  Kenneth Loafman  <kenneth@loafman.com>
+
+	* 422477 [PATCH] IMAP Backend Error in delete()  
+
+2009-09-06  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~l2g/duplicity/bug-411375
+
+2009-09-04  Larry Gilbert  <larry+launchpad@L2G.to>
+
+	Change message "--cleanup option" to "'cleanup' command"
+
+2009-09-06  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~duplicity-team/duplicity/po-updates
+
+2009-09-04  Larry Gilbert  <larry+launchpad@L2G.to>
+
+	Translation of Spanish and Portuguese has begun
+
+2009-09-04  Larry Gilbert  <larry+launchpad@L2G.to>
+
+	Updated existing PO files with Rosetta translations
+
+2009-09-02  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~l2g/duplicity/flag-transl-comments which cleared up how\ntranslation comments should be passed to the translators cleanly now.
+
+2009-08-31  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	When generating PO[T] files, only use code comments starting with "TRANSL:"
+	for notes to the translators.  "TRANSL:" is filtered out of the POT file
+	with sed after it's generated.
+
+2009-09-02  Kenneth Loafman  <kenneth@loafman.com>
+
+	Applied patches from Kasper Brand that fixed device file handling.
+	http://lists.gnu.org/archive/html/duplicity-talk/2009-09/msg00001.html
+
+2009-08-28  Kenneth Loafman  <kenneth@loafman.com>
+
+	Changes for 0.6.05.
+
 2009-08-28  Kenneth Loafman  <kenneth@loafman.com>
 
 	Merged in ~l2g/duplicity/test-compat from Larry Gilbert which made

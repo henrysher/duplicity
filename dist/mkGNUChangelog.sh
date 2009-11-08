@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # must be in root of BZR project
-cd /home/ken/workspace/duplicity-src
+cd /home/ken/workspace/duplicity-0.7-series
 
 # make changelog
 bzr log --gnu-changelog > Changelog.GNU
