@@ -1,3 +1,9 @@
+New in v0.6.07 (2009/??/??)
+---------------------------
+Applied patch 467391 to close connection on a 401 and retry
+with authentication credentials.
+
+
 New in v0.6.06 (2009/10/29)
 ---------------------------
 Merged in lp:~mterry/duplicity/list-old-chains
