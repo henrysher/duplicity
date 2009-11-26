@@ -116,6 +116,7 @@ options = ["allow-source-mismatch",
            "timeout=",
            "time-separator=",
            "use-agent",
+           "use-scp",
            "verbosity=",
            "version",
            "volsize=",
@@ -357,6 +358,8 @@ def parse_cmdline_options(arglist):
             old_fn_deprecation(opt)
         elif opt == "--use-agent":
             globals.use_agent = True
+        elif opt == "--use-scp":
+            globals.use_scp = True
         elif opt in ["-V", "--version"]:
             print "duplicity", str(globals.version)
             sys.exit(0)
@@ -464,7 +467,7 @@ def usage():
 
         # TRANSL: noun
         'command'        : _("command"),
-        
+
         # TRANSL: Used in usage help to represent the name of a container in
         # Amazon Web Services' Cloudfront. Example:
         # cf+http://container_name
@@ -472,14 +475,14 @@ def usage():
 
         # TRANSL: noun
         'count'          : _("count"),
-        
+
         # TRANSL: Used in usage help to represent the name of a file directory
         'directory'      : _("directory"),
 
         # TRANSL: Used in usage help to represent the name of a file. Example:
         # --log-file <filename>
         'filename'       : _("filename"),
-        
+
         # TRANSL: Used in usage help to represent an ID for a GnuPG key. Example:
         # --encrypt-key <gpg_key_id>
         'gpg_key_id'     : _("gpg-key-id"),
@@ -560,12 +563,12 @@ def usage():
         # Example:
         # duplicity [full|incremental] [options] source_dir target_url
         'target_url'     : _("target_url"),
-        
+
         # TRANSL: Used in usage help to represent a time spec for a previous
         # point in time, as described in the documentation. Example:
         # duplicity remove-older-than time [options] target_url
         'time'           : _("time"),
-        
+
         # TRANSL: Used in usage help to represent a user name (i.e. login).
         # Example:
         # ftp://user[:password]@other.host[:port]/some_dir
@@ -669,6 +672,7 @@ def usage():
     -t<%(time)s>, --time <%(time)s>, --restore-time <%(time)s>
     --time-separator <%(char)s>
     --use-agent
+    --use-scp
     --version
     --volsize <%(number)s>
     -v[0-9], --verbosity [0-9]

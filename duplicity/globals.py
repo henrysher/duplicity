@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
 # Copyright 2002 Ben Escoto <ben@emerose.org>
@@ -21,7 +22,7 @@
 
 """Store global configuration information"""
 
-import socket, sys, os
+import socket, os
 
 # The current version of duplicity
 version = "$version"
@@ -166,6 +167,9 @@ ssh_askpass = False
 
 # user added ssh options
 ssh_options = ""
+
+# whether to use scp for put/get, sftp is default
+use_scp = False
 
 # will be a Restart object if restarting
 restart = None
