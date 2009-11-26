@@ -107,6 +107,7 @@ class WebDAVBackend(duplicity.backend.Backend):
         self.conn.request(method, quoted_path, data, self.headers)
         response = self.conn.getresponse()
         if response.status == 401:
+            response.close()
             self.headers['Authorization'] = self.get_authorization(response, quoted_path)
             self.conn.request(method, quoted_path, data, self.headers)
             response = self.conn.getresponse()

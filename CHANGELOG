@@ -21,6 +21,9 @@ Fixed 435975 gpg asks for password in 0.6.05, but not in 0.5.18.
 Applied patches from Stéphane Lesimple found at:
 https://bugs.launchpad.net/duplicity/+bug/426282/comments/4 & 5
 
+Applied patch 467391 to close connection on a 401 and retry
+with authentication credentials.
+
 
 New in v0.6.05 (2009/08/28)
 ---------------------------
