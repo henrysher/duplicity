@@ -22,6 +22,7 @@
 """Functions for patching of directories"""
 
 import re
+import tempfile
 
 from duplicity import tarfile
 from duplicity import librsync
@@ -467,7 +468,7 @@ def patch_seq2ropath(patch_seq):
         assert delta_ropath.difftype == "diff", delta_ropath.difftype
         if not isinstance(current_file, file):
             # librsync needs true file
-            tempfp = os.tmpfile()
+            tempfp = tempfile.TemporaryFile(dir=globals.temproot)
             misc.copyfileobj(current_file, tempfp)
             assert not current_file.close()
             tempfp.seek(0)
@@ -571,5 +572,3 @@ class ROPath_IterWriter(ITRBranch):
         """Write non-directory ropath to destination"""
         if ropath.exists():
             ropath.copy(self.base_path.new_index(index))
-
-
