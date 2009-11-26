@@ -24,6 +24,9 @@ https://bugs.launchpad.net/duplicity/+bug/426282/comments/4 & 5
 Applied patch 467391 to close connection on a 401 and retry
 with authentication credentials.
 
+487686 re-add scp backend and make available via command line option
+Option --use-scp will use scp, not sftp, for get/put operations.
+
 
 New in v0.6.05 (2009/08/28)
 ---------------------------

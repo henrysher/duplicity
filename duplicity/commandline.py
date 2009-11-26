@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
 # Copyright 2002 Ben Escoto <ben@emerose.org>
@@ -41,7 +40,6 @@ from duplicity import gpg
 from duplicity import log
 from duplicity import path
 from duplicity import selection
-from duplicity import par2_utils
 
 
 select_opts = []            # Will hold all the selection options
@@ -118,10 +116,10 @@ options = ["allow-source-mismatch",
            "timeout=",
            "time-separator=",
            "use-agent",
+           "use-scp",
            "verbosity=",
            "version",
            "volsize=",
-           "par2",
            ]
 
 
@@ -140,7 +138,7 @@ def expand_archive_dir(archdir, backname):
     Return expanded version of archdir joined with backname.
     """
     assert globals.backup_name is not None, \
-        _("expand_archive_dir() called prior to globals.backup_name being set")
+        "expand_archive_dir() called prior to globals.backup_name being set"
 
     return expand_fn(os.path.join(archdir, backname))
 
@@ -190,7 +188,7 @@ def parse_cmdline_options(arglist):
         possible = [c for c in commands if c.startswith(cmd)]
         # no unique match, that's an error
         if len(possible) > 1:
-            command_line_error(_("command '%s' not unique, could be %s") % (cmd, possible))
+            command_line_error("command '%s' not unique, could be %s" % (cmd, possible))
         # only one match, that's a keeper
         elif len(possible) == 1:
             cmd = possible[0]
@@ -217,17 +215,17 @@ def parse_cmdline_options(arglist):
         try:
             arg = arglist.pop(0)
         except:
-            command_line_error(_("Missing time string for remove-older-than"))
+            command_line_error("Missing time string for remove-older-than")
         globals.remove_time = dup_time.genstrtotime(arg)
         num_expect = 1
     elif cmd == "remove-all-but-n-full":
         try:
             arg = arglist.pop(0)
         except:
-            command_line_error(_("Missing count for remove-all-but-n-full"))
+            command_line_error("Missing count for remove-all-but-n-full")
         globals.keep_chains = int(arg)
         if not globals.keep_chains > 0:
-            command_line_error(_("remove-all-but-n-full count must be > 0"))
+            command_line_error("remove-all-but-n-full count must be > 0")
         num_expect = 1
     elif cmd == "verify":
         verify = True
@@ -303,17 +301,17 @@ def parse_cmdline_options(arglist):
         elif opt == "--log-fd":
             log_fd = get_int(arg, opt)
             if log_fd < 1:
-                command_line_error(_("log-fd must be greater than zero."))
+                command_line_error("log-fd must be greater than zero.")
             try:
                 log.add_fd(log_fd)
             except:
-                command_line_error(_("Cannot write to log-fd %s.") % arg)
+                command_line_error("Cannot write to log-fd %s." % arg)
         elif opt == "--log-file":
             arg = expand_fn(arg)
             try:
                 log.add_file(arg)
             except:
-                command_line_error(_("Cannot write to log-file %s.") % arg)
+                command_line_error("Cannot write to log-file %s." % arg)
         elif opt == "--name":
             globals.backup_name = arg
         elif opt == "--no-encryption":
@@ -354,12 +352,14 @@ def parse_cmdline_options(arglist):
             globals.timeout = get_int(arg, opt)
         elif opt == "--time-separator":
             if arg == '-':
-                command_line_error(_("Dash ('-') not valid for time-separator."))
+                command_line_error("Dash ('-') not valid for time-separator.")
             globals.time_separator = arg
             dup_time.curtimestr = dup_time.timetostring(dup_time.curtime)
             old_fn_deprecation(opt)
         elif opt == "--use-agent":
             globals.use_agent = True
+        elif opt == "--use-scp":
+            globals.use_scp = True
         elif opt in ["-V", "--version"]:
             print "duplicity", str(globals.version)
             sys.exit(0)
@@ -378,12 +378,10 @@ def parse_cmdline_options(arglist):
             elif arg.isdigit() and (len(arg) == 1):
                 verb = get_int(arg, opt)
             else:
-                command_line_error(_("""
-Verbosity must be one of: digit [0-9], character [ewnid],
-or word ['error', 'warning', 'notice', 'info', 'debug'].
-The default is 4 (Notice).  It is strongly recommended
-that verbosity level is set at 2 (Warning) or higher.
-""")
+                command_line_error("\nVerbosity must be one of: digit [0-9], character [ewnid],\n"
+                                   "or word ['error', 'warning', 'notice', 'info', 'debug'].\n"
+                                   "The default is 4 (Notice).  It is strongly recommended\n"
+                                   "that verbosity level is set at 2 (Warning) or higher.")
             log.setverbosity(verb)
         elif opt == "--volsize":
             globals.volsize = get_int(arg, opt)*1024*1024
@@ -393,21 +391,15 @@ that verbosity level is set at 2 (Warning) or higher.
             globals.ignore_errors = True
         elif opt == "--imap-full-address":
             globals.imap_full_address = True
-        elif opt == "--par2":
-            if par2_utils.is_par2_supported():
-                globals.par2 = True;
-            else:
-                command_line_error(_("Par2 support was requested but par2 executable cannot be found.\n" 
-                                     "Please make the par2 executable availabe in your PATH environment."))
         else:
-            command_line_error(_("Unknown option %s") % opt)
+            command_line_error("Unknown option %s" % opt)
 
     # if we change the time format then we need a new curtime
     if globals.old_filenames:
         dup_time.curtimestr = dup_time.timetostring(dup_time.curtime)
 
     if len(args) != num_expect:
-        command_line_error(_("Expected %d args, got %d") % (num_expect, len(args)))
+        command_line_error("Expected %d args, got %d" % (num_expect, len(args)))
 
     # expand pathname args, but not URL
     for loc in range(len(args)):
@@ -419,13 +411,13 @@ that verbosity level is set at 2 (Warning) or higher.
     # checks here in order to make enough sense of args to identify
     # the backend URL/lpath for args_to_path_backend().
     if len(args) < 1:
-        command_line_error(_("Too few arguments"))
+        command_line_error("Too few arguments")
     elif len(args) == 1:
         backend_url = args[0]
     elif len(args) == 2:
         lpath, backend_url = args_to_path_backend(args[0], args[1])
     else:
-        command_line_error(_("Too many arguments"))
+        command_line_error("Too many arguments")
 
     if globals.backup_name is None:
         globals.backup_name = generate_default_backup_name(backend_url)
@@ -475,7 +467,7 @@ def usage():
 
         # TRANSL: noun
         'command'        : _("command"),
-        
+
         # TRANSL: Used in usage help to represent the name of a container in
         # Amazon Web Services' Cloudfront. Example:
         # cf+http://container_name
@@ -483,14 +475,14 @@ def usage():
 
         # TRANSL: noun
         'count'          : _("count"),
-        
+
         # TRANSL: Used in usage help to represent the name of a file directory
         'directory'      : _("directory"),
 
         # TRANSL: Used in usage help to represent the name of a file. Example:
         # --log-file <filename>
         'filename'       : _("filename"),
-        
+
         # TRANSL: Used in usage help to represent an ID for a GnuPG key. Example:
         # --encrypt-key <gpg_key_id>
         'gpg_key_id'     : _("gpg-key-id"),
@@ -571,12 +563,12 @@ def usage():
         # Example:
         # duplicity [full|incremental] [options] source_dir target_url
         'target_url'     : _("target_url"),
-        
+
         # TRANSL: Used in usage help to represent a time spec for a previous
         # point in time, as described in the documentation. Example:
         # duplicity remove-older-than time [options] target_url
         'time'           : _("time"),
-        
+
         # TRANSL: Used in usage help to represent a user name (i.e. login).
         # Example:
         # ftp://user[:password]@other.host[:port]/some_dir
@@ -680,6 +672,7 @@ def usage():
     -t<%(time)s>, --time <%(time)s>, --restore-time <%(time)s>
     --time-separator <%(char)s>
     --use-agent
+    --use-scp
     --version
     --volsize <%(number)s>
     -v[0-9], --verbosity [0-9]
@@ -702,7 +695,7 @@ def get_int(int_string, description):
     try:
         return int(int_string)
     except ValueError:
-        command_line_error(_("Received '%s' for %s, need integer") %
+        command_line_error("Received '%s' for %s, need integer" %
                                           (int_string, description.lstrip('-')))
 
 def set_archive_dir(dirstring):
@@ -746,18 +739,18 @@ def args_to_path_backend(arg1, arg2):
 
     if not arg1_is_backend and not arg2_is_backend:
         command_line_error(
-_("""One of the arguments must be an URL.  Examples of URL strings are
+"""One of the arguments must be an URL.  Examples of URL strings are
 "scp://user@host.net:1234/path" and "file:///usr/local".  See the man
-page for more information."""))
+page for more information.""")
     if arg1_is_backend and arg2_is_backend:
-        command_line_error(_("Two URLs specified.  "
-                             "One argument should be a path."))
+        command_line_error("Two URLs specified.  "
+                           "One argument should be a path.")
     if arg1_is_backend:
         return (arg2, arg1)
     elif arg2_is_backend:
         return (arg1, arg2)
     else:
-        raise AssertionError(_("this code should not be reachable"))
+        raise AssertionError('should not be reached')
 
 def set_backend(arg1, arg2):
     """Figure out which arg is url, set backend
@@ -815,27 +808,24 @@ def check_consistency(action):
                          globals.remove_time is not None])
     elif action == "restore" or action == "verify":
         if full_backup:
-            command_line_error(_("--full option cannot be used when "
-                                 "restoring or verifying"))
+            command_line_error("--full option cannot be used when "
+                               "restoring or verifying")
         elif globals.incremental:
-            command_line_error(_("--incremental option cannot be used when "
-                                 "restoring or verifying"))
+            command_line_error("--incremental option cannot be used when "
+                               "restoring or verifying")
         if select_opts and action == "restore":
-            command_line_error(_("Selection options --exclude/--include\n"
-                                 "currently work only when backing up, "
-                                 "not restoring."))
+            command_line_error("Selection options --exclude/--include\n"
+                               "currently work only when backing up, "
+                               "not restoring.")
     else:
         assert action == "inc" or action == "full"
         if verify:
-            command_line_error(_("--verify option cannot be used "
-                                 "when backing up"))
+            command_line_error("--verify option cannot be used "
+                                      "when backing up")
         if globals.restore_dir:
-            if action == "inc":
-                command_line_error(_("restore option incompatible with "
-                                     "incremental backup"))
-            else:
-                command_line_error(_("restore option incompatible with "
-                                     "full backup"))
+            command_line_error("restore option incompatible with %s backup"
+                               % (action,))
+
 
 def ProcessCommandLine(cmdline_list):
     """Process command line, set globals, return action
@@ -853,8 +843,7 @@ def ProcessCommandLine(cmdline_list):
 
     # parse_cmdline_options already verified that we got exactly 1 or 2
     # non-options arguments
-    assert len(args) >= 1 and len(args) <= 2,
-        _("arg count should have been checked already")
+    assert len(args) >= 1 and len(args) <= 2, "arg count should have been checked already"
 
     if len(args) == 1:
         if list_current:
@@ -868,7 +857,7 @@ def ProcessCommandLine(cmdline_list):
         elif globals.keep_chains is not None:
             action = "remove-all-but-n-full"
         else:
-            command_line_error(_("Too few arguments"))
+            command_line_error("Too few arguments")
         globals.backend = backend.get_backend(args[0])
         if not globals.backend:
             log.FatalError(_("""Bad URL '%s'.
@@ -893,7 +882,7 @@ Examples of URL strings are "scp://user@host.net:1234/path" and
         if action in ['full', 'inc', 'verify']:
             set_selection()
     elif len(args) > 2:
-        raise AssertionError(_("this code should not be reachable"))
+        raise AssertionError("this code should not be reachable")
 
     check_consistency(action)
     log.Info(_("Main action: ") + action)

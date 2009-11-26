@@ -168,6 +168,9 @@ ssh_askpass = False
 # user added ssh options
 ssh_options = ""
 
+# whether to use scp for put/get, sftp is default
+use_scp = False
+
 # will be a Restart object if restarting
 restart = None
 
