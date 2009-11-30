@@ -26,7 +26,6 @@ intended to be used by the backends themselves.
 
 import os
 import sys
-import socket
 import time
 import re
 import getpass
@@ -47,9 +46,6 @@ from duplicity.errors import UnsupportedBackendScheme
 
 import duplicity.backends
 
-
-# todo: this should really NOT be done here
-socket.setdefaulttimeout(globals.timeout)
 
 _forced_backend = None
 _backends = {}
