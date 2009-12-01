@@ -184,7 +184,7 @@ def parse_cmdline_options(arglist):
     def set_log_fd(fd):
         if fd < 1:
             raise optparse.OptionValueError("log-fd must be greater than zero.")
-        log.add_fd(log_fd)
+        log.add_fd(fd)
 
     def set_time_sep(sep, opt):
         if sep == '-':
