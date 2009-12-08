@@ -312,7 +312,7 @@ def parse_cmdline_options(arglist):
                       callback=lambda o, s, v, p: (log.Warn(
                           _("Running in 'ignore errors' mode due to %s; please "
                             "re-consider if this was not intended") % s),
-                          setattr(p, values, o.dest, True)))
+                          setattr(p.values, o.dest, True)))
 
     # Whether to use the full email address as the user name when
     # logging into an imap server. If false just the user name
@@ -365,7 +365,7 @@ def parse_cmdline_options(arglist):
 
     # Whether the old filename format is in effect.
     parser.add_option("--old-filenames", action="callback", 
-                      callback=lambda o, s, v, p: (setattr(p, values, o.dest, True),
+                      callback=lambda o, s, v, p: (setattr(p.values, o.dest, True),
                                                    old_fn_deprecation(s)))
 
     # Restores will try to bring back the state as of the following time.
@@ -394,7 +394,7 @@ def parse_cmdline_options(arglist):
 
     # If set, use short (< 30 char) filenames for all the remote files.
     parser.add_option("--short-filenames", action="callback", 
-                      callback=lambda o, s, v, p: (setattr(p, values, o.dest, True),
+                      callback=lambda o, s, v, p: (setattr(p.values, o.dest, True),
                                                    old_fn_deprecation(s)))
 
     # TRANSL: Used in usage help to represent an ID for a GnuPG key. Example:
