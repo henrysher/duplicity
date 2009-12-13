@@ -1111,9 +1111,6 @@ def main():
         os.setuid(os.geteuid())
         os.setgid(os.getegid())
 
-    os.environ["XDG_CACHE_HOME"] = os.getenv("XDG_CACHE_HOME", os.path.expanduser("~/.cache"))
-    os.environ["XDG_CONFIG_HOME"] = os.getenv("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
-
     # determine what action we're performing and process command line
     action = commandline.ProcessCommandLine(sys.argv[1:])
 
