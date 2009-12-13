@@ -288,7 +288,7 @@ class StatsObj:
 
     def get_statsobj_copy(self):
         """Return new StatsObj object with same stats as self"""
-        s = StatObj()
+        s = StatsObj()
         for attr in self.stat_attrs:
             s.set_stat(attr, self.get_stat(attr))
         return s
