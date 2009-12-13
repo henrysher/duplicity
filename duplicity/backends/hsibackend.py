@@ -60,7 +60,7 @@ class HSIBackend(duplicity.backend.Backend):
         return filter(lambda x: x, l)
 
     def delete(self, filename_list):
-        assert len(filename_ist) > 0
+        assert len(filename_list) > 0
         pathlist = map(lambda fn: self.remote_prefix + fn, filename_list)
         for fn in filename_list:
             commandline = '%s "rm %s%s"' % (hsi_command, self.remote_prefix, fn)
