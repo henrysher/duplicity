@@ -442,33 +442,6 @@ def parse_cmdline_options(arglist):
     parser.add_option("--volsize", type="int", action="callback", metavar=_("number"),
                       callback=lambda o, s, v, p: setattr(p.values, "volsize", v*1024*1024))
 
-    parser.set_defaults(archive_dir="$XDG_CACHE_HOME/duplicity",
-                        async_concurrency=0,
-                        config_dir="$XDG_CONFIG_HOME/duplicity",
-                        dry_run=False,
-                        encryption=True,
-                        extra_clean=False,
-                        fail_on_volume=0,
-                        ftp_connection="passive",
-                        ignore_errors=False,
-                        imap_full_address=False,
-                        imap_mailbox="INBOX",
-                        num_retries=5,
-                        old_filenames=False,
-                        print_statistics=True,
-                        s3_european_buckets=False,
-                        s3_use_new_style=False,
-                        scp_command="scp",
-                        sftp_command="sftp",
-                        short_filenames=False,
-                        ssh_askpass=False,
-                        ssh_options="",
-                        temproot=None,
-                        time_separator=":",
-                        timeout=30,
-                        use_agent=False,
-                        volsize=25*1024*1024)
-
     (options, args) = parser.parse_args()
 
     # Copy all arguments and their values to the globals module.  Don't copy
@@ -477,7 +450,10 @@ def parse_cmdline_options(arglist):
     # by using dest="")
     for f in filter(lambda x: x and not x.startswith("_"), dir(options)):
         v = getattr(options, f)
-        setattr(globals, f, v)
+        # Only set if v is not None because None is the default for all the
+        # variables.  If user didn't set it, we'll use defaults in globals.py
+        if v is not None:
+            setattr(globals, f, v)
 
     socket.setdefaulttimeout(globals.timeout)
 
