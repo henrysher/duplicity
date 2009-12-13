@@ -314,7 +314,7 @@ class TestInnerFuncs(unittest.TestCase):
 
         def try_seq(input_seq, correct_output_seq):
             normed = patchdir.normalize_ps(input_seq)
-            assert normed == correct_output_seq, (normed, correct_output_eq)
+            assert normed == correct_output_seq, (normed, correct_output_seq)
 
         try_seq(seq1, seq1)
         try_seq(seq2, [de])
