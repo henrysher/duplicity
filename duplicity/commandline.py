@@ -196,7 +196,8 @@ def parse_cmdline_options(arglist):
         select_opts.append((s, v))
 
     def add_filelist(o, s, v, p):
-        select_opts.append((s, v))
+        filename = v
+        select_opts.append((s, filename))
         try:
             select_files.append(open(filename, "r"))
         except IOError:
