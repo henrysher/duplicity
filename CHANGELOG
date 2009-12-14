@@ -10,6 +10,7 @@ Option --use-scp will use scp, not sftp, for get/put operations.
 
 Merged in lp:~mterry/duplicity/typos-0.6
 Merged in lp:~mterry/duplicity/optparse
+Merged in lp:~mterry/duplicity/typos
 
 
 New in v0.6.06 (2009/10/29)
