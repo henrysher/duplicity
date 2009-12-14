@@ -94,7 +94,7 @@ class GnuPGTests(BasicTest):
 
         creations = []
         # We'll handle the passphrase manually
-        if passphrase != None: handles.append('passphrase')
+        if passphrase != None: proc.handles.append('passphrase')
 
         attachments = { 'stdin': stdin, 'stdout': stdout }
 

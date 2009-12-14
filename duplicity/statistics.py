@@ -119,10 +119,10 @@ class StatsObj:
         if line[-1] == "\n":
             line = line[:-1]
         lineparts = line.split(" ")
-        if len(lineparts) < len(stat_file_attrs):
+        if len(lineparts) < len(self.stat_file_attrs):
             error()
-        for attr, val_string in zip(stat_file_attrs,
-                                    lineparts[-len(stat_file_attrs):]):
+        for attr, val_string in zip(self.stat_file_attrs,
+                                    lineparts[-len(self.stat_file_attrs):]):
             try:
                 val = long(val_string)
             except ValueError:
@@ -288,7 +288,7 @@ class StatsObj:
 
     def get_statsobj_copy(self):
         """Return new StatsObj object with same stats as self"""
-        s = StatObj()
+        s = StatsObj()
         for attr in self.stat_attrs:
             s.set_stat(attr, self.get_stat(attr))
         return s

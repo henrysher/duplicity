@@ -218,7 +218,7 @@ class CollectionTest(unittest.TestCase):
                       "duplicity-full.2002-08-15T01:01:01-07:00.vol1.difftar.gpg",
                       "duplicity-inc.2000-08-17T16:17:01-07:00.to.2000-08-18T00:04:30-07:00.manifest.gpg",
                       "duplicity-inc.2000-08-17T16:17:01-07:00.to.2000-08-18T00:04:30-07:00.vol1.difftar.gpg"]
-        local_received_list, remote_received_list = cs.get_extraneous()
+        local_received_list, remote_received_list = cs.get_extraneous(False)
         errors = []
         for filename in remote_received_list:
             if filename not in right_list:
