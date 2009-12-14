@@ -509,15 +509,6 @@ def parse_cmdline_options(arglist):
     elif cmd == "verify":
         verify = True
 
-    f = open("/tmp/mike", "w")
-    for v in filter(lambda x: not x.startswith("_"), dir(globals)):
-        e = getattr(globals, v)
-        if not str(e).startswith("<") and v != "version":
-            print >> f, v, e
-        else:
-            print >> f, v, "special"
-    f.close()
-
     if len(args) != num_expect:
         command_line_error("Expected %d args, got %d" % (num_expect, len(args)))
 
