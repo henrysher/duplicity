@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
 # Copyright 2002 Ben Escoto <ben@emerose.org>
@@ -22,7 +21,7 @@
 
 """Store global configuration information"""
 
-import socket, os
+import socket, sys, os
 
 # The current version of duplicity
 version = "$version"
@@ -88,10 +87,10 @@ allow_source_mismatch = None
 incremental = None
 
 # If set, print the statistics after every backup session
-print_statistics = 1
+print_statistics = True
 
 # If set, use short (< 30 char) filenames for all the remote files.
-short_filenames = 0
+short_filenames = False
 
 # If set, forces a full backup if the last full backup is older than
 # the time specified
@@ -167,9 +166,6 @@ ssh_askpass = False
 
 # user added ssh options
 ssh_options = ""
-
-# whether to use scp for put/get, sftp is default
-use_scp = False
 
 # will be a Restart object if restarting
 restart = None
