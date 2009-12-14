@@ -271,7 +271,7 @@ cannot match any files in the base directory
 Useful file specifications begin with the base directory or some
 pattern (such as '**') which matches the base directory.""") %
             (exc, self.prefix), log.ErrorCode.file_prefix_error)
-        elif isinstance(e, GlobbingError):
+        elif isinstance(exc, GlobbingError):
             log.FatalError(_("Fatal Error while processing expression\n"
                              "%s") % exc, log.ErrorCode.globbing_error)
         else:

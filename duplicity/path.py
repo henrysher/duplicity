@@ -260,7 +260,7 @@ class ROPath:
                     ti.type = tarfile.BLKTYPE
                 ti.devmajor, ti.devminor = self.devnums
             else:
-                raise PathError("Unrecognized type " + str(self.type))
+                raise PathException("Unrecognized type " + str(self.type))
 
             ti.mode = self.mode
             ti.uid, ti.gid = self.stat.st_uid, self.stat.st_gid
