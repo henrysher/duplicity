@@ -4,6 +4,8 @@ New in v0.7.00 (2009/??/??)
 
 426282  [PATCH] create par2 support
 
+Merged in lp:~mterry/duplicity/optparse
+
 Merged in lp:~mterry/duplicity/list-old-chains
 List/keep old signature chains
 

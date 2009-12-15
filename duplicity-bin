@@ -1134,11 +1134,11 @@ def main():
         os.setuid(os.geteuid())
         os.setgid(os.getegid())
 
-    # set the current time strings
-    dup_time.setcurtime()
-
     # determine what action we're performing and process command line
     action = commandline.ProcessCommandLine(sys.argv[1:])
+
+    # set the current time strings
+    dup_time.setcurtime()
 
     # get the passphrase if we need to based on action/options
     globals.gpg_profile.passphrase = get_passphrase(1, action)
