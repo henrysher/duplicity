@@ -429,6 +429,8 @@ def parse_cmdline_options(arglist):
     # Whether to specify --use-agent in GnuPG options
     parser.add_option("--use-agent", action="store_true")
 
+    parser.add_option("--use-scp", action="store_true")
+
     parser.add_option("--verbosity", "-v", type="verbosity", metavar="[0-9]",
                       dest="", action="callback",
                       callback=lambda o, s, v, p: log.setverbosity(v))
