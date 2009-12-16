@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-10-29 14:51-0600\n"
-"PO-Revision-Date: 2009-12-14 15:00+0000\n"
-"Last-Translator: Kenneth Loafman <kenneth@loafman.com>\n"
+"PO-Revision-Date: 2009-12-15 13:43+0000\n"
+"Last-Translator: MixCool <lars.thoms@mixcool.de>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-12-15 05:04+0000\n"
+"X-Launchpad-Export-Date: 2009-12-16 05:28+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../duplicity-bin:190
@@ -80,7 +80,7 @@ msgstr "Manifest-Hashcode: %s"
 #: ../duplicity-bin:636
 #, python-format
 msgid "Volume was signed by key %s, not %s"
-msgstr ""
+msgstr "Volume wurde von Schlüssel %s, anstatt von %s unterschrieben"
 
 #: ../duplicity-bin:666
 #, python-format
