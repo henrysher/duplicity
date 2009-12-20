@@ -184,3 +184,6 @@ ignore_errors = False
 
 # If we should be particularly aggressive when cleaning up
 extra_clean = False
+
+# Renames (--rename)
+rename = {}
