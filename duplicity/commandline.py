@@ -208,6 +208,9 @@ def parse_cmdline_options(arglist):
         print "duplicity %s" % (globals.version)
         sys.exit(0)
 
+    def add_rename(o, s, v, p):
+        globals.rename[os.path.normcase(os.path.normpath(v[0]))] = v[1]
+
     parser = optparse.OptionParser(option_class=DupOption, usage=usage())
 
     # If this is true, only warn and don't raise fatal error when backup
@@ -369,6 +372,9 @@ def parse_cmdline_options(arglist):
                       callback=lambda o, s, v, p: (setattr(p.values, o.dest, True),
                                                    old_fn_deprecation(s)))
 
+    parser.add_option("--rename", type="file", action="callback", nargs=2,
+                      callback=add_rename)
+
     # Restores will try to bring back the state as of the following time.
     # If it is None, default to current time.
     # TRANSL: Used in usage help to represent a time spec for a previous
@@ -428,6 +434,8 @@ def parse_cmdline_options(arglist):
 
     # Whether to specify --use-agent in GnuPG options
     parser.add_option("--use-agent", action="store_true")
+
+    parser.add_option("--use-scp", action="store_true")
 
     parser.add_option("--verbosity", "-v", type="verbosity", metavar="[0-9]",
                       dest="", action="callback",
