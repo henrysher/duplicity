@@ -32,7 +32,7 @@ import duplicity.backend
 from duplicity import globals
 from duplicity import log
 from duplicity import pexpect
-from duplicity.errors import *
+from duplicity.errors import * #@UnusedWildImport
 
 class SSHBackend(duplicity.backend.Backend):
     """This backend copies files using scp.  List not supported"""
@@ -78,7 +78,6 @@ class SSHBackend(duplicity.backend.Backend):
                 time.sleep(30)
             log.Info("Running '%s' (attempt #%d)" % (commandline, n))
             child = pexpect.spawn(commandline, timeout = None)
-            cmdloc = 0
             if globals.ssh_askpass:
                 state = "authorizing"
             else:
@@ -199,9 +198,9 @@ class SSHBackend(duplicity.backend.Backend):
 
     def put(self, source_path, remote_filename = None):
         if globals.use_scp:
-            self.put_scp(source_path, remote_filename = None)
+            self.put_scp(source_path, remote_filename = remote_filename)
         else:
-            self.put_sftp(source_path, remote_filename = None)
+            self.put_sftp(source_path, remote_filename = remote_filename)
 
     def put_sftp(self, source_path, remote_filename = None):
         """Use sftp to copy source_dir/filename to remote computer"""
