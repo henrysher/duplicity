@@ -26,12 +26,7 @@ which is written in C.  The goal was to use C as little as possible...
 
 """
 
-#TODO: remove when librsync upgraded
-try:
-    import _librsync
-except Exception, e:
-    pass
-
+import _librsync
 import types, array
 
 blocksize = _librsync.RS_JOB_BLOCKSIZE

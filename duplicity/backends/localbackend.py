@@ -25,7 +25,7 @@ import types
 import duplicity.backend
 from duplicity import log
 from duplicity import path
-from duplicity.errors import *
+from duplicity.errors import * #@UnusedWildImport
 
 class LocalBackend(duplicity.backend.Backend):
     """Use this backend when saving to local disk

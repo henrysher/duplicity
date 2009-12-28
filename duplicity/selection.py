@@ -19,22 +19,22 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
+import os #@UnusedImport
+import re #@UnusedImport
+import stat #@UnusedImport
+
+from duplicity.path import * #@UnusedWildImport
+from duplicity import log #@Reimport
+from duplicity import globals #@Reimport
+from duplicity import diffdir
+from duplicity import util #@Reimport
+
 """Iterate exactly the requested files in a directory
 
 Parses includes and excludes to yield correct files.  More
 documentation on what this code does can be found on the man page.
 
 """
-
-import os
-import re
-import stat
-
-from duplicity.path import *
-from duplicity import log
-from duplicity import globals
-from duplicity import diffdir
-from duplicity import util
 
 class SelectError(Exception):
     """Some error dealing with the Select class"""
@@ -137,7 +137,7 @@ class Select:
 
             """
             # todo: get around circular dependency issue by importing here
-            from duplicity import robust
+            from duplicity import robust #@Reimport
             for filename in robust.listpath(path):
                 new_path = robust.check_common_error(
                     error_handler, Path.append, (path, filename))

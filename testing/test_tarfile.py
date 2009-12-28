@@ -76,7 +76,7 @@ class Test_All(BaseTest):
         i = 0
         tf = tarfile.TarFile("none", "r", FileLogger(open("temp2.tar", "rb")))
         tf.debug = 3
-        for tarinfo in tf: i += 1
+        for tarinfo in tf: i += 1 #@UnusedVariable
         assert i >= 6, i
 
     def _test_extraction(self):
@@ -313,7 +313,7 @@ class Test_FObj(BaseTest):
         tarinfo = self.tar.getmember("pep.txt")
         fobj = self.tar.extractfile(tarinfo)
 
-        text = fobj.read()
+        text = fobj.read() #@UnusedVariable
         fobj.seek(0)
         self.assert_(0 == fobj.tell(),
                      "seek() to file's start failed")
@@ -365,11 +365,11 @@ class PasswordTest(unittest.TestCase):
     def compare(self, thunk1, thunk2):
         """Make sure thunk1 and thunk2 return the same"""
         try: result1 = thunk1()
-        except KeyError, exc1: keyerror = 1
+        except KeyError, exc1: keyerror = 1 #@UnusedVariable
         else: keyerror = 0
 
         try: result2 = thunk2()
-        except KeyError, exc2:
+        except KeyError, exc2: #@UnusedVariable
             assert keyerror, "Got KeyError vs " + str(result2)
             return
         else: assert not keyerror, "Got %s vs KeyError" % (str(result1),)

@@ -23,14 +23,14 @@ import types
 import subprocess
 import atexit
 import signal
-import gio
-import glib
+import gio #@UnresolvedImport
+import glib #@UnresolvedImport
 
 import duplicity.backend
 from duplicity import log
 from duplicity import globals
-from duplicity.errors import *
-from duplicity.util import exception_traceback 
+from duplicity.errors import * #@UnusedWildImport
+from duplicity.util import exception_traceback
 
 def ensure_dbus():
     # GIO requires a dbus session bus which can start the gvfs daemons

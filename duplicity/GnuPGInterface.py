@@ -229,7 +229,7 @@ from duplicity import log
 try:
     import threading
 except ImportError:
-    import dummy_threading
+    import dummy_threading #@UnusedImport
     log.Warn("Threading not available -- zombie processes may appear")
 
 __author__   = "Frank J. Tobin, ftobin@neverending.org"
@@ -673,7 +673,7 @@ def threaded_waitpid(process):
 
 
 def _run_doctests():
-    import doctest, GnuPGInterface
+    import doctest, GnuPGInterface #@UnresolvedImport
     return doctest.testmod(GnuPGInterface)
 
 # deprecated

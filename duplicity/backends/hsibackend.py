@@ -22,7 +22,7 @@
 import os
 
 import duplicity.backend
-from duplicity.errors import *
+from duplicity.errors import * #@UnusedWildImport
 
 hsi_command = "hsi"
 class HSIBackend(duplicity.backend.Backend):
@@ -61,7 +61,6 @@ class HSIBackend(duplicity.backend.Backend):
 
     def delete(self, filename_list):
         assert len(filename_list) > 0
-        pathlist = map(lambda fn: self.remote_prefix + fn, filename_list)
         for fn in filename_list:
             commandline = '%s "rm %s%s"' % (hsi_command, self.remote_prefix, fn)
             self.run_command(commandline)

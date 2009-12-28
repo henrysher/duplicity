@@ -157,14 +157,14 @@ def run (command, timeout=-1, withexitstatus=False, events=None, extra_args=None
     The run() function can often be used instead of creating a spawn instance.
     For example, the following code uses spawn::
 
-        from pexpect import *
+        from pexpect import * #@UnusedWildImport
         child = spawn('scp foo myname@host.example.com:.')
         child.expect ('(?i)password')
         child.sendline (mypassword)
 
     The previous code can be replace with the following::
 
-        from pexpect import *
+        from pexpect import * #@UnusedWildImport
         run ('scp foo myname@host.example.com:.', events={'(?i)password': mypassword})
 
     Examples
@@ -172,17 +172,17 @@ def run (command, timeout=-1, withexitstatus=False, events=None, extra_args=None
 
     Start the apache daemon on the local machine::
 
-        from pexpect import *
+        from pexpect import * #@UnusedWildImport
         run ("/usr/local/apache/bin/apachectl start")
 
     Check in a file using SVN::
 
-        from pexpect import *
+        from pexpect import * #@UnusedWildImport
         run ("svn ci -m 'automatic commit' my_file.py")
 
     Run a command and capture exit status::
 
-        from pexpect import *
+        from pexpect import * #@UnusedWildImport
         (command_output, exitstatus) = run ('ls -l /bin', withexitstatus=1)
 
     Tricky Examples
@@ -196,7 +196,7 @@ def run (command, timeout=-1, withexitstatus=False, events=None, extra_args=None
     This will start mencoder to rip a video from DVD. This will also display
     progress ticks every 5 seconds as it runs. For example::
 
-        from pexpect import *
+        from pexpect import * #@UnusedWildImport
         def print_ticks(d):
             print d['event_count'],
         run ("mencoder dvd://1 -o video.avi -oac copy -ovc copy", events={TIMEOUT:print_ticks}, timeout=5)
@@ -336,12 +336,12 @@ class spawn (object):
         the input from the child and output sent to the child. Sometimes you
         don't want to see everything you write to the child. You only want to
         log what the child sends back. For example::
-        
+
             child = pexpect.spawn('some_command')
             child.logfile_read = sys.stdout
 
         To separately log output sent to the child use logfile_send::
-        
+
             self.logfile_send = fout
 
         The delaybeforesend helps overcome a weird behavior that many users
@@ -704,7 +704,7 @@ class spawn (object):
         if timeout == -1:
             timeout = self.timeout
         if timeout is not None:
-            end_time = time.time() + timeout 
+            end_time = time.time() + timeout
         while True:
             if not self.getecho():
                 return True
@@ -800,19 +800,19 @@ class spawn (object):
         # For this case, I test isalive() before doing any reading.
         # If isalive() is false, then I pretend that this is the same as EOF.
         if not self.isalive():
-            r,w,e = self.__select([self.child_fd], [], [], 0) # timeout of 0 means "poll"
+            r,w,e = self.__select([self.child_fd], [], [], 0) # timeout of 0 means "poll" @UnusedVariable
             if not r:
                 self.flag_eof = True
                 raise EOF ('End Of File (EOF) in read_nonblocking(). Braindead platform.')
         elif self.__irix_hack:
             # This is a hack for Irix. It seems that Irix requires a long delay before checking isalive.
             # This adds a 2 second delay, but only when the child is terminated.
-            r, w, e = self.__select([self.child_fd], [], [], 2)
+            r, w, e = self.__select([self.child_fd], [], [], 2) #@UnusedVariable
             if not r and not self.isalive():
                 self.flag_eof = True
                 raise EOF ('End Of File (EOF) in read_nonblocking(). Pokey platform.')
 
-        r,w,e = self.__select([self.child_fd], [], [], timeout)
+        r,w,e = self.__select([self.child_fd], [], [], timeout) #@UnusedVariable
 
         if not r:
             if not self.isalive():
@@ -1091,7 +1091,7 @@ class spawn (object):
         is still alive until its output is read. """
 
         if self.isalive():
-            pid, status = os.waitpid(self.pid, 0)
+            pid, status = os.waitpid(self.pid, 0) #@UnusedVariable
         else:
             raise ExceptionPexpect ('Cannot wait for dead child process.')
         self.exitstatus = os.WEXITSTATUS(status)
@@ -1355,7 +1355,7 @@ class spawn (object):
         if timeout == -1:
             timeout = self.timeout
         if timeout is not None:
-            end_time = time.time() + timeout 
+            end_time = time.time() + timeout
         if searchwindowsize == -1:
             searchwindowsize = self.searchwindowsize
 
@@ -1515,7 +1515,7 @@ class spawn (object):
         """
 
         while self.isalive():
-            r,w,e = self.__select([self.child_fd, self.STDIN_FILENO], [], [])
+            r,w,e = self.__select([self.child_fd, self.STDIN_FILENO], [], []) #@UnusedVariable
             if self.child_fd in r:
                 data = self.__interact_read(self.child_fd)
                 if output_filter: data = output_filter(data)
@@ -1653,7 +1653,7 @@ class searcher_string (object):
         # rescanning until we've read three more bytes.
         #
         # Sadly, I don't know enough about this interesting topic. /grahn
-        
+
         for index, s in self._strings:
             if searchwindowsize is None:
                 # the match, if any, can only be in the fresh data,
@@ -1732,7 +1732,7 @@ class searcher_re (object):
         'buffer' which have not been searched before.
 
         See class spawn for the 'searchwindowsize' argument.
-        
+
         If there is a match this returns the index of that string, and sets
         'start', 'end' and 'match'. Otherwise, returns -1."""
 

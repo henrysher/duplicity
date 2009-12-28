@@ -27,14 +27,10 @@ first, the signature or delta is constructed of a ROPath iterator.  In
 the second, the ROPath iterator is put into tar block form.
 """
 
-import cStringIO, re, types
-from duplicity import tarfile
-from duplicity import librsync
-from duplicity import log
+import cStringIO, types
 from duplicity import statistics
-from duplicity import util
-from duplicity.path import *
-from duplicity.lazy import *
+from duplicity.path import * #@UnusedWildImport
+from duplicity.lazy import * #@UnusedWildImport
 
 # A StatsObj will be written to this from DirDelta_WriteSig only.
 stats = None
@@ -474,7 +470,7 @@ class TarBlockIter:
         """
         tarinfo.size = len(file_data)
         headers = self.tf._get_full_headers(tarinfo)
-        blocks, remainder = divmod(tarinfo.size, tarfile.BLOCKSIZE)
+        blocks, remainder = divmod(tarinfo.size, tarfile.BLOCKSIZE) #@UnusedVariable
         if remainder > 0:
             filler_data = "\0" * (tarfile.BLOCKSIZE - remainder)
         else:
@@ -486,7 +482,7 @@ class TarBlockIter:
         Turn next value of input_iter into a TarBlock
         """
         assert not self.process_waiting
-        XXX # Override in subclass
+        XXX # Override in subclass @UndefinedVariable
 
     def process_continued(self, size):
         """
@@ -496,7 +492,7 @@ class TarBlockIter:
         get the rest of them by calling process_continue.
         """
         assert self.process_waiting
-        XXX # Override in subclass
+        XXX # Override in subclass @UndefinedVariable
 
     def next(self, size = 1024 * 1024):
         """
@@ -541,7 +537,7 @@ class TarBlockIter:
         """
         Return closing string for tarfile, reset offset
         """
-        blocks, remainder = divmod(self.offset, tarfile.RECORDSIZE)
+        blocks, remainder = divmod(self.offset, tarfile.RECORDSIZE) #@UnusedVariable
         self.offset = 0l
         return '\0' * (tarfile.RECORDSIZE - remainder) # remainder can be 0
 

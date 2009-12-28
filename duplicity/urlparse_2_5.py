@@ -19,7 +19,7 @@ uses_netloc = ['ftp', 'http', 'gopher', 'nntp', 'telnet',
                'svn', 'svn+ssh', 'sftp', 'imap', 'imaps']
 non_hierarchical = ['gopher', 'hdl', 'mailto', 'news',
                     'telnet', 'wais', 'snews', 'sip', 'sips', 'imap', 'imaps']
-uses_params = ['ftp', 'hdl', 'prospero', 'http', 
+uses_params = ['ftp', 'hdl', 'prospero', 'http',
                'https', 'shttp', 'rtsp', 'rtspu', 'sip', 'sips',
                'mms', '', 'sftp', 'imap', 'imaps']
 uses_query = ['http', 'wais', 'https', 'shttp', 'mms',
@@ -259,10 +259,8 @@ def urljoin(base, url, allow_fragments=True):
         return url
     if not url:
         return base
-    bscheme, bnetloc, bpath, bparams, bquery, bfragment = \
-            urlparse(base, '', allow_fragments)
-    scheme, netloc, path, params, query, fragment = \
-            urlparse(url, bscheme, allow_fragments)
+    bscheme, bnetloc, bpath, bparams, bquery, bfragment = urlparse(base, '', allow_fragments) #@UnusedVariable
+    scheme, netloc, path, params, query, fragment = urlparse(url, bscheme, allow_fragments)
     if scheme != bscheme or scheme not in uses_relative:
         return url
     if scheme in uses_netloc:

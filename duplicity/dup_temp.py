@@ -21,7 +21,7 @@
 
 """Manage temporary files"""
 
-import tempfile, os, sys, errno
+import os, sys
 
 from duplicity import log
 from duplicity import path
@@ -180,7 +180,7 @@ class FileobjHooked:
             gpg.GPGWriteFile(src_iter, tgt.name, globals.gpg_profile, size = sys.maxint)
         else:
             os.system("cp -p %s %s" % (src.name, tgt.name))
-        globals.backend.put(tgt)
+        globals.backend.put(tgt) #@UndefinedVariable
         os.unlink(tgt.name)
 
     def to_final(self):

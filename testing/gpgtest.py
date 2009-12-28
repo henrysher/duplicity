@@ -20,7 +20,7 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import config
-import sys, os, unittest, cStringIO, random
+import sys, os, unittest, random
 sys.path.insert(0, "../")
 
 from duplicity import gpg
@@ -114,7 +114,7 @@ class GPGTest(unittest.TestCase):
         size = 400 * 1000
         gwfh = GPGWriteFile_Helper()
         profile = gpg.GPGProfile(passphrase = "foobar")
-        for i in range(10):
+        for i in range(10): #@UnusedVariable
             gpg.GPGWriteFile(gwfh, "testfiles/output/gpgwrite.gpg",
                              profile, size = size)
             #print os.stat("testfiles/output/gpgwrite.gpg").st_size-size
@@ -129,7 +129,7 @@ class GPGTest(unittest.TestCase):
         self.deltmp()
         size = 400 * 1000
         gwfh = GPGWriteFile_Helper()
-        for i in range(10):
+        for i in range(10): #@UnusedVariable
             gpg.GzipWriteFile(gwfh, "testfiles/output/gzwrite.gz",
                               size = size)
             #print os.stat("testfiles/output/gzwrite.gz").st_size-size

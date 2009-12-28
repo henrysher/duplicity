@@ -21,49 +21,49 @@
 
 """Define some lazy data structures and functions acting on them"""
 
-import os, stat, types, sys
+import os
 
-from duplicity.static import *
+from duplicity.static import * #@UnusedWildImport
 
 
 class Iter:
     """Hold static methods for the manipulation of lazy iterators"""
 
-    def filter(predicate, iterator):
+    def filter(predicate, iterator): #@NoSelf
         """Like filter in a lazy functional programming language"""
         for i in iterator:
             if predicate(i):
                 yield i
 
-    def map(function, iterator):
+    def map(function, iterator): #@NoSelf
         """Like map in a lazy functional programming language"""
         for i in iterator:
             yield function(i)
 
-    def foreach(function, iterator):
+    def foreach(function, iterator): #@NoSelf
         """Run function on each element in iterator"""
         for i in iterator:
             function(i)
 
-    def cat(*iters):
+    def cat(*iters): #@NoSelf
         """Lazily concatenate iterators"""
         for iter in iters:
             for i in iter:
                 yield i
 
-    def cat2(iter_of_iters):
+    def cat2(iter_of_iters): #@NoSelf
         """Lazily concatenate iterators, iterated by big iterator"""
         for iter in iter_of_iters:
             for i in iter:
                 yield i
 
-    def empty(iter):
+    def empty(iter): #@NoSelf
         """True if iterator has length 0"""
-        for i in iter:
+        for i in iter: #@UnusedVariable
             return None
         return 1
 
-    def equal(iter1, iter2, verbose = None, operator = lambda x, y: x == y):
+    def equal(iter1, iter2, verbose = None, operator = lambda x, y: x == y): #@NoSelf
         """True if iterator 1 has same elements as iterator 2
 
         Use equality operator, or == if it is unspecified.
@@ -88,7 +88,7 @@ class Iter:
             print "End when i2 = %s" % (i2,)
         return None
 
-    def Or(iter):
+    def Or(iter): #@NoSelf
         """True if any element in iterator is true.  Short circuiting"""
         i = None
         for i in iter:
@@ -96,7 +96,7 @@ class Iter:
                 return i
         return i
 
-    def And(iter):
+    def And(iter): #@NoSelf
         """True if all elements in iterator are true.  Short circuiting"""
         i = 1
         for i in iter:
@@ -104,7 +104,7 @@ class Iter:
                 return i
         return i
 
-    def len(iter):
+    def len(iter): #@NoSelf
         """Return length of iterator"""
         i = 0
         while 1:
@@ -114,7 +114,7 @@ class Iter:
                 return i
             i = i+1
 
-    def foldr(f, default, iter):
+    def foldr(f, default, iter): #@NoSelf
         """foldr the "fundamental list recursion operator"?"""
         try:
             next = iter.next()
@@ -122,7 +122,7 @@ class Iter:
             return default
         return f(next, Iter.foldr(f, default, iter))
 
-    def foldl(f, default, iter):
+    def foldl(f, default, iter): #@NoSelf
         """the fundamental list iteration operator.."""
         while 1:
             try:
@@ -131,7 +131,7 @@ class Iter:
                 return default
             default = f(default, next)
 
-    def multiplex(iter, num_of_forks, final_func = None, closing_func = None):
+    def multiplex(iter, num_of_forks, final_func = None, closing_func = None): #@NoSelf
         """Split a single iterater into a number of streams
 
         The return val will be a list with length num_of_forks, each

@@ -26,14 +26,17 @@ associates stat information with filenames
 
 """
 
-import stat, os, errno, socket, time, re, gzip
+import stat, errno, socket, time, re, gzip
 
-import duplicity.util as util
-
+from duplicity import file_naming
+from duplicity import globals
+from duplicity import gpg
+from duplicity import tarfile
+from duplicity import util
 from duplicity import librsync
-from duplicity import log
+from duplicity import log #@UnusedImport
 from duplicity import dup_time
-from duplicity.lazy import *
+from duplicity.lazy import * #@UnusedWildImport
 
 _copy_blocksize = 64 * 1024
 _tmp_path_counter = 1
@@ -750,10 +753,3 @@ class PathDeleter(ITRBranch):
         return not path.isdir()
     def fast_process(self, index, path):
         path.delete()
-
-
-# Wait until end to avoid circular module trouble
-from duplicity import file_naming
-from duplicity import globals
-from duplicity import gpg
-from duplicity import tarfile

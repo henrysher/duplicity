@@ -186,7 +186,7 @@ def copyfileobj(src, dst, length=None):
 
     BUFSIZE = 16 * 1024
     blocks, remainder = divmod(length, BUFSIZE)
-    for b in range(blocks):
+    for b in range(blocks): #@UnusedVariable
         buf = src.read(BUFSIZE)
         if len(buf) < BUFSIZE:
             raise IOError, "end of file reached"
@@ -332,7 +332,7 @@ class TarInfo:
         self.devmajor = 0          #-
         self.devminor = 0          #-for use with CHRTYPE and BLKTYPE
         self.prefix   = ""         # prefix, holding information
-                                   # about sparse files
+#                                  # about sparse files
 
         self.offset   = 0          # the tar header starts here
         self.offset_data = 0       # the optional file's data starts here
@@ -378,7 +378,7 @@ class TarInfo:
         turned to relative paths.
         """
         arcname = normpath(name)
-        drv, arcname = os.path.splitdrive(arcname)
+        drv, arcname = os.path.splitdrive(arcname) #@UnusedVariable
         while arcname[0:1] == "/":
             arcname = arcname[1:]
         self.name = arcname
@@ -504,7 +504,7 @@ class TarFile:
             if self._mode in "aw":
                 # fill up the end with zero-blocks
                 # (like option -b20 for tar does)
-                blocks, remainder = divmod(self.offset, RECORDSIZE)
+                blocks, remainder = divmod(self.offset, RECORDSIZE) #@UnusedVariable
                 if remainder > 0:
                     self.fileobj.write("\0" * (RECORDSIZE - remainder))
 
@@ -975,11 +975,11 @@ class TarFile:
             linkpath = normpath(linkpath)
             try:
                 self._extract_member(self.getmember(linkpath), targetpath)
-            except (IOError, OSError, KeyError), e:
+            except (IOError, OSError, KeyError), e: #@UnusedVariable
                 linkpath = os.path.normpath(linkpath)
                 try:
                     shutil.copy2(linkpath, targetpath)
-                except EnvironmentError, e:
+                except EnvironmentError, e: #@UnusedVariable
                     raise TarError, "Link could not be created"
 
     def _chown(self, tarinfo, targetpath):
@@ -1084,7 +1084,7 @@ class TarFile:
         if tarinfo.chksum != calc_chksum(buf):
             self._dbg(1, "tarfile: Bad Checksum\n")
         return tarinfo
-        
+
     def _proc_gnulong(self, tarinfo, type):
         """Evaluate the blocks that hold a GNU longname
            or longlink member.
@@ -1147,7 +1147,7 @@ class TarFile:
         try:
             # There are 4 possible sparse structs in the
             # first header.
-            for i in range(4):
+            for i in range(4): #@UnusedVariable
                 offset = int(buf[pos:pos + 12], 8)
                 numbytes = int(buf[pos + 12:pos + 24], 8)
                 if offset > lastpos:
@@ -1166,7 +1166,7 @@ class TarFile:
                 buf = self.fileobj.read(BLOCKSIZE)
                 self.offset += BLOCKSIZE
                 pos = 0
-                for i in range(21):
+                for i in range(21): #@UnusedVariable
                     offset = int(buf[pos:pos + 12], 8)
                     numbytes = int(buf[pos + 12:pos + 24], 8)
                     if offset > lastpos:
@@ -1419,7 +1419,6 @@ class TarFileCompat:
         else:
             raise ValueError, "unknown compression constant"
         if mode[0:1] == "r":
-            import time
             members = self.tarfile.getmembers()
             for i in range(len(members)):
                 m = members[i]
@@ -1518,7 +1517,7 @@ wildcards *, ?, [seq], [!seq] are accepted.
         # If under Win32, set stdout to binary.
         try:
             import msvcrt
-            msvcrt.setmode(1, os.O_BINARY)
+            msvcrt.setmode(1, os.O_BINARY) #@UndefinedVariable
         except ImportError:
             pass
         tarfile = func("sys.stdout.tar", mode, 9, sys.stdout)
@@ -1604,7 +1603,7 @@ class TarFromIterator(TarFile):
             self.buffer = self.buffer[length:]
         self.tar_iter_offset += len(result)
         return result
-        
+
     def _addtobuffer(self):
         """Write more data into the buffer.  Return None if at end"""
         if self.status == self.BEGIN:
@@ -1662,7 +1661,7 @@ class TarFromIterator(TarFile):
 
     def _add_final(self):
         """Add closing footer to buffer"""
-        blocks, remainder = divmod(self.offset, RECORDSIZE)
+        blocks, remainder = divmod(self.offset, RECORDSIZE) #@UnusedVariable
         if remainder > 0: self.buffer += "\0" * (RECORDSIZE - remainder)
 
     def close(self):

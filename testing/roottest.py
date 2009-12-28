@@ -20,13 +20,13 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import config
-import sys, os, unittest
+import sys, unittest
 sys.path.insert(0, "../")
 
 from duplicity import diffdir
 from duplicity import patchdir
 from duplicity import selection
-from duplicity.path import *
+from duplicity.path import * #@UnusedWildImport
 
 config.setup()
 

@@ -24,14 +24,13 @@ import sys, unittest, os
 sys.path.insert(0, "../")
 
 import duplicity.backend
-import duplicity.backends
 try:
     import duplicity.backends.giobackend
     gio_available = True
 except:
     gio_available = False
-from duplicity.errors import *
-from duplicity import path, log, file_naming, dup_time, globals, gpg
+from duplicity.errors import * #@UnusedWildImport
+from duplicity import path, file_naming, dup_time, globals, gpg
 
 config.setup()
 

@@ -24,7 +24,7 @@ import time
 import duplicity.backend
 from duplicity import globals
 from duplicity import log
-from duplicity.errors import *
+from duplicity.errors import * #@UnusedWildImport
 from duplicity.util import exception_traceback
 
 class CloudFilesBackend(duplicity.backend.Backend):

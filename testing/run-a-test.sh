@@ -36,7 +36,8 @@ if [ ! -e $1 ]; then
 fi
 
 # run against all supported python versions
-for v in 2.3 2.4 2.5 2.6; do
+#for v in 2.3 2.4 2.5 2.6; do
+for v in 2.5 2.6; do
     if command -v python$v ; then
         echo "========== Compiling librsync for python$v =========="
         pushd ../duplicity

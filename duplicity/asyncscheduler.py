@@ -25,9 +25,6 @@ Asynchronous job scheduler, for concurrent execution with minimalistic
 dependency guarantees.
 """
 
-import sys
-import gettext
-
 import duplicity
 from duplicity import log
 from duplicity.dup_threading import require_threading
@@ -77,8 +74,8 @@ class AsyncScheduler:
         self.__waiter_count  = 0            # number of threads waiting to submit work
         self.__barrier       = False        # barrier currently in effect?
         self.__cv            = threading.Condition() # for simplicity, we use a single cv with its lock
-                                                     # for everything, even if the resulting notifyAll():s
-                                                     # are not technically efficient.
+#                                                    # for everything, even if the resulting notifyAll():s
+#                                                    # are not technically efficient.
 
         if concurrency > 0:
             require_threading("concurrency > 0 (%d)" % (concurrency,))
@@ -168,7 +165,6 @@ class AsyncScheduler:
         with_lock(self.__cv, _wait)
 
     def __run_synchronously(self, fn, params):
-        success = False
 
         # When running synchronously, we immediately leak any exception raised
         # for immediate failure reporting to calling code.
@@ -213,7 +209,7 @@ class AsyncScheduler:
             self.__worker_count += 1
             log.Debug("%s: %s" % (self.__class__.__name__,
                                   _("active workers = %d") % (self.__worker_count,)))
-    
+
         # simply wait for an OK condition to start, then launch our worker. the worker
         # never waits on us, we just wait for them.
         with_lock(self.__cv, wait_for_and_register_launch)

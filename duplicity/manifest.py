@@ -62,7 +62,7 @@ class Manifest:
         @return: manifest
         """
         self.hostname = globals.hostname
-        self.local_dirname = globals.local_path.name
+        self.local_dirname = globals.local_path.name #@UndefinedVariable
         if self.fh:
             if self.hostname:
                 self.fh.write("Hostname %s\n" % self.hostname)
@@ -90,12 +90,12 @@ class Manifest:
             code = log.ErrorCode.hostname_mismatch
             code_extra = "%s %s" % (util.escape(globals.hostname), util.escape(self.hostname))
 
-        elif (self.local_dirname and self.local_dirname != globals.local_path.name):
+        elif (self.local_dirname and self.local_dirname != globals.local_path.name): #@UndefinedVariable
             errmsg = _("Fatal Error: Backup source directory has changed.\n"
                        "Current directory: %s\n"
-                       "Previous directory: %s") % (self.local_dirname, globals.local_path.name)
+                       "Previous directory: %s") % (self.local_dirname, globals.local_path.name) #@UndefinedVariable
             code = log.ErrorCode.source_dir_mismatch
-            code_extra = "%s %s" % (util.escape(self.local_dirname), util.escape(globals.local_path.name))
+            code_extra = "%s %s" % (util.escape(self.local_dirname), util.escape(globals.local_path.name)) #@UndefinedVariable
         else:
             return
 

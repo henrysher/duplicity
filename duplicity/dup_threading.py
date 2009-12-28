@@ -43,7 +43,6 @@ except ImportError:
     _threading_supported = False
 
 import sys
-import traceback
 
 from duplicity import errors
 
@@ -158,12 +157,12 @@ def async_split(fn):
     Splits the act of calling the given function into one front-end
     part for waiting on the result, and a back-end part for performing
     the work in another thread.
-    
+
     Returns (waiter, caller) where waiter is a function to be called
     in order to wait for the results of an asynchronous invokation of
     fn to complete, returning fn's result or propagating it's
     exception.
-    
+
     Caller is the function to call in a background thread in order to
     execute fn asynchronously. Caller will return (success, waiter)
     where success is a boolean indicating whether the function
@@ -179,24 +178,24 @@ def async_split(fn):
     # used for significant amounts of work.
 
 
-    cv = threading.Condition()
+    cv = threading.Condition() #@UndefinedVariable
     state = { 'done': False,
               'error': None,
               'trace': None,
               'value': None }
-    
+
     def waiter():
         cv.acquire()
         try:
             interruptably_wait(cv, lambda: state['done'])
-                
+
             if state['error'] is None:
                 return state['value']
             else:
                 raise state['error'], None, state['trace']
         finally:
             cv.release()
-            
+
     def caller():
         try:
             value = fn()
@@ -217,7 +216,7 @@ def async_split(fn):
             cv.release()
 
             return (False, waiter)
-            
+
     return (waiter, caller)
 
 class Value:
@@ -251,7 +250,7 @@ class Value:
         """
         self.__value = value
 
-        self.__cv = threading.Condition()
+        self.__cv = threading.Condition() #@UndefinedVariable
 
     def get(self):
         """

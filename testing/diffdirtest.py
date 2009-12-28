@@ -20,14 +20,13 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import config
-import sys, os, unittest
+import sys, unittest
 sys.path.insert(0, "../")
 
-from duplicity.path import *
+from duplicity.path import * #@UnusedWildImport
 from duplicity import diffdir
 from duplicity import selection
-from duplicity import tarfile
-from duplicity import log
+from duplicity import tarfile #@Reimport
 
 config.setup()
 
@@ -63,7 +62,7 @@ class DDTest(unittest.TestCase):
         diffdir.write_block_iter(sigtar, "testfiles/output/sigtar")
 
         i = 0
-        for tarinfo in tarfile.TarFile("testfiles/output/sigtar", "r"):
+        for tarinfo in tarfile.TarFile("testfiles/output/sigtar", "r"): #@UnusedVariable
             i += 1
         assert i >= 5, "There should be at least 5 files in sigtar"
 
@@ -106,7 +105,7 @@ class DDTest(unittest.TestCase):
         diffdir.write_block_iter(diffdir.DirDelta(select2, sigtar_fp),
                                  "testfiles/output/difftar")
 
-        size = os.stat("testfiles/output/difftar").st_size
+        size = os.stat("testfiles/output/difftar").st_size #@UnusedVariable
 
     def test_empty_diff2(self):
         """Test producing diff against directories of special files"""
@@ -176,8 +175,8 @@ class DDTest(unittest.TestCase):
 
         """
         self.deltmp()
-        deltadir1 = Path("testfiles/output/dir.deltatar1")
-        deltadir2 = Path("testfiles/output/dir.deltatar2")
+        deltadir1 = Path("testfiles/output/dir.deltatar1") #@UnusedVariable
+        deltadir2 = Path("testfiles/output/dir.deltatar2") #@UnusedVariable
         cur_full_sigs = Path("testfiles/output/fullsig.dir1")
 
         cur_dir = Path("testfiles/dir1")
@@ -188,7 +187,7 @@ class DDTest(unittest.TestCase):
         sigstack = [cur_full_sigs]
         for dirname in ['dir2', 'dir3', 'dir4']:
             #print "Processing ", dirname
-            old_dir = cur_dir
+            old_dir = cur_dir #@UnusedVariable
             cur_dir = Path("testfiles/" + dirname)
 
             old_full_sigs = cur_full_sigs

@@ -33,7 +33,7 @@ import email
 import duplicity.backend
 from duplicity import globals
 from duplicity import log
-from duplicity.errors import *
+from duplicity.errors import * #@UnusedWildImport
 
 
 class ImapBackend(duplicity.backend.Backend):

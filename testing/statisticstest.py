@@ -23,7 +23,7 @@ import config
 import sys, unittest
 sys.path.insert(0, "../")
 
-from duplicity.statistics import *
+from duplicity.statistics import * #@UnusedWildImport
 from duplicity import path
 
 config.setup()

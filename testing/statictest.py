@@ -23,12 +23,12 @@ import config
 import unittest, types, sys
 sys.path.insert(0, "../")
 
-from duplicity.static import *
+from duplicity.static import * #@UnusedWildImport
 
 config.setup()
 
 class D:
-    def foo(x, y):
+    def foo(x, y): #@NoSelf
         return x, y
     def bar(self, x):
         return 3, x
@@ -40,9 +40,9 @@ MakeStatic(D)
 
 class C:
     _a = 0
-    def get(cls):
+    def get(cls): #@NoSelf
         return cls._a
-    def inc(cls):
+    def inc(cls): #@NoSelf
         cls._a = cls._a + 1
 
 MakeClass(C)

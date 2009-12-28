@@ -19,13 +19,12 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import os
 import time
 
 import duplicity.backend
 from duplicity import globals
 from duplicity import log
-from duplicity.errors import *
+from duplicity.errors import * #@UnusedWildImport
 from duplicity.util import exception_traceback
 
 class BotoBackend(duplicity.backend.Backend):
@@ -146,7 +145,7 @@ class BotoBackend(duplicity.backend.Backend):
                     log.FatalError("European bucket creation was requested, but not new-style "
                                    "bucket addressing (--s3-use-new-style)",
                                    log.ErrorCode.s3_bucket_not_style)
-                from boto.s3.connection import Location
+                from boto.s3.connection import Location #@UnresolvedImport
                 self.bucket = self.conn.create_bucket(self.bucket_name, location = Location.EU)
             else:
                 self.bucket = self.conn.create_bucket(self.bucket_name)

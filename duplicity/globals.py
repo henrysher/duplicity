@@ -21,7 +21,7 @@
 
 """Store global configuration information"""
 
-import socket, sys, os
+import socket, os
 
 # The current version of duplicity
 version = "$version"

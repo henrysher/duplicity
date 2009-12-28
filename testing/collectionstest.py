@@ -108,7 +108,7 @@ class CollectionTest(unittest.TestCase):
         """Test basic backup chain construction"""
         random.shuffle(filename_list1)
         cs = collections.CollectionsStatus(dummy_backend, archive_dir)
-        chains, orphaned, incomplete = cs.get_backup_chains(filename_list1)
+        chains, orphaned, incomplete = cs.get_backup_chains(filename_list1) #@UnusedVariable
         if len(chains) != 1 or len(orphaned) != 0:
             print chains
             print orphaned
@@ -218,7 +218,7 @@ class CollectionTest(unittest.TestCase):
                       "duplicity-full.2002-08-15T01:01:01-07:00.vol1.difftar.gpg",
                       "duplicity-inc.2000-08-17T16:17:01-07:00.to.2000-08-18T00:04:30-07:00.manifest.gpg",
                       "duplicity-inc.2000-08-17T16:17:01-07:00.to.2000-08-18T00:04:30-07:00.vol1.difftar.gpg"]
-        local_received_list, remote_received_list = cs.get_extraneous(False)
+        local_received_list, remote_received_list = cs.get_extraneous(False) #@UnusedVariable
         errors = []
         for filename in remote_received_list:
             if filename not in right_list:

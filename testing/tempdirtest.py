@@ -20,7 +20,7 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import config
-import sys, os, unittest, gzip
+import sys, os, unittest
 sys.path.insert(0, "../")
 
 from duplicity import tempdir

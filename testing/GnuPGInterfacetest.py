@@ -24,7 +24,6 @@ or see http://www.gnu.org/copyleft/lesser.html
 
 import unittest
 
-import os
 import tempfile
 import sys
 sys.path.insert(0, "../")
@@ -94,7 +93,7 @@ class GnuPGTests(BasicTest):
 
         creations = []
         # We'll handle the passphrase manually
-        if passphrase != None: proc.handles.append('passphrase')
+        if passphrase != None: proc.handles.append('passphrase') #@UndefinedVariable
 
         attachments = { 'stdin': stdin, 'stdout': stdout }
 

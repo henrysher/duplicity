@@ -19,13 +19,13 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
+import types
 import config
-import re, StringIO, unittest, sys
+import StringIO, unittest, sys
 sys.path.insert(0, "../")
 
-from duplicity import log
-from duplicity.selection import *
-from duplicity.lazy import *
+from duplicity.selection import * #@UnusedWildImport
+from duplicity.lazy import * #@UnusedWildImport
 
 config.setup()
 
@@ -33,16 +33,14 @@ class MatchingTest(unittest.TestCase):
     """Test matching of file names against various selection functions"""
     def setUp(self):
         assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
+        self.root = Path("testfiles/select")
+        self.Select = Select(self.root)
 
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     def makeext(self, path):
         return self.root.new_index(tuple(path.split("/")))
-
-    def setUp(self):
-        self.root = Path("testfiles/select")
-        self.Select = Select(self.root)
 
     def testRegexp(self):
         """Test regular expression selection func"""
@@ -243,11 +241,10 @@ testfiles/select/1/1
         assert select.glob_get_sf("**", 0)(root) == 0
         assert select.glob_get_sf("/foo/*", 0)(root) == None
 
-        select.filelist_get_sf(StringIO.StringIO("/"), 1, "test")(root) == 1
-        select.filelist_get_sf(StringIO.StringIO("/foo/bar"), 1,
-                               "test")(root) == 1
-        select.filelist_get_sf(StringIO.StringIO("/"), 0, "test")(root) == 0
-        select.filelist_get_sf(StringIO.StringIO("/foo/bar"), 0,
+        assert select.filelist_get_sf(StringIO.StringIO("/"), 1, "test")(root) == 1
+        assert select.filelist_get_sf(StringIO.StringIO("/foo/bar"), 1, "test")(root) == 1
+        assert select.filelist_get_sf(StringIO.StringIO("/"), 0, "test")(root) == 0
+        assert select.filelist_get_sf(StringIO.StringIO("/foo/bar"), 0,
                                "test")(root) == None
 
     def testOtherFilesystems(self):

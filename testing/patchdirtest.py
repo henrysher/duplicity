@@ -20,16 +20,16 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import config
-import sys, cStringIO, os, unittest
+import sys, cStringIO, unittest
 sys.path.insert(0, "../")
 
 from duplicity import diffdir
 from duplicity import patchdir
-from duplicity import log
+from duplicity import log #@UnusedImport
 from duplicity import selection
-from duplicity import tarfile
-from duplicity import librsync
-from duplicity.path import *
+from duplicity import tarfile #@UnusedImport
+from duplicity import librsync #@UnusedImport
+from duplicity.path import * #@UnusedWildImport
 
 config.setup()
 

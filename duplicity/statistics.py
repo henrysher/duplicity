@@ -23,7 +23,6 @@
 
 import re, time, os
 
-from duplicity import lazy
 from duplicity import dup_time
 
 
@@ -336,4 +335,3 @@ class StatsDeltaProcess(StatsObj):
     def close(self):
         """End collection of data, set EndTime"""
         self.EndTime = time.time()
-

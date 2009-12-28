@@ -20,7 +20,7 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import config
-import sys, os, time
+import os
 import thread
 
 from duplicity import GnuPGInterface
@@ -40,7 +40,7 @@ def main():
         os._exit(0)
     else: # parent
         p1.handles['stdin'].close()
-        s = p1.handles['stdout'].read()
+        s = p1.handles['stdout'].read() #@UnusedVariable
         p1.handles['stdout'].close()
         p1.wait()
 
@@ -51,8 +51,8 @@ def main2():
     tmp(a)
 
 def tmp(a):
-    for i in range(10):
-        for i in a: pass
+    for i in range(10): #@UnusedVariable
+        for i in a: pass #@UnusedVariable
 
 
 main2()

@@ -18,15 +18,11 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import os
-import time
-
 import duplicity.backend
-from duplicity import globals
 from duplicity import log
-from duplicity.errors import *
+from duplicity.errors import * #@UnusedWildImport
 
-from commands import getstatusoutput,getoutput,getstatus
+from commands import getstatusoutput
 
 class TAHOEBackend(duplicity.backend.Backend):
     """
