@@ -6,6 +6,8 @@ with authentication credentials.
 487686 re-add scp backend and make available via command line option
 Option --use-scp will use scp, not sftp, for get/put operations.
 
+501093 SSHBackend doesn't handle spaces in path
+
 459511 --tempdir option doesn't override TMPDIR
 
 Merged in lp:~mterry/duplicity/typos-0.6

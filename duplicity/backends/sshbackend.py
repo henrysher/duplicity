@@ -206,7 +206,7 @@ class SSHBackend(duplicity.backend.Backend):
         """Use sftp to copy source_dir/filename to remote computer"""
         if not remote_filename:
             remote_filename = source_path.get_filename()
-        commands = ["put %s %s%s" %
+        commands = ["put \"%s\" \"%s%s\"" %
                     (source_path.name, self.remote_prefix, remote_filename)]
         commandline = ("%s %s %s" % (globals.sftp_command,
                                      globals.ssh_options,
@@ -230,7 +230,7 @@ class SSHBackend(duplicity.backend.Backend):
 
     def get_sftp(self, remote_filename, local_path):
         """Use sftp to get a remote file"""
-        commands = ["get %s%s %s" %
+        commands = ["get \"%s%s\" \"%s\"" %
                     (self.remote_prefix, remote_filename, local_path.name)]
         commandline = ("%s %s %s" % (globals.sftp_command,
                                      globals.ssh_options,
@@ -260,8 +260,8 @@ class SSHBackend(duplicity.backend.Backend):
         files with newlines in them, as the embedded newlines cannot
         be distinguished from the file boundaries.
         """
-        commands = ["mkdir %s" % (self.remote_dir,),
-                    "cd %s" % (self.remote_dir,),
+        commands = ["mkdir \"%s\"" % (self.remote_dir,),
+                    "cd \"%s\"" % (self.remote_dir,),
                     "ls -1"]
         commandline = ("%s %s %s" % (globals.sftp_command,
                                      globals.ssh_options,
@@ -275,9 +275,9 @@ class SSHBackend(duplicity.backend.Backend):
         """
         Runs sftp rm to delete files.  Files must not require quoting.
         """
-        commands = ["cd %s" % (self.remote_dir,)]
+        commands = ["cd \"%s\"" % (self.remote_dir,)]
         for fn in filename_list:
-            commands.append("rm %s" % fn)
+            commands.append("rm \"%s\"" % fn)
         commandline = ("%s %s %s" % (globals.sftp_command, globals.ssh_options, self.host_string))
         self.run_sftp_command(commandline, commands)
 
