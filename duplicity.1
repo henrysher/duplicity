@@ -517,6 +517,19 @@ Use the old filename format (incompatible with Windows/Samba) rather than
 the new filename format.
 
 .TP
+.BI "--rename " "orig new"
+Treats the path
+.I orig
+in the backup as if it were the path
+.I new.
+Can be passed multiple times.  An example:
+.PP
+.RS
+duplicity restore --rename Documents/metal Music/metal scp://uid@other.host/some_dir /home/me
+.PP
+.RE
+
+.TP
 .BI "--s3-european-buckets"
 When using the Amazon S3 backend, create buckets in Europe instead of
 the default (requires
