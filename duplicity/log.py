@@ -181,6 +181,7 @@ class ErrorCode:
     gio_not_available = 40
     par2_missing = 41
     source_dir_mismatch = 42
+    # Reserve 255 because it is used as an error code for gksu
 
 def FatalError(s, code, extra=None):
     """Write fatal error message and exit"""
