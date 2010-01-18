@@ -287,7 +287,7 @@ def add_fd(fd):
 def add_file(filename):
     """Add file to which to write machine-readable logging"""
     global _logger
-    handler = logging.FileHandler(filename, 'w')
+    handler = logging.FileHandler(filename)
     handler.setFormatter(MachineFormatter())
     handler.addFilter(MachineFilter())
     _logger.addHandler(handler)
