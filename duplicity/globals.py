@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
 # Copyright 2002 Ben Escoto <ben@emerose.org>
@@ -88,10 +87,10 @@ allow_source_mismatch = None
 incremental = None
 
 # If set, print the statistics after every backup session
-print_statistics = 1
+print_statistics = True
 
 # If set, use short (< 30 char) filenames for all the remote files.
-short_filenames = 0
+short_filenames = False
 
 # If set, forces a full backup if the last full backup is older than
 # the time specified
@@ -188,3 +187,6 @@ par2 = False
 
 # If we should be particularly aggressive when cleaning up
 extra_clean = False
+
+# Renames (--rename)
+rename = {}

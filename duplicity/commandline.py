@@ -21,10 +21,13 @@
 
 """Parse command line, check for consistency, and set globals"""
 
+from copy import copy
+import optparse
 import getopt
 import os
 import re
 import sys
+import socket
 
 try:
     from hashlib import md5
@@ -61,67 +64,6 @@ commands = ["cleanup",
             "restore",
             "verify",
             ]
-
-options = ["allow-source-mismatch",
-           "archive-dir=",
-           "asynchronous-upload",
-           "current-time=",
-           "dry-run",
-           "encrypt-key=",
-           "exclude=",
-           "exclude-if-present=",
-           "exclude-device-files",
-           "exclude-filelist=",
-           "exclude-globbing-filelist=",
-           "exclude-filelist-stdin",
-           "exclude-other-filesystems",
-           "exclude-regexp=",
-           "extra-clean",
-           "fail-on-volume=",
-           "file-to-restore=",
-           "force",
-           "ftp-passive",
-           "ftp-regular",
-           "full-if-older-than=",
-           "gio",
-           "gpg-options=",
-           "help",
-           "ignore-errors",
-           "imap-full-address",
-           "imap-mailbox=",
-           "include=",
-           "include-filelist=",
-           "include-filelist-stdin",
-           "include-globbing-filelist=",
-           "include-regexp=",
-           "log-fd=",
-           "log-file=",
-           "name=",
-           "no-encryption",
-           "no-print-statistics",
-           "null-separator",
-           "num-retries=",
-           "old-filenames",
-           "restore-time=",
-           "s3-european-buckets",
-           "s3-use-new-style",
-           "scp-command=",
-           "sftp-command=",
-           "short-filenames",
-           "sign-key=",
-           "ssh-askpass",
-           "ssh-options=",
-           "tempdir=",
-           "time=",
-           "timeout=",
-           "time-separator=",
-           "use-agent",
-           "use-scp",
-           "verbosity=",
-           "version",
-           "volsize=",
-           ]
-
 
 def old_fn_deprecation(opt):
     print >>sys.stderr, _("Warning: Option %s is pending deprecation "
@@ -163,28 +105,373 @@ def generate_default_backup_name(backend_url):
     burlhash.update(backend_url)
     return burlhash.hexdigest()
 
+def check_file(option, opt, value):
+    return expand_fn(value)
+
+def check_time(option, opt, value):
+    try:
+        return dup_time.genstrtotime(value)
+    except dup_time.TimeException, e:
+        raise optparse.OptionValueError(str(e))
+
+def check_verbosity(option, opt, value):
+    fail = False
+
+    value = value.lower()
+    if value in ['e', 'error']:
+        verb = log.ERROR
+    elif value in ['w', 'warning']:
+        verb = log.WARNING
+    elif value in ['n', 'notice']:
+        verb = log.NOTICE
+    elif value in ['i', 'info']:
+        verb = log.INFO
+    elif value in ['d', 'debug']:
+        verb = log.DEBUG
+    else:
+        try:
+            verb = int(value)
+        except ValueError:
+            fail = True
+        if verb < 0 or verb > 9:
+            fail = True
+
+    if fail:
+        # TRANSL: In this portion of the usage instructions, "[ewnid]" indicates which
+        # characters are permitted (e, w, n, i, or d); the brackets imply their own
+        # meaning in regex; i.e., only one of the characters is allowed in an instance.
+        raise optparse.OptionValueError("Verbosity must be one of: digit [0-9], character [ewnid], "
+                                        "or word ['error', 'warning', 'notice', 'info', 'debug']. "
+                                        "The default is 4 (Notice).  It is strongly recommended "
+                                        "that verbosity level is set at 2 (Warning) or higher.")
+
+    return verb
+
+class DupOption(optparse.Option):
+    TYPES = optparse.Option.TYPES + ("file", "time", "verbosity",)
+    TYPE_CHECKER = copy(optparse.Option.TYPE_CHECKER)
+    TYPE_CHECKER["file"] = check_file
+    TYPE_CHECKER["time"] = check_time
+    TYPE_CHECKER["verbosity"] = check_verbosity
+
+    ACTIONS = optparse.Option.ACTIONS + ("extend",)
+    STORE_ACTIONS = optparse.Option.STORE_ACTIONS + ("extend",)
+    TYPED_ACTIONS = optparse.Option.TYPED_ACTIONS + ("extend",)
+    ALWAYS_TYPED_ACTIONS = optparse.Option.ALWAYS_TYPED_ACTIONS + ("extend",)
+
+    def take_action(self, action, dest, opt, value, values, parser):
+        if action == "extend":
+            if hasattr(values, dest):
+                setattr(values, dest, getattr(values, dest) + ' ' + value)
+            else:
+                setattr(values, dest, value)
+        else:
+            optparse.Option.take_action(
+                self, action, dest, opt, value, values, parser)
 
 def parse_cmdline_options(arglist):
     """Parse argument list"""
     global select_opts, select_files, full_backup
     global list_current, collection_status, cleanup, remove_time, verify
 
-
-    def sel_fl(filename):
-        """Helper function for including/excluding filelists below"""
+    def use_gio(*args):
         try:
-            return open(filename, "r")
+            import duplicity.backends.giobackend
+            backend.force_backend(duplicity.backends.giobackend.GIOBackend)
+        except ImportError:
+            log.FatalError(_("Unable to load gio module"), log.ErrorCode.gio_not_available)
+
+    def set_log_fd(fd):
+        if fd < 1:
+            raise optparse.OptionValueError("log-fd must be greater than zero.")
+        log.add_fd(fd)
+
+    def set_time_sep(sep, opt):
+        if sep == '-':
+            raise optparse.OptionValueError("Dash ('-') not valid for time-separator.")
+        globals.time_separator = sep
+        old_fn_deprecation(opt)
+
+    def add_selection(o, s, v, p):
+        select_opts.append((s, v))
+
+    def add_filelist(o, s, v, p):
+        filename = v
+        select_opts.append((s, filename))
+        try:
+            select_files.append(open(filename, "r"))
         except IOError:
             log.FatalError(_("Error opening file %s") % filename,
                            log.ErrorCode.cant_open_filelist)
+
+    def print_ver(o, s, v, p):
+        print "duplicity %s" % (globals.version)
+        sys.exit(0)
+
+    def add_rename(o, s, v, p):
+        globals.rename[os.path.normcase(os.path.normpath(v[0]))] = v[1]
+
+    parser = optparse.OptionParser(option_class=DupOption, usage=usage())
+
+    # If this is true, only warn and don't raise fatal error when backup
+    # source directory doesn't match previous backup source directory.
+    parser.add_option("--allow-source-mismatch", action="store_true")
+
+    # Set to the path of the archive directory (the directory which
+    # contains the signatures and manifests of the relevent backup
+    # collection), and for checkpoint state between volumes.
+    # TRANSL: Used in usage help to represent a Unix-style path name. Example:
+    # --archive-dir <path>
+    parser.add_option("--archive-dir", type="file", metavar=_("path"))
+
+    # Asynchronous put/get concurrency limit
+    # (default of 0 disables asynchronicity).
+    parser.add_option("--asynchronous-upload", action="store_const", const=1,
+                      dest="async_concurrency")
+
+    # config dir for future use
+    parser.add_option("--config-dir", type="file", metavar=_("path"),
+                      help=optparse.SUPPRESS_HELP)
+
+    parser.add_option("--current-time", action="callback", type="int",
+                      dest="", help=optparse.SUPPRESS_HELP,
+                      callback=lambda o, s, v, p: dup_time.setcurtime(v))
+
+    # Don't actually do anything, but still report what would be done
+    parser.add_option("--dry-run", action="store_true")
+
+    # TRANSL: Used in usage help to represent an ID for a GnuPG key. Example:
+    # --encrypt-key <gpg_key_id>
+    parser.add_option("--encrypt-key", type="string", metavar=_("gpg-key-id"),
+                      dest="", action="callback",
+                      callback=lambda o, s, v, p: globals.gpg_profile.recipients.append(v))
+
+    # TRANSL: Used in usage help to represent a "glob" style pattern for
+    # matching one or more files, as described in the documentation.
+    # Example:
+    # --exclude <shell_pattern>
+    parser.add_option("--exclude", action="callback", metavar=_("shell_pattern"),
+                      dest="", type="string", callback=add_selection)
+
+    parser.add_option("--exclude-device-files", action="callback",
+                      dest="", callback=add_selection)
+
+    parser.add_option("--exclude-filelist", type="file", metavar=_("filename"),
+                      dest="", action="callback", callback=add_filelist)
+
+    parser.add_option("--exclude-filelist-stdin", action="callback", dest="",
+                      callback=lambda o, s, v, p: (select_opts.append(("--exclude-filelist", "standard input")),
+                                                   select_files.append(sys.stdin)))
+
+    parser.add_option("--exclude-globbing-filelist", type="file", metavar=_("filename"),
+                      dest="", action="callback", callback=add_filelist)
+
+    # TRANSL: Used in usage help to represent the name of a file. Example:
+    # --log-file <filename>
+    parser.add_option("--exclude-if-present", metavar=_("filename"), dest="",
+                      type="file", action="callback", callback=add_selection)
+
+    parser.add_option("--exclude-other-filesystems", action="callback",
+                      dest="", callback=add_selection)
+
+    # TRANSL: Used in usage help to represent a regular expression (regexp).
+    parser.add_option("--exclude-regexp", metavar=_("regular_expression"),
+                      dest="", type="string", action="callback", callback=add_selection)
+
+    # Whether we should be particularly aggressive when cleaning up
+    parser.add_option("--extra-clean", action="store_true")
+
+    # used in testing only - raises exception after volume
+    parser.add_option("--fail-on-volume", type="int",
+                      help=optparse.SUPPRESS_HELP)
+
+    # If set, restore only the subdirectory or file specified, not the
+    # whole root.
+    # TRANSL: Used in usage help to represent a Unix-style path name. Example:
+    # --archive-dir <path>
+    parser.add_option("--file-to-restore", "-r", action="callback", type="file",
+                      metavar=_("path"), dest="restore_dir",
+                      callback=lambda o, s, v, p: setattr(p.values, "restore_dir", v.rstrip('/')))
+
+    # Used to confirm certain destructive operations like deleting old files.
+    parser.add_option("--force", action="store_true")
+
+    # FTP data connection type
+    parser.add_option("--ftp-passive", action="store_const", const="passive", dest="ftp_connection")
+    parser.add_option("--ftp-regular", action="store_const", const="regular", dest="ftp_connection")
+
+    # If set, forces a full backup if the last full backup is older than
+    # the time specified
+    parser.add_option("--full-if-older-than", type="time", dest="full_force_time", metavar=_("time"))
+
+    parser.add_option("--gio", action="callback", callback=use_gio)
+
+    parser.add_option("--gpg-options", action="extend", metavar=_("options"))
+
+    # ignore (some) errors during operations; supposed to make it more
+    # likely that you are able to restore data under problematic
+    # circumstances. the default should absolutely always be False unless
+    # you know what you are doing.
+    parser.add_option("--ignore-errors", action="callback", 
+                      callback=lambda o, s, v, p: (log.Warn(
+                          _("Running in 'ignore errors' mode due to %s; please "
+                            "re-consider if this was not intended") % s),
+                          setattr(p.values, o.dest, True)))
+
+    # Whether to use the full email address as the user name when
+    # logging into an imap server. If false just the user name
+    # part of the email address is used.
+    parser.add_option("--imap-full-address", action="store_true",
+                      help=optparse.SUPPRESS_HELP)
+
+    # Name of the imap folder where we want to store backups.
+    # Can be changed with a command line argument.
+    # TRANSL: Used in usage help to represent an imap mailbox
+    parser.add_option("--imap-mailbox", metavar=_("imap_mailbox"))
+
+    parser.add_option("--include", action="callback", metavar=_("shell_pattern"),
+                      dest="", type="string", callback=add_selection)
+    parser.add_option("--include-filelist", type="file", metavar=_("filename"),
+                      dest="", action="callback", callback=add_filelist)
+    parser.add_option("--include-globbing-filelist", type="file", metavar=_("filename"),
+                      dest="", action="callback", callback=add_filelist)
+    parser.add_option("--include-regexp", metavar=_("regular_expression"), dest="",
+                      type="string", action="callback", callback=add_selection)
+
+    parser.add_option("--log-fd", type="int", metavar=_("file_descriptor"),
+                      dest="", action="callback",
+                      callback=lambda o, s, v, p: set_log_fd(v))
+
+    # TRANSL: Used in usage help to represent the name of a file. Example:
+    # --log-file <filename>
+    parser.add_option("--log-file", type="file", metavar=_("filename"),
+                      dest="", action="callback",
+                      callback=lambda o, s, v, p: log.add_file(v))
+
+    # TRANSL: Used in usage help (noun)
+    parser.add_option("--name", dest="backup_name", metavar=_("backup name"))
+
+    # If set to false, then do not encrypt files on remote system
+    parser.add_option("--no-encryption", action="store_false", dest="encryption")
+
+    # If set, print the statistics after every backup session
+    parser.add_option("--no-print-statistics", action="store_false", dest="print_statistics")
+
+    # If true, filelists and directory statistics will be split on
+    # nulls instead of newlines.
+    parser.add_option("--null-separator", action="store_true")
+
+    # number of retries on network operations
+    # TRANSL: Used in usage help to represent a desired number of
+    # something. Example:
+    # --num-retries <number>
+    parser.add_option("--num-retries", type="int", metavar=_("number"))
+
+    # Whether the old filename format is in effect.
+    parser.add_option("--old-filenames", action="callback", 
+                      callback=lambda o, s, v, p: (setattr(p.values, o.dest, True),
+                                                   old_fn_deprecation(s)))
+
+    parser.add_option("--rename", type="file", action="callback", nargs=2,
+                      callback=add_rename)
+
+    # Restores will try to bring back the state as of the following time.
+    # If it is None, default to current time.
+    # TRANSL: Used in usage help to represent a time spec for a previous
+    # point in time, as described in the documentation. Example:
+    # duplicity remove-older-than time [options] target_url
+    parser.add_option("--restore-time", "--time", "-t", type="time", metavar=_("time"))
+
+    # Whether to create European buckets (sorry, hard-coded to only
+    # support european for now).
+    parser.add_option("--s3-european-buckets", action="store_true")
+
+    # Whether to use "new-style" subdomain addressing for S3 buckets. Such
+    # use is not backwards-compatible with upper-case buckets, or buckets
+    # that are otherwise not expressable in a valid hostname.
+    parser.add_option("--s3-use-new-style", action="store_true")
+
+    # scp command to use
+    # TRANSL: noun
+    parser.add_option("--scp-command", metavar=_("command"))
+
+    # sftp command to use
+    # TRANSL: noun
+    parser.add_option("--sftp-command", metavar=_("command"))
+
+    # If set, use short (< 30 char) filenames for all the remote files.
+    parser.add_option("--short-filenames", action="callback", 
+                      callback=lambda o, s, v, p: (setattr(p.values, o.dest, True),
+                                                   old_fn_deprecation(s)))
+
+    # TRANSL: Used in usage help to represent an ID for a GnuPG key. Example:
+    # --encrypt-key <gpg_key_id>
+    parser.add_option("--sign-key", type="string", metavar=_("gpg-key-id"),
+                      dest="", action="callback",
+                      callback=lambda o, s, v, p: set_sign_key(v))
+
+    # default to batch mode using public-key encryption
+    parser.add_option("--ssh-askpass", action="store_true")
+
+    # user added ssh options
+    parser.add_option("--ssh-options", action="extend", metavar=_("options"))
+
+    # Working directory for the tempfile module. Defaults to /tmp on most systems.
+    parser.add_option("--tempdir", dest="temproot", type="file", metavar=_("path"))
+
+    # network timeout value
+    # TRANSL: Used in usage help. Example:
+    # --timeout <seconds>
+    parser.add_option("--timeout", type="int", metavar=_("seconds"))
+
+    # Character used like the ":" in time strings like
+    # 2002-08-06T04:22:00-07:00.  The colon isn't good for filenames on
+    # windows machines.
+    # TRANSL: abbreviation for "character" (noun)
+    parser.add_option("--time-separator", type="string", metavar=_("char"),
+                      action="callback",
+                      callback=lambda o, s, v, p: set_time_sep(v, s))
+
+    # Whether to specify --use-agent in GnuPG options
+    parser.add_option("--use-agent", action="store_true")
+
+    parser.add_option("--use-scp", action="store_true")
+
+    parser.add_option("--verbosity", "-v", type="verbosity", metavar="[0-9]",
+                      dest="", action="callback",
+                      callback=lambda o, s, v, p: log.setverbosity(v))
+
+    parser.add_option("-V", "--version", action="callback", callback=print_ver)
+
+    # volume size
+    # TRANSL: Used in usage help to represent a desired number of
+    # something. Example:
+    # --num-retries <number>
+    parser.add_option("--volsize", type="int", action="callback", metavar=_("number"),
+                      callback=lambda o, s, v, p: setattr(p.values, "volsize", v*1024*1024))
+
+    (options, args) = parser.parse_args()
+
+    # Copy all arguments and their values to the globals module.  Don't copy
+    # attributes that are 'hidden' (start with an underscore) or whose name is
+    # the empty string (used for arguments that don't directly store a value
+    # by using dest="")
+    for f in filter(lambda x: x and not x.startswith("_"), dir(options)):
+        v = getattr(options, f)
+        # Only set if v is not None because None is the default for all the
+        # variables.  If user didn't set it, we'll use defaults in globals.py
+        if v is not None:
+            setattr(globals, f, v)
+
+    socket.setdefaulttimeout(globals.timeout)
 
     # expect no cmd and two positional args
     cmd = ""
     num_expect = 2
 
     # process first arg as command
-    if arglist and arglist[0][0] != '-':
-        cmd = arglist.pop(0)
+    if args:
+        cmd = args.pop(0)
         possible = [c for c in commands if c.startswith(cmd)]
         # no unique match, that's an error
         if len(possible) > 1:
@@ -194,7 +481,7 @@ def parse_cmdline_options(arglist):
             cmd = possible[0]
         # no matches, assume no cmd
         elif not possible:
-            arglist.insert(0, cmd)
+            args.insert(0, cmd)
 
     if cmd == "cleanup":
         cleanup = True
@@ -213,14 +500,14 @@ def parse_cmdline_options(arglist):
         num_expect = 1
     elif cmd == "remove-older-than":
         try:
-            arg = arglist.pop(0)
+            arg = args.pop(0)
         except:
             command_line_error("Missing time string for remove-older-than")
         globals.remove_time = dup_time.genstrtotime(arg)
         num_expect = 1
     elif cmd == "remove-all-but-n-full":
         try:
-            arg = arglist.pop(0)
+            arg = args.pop(0)
         except:
             command_line_error("Missing count for remove-all-but-n-full")
         globals.keep_chains = int(arg)
@@ -229,174 +516,6 @@ def parse_cmdline_options(arglist):
         num_expect = 1
     elif cmd == "verify":
         verify = True
-
-    # parse the remaining args
-    try:
-        optlist, args = getopt.gnu_getopt(arglist, "hrt:v:V", options)
-    except getopt.error, e:
-        command_line_error("%s" % (str(e),))
-
-    for opt, arg in optlist:
-        if opt == "--allow-source-mismatch":
-            globals.allow_source_mismatch = 1
-        elif opt == "--archive-dir":
-            globals.archive_dir = arg
-        elif opt == "--asynchronous-upload":
-            globals.async_concurrency = 1 # (yes 1, this is not a boolean)
-        elif opt == "--current-time":
-            dup_time.setcurtime(get_int(arg, opt))
-        elif opt == "--dry-run":
-            globals.dry_run = True
-        elif opt == "--encrypt-key":
-            globals.gpg_profile.recipients.append(arg)
-        elif opt in ["--exclude",
-                     "--exclude-regexp",
-                     "--exclude-if-present",
-                     "--include",
-                     "--include-regexp"]:
-            if not opt.endswith("regexp"):
-                arg = expand_fn(arg)
-            select_opts.append((opt, arg))
-        elif opt in ["--exclude-device-files",
-                     "--exclude-other-filesystems"]:
-            select_opts.append((opt, None))
-        elif opt in ["--exclude-filelist",
-                     "--include-filelist",
-                     "--exclude-globbing-filelist",
-                     "--include-globbing-filelist"]:
-            arg = expand_fn(arg)
-            select_opts.append((opt, arg))
-            select_files.append(sel_fl(arg))
-        elif opt == "--exclude-filelist-stdin":
-            select_opts.append(("--exclude-filelist", "standard input"))
-            select_files.append(sys.stdin)
-        elif opt == "--extra-clean":
-            globals.extra_clean = True
-        elif opt == "--fail-on-volume":
-            globals.fail_on_volume = get_int(arg, opt)
-        elif opt == "--full-if-older-than":
-            globals.full_force_time = dup_time.genstrtotime(arg)
-        elif opt == "--force":
-            globals.force = 1
-        elif opt == "--ftp-passive":
-            globals.ftp_connection = 'passive'
-        elif opt == "--ftp-regular":
-            globals.ftp_connection = 'regular'
-        elif opt == "--imap-mailbox":
-            globals.imap_mailbox = arg.strip()
-        elif opt == "--gio":
-            try:
-                import duplicity.backends.giobackend
-                backend.force_backend(duplicity.backends.giobackend.GIOBackend)
-            except ImportError:
-                log.FatalError(_("Unable to load gio module"), log.ErrorCode.gio_not_available)
-        elif opt == "--gpg-options":
-            gpg.gpg_options = (gpg.gpg_options + ' ' + arg).strip()
-        elif opt in ["-h", "--help"]:
-            usage();
-            sys.exit(0);
-        elif opt == "--include-filelist-stdin":
-            select_opts.append(("--include-filelist", "standard input"))
-            select_files.append(sys.stdin)
-        elif opt == "--log-fd":
-            log_fd = get_int(arg, opt)
-            if log_fd < 1:
-                command_line_error("log-fd must be greater than zero.")
-            try:
-                log.add_fd(log_fd)
-            except:
-                command_line_error("Cannot write to log-fd %s." % arg)
-        elif opt == "--log-file":
-            arg = expand_fn(arg)
-            try:
-                log.add_file(arg)
-            except:
-                command_line_error("Cannot write to log-file %s." % arg)
-        elif opt == "--name":
-            globals.backup_name = arg
-        elif opt == "--no-encryption":
-            globals.encryption = 0
-        elif opt == "--no-print-statistics":
-            globals.print_statistics = 0
-        elif opt == "--null-separator":
-            globals.null_separator = 1
-        elif opt == "--num-retries":
-            globals.num_retries = get_int(arg, opt)
-        elif opt == "--old-filenames":
-            globals.old_filenames = True
-            old_fn_deprecation(opt)
-        elif opt in ["-r", "--file-to-restore"]:
-            globals.restore_dir = expand_fn(arg.rstrip('/'))
-        elif opt in ["-t", "--time", "--restore-time"]:
-            globals.restore_time = dup_time.genstrtotime(arg)
-        elif opt == "--s3-european-buckets":
-            globals.s3_european_buckets = True
-        elif opt == "--s3-use-new-style":
-            globals.s3_use_new_style = True
-        elif opt == "--scp-command":
-            globals.scp_command = arg
-        elif opt == "--sftp-command":
-            globals.sftp_command = arg
-        elif opt == "--short-filenames":
-            globals.short_filenames = 1
-            old_fn_deprecation(opt)
-        elif opt == "--sign-key":
-            set_sign_key(arg)
-        elif opt == "--ssh-askpass":
-            globals.ssh_askpass = True
-        elif opt == "--ssh-options":
-            globals.ssh_options = (globals.ssh_options + ' ' + arg).strip()
-        elif opt == "--tempdir":
-            globals.temproot = arg
-        elif opt == "--timeout":
-            globals.timeout = get_int(arg, opt)
-        elif opt == "--time-separator":
-            if arg == '-':
-                command_line_error("Dash ('-') not valid for time-separator.")
-            globals.time_separator = arg
-            dup_time.curtimestr = dup_time.timetostring(dup_time.curtime)
-            old_fn_deprecation(opt)
-        elif opt == "--use-agent":
-            globals.use_agent = True
-        elif opt == "--use-scp":
-            globals.use_scp = True
-        elif opt in ["-V", "--version"]:
-            print "duplicity", str(globals.version)
-            sys.exit(0)
-        elif opt in ["-v", "--verbosity"]:
-            arg = arg.lower()
-            if arg in ['e', 'error']:
-                verb = log.ERROR
-            elif arg in ['w', 'warning']:
-                verb = log.WARNING
-            elif arg in ['n', 'notice']:
-                verb = log.NOTICE
-            elif arg in ['i', 'info']:
-                verb = log.INFO
-            elif arg in ['d', 'debug']:
-                verb = log.DEBUG
-            elif arg.isdigit() and (len(arg) == 1):
-                verb = get_int(arg, opt)
-            else:
-                command_line_error("\nVerbosity must be one of: digit [0-9], character [ewnid],\n"
-                                   "or word ['error', 'warning', 'notice', 'info', 'debug'].\n"
-                                   "The default is 4 (Notice).  It is strongly recommended\n"
-                                   "that verbosity level is set at 2 (Warning) or higher.")
-            log.setverbosity(verb)
-        elif opt == "--volsize":
-            globals.volsize = get_int(arg, opt)*1024*1024
-        elif opt == "--ignore-errors":
-            log.Warn(_("running in 'ignore errors' mode due to --ignore-errors; please "
-                       "re-consider if this was not intended"))
-            globals.ignore_errors = True
-        elif opt == "--imap-full-address":
-            globals.imap_full_address = True
-        else:
-            command_line_error("Unknown option %s" % opt)
-
-    # if we change the time format then we need a new curtime
-    if globals.old_filenames:
-        dup_time.curtimestr = dup_time.timetostring(dup_time.curtime)
 
     if len(args) != num_expect:
         command_line_error("Expected %d args, got %d" % (num_expect, len(args)))
@@ -440,7 +559,7 @@ def command_line_error(message):
 
 
 def usage():
-    """Print terse usage info. The code is broken down into pieces for ease of
+    """Returns terse usage info. The code is broken down into pieces for ease of
     translation maintenance. Any comments that look extraneous or redundant should
     be assumed to be for the benefit of translators, since they can get each string
     (paired with its preceding comment, if any) independently of the others."""
@@ -454,9 +573,6 @@ def usage():
         # tahoe://alias/some_dir
         'alias'          : _("alias"),
 
-        # TRANSL: Used in usage help (noun)
-        'backup_name'    : _("backup name"),
-
         # TRANSL: Used in help to represent a "bucket name" for Amazon Web
         # Services' Simple Storage Service (S3). Example:
         # s3://other.host/bucket_name[/prefix]
@@ -467,7 +583,7 @@ def usage():
 
         # TRANSL: noun
         'command'        : _("command"),
-
+        
         # TRANSL: Used in usage help to represent the name of a container in
         # Amazon Web Services' Cloudfront. Example:
         # cf+http://container_name
@@ -475,14 +591,14 @@ def usage():
 
         # TRANSL: noun
         'count'          : _("count"),
-
+        
         # TRANSL: Used in usage help to represent the name of a file directory
         'directory'      : _("directory"),
 
         # TRANSL: Used in usage help to represent the name of a file. Example:
         # --log-file <filename>
         'filename'       : _("filename"),
-
+        
         # TRANSL: Used in usage help to represent an ID for a GnuPG key. Example:
         # --encrypt-key <gpg_key_id>
         'gpg_key_id'     : _("gpg-key-id"),
@@ -563,140 +679,64 @@ def usage():
         # Example:
         # duplicity [full|incremental] [options] source_dir target_url
         'target_url'     : _("target_url"),
-
+        
         # TRANSL: Used in usage help to represent a time spec for a previous
         # point in time, as described in the documentation. Example:
         # duplicity remove-older-than time [options] target_url
         'time'           : _("time"),
-
+        
         # TRANSL: Used in usage help to represent a user name (i.e. login).
         # Example:
         # ftp://user[:password]@other.host[:port]/some_dir
         'user'           : _("user") }
 
-    msg = _("duplicity version %s running on %s.") % (globals.version, sys.platform)
-    msg = "\n" + msg + "\n"
-
     # TRANSL: Header in usage help
-    msg = msg + _("Usage:") + """
-    duplicity [full|incremental] [%(options)s] %(source_dir)s %(target_url)s
-    duplicity [restore] [%(options)s] %(source_url)s %(target_dir)s
-    duplicity verify [%(options)s] %(source_url)s %(target_dir)s
-    duplicity collection-status [%(options)s] %(target_url)s
-    duplicity list-current-files [%(options)s] %(target_url)s
-    duplicity cleanup [%(options)s] %(target_url)s
-    duplicity remove-older-than %(time)s [%(options)s] %(target_url)s
-    duplicity remove-all-but-n-full %(count)s [%(options)s] %(target_url)s
+    msg = """
+  duplicity [full|incremental] [%(options)s] %(source_dir)s %(target_url)s
+  duplicity [restore] [%(options)s] %(source_url)s %(target_dir)s
+  duplicity verify [%(options)s] %(source_url)s %(target_dir)s
+  duplicity collection-status [%(options)s] %(target_url)s
+  duplicity list-current-files [%(options)s] %(target_url)s
+  duplicity cleanup [%(options)s] %(target_url)s
+  duplicity remove-older-than %(time)s [%(options)s] %(target_url)s
+  duplicity remove-all-but-n-full %(count)s [%(options)s] %(target_url)s
 
 """ % dict
 
     # TRANSL: Header in usage help
     msg = msg + _("Backends and their URL formats:") + """
-    cf+http://%(container_name)s
-    file:///%(some_dir)s
-    ftp://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]/%(some_dir)s
-    hsi://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]/%(some_dir)s
-    imap://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]/%(some_dir)s
-    rsync://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]::/%(module)s/%(some_dir)s
-    rsync://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]/%(relative_path)s
-    rsync://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]//%(absolute_path)s
-    s3://%(other_host)s/%(bucket_name)s[/%(prefix)s]
-    s3+http://%(bucket_name)s[/%(prefix)s]
-    scp://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]/%(some_dir)s
-    ssh://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]/%(some_dir)s
-    tahoe://%(alias)s/%(directory)s
-    webdav://%(user)s[:%(password)s]@%(other_host)s/%(some_dir)s
-    webdavs://%(user)s[:%(password)s]@%(other_host)s/%(some_dir)s
+  cf+http://%(container_name)s
+  file:///%(some_dir)s
+  ftp://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]/%(some_dir)s
+  hsi://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]/%(some_dir)s
+  imap://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]/%(some_dir)s
+  rsync://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]::/%(module)s/%(some_dir)s
+  rsync://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]/%(relative_path)s
+  rsync://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]//%(absolute_path)s
+  s3://%(other_host)s/%(bucket_name)s[/%(prefix)s]
+  s3+http://%(bucket_name)s[/%(prefix)s]
+  scp://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]/%(some_dir)s
+  ssh://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]/%(some_dir)s
+  tahoe://%(alias)s/%(directory)s
+  webdav://%(user)s[:%(password)s]@%(other_host)s/%(some_dir)s
+  webdavs://%(user)s[:%(password)s]@%(other_host)s/%(some_dir)s
 
 """ % dict
 
     # TRANSL: Header in usage help
     msg = msg + _("Commands:") + """
-    cleanup <%(target_url)s>
-    collection-status <%(target_url)s>
-    full <%(source_dir)s> <%(target_url)s>
-    incr <%(source_dir)s> <%(target_url)s>
-    list-current-files <%(target_url)s>
-    restore <%(target_url)s> <%(source_dir)s>
-    remove-older-than <%(time)s> <%(target_url)s>
-    remove-all-but-n-full <%(count)s> <%(target_url)s>
-    verify <%(target_url)s> <%(source_dir)s>
+  cleanup <%(target_url)s>
+  collection-status <%(target_url)s>
+  full <%(source_dir)s> <%(target_url)s>
+  incr <%(source_dir)s> <%(target_url)s>
+  list-current-files <%(target_url)s>
+  restore <%(target_url)s> <%(source_dir)s>
+  remove-older-than <%(time)s> <%(target_url)s>
+  remove-all-but-n-full <%(count)s> <%(target_url)s>
+  verify <%(target_url)s> <%(source_dir)s>""" % dict
 
-""" % dict
+    return msg
 
-    # TRANSL: Header in usage help
-    msg = msg + _("Options:") + """
-    --allow-source-mismatch
-    --archive-dir <%(path)s>
-    --asynchronous-upload
-    --dry-run
-    --encrypt-key <%(gpg_key_id)s>
-    --exclude <%(shell_pattern)s>
-    --exclude-device-files
-    --exclude-filelist <%(filename)s>
-    --exclude-filelist-stdin
-    --exclude-globbing-filelist <%(filename)s>
-    --exclude-other-filesystems
-    --exclude-regexp <regexp>
-    --extra-clean
-    --file-to-restore <%(path)s>
-    --full-if-older-than <%(time)s>
-    --force
-    --ftp-passive
-    --ftp-regular
-    --gio
-    --gpg-options
-    --include <%(shell_pattern)s>
-    --include-filelist <%(filename)s>
-    --include-filelist-stdin
-    --include-globbing-filelist <%(filename)s>
-    --include-regexp <regexp>
-    --log-fd <fd>
-    --log-file <%(filename)s>
-    --name <%(backup_name)s>
-    --no-encryption
-    --no-print-statistics
-    --null-separator
-    --num-retries <%(number)s>
-    --old-filenames
-    --s3-european-buckets
-    --s3-use-new-style
-    --scp-command <%(command)s>
-    --sftp-command <%(command)s>
-    --sign-key <%(gpg_key_id)s>
-    --ssh-askpass
-    --ssh-options
-    --short-filenames
-    --tempdir <%(directory)s>
-    --timeout <%(seconds)s>
-    -t<%(time)s>, --time <%(time)s>, --restore-time <%(time)s>
-    --time-separator <%(char)s>
-    --use-agent
-    --use-scp
-    --version
-    --volsize <%(number)s>
-    -v[0-9], --verbosity [0-9]
-""" % dict
-
-    # TRANSL: In this portion of the usage instructions, "[ewnid]" indicates which
-    # characters are permitted (e, w, n, i, or d); the brackets imply their own
-    # meaning in regex; i.e., only one of the characters is allowed in an instance.
-    msg = msg + _("""    Verbosity must be one of: digit [0-9], character [ewnid],
-    or word ['error', 'warning', 'notice', 'info', 'debug'].
-    The default is 4 (Notice).  It is strongly recommended
-    that verbosity level is set at 2 (Warning) or higher.
-""")
-
-    sys.stdout.write(msg)
-
-
-def get_int(int_string, description):
-    """Require that int_string be an integer, return int value"""
-    try:
-        return int(int_string)
-    except ValueError:
-        command_line_error("Received '%s' for %s, need integer" %
-                                          (int_string, description.lstrip('-')))
 
 def set_archive_dir(dirstring):
     """Check archive dir and set global"""

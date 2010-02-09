@@ -459,14 +459,27 @@ class Path(ROPath):
     """
     regex_chars_to_quote = re.compile("[\\\\\\\"\\$`]")
 
+    def rename_index(self, index):
+        if not globals.rename or not index:
+            return index # early exit
+        path = os.path.normcase(os.path.join(*index))
+        tail = []
+        while path and path not in globals.rename:
+            path, extra = os.path.split(path)
+            tail.insert(0, extra)
+        if path:
+            return globals.rename[path].split(os.sep) + tail
+        else:
+            return index # no rename found
+
     def __init__(self, base, index = ()):
         """Path initializer"""
         # self.opened should be true if the file has been opened, and
         # self.fileobj can override returned fileobj
         self.opened, self.fileobj = None, None
         self.base = base
-        self.index = index
-        self.name = os.path.join(base, *index)
+        self.index = self.rename_index(index)
+        self.name = os.path.join(base, *self.index)
         self.setdata()
 
     def setdata(self):
