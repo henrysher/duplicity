@@ -179,6 +179,7 @@ class ErrorCode:
     restart_file_not_found = 39
     gio_not_available = 40
     source_dir_mismatch = 42 # 41 is reserved for par2
+    # Reserve 255 because it is used as an error code for gksu
 
 def FatalError(s, code, extra=None):
     """Write fatal error message and exit"""
@@ -284,7 +285,7 @@ def add_fd(fd):
 def add_file(filename):
     """Add file to which to write machine-readable logging"""
     global _logger
-    handler = logging.FileHandler(filename, 'w')
+    handler = logging.FileHandler(filename)
     handler.setFormatter(MachineFormatter())
     handler.addFilter(MachineFilter())
     _logger.addHandler(handler)
