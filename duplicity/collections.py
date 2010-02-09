@@ -145,7 +145,12 @@ class BackupSet:
             if (pr
                 and pr.time == self.time
                 and pr.start_time == self.start_time
-                and pr.end_time == self.end_time):
+                and pr.end_time == self.end_time
+                and pr.type != "new-sig" ):
+                # do not remove new sigs from the cache:
+                # they aren't removed from the remote archive,
+                # and subsequent backups will have to resync
+                # which is bad if running non-interactive with encrypt-key 
                 try:
                     globals.archive_dir.append(lfn).delete()
                 except:
