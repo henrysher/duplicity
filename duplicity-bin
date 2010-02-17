@@ -773,7 +773,7 @@ def remove_old(col_stats):
 
     setlist = col_stats.get_older_than(globals.remove_time)
     if not setlist:
-        log.Warn(_("No old backup sets found, nothing deleted."))
+        log.Notice(_("No old backup sets found, nothing deleted."))
         return
     if globals.force:
         log.Notice(gettext.ngettext("Deleting backup set at time:",
