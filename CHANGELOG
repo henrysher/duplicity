@@ -1,18 +1,16 @@
-New in v0.6.07 (2009/??/??)
+New in v0.6.07 (2010/02/28)
 ---------------------------
-Applied patch 467391 to close connection on a 401 and retry
-with authentication credentials.
-
-487686 re-add scp backend and make available via command line option
-Option --use-scp will use scp, not sftp, for get/put operations.
-
-501093 SSHBackend doesn't handle spaces in path
-
-459511 --tempdir option doesn't override TMPDIR
-
-Merged in lp:~mterry/duplicity/typos-0.6
-Merged in lp:~mterry/duplicity/optparse
-Merged in lp:~mterry/duplicity/rename
+Bugs closed in this release:
+#459511     --tempdir option doesn't override TMPDIR
+#467391     [PATCH] WebDAV backend doesn't work
+#487686     re-add scp backend and make available via command line option
+#490619     Use optparse not getopt
+#497243     0.6.06, archive dir: cache desynchronization caused by remove*
+#501093     SSHBackend doesn't handle spaces in path
+#505739     "sslerror: The read operation timed out" with S3
+#520470     Don't Warn when there's old backup to delete
+#522544     OSError: [Errno 40] Too many levels of symbolic links
+#388673     Allow renaming paths as they are restored
 
 
 New in v0.6.06 (2009/10/29)
