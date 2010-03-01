@@ -160,7 +160,7 @@ class DupOption(optparse.Option):
         if action == "extend":
             if not value:
                 return
-            if hasattr(values, dest):
+            if hasattr(values, dest) and getattr(values, dest):
                 setattr(values, dest, getattr(values, dest) + ' ' + value)
             else:
                 setattr(values, dest, value)
