@@ -161,6 +161,8 @@ class DupOption(optparse.Option):
 
     def take_action(self, action, dest, opt, value, values, parser):
         if action == "extend":
+            if not value:
+                return
             if hasattr(values, dest):
                 setattr(values, dest, getattr(values, dest) + ' ' + value)
             else:
