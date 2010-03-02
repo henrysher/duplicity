@@ -1111,10 +1111,13 @@ def main():
         os.setuid(os.geteuid())
         os.setgid(os.getegid())
 
+    # set the current time strings (make it available for command line processing)
+    dup_time.setcurtime()
+
     # determine what action we're performing and process command line
     action = commandline.ProcessCommandLine(sys.argv[1:])
 
-    # set the current time strings
+    # set the current time strings again now that we have time separator
     dup_time.setcurtime()
 
     # get the passphrase if we need to based on action/options
