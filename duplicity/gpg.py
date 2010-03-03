@@ -38,9 +38,6 @@ except ImportError:
 
 blocksize = 256 * 1024
 
-# user options appended by --gpg-options
-gpg_options = ""
-
 
 class GPGError(Exception):
     """
@@ -105,8 +102,8 @@ class GPGFile:
         gnupg.options.extra_args.append('--no-secmem-warning')
         if globals.use_agent:
             gnupg.options.extra_args.append('--use-agent')
-        if gpg_options:
-            for opt in gpg_options.split():
+        if globals.gpg_options:
+            for opt in globals.gpg_options.split():
                 gnupg.options.extra_args.append(opt)
 
         if profile.sign_key:
