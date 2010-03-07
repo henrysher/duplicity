@@ -641,7 +641,13 @@ If this option is specified, then the ssh backend will use
 .I scp
 rather than
 .I sftp
-for the get and put backend operations.
+for the get and put backend operations.  The default is to use
+.I sftp
+for all operations.  With this option, duplicity will use
+.I sftp
+for list and delete operations, and
+.I scp
+for put and get operations
 
 .TP
 .BI -v verb ", --verbosity " verb
@@ -1127,6 +1133,7 @@ writing it is unclear to what extent this is an expected feature of
 Amazon S3, but in practice you may experience timeouts, socket errors
 or HTTP errors when trying to upload files to your newly created
 bucket. Give it a few minutes and the bucket should function normally.
+
 .SH IMAP
 An IMAP account can be used as a target for the upload.  The userid may
 be specified and the password will be requested.
@@ -1139,6 +1146,30 @@ the
 .B from_address_prefix
 will distinguish between different backups.
 .PP
+
+.SH A NOTE ON SSH/SCP PROTOCOLS
+Duplicity specifies two protocol names for the same protocol.  This is
+a known and user-confusing issue.  Both use the same protocol suite, namely
+.I ssh
+through its' utility routines
+.I scp
+and
+.I sftp.
+Older versions
+of duplicity used
+.I scp
+for get and put operations and
+.I sftp
+for list and
+delete operations.  The current version uses
+.I sftp
+for all four supported
+operations, unless the
+.I --use-scp
+option is used to revert to old behavior.  The change was made to
+all-sftp in order to allow the remote system to chroot the backup,
+thus providing better security.
+
 .SH BUGS
 Hard links currently unsupported (they will be treated as non-linked
 regular files).
