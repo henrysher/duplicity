@@ -180,9 +180,9 @@ def write_delta(dirname, sig_infp, outfp):
     diffdir.write_block_iter(delta_iter, outfp)
     assert not outfp.close()
 
-def write_delta_and_sig(filename, sig_infp, delta_outfp, sig_outfp):
-    """Write delta and also signature of filename"""
-    sel = get_selection(filename)
+def write_delta_and_sig(dirname, sig_infp, outfp, sig_outfp):
+    """Write delta and also signature of dirname"""
+    sel = get_selection(dirname)
     delta_iter = diffdir.DirDelta_WriteSig(sel, sig_infp, sig_outfp)
     diffdir.write_block_iter(delta_iter, outfp)
     assert not sig_outfp.close()
@@ -193,11 +193,11 @@ def patch(dirname, deltafp):
 
 def write_tar(dirname, outfp):
     """Store dirname into a tarfile, write to outfp"""
-    diffdir.write_block_iter(diffdir.DirFull(get_selection(filename)), outfp)
+    diffdir.write_block_iter(diffdir.DirFull(get_selection(dirname)), outfp)
 
 def write_tar_and_sig(dirname, outfp, sig_outfp):
     """Write tar of dirname to outfp, signature of same to sig_outfp"""
-    full_iter = diffdir.DirFull_WriteSig(get_selection(filename), sig_outfp)
+    full_iter = diffdir.DirFull_WriteSig(get_selection(dirname), sig_outfp)
     diffdir.write_block_iter(full_iter, outfp)
 
 
