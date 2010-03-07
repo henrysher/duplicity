@@ -1,16 +1,25 @@
+New in v0.6.08 (2010/03/07)
+---------------------------
+Bugs closed in this release:
+519110     Need accurate man page info on use of scp/sftp usage.
+532051     rdiffdir attempts to reference undefined variables with some command arguments
+529869     TypeError: unsupported operand type(s) for -: 'NoneType' and 'int'
+530910     TypeError: unsupported operand type(s) for +: 'NoneType' and 'str'
+
+
 New in v0.6.07 (2010/02/28)
 ---------------------------
 Bugs closed in this release:
-#459511     --tempdir option doesn't override TMPDIR
-#467391     [PATCH] WebDAV backend doesn't work
-#487686     re-add scp backend and make available via command line option
-#490619     Use optparse not getopt
-#497243     0.6.06, archive dir: cache desynchronization caused by remove*
-#501093     SSHBackend doesn't handle spaces in path
-#505739     "sslerror: The read operation timed out" with S3
-#520470     Don't Warn when there's old backup to delete
-#522544     OSError: [Errno 40] Too many levels of symbolic links
-#388673     Allow renaming paths as they are restored
+459511     --tempdir option doesn't override TMPDIR
+467391     [PATCH] WebDAV backend doesn't work
+487686     re-add scp backend and make available via command line option
+490619     Use optparse not getopt
+497243     0.6.06, archive dir: cache desynchronization caused by remove*
+501093     SSHBackend doesn't handle spaces in path
+505739     "sslerror: The read operation timed out" with S3
+520470     Don't Warn when there's old backup to delete
+522544     OSError: [Errno 40] Too many levels of symbolic links
+388673     Allow renaming paths as they are restored
 
 
 New in v0.6.06 (2009/10/29)

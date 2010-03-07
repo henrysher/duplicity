@@ -1,3 +1,39 @@
+2010-03-07  Kenneth Loafman  <kenneth@loafman.com>
+
+	#532051 rdiffdir attempts to reference undefined variables with some command arguments
+
+2010-03-07  Kenneth Loafman  <kenneth@loafman.com>
+
+	#519110 Need accurate man page info on use of scp/sftp usage.
+
+2010-03-02  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged lp:~mterry/duplicity/use-gpg-options-0.6
+
+2010-03-02  Michael Terry  <mike@mterry.name>
+
+	use global gpg options
+
+2010-03-02  ken
+
+	Merged lp:~mterry/duplicity/fix-gpg-options-crash-0.6
+
+2010-03-01  Michael Terry  <mike@mterry.name>
+
+	fix time command line handling
+
+2010-03-01  Michael Terry  <mike@mterry.name>
+
+	and handle initial, empty value for extend commandline actions
+
+2010-03-01  Michael Terry  <michael.terry@canonical.com>
+
+	fix crash on empty gpg-options argument
+
+2010-02-28  ken
+
+	Changes for 0.6.07.
+
 2010-02-28  ken
 
 	Merged lp:~duplicity-team/duplicity/po-updates.
