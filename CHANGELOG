@@ -1,3 +1,9 @@
+New in v0.6.08a (2010/03/11)
+----------------------------
+Fix bug where encrypted backup without --gpg-options crashes.
+This was a followup issue to bug 490619 released in 0.6.07.
+
+
 New in v0.6.08 (2010/03/07)
 ---------------------------
 Bugs closed in this release:
