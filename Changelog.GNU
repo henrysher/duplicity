@@ -1,3 +1,27 @@
+2010-03-11  Kenneth Loafman  <kenneth@loafman.com>
+
+	Manually apply patch from http://bazaar.launchpad.net/~duplicity-team/duplicity/0.7-series/revision/637 which did not make it into 0.6.
+
+2010-03-11  Kenneth Loafman  <kenneth@loafman.com>
+
+	Changes for 0.6.08a
+
+2010-03-09  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2010-03-01  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2010-03-11  Kenneth Loafman  <kenneth@loafman.com>
+
+	Changes for 0.6.08a
+
+2010-03-07  Kenneth Loafman  <kenneth@loafman.com>
+
+	Changes for 0.6.08
+
 2010-03-07  Kenneth Loafman  <kenneth@loafman.com>
 
 	#532051 rdiffdir attempts to reference undefined variables with some command arguments
@@ -210,17 +234,17 @@
 
 2009-10-06  Kenneth Loafman  <kenneth@loafman.com>
 
-	Add entry for patches from St?phane Lesimple for par2.
+	Add entry for patches from Stéphane Lesimple for par2.
 
 2009-10-06  Kenneth Loafman  <kenneth@loafman.com>
 
-	Applied patch from St?phane Lesimple found at:
+	Applied patch from Stéphane Lesimple found at:
 	https://bugs.launchpad.net/duplicity/+bug/426282/comments/5
 	patch skips the par2 files when building up the sets and chains of backups
 
 2009-10-06  Kenneth Loafman  <kenneth@loafman.com>
 
-	Applied patch from St?phane Lesimple found at:
+	Applied patch from Stéphane Lesimple found at:
 	https://bugs.launchpad.net/duplicity/+bug/426282/comments/4
 	patch avoids storing all the par2 files into the local cache
 
