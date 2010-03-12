@@ -66,6 +66,9 @@ select = None
 # files.  Replaces encryption_keys, sign_key, and passphrase settings.
 gpg_profile = None
 
+# Options to pass to gpg
+gpg_options = ''
+
 # If true, filelists and directory statistics will be split on
 # nulls instead of newlines.
 null_separator = None
