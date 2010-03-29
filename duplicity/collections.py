@@ -1081,7 +1081,7 @@ class CollectionsStatus:
         Furthermore, none of the times will be of a set which a newer
         set may depend on.  For instance, if set A is a full set older
         than t, and set B is an incremental based on A which is newer
-        than tt, then the time of set A will not be returned.
+        than t, then the time of set A will not be returned.
         """
         old_sets = []
         for chain in self.get_chains_older_than(t):
