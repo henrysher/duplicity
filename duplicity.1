@@ -53,6 +53,12 @@ duplicity \- Encrypted backup using rsync algorithm
 .BI [ --force ]
 .I target_url
 
+.B duplicity remove-all-inc-of-but-n-full
+.I count
+.BI [ options ]
+.BI [ --force ]
+.I target_url
+
 .SH DESCRIPTION
 Duplicity incrementally backs up files and directory
 by encrypting tar-format volumes with GnuPG and uploading them to a
@@ -193,6 +199,16 @@ full backups and associated incremental sets).
 .I count
 must be larger than zero. A value of 1 means that only the single most
 recent backup chain will be kept.  Note that
+.I --force
+will be needed to delete the files rather than just list them.
+
+.TP
+.BI "remove-all-inc-of-but-n-full " count
+Delete incremental sets of all backups sets that are older than the count:th last full
+backup (in other words, keep only old full backups and not their increments).
+.I count
+must be larger than zero. A value of 1 means that only the single most
+recent backup chain will be kept intact.  Note that
 .I --force
 will be needed to delete the files rather than just list them.
 
