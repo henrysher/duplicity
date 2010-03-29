@@ -107,9 +107,15 @@ force = None
 # be deleted.
 remove_time = None
 
-# If set, signifies the number of backups chains to keep when perfroming
-# a --remove-all-but-n-full.
+# If set, signifies the number of backups chains to keep when performing
+# a remove-all-but-n-full.
 keep_chains = None
+
+# If set, signifies that remove-all-but-n-full in progress
+remove_all_but_n_full = None
+
+# If set, signifies that remove-all-inc-of-but-n-full in progress (variant of remove-all-but-n-full)
+remove_all_inc_of_but_n_full = None
 
 # Don't actually do anything, but still report what would be done
 dry_run = False
