@@ -181,6 +181,13 @@ class ErrorCode:
     gio_not_available = 40
     par2_missing = 41
     source_dir_mismatch = 42
+
+    # 50->69 reserved for backend errors
+    backend_error = 50
+    backend_permission_denied = 51
+    backend_not_found = 52
+    backend_no_space = 53
+
     # Reserve 255 because it is used as an error code for gksu
 
 def FatalError(s, code, extra=None):
