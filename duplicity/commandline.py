@@ -507,9 +507,9 @@ def parse_cmdline_options(arglist):
         num_expect = 1
     elif cmd == "remove-all-but-n-full" or cmd == "remove-all-inc-of-but-n-full":
         if cmd == "remove-all-but-n-full" :
-            globals.remove_all_but_n_full = True
+            globals.remove_all_but_n_full_mode = True
         if cmd == "remove-all-inc-of-but-n-full" :
-            globals.remove_all_inc_of_but_n_full = True
+            globals.remove_all_inc_of_but_n_full_mode = True
         try:
             arg = args.pop(0)
         except:
@@ -900,9 +900,9 @@ def ProcessCommandLine(cmdline_list):
             action = "cleanup"
         elif globals.remove_time is not None:
             action = "remove-old"
-        elif globals.remove_all_but_n_full:
+        elif globals.remove_all_but_n_full_mode:
             action = "remove-all-but-n-full"
-        elif globals.remove_all_inc_of_but_n_full:
+        elif globals.remove_all_inc_of_but_n_full_mode:
             action = "remove-all-inc-of-but-n-full"
         else:
             command_line_error("Too few arguments")

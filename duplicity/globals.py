@@ -112,10 +112,10 @@ remove_time = None
 keep_chains = None
 
 # If set, signifies that remove-all-but-n-full in progress
-remove_all_but_n_full = None
+remove_all_but_n_full_mode = None
 
 # If set, signifies that remove-all-inc-of-but-n-full in progress (variant of remove-all-but-n-full)
-remove_all_inc_of_but_n_full = None
+remove_all_inc_of_but_n_full_mode = None
 
 # Don't actually do anything, but still report what would be done
 dry_run = False
