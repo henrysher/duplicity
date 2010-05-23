@@ -19,7 +19,7 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import os.path
+import os, re
 import tempfile
 
 import duplicity.backend
@@ -30,47 +30,89 @@ class RsyncBackend(duplicity.backend.Backend):
     """Connect to remote store using rsync
 
     rsync backend contributed by Sebastian Wilhelmi <seppi@seppi.de>
+    rsyncd auth, alternate port support
+        Copyright 2010 by Edgar Soldin <edgar.soldin@web.de>
 
     """
     def __init__(self, parsed_url):
         """rsyncBackend initializer"""
         duplicity.backend.Backend.__init__(self, parsed_url)
-        if parsed_url.netloc.find('@') < 0:
-            user = ""
-            host = parsed_url.netloc
-            mynetloc = host
-        else:
-            user, host = parsed_url.netloc.split('@')
-            if parsed_url.password:
-                user = user.split(':')[0]
-            mynetloc = '%s@%s' % (user, host)
-        # module url: rsync://user@host::/modname/path
-        # rsync via ssh/rsh: rsync://user@host//some_absolute_path
-        #      -or-          rsync://user@host/some_relative_path
-        if parsed_url.netloc.endswith("::"):
+        """
+        rsyncd module url: rsync://[user:password@]host[:port]::[/]modname/path
+                      cmd: rsync [--port=port] rsync://host::/modname/path
+        -or-
+        rsync via ssh/rsh url: rsync://user@host[:port]://some_absolute_path
+             -or-              rsync://user@host[:port]:/some_relative_path
+                          cmd: rsync 'ssh [-p=port]' [user@]host:[/]path
+        """
+        host = parsed_url.hostname
+        port = ""
+        if self.over_rsyncd():
             # its a module path
-            self.url_string = "%s%s" % (mynetloc, parsed_url.path.lstrip('/'))
-        elif parsed_url.path.startswith("//"):
-            # its an absolute path
-            self.url_string = "%s:/%s" % (mynetloc.rstrip(':'), parsed_url.path.lstrip('/'))
+            (path, port) = self.get_rsync_path()
+            self.url_string = "rsync://%s::/%s" % (host, path.lstrip('/:'))
+            if port:
+                port = " --port=%s" % port
         else:
-            # its a relative path
-            self.url_string = "%s:%s" % (mynetloc.rstrip(':'), parsed_url.path.lstrip('/'))
+            if parsed_url.path.startswith("//"):
+                # its an absolute path
+                self.url_string = "%s:/%s" % (host, parsed_url.path.lstrip('/'))
+            else:
+                # its a relative path
+                self.url_string = "%s:%s" % (host, parsed_url.path.lstrip('/'))
+            if parsed_url.port:
+                port = " -p %s" % parsed_url.port
+        # add trailing slash if missing
         if self.url_string[-1] != '/':
             self.url_string += '/'
+        # user?
+        if parsed_url.username:
+            if self.over_rsyncd():
+                os.environ['USER'] = parsed_url.username
+            else:
+                self.url_string = parsed_url.username + "@" + self.url_string
+        # password?, don't ask if none was given
+        self.use_getpass = False
+        password = self.get_password()
+        if password:
+            os.environ['RSYNC_PASSWORD'] = password
+        # build cmd
+        if self.over_rsyncd():
+            self.cmd = "rsync%s" % port
+        else:
+            self.cmd = "rsync -e 'ssh%s'" % port
+
+    def over_rsyncd(self):
+        url = self.parsed_url.url_string
+        if re.search('::[^:]*$', url):
+            return True
+        else:
+            return False
+
+    def get_rsync_path(self):
+        url = self.parsed_url.url_string
+        m = re.search("(:\d+|)?::([^:]*)$", url)
+        if m:
+            return m.group(2), m.group(1).lstrip(':')
+        raise InvalidBackendURL("Could not determine rsync path: %s"
+                                    "" % (self.parsed_url.url_string))
+
+    def run_command(self, commandline):
+        result, stdout, stderr = self.subprocess_popen_persist(commandline)
+        return result, stdout
 
     def put(self, source_path, remote_filename = None):
         """Use rsync to copy source_dir/filename to remote computer"""
         if not remote_filename:
             remote_filename = source_path.get_filename()
         remote_path = os.path.join(self.url_string, remote_filename)
-        commandline = "rsync %s %s" % (source_path.name, remote_path)
+        commandline = "%s %s %s" % (self.cmd, source_path.name, remote_path)
         self.run_command(commandline)
 
     def get(self, remote_filename, local_path):
         """Use rsync to get a remote file"""
         remote_path = os.path.join (self.url_string, remote_filename)
-        commandline = "rsync %s %s" % (remote_path, local_path.name)
+        commandline = "%s %s %s" % (self.cmd, remote_path, local_path.name)
         self.run_command(commandline)
         local_path.setdata()
         if not local_path.exists():
@@ -84,8 +126,9 @@ class RsyncBackend(duplicity.backend.Backend):
                 return line[4]
             else:
                 return None
-        commandline = "rsync %s" % self.url_string
-        return filter(lambda x: x, map (split, self.popen(commandline).split('\n')))
+        commandline = "%s %s" % (self.cmd, self.url_string)
+        result, stdout = self.run_command(commandline)
+        return filter(lambda x: x, map (split, stdout.split('\n')))
 
     def delete(self, filename_list):
         """Delete files."""
@@ -109,8 +152,8 @@ class RsyncBackend(duplicity.backend.Backend):
             print >>exclude, file
             f.close()
         exclude.close()
-        commandline = ("rsync --recursive --delete --exclude-from=%s %s/ %s" %
-                                   (exclude_name, dir, self.url_string))
+        commandline = ("%s --recursive --delete --exclude-from=%s %s/ %s" %
+                                   (self.cmd, exclude_name, dir, self.url_string))
         self.run_command(commandline)
         for file in to_delete:
             os.unlink (file)

@@ -2,6 +2,7 @@ New in v0.6.09 (2010/05/??)
 ----------------------------
 550455     duplicity doesn't handle with large files well
 579958     Assertion error "time not moving forward at appropriate pace"
+576564     username not url decoded in backend (at least rsync)
 
 
 New in v0.6.08b (2010/03/11)
