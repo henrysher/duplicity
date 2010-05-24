@@ -1,3 +1,395 @@
+2010-03-11  Kenneth Loafman  <kenneth@loafman.com>
+
+	Manually apply patch from http://bazaar.launchpad.net/~duplicity-team/duplicity/0.7-series/revision/637 which did not make it into 0.6.
+
+2010-03-11  Kenneth Loafman  <kenneth@loafman.com>
+
+	Changes for 0.6.08a
+
+2010-03-09  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2010-03-01  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2010-03-11  Kenneth Loafman  <kenneth@loafman.com>
+
+	Changes for 0.6.08a
+
+2010-03-07  Kenneth Loafman  <kenneth@loafman.com>
+
+	Changes for 0.6.08
+
+2010-03-07  Kenneth Loafman  <kenneth@loafman.com>
+
+	#532051 rdiffdir attempts to reference undefined variables with some command arguments
+
+2010-03-07  Kenneth Loafman  <kenneth@loafman.com>
+
+	#519110 Need accurate man page info on use of scp/sftp usage.
+
+2010-03-02  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged lp:~mterry/duplicity/use-gpg-options-0.6
+
+2010-03-02  Michael Terry  <mike@mterry.name>
+
+	use global gpg options
+
+2010-03-02  ken
+
+	Merged lp:~mterry/duplicity/fix-gpg-options-crash-0.6
+
+2010-03-01  Michael Terry  <mike@mterry.name>
+
+	fix time command line handling
+
+2010-03-01  Michael Terry  <mike@mterry.name>
+
+	and handle initial, empty value for extend commandline actions
+
+2010-03-01  Michael Terry  <michael.terry@canonical.com>
+
+	fix crash on empty gpg-options argument
+
+2010-02-28  ken
+
+	Changes for 0.6.07.
+
+2010-02-28  ken
+
+	Merged lp:~duplicity-team/duplicity/po-updates.
+
+2010-01-15  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2010-01-09  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2009-12-16  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2009-12-15  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2010-02-17  ken
+
+	#520470 - Don't Warn when there's old backup to delete
+
+2010-02-17  ken
+
+	Patch #505739 - "sslerror: The read operation timed out" with S3
+
+2010-02-16  ken
+
+	Patch 522544 -- OSError: [Errno 40] Too many levels of symbolic links
+
+2010-02-08  ken
+
+	Patched #497243 archive dir: cache desynchronization caused by remove*
+
+2010-02-08  ken
+
+	Merge with trunk.
+
+2010-01-18  Michael Terry  <mike@mterry.name>
+
+	logging: fix logging to files by opening them with default of 'a' not 'w'
+
+2010-01-08  Michael Terry  <mike@mterry.name>
+
+	make a comment reserving 255 as an error code (used by gksu)
+
+2009-12-28  ken
+
+	Patch 501093 SSHBackend doesn't handle spaces in path
+
+2009-12-28  ken
+
+	Try again -- remove Eclipse/PyDev control files from bzr.
+
+2009-12-28  ken
+
+	Eclipse settings should not be in bzr.
+
+2009-12-28  ken
+
+	No longer needed.
+
+2009-12-28  ken
+
+	Fix real errors found by PyLint.  Remove unneeded includes.  Tag spurious errors so they don't annoy.
+
+2009-12-28  ken
+
+	Fix problem in put() where destination filename was not being passed properly.
+
+2009-12-24  ken
+
+	Merged in lp:~mterry/duplicity/rename
+
+2009-12-20  Michael Terry  <mike@mterry.name>
+
+	add --rename argument
+
+2009-12-15  Michael Terry  <michael.terry@canonical.com>
+
+	add back accidentally-dropped --use-scp option from commandline merge
+
+2009-12-14  ken
+
+	Fix CHANGELOG.
+
+2009-12-14  ken
+
+	Merged in lp:~mterry/duplicity/typos
+
+2009-12-14  ken
+
+	Merged in lp:~duplicity-team/duplicity/po-updates
+
+2009-12-13  Michael Terry  <mike@mterry.name>
+
+	whoops, and this typo
+
+2009-12-13  Michael Terry  <mike@mterry.name>
+
+	fix some typos found when using pydev+eclipse
+
+2009-11-26  ken
+
+	459511 --tempdir option doesn't override TMPDIR
+
+2009-11-26  ken
+
+	487686 re-add scp backend and make available via command line option
+	Option --use-scp will use scp, not sftp, for get/put operations.
+
+2009-11-26  ken
+
+	Applied patch 467391 to close connection on a 401 and retry
+	with authentication credentials.
+
+2009-11-09  ken
+
+	CVS no longer used, so no longer needed.
+
+2009-11-08  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in translations.
+
+2009-11-08  Kenneth Loafman  <kenneth@loafman.com>
+
+	Checkpoint.
+
+2009-10-29  Kenneth Loafman  <kenneth@loafman.com>
+
+	lp:~duplicity-team/duplicity/po-updates
+
+2009-10-29  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merge in lp:~duplicity-team/duplicity/i18n-for-0.7
+
+2009-10-02  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	i18nized a few error messages in duplicity.selection
+
+2009-10-02  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	More strings internationalized in asyncscheduler and commandline
+
+2009-10-29  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merge of lp:~mterry/duplicity/list-old-chains
+
+2009-10-23  Michael Terry  <michael.terry@canonical.com>
+
+	warn if we don't have signatures for the given date period
+
+2009-10-22  Michael Terry  <michael.terry@canonical.com>
+
+	allow deleting old signatures with cleanup --extra-clean
+
+2009-10-19  Michael Terry  <michael.terry@canonical.com>
+
+	don't delete signature chains for old backups; allow listing old backup chain files
+
+2009-10-12  Michael Terry  <michael.terry@canonical.com>
+
+	add missing par2_utils.py to dist tarball
+
+2009-10-19  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~duplicity-team/duplicity/po-updates
+
+2009-10-09  Kenneth Loafman  <kenneth@loafman.com>
+
+	Remove unused __future__ imports.
+
+2009-10-06  Kenneth Loafman  <kenneth@loafman.com>
+
+	Add entry for patches from Stéphane Lesimple for par2.
+
+2009-10-06  Kenneth Loafman  <kenneth@loafman.com>
+
+	Applied patch from Stéphane Lesimple found at:
+	https://bugs.launchpad.net/duplicity/+bug/426282/comments/5
+	patch skips the par2 files when building up the sets and chains of backups
+
+2009-10-06  Kenneth Loafman  <kenneth@loafman.com>
+
+	Applied patch from Stéphane Lesimple found at:
+	https://bugs.launchpad.net/duplicity/+bug/426282/comments/4
+	patch avoids storing all the par2 files into the local cache
+
+2009-10-03  Kenneth Loafman  <kenneth@loafman.com>
+
+	Fixed 435975 gpg asks for password in 0.6.05, but not in 0.5.18
+
+2009-09-25  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merge with trunk.
+
+2009-04-11  Michael Terry  <mike@mterry.name>
+
+	modify file name test to test short filenames even when not specifically requested to
+
+2009-04-11  Michael Terry  <mike@mterry.name>
+
+	accept short filenames even if not specifically requested
+
+2009-09-20  Michael Terry  <michael.terry@canonical.com>
+
+	ugh, I'm the worst; add missing import
+
+2009-09-20  Michael Terry  <michael.terry@canonical.com>
+
+	add extra information to the 'hostname changed' log message, split it from the 'source dir changed' message
+
+2009-09-25  Kenneth Loafman  <kenneth@loafman.com>
+
+	Fix problems with unittests under Jaunty.  It appears that redirection
+	in os.system() has changed for the worse, so a workaround for now.
+	
+	Fix problem in restart where there were no manifest entries and no
+	remote volumes stored.  We clean out the partial and restart.
+
+2009-09-18  Kenneth Loafman  <kenneth@loafman.com>
+
+	Applied "426282 [PATCH] par2 creating support", corrected some coding format issues and made sure all unit tests passed.
+
+2009-09-15  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~mterry/duplicity/iterate-warnings
+
+2009-09-11  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~duplicity-team/duplicity/po-updates
+
+2009-09-11  Kenneth Loafman  <kenneth@loafman.com>
+
+	Clean up testing run scripts.
+
+2009-09-08  Kenneth Loafman  <kenneth@loafman.com>
+
+	* 422477 [PATCH] IMAP Backend Error in delete()  
+
+2009-12-13  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2009-11-10  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2009-12-14  ken
+
+	Merged in lp:~mterry/duplicity/optparse
+
+2009-12-13  Michael Terry  <mike@mterry.name>
+
+	whoops, remove debug code
+
+2009-12-13  Michael Terry  <mike@mterry.name>
+
+	don't set xdg dirs in duplicity-bin now that globals.py is restored
+
+2009-12-13  Michael Terry  <mike@mterry.name>
+
+	use defaults from globals.py for commandline options
+
+2009-12-13  Michael Terry  <mike@mterry.name>
+
+	fix an undefined variable usage
+
+2009-12-07  Michael Terry  <mike@mterry.name>
+
+	fix a few typos
+
+2009-12-14  ken
+
+	Merged in lp:~mterry/duplicity/typos-0.6
+
+2009-11-30  Michael Terry  <mike@mterry.name>
+
+	fix typo with log-fd support
+
+2009-11-30  Michael Terry  <michael.terry@canonical.com>
+
+	first pass at getopt->optparse conversion
+
+2009-12-13  Michael Terry  <mike@mterry.name>
+
+	whoops, and this typo
+
+2009-12-13  Michael Terry  <mike@mterry.name>
+
+	fix some typos found when using pydev+eclipse (backported from 0.7 line)
+
+2009-11-27  ken
+
+	Remove antiquated file.
+
+2009-11-27  ken
+
+	Remove requirement for GnuPGInterface, we have our own.
+
+2009-11-26  ken
+
+	459511 --tempdir option doesn't override TMPDIR
+
+2009-11-26  ken
+
+	487686 re-add scp backend and make available via command line option
+	Option --use-scp will use scp, not sftp, for get/put operations.
+
+2009-11-26  ken
+
+	Applied patch 467391 to close connection on a 401 and retry
+	with authentication credentials.
+
+2009-11-08  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in translations.
+
+2009-10-30  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2009-11-08  Kenneth Loafman  <kenneth@loafman.com>
+
+	Checkpoint.
+
+2009-10-29  Kenneth Loafman  <kenneth@loafman.com>
+
+	Changes for 0.6.06
+
 2009-10-29  Kenneth Loafman  <kenneth@loafman.com>
 
 	lp:~duplicity-team/duplicity/po-updates

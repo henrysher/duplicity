@@ -1,11 +1,57 @@
 New in v0.7.00 (2009/??/??)
 ---------------------------
 422477  [PATCH] IMAP Backend Error in delete()
-
 426282  [PATCH] create par2 support
-
 Merged in lp:~mterry/duplicity/optparse
 
+
+New in v0.6.09 (2010/05/??)
+----------------------------
+550455     duplicity doesn't handle with large files well
+579958     Assertion error "time not moving forward at appropriate pace"
+576564     username not url decoded in backend (at least rsync)
+
+
+New in v0.6.08b (2010/03/11)
+----------------------------
+Fix bug where encrypted backup without --gpg-options crashes.
+This was a followup issue to bug 490619 released in 0.6.07.
+This is attempt #2 -- not sure what happened to the patch,
+but it did not show up in 0.6-series like it should have.
+
+
+New in v0.6.08a (2010/03/11)
+----------------------------
+Fix bug where encrypted backup without --gpg-options crashes.
+This was a followup issue to bug 490619 released in 0.6.07.
+
+
+New in v0.6.08 (2010/03/07)
+---------------------------
+Bugs closed in this release:
+519110     Need accurate man page info on use of scp/sftp usage.
+532051     rdiffdir attempts to reference undefined variables with some command arguments
+529869     TypeError: unsupported operand type(s) for -: 'NoneType' and 'int'
+530910     TypeError: unsupported operand type(s) for +: 'NoneType' and 'str'
+
+
+New in v0.6.07 (2010/02/28)
+---------------------------
+Bugs closed in this release:
+459511     --tempdir option doesn't override TMPDIR
+467391     [PATCH] WebDAV backend doesn't work
+487686     re-add scp backend and make available via command line option
+490619     Use optparse not getopt
+497243     0.6.06, archive dir: cache desynchronization caused by remove*
+501093     SSHBackend doesn't handle spaces in path
+505739     "sslerror: The read operation timed out" with S3
+520470     Don't Warn when there's old backup to delete
+522544     OSError: [Errno 40] Too many levels of symbolic links
+388673     Allow renaming paths as they are restored
+
+
+New in v0.6.06 (2009/10/29)
+---------------------------
 Merged in lp:~mterry/duplicity/list-old-chains
 List/keep old signature chains
 
