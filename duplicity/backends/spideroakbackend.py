@@ -20,14 +20,17 @@
 
 import os
 import re
+import time
 import hmac
 import hashlib
 import urllib2
-import time
 
 import duplicity.backend
 from duplicity import log
 from duplicity.errors import *
+
+MAX_RETRIES = 5
+SLEEP_TIME = 2
 
 class SpiderOakBackend(duplicity.backend.Backend):
 	"""
@@ -50,7 +53,7 @@ class SpiderOakBackend(duplicity.backend.Backend):
 		url = parsed_url.geturl()
 		if url.find('diy.spideroak.com') == -1:
 			raise BackendException('Invalid URL. URL must be in format: '
-								   'spideroak+https://<username>.diy.spideroak.com')
+						'spideroak+https://<username>.diy.spideroak.com')
 		if not os.environ.has_key('SPIDEROAK_KEY_ID'):
 			raise BackendException('SPIDEROAK_KEY_ID environment variable'
 								   'is not set.')
@@ -67,7 +70,9 @@ class SpiderOakBackend(duplicity.backend.Backend):
 		else:
 			path = ''
 		
-		self.conn_data = {'url': 'https://%s.diy.spideroak.com' % (username),
+		self.retry_count = {}
+		self.conn_data = {
+						'url': 'https://%s.diy.spideroak.com' % (username),
 						'username': username,
 						'path': path,
 						'key_id': os.environ.get('SPIDEROAK_KEY_ID'),
@@ -80,7 +85,7 @@ class SpiderOakBackend(duplicity.backend.Backend):
 			request = self.__make_request('GET', filename)
 			
 			try:
-				file = open(local_path.name, 'w')
+				file = open(local_path.name, 'wb')
 				
 				while 1:
 					chunk = request.read(4096)
@@ -91,8 +96,9 @@ class SpiderOakBackend(duplicity.backend.Backend):
 			finally:
 				file.close()
 		except urllib2.HTTPError, e:
-			log.FatalError('Downloading file %s failed (code: %d)' % (filename, e.code),
-						   log.ErrorCode.connection_failed)
+			if self.__retry_command('get', filename, local_path) is False:
+				log.FatalError('Downloading file %s failed (code: %d)' %
+							(filename, e.code), log.ErrorCode.connection_failed)
 
 		log.Debug('Downloaded file: %s' % (filename))
 	
@@ -103,8 +109,9 @@ class SpiderOakBackend(duplicity.backend.Backend):
 		try:
 			files = self.__make_request('GET', '?action=listmatch').read()
 		except urllib2.HTTPError, e:
-			log.FatalError('Listing files failed (code: %d)' % (e.code),
-						   log.ErrorCode.connection_failed)
+			if self.__retry_command('list') is False:
+				log.FatalError('Listing files failed (code: %d)' % (e.code),
+							   log.ErrorCode.connection_failed)
 			
 		files = files[1:-1]
 		files = [file for file in re.findall(r"'(.*?)'", files)]
@@ -134,7 +141,8 @@ class SpiderOakBackend(duplicity.backend.Backend):
 			log.FatalError('Uploading file %s failed' % (source_path.name), 
 						   log.ErrorCode.generic)
 		except urllib2.HTTPError, e:
-			log.FatalError('Uploading file %s failed (code: %d)' %
+			if self.__retry_command('put', source_path, remote_filename, rename) is False:
+				log.FatalError('Uploading file %s failed (code: %d)' %
 						(source_path.name, e.code), log.ErrorCode.connection_failed)
 		finally:
 			file.close()
@@ -147,8 +155,27 @@ class SpiderOakBackend(duplicity.backend.Backend):
 				self.__make_request('POST', filename, '?action=delete', data = '')
 				log.Debug('Deleted file: %s' % (filename))
 			except urllib2.HTTPError, e:
-				log.FatalError('Deleting file %s failed (code: %d)' %
-							  (filename, e.code), log.ErrorCode.connection_failed)
+				if self.__retry_command('delete', filename_list) is False:
+					log.FatalError('Deleting file %s failed (code: %d)' %
+								  (filename, e.code), log.ErrorCode.connection_failed)
+				
+	def __retry_command(self, method, *args):
+		""" Retry failed command and increase the number of attempts. """
+		retry_count = self.retry_count.get(method, 0)
+		
+		if not retry_count < MAX_RETRIES:
+			return False
+
+		log.Debug('Retrying command %s (args = %s) [attempt: %d]' %
+				 (method, ', ' . join([str(arg) for arg in args]), retry_count + 1))
+		
+		try:
+			self.retry_count[method] += 1
+		except KeyError:
+			self.retry_count[method] = 1
+		
+		time.sleep(SLEEP_TIME)
+		getattr(self, method)(*args)
 			
 	def __delete_all(self):
 		""" Delete all the files on the specified path. """
