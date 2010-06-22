@@ -100,8 +100,12 @@ class SpiderOakBackend(duplicity.backend.Backend):
 		""" List files in that directory """
 		key = self.conn_data['path']
 
-		
-		files = self.__make_request('GET', '?action=listmatch').read()
+		try:
+			files = self.__make_request('GET', '?action=listmatch').read()
+		except urllib2.HTTPError, e:
+			log.FatalError('Listing files failed (code: %d)' % (e.code),
+						   log.ErrorCode.connection_failed)
+			
 		files = files[1:-1]
 		files = [file for file in re.findall(r"'(.*?)'", files)]
 		
@@ -130,8 +134,8 @@ class SpiderOakBackend(duplicity.backend.Backend):
 			log.FatalError('Uploading file %s failed' % (source_path.name), 
 						   log.ErrorCode.generic)
 		except urllib2.HTTPError, e:
-			log.FatalError('Uploading file %s failed' % (source_path.name), 
-						   log.ErrorCode.connection_failed)
+			log.FatalError('Uploading file %s failed (code: %d)' %
+						(source_path.name, e.code), log.ErrorCode.connection_failed)
 		finally:
 			file.close()
 	
@@ -143,8 +147,8 @@ class SpiderOakBackend(duplicity.backend.Backend):
 				self.__make_request('POST', filename, '?action=delete', data = '')
 				log.Debug('Deleted file: %s' % (filename))
 			except urllib2.HTTPError, e:
-				log.FatalError('Deleting file %s failed' % (filename), 
-						   log.ErrorCode.connection_failed)
+				log.FatalError('Deleting file %s failed (code: %d)' %
+							  (filename, e.code), log.ErrorCode.connection_failed)
 			
 	def __delete_all(self):
 		""" Delete all the files on the specified path. """
