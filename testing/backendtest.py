@@ -252,6 +252,19 @@ class webdavsModuleTest(unittest.TestCase, UnivTest):
     my_test_id = "webdavs"
     url_string = config.webdavs_url
     password = config.webdavs_password
+    
+
+class SpiderOakModuleTest(unittest.TestCase, UnivTest):
+
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+        
+    my_test_id = "spideroak"
+    url_string = config.so_url
+    password = ''
 
 
 if gio_available:
