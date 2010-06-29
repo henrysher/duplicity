@@ -23,6 +23,7 @@ import re
 import time
 import hmac
 import hashlib
+import urllib
 import urllib2
 
 import duplicity.backend
@@ -114,7 +115,8 @@ class SpiderOakBackend(duplicity.backend.Backend):
 							   log.ErrorCode.connection_failed)
 			
 		files = files[1:-1]
-		files = [file for file in re.findall(r"'(.*?)'", files)]
+		files = [urllib.unquote(file) for file \
+									  in re.findall(r"'(.*?)'", files)]
 		
 		if key:
 			# SpiderOak API always returns the full path to the file, so strip

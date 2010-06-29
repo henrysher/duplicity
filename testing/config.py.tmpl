@@ -79,6 +79,10 @@ webdav_password = None
 webdavs_url = None
 webdavs_password = None
 
+so_url = None
+so_key_id = None
+so_key = None
+
 def setup():
     """ setup for unit tests """
     log.setup()
@@ -98,6 +102,9 @@ def setup():
         set_environ("AWS_ACCESS_KEY_ID", None)
         set_environ("AWS_SECRET_ACCESS_KEY", None)
 
+    if so_key_id:
+        set_environ("SPIDEROAK_KEY_ID", so_key_id)
+        set_environ("SPIDEROAK_KEY", so_key)
 
 def set_environ(varname, value):
     if value is not None:
