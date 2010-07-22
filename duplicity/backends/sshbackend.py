@@ -55,11 +55,11 @@ class SSHBackend(duplicity.backend.Backend):
         # maybe use different ssh port
         if parsed_url.port:
             globals.ssh_options = globals.ssh_options + " -oPort=%s" % parsed_url.port
-        else:
-            globals.ssh_options = globals.ssh_options
-        # set network timeout.  CountMax is how many retries to do, not how many tries.
-        # Use CountMax=1 just in case there's a tiny network blip.
-        globals.ssh_options += " -oServerAliveInterval=%i -oServerAliveCountMax=1" % ((int)(globals.timeout / 2))
+        # set some defaults if user has not specified already.
+        if "ServerAliveInterval" not in globals.ssh_options:
+            globals.ssh_options += " -oServerAliveInterval=%d" % ((int)(globals.timeout / 2))
+        if "ServerAliveCountMax" not in globals.ssh_options:
+            globals.ssh_options += " -oServerAliveCountMax=2"
         # set up password
         if globals.ssh_askpass:
             self.password = self.get_password()
