@@ -1274,16 +1274,13 @@ if __name__ == "__main__":
                        log.ErrorCode.user_error,
                        e.__class__.__name__)
 
-    except AssertionError, e:
+    except Exception, e:
         if "Forced assertion for testing" in str(e):
             log.FatalError("%s: %s" % (e.__class__.__name__, str(e)),
-                           log.ErrorCode.generic,
+                           log.ErrorCode.exception,
                            e.__class__.__name__)
         else:
-            raise
-
-    except Exception, e:
-        # Traceback and that mess
-        log.FatalError("%s" % (''.join(traceback.format_exception(*sys.exc_info()))),
-                       log.ErrorCode.exception,
-                       e.__class__.__name__)
+            # Traceback and that mess
+            log.FatalError("%s" % (''.join(traceback.format_exception(*sys.exc_info()))),
+                           log.ErrorCode.exception,
+                           e.__class__.__name__)
