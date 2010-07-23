@@ -1,4 +1,4 @@
-# Esperanto translation for duplicity
+# German translation for duplicity
 # Copyright (c) 2009 Rosetta Contributors and Canonical Ltd 2009
 # This file is distributed under the same license as the duplicity package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2009.
@@ -6,16 +6,16 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
-"Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-03-11 06:57-0600\n"
-"PO-Revision-Date: 2010-05-23 16:48+0000\n"
-"Last-Translator: Kenneth Loafman <kenneth@loafman.com>\n"
-"Language-Team: Esperanto <eo@li.org>\n"
+"PO-Revision-Date: 2010-05-23 16:45+0000\n"
+"Last-Translator: MixCool <lars.thoms@mixcool.de>\n"
+"Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-05-24 03:46+0000\n"
+"X-Launchpad-Export-Date: 2010-05-24 03:47+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../duplicity-bin:190
@@ -37,67 +37,69 @@ msgid ""
 "Fatal Error: Unable to start incremental backup.  Old signatures not found "
 "and incremental specified"
 msgstr ""
+"Schwerwiegender Fehler: konnte inkrementelles Backup nicht starten. Alte "
+"Signaturen nicht gefunden und inkrementelles Backup ausgewählt."
 
 #: ../duplicity-bin:446
 msgid "No signatures found, switching to full backup."
-msgstr ""
+msgstr "Keine Signaturen gefunden, führe vollständiges Backup durch."
 
 #: ../duplicity-bin:460
 msgid "Backup Statistics"
-msgstr ""
+msgstr "Backup-Statistiken"
 
 #: ../duplicity-bin:540
 #, python-format
 msgid "%s not found in archive, no files restored."
-msgstr ""
+msgstr "%s nicht im Archiv gefunden, keine Datei wiederhergestellt."
 
 #: ../duplicity-bin:544
 msgid "No files found in archive - nothing restored."
-msgstr ""
+msgstr "Keine Dateien im Archiv - nichts wiederhergestellt."
 
 #: ../duplicity-bin:577
 #, python-format
 msgid "Processed volume %d of %d"
-msgstr "Traktis la savkopieron %d el %d"
+msgstr ""
 
 #: ../duplicity-bin:617
 #, python-format
 msgid "Invalid data - %s hash mismatch:"
-msgstr ""
+msgstr "Ungültige Daten - %s Hash nicht passend:"
 
 #: ../duplicity-bin:618
 #, python-format
 msgid "Calculated hash: %s"
-msgstr ""
+msgstr "Erstellter Hash: %s"
 
 #: ../duplicity-bin:619
 #, python-format
 msgid "Manifest hash: %s"
-msgstr ""
+msgstr "Manifest-Hashcode: %s"
 
 #: ../duplicity-bin:636
 #, python-format
 msgid "Volume was signed by key %s, not %s"
-msgstr ""
+msgstr "Volume wurde von Schlüssel %s, anstatt von %s unterschrieben"
 
 #: ../duplicity-bin:666
 #, python-format
 msgid "Verify complete: %s, %s."
-msgstr ""
+msgstr "Überprüfung vollständig: %s, %s."
 
 #: ../duplicity-bin:667
 #, python-format
 msgid "%d file compared"
 msgid_plural "%d files compared"
-msgstr[0] "Komparis %d dosieron."
-msgstr[1] "Komparis %d dosierojn."
+msgstr[0] "%d Datei vergleichen"
+msgstr[1] "%d Dateien vergleichen"
 
 #: ../duplicity-bin:669
 #, python-format
 msgid "%d difference found"
 msgid_plural "%d differences found"
-msgstr[0] "Trovis %d diferencon."
-msgstr[1] "Trovis %d diferencojn."
+msgstr[0] "%d Unterschied gefunden"
+msgstr[1] "%d Unterscheide gefunden"
 
 #: ../duplicity-bin:688
 msgid "No extraneous files found, nothing deleted in cleanup."
@@ -106,52 +108,59 @@ msgstr ""
 #: ../duplicity-bin:693
 msgid "Deleting this file from backend:"
 msgid_plural "Deleting these files from backend:"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Lösche diese Datei vom Backend:"
+msgstr[1] "Lösche diese Dateien vom Backend:"
 
 #: ../duplicity-bin:702
 msgid "Found the following file to delete:"
 msgid_plural "Found the following files to delete:"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Folgende Datei zum Löschen gefunden:"
+msgstr[1] "Folgende Dateien zum Löschen gefunden:"
 
 #: ../duplicity-bin:706
 msgid "Run duplicity again with the --force option to actually delete."
 msgstr ""
+"Führe duplicity noch einmal mit der \"--force\"-Option aus, um tatsächlich "
+"zu löschen."
 
 #: ../duplicity-bin:745
 msgid "There are backup set(s) at time(s):"
-msgstr "Estas savkopiaro(j) de la horo(j):"
+msgstr ""
 
 #: ../duplicity-bin:747
 msgid "Which can't be deleted because newer sets depend on them."
 msgstr ""
+"Kann nicht gelöscht werden, da neuere Datensätze hiervon abhängig sind."
 
 #: ../duplicity-bin:751
 msgid ""
 "Current active backup chain is older than specified time.  However, it will "
 "not be deleted.  To remove all your backups, manually purge the repository."
 msgstr ""
+"Derzeit aktive Backupschleife ist älter als der angegebene Zeitpunkt. Sie "
+"wird also nicht gelöscht. Um alle Backups zu löschen müssen sie manuell "
+"gelöscht werden."
 
 #: ../duplicity-bin:757
 msgid "No old backup sets found, nothing deleted."
-msgstr ""
+msgstr "Keine alten Backups gefunden, nichts gelöscht."
 
 #: ../duplicity-bin:760
 msgid "Deleting backup set at time:"
 msgid_plural "Deleting backup sets at times:"
-msgstr[0] "Forigas la savkopiaron de la horo:"
-msgstr[1] "Forigas la savkopiarojn de la horoj:"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../duplicity-bin:772
 msgid "Found old backup set at the following time:"
 msgid_plural "Found old backup sets at the following times:"
-msgstr[0] "Trovis malnovan savkopiaron de la jena horo:"
-msgstr[1] "Trovis malnovajn savkopiarojn de la jenaj horoj:"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../duplicity-bin:776
 msgid "Rerun command with --force option to actually delete."
 msgstr ""
+"Befehl erneut mit \"--force\"-Option ausführen, um tatsächlich zu löschen."
 
 #: ../duplicity-bin:859
 #, python-format
@@ -161,24 +170,28 @@ msgstr ""
 #: ../duplicity-bin:884 ../duplicity/dup_temp.py:239
 #, python-format
 msgid "Failed to read %s: %s"
-msgstr ""
+msgstr "Konnte %s nicht lesen: %s"
 
 #: ../duplicity-bin:895
 #, python-format
 msgid "Copying %s to local cache."
-msgstr ""
+msgstr "Kopiere %s zum lokalen Zwischenspeicher."
 
 #: ../duplicity-bin:936
 msgid "Local and Remote metadata are synchronized, no sync needed."
 msgstr ""
+"Lokale und entfernte Metadaten sind bereits synchron, keine Synchronisierung "
+"benötigt."
 
 #: ../duplicity-bin:941
 msgid "Synchronizing remote metadata to local cache..."
-msgstr ""
+msgstr "Synchronisiere entfernte Metadaten zum lokalen Cache..."
 
 #: ../duplicity-bin:950
 msgid "Sync would copy the following from remote to local:"
 msgstr ""
+"Synchronisation würde die folgenden Daten von dem entfernten Host hierher "
+"kopieren:"
 
 #: ../duplicity-bin:953
 msgid "Sync would remove the following spurious local files:"
@@ -186,12 +199,13 @@ msgstr ""
 
 #: ../duplicity-bin:996
 msgid "Unable to get free space on temp."
-msgstr ""
+msgstr "Der temporäre Speicherplatz ist belegt."
 
 #: ../duplicity-bin:1004
 #, python-format
 msgid "Temp space has %d available, backup needs approx %d."
 msgstr ""
+"%d temporärer Speicherplatz sind verfügbar, das Backup benötigt ca. %d."
 
 #: ../duplicity-bin:1007
 #, python-format
@@ -200,7 +214,7 @@ msgstr ""
 
 #: ../duplicity-bin:1015
 msgid "Unable to get max open files."
-msgstr ""
+msgstr "Konnte nicht den Maximalwert für offene Dateien feststellen."
 
 #: ../duplicity-bin:1019
 #, python-format
@@ -208,6 +222,9 @@ msgid ""
 "Max open files of %s is too low, should be >= 1024.\n"
 "Use 'ulimit -n 1024' or higher to correct.\n"
 msgstr ""
+"Limit für gleichzeitig offene Dateien von %s ist zu niedrig, sollte >=1024 "
+"sein.\n"
+"Führen Sie  'ulimit -n 1024' aus, um dies zu korrigieren.\n"
 
 #: ../duplicity-bin:1065
 msgid ""
@@ -387,19 +404,19 @@ msgstr ""
 
 #: ../duplicity/collections.py:384
 msgid "Time:"
-msgstr "Tempo:"
+msgstr ""
 
 #: ../duplicity/collections.py:384
 msgid "Num volumes:"
-msgstr "Kvanto da savkopiaroj:"
+msgstr ""
 
 #: ../duplicity/collections.py:388
 msgid "Full"
-msgstr "Plena"
+msgstr ""
 
 #: ../duplicity/collections.py:391
 msgid "Incremental"
-msgstr "Suplementa"
+msgstr ""
 
 #: ../duplicity/collections.py:451
 msgid "local"
