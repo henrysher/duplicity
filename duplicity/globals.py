@@ -145,6 +145,9 @@ s3_use_new_style = False
 # support european for now).
 s3_european_buckets = False
 
+# Whether to use S3 Reduced Redudancy Storage
+s3_use_rrs = False
+
 # Whether to use the full email address as the user name when
 # logging into an imap server. If false just the user name
 # part of the email address is used.

@@ -6,6 +6,7 @@ Bugs closed in this release:
 576564     username not url decoded in backend (at least rsync)
 567738     --ssh-options options passing options to ssh do not work
 502609     Unknown error while uploading duplicity-full-signatures
+582962     Diminishing performance on large files
 
 Upgraded tahoebackend to new parse_url.
 Fix to warning message in sshbackend.

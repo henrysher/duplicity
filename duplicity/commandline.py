@@ -385,6 +385,9 @@ def parse_cmdline_options(arglist):
     # support european for now).
     parser.add_option("--s3-european-buckets", action="store_true")
 
+    # Whether to use S3 Reduced Redudancy Storage
+    parser.add_option("--s3-use-rrs", action="store_true")
+
     # Whether to use "new-style" subdomain addressing for S3 buckets. Such
     # use is not backwards-compatible with upper-case buckets, or buckets
     # that are otherwise not expressable in a valid hostname.
