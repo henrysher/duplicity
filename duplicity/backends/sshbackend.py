@@ -187,7 +187,7 @@ class SSHBackend(duplicity.backend.Backend):
                     log.Warn("Host key authenticity could not be verified (missing known_hosts entry?)")
                     break
                 elif match == 6:
-                    log.Warn("Remote file or directory does not exist in command='%s'" % (command,))
+                    log.Warn("Remote file or directory does not exist in command='%s'" % (commandline,))
                     break
             child.close(force = True)
             if child.exitstatus == 0:
