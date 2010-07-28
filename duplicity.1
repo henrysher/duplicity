@@ -680,6 +680,17 @@ Change the volume size to
 .IR number
 Mb. Default is 25Mb.
 
+.SH ENVIRONMENT VARIABLES
+
+.TP
+.B TMPDIR, TEMP, TMP
+In decreasing order of importance, specifies the directory to use for
+temporary files (inherited from Python's tempfile module).
+.TP
+.B FTP_PASSWORD
+Supported by most backends which are password capable. More secure than 
+setting it in the backend url.
+
 
 .SH URL FORMAT
 Duplicity tries to maintain a standard URL format as much as possible.
@@ -692,6 +703,9 @@ scheme://user[:password]@host[:port]/[/]path
 It is not recommended to expose the password on the command line since
 it could be revealed to anyone with permissions to do process listings,
 however, it is permitted.
+Consider setting the environment variable FTP_PASSWORD instead, which 
+is supported by most, but not all backends. Regardless of its name it 
+can be used with other backends.
 .PP
 In protocols that support it, the path may be preceded by a single
 slash, '/path', to represent a relative path to the target home directory,
@@ -713,11 +727,15 @@ imap://user[:password]@host.com[/from_address_prefix]
 .PP
 imaps://user[:password]@host.com[/from_address_prefix]
 .PP
-rsync://user[:password]@other.host[:port]::/module/some_dir
+.BI "using rsync daemon"
+.br
+rsync://user[:password]@host.com[:port]::/module/some_dir 
 .PP
-rsync://user[:password]@other.host[:port]/relative_path
-.PP
-rsync://user[:password]@other.host[:port]//absolute_path
+.BI "using rsync over ssh (only key auth)"
+.br
+rsync://user@host.com[:port]/relative_path
+.BR
+rsync://user@host.com[:port]//absolute_path
 .PP
 s3://host/bucket_name[/prefix]
 .PP
@@ -1090,13 +1108,6 @@ The remote signatures will be encrypted if encryption is enabled.
 The local signatures will not be encrypted and stored in the archive dir (see
 .B "--archive-dir"
 ).
-
-.SH ENVIRONMENT VARIABLES
-
-.TP
-.B TMPDIR, TEMP, TMP
-In decreasing order of importance, specifies the directory to use for
-temporary files (inherited from Python's tempfile module).
 
 .SH EUROPEAN S3 BUCKETS
 Amazon S3 provides the ability to choose the location of a bucket upon
