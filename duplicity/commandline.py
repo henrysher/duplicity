@@ -128,9 +128,9 @@ def check_verbosity(option, opt, value):
     else:
         try:
             verb = int(value)
+            if verb < 0 or verb > 9:
+                fail = True
         except ValueError:
-            fail = True
-        if verb < 0 or verb > 9:
             fail = True
 
     if fail:

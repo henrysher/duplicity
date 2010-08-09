@@ -1,3 +1,157 @@
+2010-07-28  Kenneth Loafman  <kenneth@loafman.com>
+
+	Man page improvements and clarification.
+
+2010-07-25  Kenneth Loafman  <kenneth@loafman.com>
+
+	Final changes for 0.6.09.
+
+2010-07-24  Kenneth Loafman  <kenneth@loafman.com>
+
+	582962     Diminishing performance on large files
+
+2010-07-24  Kenneth Loafman  <kenneth@loafman.com>
+
+	Fix to warning message in sshbackend.
+
+2010-07-23  Kenneth Loafman  <kenneth@loafman.com>
+
+	Upgraded tahoebackend to new parse_url.
+
+2010-07-23  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~duplicity-team/duplicity/po-updates
+
+2010-07-23  Kenneth Loafman  <kenneth@loafman.com>
+
+	502609     Unknown error while uploading duplicity-full-signatures
+
+2010-07-22  Kenneth Loafman  <kenneth@loafman.com>
+
+	567738  --ssh-options options passing options to ssh do not work
+
+2010-05-15  Michael Terry  <michael.terry@canonical.com>
+
+	support new backend-error log codes
+
+2010-03-08  Michael Terry  <mike@mterry.name>
+
+	don't crash when asked to encrypt, but not passed any gpg_options.  my bad
+
+2010-03-07  Kenneth Loafman  <kenneth@loafman.com>
+
+	#532051 rdiffdir attempts to reference undefined variables with some command arguments
+
+2010-03-07  Kenneth Loafman  <kenneth@loafman.com>
+
+	#519110 Need accurate man page info on use of scp/sftp usage.
+
+2010-03-02  Kenneth Loafman  <kenneth@loafman.com>
+
+	lp:~mterry/duplicity/use-gpg-options-0.7
+
+2010-03-02  Michael Terry  <mike@mterry.name>
+
+	use global gpg options
+
+2010-03-02  ken
+
+	lp:~mterry/duplicity/fix-gpg-options-crash-0.7
+
+2010-03-01  Michael Terry  <mike@mterry.name>
+
+	fix time command line handling
+
+2010-03-01  Michael Terry  <mike@mterry.name>
+
+	and handle initial, empty value for extend commandline actions
+
+2010-03-01  Michael Terry  <michael.terry@canonical.com>
+
+	fix crash on empty gpg-options argument
+
+2010-02-17  ken
+
+	#520470 - Don't Warn when there's old backup to delete
+
+2010-02-17  ken
+
+	Patch #505739 - "sslerror: The read operation timed out" with S3
+
+2010-02-16  ken
+
+	Patch 522544 -- OSError: [Errno 40] Too many levels of symbolic links
+
+2010-02-08  ken
+
+	Patched #497243 archive dir: cache desynchronization caused by remove*
+
+2010-02-08  ken
+
+	Merge with trunk.
+
+2010-01-18  Michael Terry  <mike@mterry.name>
+
+	logging: fix logging to files by opening them with default of 'a' not 'w'
+
+2010-01-08  Michael Terry  <mike@mterry.name>
+
+	merge lp:~mterry/duplicity/rename
+
+2010-01-08  Michael Terry  <mike@mterry.name>
+
+	make a comment reserving 255 as an error code (used by gksu)
+
+2009-12-15  Michael Terry  <michael.terry@canonical.com>
+
+	merge lp:~mterry/duplicity/optparse
+
+2009-12-14  ken
+
+	Merged in lp:~mterry/duplicity/typos
+
+2009-11-27  ken
+
+	Remove antiquated file.
+
+2009-11-27  ken
+
+	Remove requirement for GnuPGInterface, we have our own.
+
+2010-05-23  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~duplicity-team/duplicity/po-updates
+
+2010-04-23  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2010-03-21  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2010-03-12  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2010-05-23  ken
+
+	576564     username not url decoded in backend (at least rsync)
+
+2010-05-23  ken
+
+	579958     Assertion error "time not moving forward at appropriate pace"
+	
+	setcurtime() must change with time changes.
+
+2010-05-23  ken
+
+	550455  	 duplicity doesn't handle with large files well (change librsync.SigGenerator.sig_string to a list)
+
+2010-03-11  Kenneth Loafman  <kenneth@loafman.com>
+
+	Changes for 0.6.08b
+
 2010-03-11  Kenneth Loafman  <kenneth@loafman.com>
 
 	Manually apply patch from http://bazaar.launchpad.net/~duplicity-team/duplicity/0.7-series/revision/637 which did not make it into 0.6.
@@ -234,17 +388,17 @@
 
 2009-10-06  Kenneth Loafman  <kenneth@loafman.com>
 
-	Add entry for patches from Stéphane Lesimple for par2.
+	Add entry for patches from St?phane Lesimple for par2.
 
 2009-10-06  Kenneth Loafman  <kenneth@loafman.com>
 
-	Applied patch from Stéphane Lesimple found at:
+	Applied patch from St?phane Lesimple found at:
 	https://bugs.launchpad.net/duplicity/+bug/426282/comments/5
 	patch skips the par2 files when building up the sets and chains of backups
 
 2009-10-06  Kenneth Loafman  <kenneth@loafman.com>
 
-	Applied patch from Stéphane Lesimple found at:
+	Applied patch from St?phane Lesimple found at:
 	https://bugs.launchpad.net/duplicity/+bug/426282/comments/4
 	patch avoids storing all the par2 files into the local cache
 
