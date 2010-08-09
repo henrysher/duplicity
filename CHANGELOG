@@ -2,6 +2,7 @@ New in v0.6.10 (2010/08/??)
 ----------------------------
 Bugs closed in this release:
 615449     Command-line verbosity parsing crash
+613448     ftpbackend fails if target directory doesn't exist
 
 
 New in v0.6.09 (2010/07/25)
