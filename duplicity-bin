@@ -98,6 +98,7 @@ def get_passphrase(n, action):
     elif action in ["collection-status",
                     "remove-old",
                     "remove-all-but-n-full",
+                    "remove-all-inc-of-but-n-full",
                     ]:
         return ""
 
@@ -761,13 +762,18 @@ def remove_old(col_stats):
                                     "Deleting backup sets at times:",
                                     len(setlist)) +
                    "\n" + set_times_str(setlist))
-        if globals.dry_run:
-            col_stats.set_values(sig_chain_warning=None)
-        else:
-            setlist.reverse() # save oldest for last
-            for set in setlist:
-                set.delete()
-            col_stats.set_values(sig_chain_warning=None)
+        setlist.reverse() # save oldest for last
+        for set in setlist:
+            # if remove_all_inc_of_but_n_full_mode mode, remove only incrementals one and not full
+            if globals.dry_run:
+                log.Notice("(Not: dry-run) Deleting set " + set.type + " " + dup_time.timetopretty(set.get_time()))
+            else:
+                if globals.remove_all_inc_of_but_n_full_mode and (set.type != "inc") :
+                    log.Notice("Not deleting set " + set.type + " " + dup_time.timetopretty(set.get_time()))
+                else :
+                    log.Notice("Deleting set " + set.type + " " + dup_time.timetopretty(set.get_time()))
+                    set.delete()
+        col_stats.set_values(sig_chain_warning=None)
     else:
         log.Notice(gettext.ngettext("Found old backup set at the following time:",
                                     "Found old backup sets at the following times:",
@@ -1194,7 +1200,7 @@ def main():
         cleanup(col_stats)
     elif action == "remove-old":
         remove_old(col_stats)
-    elif action == "remove-all-but-n-full":
+    elif action == "remove-all-but-n-full" or action == "remove-all-inc-of-but-n-full":
         remove_all_but_n_full(col_stats)
     elif action == "sync":
         sync_archive(col_stats)
