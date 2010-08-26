@@ -41,6 +41,37 @@ class BotoBackend(duplicity.backend.Backend):
 
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
+
+        from boto.s3.key import Key
+
+        # This folds the null prefix and all null parts, which means that:
+        #  //MyBucket/ and //MyBucket are equivalent.
+        #  //MyBucket//My///My/Prefix/ and //MyBucket/My/Prefix are equivalent.
+        self.url_parts = filter(lambda x: x != '', parsed_url.path.split('/'))
+        
+        if self.url_parts:
+            self.bucket_name = self.url_parts.pop(0)
+        else:
+            # Duplicity hangs if boto gets a null bucket name.
+            # HC: Caught a socket error, trying to recover
+            raise BackendException('Boto requires a bucket name.')
+
+        self.scheme = parsed_url.scheme
+
+        self.key_class = Key
+
+        if self.url_parts:
+            self.key_prefix = '%s/' % '/'.join(self.url_parts)
+        else:
+            self.key_prefix = ''
+
+        self.straight_url = duplicity.backend.strip_auth_from_url(parsed_url)
+        self.resetConnection()
+
+    def resetConnection(self):
+        self.bucket = None
+        self.conn = None
+        
         try:
             from boto.s3.connection import S3Connection
             from boto.s3.key import Key
@@ -99,12 +130,11 @@ class BotoBackend(duplicity.backend.Backend):
             log.FatalError("This backend  (s3) requires boto library, version 0.9d or later, "
                            "(http://code.google.com/p/boto/).",
                            log.ErrorCode.boto_lib_too_old)
-
-        if parsed_url.scheme == 's3+http':
+        if self.scheme == 's3+http':
             # Use the default Amazon S3 host.
             self.conn = S3Connection()
         else:
-            assert parsed_url.scheme == 's3'
+            assert self.scheme == 's3'
             self.conn = S3Connection(host=parsed_url.hostname)
 
         if hasattr(self.conn, 'calling_format'):
@@ -116,50 +146,53 @@ class BotoBackend(duplicity.backend.Backend):
             else:
                 self.conn.calling_format = calling_format
 
-        # This folds the null prefix and all null parts, which means that:
-        #  //MyBucket/ and //MyBucket are equivalent.
-        #  //MyBucket//My///My/Prefix/ and //MyBucket/My/Prefix are equivalent.
-        self.url_parts = filter(lambda x: x != '', parsed_url.path.split('/'))
-
-        if self.url_parts:
-            self.bucket_name = self.url_parts.pop(0)
         else:
             # Duplicity hangs if boto gets a null bucket name.
             # HC: Caught a socket error, trying to recover
             raise BackendException('Boto requires a bucket name.')
 
         self.bucket = self.conn.lookup(self.bucket_name)
-        self.key_class = Key
-
-        if self.url_parts:
-            self.key_prefix = '%s/' % '/'.join(self.url_parts)
-        else:
-            self.key_prefix = ''
-
-        self.straight_url = duplicity.backend.strip_auth_from_url(parsed_url)
-
+        
     def put(self, source_path, remote_filename=None):
-        if not self.bucket:
-            if globals.s3_european_buckets:
-                if not globals.s3_use_new_style:
-                    log.FatalError("European bucket creation was requested, but not new-style "
-                                   "bucket addressing (--s3-use-new-style)",
-                                   log.ErrorCode.s3_bucket_not_style)
-                from boto.s3.connection import Location #@UnresolvedImport
-                self.bucket = self.conn.create_bucket(self.bucket_name, location = Location.EU)
-            else:
-                self.bucket = self.conn.create_bucket(self.bucket_name)
+        #Network glitch may prevent first few attempts of creating/looking up a bucket
+        for n in range(1, globals.num_retries+1):
+            if self.bucket:
+                break
+            if n > 1:
+                time.sleep(30)
+            try:       
+                if globals.s3_european_buckets:
+                    if not globals.s3_use_new_style:
+                        log.FatalError("European bucket creation was requested, but not new-style "
+                                       "bucket addressing (--s3-use-new-style)",
+                                       log.ErrorCode.s3_bucket_not_style)
+                    from boto.s3.connection import Location #@UnresolvedImport
+                    self.bucket = self.conn.create_bucket(self.bucket_name, location = Location.EU)
+                else:                    
+                    self.bucket = self.conn.create_bucket(self.bucket_name)
+            except Exception, e:
+                log.Warn("Failed to create bucket (attempt #%d) '%s' failed (reason: %s: %s)"
+                         "" % (n, self.bucket_name,
+                               e.__class__.__name__,
+                               str(e)))
+                self.resetConnection()
+                    
         if not remote_filename:
             remote_filename = source_path.get_filename()
         key = self.key_class(self.bucket)
         key.key = self.key_prefix + remote_filename
         for n in range(1, globals.num_retries+1):
             if n > 1:
-                # sleep before retry
-                time.sleep(30)
-            log.Info("Uploading %s/%s" % (self.straight_url, remote_filename))
+                # sleep before retry (new connection to a **hopeful** new host, so no need to wait so long)
+                time.sleep(10)
+                
+            log.Info("Uploading %s/%s to %s Storage" % (self.straight_url, remote_filename, 
+                                                        'REDUCED_REDUNDANCY' if globals.s3_use_rrs else 'STANDARD'))
             try:
-                key.set_contents_from_filename(source_path.name, {'Content-Type': 'application/octet-stream'})
+                key.set_contents_from_filename(source_path.name, {'Content-Type': 'application/octet-stream', 
+                                              'x-amz-storage-class': 'REDUCED_REDUNDANCY' if globals.s3_use_rrs else 'STANDARD'})
+                key.close()
+                self.resetConnection()
                 return
             except Exception, e:
                 log.Warn("Upload '%s/%s' failed (attempt #%d, reason: %s: %s)"
@@ -169,6 +202,7 @@ class BotoBackend(duplicity.backend.Backend):
                                e.__class__.__name__,
                                str(e)))
                 log.Debug("Backtrace of previous error: %s" % (exception_traceback(),))
+                self.resetConnection()
         log.Warn("Giving up trying to upload %s/%s after %d attempts" %
                  (self.straight_url, remote_filename, globals.num_retries))
         raise BackendException("Error uploading %s/%s" % (self.straight_url, remote_filename))
@@ -178,12 +212,13 @@ class BotoBackend(duplicity.backend.Backend):
         key.key = self.key_prefix + remote_filename
         for n in range(1, globals.num_retries+1):
             if n > 1:
-                # sleep before retry
-                time.sleep(30)
+                # sleep before retry (new connection to a **hopeful** new host, so no need to wait so long)
+                time.sleep(10)
             log.Info("Downloading %s/%s" % (self.straight_url, remote_filename))
             try:
                 key.get_contents_to_filename(local_path.name)
                 local_path.setdata()
+                self.resetConnection()
                 return
             except Exception, e:
                 log.Warn("Download %s/%s failed (attempt #%d, reason: %s: %s)"
@@ -193,6 +228,7 @@ class BotoBackend(duplicity.backend.Backend):
                                e.__class__.__name__,
                                str(e)), 1)
                 log.Debug("Backtrace of previous error: %s" % (exception_traceback(),))
+                self.resetConnection()
         log.Warn("Giving up trying to download %s/%s after %d attempts" %
                 (self.straight_url, remote_filename, globals.num_retries))
         raise BackendException("Error downloading %s/%s" % (self.straight_url, remote_filename))

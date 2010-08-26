@@ -243,19 +243,24 @@ class ParsedUrl:
             self.password = pu.password
         except:
             raise InvalidBackendURL("Syntax error (password) in: %s" % url_string)
+        if self.password:
+            self.password = urllib.unquote(self.password)
+        else:
+            self.password = None
 
         try:
             self.hostname = pu.hostname
         except:
             raise InvalidBackendURL("Syntax error (hostname) in: %s" % url_string)
 
-        if self.scheme not in ['rsync']:
-            try:
-                self.port = pu.port
-            except:
-                raise InvalidBackendURL("Syntax error (port) in: %s" % url_string)
-        else:
-            self.port = None
+        # init to None, overwrite with actual value on success
+        self.port = None
+        try:
+            self.port = pu.port
+        except:
+            # old style rsync://host::[/]dest, are still valid, though they contain no port
+            if not ( self.scheme in ['rsync'] and re.search('::[^:]*$', self.url_string)):
+                raise InvalidBackendURL("Syntax error (port) in: %s A%s B%s C%s" % (url_string, (self.scheme in ['rsync']), re.search('::[^:]+$', self.netloc), self.netloc ) )
 
         # This happens for implicit local paths.
         if not pu.scheme:
@@ -328,6 +333,9 @@ class Backend:
         """
         raise NotImplementedError()
 
+    """ use getpass by default, inherited backends may overwrite this behaviour """
+    use_getpass = True
+
     def get_password(self):
         """
         Return a password for authentication purposes. The password
@@ -341,8 +349,12 @@ class Backend:
         try:
             password = os.environ['FTP_PASSWORD']
         except KeyError:
-            password = getpass.getpass("Password for '%s': " % self.parsed_url.hostname)
-            os.environ['FTP_PASSWORD'] = password
+            if self.use_getpass:
+                password = getpass.getpass("Password for '%s@%s': " %
+                                           (self.parsed_url.username,self.parsed_url.hostname) )
+                os.environ['FTP_PASSWORD'] = password
+            else:
+                password = None
         return password
 
     def munge_password(self, commandline):
@@ -360,76 +372,78 @@ class Backend:
         else:
             return commandline
 
+    """
+    DEPRECATED:
+    run_command(_persist) - legacy wrappers for subprocess_popen(_persist)
+    """
     def run_command(self, commandline):
-        """
-        Execute the given command line, interpreted as a shell
-        command, with logging and error detection. If execution fails,
-        raise a BackendException.
-        """
-        private = self.munge_password(commandline)
-        log.Info(_("Running '%s'") % private)
-        if os.system(commandline):
-            raise BackendException("Error running '%s'" % private)
-
+        return self.subprocess_popen(commandline)
     def run_command_persist(self, commandline):
-        """
-        Like run_command(), but repeat the attempt several times (with
-        a delay in between) if it fails.
-        """
-        private = self.munge_password(commandline)
-        for n in range(1, globals.num_retries+1):
-            if n > 1:
-                # sleep before retry
-                time.sleep(30)
-            log.Info(gettext.ngettext("Running '%s' (attempt #%d)",
-                                      "Running '%s' (attempt #%d)", n) %
-                                      (private, n))
-            if not os.system(commandline):
-                return
-            log.Warn(gettext.ngettext("Running '%s' failed (attempt #%d)",
-                                      "Running '%s' failed (attempt #%d)", n) %
-                                      (private, n), 1)
-        log.Warn(gettext.ngettext("Giving up trying to execute '%s' after %d attempt",
-                                 "Giving up trying to execute '%s' after %d attempts",
-                                 globals.num_retries) % (private, globals.num_retries))
-        raise BackendException("Error running '%s'" % private)
+        return self.subprocess_popen_persist(commandline)
 
+    """
+    DEPRECATED:
+    popen(_persist) - legacy wrappers for subprocess_popen(_persist)
+    """
     def popen(self, commandline):
+        result, stdout, stderr = self.subprocess_popen(commandline)
+        return stdout
+    def popen_persist(self, commandline):
+        result, stdout, stderr = self.subprocess_popen_persist(commandline)
+        return stdout
+
+    def _subprocess_popen(self, commandline):
         """
-        Like run_command(), but capture stdout and return it (the
-        contents read from stdout) as a string.
+        For internal use.
+        Execute the given command line, interpreted as a shell command.
+        Returns int Exitcode, string StdOut, string StdErr
+        """
+        from subprocess import Popen, PIPE
+        p = Popen(commandline, shell=True, stdout=PIPE, stderr=PIPE)
+        stdout, stderr = p.communicate()
+
+        return p.returncode, stdout, stderr
+
+    def subprocess_popen(self, commandline):
+        """
+        Execute the given command line with error check.
+        Returns int Exitcode, string StdOut, string StdErr
+
+        Raise a BackendException on failure.
         """
         private = self.munge_password(commandline)
         log.Info(_("Reading results of '%s'") % private)
-        fout = os.popen(commandline)
-        results = fout.read()
-        if fout.close():
+        result, stdout, stderr = self._subprocess_popen(commandline)
+        if result != 0:
             raise BackendException("Error running '%s'" % private)
-        return results
+        return result, stdout, stderr
 
-    def popen_persist(self, commandline):
+    def subprocess_popen_persist(self, commandline):
         """
-        Like run_command_persist(), but capture stdout and return it
-        (the contents read from stdout) as a string.
+        Execute the given command line with error check.
+        Retries globals.num_retries times with 30s delay.
+        Returns int Exitcode, string StdOut, string StdErr
+
+        Raise a BackendException on failure.
         """
         private = self.munge_password(commandline)
         for n in range(1, globals.num_retries+1):
+            # sleep before retry
             if n > 1:
-                # sleep before retry
                 time.sleep(30)
             log.Info(_("Reading results of '%s'") % private)
-            fout = os.popen(commandline)
-            results = fout.read()
-            result_status = fout.close()
-            if not result_status:
-                return results
-            elif result_status == 1280 and self.parsed_url.scheme == 'ftp':
+            result, stdout, stderr = self._subprocess_popen(commandline)
+            if result == 0:
+                return result, stdout, stderr
+            elif result == 1280 and self.parsed_url.scheme == 'ftp':
                 # This squelches the "file not found" result fromm ncftpls when
                 # the ftp backend looks for a collection that does not exist.
                 return ''
             log.Warn(gettext.ngettext("Running '%s' failed (attempt #%d)",
                                      "Running '%s' failed (attempt #%d)", n) %
                                       (private, n))
+            if stdout or stderr:
+                log.Warn(_("Error is:\n%s") % stderr + (stderr and stdout and "\n") + stdout)
         log.Warn(gettext.ngettext("Giving up trying to execute '%s' after %d attempt",
                                   "Giving up trying to execute '%s' after %d attempts",
                                   globals.num_retries) % (private, globals.num_retries))

@@ -1,3 +1,18 @@
+New in v0.6.09 (2010/07/25)
+----------------------------
+Bugs closed in this release:
+502609     Unknown error while uploading duplicity-full-signatures
+539393     Duplicity returns 1 when continuing an interrupted backup
+550455     duplicity doesn't handle with large files well
+567738     --ssh-options options passing options to ssh do not work
+576564     username not url decoded in backend (at least rsync)
+579958     Assertion error "time not moving forward at appropriate pace"
+582962     Diminishing performance on large files
+
+Upgraded tahoebackend to new parse_url.
+Fix to warning message in sshbackend.
+
+
 New in v0.6.08b (2010/03/11)
 ----------------------------
 Fix bug where encrypted backup without --gpg-options crashes.

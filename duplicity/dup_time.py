@@ -63,7 +63,7 @@ the day).""")
 def setcurtime(time_in_secs = None):
     """Sets the current time in curtime and curtimestr"""
     global curtime, curtimestr
-    t = time_in_secs or curtime or long(time.time()) # only set from NOW once
+    t = time_in_secs or long(time.time())
     assert type(t) in (types.LongType, types.IntType)
     curtime, curtimestr = t, timetostring(t)
 

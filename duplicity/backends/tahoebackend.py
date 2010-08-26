@@ -32,7 +32,7 @@ class TAHOEBackend(duplicity.backend.Backend):
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
 
-        url = parsed_url[2].strip('///').split('/')
+        url = parsed_url.path.strip('/').split('/')
 
         self.alias = url[0]
 

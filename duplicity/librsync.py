@@ -186,7 +186,7 @@ class SigGenerator:
             raise librsyncError(str(e))
         self.gotsig = None
         self.buffer = ""
-        self.sig_string = ""
+        self.sigstring_list = []
 
     def update(self, buf):
         """Add buf to data that signature will be calculated over"""
@@ -204,12 +204,12 @@ class SigGenerator:
         except _librsync.librsyncError, e:
             raise librsyncError(str(e))
         self.buffer = self.buffer[len_buf_read:]
-        self.sig_string += cycle_out
+        self.sigstring_list.append(cycle_out)
         return eof
 
     def getsig(self):
         """Return signature over given data"""
         while not self.process_buffer():
             pass # keep running until eof
-        return self.sig_string
+        return ''.join(self.sigstring_list)
 
