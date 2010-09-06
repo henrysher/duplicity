@@ -66,6 +66,7 @@ class BotoBackend(duplicity.backend.Backend):
             self.key_prefix = ''
 
         self.straight_url = duplicity.backend.strip_auth_from_url(parsed_url)
+        self.parsed_url = parsed_url
         self.resetConnection()
 
     def resetConnection(self):
@@ -135,7 +136,7 @@ class BotoBackend(duplicity.backend.Backend):
             self.conn = S3Connection()
         else:
             assert self.scheme == 's3'
-            self.conn = S3Connection(host=parsed_url.hostname)
+            self.conn = S3Connection(host=self.parsed_url.hostname)
 
         if hasattr(self.conn, 'calling_format'):
             if calling_format is None:
