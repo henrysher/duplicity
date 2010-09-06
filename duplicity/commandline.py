@@ -313,6 +313,7 @@ def parse_cmdline_options(arglist):
     # circumstances. the default should absolutely always be False unless
     # you know what you are doing.
     parser.add_option("--ignore-errors", action="callback",
+                      dest="ignore_errors",
                       callback=lambda o, s, v, p: (log.Warn(
                           _("Running in 'ignore errors' mode due to %s; please "
                             "re-consider if this was not intended") % s),
@@ -369,6 +370,7 @@ def parse_cmdline_options(arglist):
 
     # Whether the old filename format is in effect.
     parser.add_option("--old-filenames", action="callback",
+                      dest="old_filenames",
                       callback=lambda o, s, v, p: (setattr(p.values, o.dest, True),
                                                    old_fn_deprecation(s)))
 
@@ -404,6 +406,7 @@ def parse_cmdline_options(arglist):
 
     # If set, use short (< 30 char) filenames for all the remote files.
     parser.add_option("--short-filenames", action="callback",
+                      dest="short_filenames",
                       callback=lambda o, s, v, p: (setattr(p.values, o.dest, True),
                                                    old_fn_deprecation(s)))
 
