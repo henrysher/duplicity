@@ -317,7 +317,7 @@ def parse_cmdline_options(arglist):
                       callback=lambda o, s, v, p: (log.Warn(
                           _("Running in 'ignore errors' mode due to %s; please "
                             "re-consider if this was not intended") % s),
-                          setattr(p.values, o.dest, True)))
+                          setattr(p.values, "ignore errors", True)))
 
     # Whether to use the full email address as the user name when
     # logging into an imap server. If false just the user name
