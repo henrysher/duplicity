@@ -48,7 +48,7 @@ class BotoBackend(duplicity.backend.Backend):
         #  //MyBucket/ and //MyBucket are equivalent.
         #  //MyBucket//My///My/Prefix/ and //MyBucket/My/Prefix are equivalent.
         self.url_parts = filter(lambda x: x != '', parsed_url.path.split('/'))
-        
+
         if self.url_parts:
             self.bucket_name = self.url_parts.pop(0)
         else:
@@ -72,7 +72,7 @@ class BotoBackend(duplicity.backend.Backend):
     def resetConnection(self):
         self.bucket = None
         self.conn = None
-        
+
         try:
             from boto.s3.connection import S3Connection
             from boto.s3.key import Key
@@ -153,7 +153,7 @@ class BotoBackend(duplicity.backend.Backend):
             raise BackendException('Boto requires a bucket name.')
 
         self.bucket = self.conn.lookup(self.bucket_name)
-        
+
     def put(self, source_path, remote_filename=None):
         #Network glitch may prevent first few attempts of creating/looking up a bucket
         for n in range(1, globals.num_retries+1):
@@ -161,7 +161,7 @@ class BotoBackend(duplicity.backend.Backend):
                 break
             if n > 1:
                 time.sleep(30)
-            try:       
+            try:
                 if globals.s3_european_buckets:
                     if not globals.s3_use_new_style:
                         log.FatalError("European bucket creation was requested, but not new-style "
@@ -169,7 +169,7 @@ class BotoBackend(duplicity.backend.Backend):
                                        log.ErrorCode.s3_bucket_not_style)
                     from boto.s3.connection import Location #@UnresolvedImport
                     self.bucket = self.conn.create_bucket(self.bucket_name, location = Location.EU)
-                else:                    
+                else:
                     self.bucket = self.conn.create_bucket(self.bucket_name)
             except Exception, e:
                 log.Warn("Failed to create bucket (attempt #%d) '%s' failed (reason: %s: %s)"
@@ -177,7 +177,7 @@ class BotoBackend(duplicity.backend.Backend):
                                e.__class__.__name__,
                                str(e)))
                 self.resetConnection()
-                    
+
         if not remote_filename:
             remote_filename = source_path.get_filename()
         key = self.key_class(self.bucket)
@@ -186,12 +186,15 @@ class BotoBackend(duplicity.backend.Backend):
             if n > 1:
                 # sleep before retry (new connection to a **hopeful** new host, so no need to wait so long)
                 time.sleep(10)
-                
-            log.Info("Uploading %s/%s to %s Storage" % (self.straight_url, remote_filename, 
-                                                        'REDUCED_REDUNDANCY' if globals.s3_use_rrs else 'STANDARD'))
+
+            if globals.s3_use_rrs:
+                storage_class = 'REDUCED_REDUNDANCY'
+            else:
+                storage_class = 'STANDARD'
+            log.Info("Uploading %s/%s to %s Storage" % (self.straight_url, remote_filename, storage_class))
             try:
-                key.set_contents_from_filename(source_path.name, {'Content-Type': 'application/octet-stream', 
-                                              'x-amz-storage-class': 'REDUCED_REDUNDANCY' if globals.s3_use_rrs else 'STANDARD'})
+                key.set_contents_from_filename(source_path.name, {'Content-Type': 'application/octet-stream',
+                                                                  'x-amz-storage-class': storage_class})
                 key.close()
                 self.resetConnection()
                 return
