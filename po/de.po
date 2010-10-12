@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-10-06 16:02+0000\n"
-"PO-Revision-Date: 2010-10-06 09:21+0000\n"
+"PO-Revision-Date: 2010-10-11 12:31+0000\n"
 "Last-Translator: cmdrhenner <cmdrhenner@gmail.com>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-10-08 04:40+0000\n"
+"X-Launchpad-Export-Date: 2010-10-12 04:53+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../duplicity-bin:191
@@ -152,14 +152,14 @@ msgstr "Keine alten Backups gefunden, nichts gelöscht."
 #: ../duplicity-bin:761
 msgid "Deleting backup set at time:"
 msgid_plural "Deleting backup sets at times:"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Lösche Sicherungssatz zum Zeitpunkt:"
+msgstr[1] "Lösche Sicherungssätze zu den Zeitpunkten:"
 
 #: ../duplicity-bin:778
 msgid "Found old backup set at the following time:"
 msgid_plural "Found old backup sets at the following times:"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Alten Sicherungssatz zum folgenden Zeitpunkt gefunden:"
+msgstr[1] "Alte Sicherungssätze zu den folgenden Zeitpunkten gefunden:"
 
 #: ../duplicity-bin:782
 msgid "Rerun command with --force option to actually delete."
@@ -169,7 +169,7 @@ msgstr ""
 #: ../duplicity-bin:865
 #, python-format
 msgid "Deleting local %s (not authoritative at backend)."
-msgstr ""
+msgstr "Lösche lokal %s (im Backend nicht mehr vorhanden)."
 
 #: ../duplicity-bin:890 ../duplicity/dup_temp.py:239
 #, python-format
@@ -264,7 +264,7 @@ msgstr ""
 
 #: ../duplicity-bin:1181
 msgid "Last full backup date:"
-msgstr ""
+msgstr "Letzte vollständige Sicherung:"
 
 #: ../duplicity-bin:1183
 msgid "Last full backup date: none"
@@ -278,7 +278,7 @@ msgstr ""
 #: ../duplicity-bin:1259
 #, python-format
 msgid "GPG error detail: %s"
-msgstr ""
+msgstr "GPG Fehler-Detail: %s"
 
 #: ../duplicity-bin:1268
 #, python-format
