@@ -396,6 +396,10 @@ def parse_cmdline_options(arglist):
     # that are otherwise not expressable in a valid hostname.
     parser.add_option("--s3-use-new-style", action="store_true")
 
+    # Whether to use plain HTTP (without SSL) to send data to S3
+    # See <https://bugs.launchpad.net/duplicity/+bug/433970>.
+    parser.add_option("--s3-unencrypted-connection", action="store_true")
+
     # scp command to use
     # TRANSL: noun
     parser.add_option("--scp-command", metavar=_("command"))
