@@ -1,3 +1,8 @@
+New in v0.6.11 (2010/??/??)
+----------------------------
+637556     os.execve should get passed program as first argument
+
+
 New in v0.6.10 (2010/09/19)
 ----------------------------
 Bugs closed in this release:
