@@ -143,14 +143,15 @@ class SSHBackend(duplicity.backend.Backend):
 
     def run_sftp_command(self, commandline, commands):
         """ Run an sftp command, responding to password prompts, passing commands from list """
-        maxread = 2000 # expect read buffer size
+        maxread = 2000 # expected read buffer size
         responses = [pexpect.EOF,
                      "(?i)timeout, server not responding",
                      "sftp>",
                      "(?i)pass(word|phrase .*):",
                      "(?i)permission denied",
                      "authenticity",
-                     "(?i)no such file or directory"]
+                     "(?i)no such file or directory",
+                     "Couldn't delete file"]
         max_response_len = max([len(p) for p in responses[1:]])
         for n in range(1, globals.num_retries+1):
             if n > 1:
@@ -188,6 +189,9 @@ class SSHBackend(duplicity.backend.Backend):
                     break
                 elif match == 6:
                     log.Warn("Remote file or directory does not exist in command='%s'" % (commandline,))
+                    break
+                elif match == 7:
+                    log.Warn("Could not delete file in command='%s'" % (commandline,))
                     break
             child.close(force = True)
             if child.exitstatus == 0:
