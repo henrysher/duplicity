@@ -2,6 +2,7 @@ New in v0.6.11 (2010/??/??)
 ----------------------------
 637556     os.execve should get passed program as first argument
 669225     sftp: "Couldn't delete file: Failure'" only logged on level 9
+674506     RsyncBackend instance has no attribute 'subprocess_popen_persist'
 
 Merges:
 lp:~l2g/duplicity/use-py.test
@@ -9,6 +10,7 @@ lp:~blueyed/duplicity/bug-669225
 lp:~duplicity-team/duplicity/po-updates
 lp:~ed.so/duplicity/sign_symmetric2
 lp:~ed.so/duplicity/survive_spaces
+lp:~ed.so/duplicity/0.6.10-backend_fixes
 
 
 New in v0.6.10 (2010/09/19)

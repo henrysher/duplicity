@@ -80,7 +80,7 @@ class RsyncBackend(duplicity.backend.Backend):
         if self.over_rsyncd():
             self.cmd = "rsync%s" % port
         else:
-            self.cmd = "rsync -e 'ssh%s'" % port
+            self.cmd = "rsync -e 'ssh -oBatchMode=yes%s'" % port
 
     def over_rsyncd(self):
         url = self.parsed_url.url_string
@@ -95,7 +95,7 @@ class RsyncBackend(duplicity.backend.Backend):
         if m:
             return m.group(2), m.group(1).lstrip(':')
         raise InvalidBackendURL("Could not determine rsync path: %s"
-                                    "" % (self.parsed_url.url_string))
+                                    "" % self.munge_password( url ) )
 
     def run_command(self, commandline):
         result, stdout, stderr = self.subprocess_popen_persist(commandline)

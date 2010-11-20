@@ -62,6 +62,11 @@ class FTPBackend(duplicity.backend.Backend):
 
         self.url_string = duplicity.backend.strip_auth_from_url(self.parsed_url)
 
+        # This squelches the "file not found" result from ncftpls when
+        # the ftp backend looks for a collection that does not exist.
+        # version 3.2.2 has error code 5, 1280 is some legacy value
+        self.popen_persist_breaks[ 'ncftpls' ] = [ 5, 1280 ]
+
         # Use an explicit directory name.
         if self.url_string[-1] != '/':
             self.url_string += '/'
