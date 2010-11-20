@@ -106,17 +106,17 @@ class GPGFile:
             for opt in globals.gpg_options.split():
                 gnupg.options.extra_args.append(opt)
 
+        cmdlist = []
         if profile.sign_key:
             gnupg.options.default_key = profile.sign_key
+            cmdlist.append("--sign")
 
         if encrypt:
             if profile.recipients:
                 gnupg.options.recipients = profile.recipients
-                cmdlist = ['--encrypt']
-                if profile.sign_key:
-                    cmdlist.append("--sign")
+                cmdlist.append('--encrypt')
             else:
-                cmdlist = ['--symmetric']
+                cmdlist.append('--symmetric')
                 # use integrity protection
                 gnupg.options.extra_args.append('--force-mdc')
             p1 = gnupg.run(cmdlist, create_fhs=['stdin', 'passphrase'],
