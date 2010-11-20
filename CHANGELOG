@@ -1,9 +1,11 @@
 New in v0.6.11 (2010/??/??)
 ----------------------------
 637556     os.execve should get passed program as first argument
+669225     sftp: "Couldn't delete file: Failure'" only logged on level 9
 
 Merges:
 lp:~l2g/duplicity/use-py.test
+lp:~blueyed/duplicity/bug-669225
 
 
 New in v0.6.10 (2010/09/19)
