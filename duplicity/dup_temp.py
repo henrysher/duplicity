@@ -179,7 +179,7 @@ class FileobjHooked:
         elif pr.encrypted:
             gpg.GPGWriteFile(src_iter, tgt.name, globals.gpg_profile, size = sys.maxint)
         else:
-            os.system("cp -p %s %s" % (src.name, tgt.name))
+            os.system("cp -p \"%s\" \"%s\"" % (src.name, tgt.name))
         globals.backend.put(tgt) #@UndefinedVariable
         os.unlink(tgt.name)
 

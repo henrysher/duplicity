@@ -8,6 +8,7 @@ lp:~l2g/duplicity/use-py.test
 lp:~blueyed/duplicity/bug-669225
 lp:~duplicity-team/duplicity/po-updates
 lp:~ed.so/duplicity/sign_symmetric2
+lp:~ed.so/duplicity/survive_spaces
 
 
 New in v0.6.10 (2010/09/19)
