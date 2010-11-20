@@ -1,4 +1,4 @@
-New in v0.6.11 (2010/??/??)
+New in v0.6.11 (2010/11/20)
 ----------------------------
 433970     Add an option to connect to S3 with regular HTTP (and not HTTPS)
 578663     Use log codes for common backend errors
