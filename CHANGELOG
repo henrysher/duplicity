@@ -1,19 +1,22 @@
 New in v0.6.11 (2010/??/??)
 ----------------------------
+433970     Add an option to connect to S3 with regular HTTP (and not HTTPS)
+578663     Use log codes for common backend errors
+631275     missing ssh on rsyncd url - rsync: Failed to exec ssh: ...
+635494     backed up to S3, wiped drive, reinstalled, unable to restore backup
 637556     os.execve should get passed program as first argument
 669225     sftp: "Couldn't delete file: Failure'" only logged on level 9
+655468     0.6.10 does not work with S3
 674506     RsyncBackend instance has no attribute 'subprocess_popen_persist'
-631275     missing ssh on rsyncd url - rsync: Failed to exec ssh: ...
-433970     Add an option to connect to S3 with regular HTTP (and not HTTPS)
 
 Merges:
-lp:~l2g/duplicity/use-py.test
 lp:~blueyed/duplicity/bug-669225
 lp:~duplicity-team/duplicity/po-updates
-lp:~ed.so/duplicity/sign_symmetric2
-lp:~ed.so/duplicity/survive_spaces
 lp:~ed.so/duplicity/0.6.10-backend_fixes
 lp:~ed.so/duplicity/RSYNC_RSH-fix
+lp:~ed.so/duplicity/sign_symmetric2
+lp:~ed.so/duplicity/survive_spaces
+lp:~l2g/duplicity/use-py.test
 lp:~mbp/duplicity/433970-non-ssl
 
 

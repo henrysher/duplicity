@@ -1,3 +1,264 @@
+2010-11-20  Kenneth Loafman  <kenneth@loafman.com>
+
+	433970 Add an option to connect to S3 with regular HTTP (and not HTTPS)
+
+2010-10-13  Martin Pool  <mbp@sourcefrog.net>
+
+	Add --s3-unencrypted-connection (bug 433970)
+
+2010-11-20  Kenneth Loafman  <kenneth@loafman.com>
+
+	631275 missing ssh on rsyncd url - rsync: Failed to exec ssh: ...
+
+2010-11-20  ed  <edgar.soldin@web.de>
+
+	solve bug 631275
+	rsync 3.0.7 persists on either rsync:// _or_ :: module notation
+	both together and it interpretes it as a dest for rsh
+
+2010-11-13  ed  <edgar.soldin@web.de>
+
+	protect rsync from possibly conflicting remote shell environment setting
+
+2010-11-20  Kenneth Loafman  <kenneth@loafman.com>
+
+	674506 RsyncBackend instance has no attribute 'subprocess_popen_persist'.
+
+2010-11-12  ed  <edgar.soldin@web.de>
+
+	restored
+	backend:subprocess_popen_* methods
+	moved ncftpls workaround into ftpbackend
+	introduced new backend:popen_persist_breaks setting for such workarounds
+	enhanced backend:munge_password
+	rsyncbackend: rsync over ssh does not ask for password (only keyauth supported)
+
+2010-11-20  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged lp:~ed.so/duplicity/survive_spaces.
+
+2010-11-12  ed  <edgar.soldin@web.de>
+
+	survive spaces in path on local copying with encryption enabled
+
+2010-11-20  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged lp:~ed.so/duplicity/sign_symmetric2.
+
+2010-11-12  ed  <edgar.soldin@web.de>
+
+	allow signing of symmetric encryption
+
+2010-11-20  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged lp:~duplicity-team/duplicity/po-updates.
+
+2010-10-24  Launchpad Translations on behalf of duplicity-team
+
+	Launchpad automatic translations update.
+
+2010-10-12  Launchpad Translations on behalf of duplicity-team
+
+	Launchpad automatic translations update.
+
+2010-10-08  Launchpad Translations on behalf of duplicity-team
+
+	Launchpad automatic translations update.
+
+2010-09-20  duplicity-team  <duplicity-team@lists.launchpad.net>
+
+	Launchpad automatic translations update.
+
+2010-07-24  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2010-05-24  Launchpad Code Hosting  <codehost@crowberry>
+
+	Launchpad automatic translations update.
+
+2010-11-20  Kenneth Loafman  <kenneth@loafman.com>
+
+	669225 sftp: Couldnt delete file: Failure only logged on level 9.
+
+2010-11-05  Daniel Hahler  <ubuntu-launchpad@thequod.de>
+
+	Catch "Couldn't delete file" response in sftp commands.
+
+2010-11-20  Kenneth Loafman  <kenneth@loafman.com>
+
+	Fix CHANGELOG.
+
+2010-06-29  Toma? Muraus  <kami@k5-storitve.net>
+
+	When using listmatch filenames are now unqouted so colons and other special characters don't cause problems.
+	
+	Also all the tests now pass.
+
+2010-06-27  Toma? Muraus  <kami@k5-storitve.net>
+
+	Added test for SpiderOak backend (it should probably just fail in most cases since the API is still very unstable).
+
+2010-06-22  Toma? Muraus  <kami@k5-storitve.net>
+
+	Add ability to retry failed commands.
+
+2010-06-22  Toma? Muraus  <kami@k5-storitve.net>
+
+	Handle exceptions when listing files and display coresponding HTTP status code on HTTPError exception
+
+2010-06-22  Toma? Muraus  <kami@k5-storitve.net>
+
+	First version of SpiderOak DIY backend.
+	
+	Still very rough and needs tests.
+
+2010-05-26  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged lp:~mterry/duplicity/backend-log-codes2
+
+2010-05-26  Michael Terry  <mike@mterry.name>
+
+	support new backend-error log codes
+
+2010-05-24  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merge changes from 0.6-series.
+
+2010-11-20  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~l2g/duplicity/use-py.test
+
+2009-09-21  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	Adding conftest.py for py.test configuration hooks (right now just setting
+	up temporary directories)
+
+2009-09-20  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	Use py.path to simplify a little
+
+2009-09-20  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	Don't try to change dirs in cleanup_test_files for now. Actually, this file probably won't be here much longer.
+
+2009-09-20  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	Criss-cross merge. 'Scuse my mess.
+
+2009-09-19  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	trunk merge
+
+2009-09-20  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	Fix non-root-based test skipping
+
+2009-09-19  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	Expose test files' root directory as config.test_root
+
+2009-09-19  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	New helper module for tests; have backendtest.py make use of it
+
+2009-09-19  Larry Gilbert  <larry+launchpad@l2g.to>
+
+	I think these are all my own changes, not a trunk merge. Sorry for confusion.
+
+2009-09-17  Larry Gilbert  <larry+launchpad@L2G.to>
+
+	Refactored.  Put in py.test.skip to skip tests when tarfile can't be used.
+
+2009-09-17  Larry Gilbert  <larry+launchpad@L2G.to>
+
+	commit.py already adjusts sys.path, so anything that imports commit doesn't
+	need to
+
+2009-09-16  Larry Gilbert  <larry+launchpad@L2G.to>
+
+	Allow testing/config.py to find duplicity even when run outside testing/.
+	Added a missing import.
+
+2010-10-25  Kenneth Loafman  <kenneth@loafman.com>
+
+	637556     os.execve should get passed program as first argument
+
+2010-10-06  Kenneth Loafman  <kenneth@loafman.com>
+
+	Delete duplicity.spec -- autocreated.
+
+2010-09-19  Kenneth Loafman  <kenneth@loafman.com>
+
+	Changes for 0.6.10.
+
+2010-10-06  Kenneth Loafman  <kenneth@loafman.com>
+
+	Replace ternary operator with simple if statement.  Python 2.4 does not support the ternary operator.
+
+2010-10-06  Kenneth Loafman  <kenneth@loafman.com>
+
+	Upgrade setup dependency to Python 2.4 or later.
+
+2010-09-19  Kenneth Loafman  <kenneth@loafman.com>
+
+	Changes for 0.6.10.
+
+2010-09-06  Kenneth Loafman  <kenneth@loafman.com>
+
+	612714     NameError: global name 'parsed_url' is not defined
+
+2010-09-06  Kenneth Loafman  <kenneth@loafman.com>
+
+	589495     duplicity --short-filenames crashes with TypeError
+
+2010-09-06  Kenneth Loafman  <kenneth@loafman.com>
+
+	589495     duplicity --short-filenames crashes with TypeError
+
+2010-08-26  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~olivierberger/+junk/dupl-542482
+
+2010-08-26  olivier  <olivier@asustour>
+
+	merge with latest release upstream : 0.6.09
+
+2010-05-16  olivier  <olivier@asustour>
+
+	Fix remove-older-than which would no longer work
+	Differentiate the function name from global option name for remove_all_but_n_full
+
+2010-03-29  olivier  <olivier@asustour>
+
+	Added bits of manpage
+
+2010-03-29  olivier  <olivier@asustour>
+
+	Adding the remove-all-inc-of-but-n-full variant to
+	remove_all_but_n_full() : remove only incremental sets from a backup
+	chain selected as older than the n last full
+
+2010-03-29  olivier  <olivier@asustour>
+
+	Adding the 2 new remove-all-but commands as global markers
+
+2010-03-29  olivier  <olivier@asustour>
+
+	Adding new remove-all-inc-of-but-n-full command as a variant of remove-all-but-n-full
+
+2010-03-29  olivier  <olivier@asustour>
+
+	Fix small typo in comments
+
+2010-08-09  Kenneth Loafman  <kenneth@loafman.com>
+
+	613448     ftpbackend fails if target directory doesn't exist
+
+2010-08-09  Kenneth Loafman  <kenneth@loafman.com>
+
+	615449     Command-line verbosity parsing crash
+
 2010-07-28  Kenneth Loafman  <kenneth@loafman.com>
 
 	Man page improvements and clarification.
@@ -138,7 +399,7 @@
 
 	576564     username not url decoded in backend (at least rsync)
 
-2010-05-23  ken
+2010-05-23  Kenneth Loafman  <kenneth@loafman.com>
 
 	579958     Assertion error "time not moving forward at appropriate pace"
 	
