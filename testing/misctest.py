@@ -21,7 +21,6 @@
 
 import config
 import sys, os, unittest, cStringIO
-sys.path.insert(0, "../")
 
 from duplicity import misc
 

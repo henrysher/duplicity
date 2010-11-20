@@ -20,12 +20,19 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import sys, os
-sys.path.insert(0, "../")
+from os import path
+
+# Save the absolute path of the directory where this module is
+test_root = path.abspath( path.join( path.realpath(__file__), path.pardir ))
+
+# Find the duplicity modules under test
+sys.path.insert(0, path.join(test_root, path.pardir))
 
 import gettext
 gettext.install('duplicity')
 
 from duplicity import globals
+from duplicity import backend
 from duplicity import log
 
 # config for duplicity unit tests
