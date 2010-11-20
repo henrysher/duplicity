@@ -39,11 +39,12 @@ class RsyncBackend(duplicity.backend.Backend):
         duplicity.backend.Backend.__init__(self, parsed_url)
         """
         rsyncd module url: rsync://[user:password@]host[:port]::[/]modname/path
-                      cmd: rsync [--port=port] rsync://host::/modname/path
+                      Note: 3.0.7 is picky about syntax use either 'rsync://' or '::'
+                      cmd: rsync [--port=port] host::modname/path
         -or-
         rsync via ssh/rsh url: rsync://user@host[:port]://some_absolute_path
              -or-              rsync://user@host[:port]:/some_relative_path
-                          cmd: rsync 'ssh [-p=port]' [user@]host:[/]path
+                          cmd: rsync -e 'ssh [-p=port]' [user@]host:[/]path
         """
         host = parsed_url.hostname
         port = ""
@@ -52,7 +53,7 @@ class RsyncBackend(duplicity.backend.Backend):
         if self.over_rsyncd():
             # its a module path
             (path, port) = self.get_rsync_path()
-            self.url_string = "rsync://%s::/%s" % (host, path.lstrip('/:'))
+            self.url_string = "%s::%s" % (host, path.lstrip('/:'))
             if port:
                 port = " --port=%s" % port
         else:
