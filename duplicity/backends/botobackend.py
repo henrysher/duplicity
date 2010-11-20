@@ -133,10 +133,12 @@ class BotoBackend(duplicity.backend.Backend):
                            log.ErrorCode.boto_lib_too_old)
         if self.scheme == 's3+http':
             # Use the default Amazon S3 host.
-            self.conn = S3Connection()
+            self.conn = S3Connection(is_secure=(not globals.s3_unencrypted_connection))
         else:
             assert self.scheme == 's3'
-            self.conn = S3Connection(host=self.parsed_url.hostname)
+            self.conn = S3Connection(
+                host=self.parsed_url.hostname,
+                is_secure=(not globals.s3_unencrypted_connection))
 
         if hasattr(self.conn, 'calling_format'):
             if calling_format is None:

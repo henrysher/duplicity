@@ -555,12 +555,26 @@ the default (requires
 section.
 
 .TP
+.BI "--s3-unencrypted-connection"
+Don't use SSL for connections to S3.
+
+This may be much faster, at some cost to confidentiality.
+
+With this option, anyone who can observe traffic between your computer and S3
+will be able to tell: that you are using Duplicity, the name of the bucket,
+your AWS Access Key ID, the increment dates and the amount of data in each
+increment.
+
+This option affects only the connection, not the GPG encryption of the backup
+increment files.  Unless that is disabled, an observer will not be able to see
+the file names or contents.
+
+.TP
 .BI "--s3-use-new-style"
 When operating on Amazon S3 buckets, use new-style subdomain bucket
 addressing. This is now the preferred method to access Amazon S3, but
 is not backwards compatible if your bucket name contains upper-case
 characters or other characters that are not valid in a hostname.
-
 .TP
 .BI "--scp-command " command
 This option only matters when using the ssh/scp backend.  The

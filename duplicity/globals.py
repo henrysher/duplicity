@@ -151,6 +151,10 @@ s3_use_new_style = False
 # support european for now).
 s3_european_buckets = False
 
+# Whether to use plain HTTP (without SSL) to send data to S3
+# See <https://bugs.launchpad.net/duplicity/+bug/433970>.
+s3_unencrypted_connection = False
+
 # Whether to use S3 Reduced Redudancy Storage
 s3_use_rrs = False
 
