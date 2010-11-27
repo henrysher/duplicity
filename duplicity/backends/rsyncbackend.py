@@ -49,7 +49,8 @@ class RsyncBackend(duplicity.backend.Backend):
         host = parsed_url.hostname
         port = ""
         # RSYNC_RSH from calling shell might conflict with our settings
-        del os.environ['RSYNC_RSH']
+        if 'RSYNC_RSH' in os.environ:
+            del os.environ['RSYNC_RSH']
         if self.over_rsyncd():
             # its a module path
             (path, port) = self.get_rsync_path()
