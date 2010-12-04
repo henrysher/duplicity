@@ -21,10 +21,12 @@
 
 import os
 import types
+import errno
 
 import duplicity.backend
 from duplicity import log
 from duplicity import path
+from duplicity import util
 from duplicity.errors import * #@UnusedWildImport
 
 class LocalBackend(duplicity.backend.Backend):
@@ -41,6 +43,19 @@ class LocalBackend(duplicity.backend.Backend):
             raise BackendException( "Bad file:// path syntax." )
         self.remote_pathdir = path.Path(parsed_url.path[2:])
 
+    def handle_error(self, e, op, file1=None, file2=None):
+        code = log.ErrorCode.backend_error
+        if hasattr(e, 'errno'):
+            if e.errno == errno.EACCES:
+                code = log.ErrorCode.backend_permission_denied
+            elif e.errno == errno.ENOENT:
+                code = log.ErrorCode.backend_not_found
+            elif e.errno == errno.ENOSPC:
+                code = log.ErrorCode.backend_no_space
+        extra = ' '.join([util.escape(x) for x in [file1, file2] if x])
+        extra = ' '.join([op, extra])
+        log.FatalError(str(e), code, extra)
+
     def put(self, source_path, remote_filename = None, rename = None):
         """If rename is set, try that first, copying if doesn't work"""
         if not remote_filename:
@@ -52,14 +67,22 @@ class LocalBackend(duplicity.backend.Backend):
                 source_path.rename(target_path)
             except OSError:
                 pass
+            except Exception, e:
+                handle_error(e, 'put', source_path.name, target_path.name)
             else:
                 return
-        target_path.writefileobj(source_path.open("rb"))
+        try:
+            target_path.writefileobj(source_path.open("rb"))
+        except Exception, e:
+            self.handle_error(e, 'put', source_path.name, target_path.name)
 
     def get(self, filename, local_path):
         """Get file and put in local_path (Path object)"""
         source_path = self.remote_pathdir.append(filename)
-        local_path.writefileobj(source_path.open("rb"))
+        try:
+            local_path.writefileobj(source_path.open("rb"))
+        except Exception, e:
+            self.handle_error(e, 'get', source_path.name, local_path.name)
 
     def list(self):
         """List files in that directory"""
@@ -67,7 +90,10 @@ class LocalBackend(duplicity.backend.Backend):
                 os.makedirs(self.remote_pathdir.base)
         except:
                 pass
-        return self.remote_pathdir.listdir()
+        try:
+            return self.remote_pathdir.listdir()
+        except Exception, e:
+            self.handle_error(e, 'list', self.remote_pathdir.name)
 
     def delete(self, filename_list):
         """Delete all files in filename list"""
@@ -75,8 +101,8 @@ class LocalBackend(duplicity.backend.Backend):
         for filename in filename_list:
             try:
                 self.remote_pathdir.append(filename).delete()
-            except OSError, e:
-                raise BackendException(str(e))
+            except Exception, e:
+                self.handle_error(e, 'delete', self.remote_pathdir.append(filename).name)
 
 
 duplicity.backend.register_backend("file", LocalBackend)

@@ -29,6 +29,7 @@ import glib #@UnresolvedImport
 import duplicity.backend
 from duplicity import log
 from duplicity import globals
+from duplicity import util
 from duplicity.errors import * #@UnusedWildImport
 from duplicity.util import exception_traceback
 
@@ -88,10 +89,24 @@ class GIOBackend(duplicity.backend.Backend):
                                % str(e), log.ErrorCode.connection_failed)
         loop.quit()
 
+    def handle_error(self, e, op, file1=None, file2=None):
+        code = log.ErrorCode.backend_error
+        if isinstance(e, gio.Error):
+            if e.code == gio.ERROR_PERMISSION_DENIED:
+                code = log.ErrorCode.backend_permission_denied
+            elif e.code == gio.ERROR_NOT_FOUND:
+                code = log.ErrorCode.backend_not_found
+            elif e.code == gio.ERROR_NO_SPACE:
+                code = log.ErrorCode.backend_no_space
+        extra = ' '.join([util.escape(x) for x in [file1, file2] if x])
+        extra = ' '.join([op, extra])
+        log.FatalError(str(e), code, extra)
+
     def copy_progress(self, *args, **kwargs):
         pass
 
-    def copy_file(self, source, target):
+    def copy_file(self, op, source, target):
+        exc = None
         for n in range(1, globals.num_retries+1):
             log.Info(_("Writing %s") % target.get_parse_name())
             try:
@@ -103,8 +118,8 @@ class GIOBackend(duplicity.backend.Backend):
                         % (target.get_parse_name(), n, e.__class__.__name__, str(e)))
                 log.Debug("Backtrace of previous error: %s"
                           % exception_traceback())
-        raise BackendException(_("Could not copy %s to %s") % (source.get_parse_name(),
-                                                               target.get_parse_name()))
+                exc = e
+        self.handle_error(exc, op, source.get_parse_name(), target.get_parse_name())
 
     def put(self, source_path, remote_filename = None):
         """Copy file to remote"""
@@ -112,19 +127,22 @@ class GIOBackend(duplicity.backend.Backend):
             remote_filename = source_path.get_filename()
         source_file = gio.File(path=source_path.name)
         target_file = self.remote_file.get_child_for_display_name(remote_filename)
-        self.copy_file(source_file, target_file)
+        self.copy_file('put', source_file, target_file)
 
     def get(self, filename, local_path):
         """Get file and put in local_path (Path object)"""
         source_file = self.remote_file.get_child_for_display_name(filename)
         target_file = gio.File(path=local_path.name)
-        self.copy_file(source_file, target_file)
+        self.copy_file('get', source_file, target_file)
         local_path.setdata()
 
     def list(self):
         """List files in that directory"""
-        enum = self.remote_file.enumerate_children(gio.FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME,
-                                                   gio.FILE_QUERY_INFO_NOFOLLOW_SYMLINKS)
+        try:
+            enum = self.remote_file.enumerate_children(gio.FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME,
+                                                       gio.FILE_QUERY_INFO_NOFOLLOW_SYMLINKS)
+        except Exception, e:
+            self.handle_error(e, 'list', self.remote_file.get_parse_name())
         files = []
         try:
             info = enum.next_file()
@@ -133,7 +151,7 @@ class GIOBackend(duplicity.backend.Backend):
                 info = enum.next_file()
             return files
         except Exception, e:
-            raise BackendException(str(e))
+            self.handle_error(e, 'list')
 
     def delete(self, filename_list):
         """Delete all files in filename list"""
@@ -142,4 +160,4 @@ class GIOBackend(duplicity.backend.Backend):
                 for filename in filename_list:
                         self.remote_file.get_child_for_display_name(filename).delete()
         except Exception, e:
-            raise BackendException(str(e))
+            self.handle_error(e, 'delete', self.remote_file.get_child_for_display_name(filename).get_parse_name())
