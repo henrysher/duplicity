@@ -181,7 +181,7 @@ class WebDAVBackend(duplicity.backend.Backend):
         log.Info("%s" % (document,))
         dom = xml.dom.minidom.parseString(document)
         result = []
-        for href in dom.getElementsByTagName('D:href'):
+        for href in dom.getElementsByTagName('d:href') + dom.getElementsByTagName('D:href'):
             filename = self.__taste_href(href)
             if filename:
                 result.append(filename)

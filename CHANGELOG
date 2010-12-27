@@ -2,6 +2,7 @@ New in v0.6.12 (2010/12/??)
 ----------------------------
 681980     Duplicity 0.6.11 aborts if RSYNC_RSH not set
 620163     OSError: [Errno 2] No such file or directory
+486489     Only full backups done on webdav
 
 Merges:
 lp:~mterry/duplicity/backend-log-codes3
