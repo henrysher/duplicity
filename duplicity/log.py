@@ -188,7 +188,7 @@ class ErrorCode:
 
     # Reserve 255 because it is used as an error code for gksu
 
-def FatalError(s, code, extra=None):
+def FatalError(s, code=ErrorCode.generic, extra=None):
     """Write fatal error message and exit"""
     Log(s, ERROR, code, extra)
     shutdown()

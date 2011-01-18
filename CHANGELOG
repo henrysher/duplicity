@@ -1,8 +1,11 @@
 New in v0.6.12 (2010/12/??)
 ----------------------------
-681980     Duplicity 0.6.11 aborts if RSYNC_RSH not set
-620163     OSError: [Errno 2] No such file or directory
+Bugs closed in this release:
 486489     Only full backups done on webdav
+578663     Use log codes for common backend errors
+620163     OSError: [Errno 2] No such file or directory
+681980     Duplicity 0.6.11 aborts if RSYNC_RSH not set
+704314     Exception in log module
 
 Merges:
 lp:~mterry/duplicity/backend-log-codes3
@@ -10,6 +13,7 @@ lp:~mterry/duplicity/backend-log-codes3
 
 New in v0.6.11 (2010/11/20)
 ----------------------------
+Bugs closed in this release:
 433970     Add an option to connect to S3 with regular HTTP (and not HTTPS)
 578663     Use log codes for common backend errors
 631275     missing ssh on rsyncd url - rsync: Failed to exec ssh: ...
