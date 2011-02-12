@@ -10,6 +10,7 @@ Bugs closed in this release:
 
 Merges:
 lp:~mterry/duplicity/backend-log-codes3
+lp:~blueyed/duplicity/path-enodev-bugfix
 
 
 New in v0.6.11 (2010/11/20)
