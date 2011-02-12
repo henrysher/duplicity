@@ -4,6 +4,7 @@ Bugs closed in this release:
 486489     Only full backups done on webdav
 578663     Use log codes for common backend errors
 620163     OSError: [Errno 2] No such file or directory
+629136     sslerror: The read operation timed out with cf
 681980     Duplicity 0.6.11 aborts if RSYNC_RSH not set
 704314     Exception in log module
 
