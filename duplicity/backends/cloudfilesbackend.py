@@ -116,9 +116,24 @@ class CloudFilesBackend(duplicity.backend.Backend):
                                % (self.container, remote_filename))
 
     def list(self):
-        keys = self.container.list_objects()
-        log.Debug("Listed container '%s'" % self.container)
-        return keys
+        for n in range(1, globals.num_retries+1):
+            log.Info("Listing '%s'" % (self.container))
+            try:
+                keys = self.container.list_objects()
+                return keys
+            except self.resp_exc, resperr:
+                log.Warn("Listing of '%s' failed (attempt %s): CloudFiles returned: %s %s"
+                         % (self.container, n, resperr.status, resperr.reason))
+            except Exception, e:
+                log.Warn("Listing of '%s' failed (attempt %s): %s: %s"
+                         % (self.container, n, e.__class__.__name__, str(e)))
+                log.Debug("Backtrace of previous error: %s"
+                          % exception_traceback())
+            time.sleep(30)
+        log.Warn("Giving up listing of '%s' after %s attempts"
+                 % (self.container, globals.num_retries))
+        raise BackendException("Error listing '%s'"
+                               % (self.container))
 
     def delete(self, filename_list):
         for file in filename_list:
