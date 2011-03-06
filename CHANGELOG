@@ -10,6 +10,7 @@ Bugs closed in this release:
 655797     symbolic link ownership not preserved
 670891     Cygwin: TypeError: basis_file must be a (true) file ...
 681980     Duplicity 0.6.11 aborts if RSYNC_RSH not set
+700390     Backup fails silently when target is full (sftp, verbosity=4)
 704314     Exception in log module
 
 Enhancements added this release:

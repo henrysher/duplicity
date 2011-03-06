@@ -151,7 +151,8 @@ class SSHBackend(duplicity.backend.Backend):
                      "(?i)permission denied",
                      "authenticity",
                      "(?i)no such file or directory",
-                     "Couldn't delete file"]
+                     "Couldn't delete file",
+                     "open(*): Failure"]
         max_response_len = max([len(p) for p in responses[1:]])
         for n in range(1, globals.num_retries+1):
             if n > 1:
@@ -192,6 +193,9 @@ class SSHBackend(duplicity.backend.Backend):
                     break
                 elif match == 7:
                     log.Warn("Could not delete file in command='%s'" % (commandline,))
+                    break
+                elif match == 8:
+                    log.Warn("Could not open file in command='%s'" % (commandline,))
                     break
             child.close(force = True)
             if child.exitstatus == 0:
