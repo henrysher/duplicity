@@ -723,6 +723,7 @@ def usage():
   cf+http://%(container_name)s
   file:///%(some_dir)s
   ftp://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]/%(some_dir)s
+  ftps://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]/%(some_dir)s
   hsi://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]/%(some_dir)s
   imap://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]/%(some_dir)s
   rsync://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]::/%(module)s/%(some_dir)s

@@ -11,6 +11,9 @@ Bugs closed in this release:
 681980     Duplicity 0.6.11 aborts if RSYNC_RSH not set
 704314     Exception in log module
 
+Enhancements added this release:
+626915     ftps support using lftp (ftpsbackend)
+
 Merges:
 lp:~mterry/duplicity/backend-log-codes3
 lp:~blueyed/duplicity/path-enodev-bugfix

@@ -174,6 +174,7 @@ def _ensure_urlparser_initialized():
             #
             # todo: eliminate the need for backend specific hacking here completely.
             urlparser.uses_netloc = ['ftp',
+                                     'ftps',
                                      'hsi',
                                      'rsync',
                                      's3',
