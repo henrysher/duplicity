@@ -152,7 +152,7 @@ class SSHBackend(duplicity.backend.Backend):
                      "authenticity",
                      "(?i)no such file or directory",
                      "Couldn't delete file",
-                     "open(*): Failure"]
+                     "open(.*): Failure"]
         max_response_len = max([len(p) for p in responses[1:]])
         for n in range(1, globals.num_retries+1):
             if n > 1:
