@@ -93,9 +93,9 @@ class Manifest:
         elif (self.local_dirname and self.local_dirname != globals.local_path.name): #@UndefinedVariable
             errmsg = _("Fatal Error: Backup source directory has changed.\n"
                        "Current directory: %s\n"
-                       "Previous directory: %s") % (self.local_dirname, globals.local_path.name) #@UndefinedVariable
+                       "Previous directory: %s") % (globals.local_path.name, self.local_dirname) #@UndefinedVariable
             code = log.ErrorCode.source_dir_mismatch
-            code_extra = "%s %s" % (util.escape(self.local_dirname), util.escape(globals.local_path.name)) #@UndefinedVariable
+            code_extra = "%s %s" % (util.escape(globals.local_path.name), util.escape(self.local_dirname)) #@UndefinedVariable
         else:
             return
 

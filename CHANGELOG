@@ -3,6 +3,7 @@ New in v0.6.12 (2011/03/??)
 Bugs closed in this release:
 486489     Only full backups done on webdav
 578663     Use log codes for common backend errors
+581054     Inverted "Current directory" "Previous directory" in error message
 620163     OSError: [Errno 2] No such file or directory
 629136     sslerror: The read operation timed out with cf
 629984     boto backend uses Python 2.5 conditional
