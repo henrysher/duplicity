@@ -20,7 +20,7 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import config
-import sys, unittest, os, py
+import sys, unittest, os
 sys.path.insert(0, "../")
 
 import duplicity.backend
@@ -33,25 +33,6 @@ from duplicity.errors import * #@UnusedWildImport
 from duplicity import path, file_naming, dup_time, globals, gpg
 
 config.setup()
-
-class RootTest:
-    """Setup and teardown common to most tests.  Because of the contents
-    of the tarfile, these won't work unless being run as root."""
-
-    skip_me = False
-    test_files_ready = False
-
-    def setUp(self):
-        if os.geteuid() != 0:
-            self.skip_me = 'Must be run as root due to tarfile contents'
-            return
-
-        _util.extract_test_files()
-        self.test_files_ready = True
-
-    def tearDown(self):
-        if self.test_files_ready:
-            _util.cleanup_test_files()
 
 class UnivTest:
     """Contains methods that help test any backend"""
@@ -67,22 +48,18 @@ class UnivTest:
 
     def test_basic(self):
         """Test basic backend operations"""
-        if self.skip_me:
-            py.test.skip(self.skip_me)
         if not self.url_string:
-            py.test.skip("No URL for test %s" % self.my_test_id)
-
+            print "No URL for test %s...skipping... " % self.my_test_id,
+            return 0
         config.set_environ("FTP_PASSWORD", self.password)
         self.del_tmp()
         self.try_basic(duplicity.backend.get_backend(self.url_string))
 
     def test_fileobj_ops(self):
         """Test fileobj operations"""
-        if self.skip_me:
-            py.test.skip(self.skip_me)
         if not self.url_string:
-            py.test.skip("No URL for test %s" % self.my_test_id)
-
+            print "No URL for test %s...skipping... " % self.my_test_id,
+            return 0
         config.set_environ("FTP_PASSWORD", self.password)
         self.try_fileobj_ops(duplicity.backend.get_backend(self.url_string))
 
@@ -159,7 +136,7 @@ class UnivTest:
         self.try_fileobj_filename(backend, filename2)
 
 
-class LocalTest(RootTest, UnivTest, unittest.TestCase):
+class LocalTest(unittest.TestCase, UnivTest):
     """ Test the Local backend """
     def setUp(self):
         assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
@@ -172,7 +149,7 @@ class LocalTest(RootTest, UnivTest, unittest.TestCase):
     password = config.file_password
 
 
-class scpTest(RootTest, UnivTest, unittest.TestCase):
+class scpTest(unittest.TestCase, UnivTest):
     """ Test the SSH backend """
     def setUp(self):
         assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
@@ -185,7 +162,7 @@ class scpTest(RootTest, UnivTest, unittest.TestCase):
     password = config.ssh_password
 
 
-class ftpTest(RootTest, UnivTest, unittest.TestCase):
+class ftpTest(unittest.TestCase, UnivTest):
     """ Test the ftp backend """
     def setUp(self):
         assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
@@ -198,7 +175,7 @@ class ftpTest(RootTest, UnivTest, unittest.TestCase):
     password = config.ftp_password
 
 
-class rsyncAbsPathTest(RootTest, UnivTest, unittest.TestCase):
+class rsyncAbsPathTest(unittest.TestCase, UnivTest):
     """ Test the rsync abs path backend """
     def setUp(self):
         assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
@@ -211,7 +188,7 @@ class rsyncAbsPathTest(RootTest, UnivTest, unittest.TestCase):
     password = config.rsync_password
 
 
-class rsyncRelPathTest(RootTest, UnivTest, unittest.TestCase):
+class rsyncRelPathTest(unittest.TestCase, UnivTest):
     """ Test the rsync relative path backend """
     def setUp(self):
         assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
@@ -224,7 +201,7 @@ class rsyncRelPathTest(RootTest, UnivTest, unittest.TestCase):
     password = config.rsync_password
 
 
-class rsyncModuleTest(RootTest, UnivTest, unittest.TestCase):
+class rsyncModuleTest(unittest.TestCase, UnivTest):
     """ Test the rsync module backend """
     def setUp(self):
         assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
@@ -237,7 +214,7 @@ class rsyncModuleTest(RootTest, UnivTest, unittest.TestCase):
     password = config.rsync_password
 
 
-class s3ModuleTest(RootTest, UnivTest, unittest.TestCase):
+class s3ModuleTest(unittest.TestCase, UnivTest):
     """ Test the s3 module backend """
     def setUp(self):
         assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
@@ -250,7 +227,7 @@ class s3ModuleTest(RootTest, UnivTest, unittest.TestCase):
     password = None
 
 
-class webdavModuleTest(RootTest, UnivTest, unittest.TestCase):
+class webdavModuleTest(unittest.TestCase, UnivTest):
     """ Test the webdav module backend """
     def setUp(self):
         assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
@@ -263,7 +240,7 @@ class webdavModuleTest(RootTest, UnivTest, unittest.TestCase):
     password = config.webdav_password
 
 
-class webdavsModuleTest(RootTest, UnivTest, unittest.TestCase):
+class webdavsModuleTest(unittest.TestCase, UnivTest):
     """ Test the webdavs module backend """
     def setUp(self):
         assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
