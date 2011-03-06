@@ -418,6 +418,7 @@ class ROPath:
             os.mkdir(other.name)
         elif self.issym():
             os.symlink(self.symtext, other.name)
+            os.lchown(other.name, self.stat.st_uid, self.stat.st_gid)
             other.setdata()
             return # no need to copy symlink attributes
         elif self.isfifo():
