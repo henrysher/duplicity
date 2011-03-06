@@ -22,6 +22,7 @@
 import re #@UnusedImport
 import types
 import tempfile
+import os
 
 from duplicity import tarfile #@UnusedImport
 from duplicity import librsync #@UnusedImport
@@ -469,7 +470,7 @@ def patch_seq2ropath( patch_seq ):
         assert delta_ropath.difftype == "diff", delta_ropath.difftype
         if not isinstance( current_file, file ):
             # librsync needs true file
-            tempfp = tempfile.TemporaryFile( dir=globals.temproot )
+            tempfp = os.tmpfile()
             misc.copyfileobj( current_file, tempfp )
             assert not current_file.close()
             tempfp.seek( 0 )
