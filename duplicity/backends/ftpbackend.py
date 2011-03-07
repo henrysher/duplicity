@@ -112,7 +112,7 @@ class FTPBackend(duplicity.backend.Backend):
         l = self.popen_persist(commandline).split('\n')
         l = filter(lambda x: x, l)
         # Look for our files as the last element of a long list line
-        return [x.split()[-1] for x in l]
+        return [x.split()[-1] for x in l if not x.startswith("total ")]
 
     def delete(self, filename_list):
         """Delete files in filename_list"""
