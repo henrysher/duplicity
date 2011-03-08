@@ -44,6 +44,7 @@ _genstr_date_regexp3 = re.compile("^(?P<year>[0-9]{4})"
                                   "(?P<day>[0-9]{2})Z$")
 curtime = curtimestr = None
 prevtime = prevtimestr = None
+commandline_time_set = False
 
 bad_interval_string = _("""Bad interval string "%s"
 
@@ -62,10 +63,13 @@ the day).""")
 
 def setcurtime(time_in_secs = None):
     """Sets the current time in curtime and curtimestr"""
-    global curtime, curtimestr
-    t = time_in_secs or long(time.time())
-    assert type(t) in (types.LongType, types.IntType)
-    curtime, curtimestr = t, timetostring(t)
+    global curtime, curtimestr, commandline_time_set
+    if not commandline_time_set:
+        t = time_in_secs or long(time.time())
+        assert type(t) in (types.LongType, types.IntType)
+        curtime, curtimestr = t, timetostring(t)
+    if time_in_secs:
+        commandline_time_set = True
 
 def setprevtime(time_in_secs):
     """Sets the previous time in prevtime and prevtimestr"""

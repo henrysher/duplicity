@@ -33,20 +33,17 @@ pwd
 #for v in 2.3 2.4 2.5 2.6; do
 for v in 2.5 2.6; do
     if command -v python$v; then
-        LOG=/tmp/run-all-tests-$v.log
-        rm -f $LOG
-
-        echo "========== Compiling librsync for python$v ==========" | tee -a $LOG
+        echo "========== Compiling librsync for python$v =========="
         pushd ../duplicity
         python$v ./compilec.py
         popd
 
-        echo "Running tests for python$v" | tee -a $LOG
+        echo "Running tests for python$v"
         for t in `cat alltests`; do
-            echo "========== Running $t ==========" | tee -a $LOG
-            python$v -u $t -v 2>&1 | grep -v "unsafe ownership" | tee -a $LOG
-            echo | tee -a  $LOG
-            echo | tee -a  $LOG
+            echo "========== Running $t =========="
+            python$v -u $t -v 2>&1 | grep -v "unsafe ownership"
+            echo
+            echo
         done
     fi
 done

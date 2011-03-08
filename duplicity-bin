@@ -1103,15 +1103,16 @@ def main():
     """
     Start/end here
     """
-    # The following is for starting remote debugging in Eclipse with Pydev Extensions.
+    # The following is for starting remote debugging in Eclipse with Pydev.
     # Adjust the path to your location and version of Eclipse and Pydev.  Comment out
     # to run normally, or this process will hang at pydevd.settrace() waiting for the
     # remote debugger to start.
-#    pysrc = "/home/ken/eclipse3.4/plugins/org.python.pydev.debug_1.5.0.1251989166/pysrc/"
+#    pysrc = "/opt/Aptana Studio 2.0/plugins/org.python.pydev.debug_1.6.5.2011020317/pysrc/"
 #    if os.path.isdir(pysrc):
 #        sys.path.append(pysrc)
-#        import pydevd
+#        import pydevd #@UnresolvedImport
 #        pydevd.settrace()
+    # end remote debugger startup
 
     # if python is run setuid, it's only partway set,
     # so make sure to run with euid/egid of root
