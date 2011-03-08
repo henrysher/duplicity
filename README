@@ -19,11 +19,12 @@ The default prefix is /usr, so files are put in /usr/bin,
 
 REQUIREMENTS:
 
- * Python v2.3 or later (http://www.python.org)
- * librsync v0.9.6 or later (http://librsync.sourceforge.net)
- * GnuPG for encryption (http://www.gnupg.org)
- * NcFTP version 3.1.9 or later, but not 3.2.0 (http://www.ncftp.com)
- * Boto 0.9d or later (http://code.google.com/p/boto)
+ * Python v2.3 or later
+ * librsync v0.9.6 or later
+ * GnuPG v1.x for encryption
+ * for normal ftp -- NcFTP version 3.1.9 or later, but not 3.2.0
+ * for ftp over SSL -- lftp version 3.7.15 or later
+ * Boto 0.9d or later
 
 If you install from the source package, you will also need:
 
