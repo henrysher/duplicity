@@ -175,6 +175,19 @@ class ftpTest(unittest.TestCase, UnivTest):
     password = config.ftp_password
 
 
+class ftpsTest(unittest.TestCase, UnivTest):
+    """ Test the ftp backend """
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+
+    my_test_id = "ftps"
+    url_string = config.ftp_url
+    password = config.ftp_password
+
+
 class rsyncAbsPathTest(unittest.TestCase, UnivTest):
     """ Test the rsync abs path backend """
     def setUp(self):
@@ -253,37 +266,37 @@ class webdavsModuleTest(unittest.TestCase, UnivTest):
     password = config.webdavs_password
 
 
-if gio_available:
-    class GIOTest(UnivTest):
-        """ Generic gio module backend class """
-        def setUp(self):
-            duplicity.backend.force_backend(duplicity.backends.giobackend.GIOBackend)
-            assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
-
-        def tearDown(self):
-            duplicity.backend.force_backend(None)
-            assert not os.system("rm -rf testfiles tempdir temp2.tar")
-
-
-    class gioFileModuleTest(GIOTest, unittest.TestCase):
-        """ Test the gio file module backend """
-        my_test_id = "gio/file"
-        url_string = config.file_url
-        password = config.file_password
-
-
-    class gioSSHModuleTest(GIOTest, unittest.TestCase):
-        """ Test the gio ssh module backend """
-        my_test_id = "gio/ssh"
-        url_string = config.ssh_url
-        password = config.ssh_password
-
-
-    class gioFTPModuleTest(GIOTest, unittest.TestCase):
-        """ Test the gio ftp module backend """
-        my_test_id = "gio/ftp"
-        url_string = config.ftp_url
-        password = config.ftp_password
+#if gio_available:
+#    class GIOTest(UnivTest):
+#        """ Generic gio module backend class """
+#        def setUp(self):
+#            duplicity.backend.force_backend(duplicity.backends.giobackend.GIOBackend)
+#            assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
+#
+#        def tearDown(self):
+#            duplicity.backend.force_backend(None)
+#            assert not os.system("rm -rf testfiles tempdir temp2.tar")
+#
+#
+#    class gioFileModuleTest(GIOTest, unittest.TestCase):
+#        """ Test the gio file module backend """
+#        my_test_id = "gio/file"
+#        url_string = config.file_url
+#        password = config.file_password
+#
+#
+#    class gioSSHModuleTest(GIOTest, unittest.TestCase):
+#        """ Test the gio ssh module backend """
+#        my_test_id = "gio/ssh"
+#        url_string = config.ssh_url
+#        password = config.ssh_password
+#
+#
+#    class gioFTPModuleTest(GIOTest, unittest.TestCase):
+#        """ Test the gio ftp module backend """
+#        my_test_id = "gio/ftp"
+#        url_string = config.ftp_url
+#        password = config.ftp_password
 
 if __name__ == "__main__":
     unittest.main()
