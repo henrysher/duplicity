@@ -865,7 +865,7 @@ def sync_archive():
         log.Notice(_("Deleting local %s (not authoritative at backend).") % del_name)
         try:
             os.unlink(del_name)
-        except Exception as e:
+        except Exception, e:
             log.Warn(_("Unable to delete %s: %s") % (del_name, str(e)))
 
     def copy_to_local(fn):
