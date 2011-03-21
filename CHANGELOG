@@ -1,3 +1,13 @@
+New in v0.6.13 (2011/03/??)
+----------------------------
+Bugs closed in this release:
+613244     silent data corruption with checkpoint/restore
+
+Enhancements added this release:
+New manual test to make Ctrl-C issues easier to replicate.
+Use python-virtualenv to make testing multiple Python versions easier.
+
+
 New in v0.6.12 (2011/03/08)
 ----------------------------
 Bugs closed in this release:

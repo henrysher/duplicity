@@ -185,7 +185,7 @@ def restart_position_iterator(tarblock_iter):
         # Just spin our wheels
         while tarblock_iter.next():
             if (tarblock_iter.previous_index == last_index):
-                if (tarblock_iter.previous_block == last_block):
+                if (tarblock_iter.previous_block > last_block):
                     break
             if tarblock_iter.previous_index > last_index:
                 log.Warn(_("Unable to locate last file %s and block %d in backup set.\n"
@@ -1082,7 +1082,6 @@ class Restart:
                              (self.start_vol + 1, mf_len, self.start_vol + 1))
                 for vol in range(self.start_vol + 1, mf_len + 1):
                     mf.del_volume_info(vol)
-                self.setLastSaved(mf)
             else:
                 # this is an 'impossible' state, remove last partial and restart
                 log.Notice(_("RESTART: Impossible backup state: manifest has %d vols, remote has %d vols.\n"
@@ -1103,17 +1102,6 @@ def main():
     """
     Start/end here
     """
-    # The following is for starting remote debugging in Eclipse with Pydev.
-    # Adjust the path to your location and version of Eclipse and Pydev.  Comment out
-    # to run normally, or this process will hang at pydevd.settrace() waiting for the
-    # remote debugger to start.
-#    pysrc = "/opt/Aptana Studio 2.0/plugins/org.python.pydev.debug_1.6.5.2011020317/pysrc/"
-#    if os.path.isdir(pysrc):
-#        sys.path.append(pysrc)
-#        import pydevd #@UnresolvedImport
-#        pydevd.settrace()
-    # end remote debugger startup
-
     # if python is run setuid, it's only partway set,
     # so make sure to run with euid/egid of root
     if os.geteuid() == 0:
@@ -1129,6 +1117,17 @@ def main():
 
     # set the current time strings again now that we have time separator
     dup_time.setcurtime()
+
+    # The following is for starting remote debugging in Eclipse with Pydev.
+    # Adjust the path to your location and version of Eclipse and Pydev.
+    if globals.pydevd:
+        pysrc = "/opt/Aptana Studio 2.0/plugins/org.python.pydev.debug_1.6.5.2011020317/pysrc/"
+        if os.path.isdir(pysrc):
+            sys.path.append(pysrc)
+            import pydevd #@UnresolvedImport
+            pydevd.settrace()
+        else:
+            log.FatalError("Unable to locate pydevd.", log.ErrorCode.user_error)
 
     # get the passphrase if we need to based on action/options
     globals.gpg_profile.passphrase = get_passphrase(1, action)
@@ -1256,6 +1255,11 @@ if __name__ == "__main__":
     except SystemExit, e:
         # No traceback, just get out
         sys.exit(e)
+
+    except KeyboardInterrupt, e:
+        # No traceback, just get out
+        log.Info(_("INT intercepted...exiting."))
+        sys.exit(4)
 
     except gpg.GPGError, e:
         # For gpg errors, don't show an ugly stack trace by

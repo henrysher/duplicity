@@ -1,3 +1,29 @@
+2011-03-21  Kenneth Loafman  <kenneth@loafman.com>
+
+	Add a manual test for Ctrl-C interrupts.  This could be automated, but I find that the old hairy eyeball works quite well as is.
+
+2011-03-21  Kenneth Loafman  <kenneth@loafman.com>
+
+	Use python-virtualenv to provide a well-defined environment for testing multiple versions of Python.
+
+2011-03-21  Kenneth Loafman  <kenneth@loafman.com>
+
+	Add (undocumented) option --pydevd to allow easier debugging when executing long chains of duplicity executions.
+
+2011-03-21  Kenneth Loafman  <kenneth@loafman.com>
+
+	Remove threaded_waitpid().  We still need GnuPGInterface because of the shift bug in the return code and the ugly mix of tabs and spaces.  All has been reported to the author.
+	
+	Note:  With this change people who do long chains of incrementals will need to up the number of file handles.
+
+2011-03-09  Kenneth Loafman  <kenneth@loafman.com>
+
+	Replace 2.5 'except...as' syntax.
+
+2011-03-08  Kenneth Loafman  <kenneth@loafman.com>
+
+	Changes for 0.6.12.
+
 2011-03-08  Kenneth Loafman  <kenneth@loafman.com>
 
 	Various fixes for testing.  All tests pass completely.
