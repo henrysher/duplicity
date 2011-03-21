@@ -374,6 +374,10 @@ def parse_cmdline_options(arglist):
                       callback=lambda o, s, v, p: (setattr(p.values, o.dest, True),
                                                    old_fn_deprecation(s)))
 
+    # option to trigger Pydev debugger
+    parser.add_option("--pydevd", action="store_true")
+
+    # option to rename files during restore
     parser.add_option("--rename", type="file", action="callback", nargs=2,
                       callback=add_rename)
 
