@@ -36,16 +36,25 @@ if [ ! -e $1 ]; then
 fi
 
 # run against all supported python versions
-#for v in 2.3 2.4 2.5 2.6; do
-for v in 2.5 2.6; do
-    if command -v python$v ; then
+for v in 2.3 2.4 2.5 2.6; do
+    if [ -d ~/virtual$v ]; then
+        # change to virtualenv for this python version
+        pushd ~/virtual$v && source bin/activate && popd
+
+        # Go to directory housing this script
+        cd `dirname $0`
+
         echo "========== Compiling librsync for python$v =========="
         pushd ../duplicity
-        python$v ./compilec.py
+        python ./compilec.py
         popd
 
-        echo "Running test $1 for python$v"
-        echo "========== Running $1 =========="
-        python$v -u $1 -v 2>&1 | grep -v "unsafe ownership"
+        echo "========== Running $1 for python$v =========="
+        pushd .
+        python -u $1 -v 2>&1 | grep -v "unsafe ownership"
+        popd
+        echo "========== Finished $1 for python$v =========="
+        echo
+        echo
     fi
 done
