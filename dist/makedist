@@ -111,6 +111,7 @@ def MakeTar():
         "backends/botobackend.py",
         "backends/cloudfilesbackend.py",
         "backends/ftpbackend.py",
+        "backends/ftpsbackend.py",
         "backends/giobackend.py",
         "backends/hsibackend.py",
         "backends/imapbackend.py",
