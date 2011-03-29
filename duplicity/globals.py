@@ -36,6 +36,9 @@ local_path = None
 # The symbolic name of the backup being operated upon.
 backup_name = None
 
+# For testing -- set current time
+current_time = None
+
 # Set to the Path of the archive directory (the directory which
 # contains the signatures and manifests of the relevent backup
 # collection), and for checkpoint state between volumes.

@@ -2,6 +2,7 @@ New in v0.6.13 (2011/03/??)
 ----------------------------
 Bugs closed in this release:
 613244     silent data corruption with checkpoint/restore
+579958     Assertion error "time not moving forward at appropriate pace"
 
 Enhancements added this release:
 New manual test to make Ctrl-C issues easier to replicate.
