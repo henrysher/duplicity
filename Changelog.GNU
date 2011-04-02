@@ -1,3 +1,23 @@
+2011-04-02  Kenneth Loafman  <kenneth@loafman.com>
+
+	Changes for 0.6.13.
+
+2011-04-02  Kenneth Loafman  <kenneth@loafman.com>
+
+	Check for presence of bucket before trying to create.
+
+2011-03-29  Kenneth Loafman  <kenneth@loafman.com>
+
+	579958  Assertion error "time not moving forward at appropriate pace"
+
+2011-03-26  Kenneth Loafman  <kenneth@loafman.com>
+
+	Add in ftpsbackend.py.  Missed it.
+
+2011-03-21  Kenneth Loafman  <kenneth@loafman.com>
+
+	613244     silent data corruption with checkpoint/restore
+
 2011-03-21  Kenneth Loafman  <kenneth@loafman.com>
 
 	Add a manual test for Ctrl-C interrupts.  This could be automated, but I find that the old hairy eyeball works quite well as is.
