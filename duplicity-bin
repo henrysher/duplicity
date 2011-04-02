@@ -188,15 +188,15 @@ def restart_position_iterator(tarblock_iter):
                 if (tarblock_iter.previous_block > last_block):
                     break
             if tarblock_iter.previous_index > last_index:
-                log.Warn(_("Unable to locate last file %s and block %d in backup set.\n"
-                           "Attempting restart on the next file %s.") %
-                           ("/".join(last_index), last_block, "/".join(tarblock_iter.previous_index)),
+                log.Warn(_("File %s complete in backup set.\n"
+                           "Continuing restart on file %s.") %
+                           ("/".join(last_index), "/".join(tarblock_iter.previous_index)),
                            log.ErrorCode.restart_file_not_found)
                 break
     except StopIteration:
-        log.Warn(_("Unable to locate last file %s and block %d in backup set.\n"
-                   "There are no more files to be backed up.") %
-                   ("/".join(last_index), last_block),
+        log.Warn(_("File %s missing in backup set.\n"
+                   "Continuing restart on file %s.") %
+                   ("/".join(last_index), "/".join(tarblock_iter.previous_index)),
                    log.ErrorCode.restart_file_not_found)
     return 0
 
@@ -1091,11 +1091,10 @@ class Restart:
                 self.last_backup.delete()
                 os.execve(sys.argv[0], sys.argv[1:], os.environ)
 
-
     def setLastSaved(self, mf):
         vi = mf.volume_info_dict[self.start_vol]
         self.last_index = vi.end_index
-        self.last_block = vi.end_block
+        self.last_block = vi.end_block or 0
 
 
 def main():
@@ -1116,7 +1115,10 @@ def main():
     action = commandline.ProcessCommandLine(sys.argv[1:])
 
     # set the current time strings again now that we have time separator
-    dup_time.setcurtime()
+    if globals.current_time:
+        dup_time.setcurtime(globals.current_time)
+    else:
+        dup_time.setcurtime()
 
     # The following is for starting remote debugging in Eclipse with Pydev.
     # Adjust the path to your location and version of Eclipse and Pydev.
