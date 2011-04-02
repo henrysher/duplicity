@@ -3,6 +3,7 @@ New in v0.6.13 (2011/04/02)
 Bugs closed in this release:
 579958     Assertion error "time not moving forward at appropriate pace"
 613244     silent data corruption with checkpoint/restore
+731905     File "/usr/bin/duplicity", error after upgrade from 6.11 to 6.12
 
 Enhancements added this release:
 New manual test to make Ctrl-C issues easier to replicate.
