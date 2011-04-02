@@ -157,6 +157,13 @@ class BotoBackend(duplicity.backend.Backend):
         self.bucket = self.conn.lookup(self.bucket_name)
 
     def put(self, source_path, remote_filename=None):
+        from boto.s3.connection import S3ResponseError
+        from boto.s3.connection import Location
+        if globals.s3_european_buckets:
+            if not globals.s3_use_new_style:
+                log.FatalError("European bucket creation was requested, but not new-style "
+                               "bucket addressing (--s3-use-new-style)",
+                               log.ErrorCode.s3_bucket_not_style)
         #Network glitch may prevent first few attempts of creating/looking up a bucket
         for n in range(1, globals.num_retries+1):
             if self.bucket:
@@ -164,15 +171,17 @@ class BotoBackend(duplicity.backend.Backend):
             if n > 1:
                 time.sleep(30)
             try:
-                if globals.s3_european_buckets:
-                    if not globals.s3_use_new_style:
-                        log.FatalError("European bucket creation was requested, but not new-style "
-                                       "bucket addressing (--s3-use-new-style)",
-                                       log.ErrorCode.s3_bucket_not_style)
-                    from boto.s3.connection import Location #@UnresolvedImport
-                    self.bucket = self.conn.create_bucket(self.bucket_name, location = Location.EU)
-                else:
-                    self.bucket = self.conn.create_bucket(self.bucket_name)
+                try:
+                    self.bucket = self.conn.get_bucket(self.bucket_name, validate=True)
+                except S3ResponseError, e:
+                    if e.code == "NoSuchBucket":
+                        if globals.s3_european_buckets:
+                            self.bucket = self.conn.create_bucket(self.bucket_name,
+                                                                  location=Location.EU)
+                        else:
+                            self.bucket = self.conn.create_bucket(self.bucket_name)
+                    else:
+                        raise e
             except Exception, e:
                 log.Warn("Failed to create bucket (attempt #%d) '%s' failed (reason: %s: %s)"
                          "" % (n, self.bucket_name,
