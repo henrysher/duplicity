@@ -157,7 +157,10 @@ class BotoBackend(duplicity.backend.Backend):
         self.bucket = self.conn.lookup(self.bucket_name)
 
     def put(self, source_path, remote_filename=None):
-        from boto.s3.connection import S3ResponseError
+        try:
+            from boto.s3.connection import S3ResponseError
+        except ImportError:
+            from boto.s3.exception import S3ResponseError
         from boto.s3.connection import Location
         if globals.s3_european_buckets:
             if not globals.s3_use_new_style:
