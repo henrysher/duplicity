@@ -719,7 +719,8 @@ temporary files (inherited from Python's tempfile module).
 .TP
 .B FTP_PASSWORD
 Supported by most backends which are password capable. More secure than 
-setting it in the backend url.
+setting it in the backend url (which might be readable in the operating 
+systems process listing to other users on the same machine).
 
 
 .SH URL FORMAT
@@ -759,21 +760,28 @@ imaps://user[:password]@host.com[/from_address_prefix]
 .PP
 .BI "using rsync daemon"
 .br
-rsync://user[:password]@host.com[:port]::/module/some_dir 
+rsync://user[:password]@host.com[:port]::[/]module/some_dir 
 .PP
 .BI "using rsync over ssh (only key auth)"
 .br
 rsync://user@host.com[:port]/relative_path
-.BR
+.br
 rsync://user@host.com[:port]//absolute_path
 .PP
 s3://host/bucket_name[/prefix]
 .PP
 s3+http://bucket_name[/prefix]
 .PP
-scp://user[:password]@other.host[:port]/some_dir
-.PP
-ssh://user[:password]@other.host[:port]/some_dir
+.BI "ssh protocols"
+.br
+scp://.. or sftp://.. are synonymous for
+.br
+ssh://user[:password]@other.host[:port]/[/]some_dir
+.br
+see also
+.BI "A NOTE ON SSH/SCP PROTOCOLS"
+and
+.BI "--use-scp"
 .PP
 tahoe://alias/directory
 .PP
