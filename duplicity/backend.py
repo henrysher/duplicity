@@ -178,7 +178,7 @@ def _ensure_urlparser_initialized():
                                      'hsi',
                                      'rsync',
                                      's3',
-                                     'scp', 'ssh',
+                                     'scp', 'ssh', 'sftp',
                                      'webdav', 'webdavs',
                                      'http', 'https',
                                      'imap', 'imaps']

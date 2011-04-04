@@ -291,3 +291,4 @@ class SSHBackend(duplicity.backend.Backend):
 
 duplicity.backend.register_backend("ssh", SSHBackend)
 duplicity.backend.register_backend("scp", SSHBackend)
+duplicity.backend.register_backend("sftp", SSHBackend)
