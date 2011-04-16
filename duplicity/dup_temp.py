@@ -218,6 +218,15 @@ class FileobjHooked:
         self.hooklist.append(hook)
 
 
+    def get_name(self):
+        """
+        Return the name of the file
+        """
+        return self.fileobj.name
+
+    name = property(get_name)
+
+
 class Block:
     """
     Data block to return from SrcIter

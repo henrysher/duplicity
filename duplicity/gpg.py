@@ -95,6 +95,7 @@ class GPGFile:
         self.closed = None # set to true after file closed
         self.logger_fp = tempfile.TemporaryFile()
         self.stderr_fp = tempfile.TemporaryFile()
+        self.name = encrypt_path
 
         # Start GPG process - copied from GnuPGInterface docstring.
         gnupg = GnuPGInterface.GnuPG()

@@ -890,8 +890,9 @@ def sync_archive():
                 try:
                     res = Block(self.fileobj.read(size))
                 except:
+                    name = self.fileobj.name if hasattr(self.fileobj, 'name') else None
                     log.FatalError(_("Failed to read %s: %s") %
-                                   (self.fileobj.name, sys.exc_info()),
+                                   (name, sys.exc_info()),
                                    log.ErrorCode.generic)
                 if not res.data:
                     self.fileobj.close()
@@ -1123,7 +1124,7 @@ def main():
     # The following is for starting remote debugging in Eclipse with Pydev.
     # Adjust the path to your location and version of Eclipse and Pydev.
     if globals.pydevd:
-        pysrc = "/opt/Aptana Studio 2.0/plugins/org.python.pydev.debug_1.6.5.2011020317/pysrc/"
+        pysrc = "/opt/Aptana Studio 2.0/plugins/org.python.pydev.debug_2.0.0.2011040403/pysrc/"
         if os.path.isdir(pysrc):
             sys.path.append(pysrc)
             import pydevd #@UnresolvedImport
