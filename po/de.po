@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-04-02 12:48-0500\n"
-"PO-Revision-Date: 2010-10-23 15:57+0000\n"
-"Last-Translator: cmdrhenner <cmdrhenner@gmail.com>\n"
+"PO-Revision-Date: 2011-04-16 08:14+0000\n"
+"Last-Translator: Patrick <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-04-04 04:48+0000\n"
-"X-Generator: Launchpad (build 12559)\n"
+"X-Launchpad-Export-Date: 2011-04-17 04:37+0000\n"
+"X-Generator: Launchpad (build 12735)\n"
 
 #: ../duplicity-bin:191
 #, python-format
@@ -51,7 +51,7 @@ msgstr "Backup-Statistiken"
 #: ../duplicity-bin:541
 #, python-format
 msgid "%s not found in archive, no files restored."
-msgstr "%s nicht im Archiv gefunden, keine Datei wiederhergestellt."
+msgstr "%s im Archiv nicht gefunden, keine Dateien wiederhergestellt."
 
 #: ../duplicity-bin:545
 msgid "No files found in archive - nothing restored."
@@ -99,11 +99,11 @@ msgstr[1] "%d Dateien vergleichen"
 msgid "%d difference found"
 msgid_plural "%d differences found"
 msgstr[0] "%d Unterschied gefunden"
-msgstr[1] "%d Unterscheide gefunden"
+msgstr[1] "%d Unterschiede gefunden"
 
 #: ../duplicity-bin:689
 msgid "No extraneous files found, nothing deleted in cleanup."
-msgstr ""
+msgstr "Keine überflüssigen Dateien gefunden, es wurde nichts gelöscht."
 
 #: ../duplicity-bin:694
 msgid "Deleting this file from backend:"
@@ -130,7 +130,7 @@ msgstr "Es existieren Sicherungssätze zu den Zeitpunkten:"
 #: ../duplicity-bin:748
 msgid "Which can't be deleted because newer sets depend on them."
 msgstr ""
-"Kann nicht gelöscht werden, da neuere Datensätze hiervon abhängig sind."
+"Welche nicht gelöscht werden können, weil neuere Sets davon abhängen."
 
 #: ../duplicity-bin:752
 msgid ""
