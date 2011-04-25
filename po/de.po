@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-04-02 12:48-0500\n"
-"PO-Revision-Date: 2011-04-16 08:14+0000\n"
+"PO-Revision-Date: 2011-04-24 20:48+0000\n"
 "Last-Translator: Patrick <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-04-17 04:37+0000\n"
-"X-Generator: Launchpad (build 12735)\n"
+"X-Launchpad-Export-Date: 2011-04-25 04:51+0000\n"
+"X-Generator: Launchpad (build 12758)\n"
 
 #: ../duplicity-bin:191
 #, python-format
@@ -24,6 +24,8 @@ msgid ""
 "File %s complete in backup set.\n"
 "Continuing restart on file %s."
 msgstr ""
+"Datei %s ist komplett im Backup-Set.\n"
+"Beim Neustart wird fortgefahren mit Datei %s."
 
 #: ../duplicity-bin:197
 #, python-format
@@ -31,6 +33,8 @@ msgid ""
 "File %s missing in backup set.\n"
 "Continuing restart on file %s."
 msgstr ""
+"Datei %s fehlt im Backup-Set.\n"
+"Beim Neustart wird fortgefahren mit Datei %s."
 
 #: ../duplicity-bin:443
 msgid ""
@@ -165,12 +169,12 @@ msgstr ""
 #: ../duplicity-bin:865
 #, python-format
 msgid "Deleting local %s (not authoritative at backend)."
-msgstr "Lösche lokal %s (im Backend nicht mehr vorhanden)."
+msgstr "Lösche lokal %s (keine Auswirkungen am Backend)."
 
 #: ../duplicity-bin:869
 #, python-format
 msgid "Unable to delete %s: %s"
-msgstr ""
+msgstr "Kann %s nicht löschen: %s"
 
 #: ../duplicity-bin:893 ../duplicity/dup_temp.py:239
 #, python-format
@@ -200,7 +204,8 @@ msgstr ""
 
 #: ../duplicity-bin:962
 msgid "Sync would remove the following spurious local files:"
-msgstr "Sync würde die folgenden überflüssigen lokalen Dateien löschen:"
+msgstr ""
+"Synchronisation würde die folgenden überflüssigen lokalen Dateien löschen:"
 
 #: ../duplicity-bin:1005
 msgid "Unable to get free space on temp."
@@ -210,16 +215,18 @@ msgstr "Der temporäre Speicherplatz ist belegt."
 #, python-format
 msgid "Temp space has %d available, backup needs approx %d."
 msgstr ""
-"%d temporärer Speicherplatz sind verfügbar, das Backup benötigt ca. %d."
+"%d temporärer Speicherplatz ist verfügbar, das Backup benötigt ungefähr %d."
 
 #: ../duplicity-bin:1016
 #, python-format
 msgid "Temp has %d available, backup will use approx %d."
-msgstr "%d in Temp verfügbar, Sicherung wird vorraussichtlich %d nutzen."
+msgstr ""
+"%d temporärer Speicherplatz ist verfügbar, das Backup wird ungefähr %d "
+"nutzen."
 
 #: ../duplicity-bin:1024
 msgid "Unable to get max open files."
-msgstr "Konnte nicht den Maximalwert für offene Dateien feststellen."
+msgstr "Konnte den Maximalwert für offene Dateien nicht feststellen."
 
 #: ../duplicity-bin:1028
 #, python-format
@@ -264,12 +271,12 @@ msgstr ""
 #: ../duplicity-bin:1171
 #, python-format
 msgid "Last %s backup left a partial set, restarting."
-msgstr ""
+msgstr "Das letzte %s Backup ist unvollständig, Neustart."
 
 #: ../duplicity-bin:1175
 #, python-format
 msgid "Cleaning up previous partial %s backup set, restarting."
-msgstr ""
+msgstr "Entfernen des letzten unvollständigen %s Backup, Neustart."
 
 #: ../duplicity-bin:1186
 msgid "Last full backup date:"
@@ -286,7 +293,7 @@ msgstr ""
 
 #: ../duplicity-bin:1263
 msgid "INT intercepted...exiting."
-msgstr ""
+msgstr "INT abgefangen...beende."
 
 #: ../duplicity-bin:1269
 #, python-format
@@ -301,43 +308,45 @@ msgstr "Benutzer Fehler-Detail: %s"
 #: ../duplicity-bin:1287
 #, python-format
 msgid "Backend error detail: %s"
-msgstr ""
+msgstr "Backend Fehler Detail: %s"
 
 #: ../duplicity/asyncscheduler.py:66
 #, python-format
 msgid "instantiating at concurrency %d"
-msgstr ""
+msgstr "instanziere mit Simultanität %d"
 
 #: ../duplicity/asyncscheduler.py:93
 msgid "inserting barrier"
-msgstr ""
+msgstr "füge Barriere ein"
 
 #: ../duplicity/asyncscheduler.py:142
 msgid "running task synchronously (asynchronicity disabled)"
-msgstr ""
+msgstr "führe Aufgabe synchron aus (asynchronität deaktiviert)"
 
 #: ../duplicity/asyncscheduler.py:148
 msgid "scheduling task for asynchronous execution"
-msgstr ""
+msgstr "plane Aufgabe für asynchrone Ausführung"
 
 #: ../duplicity/asyncscheduler.py:177
 msgid "task completed successfully"
-msgstr ""
+msgstr "Aufgabe erfolgreich abgeschlossen"
 
 #: ../duplicity/asyncscheduler.py:188
 msgid ""
 "a previously scheduled task has failed; propagating the result immediately"
 msgstr ""
+"eine vorgängig geplante Aufgabe ist fehlgeschlagen; verbreite das Resultat "
+"sofort"
 
 #: ../duplicity/asyncscheduler.py:211 ../duplicity/asyncscheduler.py:232
 #, python-format
 msgid "active workers = %d"
-msgstr ""
+msgstr "aktive Arbeiter = %d"
 
 #: ../duplicity/asyncscheduler.py:252
 #, python-format
 msgid "task execution done (success: %s)"
-msgstr ""
+msgstr "Aufgabenausführung abgeschlossen (erfolgreich: %s)"
 
 #: ../duplicity/backend.py:415 ../duplicity/backend.py:439
 #, python-format
@@ -348,8 +357,8 @@ msgstr "Lese Ergebnisse von '%s'"
 #, python-format
 msgid "Running '%s' failed with code %d (attempt #%d)"
 msgid_plural "Running '%s' failed with code %d (attempt #%d)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ausführung von '%s' ist mit Code %d fehlgeschlagen (Versuch #%d)"
+msgstr[1] "Ausführung von '%s' ist mit Code %d fehlgeschlagen (Versuch #%d)"
 
 #: ../duplicity/backend.py:458
 #, python-format
@@ -357,12 +366,14 @@ msgid ""
 "Error is:\n"
 "%s"
 msgstr ""
+"Fehler:\n"
+"%s"
 
 #: ../duplicity/backend.py:460
 #, python-format
 msgid "Giving up trying to execute '%s' after %d attempt"
 msgid_plural "Giving up trying to execute '%s' after %d attempts"
-msgstr[0] ""
+msgstr[0] "Ausführung von '%s' aufgegeben nach dem %d. Versuch"
 msgstr[1] "Ausführung von '%s' aufgegeben nach %d Versuchen"
 
 #: ../duplicity/collections.py:181
@@ -385,17 +396,18 @@ msgstr ""
 
 #: ../duplicity/collections.py:304
 msgid "Preferring Backupset over previous one!"
-msgstr ""
+msgstr "Ziehe Backup-Set dem Vorherigen vor!"
 
 #: ../duplicity/collections.py:307
 #, python-format
 msgid "Ignoring incremental Backupset (start_time: %s; needed: %s)"
-msgstr ""
+msgstr "Ignoriere inkrementelles Backup-Set (start_zeit: %s; benötigt: %s)"
 
 #: ../duplicity/collections.py:312
 #, python-format
 msgid "Added incremental Backupset (start_time: %s / end_time: %s)"
 msgstr ""
+"Inkrementelles Backup-Set hinzugefügt (start_zeit: %s / end_zeit: %s)"
 
 #: ../duplicity/collections.py:378
 msgid "Chain start time: "
@@ -518,8 +530,8 @@ msgstr[1] "%d Dateien existieren im Backend"
 #, python-format
 msgid "%d file exists in cache"
 msgid_plural "%d files exist in cache"
-msgstr[0] "%d Datei existiert im Cache"
-msgstr[1] "%d Dateien existieren im Cache"
+msgstr[0] "%d Datei existiert im Zwischenspeicher"
+msgstr[1] "%d Dateien existieren im Zwischenspeicher"
 
 #: ../duplicity/collections.py:718
 msgid ""
@@ -578,7 +590,7 @@ msgstr "Datei %s ist Teil eines bekannten Satzes"
 #: ../duplicity/collections.py:798
 #, python-format
 msgid "File %s is not part of a known set; creating new set"
-msgstr "Datei %s ist kein Teil eines bekannten Satzes; erstelle neuen Satz"
+msgstr "Datei %s ist nicht Teil eines bekannten Sets; erstelle neues Set"
 
 #: ../duplicity/collections.py:803
 #, python-format
@@ -642,7 +654,7 @@ msgstr "Pfad"
 #: ../duplicity/commandline.py:245 ../duplicity/commandline.py:423
 #: ../duplicity/commandline.py:622
 msgid "gpg-key-id"
-msgstr ""
+msgstr "GPG-Schlüssel-ID"
 
 #. Used in usage help to represent a "glob" style pattern for
 #. matching one or more files, as described in the documentation.
@@ -651,7 +663,7 @@ msgstr ""
 #: ../duplicity/commandline.py:253 ../duplicity/commandline.py:333
 #: ../duplicity/commandline.py:672
 msgid "shell_pattern"
-msgstr ""
+msgstr "Shell_Ausdruck"
 
 #. Used in usage help to represent the name of a file. Example:
 #. --log-file <filename>
@@ -665,7 +677,7 @@ msgstr "Dateiname"
 #. Used in usage help to represent a regular expression (regexp).
 #: ../duplicity/commandline.py:278 ../duplicity/commandline.py:339
 msgid "regular_expression"
-msgstr ""
+msgstr "regulärer_Ausdruck"
 
 #. Used in usage help to represent a time spec for a previous
 #. point in time, as described in the documentation. Example:
@@ -689,15 +701,17 @@ msgid ""
 "Running in 'ignore errors' mode due to %s; please re-consider if this was "
 "not intended"
 msgstr ""
+"Laufe im 'Fehler ignorieren'-Modus aufgrund %s; bitte überprüfen wenn dies "
+"nicht beabsichtigt war"
 
 #. Used in usage help to represent an imap mailbox
 #: ../duplicity/commandline.py:331
 msgid "imap_mailbox"
-msgstr ""
+msgstr "imap_Postfach"
 
 #: ../duplicity/commandline.py:342
 msgid "file_descriptor"
-msgstr ""
+msgstr "Datei_Deskriptor"
 
 #. Used in usage help (noun)
 #: ../duplicity/commandline.py:353
@@ -767,14 +781,14 @@ msgstr "alias"
 #. s3://other.host/bucket_name[/prefix]
 #: ../duplicity/commandline.py:597
 msgid "bucket_name"
-msgstr ""
+msgstr "Bucket_Name"
 
 #. Used in usage help to represent the name of a container in
 #. Amazon Web Services' Cloudfront. Example:
 #. cf+http://container_name
 #: ../duplicity/commandline.py:608
 msgid "container_name"
-msgstr ""
+msgstr "Container_Name"
 
 #. noun
 #: ../duplicity/commandline.py:611
@@ -797,7 +811,7 @@ msgstr "modul"
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:641
 msgid "other.host"
-msgstr ""
+msgstr "anderer.Host"
 
 #. Used in usage help. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
@@ -822,7 +836,7 @@ msgstr ""
 #. rsync://user[:password]@other.host[:port]/relative_path
 #: ../duplicity/commandline.py:662
 msgid "relative_path"
-msgstr ""
+msgstr "relativer_Pfad"
 
 #. Used in usage help to represent the name of a single file
 #. directory or a Unix-style path to a directory. Example:
