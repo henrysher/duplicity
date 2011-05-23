@@ -119,6 +119,7 @@ class U1Backend(duplicity.backend.Backend):
         import urllib
         import json
         import ubuntuone.couch.auth as auth
+        import mimetypes
         if not remote_filename:
             remote_filename = source_path.get_filename()
         remote_full = self.meta_base + urllib.quote(remote_filename)
@@ -129,9 +130,14 @@ class U1Backend(duplicity.backend.Backend):
         node = json.loads(answer[1])
 
         remote_full = self.content_base + urllib.quote(node.get('content_path'), safe="/~")
-        f = open(source_path.name, 'rb')
-        data = f.read()
-        answer = auth.request(remote_full, http_method="PUT", request_body=data)
+        data = bytearray(open(source_path.name, 'rb').read())
+        size = len(data)
+        content_type = mimetypes.guess_type(source_path.name)[0]
+        content_type = content_type or 'application/octet-stream'
+        headers = {"Content-Length": str(size),
+    	           "Content-Type": content_type}
+        answer = auth.request(remote_full, http_method="PUT",
+                              headers=headers, request_body=data)
         self.handle_error('put', answer[0], source_path.name, remote_full)
 
     def get(self, filename, local_path):

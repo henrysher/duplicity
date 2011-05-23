@@ -24,16 +24,39 @@ def login():
 	loop.run()
 	return _login_success
 
+
 import urllib
 import ubuntuone.couch.auth as auth
 import json
+import httplib2
+from oauth import oauth
+import ssl
+
+def upload(filename, url):
+	"""Make an OAuth signed upload."""
+	import urlparse, httplib, os, mimetypes
+	data = bytearray(open(filename, "rb").read())
+        size = len(data)
+        content_type = mimetypes.guess_type(filename)[0]
+	content_type = content_type or 'application/octet-stream'
+	headers = {"Content-Length": str(size),
+	           "Content-Type": content_type}
+	try:
+		answer = auth.request(url, http_method='PUT', headers=headers,
+		                      request_body=data)
+	except ssl.SSLError, e:
+		print e.errno, e.message, e.strerror, e.filename
+		print dir(e)
+		answer = None
+	print answer
 
 def list(path):
 	base = "https://one.ubuntu.com/api/file_storage/v1"
-	answer = auth.request(base + "/~/" + urllib.quote(path))# + "?include_children=true")
+	answer = auth.request(base + "/~/" + urllib.quote(path) + "?include_children=true")
+	print answer
 	if len(answer) < 2:
 		return False
-	node = json.loads(answer[1])
+	#node = json.loads(answer[1])
 	return True
 
 def delete(path):
@@ -68,15 +91,9 @@ def put(source, path):
 	node = json.loads(answer[1])
 	base = "https://files.one.ubuntu.com"
 	content_url = base + urllib.quote(node['content_path'], safe="/~")
-	#f = open(source, 'rb')
-	#data = f.read()
-	data = "hello!"
 	print content_url
-	answer = auth.request(content_url, http_method="PUT", request_body=data)
-	if len(answer) < 2:
-		return False
-	#print answer[1][:500]
-	print answer[0]
+	answer = upload(source, content_url)
+	print answer
 	return True
 
 def create_volume(root):
@@ -99,4 +116,5 @@ root = "deja-dup"
 start(root)
 
 #get("Ubuntu One/MIR.log", "/tmp/test")
-put("/tmp/test", "deja-dup/blarg.txt")
+put("/home/mike/Downloads/LevelA_files/LevelA_002.jpeg", "%s/LevelA_002.jpeg" % root)
+#list("Ubuntu One")
