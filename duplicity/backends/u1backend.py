@@ -38,30 +38,6 @@ def ensure_dbus():
                     atexit.register(os.kill, int(parts[1]), signal.SIGTERM)
                 os.environ[parts[0]] = parts[1]
 
-_login_success = False
-def login():
-	from gobject import MainLoop
-	from dbus.mainloop.glib import DBusGMainLoop
-	from ubuntuone.platform.credentials import CredentialsManagementTool
-
-	global _login_success
-	_login_success = False
-
-	DBusGMainLoop(set_as_default=True)
-	loop = MainLoop()
-
-	def quit(result):
-		global _login_success
-		loop.quit()
-		if result:
-			_login_success = True
-
-	cd = CredentialsManagementTool()
-	d = cd.login()
-	d.addCallbacks(quit)
-	loop.run()
-	return _login_success
-
 class U1Backend(duplicity.backend.Backend):
     """
     Backend for Ubuntu One, through the use of the ubuntone module and a REST
@@ -70,20 +46,24 @@ class U1Backend(duplicity.backend.Backend):
     def __init__(self, url):
         duplicity.backend.Backend.__init__(self, url)
 
-        if self.scheme == 'u1+http':
+        if self.parsed_url.scheme == 'u1+http':
             # Use the default Ubuntu One host
-            self.hostname = "one.ubuntu.com"
+            self.parsed_url.hostname = "one.ubuntu.com"
         else:
-            assert self.scheme == 'u1'
+            assert self.parsed_url.scheme == 'u1'
 
-        self.api_base = "https://%s/api/file_storage/v1" % self.hostname
-        self.volume_uri = "%s/volumes/~/%s" % (self.api_base, self.parsed_url.path)
-        self.meta_base = "%s/~/%s/" % (self.api_base, self.parsed_url.path)
-        self.content_base = "https://files.%s" % self.hostname
+        path = self.parsed_url.path.lstrip('/')
+
+        self.api_base = "https://%s/api/file_storage/v1" % self.parsed_url.hostname
+        self.volume_uri = "%s/volumes/~/%s" % (self.api_base, path)
+        self.meta_base = "%s/~/%s/" % (self.api_base, path)
+        # This next line *should* work, but isn't set up correctly server-side yet
+        #self.content_base = self.api_base
+        self.content_base = "https://files.%s" % self.parsed_url.hostname
 
         ensure_dbus()
 
-	    if not login():
+	    if not self.login():
             from duplicity import log
 		    log.FatalError(_("Could not obtain Ubuntu One credentials"),
                            log.ErrorCode.backend_error)
@@ -91,45 +71,77 @@ class U1Backend(duplicity.backend.Backend):
         # Create volume in case it doesn't exist yet
         import ubuntuone.couch.auth as auth
         answer = auth.request(self.volume_uri, http_method="PUT")
-        self.handle_error('put', answer[0], self.volume_uri)
+        self.handle_error('put', answer, self.volume_uri)
+
+    def login(self):
+	    from gobject import MainLoop
+	    from dbus.mainloop.glib import DBusGMainLoop
+	    from ubuntuone.platform.credentials import CredentialsManagementTool
+
+	    self.login_success = False
+
+	    DBusGMainLoop(set_as_default=True)
+	    loop = MainLoop()
+
+	    def quit(result):
+		    loop.quit()
+		    if result:
+			    self.login_success = True
+
+	    cd = CredentialsManagementTool()
+	    d = cd.login()
+	    d.addCallbacks(quit)
+	    loop.run()
+	    return self.login_success
+
+    def quote(self, url):
+        import urllib
+        return urllib.quote(url, safe="/~")
 
     def handle_error(self, op, headers, file1=None, file2=None):
         from duplicity import log
         from duplicity import util
+        import json
 
-        status = headers.get('status')
-        if status = '200':
+        status = headers[0].get('status')
+        if status == '200':
             return
 
         if status == '400':
             code = log.ErrorCode.backend_permission_denied
         elif status == '404':
             code = log.ErrorCode.backend_not_found
-        elif status == 'XXX':
+        elif status == '500': # wish this were a more specific error
             code = log.ErrorCode.backend_no_space
         else:
             code = log.ErrorCode.backend_error
 
+        file1 = file1.encode("utf8") if file1 else None
+        file2 = file2.encode("utf8") if file2 else None
         extra = ' '.join([util.escape(x) for x in [file1, file2] if x])
         extra = ' '.join([op, extra])
-        log.FatalError(str(e), code, extra)
+        msg = _("Got status code %s") % status
+        if headers[0].get('content-type') == 'application/json':
+            node = json.loads(headers[1])
+            if node.get('error'):
+                msg = node.get('error')
+        log.FatalError(msg, code, extra)
 
     def put(self, source_path, remote_filename = None):
         """Copy file to remote"""
-        import urllib
         import json
         import ubuntuone.couch.auth as auth
         import mimetypes
         if not remote_filename:
             remote_filename = source_path.get_filename()
-        remote_full = self.meta_base + urllib.quote(remote_filename)
+        remote_full = self.meta_base + self.quote(remote_filename)
         answer = auth.request(remote_full,
                               http_method="PUT",
                               request_body='{"kind":"file"}')
-        self.handle_error('put', answer[0], source_path.name, remote_full)
+        self.handle_error('put', answer, source_path.name, remote_full)
         node = json.loads(answer[1])
 
-        remote_full = self.content_base + urllib.quote(node.get('content_path'), safe="/~")
+        remote_full = self.content_base + self.quote(node.get('content_path'))
         data = bytearray(open(source_path.name, 'rb').read())
         size = len(data)
         content_type = mimetypes.guess_type(source_path.name)[0]
@@ -138,52 +150,49 @@ class U1Backend(duplicity.backend.Backend):
     	           "Content-Type": content_type}
         answer = auth.request(remote_full, http_method="PUT",
                               headers=headers, request_body=data)
-        self.handle_error('put', answer[0], source_path.name, remote_full)
+        self.handle_error('put', answer, source_path.name, remote_full)
 
     def get(self, filename, local_path):
         """Get file and put in local_path (Path object)"""
-        import urllib
         import json
         import ubuntuone.couch.auth as auth
-        remote_full = self.meta_base + urllib.quote(filename)
+        remote_full = self.meta_base + self.quote(filename)
         answer = auth.request(remote_full)
-        self.handle_error('get', answer[0], remote_full, source_path.name)
+        self.handle_error('get', answer, remote_full, filename)
         node = json.loads(answer[1])
 
-        remote_full = self.content_base + urllib.quote(node.get('content_path'), safe="/~")
+        remote_full = self.content_base + self.quote(node.get('content_path'))
         answer = auth.request(remote_full)
-        self.handle_error('get', answer[0], remote_full, source_path.name)
+        self.handle_error('get', answer, remote_full, filename)
         f = open(local_path.name, 'wb')
         f.write(answer[1])
         local_path.setdata()
 
     def list(self):
         """List files in that directory"""
-        import urllib
         import json
         import ubuntuone.couch.auth as auth
+        import urllib
         remote_full = self.meta_base + "?include_children=true"
         answer = auth.request(remote_full)
-        self.handle_error('list', answer[0], remote_full)
-        node = json.loads(answer[1])
-        if node.get('has_children') != 'True':
-            return []
+        self.handle_error('list', answer, remote_full)
         filelist = []
-        for child in node.get('children'):
-            child_node = json.loads(child)
-            filelist += [urllib.unquote(child_node.get('path'))]
+        node = json.loads(answer[1])
+        if node.get('has_children') == True:
+            for child in node.get('children'):
+                path = urllib.unquote(child.get('path')).lstrip('/')
+                filelist += [path]
         return filelist
 
     def delete(self, filename_list):
         """Delete all files in filename list"""
         import types
-        import urllib
         import ubuntuone.couch.auth as auth
         assert type(filename_list) is not types.StringType
         for filename in filename_list:
-            remote_full = self.meta_base + urllib.quote(filename)
+            remote_full = self.meta_base + self.quote(filename)
     	    answer = auth.request(remote_full, http_method="DELETE")
-            self.handle_error('delete', answer[0], remote_full)
+            self.handle_error('delete', answer, remote_full)
 
 duplicity.backend.register_backend("u1", U1Backend)
 duplicity.backend.register_backend("u1+http", U1Backend)
