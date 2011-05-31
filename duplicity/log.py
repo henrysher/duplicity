@@ -210,7 +210,7 @@ class DupLogRecord(logging.LogRecord):
         global _logger
         logging.LogRecord.__init__(self, *args, **kwargs)
         self.controlLine = controlLine
-        self.levelName = LevelName(args[1]) # args[1] is lvl
+        self.levelName = LevelName(self.levelno)
 
 class DupLogger(logging.Logger):
     """Custom logger that creates special code-bearing records"""
@@ -276,13 +276,8 @@ class MachineFormatter(logging.Formatter):
 class MachineFilter(logging.Filter):
     """Filter that only allows levels that are consumable by other processes."""
     def filter(self, record):
-        # We only want to allow records that have level names.  If the level
-        # does not have an associated name, there will be a space as the
-        # logging module expands levelname to "Level %d".  This will confuse
-        # consumers.  Even if we dropped the space, random levels may not
-        # mean anything to consumers.
-        s = logging.getLevelName(record.levelno)
-        return s.find(' ') == -1
+        # We only want to allow records that have our custom level names
+        return hasattr(record, 'levelName')
 
 def add_fd(fd):
     """Add stream to which to write machine-readable logging"""
