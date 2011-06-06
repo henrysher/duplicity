@@ -126,12 +126,12 @@ class GIOBackend(duplicity.backend.Backend):
         if not remote_filename:
             remote_filename = source_path.get_filename()
         source_file = gio.File(path=source_path.name)
-        target_file = self.remote_file.get_child_for_display_name(remote_filename)
+        target_file = self.remote_file.get_child(remote_filename)
         self.copy_file('put', source_file, target_file)
 
     def get(self, filename, local_path):
         """Get file and put in local_path (Path object)"""
-        source_file = self.remote_file.get_child_for_display_name(filename)
+        source_file = self.remote_file.get_child(filename)
         target_file = gio.File(path=local_path.name)
         self.copy_file('get', source_file, target_file)
         local_path.setdata()
@@ -139,7 +139,7 @@ class GIOBackend(duplicity.backend.Backend):
     def list(self):
         """List files in that directory"""
         try:
-            enum = self.remote_file.enumerate_children(gio.FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME,
+            enum = self.remote_file.enumerate_children(gio.FILE_ATTRIBUTE_STANDARD_NAME,
                                                        gio.FILE_QUERY_INFO_NOFOLLOW_SYMLINKS)
         except Exception, e:
             self.handle_error(e, 'list', self.remote_file.get_parse_name())
@@ -147,7 +147,7 @@ class GIOBackend(duplicity.backend.Backend):
         try:
             info = enum.next_file()
             while info:
-                files.append(info.get_display_name())
+                files.append(info.get_name())
                 info = enum.next_file()
             return files
         except Exception, e:
@@ -158,6 +158,6 @@ class GIOBackend(duplicity.backend.Backend):
         assert type(filename_list) is not types.StringType
         try:
                 for filename in filename_list:
-                        self.remote_file.get_child_for_display_name(filename).delete()
+                        self.remote_file.get_child(filename).delete()
         except Exception, e:
-            self.handle_error(e, 'delete', self.remote_file.get_child_for_display_name(filename).get_parse_name())
+            self.handle_error(e, 'delete', self.remote_file.get_child(filename).get_parse_name())
