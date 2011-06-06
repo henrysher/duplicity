@@ -27,6 +27,7 @@ import gio #@UnresolvedImport
 import glib #@UnresolvedImport
 
 import duplicity.backend
+from duplicity.backend import retry
 from duplicity import log
 from duplicity import globals
 from duplicity import util
@@ -89,7 +90,9 @@ class GIOBackend(duplicity.backend.Backend):
                                % str(e), log.ErrorCode.connection_failed)
         loop.quit()
 
-    def handle_error(self, e, op, file1=None, file2=None):
+    def handle_error(self, raise_error, e, op, file1=None, file2=None):
+        if raise_error:
+            raise e
         code = log.ErrorCode.backend_error
         if isinstance(e, gio.Error):
             if e.code == gio.ERROR_PERMISSION_DENIED:
@@ -105,21 +108,19 @@ class GIOBackend(duplicity.backend.Backend):
     def copy_progress(self, *args, **kwargs):
         pass
 
-    def copy_file(self, op, source, target):
-        exc = None
-        for n in range(1, globals.num_retries+1):
-            log.Info(_("Writing %s") % target.get_parse_name())
-            try:
-                source.copy(target, self.copy_progress,
-                            gio.FILE_COPY_OVERWRITE | gio.FILE_COPY_NOFOLLOW_SYMLINKS)
-                return
-            except Exception, e:
-                log.Warn("Write of '%s' failed (attempt %s): %s: %s"
-                        % (target.get_parse_name(), n, e.__class__.__name__, str(e)))
-                log.Debug("Backtrace of previous error: %s"
-                          % exception_traceback())
-                exc = e
-        self.handle_error(exc, op, source.get_parse_name(), target.get_parse_name())
+    @retry
+    def copy_file(self, op, source, target, raise_errors=False):
+        log.Info(_("Writing %s") % target.get_parse_name())
+        try:
+            source.copy(target, self.copy_progress,
+                        gio.FILE_COPY_OVERWRITE | gio.FILE_COPY_NOFOLLOW_SYMLINKS)
+        except Exception, e:
+            log.Warn("Write of '%s' failed (attempt %s): %s: %s"
+                    % (target.get_parse_name(), n, e.__class__.__name__, str(e)))
+            log.Debug("Backtrace of previous error: %s"
+                      % exception_traceback())
+            self.handle_error(raise_errors, e, op, source.get_parse_name(),
+                              target.get_parse_name())
 
     def put(self, source_path, remote_filename = None):
         """Copy file to remote"""
@@ -136,28 +137,34 @@ class GIOBackend(duplicity.backend.Backend):
         self.copy_file('get', source_file, target_file)
         local_path.setdata()
 
-    def list(self):
+    @retry
+    def list(self, raise_errors=False):
         """List files in that directory"""
+        files = []
         try:
             enum = self.remote_file.enumerate_children(gio.FILE_ATTRIBUTE_STANDARD_NAME,
                                                        gio.FILE_QUERY_INFO_NOFOLLOW_SYMLINKS)
-        except Exception, e:
-            self.handle_error(e, 'list', self.remote_file.get_parse_name())
-        files = []
-        try:
             info = enum.next_file()
             while info:
                 files.append(info.get_name())
                 info = enum.next_file()
-            return files
         except Exception, e:
-            self.handle_error(e, 'list')
+            self.handle_error(raise_errors, e, 'list',
+                              self.remote_file.get_parse_name())
+        return files
 
-    def delete(self, filename_list):
+    @retry
+    def delete(self, filename_list, raise_errors=False):
         """Delete all files in filename list"""
         assert type(filename_list) is not types.StringType
-        try:
-                for filename in filename_list:
-                        self.remote_file.get_child(filename).delete()
-        except Exception, e:
-            self.handle_error(e, 'delete', self.remote_file.get_child(filename).get_parse_name())
+        for filename in filename_list:
+            target_file = self.remote_file.get_child(filename)
+            try:
+                target_file.delete()
+            except Exception, e:
+                if isinstance(e, gio.Error):
+                    if e.code == gio.ERROR_NOT_FOUND:
+                        continue
+                self.handle_error(raise_errors, e, 'delete',
+                                  target_file.get_parse_name())
+                return
