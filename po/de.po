@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-04-02 12:48-0500\n"
-"PO-Revision-Date: 2011-04-25 10:43+0000\n"
+"PO-Revision-Date: 2011-06-06 19:20+0000\n"
 "Last-Translator: Patrick <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-04-26 04:42+0000\n"
-"X-Generator: Launchpad (build 12758)\n"
+"X-Launchpad-Export-Date: 2011-06-07 04:36+0000\n"
+"X-Generator: Launchpad (build 12959)\n"
 
 #: ../duplicity-bin:191
 #, python-format
@@ -141,9 +141,9 @@ msgid ""
 "Current active backup chain is older than specified time.  However, it will "
 "not be deleted.  To remove all your backups, manually purge the repository."
 msgstr ""
-"Derzeit aktive Backupschleife ist älter als der angegebene Zeitpunkt. Sie "
-"wird also nicht gelöscht. Um alle Backups zu löschen müssen sie manuell "
-"gelöscht werden."
+"Aktuell aktive Sicherungskette ist älter als der angegebene Zeitpunkt. Sie "
+"wird nicht gelöscht. Um alle Backups zu entfernen, löschen Sie das "
+"Repository manuell."
 
 #: ../duplicity-bin:758
 msgid "No old backup sets found, nothing deleted."
@@ -457,7 +457,7 @@ msgstr "Entfernt"
 
 #: ../duplicity/collections.py:606
 msgid "Collection Status"
-msgstr ""
+msgstr "Sammlungszustand"
 
 #: ../duplicity/collections.py:608
 #, python-format
@@ -537,7 +537,7 @@ msgstr[1] "%d Dateien existieren im Zwischenspeicher"
 msgid ""
 "Warning, discarding last backup set, because of missing signature file."
 msgstr ""
-"Warnung, der letzte Sicherungssatz wird verworfen, da die Signatur-Datei "
+"Warnung, der letzte Sicherungssatz wird verworfen, weil die Signaturdatei "
 "fehlt."
 
 #: ../duplicity/collections.py:741
@@ -568,8 +568,8 @@ msgstr ""
 msgid ""
 "Warning, found incomplete backup sets, probably left from aborted session"
 msgstr ""
-"Warnung, unvollständige Sicherungssätze gefunden, wahrscheinlich aufgrund "
-"einer abgebrochenen Sitzung"
+"Warnung, unvollständige Sicherungssätze gefunden, wahrscheinlich von einer "
+"abgebrochenen Sitzung zurückgelassen"
 
 #: ../duplicity/collections.py:767
 msgid "Warning, found the following orphaned backup file:"
@@ -843,7 +843,7 @@ msgstr "relativer_Pfad"
 #. file:///some_dir
 #: ../duplicity/commandline.py:677
 msgid "some_dir"
-msgstr ""
+msgstr "irgendein_Verzeichnis"
 
 #. Used in usage help to represent the name of a single file
 #. directory or a Unix-style path to a directory where files will be
@@ -936,6 +936,10 @@ msgid ""
 "Examples of URL strings are \"scp://user@host.net:1234/path\" and\n"
 "\"file:///usr/local\".  See the man page for more information."
 msgstr ""
+"Ungültige URL '%s'.\n"
+"Beispiele eines URL-Strings sind \"scp://benutzer@host:1234/pfad\" und\n"
+"\"file:///usr/local\". Eine Konsultation der man-Seite für mehr "
+"Informationen wird empfohlen."
 
 #: ../duplicity/commandline.py:951
 msgid "Main action: "
@@ -980,6 +984,12 @@ msgid ""
 "allowed special characters are s, m, h, D, W, M, and Y.  See the man\n"
 "page for more information."
 msgstr ""
+"Ungültiger Intervall-String \"%s\"\n"
+"\n"
+"Intervalle sind angegeben wie 2Y (2 Jahre) oder 2h30m (2.5 Stunden). Die\n"
+"erlaubten Spezialzeichen sind s, m, h, D, W, M, und Y. Eine Konsultation der "
+"Man-\n"
+"Seite für weitere Informationen wird empfohlen."
 
 #: ../duplicity/dup_time.py:54
 #, python-format
@@ -993,11 +1003,20 @@ msgid ""
 "(various combinations are acceptable, but the month always precedes\n"
 "the day)."
 msgstr ""
+"Ungültiger Zeit-String \"%s\"\n"
+"\n"
+"Gültige Zeit-Strings sind Intervalle (wie \"3D46s\"), w3-Datum-Zeit-\n"
+"Strings, wie \"2002-04-26T04:22:01-07:00\" (Strings wie\n"
+"\"2002-04-26T04:22:01\" sind auch gültig - duplicity wird die \n"
+"aktuelle Zeitzone nutzen, oder gewöhnliche Daten wie 2/4/1997 oder 2001-04-"
+"23\n"
+"(verschiedene Kombinationen sind gültig, aber der Monat kommt immer vor\n"
+"dem Tag)."
 
 #: ../duplicity/lazy.py:325
 #, python-format
 msgid "Warning: oldindex %s >= newindex %s"
-msgstr ""
+msgstr "Warnung: Alt-Index %s >= Neu-Index %s"
 
 #: ../duplicity/lazy.py:400
 #, python-format
@@ -1007,7 +1026,7 @@ msgstr "Fehler '%s' beim Verarbeiten von %s"
 #: ../duplicity/lazy.py:408
 #, python-format
 msgid "Skipping %s because of previous error"
-msgstr ""
+msgstr "Überspringe %s wegen vorherigem Fehler"
 
 #: ../duplicity/manifest.py:87
 #, python-format
@@ -1016,6 +1035,9 @@ msgid ""
 "Current hostname: %s\n"
 "Previous hostname: %s"
 msgstr ""
+"Kritischer Fehler: Backup-Quell-Host hat sich geändert.\n"
+"Momentaner Hostname: %s\n"
+"Vorheriger Hostname: %s"
 
 #: ../duplicity/manifest.py:94
 #, python-format
@@ -1024,6 +1046,9 @@ msgid ""
 "Current directory: %s\n"
 "Previous directory: %s"
 msgstr ""
+"Kritischer Fehler: Backup-Quell-Verzeichnis hat sich geändert.\n"
+"Momentanes Verzeichnis: %s\n"
+"Vorheriges Verzeichnis: %s"
 
 #: ../duplicity/manifest.py:103
 msgid ""
@@ -1032,42 +1057,46 @@ msgid ""
 "If this is not a mistake, use the --allow-source-mismatch switch to avoid "
 "seeing this message"
 msgstr ""
+"Abbruch weil Sie möglicherweise aus Versehen versucht haben, zwei "
+"verschiedene Backup-Sets zum gleichen entfernten Ort zu sichern, oder zum "
+"selben Archiv-Verzeichnis. Wenn dies kein Fehler ist, verwenden Sie den "
+"«allow-source-mismatch»-Parameter, um diese Meldung auszuschalten."
 
 #: ../duplicity/manifest.py:198
 msgid "Manifests not equal because different volume numbers"
-msgstr ""
+msgstr "Manifests sind ungleich aufgrund verschiedener Volumen-Zahlen"
 
 #: ../duplicity/manifest.py:203
 msgid "Manifests not equal because volume lists differ"
-msgstr ""
+msgstr "Manifests sind ungleich aufgrund verschiedenen Volumen-Listen"
 
 #: ../duplicity/manifest.py:208
 msgid "Manifests not equal because hosts or directories differ"
-msgstr ""
+msgstr "Manifests sind ungleich aufgrund Host- oder Verzeichnisunterschieden"
 
 #: ../duplicity/manifest.py:355
 msgid "Warning, found extra Volume identifier"
-msgstr ""
+msgstr "Warnung, zusätzlicher Volumen-Identifikator gefunden"
 
 #: ../duplicity/manifest.py:381
 msgid "Other is not VolumeInfo"
-msgstr ""
+msgstr "Anderes ist kein Volumeinfo"
 
 #: ../duplicity/manifest.py:384
 msgid "Volume numbers don't match"
-msgstr ""
+msgstr "Volumenzahlen stimmen nicht überein"
 
 #: ../duplicity/manifest.py:387
 msgid "start_indicies don't match"
-msgstr ""
+msgstr "start_indexe stimmen nicht überein"
 
 #: ../duplicity/manifest.py:390
 msgid "end_index don't match"
-msgstr ""
+msgstr "end_indexe stimmen nicht überein"
 
 #: ../duplicity/manifest.py:397
 msgid "Hashes don't match"
-msgstr ""
+msgstr "Prüfsummen stimmen nicht überein"
 
 #: ../duplicity/misc.py:99
 #, python-format
@@ -1080,21 +1109,23 @@ msgid ""
 "One only volume required.\n"
 "Renaming %s to %s"
 msgstr ""
+"Es wird nur ein Volumen benötigt.\n"
+"Benenne %s zu %s um."
 
 #: ../duplicity/patchdir.py:74 ../duplicity/patchdir.py:79
 #, python-format
 msgid "Patching %s"
-msgstr ""
+msgstr "Repariere %s"
 
 #: ../duplicity/patchdir.py:567
 #, python-format
 msgid "Writing %s of type %s"
-msgstr ""
+msgstr "Schreibvorgang von %s des Typs %s"
 
 #: ../duplicity/path.py:212 ../duplicity/path.py:271
 #, python-format
 msgid "Warning: %s has negative mtime, treating as 0."
-msgstr ""
+msgstr "Warnung: %s hat eine negative mtime, behandle wie 0."
 
 #: ../duplicity/path.py:336
 msgid "Difference found:"
@@ -1113,32 +1144,32 @@ msgstr "Datei %s fehlt"
 #: ../duplicity/path.py:348
 #, python-format
 msgid "File %%s has type %s, expected %s"
-msgstr ""
+msgstr "Datei %%s ist vom Typ %s, erwartet %s"
 
 #: ../duplicity/path.py:354 ../duplicity/path.py:380
 #, python-format
 msgid "File %%s has permissions %o, expected %o"
-msgstr ""
+msgstr "Datei %%s hat Berechtigungen %o, erwartet %o"
 
 #: ../duplicity/path.py:359
 #, python-format
 msgid "File %%s has mtime %s, expected %s"
-msgstr ""
+msgstr "Datei %%s hat mtime %s, erwartet %s"
 
 #: ../duplicity/path.py:367
 #, python-format
 msgid "Data for file %s is different"
-msgstr ""
+msgstr "Daten für Datei %s sind unterschiedlich"
 
 #: ../duplicity/path.py:375
 #, python-format
 msgid "Symlink %%s points to %s, expected %s"
-msgstr ""
+msgstr "Symbolischer Link %%s zeigt auf %s, erwartet %s"
 
 #: ../duplicity/path.py:384
 #, python-format
 msgid "Device file %%s has numbers %s, expected %s"
-msgstr ""
+msgstr "Gerätedatei %%s hat Nummern %s, erwartet %s"
 
 #: ../duplicity/path.py:544
 #, python-format
@@ -1153,7 +1184,7 @@ msgstr ""
 #: ../duplicity/path.py:563
 #, python-format
 msgid "Touching %s"
-msgstr ""
+msgstr "Erstelle oder aktualisiere Zugriffszeit auf %s"
 
 #: ../duplicity/path.py:570
 #, python-format
@@ -1178,7 +1209,7 @@ msgstr "Fehler beim initialisieren der Datei %s"
 #: ../duplicity/selection.py:126 ../duplicity/selection.py:147
 #, python-format
 msgid "Error accessing possibly locked file %s"
-msgstr "Fehler beim Zugriff auf möglicherweise blockierte Datei %s"
+msgstr "Fehler beim Zugriff auf möglicherweise reservierte Datei %s"
 
 #: ../duplicity/selection.py:162
 #, python-format
@@ -1201,6 +1232,13 @@ msgid ""
 "Useful file specifications begin with the base directory or some\n"
 "pattern (such as '**') which matches the base directory."
 msgstr ""
+"Kritischer Fehler: Die Datei-Angaben\n"
+"    %s\n"
+"können nicht mit Dateien im Basis-Verzeichnis\n"
+"    %s \n"
+"übereinstimmen. Nützliche Datei-Angaben beginnen mit dem Basis-Verzeichnis "
+"oder einem\n"
+"Muster (wie '**'), welches mit dem Basis-Verzeichnis übereinstimmt."
 
 #: ../duplicity/selection.py:275
 #, python-format
@@ -1208,6 +1246,8 @@ msgid ""
 "Fatal Error while processing expression\n"
 "%s"
 msgstr ""
+"Kritischer Fehler beim Verarbeiten des Ausdrucks\n"
+"%s"
 
 #: ../duplicity/selection.py:285
 #, python-format
@@ -1218,6 +1258,12 @@ msgid ""
 "include all files, the expression is redundant.  Exiting because this\n"
 "probably isn't what you meant."
 msgstr ""
+"Letzter Auswahl-Ausdruck:\n"
+"    %s\n"
+"Gibt nur Dateien an, die einbezieht werden. Weil standardmässig\n"
+"alle Dateien einbezieht werden ist der Ausdruck überflüssig. Beende, weil "
+"dies\n"
+"wahrscheinlich nicht das ist, was Sie beabsichtigten."
 
 #: ../duplicity/selection.py:310
 #, python-format
@@ -1250,7 +1296,7 @@ msgstr "Fehler beim Schließen der Dateiliste %s"
 #: ../duplicity/selection.py:427
 #, python-format
 msgid "Reading globbing filelist %s"
-msgstr ""
+msgstr "Lese ausdruckbasierte Dateiliste %s"
 
 #: ../duplicity/selection.py:460
 #, python-format
@@ -1283,12 +1329,14 @@ msgstr "Registriere (mkstemp) temporäre Datei %s"
 #: ../duplicity/tempdir.py:210
 #, python-format
 msgid "Forgetting temporary file %s"
-msgstr ""
+msgstr "Vergesse temporäre Datei %s"
 
 #: ../duplicity/tempdir.py:213
 #, python-format
 msgid "Attempt to forget unknown tempfile %s - this is probably a bug."
 msgstr ""
+"Versuchte unbekannte temporäre Datei %s zu vergessen - dies ist "
+"wahrscheinlich ein Bug."
 
 #: ../duplicity/tempdir.py:232
 #, python-format
@@ -1298,7 +1346,7 @@ msgstr "Entferne temporäre Datei %s"
 #: ../duplicity/tempdir.py:235
 #, python-format
 msgid "Cleanup of temporary file %s failed"
-msgstr "Aufräumen des temporären Verzeichnisses %s fehlgeschlagen"
+msgstr "Entfernen der temporären Datei %s ist fehlgeschlagen"
 
 #: ../duplicity/tempdir.py:240
 #, python-format
@@ -1310,7 +1358,7 @@ msgstr ""
 #: ../duplicity/util.py:65
 #, python-format
 msgid "IGNORED_ERROR: Warning: ignoring error as requested: %s: %s"
-msgstr "IGNORED_ERROR: Warnung: Fehler wird ignoriert: %s: %s"
+msgstr "IGNORIERTER_FEHLER: Warnung: ignoriere Fehler wie verlangt: %s: %s"
 
 #: ../duplicity/backends/giobackend.py:88
 #, python-format
