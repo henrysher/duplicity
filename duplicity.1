@@ -74,6 +74,13 @@ Duplicity will read the PASSPHRASE environment variable to find the
 passphrase to give to GnuPG.  If this is not set, the user will be
 prompted for the passphrase.
 
+When signing the backup with a GPG key as specified by
+.B --sign-key
+, the environment variable SIGN_PASSPHRASE can be used to set a
+passphrase for this key. If SIGN_PASSPHRASE is not set but PASSPHRASE is set,
+the latter will be used. Otherwise, if no passphrase is available, the user
+will be prompted for it.
+
 If you are backing up the root directory /, remember to --exclude
 /proc, or else duplicity will probably crash on the weird stuff in
 there.
@@ -297,6 +304,15 @@ Calculate what would be done, but do not perform any backend actions
 .BI "--encrypt-key " key
 When backing up, encrypt to the given public key, instead of using
 symmetric (traditional) encryption.  Can be specified multiple times.
+
+.TP
+.BI "--encrypt-secret-keyring " filename
+This option can only be used with
+.BR --encrypt-key ,
+and changes the path to the secret keyring for the encrypt key to
+.I filename
+This keyring is not used when creating a backup. If not specified, the
+default secret keyring is used which is usually located at .gnupg/secring.gpg
 
 .TP
 .BI "--exclude " shell_pattern

@@ -246,6 +246,9 @@ def parse_cmdline_options(arglist):
                       dest="", action="callback",
                       callback=lambda o, s, v, p: globals.gpg_profile.recipients.append(v)) #@UndefinedVariable
 
+    # secret keyring in which the private encrypt key can be found
+    parser.add_option("--encrypt-secret-keyring", type="string", metavar=_("path"))
+
     # TRANSL: Used in usage help to represent a "glob" style pattern for
     # matching one or more files, as described in the documentation.
     # Example:
