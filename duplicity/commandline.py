@@ -334,6 +334,9 @@ def parse_cmdline_options(arglist):
                       dest="", type="string", callback=add_selection)
     parser.add_option("--include-filelist", type="file", metavar=_("filename"),
                       dest="", action="callback", callback=add_filelist)
+    parser.add_option("--include-filelist-stdin", action="callback", dest="",
+                      callback=lambda o, s, v, p: (select_opts.append(("--include-filelist", "standard input")),
+                                                   select_files.append(sys.stdin)))
     parser.add_option("--include-globbing-filelist", type="file", metavar=_("filename"),
                       dest="", action="callback", callback=add_filelist)
     parser.add_option("--include-regexp", metavar=_("regular_expression"), dest="",
