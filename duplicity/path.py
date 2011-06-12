@@ -147,8 +147,9 @@ class ROPath:
             return "."
 
     def getperms(self):
-        """Return permissions mode"""
-        return self.mode
+        """Return permissions mode, owner and group"""
+        s1 = self.stat
+        return '%s:%s %o' % (s1.st_uid, s1.st_gid, self.mode)
 
     def open(self, mode):
         """Return fileobj associated with self"""
@@ -351,7 +352,7 @@ class ROPath:
 
         if self.isreg() or self.isdir() or self.isfifo():
             if not self.perms_equal(other):
-                log_diff(_("File %%s has permissions %o, expected %o") %
+                log_diff(_("File %%s has permissions %s, expected %s") %
                          (other.getperms(), self.getperms()))
                 return 0
             if ((int(self.stat.st_mtime) != int(other.stat.st_mtime)) and
@@ -377,7 +378,7 @@ class ROPath:
                 return 0
         elif self.isdev():
             if not self.perms_equal(other):
-                log_diff(_("File %%s has permissions %o, expected %o") %
+                log_diff(_("File %%s has permissions %s, expected %s") %
                          (other.getperms(), self.getperms()))
                 return 0
             if self.devnums != other.devnums:

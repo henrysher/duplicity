@@ -7,6 +7,7 @@ Bugs closed in this release:
 512628     --exclude-filelist-stdin and gpg error with/without PASSPHRASE
 705499     "include-filelist-stdin" not implemented on version 0.6.11
 739438     [PATCH] Local backend should always try renaming instead of copying
+761688     Difference found: File X has permissions 666, expected 666
 
 
 New in v0.6.13 (2011/04/02)
