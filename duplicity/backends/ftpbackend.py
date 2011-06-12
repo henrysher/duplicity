@@ -117,7 +117,7 @@ class FTPBackend(duplicity.backend.Backend):
     def delete(self, filename_list):
         """Delete files in filename_list"""
         for filename in filename_list:
-            commandline = "ncftpls %s -X 'DELE %s' '%s'" % \
+            commandline = "ncftpls %s -l -X 'DELE %s' '%s'" % \
                 (self.flags, filename, self.url_string)
             self.popen_persist(commandline)
 

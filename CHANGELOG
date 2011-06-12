@@ -9,6 +9,7 @@ Bugs closed in this release:
 739438     [PATCH] Local backend should always try renaming instead of copying
 761688     Difference found: File X has permissions 666, expected 666
 507904     Cygwin: Full Backup fails with "IOError: [Errno 13] Permission denied"
+778215     ncftpls file delete fails in ftpbackend.py
 
 
 New in v0.6.13 (2011/04/02)
