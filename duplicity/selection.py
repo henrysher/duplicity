@@ -22,6 +22,7 @@
 import os #@UnusedImport
 import re #@UnusedImport
 import stat #@UnusedImport
+import sys
 
 from duplicity.path import * #@UnusedWildImport
 from duplicity import log #@Reimport
@@ -356,7 +357,7 @@ probably isn't what you meant.""") %
             tuple_list.append(tuple)
             if not tuple[1]:
                 something_excluded = 1
-        if filelist_fp.close():
+        if filelist_fp not in (sys.stdin,) and filelist_fp.close():
             log.Warn(_("Error closing filelist %s") % filelist_name)
         return (tuple_list, something_excluded)
 
