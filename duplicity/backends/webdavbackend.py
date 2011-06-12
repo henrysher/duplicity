@@ -74,13 +74,14 @@ class WebDAVBackend(duplicity.backend.Backend):
             self.directory = '/'
 
         log.Info("Using WebDAV host %s" % (parsed_url.hostname,))
+        log.Info("Using WebDAV port %s" % (parsed_url.port,))	
         log.Info("Using WebDAV directory %s" % (self.directory,))
         log.Info("Using WebDAV protocol %s" % (globals.webdav_proto,))
 
         if parsed_url.scheme == 'webdav':
-            self.conn = httplib.HTTPConnection(parsed_url.hostname)
+            self.conn = httplib.HTTPConnection(parsed_url.hostname, parsed_url.port)
         elif parsed_url.scheme == 'webdavs':
-            self.conn = httplib.HTTPSConnection(parsed_url.hostname)
+            self.conn = httplib.HTTPSConnection(parsed_url.hostname, parsed_url.port)
         else:
             raise BackendException("Unknown URI scheme: %s" % (parsed_url.scheme))
 

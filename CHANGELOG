@@ -4,13 +4,14 @@ Boto moved S3ResponseError, so allow for different imports.
 
 Bugs closed in this release:
 433591     AttributeError: FileobjHooked instance has no attribute 'name'
+507904     Cygwin: Full Backup fails with "IOError: [Errno 13] Permission denied"
 512628     --exclude-filelist-stdin and gpg error with/without PASSPHRASE
 705499     "include-filelist-stdin" not implemented on version 0.6.11
 739438     [PATCH] Local backend should always try renaming instead of copying
 761688     Difference found: File X has permissions 666, expected 666
-507904     Cygwin: Full Backup fails with "IOError: [Errno 13] Permission denied"
 778215     ncftpls file delete fails in ftpbackend.py
 782321     duplicity sftp backend should ignore removing a file which is not there
+792704     Webdav(s) url scheme lacks port support
 
 
 New in v0.6.13 (2011/04/02)
