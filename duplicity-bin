@@ -238,9 +238,15 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
         return start_index, start_block, end_index, end_block
 
     def put(tdp, dest_filename):
-        backend.put(tdp, dest_filename)
+        """
+        Retrieve file size *before* calling backend.put(), which may (at least
+        in case of the localbackend) rename the temporary file to the target
+        instead of copying.
+        """
         putsize = tdp.getsize()
-        tdp.delete()
+        backend.put(tdp, dest_filename)
+        if tdp.stat:
+            tdp.delete()
         return putsize
 
     if not globals.restart:

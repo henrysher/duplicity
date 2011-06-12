@@ -56,21 +56,20 @@ class LocalBackend(duplicity.backend.Backend):
         extra = ' '.join([op, extra])
         log.FatalError(str(e), code, extra)
 
-    def put(self, source_path, remote_filename = None, rename = None):
-        """If rename is set, try that first, copying if doesn't work"""
+    def put(self, source_path, remote_filename = None):
         if not remote_filename:
             remote_filename = source_path.get_filename()
         target_path = self.remote_pathdir.append(remote_filename)
         log.Info("Writing %s" % target_path.name)
-        if rename:
-            try:
-                source_path.rename(target_path)
-            except OSError:
-                pass
-            except Exception, e:
-                handle_error(e, 'put', source_path.name, target_path.name)
-            else:
-                return
+        """Try renaming first, copying if doesn't work"""
+        try:
+            source_path.rename(target_path)
+        except OSError:
+            pass
+        except Exception, e:
+            handle_error(e, 'put', source_path.name, target_path.name)
+        else:
+            return
         try:
             target_path.writefileobj(source_path.open("rb"))
         except Exception, e:

@@ -1,4 +1,4 @@
-New in v0.6.14 (2011/04/??)
+New in v0.6.14 (2011/06/??)
 ----------------------------
 Boto moved S3ResponseError, so allow for different imports.
 
@@ -6,6 +6,7 @@ Bugs closed in this release:
 433591     AttributeError: FileobjHooked instance has no attribute 'name'
 512628     --exclude-filelist-stdin and gpg error with/without PASSPHRASE
 705499     "include-filelist-stdin" not implemented on version 0.6.11
+739438     [PATCH] Local backend should always try renaming instead of copying
 
 
 New in v0.6.13 (2011/04/02)
