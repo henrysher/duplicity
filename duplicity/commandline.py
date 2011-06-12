@@ -875,9 +875,9 @@ def check_consistency(action):
             command_line_error("--incremental option cannot be used when "
                                "restoring or verifying")
         if select_opts and action == "restore":
-            command_line_error("Selection options --exclude/--include\n"
-                               "currently work only when backing up, "
-                               "not restoring.")
+            log.Warn( _("Command line warning: %s") % _("Selection options --exclude/--include\n"
+                                                        "currently work only when backing up,"
+                                                        "not restoring.") )
     else:
         assert action == "inc" or action == "full"
         if verify:
