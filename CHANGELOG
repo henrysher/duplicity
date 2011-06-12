@@ -4,6 +4,7 @@ Boto moved S3ResponseError, so allow for different imports.
 
 Bugs closed in this release:
 433591     AttributeError: FileobjHooked instance has no attribute 'name'
+512628     --exclude-filelist-stdin and gpg error with/without PASSPHRASE
 
 
 New in v0.6.13 (2011/04/02)
