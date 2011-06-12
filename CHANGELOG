@@ -10,6 +10,7 @@ Bugs closed in this release:
 761688     Difference found: File X has permissions 666, expected 666
 507904     Cygwin: Full Backup fails with "IOError: [Errno 13] Permission denied"
 778215     ncftpls file delete fails in ftpbackend.py
+782321     duplicity sftp backend should ignore removing a file which is not there
 
 
 New in v0.6.13 (2011/04/02)
