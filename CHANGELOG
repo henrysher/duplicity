@@ -1,8 +1,9 @@
 New in v0.6.14 (2011/06/??)
 ----------------------------
-Boto moved S3ResponseError, so allow for different imports.
+ - Boto moved S3ResponseError, so allow for different import locations.
 
 Bugs closed in this release:
+452342     Provide Ubuntu One integration
 433591     AttributeError: FileobjHooked instance has no attribute 'name'
 507904     Cygwin: Full Backup fails with "IOError: [Errno 13] Permission denied"
 512628     --exclude-filelist-stdin and gpg error with/without PASSPHRASE

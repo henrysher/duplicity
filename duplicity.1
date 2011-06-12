@@ -772,6 +772,12 @@ s3://host/bucket_name[/prefix]
 .PP
 s3+http://bucket_name[/prefix]
 .PP
+.BI "Ubuntu One"
+.br
+u1://host/volume_path
+.br
+u1+http://volume_path
+.PP
 .BI "ssh protocols"
 .br
 scp://.. or sftp://.. are synonymous for
@@ -1182,6 +1188,14 @@ writing it is unclear to what extent this is an expected feature of
 Amazon S3, but in practice you may experience timeouts, socket errors
 or HTTP errors when trying to upload files to your newly created
 bucket. Give it a few minutes and the bucket should function normally.
+
+.SH UBUNTU ONE
+Connecting to Ubuntu One requires that you be running duplicity inside of an X
+session so that you can be prompted for your credentials if necessary by the
+Ubuntu One session daemon.
+.PP
+See https://one.ubuntu.com/ for more information about Ubuntu One.
+.PP
 
 .SH IMAP
 An IMAP account can be used as a target for the upload.  The userid may
