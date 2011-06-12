@@ -115,10 +115,6 @@ class GIOBackend(duplicity.backend.Backend):
             source.copy(target, self.copy_progress,
                         gio.FILE_COPY_OVERWRITE | gio.FILE_COPY_NOFOLLOW_SYMLINKS)
         except Exception, e:
-            log.Warn("Write of '%s' failed (attempt %s): %s: %s"
-                    % (target.get_parse_name(), n, e.__class__.__name__, str(e)))
-            log.Debug("Backtrace of previous error: %s"
-                      % exception_traceback())
             self.handle_error(raise_errors, e, op, source.get_parse_name(),
                               target.get_parse_name())
 
