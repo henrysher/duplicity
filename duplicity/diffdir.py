@@ -381,7 +381,11 @@ class FileWithReadCounter:
         self.infile = infile
 
     def read(self, length = -1):
-        buf = self.infile.read(length)
+        try:
+            buf = self.infile.read(length)
+        except IOError as ex:
+            buf = ""
+            log.Warn(_("Error %s getting delta for %s") % (str(ex), self.infile.name))
         if stats:
             stats.SourceFileSize += len(buf)
         return buf
