@@ -21,7 +21,7 @@ Bugs closed in this release:
 782321     duplicity sftp backend should ignore removing a file which is not there
 792704     Webdav(s) url scheme lacks port support
 782294     create tomporary files with sftp
-
+782337     sftp backend cannot create new subdirs on new backup
 
 New in v0.6.13 (2011/04/02)
 ----------------------------

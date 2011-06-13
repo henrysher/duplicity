@@ -27,6 +27,7 @@
 import re
 import string
 import time
+import os
 
 import duplicity.backend
 from duplicity import globals
@@ -276,9 +277,12 @@ class SSHBackend(duplicity.backend.Backend):
         files with newlines in them, as the embedded newlines cannot
         be distinguished from the file boundaries.
         """
-        commands = ["mkdir \"%s\"" % (self.remote_dir,),
-                    "cd \"%s\"" % (self.remote_dir,),
-                    "ls -1"]
+        dirs = self.remote_dir.split(os.sep)
+        mkdir_commands = [];
+        for d in dirs:
+            mkdir_commands += ["mkdir \"%s\"" % (d)] + ["cd \"%s\"" % (d)]
+
+        commands = mkdir_commands + ["ls -1"]
         commandline = ("%s %s %s" % (globals.sftp_command,
                                      globals.ssh_options,
                                      self.host_string))
