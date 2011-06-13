@@ -1,6 +1,12 @@
 New in v0.6.14 (2011/06/??)
 ----------------------------
  - Boto moved S3ResponseError, so allow for different import locations.
+ - Merged in lp:~ed.so/duplicity/0.6-add_sftp
+ - Merged in lp:~ed.so/duplicity/0.6-nonfatal-exclude
+ - Merged in lp:~mterry/duplicity/levelName
+ - Merged in lp:~mterry/duplicity/gio-name
+ - Merged in lp:~mterry/duplicity/retry-decorator
+ - Merged in lp:~mterry/duplicity/u1-status
 
 Bugs closed in this release:
 452342     Provide Ubuntu One integration
