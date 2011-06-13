@@ -40,6 +40,8 @@ from duplicity import globals
 from duplicity import log
 from duplicity import urlparse_2_5 as urlparser
 
+from duplicity.util import exception_traceback
+
 from duplicity.errors import BackendException
 from duplicity.errors import ConflictingScheme
 from duplicity.errors import InvalidBackendURL
@@ -301,14 +303,16 @@ def retry(fn):
     def iterate(*args):
         for n in range(1, globals.num_retries):
             try:
-                return fn(*args, raise_errors=True)
+                kwargs = {"raise_errors" : True}
+                return fn(*args, **kwargs)
             except Exception, e:
                 log.Warn("Attempt %s failed: %s: %s"
                          % (n, e.__class__.__name__, str(e)))
                 log.Debug("Backtrace of previous error: %s"
                           % exception_traceback())
         # Now try one last time, but fatal-log instead of raising errors
-        return fn(*args, raise_errors=False)
+        kwargs = {"raise_errors" : True}
+        return fn(*args, **kwargs)
     return iterate
 
 
@@ -420,14 +424,14 @@ class Backend:
         from subprocess import Popen, PIPE
         p = Popen(commandline, shell=True, stdout=PIPE, stderr=PIPE)
         stdout, stderr = p.communicate()
-        
+
         return p.returncode, stdout, stderr
 
     def subprocess_popen(self, commandline):
         """
         Execute the given command line with error check.
         Returns int Exitcode, string StdOut, string StdErr
-        
+
         Raise a BackendException on failure.
         """
         private = self.munge_password(commandline)
@@ -437,7 +441,7 @@ class Backend:
             raise BackendException("Error running '%s'" % private)
         return result, stdout, stderr
 
-    """ a dictionary for persist breaking exceptions, syntax is 
+    """ a dictionary for persist breaking exceptions, syntax is
         { 'command' : [ code1, code2 ], ... } see ftpbackend for an example """
     popen_persist_breaks = {}
 
@@ -446,7 +450,7 @@ class Backend:
         Execute the given command line with error check.
         Retries globals.num_retries times with 30s delay.
         Returns int Exitcode, string StdOut, string StdErr
-        
+
         Raise a BackendException on failure.
         """
         private = self.munge_password(commandline)
@@ -459,7 +463,7 @@ class Backend:
             result, stdout, stderr = self._subprocess_popen(commandline)
             if result == 0:
                 return result, stdout, stderr
-            
+
             try:
                 m = re.search("^\s*([\S]+)", commandline)
                 cmd = m.group(1)
