@@ -103,15 +103,15 @@ class U1Backend(duplicity.backend.Backend):
         from duplicity import util
         import json
 
-        status = headers[0].get('status')
-        if status == '200':
+        status = int(headers[0].get('status'))
+        if status >= 200 and status < 300:
             return
 
-        if status == '400':
+        if status == 400:
             code = log.ErrorCode.backend_permission_denied
-        elif status == '404':
+        elif status == 404:
             code = log.ErrorCode.backend_not_found
-        elif status == '500': # wish this were a more specific error
+        elif status == 500: # wish this were a more specific error
             code = log.ErrorCode.backend_no_space
         else:
             code = log.ErrorCode.backend_error
