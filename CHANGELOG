@@ -1,6 +1,5 @@
 New in v0.6.14 (2011/06/??)
 ----------------------------
- - Boto moved S3ResponseError, so allow for different import locations.
  - Merged in lp:~ed.so/duplicity/0.6-add_sftp
  - Merged in lp:~ed.so/duplicity/0.6-nonfatal-exclude
  - Merged in lp:~mterry/duplicity/levelName
@@ -15,6 +14,7 @@ Bugs closed in this release:
 512628     --exclude-filelist-stdin and gpg error with/without PASSPHRASE
 705499     "include-filelist-stdin" not implemented on version 0.6.11
 739438     [PATCH] Local backend should always try renaming instead of copying
+753858     cannot import name S3ResponseError
 761688     Difference found: File X has permissions 666, expected 666
 778215     ncftpls file delete fails in ftpbackend.py
 782294     create tomporary files with sftp
