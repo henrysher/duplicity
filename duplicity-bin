@@ -1074,7 +1074,10 @@ class Restart:
             self.type = "inc"
             self.end_time = last_backup.end_time
             self.start_time = last_backup.start_time
-        self.start_vol = len(last_backup)
+        # We start one volume back in case we weren't able to finish writing
+        # the most recent block.  Actually checking if we did (via hash) would
+        # involve downloading the block.  Easier to just redo one block.
+        self.start_vol = max(len(last_backup) - 1, 0)
 
     def checkManifest(self, mf):
         mf_len = len(mf.volume_info_dict)

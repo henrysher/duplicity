@@ -1,15 +1,8 @@
 New in v0.6.14 (2011/06/??)
 ----------------------------
- - Merged in lp:~ed.so/duplicity/0.6-add_sftp
- - Merged in lp:~ed.so/duplicity/0.6-nonfatal-exclude
- - Merged in lp:~mterry/duplicity/levelName
- - Merged in lp:~mterry/duplicity/gio-name
- - Merged in lp:~mterry/duplicity/retry-decorator
- - Merged in lp:~mterry/duplicity/u1-status
-
 Bugs closed in this release:
-452342     Provide Ubuntu One integration
 433591     AttributeError: FileobjHooked instance has no attribute 'name'
+487720     Restore fails with "Invalid data - SHA1 hash mismatch"
 507904     Cygwin: Full Backup fails with "IOError: [Errno 13] Permission denied"
 512628     --exclude-filelist-stdin and gpg error with/without PASSPHRASE
 705499     "include-filelist-stdin" not implemented on version 0.6.11
@@ -22,6 +15,18 @@ Bugs closed in this release:
 792704     Webdav(s) url scheme lacks port support
 782294     create tomporary files with sftp
 782337     sftp backend cannot create new subdirs on new backup
+
+Enhancements:
+452342     Provide Ubuntu One integration
+
+Merges:
+lp:~ed.so/duplicity/0.6-add_sftp
+lp:~ed.so/duplicity/0.6-nonfatal-exclude
+lp:~mterry/duplicity/levelName
+lp:~mterry/duplicity/gio-name
+lp:~mterry/duplicity/retry-decorator
+lp:~mterry/duplicity/u1-status
+
 
 New in v0.6.13 (2011/04/02)
 ----------------------------
