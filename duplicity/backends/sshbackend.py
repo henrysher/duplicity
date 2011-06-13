@@ -220,8 +220,10 @@ class SSHBackend(duplicity.backend.Backend):
         """Use sftp to copy source_dir/filename to remote computer"""
         if not remote_filename:
             remote_filename = source_path.get_filename()
-        commands = ["put \"%s\" \"%s%s\"" %
-                    (source_path.name, self.remote_prefix, remote_filename)]
+        commands = ["put \"%s\" \"%s.%s.part\"" %
+                    (source_path.name, self.remote_prefix, remote_filename),
+                    "rename \"%s.%s.part\" \"%s%s\"" %
+                    (self.remote_prefix, remote_filename,self.remote_prefix, remote_filename)]
         commandline = ("%s %s %s" % (globals.sftp_command,
                                      globals.ssh_options,
                                      self.host_string))
