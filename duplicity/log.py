@@ -3,6 +3,7 @@
 # Copyright 2002 Ben Escoto <ben@emerose.org>
 # Copyright 2007 Kenneth Loafman <kenneth@loafman.com>
 # Copyright 2008 Michael Terry <mike@mterry.name>
+# Copyright 2011 Canonical Ltd
 #
 # This file is part of duplicity.
 #
@@ -45,6 +46,14 @@ def LoggerToDupLevel(verb):
     """Convert logging module level to duplicity's system, where lowere is
        more severe"""
     return DupToLoggerLevel(verb)
+
+def LevelName(level):
+    level = LoggerToDupLevel(level)
+    if   level >= 9: return "DEBUG"
+    elif level >= 5: return "INFO"
+    elif level >= 3: return "NOTICE"
+    elif level >= 1: return "WARNING"
+    else:            return "ERROR"
 
 def Log(s, verb_level, code=1, extra=None, force_print=False):
     """Write s to stderr if verbosity level low enough"""
@@ -201,6 +210,7 @@ class DupLogRecord(logging.LogRecord):
         global _logger
         logging.LogRecord.__init__(self, *args, **kwargs)
         self.controlLine = controlLine
+        self.levelName = LevelName(self.levelno)
 
 class DupLogger(logging.Logger):
     """Custom logger that creates special code-bearing records"""
@@ -229,18 +239,6 @@ def setup():
     logging.setLoggerClass(DupLogger)
     _logger = logging.getLogger("duplicity")
 
-    # Set up our special level names
-    logging.addLevelName(DupToLoggerLevel(0), "ERROR")
-    logging.addLevelName(DupToLoggerLevel(1), "WARNING")
-    logging.addLevelName(DupToLoggerLevel(2), "WARNING")
-    logging.addLevelName(DupToLoggerLevel(3), "NOTICE")
-    logging.addLevelName(DupToLoggerLevel(4), "NOTICE")
-    logging.addLevelName(DupToLoggerLevel(5), "INFO")
-    logging.addLevelName(DupToLoggerLevel(6), "INFO")
-    logging.addLevelName(DupToLoggerLevel(7), "INFO")
-    logging.addLevelName(DupToLoggerLevel(8), "INFO")
-    logging.addLevelName(DupToLoggerLevel(9), "DEBUG")
-
     # Default verbosity allows notices and above
     setverbosity(NOTICE)
 
@@ -258,7 +256,11 @@ class MachineFormatter(logging.Formatter):
        processes."""
     def __init__(self):
         # 'message' will be appended by format()
-        logging.Formatter.__init__(self, "%(levelname)s %(controlLine)s")
+        # Note that we use our own, custom-created 'levelName' instead of the
+        # standard 'levelname'.  This is because the standard 'levelname' can
+        # be adjusted by any library anywhere in our stack without us knowing.
+        # But we control 'levelName'.
+        logging.Formatter.__init__(self, "%(levelName)s %(controlLine)s")
 
     def format(self, record):
         s = logging.Formatter.format(self, record)
@@ -274,13 +276,8 @@ class MachineFormatter(logging.Formatter):
 class MachineFilter(logging.Filter):
     """Filter that only allows levels that are consumable by other processes."""
     def filter(self, record):
-        # We only want to allow records that have level names.  If the level
-        # does not have an associated name, there will be a space as the
-        # logging module expands levelname to "Level %d".  This will confuse
-        # consumers.  Even if we dropped the space, random levels may not
-        # mean anything to consumers.
-        s = logging.getLevelName(record.levelno)
-        return s.find(' ') == -1
+        # We only want to allow records that have our custom level names
+        return hasattr(record, 'levelName')
 
 def add_fd(fd):
     """Add stream to which to write machine-readable logging"""
