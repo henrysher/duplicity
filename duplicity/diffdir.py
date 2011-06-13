@@ -383,7 +383,7 @@ class FileWithReadCounter:
     def read(self, length = -1):
         try:
             buf = self.infile.read(length)
-        except IOError as ex:
+        except IOError, ex:
             buf = ""
             log.Warn(_("Error %s getting delta for %s") % (str(ex), self.infile.name))
         if stats:
