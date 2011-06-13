@@ -294,6 +294,24 @@ def strip_auth_from_url(parsed_url):
     return parsed_url.geturl().replace(parsed_url.netloc, straight_netloc, 1)
 
 
+# Decorator for backend operation functions to simplify writing one that
+# retries.  Make sure to add a keyword argument 'raise_errors' to your function
+# and if it is true, raise an exception on an error.  If false, fatal-log it.
+def retry(fn):
+    def iterate(*args):
+        for n in range(1, globals.num_retries):
+            try:
+                return fn(*args, raise_errors=True)
+            except Exception, e:
+                log.Warn("Attempt %s failed: %s: %s"
+                         % (n, e.__class__.__name__, str(e)))
+                log.Debug("Backtrace of previous error: %s"
+                          % exception_traceback())
+        # Now try one last time, but fatal-log instead of raising errors
+        return fn(*args, raise_errors=False)
+    return iterate
+
+
 class Backend:
     """
     Represents a generic duplicity backend, capable of storing and
