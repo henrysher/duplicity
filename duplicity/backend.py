@@ -311,7 +311,7 @@ def retry(fn):
                 log.Debug("Backtrace of previous error: %s"
                           % exception_traceback())
         # Now try one last time, but fatal-log instead of raising errors
-        kwargs = {"raise_errors" : True}
+        kwargs = {"raise_errors" : False}
         return fn(*args, **kwargs)
     return iterate
 
