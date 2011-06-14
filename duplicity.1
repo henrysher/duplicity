@@ -655,6 +655,13 @@ Use
 as the time separator in filenames instead of colon (":").
 
 .TP
+.BI "--timeout " seconds
+Use
+.IR seconds
+as the socket timeout value if duplicity begins to timeout during
+network operations.  The default is 30 seconds.
+
+.TP
 .BI --use-agent
 If this option is specified, then
 .I --use-agent
@@ -718,8 +725,8 @@ In decreasing order of importance, specifies the directory to use for
 temporary files (inherited from Python's tempfile module).
 .TP
 .B FTP_PASSWORD
-Supported by most backends which are password capable. More secure than 
-setting it in the backend url (which might be readable in the operating 
+Supported by most backends which are password capable. More secure than
+setting it in the backend url (which might be readable in the operating
 systems process listing to other users on the same machine).
 
 
@@ -734,8 +741,8 @@ scheme://user[:password]@host[:port]/[/]path
 It is not recommended to expose the password on the command line since
 it could be revealed to anyone with permissions to do process listings,
 however, it is permitted.
-Consider setting the environment variable FTP_PASSWORD instead, which 
-is supported by most, but not all backends. Regardless of its name it 
+Consider setting the environment variable FTP_PASSWORD instead, which
+is supported by most, but not all backends. Regardless of its name it
 can be used with other backends.
 .PP
 In protocols that support it, the path may be preceded by a single
@@ -760,7 +767,7 @@ imaps://user[:password]@host.com[/from_address_prefix]
 .PP
 .BI "using rsync daemon"
 .br
-rsync://user[:password]@host.com[:port]::[/]module/some_dir 
+rsync://user[:password]@host.com[:port]::[/]module/some_dir
 .PP
 .BI "using rsync over ssh (only key auth)"
 .br

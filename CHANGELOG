@@ -15,6 +15,7 @@ Bugs closed in this release:
 792704     Webdav(s) url scheme lacks port support
 782294     create tomporary files with sftp
 782337     sftp backend cannot create new subdirs on new backup
+794123     Timeout on sftp command 'ls -1'
 
 Enhancements:
 452342     Provide Ubuntu One integration
