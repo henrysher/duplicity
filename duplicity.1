@@ -70,10 +70,6 @@ the parts of files that have changed since the last backup.  Currently
 duplicity supports deleted files, full Unix permissions, directories,
 symbolic links, fifos, etc., but not hard links.
 
-Duplicity will read the PASSPHRASE environment variable to find the
-passphrase to give to GnuPG.  If this is not set, the user will be
-prompted for the passphrase.
-
 If you are backing up the root directory /, remember to --exclude
 /proc, or else duplicity will probably crash on the weird stuff in
 there.
@@ -297,6 +293,15 @@ Calculate what would be done, but do not perform any backend actions
 .BI "--encrypt-key " key
 When backing up, encrypt to the given public key, instead of using
 symmetric (traditional) encryption.  Can be specified multiple times.
+
+.TP
+.BI "--encrypt-secret-keyring " filename
+This option can only be used with
+.BR --encrypt-key ,
+and changes the path to the secret keyring for the encrypt key to
+.I filename
+This keyring is not used when creating a backup. If not specified, the
+default secret keyring is used which is usually located at .gnupg/secring.gpg
 
 .TP
 .BI "--exclude " shell_pattern
@@ -728,7 +733,16 @@ temporary files (inherited from Python's tempfile module).
 Supported by most backends which are password capable. More secure than
 setting it in the backend url (which might be readable in the operating
 systems process listing to other users on the same machine).
-
+.TP
+.B PASSPHRASE
+This passphrase is passed to GnuPG. If this is not set, the user will be
+prompted for the passphrase.
+.TP
+.B SIGN_PASSPHRASE
+The passphrase to be used for
+.B --sign-key
+, if SIGN_PASSPHRASE is not set but PASSPHRASE is set, the latter will be used.
+Otherwise, if no passphrase is available, the user will be prompted for it.
 
 .SH URL FORMAT
 Duplicity tries to maintain a standard URL format as much as possible.
@@ -1246,6 +1260,17 @@ regular files).
 
 Bad signatures will be treated as empty instead of logging appropriate
 error message.
+
+If symmetric encryption is used and the signing key is passphrase-protected, the
+encryption passphrase must equal the passphrase of the signing key. This
+limitation can be circumvented by using
+.B gpg-agent
+for storing the passphrase of the signing key and the
+.B PASSPHRASE
+environment variable for the encryption key or by enabling asymmetric
+encryption using the 
+.B --encrypt-key
+option.
 
 .SH AUTHOR
 Original Author - Ben Escoto <bescoto@stanford.edu>

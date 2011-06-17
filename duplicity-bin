@@ -58,7 +58,7 @@ from duplicity import util
 exit_val = None
 
 
-def get_passphrase(n, action):
+def get_passphrase(n, action, for_signing = False):
     """
     Check to make sure passphrase is indeed needed, then get
     the passphrase from environment, from gpg-agent, or user
@@ -68,12 +68,22 @@ def get_passphrase(n, action):
     verification for the time being.
 
     @type  n: int
-    @param n: action to perform
+    @param n: verification level for a passphrase being requested
+    @type  action: string
+    @param action: action to perform
+    @type  for_signing: boolean
+    @param for_signing: true if the passphrase is for a signing key, false if not
     @rtype: string
     @return: passphrase
     """
 
     # First try the environment
+    try:
+        if for_signing:
+            return os.environ['SIGN_PASSPHRASE']
+    except KeyError:
+        pass
+
     try:
         return os.environ['PASSPHRASE']
     except KeyError:
@@ -90,7 +100,7 @@ def get_passphrase(n, action):
     if not globals.encryption or globals.use_agent:
         return ""
 
-    # no passphrase if --list-current
+    # no passphrase needed if --list-current
     elif (action == "list-current"):
         return ""
 
@@ -119,28 +129,42 @@ def get_passphrase(n, action):
     # Finally, ask the user for the passphrase
     else:
         log.Info("PASSPHRASE variable not set, asking user.")
+        use_cache = True
         while 1:
-            if n == 2:
-                pass1 = globals.gpg_profile.passphrase
-            else:
-                if globals.gpg_profile.passphrase:
-                    pass1 = globals.gpg_profile.passphrase
+            # ask the user to enter a new passphrase to avoid an infinite loop
+            # if the user made a typo in the first passphrase
+            if use_cache and n == 2:
+                if for_signing:
+                    pass1 = globals.gpg_profile.signing_passphrase
                 else:
-                    pass1 = getpass.getpass("GnuPG passphrase: ")
+                    pass1 = globals.gpg_profile.passphrase
+            else:
+                if for_signing:
+                    if use_cache and globals.gpg_profile.signing_passphrase:
+                        pass1 = globals.gpg_profile.signing_passphrase
+                    else:
+                        pass1 = getpass.getpass("GnuPG passphrase for signing key: ")
+                else:
+                    if use_cache and globals.gpg_profile.passphrase:
+                        pass1 = globals.gpg_profile.passphrase
+                    else:
+                        pass1 = getpass.getpass("GnuPG passphrase: ")
 
             if n == 1:
                 pass2 = pass1
+            elif for_signing:
+                pass2 = getpass.getpass("Retype passphrase for signing key to confirm: ")
             else:
                 pass2 = getpass.getpass("Retype passphrase to confirm: ")
 
             if not pass1 == pass2:
                 print "First and second passphrases do not match!  Please try again."
-                n = 3
+                use_cache = False
                 continue
 
-            if not pass1 and not globals.gpg_profile.recipients:
+            if not pass1 and not globals.gpg_profile.recipients and not for_signing:
                 print "Cannot use empty passphrase with symmetric encryption!  Please try again."
-                n = 3
+                use_cache = False
                 continue
 
             return pass1
@@ -959,6 +983,7 @@ def sync_archive():
         if not globals.dry_run:
             log.Notice(_("Synchronizing remote metadata to local cache..."))
             if local_missing and (rem_needpass or loc_needpass):
+                # password for the --encrypt-key
                 globals.gpg_profile.passphrase = get_passphrase(1, "sync")
             for fn in local_spurious:
                 remove_local(fn)
@@ -1144,19 +1169,16 @@ def main():
         else:
             log.FatalError("Unable to locate pydevd.", log.ErrorCode.user_error)
 
-    # get the passphrase if we need to based on action/options
-    globals.gpg_profile.passphrase = get_passphrase(1, action)
-
     # log some debugging status info
     log_startup_parms(log.INFO)
 
     # check for disk space and available file handles
     check_resources(action)
 
-    # check archive synch with remote, fix if needed
+    # synchronize local and remote, the passphrase is requested if needed
     sync_archive()
 
-    # get current collection status
+    # get current collection status, no passphrase needed
     col_stats = collections.CollectionsStatus(globals.backend,
                                               globals.archive_dir).set_values()
 
@@ -1206,6 +1228,11 @@ def main():
 
     os.umask(077)
 
+    # full/inc only needs a passphrase for symmetric keys
+    if not action in ["full", "inc"] or not globals.gpg_profile.recipients:
+        # get the passphrase if we need to based on action/options
+        globals.gpg_profile.passphrase = get_passphrase(1, action)
+
     if action == "restore":
         restore(col_stats)
     elif action == "verify":
@@ -1224,16 +1251,36 @@ def main():
         sync_archive(col_stats)
     else:
         assert action == "inc" or action == "full", action
-        if action == "full":
+        # the passphrase for full and inc is used by --sign-key
+        # the sign key can have a different passphrase than the encrypt
+        # key, therefore request a passphrase
+        if globals.gpg_profile.sign_key:
+            globals.gpg_profile.signing_passphrase = get_passphrase(3, action, True)
+
+        # if there are no recipients (no --encrypt-key), it must be a
+        # symmetric key. Therefore, confirm the passphrase
+        if not globals.gpg_profile.recipients:
             globals.gpg_profile.passphrase = get_passphrase(2, action)
+            # a limitation in the GPG implementation does not allow for
+            # inputting different passphrases, this affects symmetric+sign.
+            # Allow an empty passphrase for the key though to allow a non-empty
+            # symmetric key
+            if (globals.gpg_profile.signing_passphrase and
+                globals.gpg_profile.passphrase != globals.gpg_profile.signing_passphrase):
+                log.FatalError("When using symmetric encryption, the signing passphrase must equal the encryption passphrase.", log.ErrorCode.user_error)
+
+        if action == "full":
             full_backup(col_stats)
         else:  # attempt incremental
             sig_chain = check_sig_chain(col_stats)
+            # action == "inc" was requested, but no full backup is available
             if not sig_chain:
-                globals.gpg_profile.passphrase = get_passphrase(2, action)
                 full_backup(col_stats)
             else:
                 if not globals.restart:
+                    # only ask for a passphrase if there was a previous backup
+                    if col_stats.all_backup_chains:
+                        globals.gpg_profile.passphrase = get_passphrase(1, action)
                     check_last_manifest(col_stats) # not needed for full backup
                 incremental_backup(sig_chain)
     globals.backend.close()

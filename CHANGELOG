@@ -5,6 +5,7 @@ Bugs closed in this release:
 487720     Restore fails with "Invalid data - SHA1 hash mismatch"
 507904     Cygwin: Full Backup fails with "IOError: [Errno 13] Permission denied"
 512628     --exclude-filelist-stdin and gpg error with/without PASSPHRASE
+680425     Endless retype passphrase when typo
 705499     "include-filelist-stdin" not implemented on version 0.6.11
 739438     [PATCH] Local backend should always try renaming instead of copying
 753858     cannot import name S3ResponseError
@@ -17,6 +18,7 @@ Bugs closed in this release:
 782337     sftp backend cannot create new subdirs on new backup
 794123     Timeout on sftp command 'ls -1'
 797758     Duplicity ignores some FatalErrors
+793096     Allow to pass different passwords for --sign-key and --encrypt-key
 
 Enhancements:
 452342     Provide Ubuntu One integration
@@ -24,12 +26,12 @@ Enhancements:
 Merges:
 lp:~ed.so/duplicity/0.6-add_sftp
 lp:~ed.so/duplicity/0.6-nonfatal-exclude
-lp:~mterry/duplicity/levelName
+lp:~lekensteyn/duplicity/multipass
+lp:~mterry/duplicity/797758
 lp:~mterry/duplicity/gio-name
+lp:~mterry/duplicity/levelName
 lp:~mterry/duplicity/retry-decorator
 lp:~mterry/duplicity/u1-status
-lp:~mterry/duplicity/797758
-
 
 New in v0.6.13 (2011/04/02)
 ----------------------------
