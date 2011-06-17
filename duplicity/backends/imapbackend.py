@@ -75,7 +75,7 @@ class ImapBackend(duplicity.backend.Backend):
         #  Try to close the connection cleanly
         try:
             self._conn.close()
-        except:
+        except Exception:
             pass
 
         if (parsed_url.scheme == "imap"):

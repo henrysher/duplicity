@@ -895,7 +895,7 @@ def sync_archive():
             def next(self, size):
                 try:
                     res = Block(self.fileobj.read(size))
-                except:
+                except Exception:
                     if hasattr(self.fileobj, 'name'):
                         name = self.fileobj.name
                     else:
@@ -1011,7 +1011,7 @@ def check_resources(action):
         tempfs = os.path.sep.join(tempname.split(os.path.sep)[:-2])
         try:
             stats = os.statvfs(tempfs)
-        except:
+        except Exception:
             log.FatalError(_("Unable to get free space on temp."),
                            log.ErrorCode.get_freespace_failed)
         # Calculate space we need for at least 2 volumes of full or inc

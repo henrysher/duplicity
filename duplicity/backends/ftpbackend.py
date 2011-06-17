@@ -38,7 +38,7 @@ class FTPBackend(duplicity.backend.Backend):
             p = os.popen("ncftpls -v")
             fout = p.read()
             ret = p.close()
-        except:
+        except Exception:
             pass
         # the expected error is 8 in the high-byte and some output
         if ret != 0x0800 or not fout:

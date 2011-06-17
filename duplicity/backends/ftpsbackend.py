@@ -41,7 +41,7 @@ class FTPSBackend(duplicity.backend.Backend):
             p = os.popen("lftp --version")
             fout = p.read()
             ret = p.close()
-        except:
+        except Exception:
             pass
         # there is no output if lftp not found
         if not fout:

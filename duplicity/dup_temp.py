@@ -244,7 +244,7 @@ class SrcIter:
     def next(self, size):
         try:
             res = Block(self.fp.read(size))
-        except:
+        except Exception:
             log.FatalError(_("Failed to read %s: %s") %
                            (self.src.name, sys.exc_info()),
                            log.ErrorCode.generic)

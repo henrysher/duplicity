@@ -457,7 +457,7 @@ probably isn't what you meant.""") %
         assert include == 0 or include == 1
         try:
             regexp = re.compile(regexp_string)
-        except:
+        except Exception:
             log.Warn(_("Error compiling regular expression %s") % regexp_string)
             raise
 
