@@ -76,7 +76,7 @@ def import_backends():
             try:
                 __import__(imp)
                 res = "Succeeded"
-            except:
+            except Exception:
                 res = "Failed: " + str(sys.exc_info()[1])
             log.Info("Import of %s %s" % (imp, res))
         else:
@@ -216,27 +216,27 @@ class ParsedUrl:
 
         try:
             pu = urlparser.urlparse(url_string)
-        except:
+        except Exception:
             raise InvalidBackendURL("Syntax error in: %s" % url_string)
 
         try:
             self.scheme = pu.scheme
-        except:
+        except Exception:
             raise InvalidBackendURL("Syntax error (scheme) in: %s" % url_string)
 
         try:
             self.netloc = pu.netloc
-        except:
+        except Exception:
             raise InvalidBackendURL("Syntax error (netloc) in: %s" % url_string)
 
         try:
             self.path = pu.path
-        except:
+        except Exception:
             raise InvalidBackendURL("Syntax error (path) in: %s" % url_string)
 
         try:
             self.username = pu.username
-        except:
+        except Exception:
             raise InvalidBackendURL("Syntax error (username) in: %s" % url_string)
         if self.username:
             self.username = urllib.unquote(pu.username)
@@ -245,7 +245,7 @@ class ParsedUrl:
 
         try:
             self.password = pu.password
-        except:
+        except Exception:
             raise InvalidBackendURL("Syntax error (password) in: %s" % url_string)
         if self.password:
             self.password = urllib.unquote(self.password)
@@ -254,14 +254,14 @@ class ParsedUrl:
 
         try:
             self.hostname = pu.hostname
-        except:
+        except Exception:
             raise InvalidBackendURL("Syntax error (hostname) in: %s" % url_string)
 
         # init to None, overwrite with actual value on success
         self.port = None
         try:
             self.port = pu.port
-        except:
+        except Exception:
             # old style rsync://host::[/]dest, are still valid, though they contain no port
             if not ( self.scheme in ['rsync'] and re.search('::[^:]*$', self.url_string)):
                 raise InvalidBackendURL("Syntax error (port) in: %s A%s B%s C%s" % (url_string, (self.scheme in ['rsync']), re.search('::[^:]+$', self.netloc), self.netloc ) )

@@ -87,7 +87,7 @@ class LocalBackend(duplicity.backend.Backend):
         """List files in that directory"""
         try:
                 os.makedirs(self.remote_pathdir.base)
-        except:
+        except Exception:
                 pass
         try:
             return self.remote_pathdir.listdir()

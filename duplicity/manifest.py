@@ -132,7 +132,7 @@ class Manifest:
         """
         try:
             del self.volume_info_dict[vol_num]
-        except:
+        except Exception:
             raise ManifestError("Volume %d not present in manifest" % (vol_num,))
 
     def to_string(self):

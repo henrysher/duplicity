@@ -41,7 +41,7 @@ class HSIBackend(duplicity.backend.Backend):
         commandline = '%s "put %s : %s%s"' % (hsi_command,source_path.name,self.remote_prefix,remote_filename)
         try:
             self.run_command(commandline)
-        except:
+        except Exception:
             print commandline
 
     def get(self, remote_filename, local_path):

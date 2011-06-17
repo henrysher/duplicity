@@ -27,7 +27,7 @@ import duplicity.backend
 try:
     import duplicity.backends.giobackend
     gio_available = True
-except:
+except Exception:
     gio_available = False
 from duplicity.errors import * #@UnusedWildImport
 from duplicity import path, file_naming, dup_time, globals, gpg

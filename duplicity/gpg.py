@@ -150,7 +150,7 @@ class GPGFile:
     def write(self, buf):
         try:
             res = self.gpg_input.write(buf)
-        except:
+        except Exception:
             self.gpg_failed()
         return res
 
@@ -171,13 +171,13 @@ class GPGFile:
         if self.encrypt:
             try:
                 self.gpg_input.close()
-            except:
+            except Exception:
                 self.gpg_failed()
             if self.status_fp:
                 self.set_signature()
             try:
                 self.gpg_process.wait()
-            except:
+            except Exception:
                 self.gpg_failed()
         else:
             res = 1
@@ -185,17 +185,17 @@ class GPGFile:
                 # discard remaining output to avoid GPG error
                 try:
                     res = self.gpg_output.read(blocksize)
-                except:
+                except Exception:
                     self.gpg_failed()
             try:
                 self.gpg_output.close()
-            except:
+            except Exception:
                 self.gpg_failed()
             if self.status_fp:
                 self.set_signature()
             try:
                 self.gpg_process.wait()
-            except:
+            except Exception:
                 self.gpg_failed()
         self.logger_fp.close()
         self.stderr_fp.close()

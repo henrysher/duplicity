@@ -137,7 +137,7 @@ class BackupSet:
         rfn.reverse()
         try:
             self.backend.delete(rfn)
-        except:
+        except Exception:
             log.Debug("BackupSet.delete: missing %s" % rfn)
             pass
         for lfn in globals.archive_dir.listdir():
@@ -153,7 +153,7 @@ class BackupSet:
                 # which is bad if running non-interactive with encrypt-key 
                 try:
                     globals.archive_dir.append(lfn).delete()
-                except:
+                except Exception:
                     log.Debug("BackupSet.delete: missing %s" % lfn)
                     pass
 

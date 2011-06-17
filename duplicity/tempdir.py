@@ -231,12 +231,12 @@ class TemporaryDirectory:
                     try:
                         log.Debug(_("Removing still remembered temporary file %s") % (file,))
                         os.unlink(file)
-                    except:
+                    except Exception:
                         log.Info(_("Cleanup of temporary file %s failed") % (file,))
                         pass
                 try:
                     os.rmdir(self.__dir)
-                except:
+                except Exception:
                     log.Warn(_("Cleanup of temporary directory %s failed - this is probably a bug.") % (self.__dir,))
                     pass
                 self.__pending = None

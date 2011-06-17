@@ -112,5 +112,5 @@ def set_environ(varname, value):
     else:
         try:
             del os.environ[varname]
-        except:
+        except Exception:
             pass

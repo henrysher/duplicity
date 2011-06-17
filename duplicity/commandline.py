@@ -518,7 +518,7 @@ def parse_cmdline_options(arglist):
     elif cmd == "remove-older-than":
         try:
             arg = args.pop(0)
-        except:
+        except Exception:
             command_line_error("Missing time string for remove-older-than")
         globals.remove_time = dup_time.genstrtotime(arg)
         num_expect = 1
@@ -529,7 +529,7 @@ def parse_cmdline_options(arglist):
             globals.remove_all_inc_of_but_n_full_mode = True
         try:
             arg = args.pop(0)
-        except:
+        except Exception:
             command_line_error("Missing count for " + cmd)
         globals.keep_chains = int(arg)
         if not globals.keep_chains > 0:
@@ -767,7 +767,7 @@ def set_archive_dir(dirstring):
     if not os.path.exists(dirstring):
         try:
             os.makedirs(dirstring)
-        except:
+        except Exception:
             pass
     archive_dir = path.Path(dirstring)
     if not archive_dir.isdir():

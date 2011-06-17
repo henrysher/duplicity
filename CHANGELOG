@@ -16,6 +16,7 @@ Bugs closed in this release:
 782294     create tomporary files with sftp
 782337     sftp backend cannot create new subdirs on new backup
 794123     Timeout on sftp command 'ls -1'
+797758     Duplicity ignores some FatalErrors
 
 Enhancements:
 452342     Provide Ubuntu One integration
@@ -27,6 +28,7 @@ lp:~mterry/duplicity/levelName
 lp:~mterry/duplicity/gio-name
 lp:~mterry/duplicity/retry-decorator
 lp:~mterry/duplicity/u1-status
+lp:~mterry/duplicity/797758
 
 
 New in v0.6.13 (2011/04/02)
