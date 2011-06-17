@@ -129,39 +129,42 @@ def get_passphrase(n, action, for_signing = False):
     # Finally, ask the user for the passphrase
     else:
         log.Info("PASSPHRASE variable not set, asking user.")
+        use_cache = True
         while 1:
-            if n == 2:
+            # ask the user to enter a new passphrase to avoid an infinite loop
+            # if the user made a typo in the first passphrase
+            if use_cache and n == 2:
                 if for_signing:
                     pass1 = globals.gpg_profile.signing_passphrase
                 else:
                     pass1 = globals.gpg_profile.passphrase
             else:
                 if for_signing:
-                    if globals.gpg_profile.signing_passphrase and n != 3:
+                    if use_cache and globals.gpg_profile.signing_passphrase:
                         pass1 = globals.gpg_profile.signing_passphrase
                     else:
                         pass1 = getpass.getpass("GnuPG passphrase for signing key: ")
                 else:
-                    # do not hang in an infinite loop if the first passphrase
-                    # was wrong, just ask again
-                    if globals.gpg_profile.passphrase and n != 3:
+                    if use_cache and globals.gpg_profile.passphrase:
                         pass1 = globals.gpg_profile.passphrase
                     else:
                         pass1 = getpass.getpass("GnuPG passphrase: ")
 
             if n == 1:
                 pass2 = pass1
+            elif for_signing:
+                pass2 = getpass.getpass("Retype passphrase for signing key to confirm: ")
             else:
                 pass2 = getpass.getpass("Retype passphrase to confirm: ")
 
             if not pass1 == pass2:
                 print "First and second passphrases do not match!  Please try again."
-                n = 3
+                use_cache = False
                 continue
 
-            if not pass1 and not globals.gpg_profile.recipients:
+            if not pass1 and not globals.gpg_profile.recipients and not for_signing:
                 print "Cannot use empty passphrase with symmetric encryption!  Please try again."
-                n = 3
+                use_cache = False
                 continue
 
             return pass1
@@ -1216,7 +1219,7 @@ def main():
 
     os.umask(077)
 
-    # the passphrase is not always needed for full/inc; symmetric crypto is another story
+    # full/inc only needs a passphrase for symmetric keys
     if not action in ["full", "inc"] or not globals.gpg_profile.recipients:
         # get the passphrase if we need to based on action/options
         globals.gpg_profile.passphrase = get_passphrase(1, action)
@@ -1245,16 +1248,24 @@ def main():
         if globals.gpg_profile.sign_key:
             globals.gpg_profile.signing_passphrase = get_passphrase(3, action, True)
 
+        # if there are no recipients (no --encrypt-key), it must be a
+        # symmetric key. Therefore, confirm the passphrase
+        if not globals.gpg_profile.recipients:
+            globals.gpg_profile.passphrase = get_passphrase(2, action)
+            # a limitation in the GPG implementation does not allow for
+            # inputting different passphrases, this affects symmetric+sign.
+            # Allow an empty passphrase for the key though to allow a non-empty
+            # symmetric key
+            if (globals.gpg_profile.signing_passphrase and
+                globals.gpg_profile.passphrase != globals.gpg_profile.signing_passphrase):
+                log.FatalError("When using symmetric encryption, the signing passphrase must equal the encryption passphrase.", log.ErrorCode.user_error)
+
         if action == "full":
-            if not globals.gpg_profile.sign_key:
-                globals.gpg_profile.passphrase = get_passphrase(2, action)
             full_backup(col_stats)
         else:  # attempt incremental
             sig_chain = check_sig_chain(col_stats)
             # action == "inc" was requested, but no full backup is available
             if not sig_chain:
-                if not globals.gpg_profile.sign_key:
-                    globals.gpg_profile.passphrase = get_passphrase(2, action)
                 full_backup(col_stats)
             else:
                 if not globals.restart:

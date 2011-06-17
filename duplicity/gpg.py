@@ -113,11 +113,17 @@ class GPGFile:
         if profile.sign_key:
             gnupg.options.default_key = profile.sign_key
             cmdlist.append("--sign")
-        # the passphrase for --encrypt-key may not be the same as --sign-key
-        if encrypt and profile.recipients:
+        # encrypt: sign key needs passphrase
+        # decrypt: encrypt key needs passphrase
+        # special case: allow different symmetric pass with empty sign pass
+        if encrypt and profile.sign_key and profile.signing_passphrase:
             passphrase = profile.signing_passphrase
         else:
             passphrase = profile.passphrase
+        # in case the passphrase is not set, pass an empty one to prevent
+        # TypeError: expected a character buffer object on .write()
+        if passphrase is None:
+            passphrase = ""
 
         if encrypt:
             if profile.recipients:
