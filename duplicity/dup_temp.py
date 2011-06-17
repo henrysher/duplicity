@@ -181,7 +181,10 @@ class FileobjHooked:
         else:
             os.system("cp -p \"%s\" \"%s\"" % (src.name, tgt.name))
         globals.backend.put(tgt) #@UndefinedVariable
-        os.unlink(tgt.name)
+        try:
+            os.unlink(tgt.name)
+        except Exception, e:
+            log.Warn(_("Unable to delete %s: %s" % (tgt.name, str(e))))
 
     def to_final(self):
         """

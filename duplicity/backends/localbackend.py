@@ -67,7 +67,7 @@ class LocalBackend(duplicity.backend.Backend):
         except OSError:
             pass
         except Exception, e:
-            handle_error(e, 'put', source_path.name, target_path.name)
+            self.handle_error(e, 'put', source_path.name, target_path.name)
         else:
             return
         try:

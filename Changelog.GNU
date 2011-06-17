@@ -1,3 +1,223 @@
+2011-06-14  Kenneth Loafman  <kenneth@loafman.com>
+
+	Checkpoint.
+
+2011-06-13  Kenneth Loafman  <kenneth@loafman.com>
+
+	487720     Restore fails with "Invalid data - SHA1 hash mismatch" 
+
+2011-06-13  Kenneth Loafman  <kenneth@loafman.com>
+
+	Fixed boolean swap made when correcting syntax.
+
+2011-06-13  Kenneth Loafman  <kenneth@loafman.com>
+
+	Fix syntax for Python 2.4 and 2.5.
+
+2011-06-13  Kenneth Loafman  <kenneth@loafman.com>
+
+	Fix syntax for Python 2.4 and 2.5.
+
+2011-06-13  Kenneth Loafman  <kenneth@loafman.com>
+
+	Fix CHANGELOG.
+
+2011-06-13  Kenneth Loafman  <kenneth@loafman.com>
+
+	782337     sftp backend cannot create new subdirs on new backup 
+
+2011-06-13  Kenneth Loafman  <kenneth@loafman.com>
+
+	782294     create tomporary files with sftp
+
+2011-06-13  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~mterry/duplicity/retry-decorator
+
+2011-06-12  Michael Terry  <mike@mterry.name>
+
+	move logging code up to retry decorator; fixes use of 'n' variable where it doesn't belong
+
+2011-06-06  Michael Terry  <mike@mterry.name>
+
+	add retry decorator for backend functions; use it for giobackend; add retry to giobackend's list and delete operations
+
+2011-06-13  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~mterry/duplicity/u1-status
+
+2011-06-13  Michael Terry  <mike@mterry.name>
+
+	u1: allow any success status, not just 200
+
+2011-06-13  Kenneth Loafman  <kenneth@loafman.com>
+
+	Checkpoint.
+
+2011-06-13  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~mterry/duplicity/gio-name
+
+2011-06-06  Michael Terry  <mike@mterry.name>
+
+	giobackend: use name, not display name to list files
+
+2011-06-13  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~mterry/duplicity/levelName
+
+2011-05-31  Michael Terry  <mike@mterry.name>
+
+	fix MachineFilter logic to match new level name code
+
+2011-05-24  Michael Terry  <michael.terry@canonical.com>
+
+	Cautiously avoid using levelname directly in log module.  It can be adjusted by libraries.
+
+2011-06-12  Kenneth Loafman  <kenneth@loafman.com>
+
+	452342     Provide Ubuntu One integration
+
+2011-05-24  Michael Terry  <michael.terry@canonical.com>
+
+	update man page
+
+2011-05-24  Michael Terry  <michael.terry@canonical.com>
+
+	drop test file
+
+2011-05-24  Michael Terry  <michael.terry@canonical.com>
+
+	further fixups
+
+2011-05-23  Michael Terry  <michael.terry@canonical.com>
+
+	further upload work
+
+2011-05-17  Michael Terry  <michael.terry@canonical.com>
+
+	start of u1 support
+
+2011-06-12  Kenneth Loafman  <kenneth@loafman.com>
+
+	792704     Webdav(s) url scheme lacks port support
+
+2011-06-12  Kenneth Loafman  <kenneth@loafman.com>
+
+	782321     duplicity sftp backend should ignore removing a file which is not there
+
+2011-06-12  Kenneth Loafman  <kenneth@loafman.com>
+
+	778215     ncftpls file delete fails in ftpbackend.py
+
+2011-06-12  Kenneth Loafman  <kenneth@loafman.com>
+
+	507904     Cygwin: Full Backup fails with "IOError: [Errno 13] Permission denied"
+
+2011-06-12  Kenneth Loafman  <kenneth@loafman.com>
+
+	761688     Difference found: File X has permissions 666, expected 666 
+
+2011-06-12  Kenneth Loafman  <kenneth@loafman.com>
+
+	739438     [PATCH] Local backend should always try renaming instead of copying
+
+2011-06-12  Kenneth Loafman  <kenneth@loafman.com>
+
+	705499     "include-filelist-stdin" not implemented on version 0.6.11
+
+2011-06-12  Kenneth Loafman  <kenneth@loafman.com>
+
+	Sync with repository.
+
+2011-06-07  Launchpad Translations on behalf of duplicity-team
+
+	Launchpad automatic translations update.
+
+2011-04-26  Launchpad Translations on behalf of duplicity-team
+
+	Launchpad automatic translations update.
+
+2011-04-25  Launchpad Translations on behalf of duplicity-team
+
+	Launchpad automatic translations update.
+
+2011-04-17  Launchpad Translations on behalf of duplicity-team
+
+	Launchpad automatic translations update.
+
+2011-04-04  Launchpad Translations on behalf of duplicity-team
+
+	Launchpad automatic translations update.
+
+2011-04-03  Launchpad Translations on behalf of duplicity-team
+
+	Launchpad automatic translations update.
+
+2011-03-22  Launchpad Translations on behalf of duplicity-team
+
+	Launchpad automatic translations update.
+
+2010-12-15  Launchpad Translations on behalf of duplicity-team
+
+	Launchpad automatic translations update.
+
+2010-12-08  Launchpad Translations on behalf of duplicity-team
+
+	Launchpad automatic translations update.
+
+2010-11-21  Launchpad Translations on behalf of duplicity-team
+
+	Launchpad automatic translations update.
+
+2011-05-11  ed  <edgar.soldin@web.de>
+
+	as restoring is non-destructive by default (overideable with --force) there is no need to raie fata errors if not supported in/exclude parameters are given as parameters.
+	see also:
+	http://lists.gnu.org/archive/html/duplicity-talk/2011-04/msg00010.html
+
+2011-06-12  Kenneth Loafman  <kenneth@loafman.com>
+
+	512628     --exclude-filelist-stdin and gpg error with/without PASSPHRASE
+
+2011-06-12  Kenneth Loafman  <kenneth@loafman.com>
+
+	512628     --exclude-filelist-stdin and gpg error with/without PASSPHRASE
+
+2011-04-16  Kenneth Loafman  <kenneth@loafman.com>
+
+	Insure Python 2.4 compatible.
+
+2011-04-16  Kenneth Loafman  <kenneth@loafman.com>
+
+	433591  AttributeError: FileobjHooked instance has no attribute 'name'
+
+2011-04-04  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~ed.so/duplicity/0.6-add_sftp.
+
+2011-04-04  ed  <edgar.soldin@web.de>
+
+	link sftp to ssh backend, thus enabling sftp:// urls
+	modified explanation in manpage
+	minor changes in manpage
+
+2011-04-04  Kenneth Loafman  <kenneth@loafman.com>
+
+	Boto has refactored too many times, so back off and just use Exception rather than searching.
+
+2011-04-03  Kenneth Loafman  <kenneth@loafman.com>
+
+	Boto moved S3ResponseError, so allow for different imports.
+
+2011-04-02  Kenneth Loafman  <kenneth@loafman.com>
+
+	Changes for 0.6.13.
+
+2011-04-02  Kenneth Loafman  <kenneth@loafman.com>
+
+	Changes for 0.6.13.
+
 2011-04-02  Kenneth Loafman  <kenneth@loafman.com>
 
 	Changes for 0.6.13.
