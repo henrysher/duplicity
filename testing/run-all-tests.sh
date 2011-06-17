@@ -26,7 +26,7 @@ if [ "`id -ur`" != '0' ]; then
 fi
 
 # run against all supported python versions
-for v in 2.6; do
+for v in 2.4 2.5 2.6; do
     if [ -d ~/virtual$v ]; then
         # change to virtualenv for this python version
         pushd ~/virtual$v && source bin/activate && popd

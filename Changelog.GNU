@@ -1,3 +1,55 @@
+2011-06-17  Kenneth Loafman  <kenneth@loafman.com>
+
+	680425     Endless retype passphrase when typo
+	793096     Allow to pass different passwords for --sign-key and --encrypt-key
+
+2011-06-17  Lekensteyn  <lekensteyn@gmail.com>
+
+	- duplicity.1: move information about the PASSPHRASE and SIGN_PASSPHRASE
+	environment variables to the Environment Variables section
+	- duplicity.1: add information about the limitation on using 
+	symmetric+sign to the bugs section
+	- In the passphrase retrieval function get_passphrase, do not switch from
+	"ask password without verifying" to ask+verify if the passphrase was
+	empty
+	- Allow an empty passphrase for signing key
+	- Make clear in the verification prompt whether the encryption passphrase
+	or the signing passphrase is being confirmed
+	- Fix passphrase retrieval for sym+sign (duplicity-bin and gpg.py)
+	- Allow sym+sign with limitation (see comments and manual page)
+
+2011-06-11  Lekensteyn  <lekensteyn@gmail.com>
+
+	- invalid function description fixed for get_passphrase in duplicity-bin
+	- function get_passphrase in duplicity-bin accepts argument "for_signing"
+	which indicates that a passphrase for a signing key is requested
+	- introduces the SIGN_PASSPHRASE environment variable for passing a
+	different passphrase to the signing key
+	- commandline option --encrypt-secret-keyring=path introduced to set a
+	custom location for the secret keyring used by the encryption key
+	- manual page updated with SIGN_PASSPHRASE and --encrypt-secret-keyring
+	- ask for a new passphrase if the passphrase confirmation failed to
+	prevent an endless retype
+	- improved some comments in the code
+	- due to the difference in the handling of the signing and encryption
+	passphrase, the passphrase is asked later in the duplicity-bin
+
+2011-06-17  Kenneth Loafman  <kenneth@loafman.com>
+
+	797758     Duplicity ignores some FatalErrors
+
+2011-06-17  Michael Terry  <mike@mterry.name>
+
+	always catch Exceptions, not BaseExceptions
+
+2011-06-17  Kenneth Loafman  <kenneth@loafman.com>
+
+	Checkpoint
+
+2011-06-14  Kenneth Loafman  <kenneth@loafman.com>
+
+	794123     Timeout on sftp command 'ls -1'
+
 2011-06-14  Kenneth Loafman  <kenneth@loafman.com>
 
 	Checkpoint.

@@ -20,20 +20,17 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import sys, os
-from os import path
-
-# Save the absolute path of the directory where this module is
-test_root = path.abspath( path.join( path.realpath(__file__), path.pardir ))
-
-# Find the duplicity modules under test
-sys.path.insert(0, path.join(test_root, path.pardir))
+testing = os.path.dirname(sys.argv[0])
+newpath = os.path.abspath(os.path.join(testing, "../."))
+sys.path.insert(0, newpath)
 
 import gettext
 gettext.install('duplicity')
 
 from duplicity import globals
-from duplicity import backend
 from duplicity import log
+from duplicity import backend
+from duplicity.backends import localbackend
 
 # config for duplicity unit tests
 
@@ -56,9 +53,6 @@ sign_passphrase = ""
 file_url = "file:///home/ken/testdup"
 file_password = None
 
-ftp_url = None
-ftp_password = None
-
 # To set up rsyncd for test:
 # /etc/rsyncd.conf contains
 # [testdup]
@@ -67,6 +61,9 @@ ftp_password = None
 # read only = false
 #
 # NOTE: chmod 777 /home/ken/testdup
+
+ftp_url = None
+ftp_password = None
 
 rsync_abspath_url = None
 rsync_relpath_url = None
@@ -86,11 +83,23 @@ webdav_password = None
 webdavs_url = None
 webdavs_password = None
 
+
 def setup():
     """ setup for unit tests """
+    # The following is for starting remote debugging in Eclipse with Pydev.
+    # Adjust the path to your location and version of Eclipse and Pydev.  Comment out
+    # to run normally, or this process will hang at pydevd.settrace() waiting for the
+    # remote debugger to start.
+    pysrc = "/opt/Aptana Studio 2/plugins/org.python.pydev.debug_2.1.0.2011052613/pysrc/"
+    sys.path.append(pysrc)
+    import pydevd #@UnresolvedImport
+    pydevd.settrace()
+    # end remote debugger startup
+
     log.setup()
     log.setverbosity(verbosity)
     globals.print_statistics = 0
+    localbackend.testing_in_progress = True
 
     globals.num_retries = 2
 

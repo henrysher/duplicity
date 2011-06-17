@@ -29,6 +29,9 @@ from duplicity import path
 from duplicity import util
 from duplicity.errors import * #@UnusedWildImport
 
+testing_in_progress = False
+
+
 class LocalBackend(duplicity.backend.Backend):
     """Use this backend when saving to local disk
 
@@ -39,11 +42,11 @@ class LocalBackend(duplicity.backend.Backend):
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
         # The URL form "file:MyFile" is not a valid duplicity target.
-        if not parsed_url.path.startswith( '//' ):
-            raise BackendException( "Bad file:// path syntax." )
+        if not parsed_url.path.startswith('//'):
+            raise BackendException("Bad file:// path syntax.")
         self.remote_pathdir = path.Path(parsed_url.path[2:])
 
-    def handle_error(self, e, op, file1=None, file2=None):
+    def handle_error(self, e, op, file1 = None, file2 = None):
         code = log.ErrorCode.backend_error
         if hasattr(e, 'errno'):
             if e.errno == errno.EACCES:
@@ -54,7 +57,10 @@ class LocalBackend(duplicity.backend.Backend):
                 code = log.ErrorCode.backend_no_space
         extra = ' '.join([util.escape(x) for x in [file1, file2] if x])
         extra = ' '.join([op, extra])
-        log.FatalError(str(e), code, extra)
+        if op != 'delete':
+            log.FatalError(str(e), code, extra)
+        else:
+            log.Warn(str(e), code, extra)
 
     def put(self, source_path, remote_filename = None):
         if not remote_filename:
@@ -62,14 +68,15 @@ class LocalBackend(duplicity.backend.Backend):
         target_path = self.remote_pathdir.append(remote_filename)
         log.Info("Writing %s" % target_path.name)
         """Try renaming first, copying if doesn't work"""
-        try:
-            source_path.rename(target_path)
-        except OSError:
-            pass
-        except Exception, e:
-            self.handle_error(e, 'put', source_path.name, target_path.name)
-        else:
-            return
+        if not testing_in_progress:
+            try:
+                source_path.rename(target_path)
+            except OSError:
+                pass
+            except Exception, e:
+                self.handle_error(e, 'put', source_path.name, target_path.name)
+            else:
+                return
         try:
             target_path.writefileobj(source_path.open("rb"))
         except Exception, e:

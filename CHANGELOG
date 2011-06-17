@@ -1,5 +1,8 @@
 New in v0.6.14 (2011/06/??)
 ----------------------------
+Enhancements:
+452342     Provide Ubuntu One integration
+
 Bugs closed in this release:
 433591     AttributeError: FileobjHooked instance has no attribute 'name'
 487720     Restore fails with "Invalid data - SHA1 hash mismatch"
@@ -10,6 +13,7 @@ Bugs closed in this release:
 739438     [PATCH] Local backend should always try renaming instead of copying
 753858     cannot import name S3ResponseError
 761688     Difference found: File X has permissions 666, expected 666
+777377     collection-status asking for passphrase
 778215     ncftpls file delete fails in ftpbackend.py
 782294     create tomporary files with sftp
 782321     duplicity sftp backend should ignore removing a file which is not there
@@ -19,9 +23,6 @@ Bugs closed in this release:
 794123     Timeout on sftp command 'ls -1'
 797758     Duplicity ignores some FatalErrors
 793096     Allow to pass different passwords for --sign-key and --encrypt-key
-
-Enhancements:
-452342     Provide Ubuntu One integration
 
 Merges:
 lp:~ed.so/duplicity/0.6-add_sftp
@@ -33,21 +34,25 @@ lp:~mterry/duplicity/levelName
 lp:~mterry/duplicity/retry-decorator
 lp:~mterry/duplicity/u1-status
 
+
 New in v0.6.13 (2011/04/02)
 ----------------------------
-Bugs closed in this release:
-579958     Assertion error "time not moving forward at appropriate pace"
-613244     silent data corruption with checkpoint/restore
-731905     File "/usr/bin/duplicity", error after upgrade from 6.11 to 6.12
-
 Enhancements added this release:
 New manual test to make Ctrl-C issues easier to replicate.
 Use python-virtualenv to make testing multiple Python versions easier.
 In boto backend check for existing bucket before trying to create.
 
+Bugs closed in this release:
+579958     Assertion error "time not moving forward at appropriate pace"
+613244     silent data corruption with checkpoint/restore
+731905     File "/usr/bin/duplicity", error after upgrade from 6.11 to 6.12
+
 
 New in v0.6.12 (2011/03/08)
 ----------------------------
+Enhancements added this release:
+626915     ftps support using lftp (ftpsbackend)
+
 Bugs closed in this release:
 486489     Only full backups done on webdav
 578663     Use log codes for common backend errors
@@ -60,9 +65,6 @@ Bugs closed in this release:
 681980     Duplicity 0.6.11 aborts if RSYNC_RSH not set
 700390     Backup fails silently when target is full (sftp, verbosity=4)
 704314     Exception in log module
-
-Enhancements added this release:
-626915     ftps support using lftp (ftpsbackend)
 
 Merges:
 lp:~mterry/duplicity/backend-log-codes3

@@ -332,10 +332,10 @@ class TestInnerFuncs(unittest.TestCase):
             assert not fout.close()
             assert contents == buf, (contents, buf)
 
-        testseq([self.snapshot()], 0600, "hello, world!")
-        testseq([self.snapshot(), self.delta1()], 0640,
+        testseq([self.snapshot()], ("0:0 600"), "hello, world!")
+        testseq([self.snapshot(), self.delta1()], ("0:0 640"),
                 "aonseuth aosetnuhaonsuhtansoetuhaoe")
-        testseq([self.snapshot(), self.delta1(), self.delta2()], 0644,
+        testseq([self.snapshot(), self.delta1(), self.delta2()], ("0:0 644"),
                 "3499 34957839485792357 458348573")
 
 

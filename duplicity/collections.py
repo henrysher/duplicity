@@ -150,7 +150,7 @@ class BackupSet:
                 # do not remove new sigs from the cache:
                 # they aren't removed from the remote archive,
                 # and subsequent backups will have to resync
-                # which is bad if running non-interactive with encrypt-key 
+                # which is bad if running non-interactive with encrypt-key
                 try:
                     globals.archive_dir.append(lfn).delete()
                 except Exception:
@@ -917,11 +917,9 @@ class CollectionsStatus:
             else:
                 assert len(chain_list) == 2
                 if chain_list[0].backend: # is remote, goes first
-                    assert chain_list[1].archive_dir # other is local
                     sorted_chain_list.append(chain_list[0])
                     sorted_chain_list.append(chain_list[1])
                 else: # is local, goes second
-                    assert chain_list[1].backend # other is remote
                     sorted_chain_list.append(chain_list[1])
                     sorted_chain_list.append(chain_list[0])
 
@@ -996,7 +994,7 @@ class CollectionsStatus:
             if self.matched_chain_pair:
                 matched_sig_chain = self.matched_chain_pair[0]
                 for sig_chain in self.all_sig_chains:
-                    print sig_chain.start_time, matched_sig_chain.start_time, 
+                    print sig_chain.start_time, matched_sig_chain.start_time,
                     print sig_chain.end_time, matched_sig_chain.end_time
                     if (sig_chain.start_time == matched_sig_chain.start_time and
                         sig_chain.end_time == matched_sig_chain.end_time):

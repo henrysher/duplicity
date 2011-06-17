@@ -728,7 +728,10 @@ def cleanup(col_stats):
         if not globals.dry_run:
             col_stats.backend.delete(ext_remote)
             for fn in ext_local:
-                globals.archive_dir.append(fn).delete()
+                try:
+                    globals.archive_dir.append(fn).delete()
+                except Exception:
+                    pass
     else:
         log.Notice(gettext.ngettext("Found the following file to delete:",
                                      "Found the following files to delete:",
@@ -1161,24 +1164,22 @@ def main():
     # The following is for starting remote debugging in Eclipse with Pydev.
     # Adjust the path to your location and version of Eclipse and Pydev.
     if globals.pydevd:
-        pysrc = "/opt/Aptana Studio 2.0/plugins/org.python.pydev.debug_2.0.0.2011040403/pysrc/"
-        if os.path.isdir(pysrc):
-            sys.path.append(pysrc)
-            import pydevd #@UnresolvedImport
-            pydevd.settrace()
-        else:
-            log.FatalError("Unable to locate pydevd.", log.ErrorCode.user_error)
+        pysrc = "/opt/Aptana Studio 2/plugins/org.python.pydev.debug_2.1.0.2011052613/pysrc/"
+        sys.path.append(pysrc)
+        import pydevd #@UnresolvedImport
+        pydevd.settrace()
 
     # log some debugging status info
     log_startup_parms(log.INFO)
 
     # check for disk space and available file handles
     check_resources(action)
-
-    # synchronize local and remote, the passphrase is requested if needed
-    sync_archive()
-
-    # get current collection status, no passphrase needed
+    
+    # check archive synch with remote, fix if needed
+ 	if action not in ["collection-status"]:
+ 		sync_archive()
+    
+    # get current collection status
     col_stats = collections.CollectionsStatus(globals.backend,
                                               globals.archive_dir).set_values()
 
