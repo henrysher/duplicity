@@ -1,5 +1,11 @@
 2011-06-17  Kenneth Loafman  <kenneth@loafman.com>
 
+	777377     collection-status asking for passphrase
+	
+	Various fixes to unit tests to comprehend changes made.
+
+2011-06-17  Kenneth Loafman  <kenneth@loafman.com>
+
 	680425     Endless retype passphrase when typo
 	793096     Allow to pass different passwords for --sign-key and --encrypt-key
 
