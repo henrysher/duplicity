@@ -1,0 +1,55 @@
+%define PYTHON_NAME %((rpm -q --quiet python2 && echo python2) || echo python)
+
+Version: 0.6.14
+Summary: Untrusted/encrypted backup using rsync algorithm
+Name: duplicity
+Release: 0.fdr.6
+Epoch: 0
+URL: http://www.nongnu.org/duplicity/
+Source: http://savannah.nongnu.org/download/duplicity/%{name}-%{version}.tar.gz
+License: GPL
+Group: Applications/Archiving
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+requires: librsync >= 0.9.6, %{PYTHON_NAME} >= 2.2, gnupg >= 1.0.6
+BuildPrereq: %{PYTHON_NAME}-devel >= 2.2, librsync-devel >= 0.9.6
+
+%description
+Duplicity incrementally backs up files and directory by encrypting
+tar-format volumes with GnuPG and uploading them to a remote (or
+local) file server.  In theory many remote backends are possible;
+right now local, ssh/scp, ftp, and rsync backends are written.
+Because duplicity uses librsync, the incremental archives are space
+efficient and only record the parts of files that have changed since
+the last backup.  Currently duplicity supports deleted files, full
+unix permissions, directories, symbolic links, fifos, etc., but not
+hard links.
+
+%prep
+%setup -q
+
+%build
+%{PYTHON_NAME} setup.py build
+
+%install
+%{PYTHON_NAME} setup.py install --prefix=$RPM_BUILD_ROOT/usr
+%find_lang %{name}
+
+%clean
+[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
+
+%files -f %{name}.lang
+%defattr(-,root,root)
+%{_bindir}/rdiffdir
+%{_bindir}/duplicity
+%{_mandir}/man1/*
+%{_libdir}/
+%doc CHANGELOG COPYING README
+
+%changelog
+* Sat Aug 09 2003 Ben Escoto <bescoto@stanford.edu>
+- Repackaging for Fedora
+- autodetect python version
+- require librsync >=0.9.6
+* Sun Aug 30 2002 Ben Escoto <bescoto@stanford.edu>
+- Initial RPM
+
