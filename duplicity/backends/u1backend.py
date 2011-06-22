@@ -98,13 +98,16 @@ class U1Backend(duplicity.backend.Backend):
         import urllib
         return urllib.quote(url, safe="/~")
 
-    def handle_error(self, op, headers, file1=None, file2=None):
+    def handle_error(self, op, headers, file1=None, file2=None, ignore=None):
         from duplicity import log
         from duplicity import util
         import json
 
         status = int(headers[0].get('status'))
         if status >= 200 and status < 300:
+            return
+
+        if ignore and status in ignore:
             return
 
         if status == 400:
@@ -192,7 +195,7 @@ class U1Backend(duplicity.backend.Backend):
         for filename in filename_list:
             remote_full = self.meta_base + self.quote(filename)
     	    answer = auth.request(remote_full, http_method="DELETE")
-            self.handle_error('delete', answer, remote_full)
+            self.handle_error('delete', answer, remote_full, ignore=[404])
 
 duplicity.backend.register_backend("u1", U1Backend)
 duplicity.backend.register_backend("u1+http", U1Backend)
