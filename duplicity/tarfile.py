@@ -562,6 +562,8 @@ class TarFile:
         # statement, we must process this first.
         if tarinfo.type in (GNUTYPE_LONGLINK, GNUTYPE_LONGNAME):
             tarinfo = self._proc_gnulong(tarinfo, tarinfo.type)
+            if not tarinfo:
+                return None
 
         if tarinfo.issparse():
             assert 0, "Sparse file support turned off"
