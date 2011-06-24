@@ -224,6 +224,14 @@ import os
 import sys
 import fcntl
 
+from duplicity import log
+
+try:
+    import threading
+except ImportError:
+    import dummy_threading #@UnusedImport
+    log.Warn("Threading not available -- zombie processes may appear")
+
 __author__   = "Frank J. Tobin, ftobin@neverending.org"
 __version__  = "0.3.2"
 __revision__ = "$Id: GnuPGInterface.py,v 1.6 2009/06/06 17:35:19 loafman Exp $"
