@@ -1174,11 +1174,11 @@ def main():
 
     # check for disk space and available file handles
     check_resources(action)
-    
+
     # check archive synch with remote, fix if needed
- 	if action not in ["collection-status"]:
- 		sync_archive()
-    
+    if action not in ["collection-status"]:
+        sync_archive()
+
     # get current collection status
     col_stats = collections.CollectionsStatus(globals.backend,
                                               globals.archive_dir).set_values()
