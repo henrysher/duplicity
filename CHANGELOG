@@ -7,6 +7,7 @@ Ignore 404 errors when we try to delete a file on Ubuntu One.
 
 Merges:
 lp:~mterry/duplicity/u1-ignore-404
+lp:~mterry/duplicity/guard-tarinfo
 
 
 New in v0.6.14 (2011/06/18)
