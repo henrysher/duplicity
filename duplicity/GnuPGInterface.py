@@ -405,6 +405,12 @@ class GnuPG:
             process._pipes[fh_name] = Pipe(fh.fileno(), fh.fileno(), 1)
 
         process.pid = os.fork()
+        if process.pid != 0:
+            # start a threaded_waitpid on the child
+            process.thread = threading.Thread(target=threaded_waitpid,
+                                              name="wait%d" % process.pid,
+                                              args=(process,))
+            process.thread.start()
 
         if process.pid == 0: self._as_child(process, gnupg_commands, args)
         return self._as_parent(process)
@@ -633,18 +639,38 @@ class Process:
     """
 
     def __init__(self):
-        self._pipes  = {}
-        self.handles = {}
-        self.pid     = None
-        self._waited = None
+        self._pipes   = {}
+        self.handles  = {}
+        self.pid      = None
+        self._waited  = None
+        self.thread   = None
+        self.returned = None
 
     def wait(self):
-        """Wait on the process to exit, allowing for child cleanup.
-        Will raise an IOError if the process exits non-zero."""
+        """
+        Wait on threaded_waitpid to exit and examine results.
+        Will raise an IOError if the process exits non-zero.
+        """
+        if self.returned == None:
+            self.thread.join()
+        if self.returned != 0:
+            raise IOError, "GnuPG exited non-zero, with code %d" % (self.returned >> 8)
 
-        e = os.waitpid(self.pid, 0)[1]
-        if e != 0:
-            raise IOError, "GnuPG exited non-zero, with code %d" % (e >> 8)
+
+def threaded_waitpid(process):
+    """
+    When started as a thread with the Process object, thread
+    will execute an immediate waitpid() against the process
+    pid and will collect the process termination info.  This
+    will allow us to reap child processes as soon as possible,
+    thus freeing resources quickly.
+    """
+    try:
+        process.returned = os.waitpid(process.pid, 0)[1]
+    except:
+        log.Debug("GPG process %d terminated before wait()" % process.pid)
+        process.returned = 0
+
 
 def _run_doctests():
     import doctest, GnuPGInterface #@UnresolvedImport
