@@ -815,7 +815,7 @@ def remove_old(col_stats):
                    _("Rerun command with --force option to actually delete."))
 
 
-def sync_archive():
+def sync_archive(decrypt):
     """
     Synchronize local archive manifest file and sig chains to remote archives.
     Copy missing files from remote to local as needed to make sure the local
@@ -824,7 +824,7 @@ def sync_archive():
     @rtype: void
     @return: void
     """
-    suffixes = [".g", ".gpg", ".z", ".gz"]
+    suffixes = [".g", ".gpg", ".z", ".gz", ".part"]
 
     def get_metafiles(filelist):
         """
@@ -832,30 +832,31 @@ def sync_archive():
         Files of interest are:
           sigtar - signature files
           manifest - signature files
+          duplicity partial versions of the above
         Files excluded are:
           non-duplicity files
-          duplicity partial files
 
         @rtype: list
         @return: list of duplicity metadata files
         """
         metafiles = {}
+        partials = {}
         need_passphrase = False
         for fn in filelist:
             pr = file_naming.parse(fn)
             if not pr:
                 continue
-            if pr.partial:
-                continue
             if pr.encrypted:
                 need_passphrase = True
             if pr.type in ["full-sig", "new-sig"] or pr.manifest:
                 base, ext = os.path.splitext(fn)
-                if ext in suffixes:
-                    metafiles[base] = fn
+                if ext not in suffixes:
+                    base = fn
+                if pr.partial:
+                    partials[base] = fn
                 else:
-                    metafiles[fn] = fn
-        return metafiles, need_passphrase
+                    metafiles[base] = fn
+        return metafiles, partials, need_passphrase
 
     def copy_raw(src_iter, filename):
         """
@@ -954,11 +955,11 @@ def sync_archive():
 
     # get remote metafile list
     remlist = globals.backend.list()
-    remote_metafiles, rem_needpass = get_metafiles(remlist)
+    remote_metafiles, ignored, rem_needpass = get_metafiles(remlist)
 
     # get local metafile list
     loclist = globals.archive_dir.listdir()
-    local_metafiles, loc_needpass = get_metafiles(loclist)
+    local_metafiles, local_partials, loc_needpass = get_metafiles(loclist)
 
     # we have the list of metafiles on both sides. remote is always
     # authoritative. figure out which are local spurious (should not
@@ -970,11 +971,18 @@ def sync_archive():
     local_spurious = []
 
     for key in remote_keys:
-        if not key in local_keys:
+        # If we lost our cache, re-get the remote file.  But don't do it if we
+        # already have a local partial.  The local partial will already be
+        # complete in this case (seems we got interrupted before we could move
+        # it to its final location).
+        if key not in local_keys and key not in local_partials:
             local_missing.append(key)
 
     for key in local_keys:
-        if not key in remote_keys:
+        # If we have a file locally that is unnecessary, delete it.  Also
+        # delete final versions of partial files because if we have both, it
+        # means the write of the final version got interrupted.
+        if key not in remote_keys or key in local_partials:
             local_spurious.append(key)
 
     # finally finish the process
@@ -986,8 +994,11 @@ def sync_archive():
         if not globals.dry_run:
             log.Notice(_("Synchronizing remote metadata to local cache..."))
             if local_missing and (rem_needpass or loc_needpass):
-                # password for the --encrypt-key
-                globals.gpg_profile.passphrase = get_passphrase(1, "sync")
+                if decrypt:
+                    # password for the --encrypt-key
+                    globals.gpg_profile.passphrase = get_passphrase(1, "sync")
+                else:
+                    local_missing = [] # don't download if we can't decrypt
             for fn in local_spurious:
                 remove_local(fn)
             for fn in local_missing:
@@ -1176,8 +1187,8 @@ def main():
     check_resources(action)
 
     # check archive synch with remote, fix if needed
-    if action not in ["collection-status"]:
-        sync_archive()
+    decrypt = action not in ["collection-status"]
+    sync_archive(decrypt)
 
     # get current collection status
     col_stats = collections.CollectionsStatus(globals.backend,
@@ -1249,7 +1260,7 @@ def main():
     elif action == "remove-all-but-n-full" or action == "remove-all-inc-of-but-n-full":
         remove_all_but_n_full(col_stats)
     elif action == "sync":
-        sync_archive(col_stats)
+        sync_archive(True)
     else:
         assert action == "inc" or action == "full", action
         # the passphrase for full and inc is used by --sign-key
