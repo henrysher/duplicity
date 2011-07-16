@@ -1,3 +1,13 @@
+2011-07-16  Ede <edgar.soldin AT web.de>
+	branch encrypt-sign-key:
+	- introduce --encrypt-sign-key parameter
+	- duplicity-bin::get_passphrase
+	  skip passphrase asking and reuse passphrase if 
+	  sign-key is also an encrypt key and 
+	  a passphrase for either one is already set
+	- add _() gettext to text in duplicity-bin::get_passphrase
+	- document changes and minor additions in manpage
+
 2011-06-17  Kenneth Loafman  <kenneth@loafman.com>
 
 	777377     collection-status asking for passphrase

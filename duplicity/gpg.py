@@ -62,8 +62,6 @@ class GPGProfile:
         'AA0E73D2'.
         """
         assert passphrase is None or type(passphrase) is types.StringType
-        if sign_key:
-            assert recipients # can only sign with asym encryption
 
         self.passphrase = passphrase
         self.signing_passphrase = passphrase
