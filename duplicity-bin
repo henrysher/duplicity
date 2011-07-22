@@ -877,24 +877,18 @@ def sync_archive(decrypt):
         @return: (parsedresult, local_name, remote_name)
         """
         pr = file_naming.parse(fn)
-        if pr.manifest:
-            suffix = file_naming.get_suffix(globals.encryption, False)
-        else:
-            suffix = file_naming.get_suffix(globals.encryption, not globals.encryption)
-        rem_name = fn + suffix
 
-        if pr.manifest:
-            suffix = file_naming.get_suffix(False, False)
-        else:
-            suffix = file_naming.get_suffix(False, True)
-        loc_name = fn + suffix
+        base, ext = os.path.splitext(fn)
+        if ext not in suffixes:
+            base = fn
 
-        return (pr, loc_name, rem_name)
+        suffix = file_naming.get_suffix(False, not pr.manifest)
+        loc_name = base + suffix
+
+        return (pr, loc_name, fn)
 
     def remove_local(fn):
-        pr, loc_name, rem_name = resolve_basename(fn)
-
-        del_name = globals.archive_dir.append(loc_name).name
+        del_name = globals.archive_dir.append(fn).name
 
         log.Notice(_("Deleting local %s (not authoritative at backend).") % del_name)
         try:
@@ -943,7 +937,7 @@ def sync_archive(decrypt):
 
         pr, loc_name, rem_name = resolve_basename(fn)
 
-        fileobj = globals.backend.get_fileobj_read(rem_name)
+        fileobj = globals.backend.get_fileobj_read(fn)
         src_iter = SrcIter(fileobj)
         if pr.manifest:
             copy_raw(src_iter,
@@ -976,14 +970,14 @@ def sync_archive(decrypt):
         # complete in this case (seems we got interrupted before we could move
         # it to its final location).
         if key not in local_keys and key not in local_partials:
-            local_missing.append(key)
+            local_missing.append(remote_metafiles[key])
 
     for key in local_keys:
         # If we have a file locally that is unnecessary, delete it.  Also
         # delete final versions of partial files because if we have both, it
         # means the write of the final version got interrupted.
         if key not in remote_keys or key in local_partials:
-            local_spurious.append(key)
+            local_spurious.append(local_metafiles[key])
 
     # finally finish the process
     if not local_missing and not local_spurious:
