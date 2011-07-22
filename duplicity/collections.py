@@ -52,6 +52,7 @@ class BackupSet:
         self.start_time = None                      # will be set if inc
         self.end_time = None                        # will be set if inc
         self.partial = False                        # true if a partial backup
+        self.encrypted = False                      # true if an encrypted backup
 
     def is_complete(self):
         """
@@ -108,6 +109,7 @@ class BackupSet:
         self.end_time = pr.end_time
         self.time = pr.time
         self.partial = pr.partial
+        self.encrypted = bool(pr.encrypted)
         self.info_set = True
 
     def set_manifest(self, remote_filename):
@@ -366,7 +368,8 @@ class BackupChain:
             else:
                 type = "inc"
                 time = s.end_time
-            l.append("%s%s %s %d" % (prefix, type, dup_time.timetostring(time), (len(s)),))
+            enc = "enc" if s.encrypted else "noenc"
+            l.append("%s%s %s %d %s" % (prefix, type, dup_time.timetostring(time), (len(s)), enc))
         return l
 
     def __str__(self):
