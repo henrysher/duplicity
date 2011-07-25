@@ -939,13 +939,13 @@ def sync_archive(decrypt):
 
         fileobj = globals.backend.get_fileobj_read(fn)
         src_iter = SrcIter(fileobj)
+        tdp = dup_temp.new_tempduppath(file_naming.parse(loc_name))
         if pr.manifest:
-            copy_raw(src_iter,
-                     globals.archive_dir.append(loc_name).name)
+            copy_raw(src_iter, tdp.name)
         else:
-            gpg.GzipWriteFile(src_iter,
-                              globals.archive_dir.append(loc_name).name,
-                              size=sys.maxint)
+            gpg.GzipWriteFile(src_iter, tdp.name, size=sys.maxint)
+        tdp.setdata()
+        tdp.move(globals.archive_dir.append(loc_name))
 
     # get remote metafile list
     remlist = globals.backend.list()
