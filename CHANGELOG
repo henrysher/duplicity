@@ -12,6 +12,7 @@ lp:~mterry/duplicity/u1-ignore-404
 lp:~mterry/duplicity/guard-tarinfo
 lp:~mterry/duplicity/enotconn
 lp:~mterry/duplicity/look-at-partials-during-sync
+lp:~mterry/duplicity/more-accurate-sync
 
 
 New in v0.6.14 (2011/06/18)
