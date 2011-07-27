@@ -43,3 +43,4 @@ duplicity/backends/rsyncbackend.py
 duplicity/backends/sshbackend.py
 duplicity/backends/tahoebackend.py
 duplicity/backends/webdavbackend.py
+duplicity/backends/gdocsbackend.py
