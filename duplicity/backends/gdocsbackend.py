@@ -73,24 +73,39 @@ class GDocsBackend(duplicity.backend.Backend):
         if not remote_filename:
           remote_filename = source_path.get_filename()
         
+        # If remote file already exists in destination folder, remove it.
+        feed = self.client.GetDocList(uri = self.folder.content.src + '?title=' +
+                                           remote_filename + '&title-exact=true')
+        if feed:
+          for entry in feed.entry:
+            self.client.Delete(entry.GetEditLink().href + '?delete=true', force = True)
+        
         # Set uploader instance. Note that resumable uploads are required in order to
         # enable uploads for all file types.
         # (see http://googleappsdeveloper.blogspot.com/2011/05/upload-all-file-types-to-any-google.html)
-        file = open(source_path.name)
-        content_type = 'application/binary'
-        file_size = os.path.getsize(file.name)
+        file = source_path.open()
         uploader = gdata.client.ResumableUploader(
-          self.client, file, content_type, file_size,
+          self.client, file, 'application/binary', os.path.getsize(file.name),
           chunk_size = gdata.client.ResumableUploader.DEFAULT_CHUNK_SIZE,
-          desired_class=gdata.docs.data.DocsEntry)
-        
-        # Upload!
-        entry = gdata.docs.data.DocsEntry(title = atom.data.Title(text=remote_filename))
-        uri = '/feeds/upload/create-session/default/private/full?convert=false'
-        entry = uploader.UploadFile(uri, entry = entry)
-
-        # Move to destination folder (TODO: any ideas on how to avoid this step?).
-        self.client.Move(entry, self.folder)
+          desired_class = gdata.docs.data.DocsEntry)
+        if uploader:
+          # Upload!
+          entry = gdata.docs.data.DocsEntry(title = atom.data.Title(text=remote_filename))
+          uri = '/feeds/upload/create-session/default/private/full?convert=false'
+          entry = uploader.UploadFile(uri, entry = entry)
+          file.close()
+          if entry:
+            # Move to destination folder.
+            # TODO: any ideas on how to avoid this step?
+            if not self.client.Move(entry, self.folder):
+              raise BackendException("Failed to move uploaded file '%s' to destination remote folder '%s'"
+                                     % (source_path.get_filename(), self.folder.title.text))
+          else:
+            raise BackendException("Failed to upload file '%s' to remote folder '%s'"
+                                   % (source_path.get_filename(), self.folder.title.text))
+        else:
+          raise BackendException("Failed to initialize upload of file '%s' to remote folder '%s'"
+                                 % (source_path.get_filename(), self.folder.title.text))
         
     def get(self, remote_filename, local_path):
         """Get remote filename, saving it to local_path"""
