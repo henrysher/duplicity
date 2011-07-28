@@ -18,24 +18,28 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
+import os.path
+
 import duplicity.backend
 from duplicity import log
 from duplicity.errors import * #@UnusedWildImport
 
-import os.path
-import atom.data
-import gdata.client
-import gdata.data
-import gdata.gauth
-import gdata.docs.client
-import gdata.docs.data
-import gdata.sample_util
-import gdata.sites.data
-
 class GDocsBackend(duplicity.backend.Backend):
-    """Connect to remote store using Google Docs API"""
+    """Connect to remote store using Google Google Documents List API"""
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
+        
+        # Import Google Data APIs libraries.
+        try:
+          global atom
+          global gdata
+          import atom.data
+          import gdata.client
+          import gdata.docs.client
+          import gdata.docs.data
+        except ImportError:
+          raise BackendException("Google Docs backend requires Google Data APIs Python "
+                                 "Client Library (http://code.google.com/p/gdata-python-client/).")
         
         # Setup client instance.
         try:
@@ -51,11 +55,14 @@ class GDocsBackend(duplicity.backend.Backend):
           log.FatalError('Google Docs API fatal error: %s.' % str(e))
           
         # Fetch folder entry.
-        feed = self.client.GetDocList(uri = '/feeds/default/private/full/-/folder?title=' + parsed_url.path[1:] + '&title-exact=true')
+        folder_name = parsed_url.path[1:]
+        feed = self.client.GetDocList(uri = '/feeds/default/private/full/-/folder?title=' + folder_name + '&title-exact=true')
         if (len(feed.entry) == 1):
           self.folder = feed.entry[0]
         else:
-          log.FatalError('Google Docs API fatal error: Invalid folder name.')
+          self.folder = self.client.Create(gdata.docs.data.FOLDER_LABEL, folder_name)
+          if not self.folder:
+            log.FatalError('Google Docs API fatal error: Invalid folder name.')
 
     def put(self, source_path, remote_filename = None):
         """Transfer source_path to remote_filename"""
