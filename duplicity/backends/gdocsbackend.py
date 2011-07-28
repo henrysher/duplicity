@@ -100,7 +100,7 @@ class GDocsBackend(duplicity.backend.Backend):
             # Move to destination folder.
             # TODO: any ideas on how to avoid this step?
             if self.client.Move(entry, self.folder):
-              file.close()
+              assert not file.close()
               return
             else:
               log.Warn("Failed to move uploaded file '%s' to destination remote folder '%s'"
@@ -111,7 +111,7 @@ class GDocsBackend(duplicity.backend.Backend):
         else:
           log.Warn("Failed to initialize upload of file '%s' to remote folder '%s'"
                    % (source_path.get_filename(), self.folder.title.text))
-        file.close()
+        assert not file.close()
 
       ## Error!
       raise BackendException("Error uploading file '%s' to remote folder '%s'"
@@ -126,6 +126,7 @@ class GDocsBackend(duplicity.backend.Backend):
           entry = feed.entry[0]
           try:
             self.client.Download(entry, local_path.name)
+            local_path.setdata()
             return
           except gdata.client.RequestError:
             log.Warn("Failed to download file '%s' in remote folder '%s'"
