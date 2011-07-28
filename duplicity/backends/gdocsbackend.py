@@ -53,7 +53,11 @@ class GDocsBackend(duplicity.backend.Backend):
         self.client.http_client.debug = False
         self.client.client_login(email, password, source = 'duplicity', service = 'writely')
       except gdata.client.BadAuthentication:
-        log.FatalError('Google Docs error: Invalid user credentials given.')
+        log.FatalError('Google Docs error: Invalid user credentials given. Be aware that accounts '
+                       'that use 2-step verification require creating an application specific '
+                       'access code for using this Duplicity backend. Follow the instrucction in '
+                       'http://www.google.com/support/accounts/bin/static.py?page=guide.cs&guide=1056283&topic=1056286 '
+                       'and create your application-specific password to run duplicity backups.')
       except Exception, e:
         log.FatalError('Google Docs error: %s.' % str(e))
 
