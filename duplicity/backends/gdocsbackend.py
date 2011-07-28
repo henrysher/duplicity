@@ -26,6 +26,7 @@ from duplicity.errors import * #@UnusedWildImport
 
 class GDocsBackend(duplicity.backend.Backend):
     """Connect to remote store using Google Google Documents List API"""
+
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
         
@@ -38,10 +39,11 @@ class GDocsBackend(duplicity.backend.Backend):
           import gdata.docs.client
           import gdata.docs.data
         except ImportError:
-          raise BackendException("Google Docs backend requires Google Data APIs Python "
-                                 "Client Library (http://code.google.com/p/gdata-python-client/).")
+          raise BackendException('Google Docs backend requires Google Data APIs Python '
+                                 'Client Library (see http://code.google.com/p/gdata-python-client/).')
         
         # Setup client instance.
+        # TODO: handle gdata.client.CaptchaRequired exception.
         try:
           email = parsed_url.username + '@' + parsed_url.hostname
           password = parsed_url.password
@@ -50,19 +52,20 @@ class GDocsBackend(duplicity.backend.Backend):
           self.client.http_client.debug = False
           self.client.client_login(email, password, source = 'duplicity', service = 'writely')
         except gdata.client.BadAuthentication:
-          log.FatalError('Google Docs API fatal error: Invalid user credentials given.')
+          log.FatalError('Google Docs error: Invalid user credentials given.')
         except Exception, e:
-          log.FatalError('Google Docs API fatal error: %s.' % str(e))
+          log.FatalError('Google Docs error: %s.' % str(e))
           
-        # Fetch folder entry.
+        # Fetch/create folder entry.
         folder_name = parsed_url.path[1:]
-        feed = self.client.GetDocList(uri = '/feeds/default/private/full/-/folder?title=' + folder_name + '&title-exact=true')
+        feed = self.client.GetDocList(uri = '/feeds/default/private/full/-/folder?title=' +
+                                            folder_name + '&title-exact=true')
         if (len(feed.entry) == 1):
           self.folder = feed.entry[0]
         else:
           self.folder = self.client.Create(gdata.docs.data.FOLDER_LABEL, folder_name)
           if not self.folder:
-            log.FatalError('Google Docs API fatal error: Invalid folder name.')
+            log.FatalError('Google Docs error: Invalid folder name.')
 
     def put(self, source_path, remote_filename = None):
         """Transfer source_path to remote_filename"""
@@ -91,22 +94,39 @@ class GDocsBackend(duplicity.backend.Backend):
         
     def get(self, remote_filename, local_path):
         """Get remote filename, saving it to local_path"""
-        feed = self.client.GetDocList(uri = self.folder.content.src + '?title=' + remote_filename + '&title-exact=true')
-        if (len(feed.entry) == 1):
+        feed = self.client.GetDocList(uri = self.folder.content.src + '?title=' +
+                                            remote_filename + '&title-exact=true')
+        if feed and (len(feed.entry) == 1):
           entry = feed.entry[0]
-          self.client.Download(entry, local_path.name)
+          try:
+            self.client.Download(entry, local_path.name)
+          except gdata.client.RequestError:
+            raise BackendException("Failed to download file '%s' in remote folder '%s'"
+                                   % (remote_filename, self.folder.title.text))
+        else:
+          raise BackendException("Failed to find file '%s' in remote folder '%s'"
+                                 % (remote_filename, self.folder.title.text))
 
     def list(self):
         """List files in folder"""
         feed = self.client.GetDocList(uri = self.folder.content.src)
-        return [entry.title.text for entry in feed.entry]
+        if feed:
+          return [entry.title.text for entry in feed.entry]
+        else:
+          raise BackendException("Error listing files in remote folder '%s'" % (self.folder.title.text))
 
     def delete(self, filename_list):
         """Delete files in filename_list"""
         for filename in filename_list:
-          feed = self.client.GetDocList(uri = self.folder.content.src + '?title=' + filename + '&title-exact=true')
-          if (len(feed.entry) == 1):
+          feed = self.client.GetDocList(uri = self.folder.content.src + '?title=' +
+                                              filename + '&title-exact=true')
+          if feed and (len(feed.entry) == 1):
             entry = feed.entry[0]
-            self.client.Delete(entry.GetEditLink().href + '?delete=true', force=True)
+            if not self.client.Delete(entry.GetEditLink().href + '?delete=true', force = True):
+              log.Warn("Failed to remove file '%s' in remote folder '%s'"
+                       % (filename, self.folder.title.text))
+          else:
+            log.Warn("Failed to fetch & remove file '%s' in remote folder '%s'"
+                     % (filename, self.folder.title.text))
 
-duplicity.backend.register_backend("gdocs", GDocsBackend)
+duplicity.backend.register_backend('gdocs', GDocsBackend)
