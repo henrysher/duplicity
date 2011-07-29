@@ -81,13 +81,24 @@ def get_passphrase(n, action, for_signing = False):
     try:
         if for_signing:
             return os.environ['SIGN_PASSPHRASE']
+        else:
+            return os.environ['PASSPHRASE']
     except KeyError:
         pass
 
-    try:
-        return os.environ['PASSPHRASE']
-    except KeyError:
-        pass
+    # check if we can reuse an already set (signing_)passphrase
+    ## if signing key is also an encryption key assume that the passphrase is identical
+    if ( for_signing 
+         and globals.gpg_profile.sign_key in globals.gpg_profile.recipients 
+         and globals.gpg_profile.passphrase is not None ):
+        log.Notice(_("Reuse already set PASSPHRASE as SIGNING_PASSPHRASE"))
+        return globals.gpg_profile.passphrase
+    ## if one encryption key is also the signing key assume that the passphrase is identical
+    if ( not for_signing 
+         and globals.gpg_profile.sign_key in globals.gpg_profile.recipients 
+         and globals.gpg_profile.signing_passphrase is not None ):
+        log.Notice(_("Reuse already set SIGNING_PASSPHRASE as PASSPHRASE"))
+        return globals.gpg_profile.signing_passphrase
 
     # Next, verify we need to ask the user
 
@@ -128,7 +139,7 @@ def get_passphrase(n, action, for_signing = False):
 
     # Finally, ask the user for the passphrase
     else:
-        log.Info("PASSPHRASE variable not set, asking user.")
+        log.Info(_("PASSPHRASE variable not set, asking user."))
         use_cache = True
         while 1:
             # ask the user to enter a new passphrase to avoid an infinite loop
@@ -143,27 +154,27 @@ def get_passphrase(n, action, for_signing = False):
                     if use_cache and globals.gpg_profile.signing_passphrase:
                         pass1 = globals.gpg_profile.signing_passphrase
                     else:
-                        pass1 = getpass.getpass("GnuPG passphrase for signing key: ")
+                        pass1 = getpass.getpass(_("GnuPG passphrase for signing key:")+" ")
                 else:
                     if use_cache and globals.gpg_profile.passphrase:
                         pass1 = globals.gpg_profile.passphrase
                     else:
-                        pass1 = getpass.getpass("GnuPG passphrase: ")
+                        pass1 = getpass.getpass(_("GnuPG passphrase:")+" ")
 
             if n == 1:
                 pass2 = pass1
             elif for_signing:
-                pass2 = getpass.getpass("Retype passphrase for signing key to confirm: ")
+                pass2 = getpass.getpass(_("Retype passphrase for signing key to confirm: "))
             else:
-                pass2 = getpass.getpass("Retype passphrase to confirm: ")
+                pass2 = getpass.getpass(_("Retype passphrase to confirm: "))
 
             if not pass1 == pass2:
-                print "First and second passphrases do not match!  Please try again."
+                print _("First and second passphrases do not match!  Please try again.")
                 use_cache = False
                 continue
 
             if not pass1 and not globals.gpg_profile.recipients and not for_signing:
-                print "Cannot use empty passphrase with symmetric encryption!  Please try again."
+                print _("Cannot use empty passphrase with symmetric encryption!  Please try again.")
                 use_cache = False
                 continue
 
