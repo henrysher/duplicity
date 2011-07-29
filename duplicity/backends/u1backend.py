@@ -19,6 +19,8 @@
 # along with duplicity.  If not, see <http://www.gnu.org/licenses/>.
 
 import duplicity.backend
+from duplicity.backend import retry
+from duplicity.errors import BackendException
 
 def ensure_dbus():
     # GIO requires a dbus session bus which can start the gvfs daemons
@@ -69,9 +71,7 @@ class U1Backend(duplicity.backend.Backend):
                            log.ErrorCode.backend_error)
 
         # Create volume in case it doesn't exist yet
-        import ubuntuone.couch.auth as auth
-        answer = auth.request(self.volume_uri, http_method="PUT")
-        self.handle_error('put', answer, self.volume_uri)
+        self.create_volume()
 
     def login(self):
 	    from gobject import MainLoop
@@ -98,7 +98,7 @@ class U1Backend(duplicity.backend.Backend):
         import urllib
         return urllib.quote(url, safe="/~")
 
-    def handle_error(self, op, headers, file1=None, file2=None, ignore=None):
+    def handle_error(self, raise_error, op, headers, file1=None, file2=None, ignore=None):
         from duplicity import log
         from duplicity import util
         import json
@@ -128,9 +128,20 @@ class U1Backend(duplicity.backend.Backend):
             node = json.loads(headers[1])
             if node.get('error'):
                 msg = node.get('error')
-        log.FatalError(msg, code, extra)
 
-    def put(self, source_path, remote_filename = None):
+        if raise_error:
+            raise BackendException(msg)
+        else:
+            log.FatalError(msg, code, extra)
+
+    @retry
+    def create_volume(self, raise_errors=False):
+        import ubuntuone.couch.auth as auth
+        answer = auth.request(self.volume_uri, http_method="PUT")
+        self.handle_error(raise_errors, 'put', answer, self.volume_uri)
+
+    @retry
+    def put(self, source_path, remote_filename = None, raise_errors=False):
         """Copy file to remote"""
         import json
         import ubuntuone.couch.auth as auth
@@ -141,7 +152,7 @@ class U1Backend(duplicity.backend.Backend):
         answer = auth.request(remote_full,
                               http_method="PUT",
                               request_body='{"kind":"file"}')
-        self.handle_error('put', answer, source_path.name, remote_full)
+        self.handle_error(raise_errors, 'put', answer, source_path.name, remote_full)
         node = json.loads(answer[1])
 
         remote_full = self.content_base + self.quote(node.get('content_path'))
@@ -153,32 +164,34 @@ class U1Backend(duplicity.backend.Backend):
     	           "Content-Type": content_type}
         answer = auth.request(remote_full, http_method="PUT",
                               headers=headers, request_body=data)
-        self.handle_error('put', answer, source_path.name, remote_full)
+        self.handle_error(raise_errors, 'put', answer, source_path.name, remote_full)
 
-    def get(self, filename, local_path):
+    @retry
+    def get(self, filename, local_path, raise_errors=False):
         """Get file and put in local_path (Path object)"""
         import json
         import ubuntuone.couch.auth as auth
         remote_full = self.meta_base + self.quote(filename)
         answer = auth.request(remote_full)
-        self.handle_error('get', answer, remote_full, filename)
+        self.handle_error(raise_errors, 'get', answer, remote_full, filename)
         node = json.loads(answer[1])
 
         remote_full = self.content_base + self.quote(node.get('content_path'))
         answer = auth.request(remote_full)
-        self.handle_error('get', answer, remote_full, filename)
+        self.handle_error(raise_errors, 'get', answer, remote_full, filename)
         f = open(local_path.name, 'wb')
         f.write(answer[1])
         local_path.setdata()
 
-    def list(self):
+    @retry
+    def list(self, raise_errors=False):
         """List files in that directory"""
         import json
         import ubuntuone.couch.auth as auth
         import urllib
         remote_full = self.meta_base + "?include_children=true"
         answer = auth.request(remote_full)
-        self.handle_error('list', answer, remote_full)
+        self.handle_error(raise_errors, 'list', answer, remote_full)
         filelist = []
         node = json.loads(answer[1])
         if node.get('has_children') == True:
@@ -187,7 +200,8 @@ class U1Backend(duplicity.backend.Backend):
                 filelist += [path]
         return filelist
 
-    def delete(self, filename_list):
+    @retry
+    def delete(self, filename_list, raise_errors=False):
         """Delete all files in filename list"""
         import types
         import ubuntuone.couch.auth as auth
@@ -195,7 +209,7 @@ class U1Backend(duplicity.backend.Backend):
         for filename in filename_list:
             remote_full = self.meta_base + self.quote(filename)
     	    answer = auth.request(remote_full, http_method="DELETE")
-            self.handle_error('delete', answer, remote_full, ignore=[404])
+            self.handle_error(raise_errors, 'delete', answer, remote_full, ignore=[404])
 
 duplicity.backend.register_backend("u1", U1Backend)
 duplicity.backend.register_backend("u1+http", U1Backend)
