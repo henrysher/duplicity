@@ -144,10 +144,10 @@ class GDocsBackend(duplicity.backend.Backend):
     def list(self):
       """List files in folder"""
       for n in range(0, globals.num_retries):
-        feed = self.client.GetDocList(uri = self.folder.content.src)
-        if feed:
-          return [entry.title.text for entry in feed.entry]
-        else:
+        try:
+          entries = self.client.GetEverything(uri = self.folder.content.src)
+          return [entry.title.text for entry in entries]
+        except Exception, e:
           log.Warn("Failed to fetch list of files in remote folder '%s'"
                    % (self.folder.title.text))
       raise BackendException("Error listing files in remote folder '%s'"
