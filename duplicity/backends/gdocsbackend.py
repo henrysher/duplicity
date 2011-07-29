@@ -44,22 +44,10 @@ class GDocsBackend(duplicity.backend.Backend):
                                'Client Library (see http://code.google.com/p/gdata-python-client/).')
 
       # Setup client instance.
-      # TODO: handle gdata.client.CaptchaRequired exception.
-      try:
-        email = parsed_url.username + '@' + parsed_url.hostname
-        password = parsed_url.password
-        self.client = gdata.docs.client.DocsClient(source = 'duplicity')
-        self.client.ssl = True
-        self.client.http_client.debug = False
-        self.client.client_login(email, password, source = 'duplicity', service = 'writely')
-      except gdata.client.BadAuthentication:
-        raise BackendException('Invalid user credentials given. Be aware that accounts '
-                               'that use 2-step verification require creating an application specific '
-                               'access code for using this Duplicity backend. Follow the instrucction in '
-                               'http://www.google.com/support/accounts/bin/static.py?page=guide.cs&guide=1056283&topic=1056286 '
-                               'and create your application-specific password to run duplicity backups.')
-      except Exception, e:
-        raise BackendException('Error while authenticating client: %s.' % str(e))
+      self.client = gdata.docs.client.DocsClient(source = 'duplicity')
+      self.client.ssl = True
+      self.client.http_client.debug = False
+      self.__authorize(parsed_url.username + '@' + parsed_url.hostname, parsed_url.password)
 
       # Fetch/create folder entry.
       folder_name = parsed_url.path[1:]
@@ -164,7 +152,7 @@ class GDocsBackend(duplicity.backend.Backend):
             success = True
             for entry in entries:
               if not self.client.Delete(entry.GetEditLink().href + '?delete=true', force = True):
-                success =False
+                success = False
             if success:
               break
           else:
@@ -174,5 +162,27 @@ class GDocsBackend(duplicity.backend.Backend):
           if n == globals.num_retries:
             raise BackendException("Error removing file '%s' in remote folder '%s'"
                                    % (filename, self.folder.title.text))
+
+    def __authorize(self, email, password, captcha_token = None, captcha_response = None):
+      try:
+        self.client.client_login(email, password,
+                                 source = 'duplicity',
+                                 service = 'writely',
+                                 captcha_token = captcha_token,
+                                 captcha_response = captcha_response)
+      except gdata.client.CaptchaChallenge, challenge:
+        print('A captcha challenge in required. Please visit ' + challenge.captcha_url)
+        answer = None
+        while not answer:
+          answer = raw_input('Answer to the challenge? ')
+        self.__authorize(email, password, challenge.captcha_token, answer)
+      except gdata.client.BadAuthentication:
+        raise BackendException('Invalid user credentials given. Be aware that accounts '
+                               'that use 2-step verification require creating an application specific '
+                               'access code for using this Duplicity backend. Follow the instrucction in '
+                               'http://www.google.com/support/accounts/bin/static.py?page=guide.cs&guide=1056283&topic=1056286 '
+                               'and create your application-specific password to run duplicity backups.')
+      except Exception, e:
+        raise BackendException('Error while authenticating client: %s.' % str(e))
 
 duplicity.backend.register_backend('gdocs', GDocsBackend)
