@@ -53,24 +53,26 @@ class GDocsBackend(duplicity.backend.Backend):
         self.client.http_client.debug = False
         self.client.client_login(email, password, source = 'duplicity', service = 'writely')
       except gdata.client.BadAuthentication:
-        log.FatalError('Google Docs error: Invalid user credentials given. Be aware that accounts '
-                       'that use 2-step verification require creating an application specific '
-                       'access code for using this Duplicity backend. Follow the instrucction in '
-                       'http://www.google.com/support/accounts/bin/static.py?page=guide.cs&guide=1056283&topic=1056286 '
-                       'and create your application-specific password to run duplicity backups.')
+        raise BackendException('Invalid user credentials given. Be aware that accounts '
+                               'that use 2-step verification require creating an application specific '
+                               'access code for using this Duplicity backend. Follow the instrucction in '
+                               'http://www.google.com/support/accounts/bin/static.py?page=guide.cs&guide=1056283&topic=1056286 '
+                               'and create your application-specific password to run duplicity backups.')
       except Exception, e:
-        log.FatalError('Google Docs error: %s.' % str(e))
+        raise BackendException('Error while authenticating client: %s.' % str(e))
 
       # Fetch/create folder entry.
       folder_name = parsed_url.path[1:]
       feed = self.client.GetDocList(uri = '/feeds/default/private/full/-/folder?title=' +
-                                          folder_name + '&title-exact=true')
-      if (len(feed.entry) == 1):
+                                    folder_name + '&title-exact=true')
+      if feed and (len(feed.entry) == 1):
         self.folder = feed.entry[0]
-      else:
+      elif feed and (len(feed.entry) == 0):
         self.folder = self.client.Create(gdata.docs.data.FOLDER_LABEL, folder_name)
         if not self.folder:
-          log.FatalError('Google Docs error: Invalid folder name.')
+          raise BackendException("Error while creating destination folder '%s'." % folder_name)
+      else:
+        raise BackendException("Error while fetching destination folder '%s'." % folder_name)
 
     def put(self, source_path, remote_filename = None):
       """Transfer source_path to remote_filename"""
@@ -81,11 +83,10 @@ class GDocsBackend(duplicity.backend.Backend):
       # Upload!
       for n in range(0, globals.num_retries):
         # If remote file already exists in destination folder, remove it.
-        feed = self.client.GetDocList(uri = self.folder.content.src + '?title=' +
-                                      remote_filename + '&title-exact=true')
-        if feed:
-          for entry in feed.entry:
-            self.client.Delete(entry.GetEditLink().href + '?delete=true', force = True)
+        entries = self.client.GetEverything(uri = self.folder.content.src + '?title=' +
+                                            remote_filename + '&title-exact=true')
+        for entry in entries:
+          self.client.Delete(entry.GetEditLink().href + '?delete=true', force = True)
 
         # Set uploader instance. Note that resumable uploads are required in order to
         # enable uploads for all file types.
@@ -157,11 +158,14 @@ class GDocsBackend(duplicity.backend.Backend):
       """Delete files in filename_list"""
       for filename in filename_list:
         for n in range(0, globals.num_retries):
-          feed = self.client.GetDocList(uri = self.folder.content.src + '?title=' +
+          entries = self.client.GetEverything(uri = self.folder.content.src + '?title=' +
                                               filename + '&title-exact=true')
-          if feed and (len(feed.entry) == 1):
-            entry = feed.entry[0]
-            if self.client.Delete(entry.GetEditLink().href + '?delete=true', force = True):
+          if len(entries) > 0:
+            success = True
+            for entry in entries:
+              if not self.client.Delete(entry.GetEditLink().href + '?delete=true', force = True):
+                success =False
+            if success:
               break
           else:
             log.Warn("Failed to fetch & remove file '%s' in remote folder '%s'"
