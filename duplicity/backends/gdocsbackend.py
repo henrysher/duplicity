@@ -19,6 +19,8 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import os.path
+import string
+import urllib;
 
 import duplicity.backend
 from duplicity import log
@@ -27,6 +29,9 @@ from duplicity.errors import * #@UnusedWildImport
 
 class GDocsBackend(duplicity.backend.Backend):
     """Connect to remote store using Google Google Documents List API"""
+
+    ROOT_FOLDER_ID = 'folder%3Aroot'
+    BACKUP_DOCUMENT_TYPE = 'application/binary'
 
     def __init__(self, parsed_url):
       duplicity.backend.Backend.__init__(self, parsed_url)
@@ -44,23 +49,31 @@ class GDocsBackend(duplicity.backend.Backend):
                                'Client Library (see http://code.google.com/p/gdata-python-client/).')
 
       # Setup client instance.
-      self.client = gdata.docs.client.DocsClient(source = 'duplicity')
+      self.client = gdata.docs.client.DocsClient(source = 'duplicity $version')
       self.client.ssl = True
       self.client.http_client.debug = False
       self.__authorize(parsed_url.username + '@' + parsed_url.hostname, parsed_url.password)
 
-      # Fetch/create folder entry.
-      folder_name = parsed_url.path[1:]
-      feed = self.client.GetDocList(uri = '/feeds/default/private/full/-/folder?title=' +
-                                    folder_name + '&title-exact=true')
-      if feed and (len(feed.entry) == 1):
-        self.folder = feed.entry[0]
-      elif feed and (len(feed.entry) == 0):
-        self.folder = self.client.Create(gdata.docs.data.FOLDER_LABEL, folder_name)
-        if not self.folder:
-          raise BackendException("Error while creating destination folder '%s'." % folder_name)
-      else:
-        raise BackendException("Error while fetching destination folder '%s'." % folder_name)
+      # Fetch destination folder entry (and crete hierarchy if required).
+      folder_names = string.split(parsed_url.path[1:], '/')
+      parent_folder = None
+      parent_folder_id = GDocsBackend.ROOT_FOLDER_ID
+      for folder_name in folder_names:
+        entries = self.__fetch_entries(parent_folder_id, 'folder', folder_name)
+        if entries is not None:
+          if len(entries) == 1:
+            parent_folder = entries[0]
+          elif len(entries) == 0:
+            parent_folder = self.client.create(gdata.docs.data.FOLDER_LABEL, folder_name, parent_folder)
+          else:
+            parent_folder = None
+          if parent_folder:
+            parent_folder_id = parent_folder.resource_id.text
+          else:
+            raise BackendException("Error while creating destination folder '%s'." % folder_name)
+        else:
+          raise BackendException("Error while fetching destination folder '%s'." % folder_name)
+      self.folder = parent_folder
 
     def put(self, source_path, remote_filename = None):
       """Transfer source_path to remote_filename"""
@@ -71,17 +84,16 @@ class GDocsBackend(duplicity.backend.Backend):
       # Upload!
       for n in range(0, globals.num_retries):
         # If remote file already exists in destination folder, remove it.
-        entries = self.client.GetEverything(uri = self.folder.content.src + '?title=' +
-                                            remote_filename + '&title-exact=true')
+        entries = self.__fetch_entries(self.folder.resource_id.text, GDocsBackend.BACKUP_DOCUMENT_TYPE, remote_filename)
         for entry in entries:
-          self.client.Delete(entry.GetEditLink().href + '?delete=true', force = True)
+          self.client.delete(entry.get_edit_link().href + '?delete=true', force = True)
 
         # Set uploader instance. Note that resumable uploads are required in order to
         # enable uploads for all file types.
         # (see http://googleappsdeveloper.blogspot.com/2011/05/upload-all-file-types-to-any-google.html)
         file = source_path.open()
         uploader = gdata.client.ResumableUploader(
-          self.client, file, 'application/binary', os.path.getsize(file.name),
+          self.client, file, GDocsBackend.BACKUP_DOCUMENT_TYPE, os.path.getsize(file.name),
           chunk_size = gdata.client.ResumableUploader.DEFAULT_CHUNK_SIZE,
           desired_class = gdata.docs.data.DocsEntry)
         if uploader:
@@ -96,14 +108,14 @@ class GDocsBackend(duplicity.backend.Backend):
               assert not file.close()
               return
             else:
-              log.Warn("Failed to move uploaded file '%s' to destination remote folder '%s'"
-                       % (source_path.get_filename(), self.folder.title.text))
+              log.Warn("[%d/%d] Failed to move uploaded file '%s' to destination remote folder '%s'"
+                       % (n + 1, globals.num_retries, source_path.get_filename(), self.folder.title.text))
           else:
-            log.Warn("Failed to upload file '%s' to remote folder '%s'" 
-                     % (source_path.get_filename(), self.folder.title.text))
+            log.Warn("[%d/%d] Failed to upload file '%s' to remote folder '%s'" 
+                     % (n + 1, globals.num_retries, source_path.get_filename(), self.folder.title.text))
         else:
-          log.Warn("Failed to initialize upload of file '%s' to remote folder '%s'"
-                   % (source_path.get_filename(), self.folder.title.text))
+          log.Warn("[%d/%d] Failed to initialize upload of file '%s' to remote folder '%s'"
+                   % (n + 1, globals.num_retries, source_path.get_filename(), self.folder.title.text))
         assert not file.close()
 
       ## Error!
@@ -113,20 +125,19 @@ class GDocsBackend(duplicity.backend.Backend):
     def get(self, remote_filename, local_path):
       """Get remote filename, saving it to local_path"""
       for n in range(0, globals.num_retries):
-        feed = self.client.GetDocList(uri = self.folder.content.src + '?title=' +
-                                      remote_filename + '&title-exact=true')
-        if feed and (len(feed.entry) == 1):
-          entry = feed.entry[0]
+        entries = self.__fetch_entries(self.folder.resource_id.text, GDocsBackend.BACKUP_DOCUMENT_TYPE, remote_filename)
+        if len(entries) == 1:
+          entry = entries[0]
           try:
             self.client.Download(entry, local_path.name)
             local_path.setdata()
             return
           except gdata.client.RequestError:
-            log.Warn("Failed to download file '%s' in remote folder '%s'"
-                     % (remote_filename, self.folder.title.text))
+            log.Warn("[%d/%d] Failed to download file '%s' in remote folder '%s'"
+                     % (n + 1, globals.num_retries, remote_filename, self.folder.title.text))
         else:
-          log.Warn("Failed to find file '%s' in remote folder '%s'"
-                  % (remote_filename, self.folder.title.text))
+          log.Warn("[%d/%d] Failed to find file '%s' in remote folder '%s'"
+                  % (n + 1, globals.num_retries, remote_filename, self.folder.title.text))
       raise BackendException("Failed to download file '%s' in remote folder '%s'"
                              % (remote_filename, self.folder.title.text))
 
@@ -134,11 +145,11 @@ class GDocsBackend(duplicity.backend.Backend):
       """List files in folder"""
       for n in range(0, globals.num_retries):
         try:
-          entries = self.client.GetEverything(uri = self.folder.content.src)
+          entries = self.__fetch_entries(self.folder.resource_id.text, GDocsBackend.BACKUP_DOCUMENT_TYPE)
           return [entry.title.text for entry in entries]
-        except Exception, e:
-          log.Warn("Failed to fetch list of files in remote folder '%s'"
-                   % (self.folder.title.text))
+        except Exception:
+          log.Warn("[%d/%d] Failed to fetch list of files in remote folder '%s'"
+                   % (n + 1, globals.num_retries, self.folder.title.text))
       raise BackendException("Error listing files in remote folder '%s'"
                              % (self.folder.title.text))
 
@@ -146,15 +157,17 @@ class GDocsBackend(duplicity.backend.Backend):
       """Delete files in filename_list"""
       for filename in filename_list:
         for n in range(0, globals.num_retries):
-          entries = self.client.GetEverything(uri = self.folder.content.src + '?title=' +
-                                              filename + '&title-exact=true')
+          entries = self.__fetch_entries(self.folder.resource_id.text, GDocsBackend.BACKUP_DOCUMENT_TYPE, filename)
           if len(entries) > 0:
             success = True
             for entry in entries:
-              if not self.client.Delete(entry.GetEditLink().href + '?delete=true', force = True):
+              if not self.client.delete(entry.get_edit_link().href + '?delete=true', force = True):
                 success = False
             if success:
               break
+            else:
+              log.Warn("[%d/%d] Failed to remove file '%s' in remote folder '%s'"
+                       % (n + 1, globals.num_retries, filename, self.folder.title.text))
           else:
             log.Warn("Failed to fetch & remove file '%s' in remote folder '%s'"
                      % (filename, self.folder.title.text))
@@ -184,5 +197,40 @@ class GDocsBackend(duplicity.backend.Backend):
                                'and create your application-specific password to run duplicity backups.')
       except Exception, e:
         raise BackendException('Error while authenticating client: %s.' % str(e))
+
+    def __fetch_entries(self, folder_id, type, title = None):
+      # Build URI.
+      uri = '/feeds/default/private/full/%s/contents' % folder_id
+      if type == 'folder':
+        uri += '/-/folder?showfolders=true'
+      elif type == GDocsBackend.BACKUP_DOCUMENT_TYPE:
+        uri += '?showfolders=false'
+      else:
+        uri += '?showfolders=true'
+      if title:
+        uri += '&title=' + urllib.quote(title) + '&title-exact=true'
+
+      # Fetch entries
+      entries = self.client.get_everything(uri = uri)
+
+      # When filtering by entry title, API is returning (don't know why) documents in other
+      # folders (apart from folder_id) matching the title, so some extra filtering is required.
+      if title:
+        result = []
+        for entry in entries:
+          if (not type) or (entry.get_document_type() == type):
+            if folder_id != GDocsBackend.ROOT_FOLDER_ID:
+              for link in entry.in_folders():
+                folder_entry = self.client.get_entry(link.href, None, None,
+                                                     desired_class = gdata.docs.data.DocsEntry)
+                if folder_entry and (folder_entry.resource_id.text == folder_id):
+                  result.append(entry)
+            elif len(entry.in_folders()) == 0:
+              result.append(entry)
+      else:
+        result = entries
+
+      # Done!
+      return result
 
 duplicity.backend.register_backend('gdocs', GDocsBackend)
