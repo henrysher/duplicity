@@ -23,8 +23,8 @@ import string
 import urllib;
 
 import duplicity.backend
+from duplicity.backend import retry
 from duplicity import log
-from duplicity import globals
 from duplicity.errors import * #@UnusedWildImport
 
 class GDocsBackend(duplicity.backend.Backend):
@@ -75,14 +75,15 @@ class GDocsBackend(duplicity.backend.Backend):
           raise BackendException("Error while fetching destination folder '%s'." % folder_name)
       self.folder = parent_folder
 
-    def put(self, source_path, remote_filename = None):
+    @retry
+    def put(self, source_path, remote_filename = None, raise_errors = False):
       """Transfer source_path to remote_filename"""
       # Default remote file name.
       if not remote_filename:
         remote_filename = source_path.get_filename()
 
       # Upload!
-      for n in range(0, globals.num_retries):
+      try:
         # If remote file already exists in destination folder, remove it.
         entries = self.__fetch_entries(self.folder.resource_id.text, GDocsBackend.BACKUP_DOCUMENT_TYPE, remote_filename)
         for entry in entries:
@@ -108,74 +109,73 @@ class GDocsBackend(duplicity.backend.Backend):
               assert not file.close()
               return
             else:
-              log.Warn("[%d/%d] Failed to move uploaded file '%s' to destination remote folder '%s'"
-                       % (n + 1, globals.num_retries, source_path.get_filename(), self.folder.title.text))
+              self.__handle_error("Failed to move uploaded file '%s' to destination remote folder '%s'"
+                       % (source_path.get_filename(), self.folder.title.text), raise_errors)
           else:
-            log.Warn("[%d/%d] Failed to upload file '%s' to remote folder '%s'" 
-                     % (n + 1, globals.num_retries, source_path.get_filename(), self.folder.title.text))
+            self.__handle_error("Failed to upload file '%s' to remote folder '%s'" 
+                     % (source_path.get_filename(), self.folder.title.text), raise_errors)
         else:
-          log.Warn("[%d/%d] Failed to initialize upload of file '%s' to remote folder '%s'"
-                   % (n + 1, globals.num_retries, source_path.get_filename(), self.folder.title.text))
+          self.__handle_error("Failed to initialize upload of file '%s' to remote folder '%s'"
+                   % (source_path.get_filename(), self.folder.title.text), raise_errors)
         assert not file.close()
+      except Exception, e:
+        self.__handle_error("Failed to upload file '%s' to remote folder '%s': %s"
+                            % (source_path.get_filename(), self.folder.title.text, str(e)), raise_errors)
 
-      ## Error!
-      raise BackendException("Error uploading file '%s' to remote folder '%s'"
-                             % (source_path.get_filename(), self.folder.title.text))
-
-    def get(self, remote_filename, local_path):
+    @retry
+    def get(self, remote_filename, local_path, raise_errors = False):
       """Get remote filename, saving it to local_path"""
-      for n in range(0, globals.num_retries):
+      try:
         entries = self.__fetch_entries(self.folder.resource_id.text, GDocsBackend.BACKUP_DOCUMENT_TYPE, remote_filename)
         if len(entries) == 1:
           entry = entries[0]
-          try:
-            self.client.Download(entry, local_path.name)
-            local_path.setdata()
-            return
-          except gdata.client.RequestError:
-            log.Warn("[%d/%d] Failed to download file '%s' in remote folder '%s'"
-                     % (n + 1, globals.num_retries, remote_filename, self.folder.title.text))
+          self.client.Download(entry, local_path.name)
+          local_path.setdata()
+          return
         else:
-          log.Warn("[%d/%d] Failed to find file '%s' in remote folder '%s'"
-                  % (n + 1, globals.num_retries, remote_filename, self.folder.title.text))
-      raise BackendException("Failed to download file '%s' in remote folder '%s'"
-                             % (remote_filename, self.folder.title.text))
+          self.__handle_error("Failed to find file '%s' in remote folder '%s'"
+                              % (remote_filename, self.folder.title.text), raise_errors)
+      except Exception, e:
+        self.__handle_error("Failed to download file '%s' in remote folder '%s': %s"
+                             % (remote_filename, self.folder.title.text, str(e)), raise_errors)
 
-    def list(self):
+    @retry
+    def list(self, raise_errors = False):
       """List files in folder"""
-      for n in range(0, globals.num_retries):
-        try:
-          entries = self.__fetch_entries(self.folder.resource_id.text, GDocsBackend.BACKUP_DOCUMENT_TYPE)
-          return [entry.title.text for entry in entries]
-        except Exception:
-          log.Warn("[%d/%d] Failed to fetch list of files in remote folder '%s'"
-                   % (n + 1, globals.num_retries, self.folder.title.text))
-      raise BackendException("Error listing files in remote folder '%s'"
-                             % (self.folder.title.text))
+      try:
+        entries = self.__fetch_entries(self.folder.resource_id.text, GDocsBackend.BACKUP_DOCUMENT_TYPE)
+        return [entry.title.text for entry in entries]
+      except Exception, e:
+        self.__handle_error("Failed to fetch list of files in remote folder '%s': %s"
+                            % (self.folder.title.text, str(e)), raise_errors)
 
-    def delete(self, filename_list):
+    @retry
+    def delete(self, filename_list, raise_errors = False):
       """Delete files in filename_list"""
       for filename in filename_list:
-        for n in range(0, globals.num_retries):
+        try:
           entries = self.__fetch_entries(self.folder.resource_id.text, GDocsBackend.BACKUP_DOCUMENT_TYPE, filename)
           if len(entries) > 0:
             success = True
             for entry in entries:
               if not self.client.delete(entry.get_edit_link().href + '?delete=true', force = True):
                 success = False
-            if success:
-              break
-            else:
-              log.Warn("[%d/%d] Failed to remove file '%s' in remote folder '%s'"
-                       % (n + 1, globals.num_retries, filename, self.folder.title.text))
+            if not success:
+              self.__handle_error("Failed to remove file '%s' in remote folder '%s'"
+                                  % (filename, self.folder.title.text), raise_errors)
           else:
-            log.Warn("Failed to fetch & remove file '%s' in remote folder '%s'"
+            log.Warn("Failed to fetch file '%s' in remote folder '%s'"
                      % (filename, self.folder.title.text))
-            break
-          if n == globals.num_retries:
-            raise BackendException("Error removing file '%s' in remote folder '%s'"
-                                   % (filename, self.folder.title.text))
+        except Exception, e:
+          self.__handle_error("Failed to remove file '%s' in remote folder '%s': %s"
+                              % (filename, self.folder.title.text, str(e)), raise_errors)
 
+    def __handle_error(self, message, raise_errors = True):
+      if raise_errors:
+        raise BackendException(message)
+      else:
+        log.FatalError(message, log.ErrorCode.backend_error)
+    
     def __authorize(self, email, password, captcha_token = None, captcha_response = None):
       try:
         self.client.client_login(email, password,
@@ -190,13 +190,13 @@ class GDocsBackend(duplicity.backend.Backend):
           answer = raw_input('Answer to the challenge? ')
         self.__authorize(email, password, challenge.captcha_token, answer)
       except gdata.client.BadAuthentication:
-        raise BackendException('Invalid user credentials given. Be aware that accounts '
-                               'that use 2-step verification require creating an application specific '
-                               'access code for using this Duplicity backend. Follow the instrucction in '
-                               'http://www.google.com/support/accounts/bin/static.py?page=guide.cs&guide=1056283&topic=1056286 '
-                               'and create your application-specific password to run duplicity backups.')
+        self.__handle_error('Invalid user credentials given. Be aware that accounts '
+                            'that use 2-step verification require creating an application specific '
+                            'access code for using this Duplicity backend. Follow the instrucction in '
+                            'http://www.google.com/support/accounts/bin/static.py?page=guide.cs&guide=1056283&topic=1056286 '
+                            'and create your application-specific password to run duplicity backups.')
       except Exception, e:
-        raise BackendException('Error while authenticating client: %s.' % str(e))
+        self.__handle_error('Error while authenticating client: %s.' % str(e))
 
     def __fetch_entries(self, folder_id, type, title = None):
       # Build URI.
@@ -210,27 +210,30 @@ class GDocsBackend(duplicity.backend.Backend):
       if title:
         uri += '&title=' + urllib.quote(title) + '&title-exact=true'
 
-      # Fetch entries
-      entries = self.client.get_everything(uri = uri)
-
-      # When filtering by entry title, API is returning (don't know why) documents in other
-      # folders (apart from folder_id) matching the title, so some extra filtering is required.
-      if title:
-        result = []
-        for entry in entries:
-          if (not type) or (entry.get_document_type() == type):
-            if folder_id != GDocsBackend.ROOT_FOLDER_ID:
-              for link in entry.in_folders():
-                folder_entry = self.client.get_entry(link.href, None, None,
-                                                     desired_class = gdata.docs.data.DocsEntry)
-                if folder_entry and (folder_entry.resource_id.text == folder_id):
-                  result.append(entry)
-            elif len(entry.in_folders()) == 0:
-              result.append(entry)
-      else:
-        result = entries
-
-      # Done!
-      return result
+      try:
+        # Fetch entries
+        entries = self.client.get_everything(uri = uri)
+  
+        # When filtering by entry title, API is returning (don't know why) documents in other
+        # folders (apart from folder_id) matching the title, so some extra filtering is required.
+        if title:
+          result = []
+          for entry in entries:
+            if (not type) or (entry.get_document_type() == type):
+              if folder_id != GDocsBackend.ROOT_FOLDER_ID:
+                for link in entry.in_folders():
+                  folder_entry = self.client.get_entry(link.href, None, None,
+                                                       desired_class = gdata.docs.data.DocsEntry)
+                  if folder_entry and (folder_entry.resource_id.text == folder_id):
+                    result.append(entry)
+              elif len(entry.in_folders()) == 0:
+                result.append(entry)
+        else:
+          result = entries
+  
+        # Done!
+        return result
+      except Exception, e:
+        self.__handle_error('Error while fetching remote entries: %s.' % str(e))
 
 duplicity.backend.register_backend('gdocs', GDocsBackend)
