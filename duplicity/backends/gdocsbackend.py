@@ -52,7 +52,7 @@ class GDocsBackend(duplicity.backend.Backend):
       self.client = gdata.docs.client.DocsClient(source = 'duplicity $version')
       self.client.ssl = True
       self.client.http_client.debug = False
-      self.__authorize(parsed_url.username + '@' + parsed_url.hostname, parsed_url.password)
+      self.__authorize(parsed_url.username + '@' + parsed_url.hostname, self.get_password())
 
       # Fetch destination folder entry (and crete hierarchy if required).
       folder_names = string.split(parsed_url.path[1:], '/')
