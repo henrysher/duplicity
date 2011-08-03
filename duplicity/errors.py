@@ -70,4 +70,10 @@ class BackendException(DuplicityError):
     """
     pass
 
+class TemporaryLoadException(BackendException):
+    """
+    Raised to indicate a temporary issue on the backend.
+    Duplicity should back off for a bit and try again.
+    """
+    pass
 

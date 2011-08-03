@@ -20,7 +20,7 @@
 
 import duplicity.backend
 from duplicity.backend import retry
-from duplicity.errors import BackendException
+from duplicity.errors import BackendException, TemporaryLoadException
 
 def ensure_dbus():
     # GIO requires a dbus session bus which can start the gvfs daemons
@@ -114,7 +114,7 @@ class U1Backend(duplicity.backend.Backend):
             code = log.ErrorCode.backend_permission_denied
         elif status == 404:
             code = log.ErrorCode.backend_not_found
-        elif status == 500: # wish this were a more specific error
+        elif status == 507:
             code = log.ErrorCode.backend_no_space
         else:
             code = log.ErrorCode.backend_error
@@ -124,13 +124,18 @@ class U1Backend(duplicity.backend.Backend):
         extra = ' '.join([util.escape(x) for x in [file1, file2] if x])
         extra = ' '.join([op, extra])
         msg = _("Got status code %s") % status
+        if headers[0].get('x-oops-id') is not None:
+            msg += '\nOops-ID: %s' % headers[0].get('x-oops-id')
         if headers[0].get('content-type') == 'application/json':
             node = json.loads(headers[1])
             if node.get('error'):
                 msg = node.get('error')
 
         if raise_error:
-            raise BackendException(msg)
+            if status == 503:
+                raise TemporaryLoadException(msg)
+            else:
+                raise BackendException(msg)
         else:
             log.FatalError(msg, code, extra)
 
