@@ -1,4 +1,4 @@
-New in v0.6.15 (2011/07/??)
+New in v0.6.15 (2011/08/??)
 ----------------------------
 Enhancements:
 
@@ -20,6 +20,7 @@ lp:~mterry/duplicity/815635
 lp:~mterry/duplicity/retry-u1
 lp:~mterry/duplicity/818178
 lp:~ed.so/duplicity/encr-sign-key2
+lp:~mterry/duplicity/u1-fixes
 
 
 New in v0.6.14 (2011/06/18)
