@@ -122,6 +122,7 @@ def MakeTar():
         "backends/tahoebackend.py",
         "backends/u1backend.py",
         "backends/webdavbackend.py",
+        "backends/gdocsbackend.py",
         ]:
         assert not os.system("cp %s/%s %s/src/backends" %
                              (SourceDir, filename, tardir)), filename

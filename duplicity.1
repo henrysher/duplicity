@@ -63,7 +63,7 @@ duplicity \- Encrypted backup using rsync algorithm
 Duplicity incrementally backs up files and directory
 by encrypting tar-format volumes with GnuPG and uploading them to a
 remote (or local) file server.  Currently local, ftp, ssh/scp, rsync,
-WebDAV, WebDAVs, HSi and Amazon S3 backends are available.
+WebDAV, WebDAVs, Google Docs, HSi and Amazon S3 backends are available.
 Because duplicity uses
 librsync, the incremental archives are space efficient and only record
 the parts of files that have changed since the last backup.  Currently
@@ -826,6 +826,8 @@ tahoe://alias/directory
 webdav://user[:password]@other.host/some_dir
 .PP
 webdavs://user[:password]@other.host/some_dir
+.PP
+gdocs://user[:password]@other.host/some_dir
 
 .RE
 

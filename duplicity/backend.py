@@ -184,6 +184,7 @@ def _ensure_urlparser_initialized():
                                      'u1',
                                      'scp', 'ssh', 'sftp',
                                      'webdav', 'webdavs',
+                                     'gdocs',
                                      'http', 'https',
                                      'imap', 'imaps']
 
