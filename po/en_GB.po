@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
 "POT-Creation-Date: 2011-06-18 08:53-0500\n"
-"PO-Revision-Date: 2010-03-11 14:36+0000\n"
-"Last-Translator: SteVe Cook <yorvik.ubunto@googlemail.com>\n"
+"PO-Revision-Date: 2011-08-09 00:09+0000\n"
+"Last-Translator: Sohrab <Unknown>\n"
 "Language-Team: English (United Kingdom) <en_GB@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-06-23 04:57+0000\n"
-"X-Generator: Launchpad (build 13168)\n"
+"X-Launchpad-Export-Date: 2011-08-09 04:50+0000\n"
+"X-Generator: Launchpad (build 13628)\n"
 
 #: ../duplicity-bin:215
 #, python-format
@@ -24,6 +24,8 @@ msgid ""
 "File %s complete in backup set.\n"
 "Continuing restart on file %s."
 msgstr ""
+"File %s complete in back-up set.\n"
+"Continuing restart on file %s."
 
 #: ../duplicity-bin:221
 #, python-format
@@ -31,6 +33,8 @@ msgid ""
 "File %s missing in backup set.\n"
 "Continuing restart on file %s."
 msgstr ""
+"File %s missing in back-up set.\n"
+"Continuing restart on file %s."
 
 #: ../duplicity-bin:473
 msgid ""
@@ -51,26 +55,26 @@ msgstr "Backup Statistics"
 #: ../duplicity-bin:571
 #, python-format
 msgid "%s not found in archive, no files restored."
-msgstr "%s não encontrado em arquivo, não foram restaurados ficheiros."
+msgstr "%s not found in archive, no files restored."
 
 #: ../duplicity-bin:575
 msgid "No files found in archive - nothing restored."
-msgstr "Nenhum ficheiro encontrado em arquivo - Nada foi restaurado."
+msgstr "No files found in archive - nothing restored."
 
 #: ../duplicity-bin:608
 #, python-format
 msgid "Processed volume %d of %d"
-msgstr "Processado volume %d de %d"
+msgstr "Processed volume %d of %d"
 
 #: ../duplicity-bin:648
 #, python-format
 msgid "Invalid data - %s hash mismatch:"
-msgstr "Dados inválidos - %s hash não corresponde:"
+msgstr "Invalid data - %s hash mismatch:"
 
 #: ../duplicity-bin:649
 #, python-format
 msgid "Calculated hash: %s"
-msgstr "Hash calculado: %s"
+msgstr "Calculated hash: %s"
 
 #: ../duplicity-bin:650
 #, python-format
@@ -85,25 +89,25 @@ msgstr "Volume was signed by key %s, not %s"
 #: ../duplicity-bin:697
 #, python-format
 msgid "Verify complete: %s, %s."
-msgstr "Verificação completa: %s, %s."
+msgstr "Verify complete: %s, %s."
 
 #: ../duplicity-bin:698
 #, python-format
 msgid "%d file compared"
 msgid_plural "%d files compared"
-msgstr[0] "%d ficheiro comparado"
-msgstr[1] "%d ficheiros comparados"
+msgstr[0] "%d file compared"
+msgstr[1] "%d files compared"
 
 #: ../duplicity-bin:700
 #, python-format
 msgid "%d difference found"
 msgid_plural "%d differences found"
-msgstr[0] "%d diferença encontrada"
-msgstr[1] "%d diferenças encontradas"
+msgstr[0] "%d difference found"
+msgstr[1] "%d differences found"
 
 #: ../duplicity-bin:719
 msgid "No extraneous files found, nothing deleted in cleanup."
-msgstr "Nenhum ficheiro estranho encontrado, nada foi eliminado."
+msgstr "No extraneous files found, nothing deleted in cleanup."
 
 #: ../duplicity-bin:724
 msgid "Deleting this file from backend:"
@@ -114,13 +118,12 @@ msgstr[1] "Deleting these files from backend:"
 #: ../duplicity-bin:736
 msgid "Found the following file to delete:"
 msgid_plural "Found the following files to delete:"
-msgstr[0] "Encontrado o seguinte ficheiro para eliminar:"
-msgstr[1] "Encontrados os seguintes ficheiros para eliminar:"
+msgstr[0] "Found the following file to delete:"
+msgstr[1] "Found the following files to delete:"
 
 #: ../duplicity-bin:740
 msgid "Run duplicity again with the --force option to actually delete."
-msgstr ""
-"Correr Duplicity novamente com opção --force para eliminar efectivamente."
+msgstr "Run duplicity again with the --force option to actually delete."
 
 #: ../duplicity-bin:779
 msgid "There are backup set(s) at time(s):"
@@ -156,7 +159,7 @@ msgstr[1] "Found old backup sets at the following times:"
 
 #: ../duplicity-bin:815
 msgid "Rerun command with --force option to actually delete."
-msgstr "Reiniciar comando com opção --force para eliminar efectivamente."
+msgstr "Rerun command with --force option to actually delete."
 
 #: ../duplicity-bin:898
 #, python-format
@@ -166,12 +169,12 @@ msgstr "Deleting local %s (not authoritative at backend)."
 #: ../duplicity-bin:902 ../duplicity/dup_temp.py:187
 #, python-format
 msgid "Unable to delete %s: %s"
-msgstr ""
+msgstr "Unable to delete %s: %s"
 
 #: ../duplicity-bin:930 ../duplicity/dup_temp.py:251
 #, python-format
 msgid "Failed to read %s: %s"
-msgstr "Falha de leitura %s: %s"
+msgstr "Failed to read %s: %s"
 
 #: ../duplicity-bin:941
 #, python-format
@@ -275,7 +278,7 @@ msgstr "Last full backup is too old, forcing full backup"
 
 #: ../duplicity-bin:1324
 msgid "INT intercepted...exiting."
-msgstr ""
+msgstr "INT intercepted...exiting."
 
 #: ../duplicity-bin:1330
 #, python-format
@@ -338,8 +341,8 @@ msgstr "Reading results of '%s'"
 #, python-format
 msgid "Running '%s' failed with code %d (attempt #%d)"
 msgid_plural "Running '%s' failed with code %d (attempt #%d)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Running '%s' failed with code %d (attempt #%d)"
+msgstr[1] "Running '%s' failed with code %d (attempt #%d)"
 
 #: ../duplicity/backend.py:481
 #, python-format
@@ -891,13 +894,15 @@ msgstr "Backup source directory %s does not exist."
 #: ../duplicity/commandline.py:884
 #, python-format
 msgid "Command line warning: %s"
-msgstr ""
+msgstr "Command line warning: %s"
 
 #: ../duplicity/commandline.py:884
 msgid ""
 "Selection options --exclude/--include\n"
 "currently work only when backing up,not restoring."
 msgstr ""
+"Selection options --exclude/--include\n"
+"currently work only when backing up,not restoring."
 
 #: ../duplicity/commandline.py:932
 #, python-format
@@ -942,7 +947,7 @@ msgstr "Comparing %s and %s"
 #: ../duplicity/diffdir.py:194
 #, python-format
 msgid "D %s"
-msgstr ""
+msgstr "D %s"
 
 #: ../duplicity/dup_time.py:48
 #, python-format
@@ -953,6 +958,11 @@ msgid ""
 "allowed special characters are s, m, h, D, W, M, and Y.  See the man\n"
 "page for more information."
 msgstr ""
+"Bad interval string \"%s\"\n"
+"\n"
+"Intervals are specified like 2Y (2 years) or 2h30m (2.5 hours).  The\n"
+"allowed special characters are s, m, h, D, W, M, and Y.  See the manual\n"
+"page for more information."
 
 #: ../duplicity/dup_time.py:54
 #, python-format
@@ -966,11 +976,19 @@ msgid ""
 "(various combinations are acceptable, but the month always precedes\n"
 "the day)."
 msgstr ""
+"Bad time string \"%s\"\n"
+"\n"
+"The acceptible time strings are intervals (like \"3D64s\"), w3-datetime\n"
+"strings, like \"2002-04-26T04:22:01-07:00\" (strings like\n"
+"\"2002-04-26T04:22:01\" are also acceptable - duplicity will use the\n"
+"current time zone), or ordinary dates like 2/4/1997 or 2001-04-23\n"
+"(various combinations are acceptable, but the month always precedes\n"
+"the day)."
 
 #: ../duplicity/lazy.py:325
 #, python-format
 msgid "Warning: oldindex %s >= newindex %s"
-msgstr ""
+msgstr "Warning: oldindex %s >= newindex %s"
 
 #: ../duplicity/lazy.py:400
 #, python-format
@@ -1018,7 +1036,7 @@ msgstr ""
 
 #: ../duplicity/manifest.py:198
 msgid "Manifests not equal because different volume numbers"
-msgstr ""
+msgstr "Manifests not equal because different volume numbers"
 
 #: ../duplicity/manifest.py:203
 msgid "Manifests not equal because volume lists differ"
@@ -1034,7 +1052,7 @@ msgstr "Warning, found extra Volume identifier"
 
 #: ../duplicity/manifest.py:381
 msgid "Other is not VolumeInfo"
-msgstr ""
+msgstr "Other is not VolumeInfo"
 
 #: ../duplicity/manifest.py:384
 msgid "Volume numbers don't match"
@@ -1042,15 +1060,15 @@ msgstr "Volume numbers don't match"
 
 #: ../duplicity/manifest.py:387
 msgid "start_indicies don't match"
-msgstr ""
+msgstr "start_indicies don't match"
 
 #: ../duplicity/manifest.py:390
 msgid "end_index don't match"
-msgstr ""
+msgstr "end_index don't match"
 
 #: ../duplicity/manifest.py:397
 msgid "Hashes don't match"
-msgstr ""
+msgstr "Hashes don't match"
 
 #: ../duplicity/misc.py:99
 #, python-format
@@ -1063,6 +1081,8 @@ msgid ""
 "One only volume required.\n"
 "Renaming %s to %s"
 msgstr ""
+"One only volume required.\n"
+"Renaming %s to %s"
 
 #: ../duplicity/patchdir.py:74 ../duplicity/patchdir.py:79
 #, python-format
@@ -1077,7 +1097,7 @@ msgstr "Writing %s of type %s"
 #: ../duplicity/path.py:213 ../duplicity/path.py:272
 #, python-format
 msgid "Warning: %s has negative mtime, treating as 0."
-msgstr ""
+msgstr "Warning: %s has negative mtime, treating as 0."
 
 #: ../duplicity/path.py:337
 msgid "Difference found:"
@@ -1101,12 +1121,12 @@ msgstr "File %%s has type %s, expected %s"
 #: ../duplicity/path.py:355 ../duplicity/path.py:381
 #, python-format
 msgid "File %%s has permissions %s, expected %s"
-msgstr ""
+msgstr "File %%s has permissions %s, expected %s"
 
 #: ../duplicity/path.py:360
 #, python-format
 msgid "File %%s has mtime %s, expected %s"
-msgstr ""
+msgstr "File %%s has mtime %s, expected %s"
 
 #: ../duplicity/path.py:368
 #, python-format
@@ -1116,12 +1136,12 @@ msgstr "Data for file %s is different"
 #: ../duplicity/path.py:376
 #, python-format
 msgid "Symlink %%s points to %s, expected %s"
-msgstr ""
+msgstr "Symlink %%s points to %s, expected %s"
 
 #: ../duplicity/path.py:385
 #, python-format
 msgid "Device file %%s has numbers %s, expected %s"
-msgstr ""
+msgstr "Device file %%s has numbers %s, expected %s"
 
 #: ../duplicity/path.py:545
 #, python-format
@@ -1184,6 +1204,12 @@ msgid ""
 "Useful file specifications begin with the base directory or some\n"
 "pattern (such as '**') which matches the base directory."
 msgstr ""
+"Fatal Error: The file specification\n"
+"    %s\n"
+"cannot match any files in the base directory\n"
+"    %s\n"
+"Useful file specifications begin with the base directory or some\n"
+"pattern (such as '**') which matches the base directory."
 
 #: ../duplicity/selection.py:276
 #, python-format
@@ -1203,6 +1229,11 @@ msgid ""
 "include all files, the expression is redundant.  Exiting because this\n"
 "probably isn't what you meant."
 msgstr ""
+"Last selection expression:\n"
+"    %s\n"
+"only specifies that files be included.  Because the default is to\n"
+"include all files, the expression is redundant.  Exiting because this\n"
+"probably isn't what you meant."
 
 #: ../duplicity/selection.py:311
 #, python-format
@@ -1220,6 +1251,8 @@ msgid ""
 "Warning: file specification '%s' in filelist %s\n"
 "doesn't start with correct prefix %s.  Ignoring."
 msgstr ""
+"Warning: file specification '%s' in filelist %s\n"
+"doesn't start with correct prefix %s.  Ignoring."
 
 #: ../duplicity/selection.py:345
 msgid "Future prefix errors will not be logged."
@@ -1233,7 +1266,7 @@ msgstr "Error closing filelist %s"
 #: ../duplicity/selection.py:428
 #, python-format
 msgid "Reading globbing filelist %s"
-msgstr ""
+msgstr "Reading globbing filelist %s"
 
 #: ../duplicity/selection.py:461
 #, python-format
@@ -1245,6 +1278,8 @@ msgid ""
 "Warning: exclude-device-files is not the first selector.\n"
 "This may not be what you intended"
 msgstr ""
+"Warning: exclude-device-files is not the first selector.\n"
+"This may not be what you intended"
 
 #: ../duplicity/tempdir.py:118
 #, python-format
@@ -1254,12 +1289,12 @@ msgstr "Using temporary directory %s"
 #: ../duplicity/tempdir.py:156
 #, python-format
 msgid "Registering (mktemp) temporary file %s"
-msgstr ""
+msgstr "Registering (mktemp) temporary file %s"
 
 #: ../duplicity/tempdir.py:178
 #, python-format
 msgid "Registering (mkstemp) temporary file %s"
-msgstr ""
+msgstr "Registering (mkstemp) temporary file %s"
 
 #: ../duplicity/tempdir.py:210
 #, python-format
@@ -1318,10 +1353,6 @@ msgstr "Writing %s"
 #~ msgstr[1] "Running '%s' (attempt #%d)"
 
 #, python-format
-#~ msgid "Error initializing file %s/%s"
-#~ msgstr "Error initialising file %s/%s"
-
-#, python-format
 #~ msgid ""
 #~ "Unable to locate last file %s and block %d in backup set.\n"
 #~ "There are no more files to be backed up."
@@ -1336,14 +1367,11 @@ msgstr "Writing %s"
 #~ msgstr ""
 #~ "Unable to locate last file %s and block %d in backup set.\n"
 #~ "Attempting restart on the next file %s."
-
-#~ msgid ""
-#~ "running in 'ignore errors' mode due to --ignore-errors; please re-consider "
-#~ "if this was not intended"
-#~ msgstr ""
-#~ "running in 'ignore errors' mode due to --ignore-errors; please re-consider "
-#~ "if this was not intended"
 
 #, python-format
 #~ msgid "File %%s has permissions %o, expected %o"
 #~ msgstr "File %%s has permissions %o, expected %o"
+
+#, python-format
+#~ msgid "Could not copy %s to %s"
+#~ msgstr "Could not copy %s to %s"
