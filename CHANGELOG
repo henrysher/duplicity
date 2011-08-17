@@ -12,6 +12,7 @@ Bugs closed in this release:
 818178     Shouldn't try to delete files it knows don't exist
 821368     Error doing backup of the .evolution folder
 823556     sftp errors after rev 740 change
+824678     0.6.14 Fails to install on 8.04 LTS (Hardy)
 
 Merges:
 lp:~mterry/duplicity/u1-ignore-404

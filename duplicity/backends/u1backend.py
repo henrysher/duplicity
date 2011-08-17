@@ -119,8 +119,14 @@ class U1Backend(duplicity.backend.Backend):
         else:
             code = log.ErrorCode.backend_error
 
-        file1 = file1.encode("utf8") if file1 else None
-        file2 = file2.encode("utf8") if file2 else None
+        if file1:
+            file1 = file1.encode("utf8")
+        else:
+            file1 = None
+        if file2:
+            file2 = file2.encode("utf8")
+        else:
+            file2 = None
         extra = ' '.join([util.escape(x) for x in [file1, file2] if x])
         extra = ' '.join([op, extra])
         msg = _("Got status code %s") % status
