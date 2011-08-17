@@ -278,6 +278,10 @@ class SSHBackend(duplicity.backend.Backend):
         be distinguished from the file boundaries.
         """
         dirs = self.remote_dir.split(os.sep)
+        if len(dirs) > 0:
+            if not dirs[0] :
+                dirs = dirs[1:]
+                dirs[0]= '/' + dirs[0]
         mkdir_commands = [];
         for d in dirs:
             mkdir_commands += ["mkdir \"%s\"" % (d)] + ["cd \"%s\"" % (d)]

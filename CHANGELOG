@@ -2,12 +2,16 @@ New in v0.6.15 (2011/08/??)
 ----------------------------
 Enhancements:
 
+Enhancements/Unreported bugs fixed.
+- Ignore 404 errors when we try to delete a file on Ubuntu One.
+
 Bugs closed in this release:
-Ignore 404 errors when we try to delete a file on Ubuntu One.
-794576     Transport endpoint is not connected
 703142     AssertionError: assert len(chain_list) == 2
+794576     Transport endpoint is not connected
 815635     Bad passphrase can leave bogus sigtar in archive
 818178     Shouldn't try to delete files it knows don't exist
+821368     Error doing backup of the .evolution folder
+823556     sftp errors after rev 740 change
 
 Merges:
 lp:~mterry/duplicity/u1-ignore-404
