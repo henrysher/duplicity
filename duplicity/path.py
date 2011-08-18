@@ -554,9 +554,9 @@ class Path(ROPath):
         """Remove this file"""
         log.Info(_("Deleting %s") % (self.name,))
         if self.isdir():
-            os.rmdir(self.name)
+            util.ignore_missing(os.rmdir, self.name)
         else:
-            os.unlink(self.name)
+            util.ignore_missing(os.unlink, self.name)
         self.setdata()
 
     def touch(self):

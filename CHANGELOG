@@ -2,8 +2,10 @@ New in v0.6.15 (2011/08/??)
 ----------------------------
 Enhancements:
 
-Enhancements/Unreported bugs fixed.
-- Ignore 404 errors when we try to delete a file on Ubuntu One.
+Enhancements:
+- Ignore 404 errors when deleting a file on Ubuntu One.
+- Ignore ENOENT (file missing) errors where it is safe.
+- Set minimum Python version to 2.4 in README.
 
 Bugs closed in this release:
 703142     AssertionError: assert len(chain_list) == 2

@@ -20,11 +20,12 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 """
-Miscellaneous utilities. 
+Miscellaneous utilities.
 """
 
-import string
+import errno
 import sys
+import string
 import traceback
 
 import duplicity.globals as globals
@@ -39,7 +40,7 @@ def exception_traceback(limit = 50):
 
     lines = traceback.format_tb(tb, limit)
     lines.extend(traceback.format_exception_only(type, value))
-    
+
     str = "Traceback (innermost last):\n"
     str = str + "%-20s %s" % (string.join(lines[:-1], ""),
                                 lines[-1])
@@ -67,3 +68,19 @@ def maybe_ignore_errors(fn):
             return None
         else:
             raise
+
+def ignore_missing(fn, filename):
+    """
+    Execute fn on filename.  Ignore ENOENT errors, otherwise raise exception.
+
+    @param fn: callable
+    @param filename: string
+    """
+    try:
+        fn(filename)
+    except Exception:
+        type, value, tb = sys.exc_info() #@UnusedVariable
+        if isinstance(type, OSError) and value[0] == errno.ENOENT:
+            pass
+        raise
+

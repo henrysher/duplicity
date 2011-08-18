@@ -24,6 +24,7 @@
 import os, sys
 
 from duplicity import log
+from duplicity import util
 from duplicity import path
 from duplicity import file_naming
 from duplicity import tempdir
@@ -182,7 +183,7 @@ class FileobjHooked:
             os.system("cp -p \"%s\" \"%s\"" % (src.name, tgt.name))
         globals.backend.put(tgt) #@UndefinedVariable
         try:
-            os.unlink(tgt.name)
+            util.ignore_missing(os.unlink, tgt.name)
         except Exception, e:
             log.Warn(_("Unable to delete %s: %s" % (tgt.name, str(e))))
 

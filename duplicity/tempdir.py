@@ -31,6 +31,7 @@ import threading
 import tempfile
 
 from duplicity import log
+from duplicity import util
 from duplicity import globals
 
 # Set up state related to managing the default temporary directory
@@ -230,7 +231,7 @@ class TemporaryDirectory:
                 for file in self.__pending.keys():
                     try:
                         log.Debug(_("Removing still remembered temporary file %s") % (file,))
-                        os.unlink(file)
+                        util.ignore_missing(os.unlink, file)
                     except Exception:
                         log.Info(_("Cleanup of temporary file %s failed") % (file,))
                         pass

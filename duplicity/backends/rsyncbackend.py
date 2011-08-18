@@ -24,7 +24,7 @@ import tempfile
 
 import duplicity.backend
 from duplicity.errors import * #@UnusedWildImport
-from duplicity import tempdir
+from duplicity import tempdir, util
 
 class RsyncBackend(duplicity.backend.Backend):
     """Connect to remote store using rsync
@@ -160,7 +160,7 @@ class RsyncBackend(duplicity.backend.Backend):
                                    (self.cmd, exclude_name, dir, self.url_string))
         self.run_command(commandline)
         for file in to_delete:
-            os.unlink (file)
+            util.ignore_missing(os.unlink, file)
         os.rmdir (dir)
 
 duplicity.backend.register_backend("rsync", RsyncBackend)
