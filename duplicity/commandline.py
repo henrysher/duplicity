@@ -378,6 +378,9 @@ def parse_cmdline_options(arglist):
     # --num-retries <number>
     parser.add_option("--num-retries", type="int", metavar=_("number"))
 
+    # File owner uid keeps number from tar file. Like same option in GNU tar.
+    parser.add_option("--numeric-owner", action="store_true")
+
     # Whether the old filename format is in effect.
     parser.add_option("--old-filenames", action="callback",
                       dest="old_filenames",

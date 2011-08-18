@@ -636,7 +636,16 @@ def restore_get_enc_fileobj(backend, filename, volume_info):
     parseresults = file_naming.parse(filename)
     tdp = dup_temp.new_tempduppath(parseresults)
     backend.get(filename, tdp)
-    restore_check_hash(volume_info, tdp)
+    
+    """ verify hash of the remote file """
+    verified, hash_pair, calculated_hash = restore_check_hash(volume_info, tdp)
+    if not verified:
+        log.FatalError("%s\n %s\n %s\n %s\n" %
+                           (_("Invalid data - %s hash mismatch for file:") % hash_pair[0],
+                            filename,
+                            _("Calculated hash: %s") % calculated_hash,
+                            _("Manifest hash: %s") % hash_pair[1]),
+                           log.ErrorCode.mismatched_hash)
 
     fileobj = tdp.filtered_open_with_delete("rb")
     if parseresults.encrypted and globals.gpg_profile.sign_key:
@@ -648,18 +657,16 @@ def restore_check_hash(volume_info, vol_path):
     """
     Check the hash of vol_path path against data in volume_info
 
-    @rtype: void
-    @return: void
+    @rtype: boolean
+    @return: true (verified) / false (failed)
     """
     hash_pair = volume_info.get_best_hash()
     if hash_pair:
         calculated_hash = gpg.get_hash(hash_pair[0], vol_path)
         if calculated_hash != hash_pair[1]:
-            log.FatalError("%s\n%s\n%s\n" %
-                           (_("Invalid data - %s hash mismatch:") % hash_pair[0],
-                            _("Calculated hash: %s") % calculated_hash,
-                            _("Manifest hash: %s") % hash_pair[1]),
-                           log.ErrorCode.mismatched_hash)
+            return False, hash_pair, calculated_hash
+    """ reached here, verification passed """
+    return True
 
 
 def restore_add_sig_check(fileobj):
