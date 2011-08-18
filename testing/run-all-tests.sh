@@ -26,27 +26,22 @@ if [ "`id -ur`" != '0' ]; then
 fi
 
 # run against all supported python versions
-for v in 2.4 2.5 2.6; do
-    if [ -d ~/virtual$v ]; then
-        # change to virtualenv for this python version
-        pushd ~/virtual$v && source bin/activate && popd
+for v in 2.6; do
+    # Go to directory housing this script
+    cd `dirname $0`
 
-        # Go to directory housing this script
-        cd `dirname $0`
+    echo "========== Compiling librsync for python$v =========="
+    pushd ../duplicity
+    python$v ./compilec.py
+    popd
 
-        echo "========== Compiling librsync for python$v =========="
-        pushd ../duplicity
-        python ./compilec.py
+    for t in `cat alltests`; do
+        echo "========== Running $t for python$v =========="
+        pushd .
+        python$v -u $t -v 2>&1 | grep -v "unsafe ownership"
         popd
-
-        for t in `cat alltests`; do
-            echo "========== Running $t for python$v =========="
-            pushd .
-            python -u $t -v 2>&1 | grep -v "unsafe ownership"
-            popd
-            echo "========== Finished $t for python$v =========="
-            echo
-            echo
-        done
-    fi
+        echo "========== Finished $t for python$v =========="
+        echo
+        echo
+    done
 done
