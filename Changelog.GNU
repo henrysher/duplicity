@@ -1,3 +1,9 @@
+2011-08-18  Ede <edgar.soldin AT web.de>
+	- introduce --numeric-owner parameter
+	  patch courtesy of Lukas Anzinger <l.anzinger AT gmail.com>
+	- duplicity:restore_check_hash 
+	  "Invalid data - *** hash mismatch" error now tells the offending filename
+
 2011-07-16  Ede <edgar.soldin AT web.de>
 	branch encrypt-sign-key:
 	- introduce --encrypt-sign-key parameter

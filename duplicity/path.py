@@ -198,12 +198,20 @@ class ROPath:
         self.mode = tarinfo.mode
         self.stat = StatResult()
 
-        # Set user and group id
+        """ Set user and group id 
+        use numeric id if name lookup fails
+        OR
+        --numeric-owner is set 
+        """
         try:
+            if globals.numeric_owner:
+                raise KeyError
             self.stat.st_uid = tarfile.uname2uid(tarinfo.uname)
         except KeyError:
             self.stat.st_uid = tarinfo.uid
         try:
+            if globals.numeric_owner:
+                raise KeyError
             self.stat.st_gid = tarfile.gname2gid(tarinfo.gname)
         except KeyError:
             self.stat.st_gid = tarinfo.gid

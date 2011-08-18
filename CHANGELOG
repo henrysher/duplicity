@@ -6,6 +6,10 @@ Enhancements:
 - Ignore 404 errors when deleting a file on Ubuntu One.
 - Ignore ENOENT (file missing) errors where it is safe.
 - Set minimum Python version to 2.4 in README.
+- introduce --numeric-owner parameter
+  patch courtesy of Lukas Anzinger <l.anzinger AT gmail.com>
+- duplicity:restore_check_hash
+  "Invalid data - *** hash mismatch" lists the offending filename
 
 Bugs closed in this release:
 703142     AssertionError: assert len(chain_list) == 2

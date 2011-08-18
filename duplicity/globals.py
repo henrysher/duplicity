@@ -156,6 +156,9 @@ s3_use_new_style = False
 # support european for now).
 s3_european_buckets = False
 
+# File owner uid keeps number from tar file. Like same option in GNU tar.
+numeric_owner = False
+
 # Whether to use plain HTTP (without SSL) to send data to S3
 # See <https://bugs.launchpad.net/duplicity/+bug/433970>.
 s3_unencrypted_connection = False
