@@ -1,18 +1,228 @@
-2011-08-18  Ede <edgar.soldin AT web.de>
-	- introduce --numeric-owner parameter
-	  patch courtesy of Lukas Anzinger <l.anzinger AT gmail.com>
-	- duplicity:restore_check_hash 
-	  "Invalid data - *** hash mismatch" error now tells the offending filename
+2011-08-19  Kenneth Loafman  <kenneth@loafman.com>
 
-2011-07-16  Ede <edgar.soldin AT web.de>
-	branch encrypt-sign-key:
+	fixes to unit tests to support SIGN_PASSPHRASE.
+
+2011-08-18  Kenneth Loafman  <kenneth@loafman.com>
+
+	- introduce --numeric-owner parameter
+	patch courtesy of Lukas Anzinger <l.anzinger AT gmail.com>
+	- duplicity:restore_check_hash
+	'Invalid data - *** hash mismatch' lists the offending filename
+
+2011-08-18  edso
+
+	typo fix
+
+2011-08-18  edso
+
+	numowner & hash mismatch verbosity
+
+2011-08-18  Kenneth Loafman  <kenneth@loafman.com>
+
+	Remove use of virtualenv.
+
+2011-08-18  Kenneth Loafman  <kenneth@loafman.com>
+
+	- Ignore ENOENT (file missing) errors where it is safe.
+	- Set minimum Python version to 2.4 in README.
+
+2011-08-17  Kenneth Loafman  <kenneth@loafman.com>
+
+	824678     0.6.14 Fails to install on 8.04 LTS (Hardy)
+
+2011-08-17  Kenneth Loafman  <kenneth@loafman.com>
+
+	823556     sftp errors after rev 740 change
+
+2011-08-06  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~carlos-abalde/duplicity/google-docs
+
+2011-08-03  Carlos Abalde  <carlos.abalde@gmail.com>
+
+	Fixed indentation: 2 to 4 spaces
+
+2011-07-31  Carlos Abalde  <carlos.abalde@gmail.com>
+
+	Fetching user password correctly (i.e. not using directly self.parsed_url.password)
+
+2011-07-31  Carlos Abalde  <carlos.abalde@gmail.com>
+
+	Now using backend.retry(fn) decorator to handle API retries
+
+2011-07-30  Carlos Abalde  <carlos.abalde@gmail.com>
+
+	Added subfolders support + several minor improvements and fixes
+
+2011-07-29  Carlos Abalde  <carlos.abalde@gmail.com>
+
+	Added support for captcha challenges
+
+2011-07-29  Carlos Abalde  <carlos.abalde@gmail.com>
+
+	Replacing get_doclist by get_everything in put & delete methods. Raisng BackendException's in constructor
+
+2011-07-29  Carlos Abalde  <carlos.abalde@gmail.com>
+
+	Replaces get_doclist by get_everything when retrieving remote list of files in backup destination folder
+
+2011-07-28  Carlos Abalde  <carlos.abalde@gmail.com>
+
+	Added authentication instruction for accounts with 2-step verification enabled
+
+2011-07-28  Carlos Abalde  <carlos.abalde@gmail.com>
+
+	A couple of assert + missing local_path.setdata on remote file get
+
+2011-07-28  Carlos Abalde  <carlos.abalde@gmail.com>
+
+	Better error logging + retries for each API op
+
+2011-07-28  Carlos Abalde  <carlos.abalde@gmail.com>
+
+	Improved upload: check duplicated file names on destination folder + better error handling
+
+2011-07-28  Carlos Abalde  <carlos.abalde@gmail.com>
+
+	Improved API error handling
+
+2011-07-28  Carlos Abalde  <carlos.abalde@gmail.com>
+
+	Checking Google Data APIs Python libraries are present
+
+2011-07-27  Carlos Abalde  <carlos.abalde@gmail.com>
+
+	Fixed URI format
+
+2011-07-27  Carlos Abalde  <carlos.abalde@gmail.com>
+
+	First usable prototype
+
+2011-08-06  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~mterry/duplicity/u1-fixes
+
+2011-08-03  Michael Terry  <michael.terry@canonical.com>
+
+	some u1 backend fixes: handle errors 507 and 503; add oops-id to message user sees so U1 folks can help
+
+2011-07-29  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~ed.so/duplicity/encr-sign-key2
+
+2011-07-29  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~ed.so/duplicity/encr-sign-key2
+
+2011-07-16  ede
+
 	- introduce --encrypt-sign-key parameter
 	- duplicity-bin::get_passphrase
-	  skip passphrase asking and reuse passphrase if 
-	  sign-key is also an encrypt key and 
-	  a passphrase for either one is already set
+	skip passphrase asking and reuse passphrase if 
+	sign-key is also an encrypt key and 
+	a passphrase for either one is already set
 	- add _() gettext to text in duplicity-bin::get_passphrase
 	- document changes and minor additions in manpage
+
+2011-07-29  Kenneth Loafman  <kenneth@loafman.com>
+
+	818178     Shouldn't try to delete files it knows don't exist
+
+2011-07-29  Michael Terry  <michael.terry@canonical.com>
+
+	Don't try to delete partial manifests from backends
+
+2011-07-29  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~mterry/duplicity/retry-u1
+
+2011-07-29  Michael Terry  <michael.terry@canonical.com>
+
+	retry operations on u1 backend
+
+2011-07-26  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged lp:~mterry/duplicity/815635
+
+2011-07-25  Michael Terry  <michael.terry@canonical.com>
+
+	when copying metadata from remote to local archive, first copy to a temporary file then move over to archive
+
+2011-07-26  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged lp:~mterry/duplicity/report-encrypted-chains
+
+2011-07-22  Michael Terry  <michael.terry@canonical.com>
+
+	report whether a chain is encrypted or not
+
+2011-07-26  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged lp:~mterry/duplicity/more-accurate-sync
+
+2011-07-22  Michael Terry  <michael.terry@canonical.com>
+
+	be more careful about what we try to synchronize
+
+2011-07-09  Kenneth Loafman  <kenneth@loafman.com>
+
+	703142     AssertionError: assert len(chain_list) == 2
+
+2011-07-08  Michael Terry  <michael.terry@canonical.com>
+
+	pay attention to local partials when sync'ing metadata and make sure we don't end up with three copies of a metadata file
+
+2011-07-09  Kenneth Loafman  <kenneth@loafman.com>
+
+	794576     Transport endpoint is not connected
+
+2011-07-07  Michael Terry  <michael.terry@canonical.com>
+
+	ignore ENOTCONN when scanning files
+
+2011-06-28  Kenneth Loafman  <kenneth@loafman.com>
+
+	Really restore threaded_waitpid().
+
+2011-06-27  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~mterry/duplicity/guard-tarinfo
+
+2011-06-23  Michael Terry  <michael.terry@canonical.com>
+
+	also guard the recursive call
+
+2011-06-23  Michael Terry  <michael.terry@canonical.com>
+
+	guard tarinfo object from being None
+
+2011-06-27  Kenneth Loafman  <kenneth@loafman.com>
+
+	Detabify.  Tabs are evil.
+
+2011-06-24  Kenneth Loafman  <kenneth@loafman.com>
+
+	Restore previous version with threaded_waitpid().
+
+2011-06-22  Kenneth Loafman  <kenneth@loafman.com>
+
+	Ignore 404 errors when we try to delete a file on Ubuntu One.
+
+2011-06-21  Michael Terry  <michael.terry@canonical.com>
+
+	u1backend: ignore file-not-found errors on delete
+
+2011-06-22  Kenneth Loafman  <kenneth@loafman.com>
+
+	Update to duplicity messages.
+
+2011-06-18  Kenneth Loafman  <kenneth@loafman.com>
+
+	Prep for 0.6.14 release.
+
+2011-06-18  Kenneth Loafman  <kenneth@loafman.com>
+
+	Prep for 0.6.14 release.
 
 2011-06-17  Kenneth Loafman  <kenneth@loafman.com>
 

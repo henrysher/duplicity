@@ -8,8 +8,10 @@ Enhancements:
   patch courtesy of Lukas Anzinger <l.anzinger AT gmail.com>
 - duplicity:restore_check_hash
   "Invalid data - *** hash mismatch" lists the offending filename
+- fixes to unit tests to support SIGN_PASSPHRASE
 
 Bugs closed in this release:
+524922     duplicity does not have numeric uid/gid support
 703142     AssertionError: assert len(chain_list) == 2
 794576     Transport endpoint is not connected
 815635     Bad passphrase can leave bogus sigtar in archive
@@ -31,6 +33,7 @@ lp:~mterry/duplicity/818178
 lp:~ed.so/duplicity/encr-sign-key2
 lp:~mterry/duplicity/u1-fixes
 lp:~carlos-abalde/duplicity/google-docs
+lp:~ed.so/duplicity/numowner+hashverbose
 
 
 New in v0.6.14 (2011/06/18)
