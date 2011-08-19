@@ -111,15 +111,12 @@ def get_passphrase(n, action, for_signing = False):
     if not globals.encryption or globals.use_agent:
         return ""
 
-    # no passphrase needed if --list-current
-    elif (action == "list-current"):
-        return ""
-
-    # these commands don't look inside the collection
+    # these commands don't need a password
     elif action in ["collection-status",
-                    "remove-old",
+                    "list-current",
                     "remove-all-but-n-full",
                     "remove-all-inc-of-but-n-full",
+                    "remove-old",
                     ]:
         return ""
 
@@ -636,7 +633,7 @@ def restore_get_enc_fileobj(backend, filename, volume_info):
     parseresults = file_naming.parse(filename)
     tdp = dup_temp.new_tempduppath(parseresults)
     backend.get(filename, tdp)
-    
+
     """ verify hash of the remote file """
     verified, hash_pair, calculated_hash = restore_check_hash(volume_info, tdp)
     if not verified:
@@ -666,7 +663,7 @@ def restore_check_hash(volume_info, vol_path):
         if calculated_hash != hash_pair[1]:
             return False, hash_pair, calculated_hash
     """ reached here, verification passed """
-    return True
+    return True, hash_pair, calculated_hash
 
 
 def restore_add_sig_check(fileobj):
@@ -1184,14 +1181,6 @@ def main():
     else:
         dup_time.setcurtime()
 
-    # The following is for starting remote debugging in Eclipse with Pydev.
-    # Adjust the path to your location and version of Eclipse and Pydev.
-    if globals.pydevd:
-        pysrc = "/opt/Aptana Studio 2/plugins/org.python.pydev.debug_2.1.0.2011052613/pysrc/"
-        sys.path.append(pysrc)
-        import pydevd #@UnresolvedImport
-        pydevd.settrace()
-
     # log some debugging status info
     log_startup_parms(log.INFO)
 
@@ -1330,6 +1319,16 @@ def with_tempdir(fn):
 
 
 if __name__ == "__main__":
+    # The following is for starting remote debugging in Eclipse with Pydev.
+    # Adjust the path to your location and version of Eclipse and Pydev.  Comment out
+    # to run normally, or this process will hang at pydevd.settrace() waiting for the
+    # remote debugger to start.
+#    pysrc = "/opt/Aptana Studio 2/plugins/org.python.pydev.debug_2.1.0.2011052613/pysrc/"
+#    sys.path.append(pysrc)
+#    import pydevd #@UnresolvedImport
+#    pydevd.settrace()
+    # end remote debugger startup
+
     try:
         with_tempdir(main)
 

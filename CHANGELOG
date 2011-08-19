@@ -1,7 +1,5 @@
-New in v0.6.15 (2011/08/??)
+New in v0.6.15 (2011/08/19)
 ----------------------------
-Enhancements:
-
 Enhancements:
 - Ignore 404 errors when deleting a file on Ubuntu One.
 - Ignore ENOENT (file missing) errors where it is safe.

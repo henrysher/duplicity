@@ -164,7 +164,7 @@ class FinalTest:
                           "--sign-key " + config.sign_key]
         restore_options = ["--encrypt-key " + config.encrypt_key1,
                            "--sign-key " + config.sign_key]
-        config.set_environ("PASSPHRASE", config.sign_passphrase)
+        config.set_environ("SIGN_PASSPHRASE", config.sign_passphrase)
         self.test_basic_cycle(backup_options = backup_options,
                               restore_options = restore_options)
 
