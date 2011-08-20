@@ -139,39 +139,40 @@ def difftar2path_iter( diff_tarfile ):
 
 def get_index_from_tarinfo( tarinfo ):
     """Return (index, difftype, multivol) pair from tarinfo object"""
-    for prefix in ["snapshot", "diff", "deleted",
-                   "multivol_diff", "multivol_snapshot"]:
-        if tarinfo.name.startswith( prefix ):
-            name = tarinfo.name[len( prefix )+1:] # strip prefix
+    for prefix in ["snapshot/", "diff/", "deleted/",
+                   "multivol_diff/", "multivol_snapshot/"]:
+        tiname = util.get_tarinfo_name( tarinfo )
+        if tiname.startswith( prefix ):
+            name = tiname[len( prefix ):] # strip prefix
             if prefix.startswith( "multivol" ):
-                if prefix == "multivol_diff":
+                if prefix == "multivol_diff/":
                     difftype = "diff"
                 else:
                     difftype = "snapshot"
                 multivol = 1
                 name, num_subs = \
                       re.subn( "(?s)^multivol_(diff|snapshot)/?(.*)/[0-9]+$",
-                              "\\2", tarinfo.name )
+                              "\\2", tiname )
                 if num_subs != 1:
                     raise PatchDirException( "Unrecognized diff entry %s" %
-                                            ( tarinfo.name, ) )
+                                            ( tiname, ) )
             else:
-                difftype = prefix
-                name = tarinfo.name[len( prefix )+1:]
+                difftype = prefix[:-1] # strip trailing /
+                name = tiname[len( prefix ):]
                 if name.endswith( "/" ):
                     name = name[:-1] # strip trailing /'s
                 multivol = 0
             break
     else:
         raise PatchDirException( "Unrecognized diff entry %s" %
-                                 ( tarinfo.name, ) )
+                                 ( tiname, ) )
     if name == "." or name == "":
         index = ()
     else:
         index = tuple( name.split( "/" ) )
         if '..' in index:
             raise PatchDirException( "Tar entry %s contains '..'.  Security "
-                                    "violation" % ( tarinfo.name, ) )
+                                    "violation" % ( tiname, ) )
     return ( index, difftype, multivol )
 
 

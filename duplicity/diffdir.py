@@ -228,13 +228,14 @@ def sigtar2path_iter(sigtarobj):
     tf = util.make_tarfile("r", sigtarobj)
     tf.debug = 1
     for tarinfo in tf:
-        for prefix in ["signature", "snapshot", "deleted"]:
-            if tarinfo.name.startswith(prefix):
+        tiname = util.get_tarinfo_name(tarinfo)
+        for prefix in ["signature/", "snapshot/", "deleted/"]:
+            if tiname.startswith(prefix):
                 # strip prefix and '/' from name and set it to difftype
-                name, difftype = tarinfo.name[len(prefix)+1:], prefix
+                name, difftype = tiname[len(prefix):], prefix[:-1]
                 break
         else:
-            raise DiffDirException("Bad tarinfo name %s" % (tarinfo.name,))
+            raise DiffDirException("Bad tarinfo name %s" % (tiname,))
 
         index = tuple(name.split("/"))
         if not index[-1]:

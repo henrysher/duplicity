@@ -83,6 +83,15 @@ def make_tarfile(mode, fp):
     else:
         return tarfile.TarFile("arbitrary", mode, fp, ignore_zeros=True)
 
+def get_tarinfo_name(ti):
+    # Python versions before 2.6 ensure that directories end with /, but 2.6
+    # and later ensure they they *don't* have /.  ::shrug::  Internally, we
+    # continue to use pre-2.6 method.
+    if ti.isdir() and not ti.name.endswith("/"):
+        return ti.name + "/"
+    else:
+        return ti.name
+
 def ignore_missing(fn, filename):
     """
     Execute fn on filename.  Ignore ENOENT errors, otherwise raise exception.
