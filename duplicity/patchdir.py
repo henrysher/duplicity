@@ -320,8 +320,7 @@ class TarFile_FromFileobjs:
         if self.current_fp:
             assert not self.current_fp.close()
         self.current_fp = self.fileobj_iter.next()
-        self.tarfile = tarfile.TarFile("arbitrary", "r", self.current_fp,
-                                       ignore_zeros=True)
+        self.tarfile = util.make_tarfile("r", self.current_fp)
         self.tar_iter = iter( self.tarfile )
 
     def next( self ):

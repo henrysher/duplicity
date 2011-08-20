@@ -29,6 +29,7 @@ the second, the ROPath iterator is put into tar block form.
 
 import cStringIO, types
 from duplicity import statistics
+from duplicity import util
 from duplicity.path import * #@UnusedWildImport
 from duplicity.lazy import * #@UnusedWildImport
 
@@ -181,7 +182,7 @@ def get_delta_iter(new_iter, sig_iter, sig_fileobj=None):
     """
     collated = collate2iters(new_iter, sig_iter)
     if sig_fileobj:
-        sigTarFile = tarfile.TarFile("arbitrary", "w", sig_fileobj, ignore_zeros=True)
+        sigTarFile = util.make_tarfile("w", sig_fileobj)
     else:
         sigTarFile = None
     for new_path, sig_path in collated:
@@ -224,7 +225,7 @@ def sigtar2path_iter(sigtarobj):
     """
     Convert signature tar file object open for reading into path iter
     """
-    tf = tarfile.TarFile("Arbitrary Name", "r", sigtarobj, ignore_zeros=True)
+    tf = util.make_tarfile("r", sigtarobj)
     tf.debug = 1
     for tarinfo in tf:
         for prefix in ["signature", "snapshot", "deleted"]:

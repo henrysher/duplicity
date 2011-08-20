@@ -69,6 +69,19 @@ def maybe_ignore_errors(fn):
         else:
             raise
 
+def make_tarfile(mode, fp):
+    # We often use 'empty' tarfiles for signatures that haven't been filled out
+    # yet.  So we want to 'ignore_zeros' which means, "don't raise errors when
+    # tarfile is empty".  This is a simple object flag, but in python2.6 and
+    # beyond, a block is read in the constructor too, so it needs to be passed
+    # in there.
+    if sys.version_info < (2, 6):
+        tf = tarfile.TarFile("arbitrary", mode, fp)
+        tf.ignore_zeros = True
+        return tf
+    else:
+        return tarfile.TarFile("arbitrary", mode, fp, ignore_zeros=True)
+
 def ignore_missing(fn, filename):
     """
     Execute fn on filename.  Ignore ENOENT errors, otherwise raise exception.
