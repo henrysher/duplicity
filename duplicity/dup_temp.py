@@ -207,6 +207,18 @@ class FileobjHooked:
         """
         return self.fileobj.read(length)
 
+    def tell(self):
+        """
+        Returns current location of fileobj
+        """
+        return self.fileobj.tell()
+
+    def seek(self, offset):
+        """
+        Seeks to a location of fileobj
+        """
+        return self.fileobj.seek(offset)
+
     def close(self):
         """
         Close fileobj, running hooks right afterwards

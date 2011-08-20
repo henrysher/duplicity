@@ -33,7 +33,6 @@ gettext.install('duplicity')
 from duplicity import diffdir
 from duplicity import patchdir
 from duplicity import log
-from duplicity import tarfile
 from duplicity import globals
 from duplicity import selection
 from duplicity import path

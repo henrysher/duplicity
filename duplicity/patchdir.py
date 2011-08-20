@@ -23,8 +23,8 @@ import re #@UnusedImport
 import types
 import tempfile
 import os
+import tarfile #@UnusedImport
 
-from duplicity import tarfile #@UnusedImport
 from duplicity import librsync #@UnusedImport
 from duplicity import log #@UnusedImport
 from duplicity import diffdir
@@ -139,25 +139,25 @@ def difftar2path_iter( diff_tarfile ):
 
 def get_index_from_tarinfo( tarinfo ):
     """Return (index, difftype, multivol) pair from tarinfo object"""
-    for prefix in ["snapshot/", "diff/", "deleted/",
-                   "multivol_diff/", "multivol_snapshot/"]:
+    for prefix in ["snapshot", "diff", "deleted",
+                   "multivol_diff", "multivol_snapshot"]:
         if tarinfo.name.startswith( prefix ):
-            name = tarinfo.name[len( prefix ):] # strip prefix
+            name = tarinfo.name[len( prefix )+1:] # strip prefix
             if prefix.startswith( "multivol" ):
-                if prefix == "multivol_diff/":
+                if prefix == "multivol_diff":
                     difftype = "diff"
                 else:
                     difftype = "snapshot"
                 multivol = 1
                 name, num_subs = \
-                      re.subn( "(?s)^multivol_(diff|snapshot)/(.*)/[0-9]+$",
+                      re.subn( "(?s)^multivol_(diff|snapshot)/?(.*)/[0-9]+$",
                               "\\2", tarinfo.name )
                 if num_subs != 1:
                     raise PatchDirException( "Unrecognized diff entry %s" %
                                             ( tarinfo.name, ) )
             else:
-                difftype = prefix[:-1] # strip trailing /
-                name = tarinfo.name[len( prefix ):]
+                difftype = prefix
+                name = tarinfo.name[len( prefix )+1:]
                 if name.endswith( "/" ):
                     name = name[:-1] # strip trailing /'s
                 multivol = 0
@@ -320,7 +320,8 @@ class TarFile_FromFileobjs:
         if self.current_fp:
             assert not self.current_fp.close()
         self.current_fp = self.fileobj_iter.next()
-        self.tarfile = tarfile.TarFile( "arbitrary", "r", self.current_fp )
+        self.tarfile = tarfile.TarFile("arbitrary", "r", self.current_fp,
+                                       ignore_zeros=True)
         self.tar_iter = iter( self.tarfile )
 
     def next( self ):

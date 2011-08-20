@@ -25,9 +25,9 @@
 # $Id: test_tarfile.py,v 1.11 2009/04/02 14:47:12 loafman Exp $
 
 import config
-import sys, os, shutil, StringIO, tempfile, unittest, stat, pwd, grp
+import sys, os, shutil, StringIO, tempfile, unittest, stat
 
-from duplicity import tarfile
+import tarfile
 
 config.setup()
 
@@ -187,50 +187,9 @@ class Test_All(BaseTest):
             tf.add(filename, filename, 0)
         tf.close()
 
-    def make_temptar_iterator(self):
-        """Tar up tempdir using an iterator"""
-        try:
-            os.lstat("temp2.tar")
-        except OSError:
-            pass
-        else:
-            assert not os.system("rm temp2.tar")
-
-        self.make_tempdir()
-        def generate_pairs(tfi_list):
-            for filename in self.files_in_tempdir:
-                ti = tarfile.TarInfo()
-                ti.set_arcname(filename)
-                ti.init_from_stat(os.lstat(filename))
-                if filename == "tempdir/hardlinked2":
-                    ti.type = tarfile.LNKTYPE
-                    ti.linkname = "tempdir/hardlinked1"
-                    yield (ti, None)
-                elif filename == "tempdir" or filename == "tempdir/fifo":
-                    yield (ti, None)
-                elif filename == "tempdir/symlink":
-                    ti.linkname = os.readlink(filename)
-                    yield (ti, None)
-                else:
-                    yield (ti, open(filename, "rb"))
-        tfi_list = [None]
-        tfi = tarfile.TarFromIterator(generate_pairs(tfi_list))
-        tfi_list[0] = tfi # now generate_pairs can find tfi
-
-        buf = tfi.read()
-        tfi.close()
-        fout = open("temp2.tar", "wb")
-        fout.write(buf)
-        fout.close()
-
     def test_tarfile_creation(self):
         """Create directory, make tarfile, extract using gnutar, compare"""
         self.make_temptar()
-        self.extract_and_compare_tarfile()
-
-    def test_tarfile_creation_from_iterator(self):
-        """Same as test_tarfile_creation, but use iterator interface"""
-        self.make_temptar_iterator()
         self.extract_and_compare_tarfile()
 
     def extract_and_compare_tarfile(self):
@@ -354,50 +313,12 @@ class FileLogger:
     def seek(self, position):
         #print "Seeking to ", position
         return self.infp.seek(position)
+    def tell(self):
+        #print "Telling"
+        return self.infp.tell()
     def close(self):
         #print "Closing"
         return self.infp.close()
-
-
-class PasswordTest(unittest.TestCase):
-    """Test retrieving, storing password information"""
-    def compare(self, thunk1, thunk2):
-        """Make sure thunk1 and thunk2 return the same"""
-        try: result1 = thunk1()
-        except KeyError, exc1: keyerror = 1 #@UnusedVariable
-        else: keyerror = 0
-
-        try: result2 = thunk2()
-        except KeyError, exc2: #@UnusedVariable
-            assert keyerror, "Got KeyError vs " + str(result2)
-            return
-        else: assert not keyerror, "Got %s vs KeyError" % (str(result1),)
-
-        assert result1 == result2, (result1, result2)
-
-    def test_uid2uname(self):
-        """Test getting unames by uid"""
-        for uid in (0, 500, 789, 0, 0, 500):
-            self.compare(lambda: tarfile.uid2uname(uid),
-                         lambda: pwd.getpwuid(uid)[0])
-
-    def test_gid2gname(self):
-        """Test getting group names by gid"""
-        for gid in (0, 500, 789, 0, 0, 500):
-            self.compare(lambda: tarfile.gid2gname(gid),
-                         lambda: grp.getgrgid(gid)[0])
-
-    def test_gname2gid(self):
-        """Test getting gids from gnames"""
-        for gname in ('root', 'ben', 'bin', 'sanothua', 'root', 'root'):
-            self.compare(lambda: tarfile.gname2gid(gname),
-                         lambda: grp.getgrnam(gname)[2])
-
-    def test_uname2uid(self):
-        """Test getting uids from unames"""
-        for uname in ('root', 'ben', 'bin', 'sanothua', 'root', 'root'):
-            self.compare(lambda: tarfile.uname2uid(uname),
-                         lambda: pwd.getpwnam(uname)[2])
 
 
 if __name__ == "__main__":

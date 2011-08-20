@@ -96,6 +96,7 @@ class GPGFile:
         self.logger_fp = tempfile.TemporaryFile()
         self.stderr_fp = tempfile.TemporaryFile()
         self.name = encrypt_path
+        self.byte_count = 0
 
         # Start GPG process - copied from GnuPGInterface docstring.
         gnupg = GnuPGInterface.GnuPG()
@@ -157,6 +158,8 @@ class GPGFile:
     def read(self, length = -1):
         try:
             res = self.gpg_output.read(length)
+            if res is not None:
+                self.byte_count += len(res)
         except Exception:
             self.gpg_failed()
         return res
@@ -164,9 +167,20 @@ class GPGFile:
     def write(self, buf):
         try:
             res = self.gpg_input.write(buf)
+            if res is not None:
+                self.byte_count += len(res)
         except Exception:
             self.gpg_failed()
         return res
+
+    def tell(self):
+        return self.byte_count
+
+    def seek(self, offset):
+        assert not self.encrypt
+        assert offset >= self.byte_count, "%d < %d" % (offset, self.byte_count)
+        if offset > self.byte_count:
+            self.read(offset - self.byte_count)
 
     def gpg_failed(self):
         msg = "GPG Failed, see log below:\n"

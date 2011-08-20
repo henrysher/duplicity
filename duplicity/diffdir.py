@@ -181,7 +181,7 @@ def get_delta_iter(new_iter, sig_iter, sig_fileobj=None):
     """
     collated = collate2iters(new_iter, sig_iter)
     if sig_fileobj:
-        sigTarFile = tarfile.TarFile("arbitrary", "w", sig_fileobj)
+        sigTarFile = tarfile.TarFile("arbitrary", "w", sig_fileobj, ignore_zeros=True)
     else:
         sigTarFile = None
     for new_path, sig_path in collated:
@@ -224,13 +224,13 @@ def sigtar2path_iter(sigtarobj):
     """
     Convert signature tar file object open for reading into path iter
     """
-    tf = tarfile.TarFile("Arbitrary Name", "r", sigtarobj)
-    tf.debug = 2
+    tf = tarfile.TarFile("Arbitrary Name", "r", sigtarobj, ignore_zeros=True)
+    tf.debug = 1
     for tarinfo in tf:
-        for prefix in ["signature/", "snapshot/", "deleted/"]:
+        for prefix in ["signature", "snapshot", "deleted"]:
             if tarinfo.name.startswith(prefix):
-                # strip prefix and from name and set it to difftype
-                name, difftype = tarinfo.name[len(prefix):], prefix[:-1]
+                # strip prefix and '/' from name and set it to difftype
+                name, difftype = tarinfo.name[len(prefix)+1:], prefix
                 break
         else:
             raise DiffDirException("Bad tarinfo name %s" % (tarinfo.name,))
@@ -464,16 +464,12 @@ class TarBlockIter:
         self.remember_value = None          # holds index of next block
         self.remember_block = None          # holds block of next block
 
-        # We need to instantiate a dummy TarFile just to get access to
-        # some of the functions like _get_full_headers.
-        self.tf = tarfile.TarFromIterator(None)
-
     def tarinfo2tarblock(self, index, tarinfo, file_data = ""):
         """
         Make tarblock out of tarinfo and file data
         """
         tarinfo.size = len(file_data)
-        headers = self.tf._get_full_headers(tarinfo)
+        headers = tarinfo.tobuf()
         blocks, remainder = divmod(tarinfo.size, tarfile.BLOCKSIZE) #@UnusedVariable
         if remainder > 0:
             filler_data = "\0" * (tarfile.BLOCKSIZE - remainder)

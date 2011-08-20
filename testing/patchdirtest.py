@@ -27,7 +27,7 @@ from duplicity import diffdir
 from duplicity import patchdir
 from duplicity import log #@UnusedImport
 from duplicity import selection
-from duplicity import tarfile #@UnusedImport
+import tarfile #@UnusedImport
 from duplicity import librsync #@UnusedImport
 from duplicity.path import * #@UnusedWildImport
 
@@ -145,25 +145,18 @@ class PatchingTest(unittest.TestCase):
 
         def make_bad_tar(filename):
             """Write attack tarfile to filename"""
-            def iterate_one_pair(path):
-                """Iterate one (tarinfo, fp) pair
+            tf = tarfile.TarFile(name=filename, mode="w")
 
-                file object will be empty, and tarinfo will have path
-                "snapshot/../warning-security-error"
-
-                """
-                path.index = ("diff", "..", "warning-security-error")
-                ti = path.get_tarinfo()
-                fp = cStringIO.StringIO("")
-                yield (ti, fp)
+            # file object will be empty, and tarinfo will have path
+            # "snapshot/../warning-security-error"
             assert not os.system("cat /dev/null >testfiles/output/file")
-            tf = tarfile.TarFromIterator(iterate_one_pair(
-                Path("testfiles/output/file")))
-            tfbuf = tf.read()
+            path = Path("testfiles/output/file")
+            path.index = ("diff", "..", "warning-security-error")
+            ti = path.get_tarinfo()
+            fp = cStringIO.StringIO("")
+            tf.addfile(ti, fp)
 
-            fout = open(filename, "wb")
-            fout.write(tfbuf)
-            assert not fout.close()
+            tf.close()
 
         self.deltmp()
         make_bad_tar("testfiles/output/bad.tar")
