@@ -127,10 +127,10 @@ class DDTest(unittest.TestCase):
 
         changed_files = ["diff/changeable_permission",
                          "diff/regular_file",
-                         "snapshot/symbolic_link",
+                         "snapshot/symbolic_link/",
                          "deleted/deleted_file",
                          "snapshot/directory_to_file",
-                         "snapshot/file_to_directory"]
+                         "snapshot/file_to_directory/"]
         for tarinfo in tarfile.TarFile("testfiles/output/dir1dir2.difftar",
                                        "r"):
             if tarinfo.name in changed_files:
