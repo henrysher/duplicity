@@ -70,16 +70,21 @@ def maybe_ignore_errors(fn):
         else:
             raise
 
-def make_tarfile(mode, fp, debug=0):
+class FakeTarFile:
+    debug = 0
+    def __iter__(self):
+        return iter([])
+    def close(self):
+        pass
+
+def make_tarfile(mode, fp):
     # We often use 'empty' tarfiles for signatures that haven't been filled out
     # yet.  So we want to ignore ReadError exceptions, which are used to signal
     # this.
     try:
-        tf = tarfile.TarFile("arbitrary", mode, fp)
-        tf.debug = debug
-        return tf
+        return tarfile.TarFile("arbitrary", mode, fp)
     except tarfile.ReadError:
-        return [] # to fake no TarInfos
+        return FakeTarFile()
 
 def get_tarinfo_name(ti):
     # Python versions before 2.6 ensure that directories end with /, but 2.6

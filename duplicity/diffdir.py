@@ -225,7 +225,8 @@ def sigtar2path_iter(sigtarobj):
     """
     Convert signature tar file object open for reading into path iter
     """
-    tf = util.make_tarfile("r", sigtarobj, debug=1)
+    tf = util.make_tarfile("r", sigtarobj)
+    tf.debug = 1
     for tarinfo in tf:
         tiname = util.get_tarinfo_name(tarinfo)
         for prefix in ["signature/", "snapshot/", "deleted/"]:
