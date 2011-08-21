@@ -373,7 +373,10 @@ class BackupChain:
             else:
                 type = "inc"
                 time = s.end_time
-            enc = "enc" if s.encrypted else "noenc"
+            if s.encrypted:
+                enc = "enc"
+            else:
+                enc = "noenc"
             l.append("%s%s %s %d %s" % (prefix, type, dup_time.timetostring(time), (len(s)), enc))
         return l
 
