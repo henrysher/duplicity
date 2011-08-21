@@ -70,18 +70,16 @@ def maybe_ignore_errors(fn):
         else:
             raise
 
-def make_tarfile(mode, fp):
+def make_tarfile(mode, fp, debug=0):
     # We often use 'empty' tarfiles for signatures that haven't been filled out
-    # yet.  So we want to 'ignore_zeros' which means, "don't raise errors when
-    # tarfile is empty".  This is a simple object flag, but in python2.6 and
-    # beyond, a block is read in the constructor too, so it needs to be passed
-    # in there.
-    if sys.version_info < (2, 6):
+    # yet.  So we want to ignore ReadError exceptions, which are used to signal
+    # this.
+    try:
         tf = tarfile.TarFile("arbitrary", mode, fp)
-        tf.ignore_zeros = True
+        tf.debug = debug
         return tf
-    else:
-        return tarfile.TarFile("arbitrary", mode, fp, ignore_zeros=True)
+    except tarfile.ReadError:
+        return [] # to fake no TarInfos
 
 def get_tarinfo_name(ti):
     # Python versions before 2.6 ensure that directories end with /, but 2.6
