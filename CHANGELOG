@@ -1,3 +1,15 @@
+New in v0.6.16 (2011/09/??)
+----------------------------
+Enhancements:
+- usability enhancement: sign passphrase prompt has no second
+  verification prompt anymore, symmetric passphrases are still verified
+
+Bugs closed in this release:
+
+Merges:
+lp:~ed.so/duplicity/reuse-passphrase-for-signing-fix
+
+
 New in v0.6.15 (2011/08/19)
 ----------------------------
 Enhancements:
