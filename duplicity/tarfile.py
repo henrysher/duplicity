@@ -868,20 +868,20 @@ class ExFileObject(object):
 
         return self.position
 
-    def seek(self, pos, whence=os.SEEK_SET):
+    def seek(self, pos, whence=0):
         """Seek to a position in the file.
         """
         if self.closed:
             raise ValueError("I/O operation on closed file")
 
-        if whence == os.SEEK_SET:
+        if whence == 0:
             self.position = min(max(pos, 0), self.size)
-        elif whence == os.SEEK_CUR:
+        elif whence == 1:
             if pos < 0:
                 self.position = max(self.position + pos, 0)
             else:
                 self.position = min(self.position + pos, self.size)
-        elif whence == os.SEEK_END:
+        elif whence == 2:
             self.position = max(min(self.size + pos, self.size), 0)
         else:
             raise ValueError("Invalid argument")
@@ -1525,7 +1525,10 @@ class TarFile(object):
             if hasattr(fileobj, "mode"):
                 self._mode = fileobj.mode
             self._extfileobj = True
-        self.name = os.path.abspath(name) if name else None
+				if name:
+						self.name = os.path.abspath(name)
+				else:
+						self.name = None
         self.fileobj = fileobj
 
         # Init attributes.
@@ -1928,7 +1931,10 @@ class TarFile(object):
                 print "%d-%02d-%02d %02d:%02d:%02d" \
                       % time.localtime(tarinfo.mtime)[:6],
 
-            print tarinfo.name + ("/" if tarinfo.isdir() else ""),
+						if tarinfo.isdir():
+		            print tarinfo.name + "/",
+						else:
+								print tarinfo.name,
 
             if verbose:
                 if tarinfo.issym():
