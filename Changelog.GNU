@@ -1,3 +1,8 @@
+2011-08-23 edso
+
+	- usability enhancement: sign passphrase prompt has no second 
+	  verification prompt anymore, symmetric passphrases are still verified
+
 2011-08-19  Kenneth Loafman  <kenneth@loafman.com>
 
 	fixes to unit tests to support SIGN_PASSPHRASE.

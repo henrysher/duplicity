@@ -1268,7 +1268,7 @@ def main():
         # the sign key can have a different passphrase than the encrypt
         # key, therefore request a passphrase
         if globals.gpg_profile.sign_key:
-            globals.gpg_profile.signing_passphrase = get_passphrase(3, action, True)
+            globals.gpg_profile.signing_passphrase = get_passphrase(1, action, True)
 
         # if there are no recipients (no --encrypt-key), it must be a
         # symmetric key. Therefore, confirm the passphrase
