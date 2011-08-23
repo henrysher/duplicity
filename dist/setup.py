@@ -50,6 +50,7 @@ data_files = [('share/man/man1',
                 'REPO-README',
                 'LOG-README',
                 'README',
+                'tarfile-LICENSE',
                 'CHANGELOG']),
               ]
 

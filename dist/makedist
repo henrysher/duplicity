@@ -65,6 +65,7 @@ def MakeTar():
         "REPO-README",
         "LOG-README",
         "README",
+        "tarfile-LICENSE",
         SourceDir + "/_librsyncmodule.c",
         DistDir + "/setup.py",
         ]:
@@ -98,6 +99,7 @@ def MakeTar():
         "selection.py",
         "static.py",
         "statistics.py",
+        "tarfile.py",
         "tempdir.py",
         "urlparse_2_5.py",
         "util.py",

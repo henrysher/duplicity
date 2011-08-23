@@ -23,8 +23,8 @@ import re #@UnusedImport
 import types
 import tempfile
 import os
-import tarfile #@UnusedImport
 
+from duplicity import tarfile #@UnusedImport
 from duplicity import librsync #@UnusedImport
 from duplicity import log #@UnusedImport
 from duplicity import diffdir

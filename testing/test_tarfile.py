@@ -27,7 +27,7 @@
 import config
 import sys, os, shutil, StringIO, tempfile, unittest, stat
 
-import tarfile
+from duplicity import tarfile
 
 config.setup()
 

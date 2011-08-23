@@ -27,7 +27,7 @@ from duplicity import diffdir
 from duplicity import patchdir
 from duplicity import log #@UnusedImport
 from duplicity import selection
-import tarfile #@UnusedImport
+from duplicity import tarfile #@UnusedImport
 from duplicity import librsync #@UnusedImport
 from duplicity.path import * #@UnusedWildImport
 

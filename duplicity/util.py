@@ -27,7 +27,8 @@ import errno
 import sys
 import string
 import traceback
-import tarfile
+
+from duplicity import tarfile
 
 import duplicity.globals as globals
 import duplicity.log as log

@@ -27,7 +27,7 @@ from duplicity.path import * #@UnusedWildImport
 from duplicity import diffdir
 from duplicity import selection
 from duplicity import util
-import tarfile #@Reimport
+from duplicity import tarfile #@Reimport
 
 config.setup()
 

@@ -26,8 +26,9 @@ associates stat information with filenames
 
 """
 
-import stat, errno, socket, time, re, gzip, tarfile, pwd, grp
+import stat, errno, socket, time, re, gzip, pwd, grp
 
+from duplicity import tarfile
 from duplicity import file_naming
 from duplicity import globals
 from duplicity import gpg

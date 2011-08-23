@@ -1,0 +1,3 @@
+tarfile.py is a copy of python2.7's tarfile.py.
+
+No changes besides 2.4 compatibility have been made.
