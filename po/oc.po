@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-06-18 08:53-0500\n"
+"POT-Creation-Date: 2011-08-19 13:26-0500\n"
 "PO-Revision-Date: 2011-08-20 10:44+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Occitan (post 1500) <oc@li.org>\n"
@@ -15,8 +15,45 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2011-08-21 04:47+0000\n"
+"X-Launchpad-Export-Date: 2011-08-24 04:37+0000\n"
 "X-Generator: Launchpad (build 13697)\n"
+
+#: ../duplicity-bin:94
+msgid "Reuse already set PASSPHRASE as SIGNING_PASSPHRASE"
+msgstr ""
+
+#: ../duplicity-bin:100
+msgid "Reuse already set SIGNING_PASSPHRASE as PASSPHRASE"
+msgstr ""
+
+#: ../duplicity-bin:139
+msgid "PASSPHRASE variable not set, asking user."
+msgstr ""
+
+#: ../duplicity-bin:154
+msgid "GnuPG passphrase for signing key:"
+msgstr ""
+
+#: ../duplicity-bin:159
+msgid "GnuPG passphrase:"
+msgstr ""
+
+#: ../duplicity-bin:164
+msgid "Retype passphrase for signing key to confirm: "
+msgstr ""
+
+#: ../duplicity-bin:166
+msgid "Retype passphrase to confirm: "
+msgstr ""
+
+#: ../duplicity-bin:169
+msgid "First and second passphrases do not match!  Please try again."
+msgstr ""
+
+#: ../duplicity-bin:174
+msgid ""
+"Cannot use empty passphrase with symmetric encryption!  Please try again."
+msgstr ""
 
 #: ../duplicity-bin:223
 #, python-format
@@ -60,9 +97,9 @@ msgstr ""
 msgid "Processed volume %d of %d"
 msgstr ""
 
-#: ../duplicity-bin:648
+#: ../duplicity-bin:641
 #, python-format
-msgid "Invalid data - %s hash mismatch:"
+msgid "Invalid data - %s hash mismatch for file:"
 msgstr ""
 
 #: ../duplicity-bin:643
