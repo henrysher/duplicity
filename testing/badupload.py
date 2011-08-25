@@ -27,8 +27,7 @@ sys.path.insert(0, "../")
 config.setup()
 
 # This can be changed to select the URL to use
-backend_dir = 'testfiles/output'
-backend_url = 'file://' + backend_dir
+backend_url = 'file://testfiles/output'
 
 class CmdError(Exception):
     """Indicates an error running an external command"""
@@ -79,8 +78,6 @@ class BadUploadTest(unittest.TestCase):
             assert False # shouldn't get this far
         except CmdError, e:
             assert e.return_val == 44, e.return_val
-        files = os.listdir(backend_dir)
-        assert len(files) == 0, files
 
 if __name__ == "__main__":
     unittest.main()
