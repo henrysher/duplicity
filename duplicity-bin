@@ -269,14 +269,28 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
             end_block -= 1
         return start_index, start_block, end_index, end_block
 
-    def put(tdp, dest_filename):
+    def validate_block(tdp, dest_filename):
+        info = backend.query_info([dest_filename]).get(dest_filename)
+        if info is None:
+            return
+        size = info.get('size')
+        if size is None:
+            size = 0 # could not query size for some reason
+        if size != tdp.getsize():
+            code_extra = "%s %d %d" % (util.escape(dest_filename), tdp.getsize(), size)
+            log.FatalError(_("File %s was corrupted during upload.") % dest_filename,
+                           log.ErrorCode.volume_wrong_size, code_extra)
+
+    def put(tdp, dest_filename, vol_num):
         """
         Retrieve file size *before* calling backend.put(), which may (at least
         in case of the localbackend) rename the temporary file to the target
         instead of copying.
         """
         putsize = tdp.getsize()
-        backend.put(tdp, dest_filename)
+        if globals.skip_volume != vol_num: # for testing purposes only
+            backend.put(tdp, dest_filename)
+        validate_block(tdp, dest_filename)
         if tdp.stat:
             tdp.delete()
         return putsize
@@ -350,8 +364,8 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
             sig_outfp.flush()
             man_outfp.flush()
 
-        async_waiters.append(io_scheduler.schedule_task(lambda tdp, dest_filename: put(tdp, dest_filename),
-                                                        (tdp, dest_filename)))
+        async_waiters.append(io_scheduler.schedule_task(lambda tdp, dest_filename, vol_num: put(tdp, dest_filename, vol_num),
+                                                        (tdp, dest_filename, vol_num)))
 
         # Log human-readable version as well as raw numbers for machine consumers
         log.Progress('Processed volume %d' % vol_num, diffdir.stats.SourceFileSize)

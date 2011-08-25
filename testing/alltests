@@ -24,3 +24,4 @@ test_tarfile.py
 finaltest.py
 restarttest.py
 cleanuptest.py
+badupload.py

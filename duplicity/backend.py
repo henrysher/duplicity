@@ -361,6 +361,20 @@ class Backend:
         """
         raise NotImplementedError()
 
+    def query_info(self, filename_list, raise_errors=True):
+        """
+        Return metadata about each filename in filename_list
+        """
+        if hasattr(self, '_query_list_info'):
+            return self._query_list_info(filename_list)
+        elif hasattr(self, '_query_file_info'):
+            info = {}
+            for filename in filename_list:
+                info[filename] = self._query_file_info(filename)
+            return info
+        else:
+            return {}
+
     """ use getpass by default, inherited backends may overwrite this behaviour """
     use_getpass = True
 
