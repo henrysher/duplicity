@@ -270,8 +270,8 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
         return start_index, start_block, end_index, end_block
 
     def validate_block(tdp, dest_filename):
-        info = backend.query_info([dest_filename]).get(dest_filename)
-        if info is None or 'size' not in info:
+        info = backend.query_info([dest_filename])[dest_filename]
+        if 'size' not in info:
             return # backend didn't know how to query size
         size = info['size']
         if size is None:

@@ -362,23 +362,33 @@ class Backend:
         raise NotImplementedError()
 
     # Should never cause FatalError.
-    # Returns a dictionary that may return:
-    # * size: if >= 0, size of file
+    # Returns a dictionary of dictionaries.  The outer dictionary maps
+    # filenames to metadata dictionaries.  Supported metadata are:
+    #
+    # 'size': if >= 0, size of file
     #         if -1, file is not found
     #         if None, error querying file
+    #
+    # Returned dictionary is guaranteed to contain a metadata dictionary for
+    # each filename, but not all metadata are guaranteed to be present.
     def query_info(self, filename_list, raise_errors=True):
         """
         Return metadata about each filename in filename_list
         """
+        info = {}
         if hasattr(self, '_query_list_info'):
-            return self._query_list_info(filename_list)
+            info = self._query_list_info(filename_list)
         elif hasattr(self, '_query_file_info'):
-            info = {}
             for filename in filename_list:
                 info[filename] = self._query_file_info(filename)
-            return info
-        else:
-            return {}
+
+        # Fill out any missing entries (may happen if backend has no support
+        # or its query_list support is lazy)
+        for filename in filename_list:
+            if filename not in info:
+                info[filename] = {}
+
+        return info
 
     """ use getpass by default, inherited backends may overwrite this behaviour """
     use_getpass = True
