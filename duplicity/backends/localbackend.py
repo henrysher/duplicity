@@ -57,7 +57,7 @@ class LocalBackend(duplicity.backend.Backend):
                 code = log.ErrorCode.backend_no_space
         extra = ' '.join([util.escape(x) for x in [file1, file2] if x])
         extra = ' '.join([op, extra])
-        if op != 'delete':
+        if op != 'delete' and op != 'query':
             log.FatalError(str(e), code, extra)
         else:
             log.Warn(str(e), code, extra)
@@ -110,5 +110,17 @@ class LocalBackend(duplicity.backend.Backend):
             except Exception, e:
                 self.handle_error(e, 'delete', self.remote_pathdir.append(filename).name)
 
+    def _query_file_info(self, filename):
+        """Query attributes on filename"""
+        try:
+            target_file = self.remote_pathdir.append(filename)
+            if not os.path.exists(target_file.name):
+                return {'size': -1}
+            target_file.setdata()
+            size = target_file.getsize()
+            return {'size': size}
+        except Exception, e:
+            self.handle_error(e, 'query', target_file.name)
+            return {'size': None}
 
 duplicity.backend.register_backend("file", LocalBackend)

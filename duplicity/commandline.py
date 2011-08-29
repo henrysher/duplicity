@@ -292,6 +292,10 @@ def parse_cmdline_options(arglist):
     parser.add_option("--fail-on-volume", type="int",
                       help=optparse.SUPPRESS_HELP)
 
+    # used in testing only - skips upload for a given volume
+    parser.add_option("--skip-volume", type="int",
+                      help=optparse.SUPPRESS_HELP)
+
     # If set, restore only the subdirectory or file specified, not the
     # whole root.
     # TRANSL: Used in usage help to represent a Unix-style path name. Example:

@@ -10,6 +10,7 @@ Bugs closed in this release:
 Merges:
 lp:~ed.so/duplicity/reuse-passphrase-for-signing-fix
 lp:~mterry/duplicity/cloudfiles-10k
+lp:~duplicity-team/duplicity/check-volumes
 
 
 New in v0.6.15 (2011/08/19)

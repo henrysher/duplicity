@@ -26,6 +26,7 @@ from duplicity import globals
 from duplicity import log
 from duplicity.errors import * #@UnusedWildImport
 from duplicity.util import exception_traceback
+from duplicity.backend import retry
 
 class BotoBackend(duplicity.backend.Backend):
     """
@@ -293,6 +294,24 @@ class BotoBackend(duplicity.backend.Backend):
         for filename in filename_list:
             self.bucket.delete_key(self.key_prefix + filename)
             log.Debug("Deleted %s/%s" % (self.straight_url, filename))
+
+    @retry
+    def _query_file_info(self, filename, raise_errors=False):
+        try:
+            key = self.bucket.lookup(self.key_prefix + filename)
+            if key is None:
+                return {'size': -1}
+            return {'size': key.size}
+        except Exception, e:
+            log.Warn("Query %s/%s failed: %s"
+                     "" % (self.straight_url,
+                           filename,
+                           str(e)))
+            self.resetConnection()
+            if raise_errors:
+                raise e
+            else:
+                return {'size': None}
 
 duplicity.backend.register_backend("s3", BotoBackend)
 duplicity.backend.register_backend("s3+http", BotoBackend)

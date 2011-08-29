@@ -26,6 +26,7 @@ from duplicity import globals
 from duplicity import log
 from duplicity.errors import * #@UnusedWildImport
 from duplicity.util import exception_traceback
+from duplicity.backend import retry
 
 class CloudFilesBackend(duplicity.backend.Backend):
     """
@@ -145,5 +146,23 @@ class CloudFilesBackend(duplicity.backend.Backend):
         for file in filename_list:
             self.container.delete_object(file)
             log.Debug("Deleted '%s/%s'" % (self.container, file))
+
+    @retry
+    def _query_file_info(self, filename, raise_errors=False):
+        from cloudfiles.errors import NoSuchObject
+        try:
+            sobject = self.container.get_object(filename)
+            return {'size': sobject.size}
+        except NoSuchObject:
+            return {'size': -1}
+        except Exception, e:
+            log.Warn("Error querying '%s/%s': %s"
+                     "" % (self.container,
+                           filename,
+                           str(e)))
+            if raise_errors:
+                raise e
+            else:
+                return {'size': None}
 
 duplicity.backend.register_backend("cf+http", CloudFilesBackend)

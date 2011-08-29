@@ -164,3 +164,20 @@ class GIOBackend(duplicity.backend.Backend):
                 self.handle_error(raise_errors, e, 'delete',
                                   target_file.get_parse_name())
                 return
+
+    @retry
+    def _query_file_info(self, filename, raise_errors=False):
+        """Query attributes on filename"""
+        target_file = self.remote_file.get_child(filename)
+        attrs = gio.FILE_ATTRIBUTE_STANDARD_SIZE
+        try:
+            info = target_file.query_info(attrs, gio.FILE_QUERY_INFO_NONE)
+            return {'size': info.get_size()}
+        except Exception, e:
+            if isinstance(e, gio.Error):
+                if e.code == gio.ERROR_NOT_FOUND:
+                    return {'size': -1} # early exit, no need to retry
+            if raise_errors:
+                raise e
+            else:
+                return {'size': None}

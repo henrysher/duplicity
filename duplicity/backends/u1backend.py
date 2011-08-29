@@ -98,17 +98,15 @@ class U1Backend(duplicity.backend.Backend):
         import urllib
         return urllib.quote(url, safe="/~")
 
-    def handle_error(self, raise_error, op, headers, file1=None, file2=None, ignore=None):
+    def parse_error(self, headers, ignore=None):
         from duplicity import log
-        from duplicity import util
-        import json
 
         status = int(headers[0].get('status'))
         if status >= 200 and status < 300:
-            return
+            return None
 
         if ignore and status in ignore:
-            return
+            return None
 
         if status == 400:
             code = log.ErrorCode.backend_permission_denied
@@ -118,6 +116,18 @@ class U1Backend(duplicity.backend.Backend):
             code = log.ErrorCode.backend_no_space
         else:
             code = log.ErrorCode.backend_error
+        return code
+
+    def handle_error(self, raise_error, op, headers, file1=None, file2=None, ignore=None):
+        from duplicity import log
+        from duplicity import util
+        import json
+
+        code = self.parse_error(headers, ignore)
+        if code is None:
+            return
+
+        status = int(headers[0].get('status'))
 
         if file1:
             file1 = file1.encode("utf8")
@@ -221,6 +231,28 @@ class U1Backend(duplicity.backend.Backend):
             remote_full = self.meta_base + self.quote(filename)
     	    answer = auth.request(remote_full, http_method="DELETE")
             self.handle_error(raise_errors, 'delete', answer, remote_full, ignore=[404])
+
+    @retry
+    def _query_file_info(self, filename, raise_errors=False):
+        """Query attributes on filename"""
+        import json
+        import ubuntuone.couch.auth as auth
+        from duplicity import log
+        remote_full = self.meta_base + self.quote(filename)
+        answer = auth.request(remote_full)
+
+        code = self.parse_error(answer)
+        if code is not None:
+            if code == log.ErrorCode.backend_not_found:
+                return {'size': -1}
+            elif raise_errors:
+                self.handle_error(raise_errors, 'query', answer, remote_full, filename)
+            else:
+                return {'size': None}
+
+        node = json.loads(answer[1])
+        size = node.get('size')
+        return {'size': size}
 
 duplicity.backend.register_backend("u1", U1Backend)
 duplicity.backend.register_backend("u1+http", U1Backend)
