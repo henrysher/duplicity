@@ -165,7 +165,6 @@ class GIOBackend(duplicity.backend.Backend):
                                   target_file.get_parse_name())
                 return
 
-    # Should never cause FatalError
     @retry
     def _query_file_info(self, filename, raise_errors=False):
         """Query attributes on filename"""
@@ -181,4 +180,4 @@ class GIOBackend(duplicity.backend.Backend):
             if raise_errors:
                 raise e
             else:
-                return {}
+                return {'size': None}

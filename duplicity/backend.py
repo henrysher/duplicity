@@ -361,6 +361,11 @@ class Backend:
         """
         raise NotImplementedError()
 
+    # Should never cause FatalError.
+    # Returns a dictionary that may return:
+    # * size: if >= 0, size of file
+    #         if -1, file is not found
+    #         if None, error querying file
     def query_info(self, filename_list, raise_errors=True):
         """
         Return metadata about each filename in filename_list

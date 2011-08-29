@@ -110,7 +110,6 @@ class LocalBackend(duplicity.backend.Backend):
             except Exception, e:
                 self.handle_error(e, 'delete', self.remote_pathdir.append(filename).name)
 
-    # Should never cause FatalError
     def _query_file_info(self, filename):
         """Query attributes on filename"""
         try:
@@ -122,6 +121,6 @@ class LocalBackend(duplicity.backend.Backend):
             return {'size': size}
         except Exception, e:
             self.handle_error(e, 'query', target_file.name)
-            return {}
+            return {'size': None}
 
 duplicity.backend.register_backend("file", LocalBackend)

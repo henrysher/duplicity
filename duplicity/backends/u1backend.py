@@ -232,7 +232,6 @@ class U1Backend(duplicity.backend.Backend):
     	    answer = auth.request(remote_full, http_method="DELETE")
             self.handle_error(raise_errors, 'delete', answer, remote_full, ignore=[404])
 
-    # Should never cause FatalError
     @retry
     def _query_file_info(self, filename, raise_errors=False):
         """Query attributes on filename"""
@@ -249,14 +248,11 @@ class U1Backend(duplicity.backend.Backend):
             elif raise_errors:
                 self.handle_error(raise_errors, 'query', answer, remote_full, filename)
             else:
-                return {}
+                return {'size': None}
 
         node = json.loads(answer[1])
         size = node.get('size')
-        if size is None:
-            return {}
-        else:
-            return {'size': size}
+        return {'size': size}
 
 duplicity.backend.register_backend("u1", U1Backend)
 duplicity.backend.register_backend("u1+http", U1Backend)
