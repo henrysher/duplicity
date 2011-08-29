@@ -119,7 +119,13 @@ class CloudFilesBackend(duplicity.backend.Backend):
         for n in range(1, globals.num_retries+1):
             log.Info("Listing '%s'" % (self.container))
             try:
-                keys = self.container.list_objects()
+                # Cloud Files will return a max of 10,000 objects.  We have
+                # to make multiple requests to get them all.
+                objs = self.container.list_objects()
+                keys = objs
+                while len(objs) == 10000:
+                    objs = self.container.list_objects(marker=keys[-1])
+                    keys += objs
                 return keys
             except self.resp_exc, resperr:
                 log.Warn("Listing of '%s' failed (attempt %s): CloudFiles returned: %s %s"

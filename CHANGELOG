@@ -5,9 +5,11 @@ Enhancements:
   verification prompt anymore, symmetric passphrases are still verified
 
 Bugs closed in this release:
+832149: Uploads to Rackspace fail silently
 
 Merges:
 lp:~ed.so/duplicity/reuse-passphrase-for-signing-fix
+lp:~mterry/duplicity/cloudfiles-10k
 
 
 New in v0.6.15 (2011/08/19)
