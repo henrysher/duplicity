@@ -131,25 +131,37 @@ class GPGFile:
                 cmdlist.append('--symmetric')
                 # use integrity protection
                 gnupg.options.extra_args.append('--force-mdc')
-            p1 = gnupg.run(cmdlist, create_fhs=['stdin', 'passphrase'],
+            # Skip the passphrase if using the agent
+            if globals.use_agent:
+                gnupg_fhs = ['stdin',]
+            else:
+                gnupg_fhs = ['stdin','passphrase']
+            p1 = gnupg.run(cmdlist, create_fhs=gnupg_fhs,
                            attach_fhs={'stdout': encrypt_path.open("wb"),
                                        'stderr': self.stderr_fp,
                                        'logger': self.logger_fp})
-            p1.handles['passphrase'].write(passphrase)
-            p1.handles['passphrase'].close()
+            if not(globals.use_agent):
+                p1.handles['passphrase'].write(passphrase)
+                p1.handles['passphrase'].close()
             self.gpg_input = p1.handles['stdin']
         else:
             if profile.recipients and profile.encrypt_secring:
                 cmdlist.append('--secret-keyring')
                 cmdlist.append(profile.encrypt_secring)
             self.status_fp = tempfile.TemporaryFile()
-            p1 = gnupg.run(['--decrypt'], create_fhs=['stdout', 'passphrase'],
+            # Skip the passphrase if using the agent
+            if globals.use_agent:
+                gnupg_fhs = ['stdout',]
+            else:
+                gnupg_fhs = ['stdout','passphrase']
+            p1 = gnupg.run(['--decrypt'], create_fhs=gnupg_fhs,
                            attach_fhs={'stdin': encrypt_path.open("rb"),
                                        'status': self.status_fp,
                                        'stderr': self.stderr_fp,
                                        'logger': self.logger_fp})
-            p1.handles['passphrase'].write(passphrase)
-            p1.handles['passphrase'].close()
+            if not(globals.use_agent):
+                p1.handles['passphrase'].write(passphrase)
+                p1.handles['passphrase'].close()
             self.gpg_output = p1.handles['stdout']
         self.gpg_process = p1
         self.encrypt = encrypt
