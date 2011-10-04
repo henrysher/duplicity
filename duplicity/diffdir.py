@@ -121,7 +121,7 @@ def get_delta_path(new_path, sig_path, sigTarFile = None):
         ti.name = "signature/" + "/".join(index)
         sigTarFile.addfile(ti, cStringIO.StringIO(sig_string))
 
-    if new_path.isreg() and sig_path and sig_path.difftype == "signature":
+    if new_path.isreg() and sig_path and sig_path.isreg() and sig_path.difftype == "signature":
         delta_path.difftype = "diff"
         old_sigfp = sig_path.open("rb")
         newfp = FileWithReadCounter(new_path.open("rb"))
