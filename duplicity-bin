@@ -269,15 +269,15 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
             end_block -= 1
         return start_index, start_block, end_index, end_block
 
-    def validate_block(tdp, dest_filename):
+    def validate_block(orig_size, dest_filename):
         info = backend.query_info([dest_filename])[dest_filename]
         if 'size' not in info:
             return # backend didn't know how to query size
         size = info['size']
         if size is None:
             return # error querying file
-        if size != tdp.getsize():
-            code_extra = "%s %d %d" % (util.escape(dest_filename), tdp.getsize(), size)
+        if size != orig_size:
+            code_extra = "%s %d %d" % (util.escape(dest_filename), orig_size, size)
             log.FatalError(_("File %s was corrupted during upload.") % dest_filename,
                            log.ErrorCode.volume_wrong_size, code_extra)
 
@@ -290,7 +290,7 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
         putsize = tdp.getsize()
         if globals.skip_volume != vol_num: # for testing purposes only
             backend.put(tdp, dest_filename)
-        validate_block(tdp, dest_filename)
+        validate_block(putsize, dest_filename)
         if tdp.stat:
             tdp.delete()
         return putsize
