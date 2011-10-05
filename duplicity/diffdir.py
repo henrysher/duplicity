@@ -29,6 +29,7 @@ the second, the ROPath iterator is put into tar block form.
 
 import cStringIO, types
 from duplicity import statistics
+from duplicity import util
 from duplicity.path import * #@UnusedWildImport
 from duplicity.lazy import * #@UnusedWildImport
 
@@ -181,7 +182,7 @@ def get_delta_iter(new_iter, sig_iter, sig_fileobj=None):
     """
     collated = collate2iters(new_iter, sig_iter)
     if sig_fileobj:
-        sigTarFile = tarfile.TarFile("arbitrary", "w", sig_fileobj)
+        sigTarFile = util.make_tarfile("w", sig_fileobj)
     else:
         sigTarFile = None
     for new_path, sig_path in collated:
@@ -224,16 +225,17 @@ def sigtar2path_iter(sigtarobj):
     """
     Convert signature tar file object open for reading into path iter
     """
-    tf = tarfile.TarFile("Arbitrary Name", "r", sigtarobj)
-    tf.debug = 2
+    tf = util.make_tarfile("r", sigtarobj)
+    tf.debug = 1
     for tarinfo in tf:
+        tiname = util.get_tarinfo_name(tarinfo)
         for prefix in ["signature/", "snapshot/", "deleted/"]:
-            if tarinfo.name.startswith(prefix):
-                # strip prefix and from name and set it to difftype
-                name, difftype = tarinfo.name[len(prefix):], prefix[:-1]
+            if tiname.startswith(prefix):
+                # strip prefix and '/' from name and set it to difftype
+                name, difftype = tiname[len(prefix):], prefix[:-1]
                 break
         else:
-            raise DiffDirException("Bad tarinfo name %s" % (tarinfo.name,))
+            raise DiffDirException("Bad tarinfo name %s" % (tiname,))
 
         index = tuple(name.split("/"))
         if not index[-1]:
@@ -464,16 +466,12 @@ class TarBlockIter:
         self.remember_value = None          # holds index of next block
         self.remember_block = None          # holds block of next block
 
-        # We need to instantiate a dummy TarFile just to get access to
-        # some of the functions like _get_full_headers.
-        self.tf = tarfile.TarFromIterator(None)
-
     def tarinfo2tarblock(self, index, tarinfo, file_data = ""):
         """
         Make tarblock out of tarinfo and file data
         """
         tarinfo.size = len(file_data)
-        headers = self.tf._get_full_headers(tarinfo)
+        headers = tarinfo.tobuf()
         blocks, remainder = divmod(tarinfo.size, tarfile.BLOCKSIZE) #@UnusedVariable
         if remainder > 0:
             filler_data = "\0" * (tarfile.BLOCKSIZE - remainder)

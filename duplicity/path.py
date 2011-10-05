@@ -26,12 +26,12 @@ associates stat information with filenames
 
 """
 
-import stat, errno, socket, time, re, gzip
+import stat, errno, socket, time, re, gzip, pwd, grp
 
+from duplicity import tarfile
 from duplicity import file_naming
 from duplicity import globals
 from duplicity import gpg
-from duplicity import tarfile
 from duplicity import util
 from duplicity import librsync
 from duplicity import log #@UnusedImport
@@ -206,13 +206,13 @@ class ROPath:
         try:
             if globals.numeric_owner:
                 raise KeyError
-            self.stat.st_uid = tarfile.uname2uid(tarinfo.uname)
+            self.stat.st_uid = pwd.getpwnam(tarinfo.uname)[2]
         except KeyError:
             self.stat.st_uid = tarinfo.uid
         try:
             if globals.numeric_owner:
                 raise KeyError
-            self.stat.st_gid = tarfile.gname2gid(tarinfo.gname)
+            self.stat.st_gid = grp.getgrnam(tarinfo.gname)[2]
         except KeyError:
             self.stat.st_gid = tarinfo.gid
 
@@ -284,13 +284,13 @@ class ROPath:
                 ti.mtime = int(self.stat.st_mtime)
 
             try:
-                ti.uname = tarfile.uid2uname(ti.uid)
+                ti.uname = pwd.getpwuid(ti.uid)[0]
             except KeyError:
-                pass
+                ti.uname = ''
             try:
-                ti.gname = tarfile.gid2gname(ti.gid)
+                ti.gname = grp.getgrgid(ti.gid)[0]
             except KeyError:
-                pass
+                ti.gname = ''
 
             if ti.type in (tarfile.CHRTYPE, tarfile.BLKTYPE):
                 if hasattr(os, "major") and hasattr(os, "minor"):

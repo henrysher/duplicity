@@ -28,6 +28,8 @@ import sys
 import string
 import traceback
 
+from duplicity import tarfile
+
 import duplicity.globals as globals
 import duplicity.log as log
 
@@ -68,6 +70,31 @@ def maybe_ignore_errors(fn):
             return None
         else:
             raise
+
+class FakeTarFile:
+    debug = 0
+    def __iter__(self):
+        return iter([])
+    def close(self):
+        pass
+
+def make_tarfile(mode, fp):
+    # We often use 'empty' tarfiles for signatures that haven't been filled out
+    # yet.  So we want to ignore ReadError exceptions, which are used to signal
+    # this.
+    try:
+        return tarfile.TarFile("arbitrary", mode, fp)
+    except tarfile.ReadError:
+        return FakeTarFile()
+
+def get_tarinfo_name(ti):
+    # Python versions before 2.6 ensure that directories end with /, but 2.6
+    # and later ensure they they *don't* have /.  ::shrug::  Internally, we
+    # continue to use pre-2.6 method.
+    if ti.isdir() and not ti.name.endswith("/"):
+        return ti.name + "/"
+    else:
+        return ti.name
 
 def ignore_missing(fn, filename):
     """

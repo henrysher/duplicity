@@ -26,6 +26,7 @@ sys.path.insert(0, "../")
 from duplicity.path import * #@UnusedWildImport
 from duplicity import diffdir
 from duplicity import selection
+from duplicity import util
 from duplicity import tarfile #@Reimport
 
 config.setup()
@@ -133,8 +134,9 @@ class DDTest(unittest.TestCase):
                          "snapshot/file_to_directory/"]
         for tarinfo in tarfile.TarFile("testfiles/output/dir1dir2.difftar",
                                        "r"):
-            if tarinfo.name in changed_files:
-                changed_files.remove(tarinfo.name)
+            tiname = util.get_tarinfo_name(tarinfo)
+            if tiname in changed_files:
+                changed_files.remove(tiname)
         assert not changed_files, ("Following files not found:\n"
                                    + "\n".join(changed_files))
 
