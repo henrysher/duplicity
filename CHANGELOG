@@ -10,6 +10,7 @@ Bugs closed in this release:
 485219     Fixed fields are not fixed, leading to buffer overflows...
 690549     uid and guid setting adversely affects integrity
 838264     Duplicity thinks partial encrypted backups are not encrypted
+835892     duplicity crash: "AssertionError: rb None None"
 
 Merges:
 lp:~ed.so/duplicity/reuse-passphrase-for-signing-fix
@@ -19,6 +20,7 @@ lp:~mterry/duplicity/tarfile
 lp:~mterry/duplicity/partial-encryption
 lp:~mterry/duplicity/fix-local-backend-validation
 lp:~ross-ross-williams/duplicity/gpg-agent-fix
+lp:~mterry/duplicity/rbNoneNone
 
 
 New in v0.6.15 (2011/08/19)
