@@ -85,6 +85,11 @@ class BackupSet:
             if (pr.start_time != self.start_time or
                 pr.end_time != self.end_time):
                 return False
+            if pr.encrypted != self.encrypted:
+                if self.partial and pr.encrypted:
+                    self.encrypted = pr.encrypted
+                else:
+                    return False
 
         if pr.manifest:
             self.set_manifest(filename)

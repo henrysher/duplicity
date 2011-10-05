@@ -9,12 +9,14 @@ Bugs closed in this release:
 832149     Uploads to Rackspace fail silently
 485219     Fixed fields are not fixed, leading to buffer overflows...
 690549     uid and guid setting adversely affects integrity
+838264     Duplicity thinks partial encrypted backups are not encrypted
 
 Merges:
 lp:~ed.so/duplicity/reuse-passphrase-for-signing-fix
 lp:~mterry/duplicity/cloudfiles-10k
 lp:~duplicity-team/duplicity/check-volumes
 lp:~mterry/duplicity/tarfile
+lp:~mterry/duplicity/partial-encryption
 
 
 New in v0.6.15 (2011/08/19)
