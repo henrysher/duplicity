@@ -18,6 +18,7 @@ lp:~duplicity-team/duplicity/check-volumes
 lp:~mterry/duplicity/tarfile
 lp:~mterry/duplicity/partial-encryption
 lp:~mterry/duplicity/fix-local-backend-validation
+lp:~ross-ross-williams/duplicity/gpg-agent-fix
 
 
 New in v0.6.15 (2011/08/19)
