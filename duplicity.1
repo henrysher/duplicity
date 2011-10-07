@@ -628,6 +628,9 @@ should be an 8 character hex string, like AA0E73D2.
 Should be specified only once because currently only 
 .B one
 signing key is supported. Last entry overrides all other entries.
+.br
+see also
+.BI "A NOTE ON SYMMETRIC ENCRYPTION AND SIGNING"
 
 .TP
 .B --ssh-askpass
@@ -688,12 +691,18 @@ network operations.  The default is 30 seconds.
 .BI --use-agent
 If this option is specified, then
 .I --use-agent
-is passed to the GnuPG
-encryption process and it will turn off any passphrase interaction with
-the user with respect to
+is passed to the GnuPG encryption process and it will try to connect to
+.B gpg-agent
+before it asks for a passphrase for
 .I --encrypt-key
 or
-.I --sign-key.
+.I --sign-key
+if needed.
+.br
+.B Note:
+GnuPG 2 and newer ignore this option and will always use a running
+.B gpg-agent
+if no passphrase was delivered.
 
 .TP
 .BI --use-scp
@@ -710,25 +719,22 @@ for list and delete operations, and
 for put and get operations
 
 .TP
-.BI -v verb ", --verbosity " verb
-Specify verbosity level (0 is total silent, 4 is the default, and 9 is
-noisiest).  Verbosity may also be one of: character
-.I ewnid,
-or word
-.I error,
-.I warning,
-.I notice,
-.I info,
-.I debug.
-The default is 4 (Notice).  The options
-.I -v4,
-.I -vn,
-and
-.I -vnotice
-are functionally equivalent, as are  the mixed/upper-case versions,
-.I -vN,
-.I -vNotice, and
-.I -vNOTICE.
+.BI "--verbosity " level ", -v" level
+Specify output verbosity level (log level).
+Named levels and corresponding values are
+0 Error, 2 Warning, 4 Notice (default), 8 Info, 9 Debug (noisiest).
+.br
+.I level
+may also be
+.br
+.B a character:
+e, w, n, i, d
+.br
+.B a word:
+error, warning, notice, info, debug
+
+The options -v4, -vn and -vnotice are functionally equivalent, as are the mixed/\
+upper-case versions -vN, -vNotice and -vNOTICE.
 
 .TP
 .BI --version
@@ -789,13 +795,14 @@ cf+http://container_name
 .PP
 file:///some_dir
 .PP
-ftp://user[:password]@other.host[:port]/some_dir
+ftp[s]://user[:password]@other.host[:port]/some_dir
 .PP
 hsi://user[:password]@other.host/some_dir
 .PP
-imap://user[:password]@host.com[/from_address_prefix]
-.PP
-imaps://user[:password]@host.com[/from_address_prefix]
+imap[s]://user[:password]@host.com[/from_address_prefix]
+.br
+see also
+.BI "A NOTE ON IMAP"
 .PP
 .BI "using rsync daemon"
 .br
@@ -808,14 +815,20 @@ rsync://user@host.com[:port]/relative_path
 rsync://user@host.com[:port]//absolute_path
 .PP
 s3://host/bucket_name[/prefix]
-.PP
+.br
 s3+http://bucket_name[/prefix]
+.br
+see also
+.BI "A NOTE ON EUROPEAN S3 BUCKETS"
 .PP
 .BI "Ubuntu One"
 .br
 u1://host/volume_path
 .br
 u1+http://volume_path
+.br
+see also
+.BI "A NOTE ON UBUNTU ONE"
 .PP
 .BI "ssh protocols"
 .br
@@ -830,9 +843,7 @@ and
 .PP
 tahoe://alias/directory
 .PP
-webdav://user[:password]@other.host/some_dir
-.PP
-webdavs://user[:password]@other.host/some_dir
+webdav[s]://user[:password]@other.host/some_dir
 .PP
 gdocs://user[:password]@other.host/some_dir
 
@@ -1134,6 +1145,110 @@ matches any files whose full pathnames contain 7 consecutive digits
 which aren't followed by 'foo'.  However, it wouldn't match /home even
 if /home/ben/1234567 existed.
 
+.SH A NOTE ON EUROPEAN S3 BUCKETS
+Amazon S3 provides the ability to choose the location of a bucket upon
+its creation. The purpose is to enable the user to choose a location
+which is better located network topologically relative to the user,
+because it may allow for faster data transfers.
+.PP
+duplicity will create a new bucket the first time a bucket access is
+attempted. At this point, the bucket will be created in Europe if
+.B --s3-european-buckets
+was given. For reasons having to do with how the Amazon S3 service
+works, this also requires the use of the
+.B --s3-use-new-style
+option. This option turns on subdomain based bucket addressing in
+S3. The details are beyond the scope of this man page, but it is
+important to know that your bucket must not contain upper case letters
+or any other characters that are not valid parts of a
+hostname. Consequently, for reasons of backwards compatibility, use of
+subdomain based bucket addressing is not enabled by default.
+.PP
+Note that you will need to use
+.B --s3-use-new-style
+for all operations on European buckets; not just upon initial
+creation.
+.PP
+You only need to use
+.B --s3-european-buckets
+upon initial creation, but you may may use it at all times for
+consistency.
+.PP
+Further note that when creating a new European bucket, it can take a
+while before the bucket is fully accessible. At the time of this
+writing it is unclear to what extent this is an expected feature of
+Amazon S3, but in practice you may experience timeouts, socket errors
+or HTTP errors when trying to upload files to your newly created
+bucket. Give it a few minutes and the bucket should function normally.
+
+.SH A NOTE ON IMAP
+An IMAP account can be used as a target for the upload.  The userid may
+be specified and the password will be requested.
+.PP
+The
+.B from_address_prefix
+may be specified (and probably should be). The text will be used as
+the "From" address in the IMAP server.  Then on a restore (or list) command
+the
+.B from_address_prefix
+will distinguish between different backups.
+
+.SH A NOTE ON SSH/SCP PROTOCOLS
+Duplicity specifies two protocol names for the same protocol.  This is
+a known and user-confusing issue.  Both use the same protocol suite, namely
+.I ssh
+through its' utility routines
+.I scp
+and
+.I sftp.
+Older versions
+of duplicity used
+.I scp
+for get and put operations and
+.I sftp
+for list and
+delete operations.  The current version uses
+.I sftp
+for all four supported
+operations, unless the
+.I --use-scp
+option is used to revert to old behavior.  The change was made to
+all-sftp in order to allow the remote system to chroot the backup,
+thus providing better security.
+
+.SH A NOTE ON UBUNTU ONE
+Connecting to Ubuntu One requires that you be running duplicity inside of an X
+session so that you can be prompted for your credentials if necessary by the
+Ubuntu One session daemon.
+.PP
+See https://one.ubuntu.com/ for more information about Ubuntu One.
+
+.SH A NOTE ON SYMMETRIC ENCRYPTION AND SIGNING
+Signing and symmetrically encrypt at the same time with the gpg binary on the
+command line, as used within duplicity, is a specifically challenging issue.
+Tests showed that the following combinations proved working.
+.PP
+1. Setup gpg-agent properly. Use the option
+.BI --use-agent
+and enter both passphrases (symmetric and sign key) in the gpg-agent's dialog.
+.PP
+2. Use a
+.BI PASSPHRASE
+for symmetric encryption of your choice but the signing key has an 
+.B empty
+passphrase.
+.PP
+3. The used
+.BI PASSPHRASE
+for symmetric encryption and the passphrase of the signing key are identical.
+
+.SH KNOWN ISSUES / BUGS
+Hard links currently unsupported (they will be treated as non-linked
+regular files).
+
+Bad signatures will be treated as empty instead of logging appropriate
+error message.
+
 .SH OPERATION AND DATA FORMATS
 This section describes duplicity's basic operation and the format of
 its data files.  It should not necessary to read this section to use
@@ -1193,104 +1308,6 @@ The remote signatures will be encrypted if encryption is enabled.
 The local signatures will not be encrypted and stored in the archive dir (see
 .B "--archive-dir"
 ).
-
-.SH EUROPEAN S3 BUCKETS
-Amazon S3 provides the ability to choose the location of a bucket upon
-its creation. The purpose is to enable the user to choose a location
-which is better located network topologically relative to the user,
-because it may allow for faster data transfers.
-.PP
-duplicity will create a new bucket the first time a bucket access is
-attempted. At this point, the bucket will be created in Europe if
-.B --s3-european-buckets
-was given. For reasons having to do with how the Amazon S3 service
-works, this also requires the use of the
-.B --s3-use-new-style
-option. This option turns on subdomain based bucket addressing in
-S3. The details are beyond the scope of this man page, but it is
-important to know that your bucket must not contain upper case letters
-or any other characters that are not valid parts of a
-hostname. Consequently, for reasons of backwards compatibility, use of
-subdomain based bucket addressing is not enabled by default.
-.PP
-Note that you will need to use
-.B --s3-use-new-style
-for all operations on European buckets; not just upon initial
-creation.
-.PP
-You only need to use
-.B --s3-european-buckets
-upon initial creation, but you may may use it at all times for
-consistency.
-.PP
-Further note that when creating a new European bucket, it can take a
-while before the bucket is fully accessible. At the time of this
-writing it is unclear to what extent this is an expected feature of
-Amazon S3, but in practice you may experience timeouts, socket errors
-or HTTP errors when trying to upload files to your newly created
-bucket. Give it a few minutes and the bucket should function normally.
-
-.SH UBUNTU ONE
-Connecting to Ubuntu One requires that you be running duplicity inside of an X
-session so that you can be prompted for your credentials if necessary by the
-Ubuntu One session daemon.
-.PP
-See https://one.ubuntu.com/ for more information about Ubuntu One.
-.PP
-
-.SH IMAP
-An IMAP account can be used as a target for the upload.  The userid may
-be specified and the password will be requested.
-.PP
-The
-.B from_address_prefix
-may be specified (and probably should be). The text will be used as
-the "From" address in the IMAP server.  Then on a restore (or list) command
-the
-.B from_address_prefix
-will distinguish between different backups.
-.PP
-
-.SH A NOTE ON SSH/SCP PROTOCOLS
-Duplicity specifies two protocol names for the same protocol.  This is
-a known and user-confusing issue.  Both use the same protocol suite, namely
-.I ssh
-through its' utility routines
-.I scp
-and
-.I sftp.
-Older versions
-of duplicity used
-.I scp
-for get and put operations and
-.I sftp
-for list and
-delete operations.  The current version uses
-.I sftp
-for all four supported
-operations, unless the
-.I --use-scp
-option is used to revert to old behavior.  The change was made to
-all-sftp in order to allow the remote system to chroot the backup,
-thus providing better security.
-
-.SH BUGS
-Hard links currently unsupported (they will be treated as non-linked
-regular files).
-
-Bad signatures will be treated as empty instead of logging appropriate
-error message.
-
-If symmetric encryption is used and the signing key is passphrase-protected, the
-encryption passphrase must equal the passphrase of the signing key. This
-limitation can be circumvented by using
-.B gpg-agent
-for storing the passphrase of the signing key and the
-.B PASSPHRASE
-environment variable for the encryption key or by enabling asymmetric
-encryption using the 
-.B --encrypt-key
-option.
 
 .SH AUTHOR
 Original Author - Ben Escoto <bescoto@stanford.edu>
