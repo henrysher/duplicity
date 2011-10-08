@@ -181,11 +181,7 @@ class FileobjHooked:
             gpg.GPGWriteFile(src_iter, tgt.name, globals.gpg_profile, size = sys.maxint)
         else:
             os.system("cp -p \"%s\" \"%s\"" % (src.name, tgt.name))
-        globals.backend.put(tgt) #@UndefinedVariable
-        try:
-            util.ignore_missing(os.unlink, tgt.name)
-        except Exception, e:
-            log.Warn(_("Unable to delete %s: %s" % (tgt.name, str(e))))
+        globals.backend.move(tgt) #@UndefinedVariable
 
     def to_final(self):
         """

@@ -332,6 +332,10 @@ class Backend:
       - list
       - delete
       - close (if needed)
+
+    Optional:
+
+      - move
     """
     def __init__(self, parsed_url):
         self.parsed_url = parsed_url
@@ -344,6 +348,16 @@ class Backend:
         path component of pathname.
         """
         raise NotImplementedError()
+
+    def move(self, source_path, remote_filename = None):
+        """
+        Move source_path (Path object) to remote_filename (string)
+
+        Same as put(), but unlinks source_path in the process.  This allows the
+        local backend to do this more efficiently using rename.
+        """
+        self.put(source_path, remote_filename)
+        source_path.delete()
 
     def get(self, remote_filename, local_path):
         """Retrieve remote_filename and place in local_path"""

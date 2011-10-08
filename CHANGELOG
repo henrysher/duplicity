@@ -6,11 +6,12 @@ Enhancements:
   still verified
 
 Bugs closed in this release:
-832149     Uploads to Rackspace fail silently
 485219     Fixed fields are not fixed, leading to buffer overflows...
 690549     uid and guid setting adversely affects integrity
-838264     Duplicity thinks partial encrypted backups are not encrypted
+739438     Local backend should always try renaming instead of copying
+832149     Uploads to Rackspace fail silently
 835892     duplicity crash: "AssertionError: rb None None"
+838264     Duplicity thinks partial encrypted backups are not encrypted
 
 Merges:
 lp:~ed.so/duplicity/reuse-passphrase-for-signing-fix
