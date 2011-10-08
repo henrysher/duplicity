@@ -19,7 +19,11 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
+import os
 import time
+import multiprocessing
+
+from filechunkio import FileChunkIO
 
 import duplicity.backend
 from duplicity import globals
@@ -27,6 +31,90 @@ from duplicity import log
 from duplicity.errors import * #@UnusedWildImport
 from duplicity.util import exception_traceback
 from duplicity.backend import retry
+
+
+def get_connection(scheme, url):
+    try:
+        from boto.s3.connection import S3Connection
+        assert hasattr(S3Connection, 'lookup')
+
+        # Newer versions of boto default to using
+        # virtual hosting for buckets as a result of
+        # upstream deprecation of the old-style access
+        # method by Amazon S3. This change is not
+        # backwards compatible (in particular with
+        # respect to upper case characters in bucket
+        # names); so we default to forcing use of the
+        # old-style method unless the user has
+        # explicitly asked us to use new-style bucket
+        # access.
+        #
+        # Note that if the user wants to use new-style
+        # buckets, we use the subdomain calling form
+        # rather than given the option of both
+        # subdomain and vhost. The reason being that
+        # anything addressable as a vhost, is also
+        # addressable as a subdomain. Seeing as the
+        # latter is mostly a convenience method of
+        # allowing browse:able content semi-invisibly
+        # being hosted on S3, the former format makes
+        # a lot more sense for us to use - being
+        # explicit about what is happening (the fact
+        # that we are talking to S3 servers).
+
+        try:
+            from boto.s3.connection import OrdinaryCallingFormat
+            from boto.s3.connection import SubdomainCallingFormat
+            cfs_supported = True
+            calling_format = OrdinaryCallingFormat()
+        except ImportError:
+            cfs_supported = False
+            calling_format = None
+
+        if globals.s3_use_new_style:
+            if cfs_supported:
+                calling_format = SubdomainCallingFormat()
+            else:
+                log.FatalError("Use of new-style (subdomain) S3 bucket addressing was"
+                               "requested, but does not seem to be supported by the "
+                               "boto library. Either you need to upgrade your boto "
+                               "library or duplicity has failed to correctly detect "
+                               "the appropriate support.",
+                               log.ErrorCode.boto_old_style)
+        else:
+            if cfs_supported:
+                calling_format = OrdinaryCallingFormat()
+            else:
+                calling_format = None
+
+    except ImportError:
+        log.FatalError("This backend  (s3) requires boto library, version 0.9d or later, "
+                       "(http://code.google.com/p/boto/).",
+                       log.ErrorCode.boto_lib_too_old)
+    if scheme == 's3+http':
+        # Use the default Amazon S3 host.
+        conn = S3Connection(is_secure=(not globals.s3_unencrypted_connection))
+    else:
+        assert self.scheme == 's3'
+        conn = S3Connection(
+            host=parsed_url.hostname,
+            is_secure=(not globals.s3_unencrypted_connection))
+
+    if hasattr(conn, 'calling_format'):
+        if calling_format is None:
+            log.FatalError("It seems we previously failed to detect support for calling "
+                           "formats in the boto library, yet the support is there. This is "
+                           "almost certainly a duplicity bug.",
+                           log.ErrorCode.boto_calling_format)
+        else:
+            conn.calling_format = calling_format
+
+    else:
+        # Duplicity hangs if boto gets a null bucket name.
+        # HC: Caught a socket error, trying to recover
+        raise BackendException('Boto requires a bucket name.')
+    return conn
+
 
 class BotoBackend(duplicity.backend.Backend):
     """
@@ -44,6 +132,7 @@ class BotoBackend(duplicity.backend.Backend):
         duplicity.backend.Backend.__init__(self, parsed_url)
 
         from boto.s3.key import Key
+        from boto.s3.multipart import MultiPartUpload
 
         # This folds the null prefix and all null parts, which means that:
         #  //MyBucket/ and //MyBucket are equivalent.
@@ -72,89 +161,7 @@ class BotoBackend(duplicity.backend.Backend):
 
     def resetConnection(self):
         self.bucket = None
-        self.conn = None
-
-        try:
-            from boto.s3.connection import S3Connection
-            from boto.s3.key import Key
-            assert hasattr(S3Connection, 'lookup')
-
-            # Newer versions of boto default to using
-            # virtual hosting for buckets as a result of
-            # upstream deprecation of the old-style access
-            # method by Amazon S3. This change is not
-            # backwards compatible (in particular with
-            # respect to upper case characters in bucket
-            # names); so we default to forcing use of the
-            # old-style method unless the user has
-            # explicitly asked us to use new-style bucket
-            # access.
-            #
-            # Note that if the user wants to use new-style
-            # buckets, we use the subdomain calling form
-            # rather than given the option of both
-            # subdomain and vhost. The reason being that
-            # anything addressable as a vhost, is also
-            # addressable as a subdomain. Seeing as the
-            # latter is mostly a convenience method of
-            # allowing browse:able content semi-invisibly
-            # being hosted on S3, the former format makes
-            # a lot more sense for us to use - being
-            # explicit about what is happening (the fact
-            # that we are talking to S3 servers).
-
-            try:
-                from boto.s3.connection import OrdinaryCallingFormat
-                from boto.s3.connection import SubdomainCallingFormat
-                cfs_supported = True
-                calling_format = OrdinaryCallingFormat()
-            except ImportError:
-                cfs_supported = False
-                calling_format = None
-
-            if globals.s3_use_new_style:
-                if cfs_supported:
-                    calling_format = SubdomainCallingFormat()
-                else:
-                    log.FatalError("Use of new-style (subdomain) S3 bucket addressing was"
-                                   "requested, but does not seem to be supported by the "
-                                   "boto library. Either you need to upgrade your boto "
-                                   "library or duplicity has failed to correctly detect "
-                                   "the appropriate support.",
-                                   log.ErrorCode.boto_old_style)
-            else:
-                if cfs_supported:
-                    calling_format = OrdinaryCallingFormat()
-                else:
-                    calling_format = None
-
-        except ImportError:
-            log.FatalError("This backend  (s3) requires boto library, version 0.9d or later, "
-                           "(http://code.google.com/p/boto/).",
-                           log.ErrorCode.boto_lib_too_old)
-        if self.scheme == 's3+http':
-            # Use the default Amazon S3 host.
-            self.conn = S3Connection(is_secure=(not globals.s3_unencrypted_connection))
-        else:
-            assert self.scheme == 's3'
-            self.conn = S3Connection(
-                host=self.parsed_url.hostname,
-                is_secure=(not globals.s3_unencrypted_connection))
-
-        if hasattr(self.conn, 'calling_format'):
-            if calling_format is None:
-                log.FatalError("It seems we previously failed to detect support for calling "
-                               "formats in the boto library, yet the support is there. This is "
-                               "almost certainly a duplicity bug.",
-                               log.ErrorCode.boto_calling_format)
-            else:
-                self.conn.calling_format = calling_format
-
-        else:
-            # Duplicity hangs if boto gets a null bucket name.
-            # HC: Caught a socket error, trying to recover
-            raise BackendException('Boto requires a bucket name.')
-
+        self.conn = get_connection(self.scheme, self.parsed_url)
         self.bucket = self.conn.lookup(self.bucket_name)
 
     def put(self, source_path, remote_filename=None):
@@ -191,8 +198,7 @@ class BotoBackend(duplicity.backend.Backend):
 
         if not remote_filename:
             remote_filename = source_path.get_filename()
-        key = self.key_class(self.bucket)
-        key.key = self.key_prefix + remote_filename
+        key = self.key_prefix + remote_filename
         for n in range(1, globals.num_retries+1):
             if n > 1:
                 # sleep before retry (new connection to a **hopeful** new host, so no need to wait so long)
@@ -204,9 +210,11 @@ class BotoBackend(duplicity.backend.Backend):
                 storage_class = 'STANDARD'
             log.Info("Uploading %s/%s to %s Storage" % (self.straight_url, remote_filename, storage_class))
             try:
-                key.set_contents_from_filename(source_path.name, {'Content-Type': 'application/octet-stream',
-                                                                  'x-amz-storage-class': storage_class})
-                key.close()
+                headers = {
+                    'Content-Type': 'application/octet-stream',
+                    'x-amz-storage-class': storage_class
+                }
+                self.upload(source_path.name, key, headers)
                 self.resetConnection()
                 return
             except Exception, e:
@@ -313,6 +321,88 @@ class BotoBackend(duplicity.backend.Backend):
             else:
                 return {'size': None}
 
+    def upload(self, filename, key, headers=None):
+        chunk_size = globals.s3_multipart_chunk_size
+
+        # Check minimum chunk size for S3
+        if chunk_size < globals.s3_multipart_minimum_chunk_size:
+            log.Warn("Minimum chunk size is %d, but %d specified." % (
+                globals.s3_multipart_minimum_chunk_size, chunk_size))
+            chunk_size = globals.s3_multipart_minimum_chunk_size
+
+        # Decide in how many chunks to upload
+        bytes = os.path.getsize(filename)
+        if bytes < chunk_size:
+            chunks = 1
+        else:
+            chunks = bytes / chunk_size
+            if (bytes % chunk_size):
+                chunks += 1
+
+        log.Debug("Uploading %d bytes in %d chunks" % (bytes, chunks))
+
+        mp = self.bucket.initiate_multipart_upload(key, headers)
+
+        pool = multiprocessing.Pool(processes=chunks)
+        for n in range(chunks):
+            params = {
+                'scheme': self.scheme,
+                'url': self.parsed_url,
+                'bucket_name': self.bucket_name,
+                'multipart_id': mp.id,
+                'filename': filename,
+                'offset': n,
+                'bytes': chunk_size,
+                'num_retries': globals.num_retries,
+            }
+            pool.apply_async(multipart_upload_worker, kwds=params)
+        pool.close()
+        pool.join()
+
+        if len(mp.get_all_parts()) < chunks:
+            mp.cancel_upload()
+            raise BackendException("Multipart upload failed. Aborted.")
+
+        return mp.complete_upload()
+
+
+def multipart_upload_worker(scheme, url, bucket_name, multipart_id, filename,
+                            offset, bytes, num_retries):
+    """
+    Worker method for uploading a file chunk to S3 using multipart upload.
+    Note that the file chunk is read into memory, so it's important to keep
+    this number reasonably small.
+    """
+    import traceback
+
+    def _upload_callback(uploaded, total):
+        worker_name = multiprocessing.current_process().name
+        log.Debug("%s: Uploaded %s/%s bytes" % (worker_name, uploaded, total))
+
+    def _upload(num_retries):
+        worker_name = multiprocessing.current_process().name
+        log.Debug("%s: Uploading chunk %d" % (worker_name, offset + 1))
+        try:
+            conn = get_connection(scheme, url)
+            bucket = conn.lookup(bucket_name)
+
+            for mp in bucket.get_all_multipart_uploads():
+                if mp.id == multipart_id:
+                    with FileChunkIO(filename, 'r', offset=offset, bytes=bytes) as fd:
+                        mp.upload_part_from_file(fd, offset + 1, cb=_upload_callback)
+                    break
+        except Exception, e:
+            traceback.print_exc()
+            if num_retries:
+                log.Debug("%s: Upload of chunk %d failed. Retrying %d more times..." % (
+                    worker_name, offset + 1, num_retries - 1))
+                return _upload(num_retries - 1)
+            log.Debug("%s: Upload of chunk %d failed. Aborting..." % (
+                worker_name, offset + 1))
+            raise e
+        log.Debug("%s: Upload of chunk %d complete" % (worker_name, offset + 1))
+
+    return _upload(num_retries)
+
 duplicity.backend.register_backend("s3", BotoBackend)
 duplicity.backend.register_backend("s3+http", BotoBackend)
-

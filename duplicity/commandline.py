@@ -421,6 +421,12 @@ def parse_cmdline_options(arglist):
     # See <https://bugs.launchpad.net/duplicity/+bug/433970>.
     parser.add_option("--s3-unencrypted-connection", action="store_true")
 
+    # Chunk size used for S3 multipart uploads.The number of parallel uploads to
+    # S3 be given by chunk size / volume size. Use this to maximize the use of
+    # your bandwidth. Defaults to 25MB
+    parser.add_option("--s3-multipart-chunk-size", type="int", action="callback", metavar=_("number"),
+                      callback=lambda o, s, v, p: setattr(p.values, "s3_multipart_chunk_size", v*1024*1024))
+
     # scp command to use
     # TRANSL: noun
     parser.add_option("--scp-command", metavar=_("command"))

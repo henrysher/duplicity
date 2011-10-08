@@ -7,6 +7,7 @@ Enhancements:
 
 Bugs closed in this release:
 485219     Fixed fields are not fixed, leading to buffer overflows...
+676109     Amazon S3 backend multipart upload support
 690549     uid and guid setting adversely affects integrity
 739438     Local backend should always try renaming instead of copying
 832149     Uploads to Rackspace fail silently

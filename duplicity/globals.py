@@ -166,6 +166,14 @@ s3_unencrypted_connection = False
 # Whether to use S3 Reduced Redudancy Storage
 s3_use_rrs = False
 
+# Chunk size used for S3 multipart uploads.The number of parallel uploads to
+# S3 be given by chunk size / volume size. Use this to maximize the use of
+# your bandwidth. Defaults to 25MB
+s3_multipart_chunk_size = 25*1024*1024
+
+# Minimum chunk size accepted by S3
+s3_multipart_minimum_chunk_size = 5*1024*1024
+
 # Whether to use the full email address as the user name when
 # logging into an imap server. If false just the user name
 # part of the email address is used.
