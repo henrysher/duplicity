@@ -12,6 +12,7 @@ Bugs closed in this release:
 739438     Local backend should always try renaming instead of copying
 832149     Uploads to Rackspace fail silently
 835892     duplicity crash: "AssertionError: rb None None"
+838162     Duplicity URL Parser is not parsing IPv6 properly
 838264     Duplicity thinks partial encrypted backups are not encrypted
 
 Merges:

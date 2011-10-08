@@ -109,18 +109,19 @@ class BaseResult(tuple):
     password = property(get_password)
 
     def get_hostname(self):
-        netloc = self.netloc
-        if "@" in netloc:
-            netloc = _rsplit(netloc, "@", 1)[1]
-        if ":" in netloc:
-            netloc = netloc.split(":", 1)[0]
-        return netloc.lower() or None
+        netloc = self.netloc.split('@')[-1]
+        if '[' in netloc and ']' in netloc:
+            return netloc.split(']')[0][1:].lower()
+        elif ':' in netloc:
+            return netloc.split(':')[0].lower()
+        elif netloc == '':
+            return None
+        else:
+            return netloc.lower()
     hostname = property(get_hostname)
 
     def get_port(self):
-        netloc = self.netloc
-        if "@" in netloc:
-            netloc = _rsplit(netloc, "@", 1)[1]
+        netloc = self.netloc.split('@')[-1].split(']')[-1]
         if ":" in netloc:
             port = netloc.split(":", 1)[1]
             return int(port, 10)
