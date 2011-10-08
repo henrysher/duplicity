@@ -1525,10 +1525,10 @@ class TarFile(object):
             if hasattr(fileobj, "mode"):
                 self._mode = fileobj.mode
             self._extfileobj = True
-				if name:
-						self.name = os.path.abspath(name)
-				else:
-						self.name = None
+        if name:
+            self.name = os.path.abspath(name)
+        else:
+            self.name = None
         self.fileobj = fileobj
 
         # Init attributes.
@@ -1931,10 +1931,10 @@ class TarFile(object):
                 print "%d-%02d-%02d %02d:%02d:%02d" \
                       % time.localtime(tarinfo.mtime)[:6],
 
-						if tarinfo.isdir():
-		            print tarinfo.name + "/",
-						else:
-								print tarinfo.name,
+            if tarinfo.isdir():
+                print tarinfo.name + "/",
+            else:
+                print tarinfo.name,
 
             if verbose:
                 if tarinfo.issym():
