@@ -4,6 +4,7 @@ Enhancements:
 - usability enhancement: sign passphrase prompt has no second
   verification prompt anymore, symmetric passphrases are
   still verified
+- Fixed Unicode errors when translations are used.
 
 Bugs closed in this release:
 485219     Fixed fields are not fixed, leading to buffer overflows...
@@ -24,6 +25,7 @@ lp:~mterry/duplicity/partial-encryption
 lp:~mterry/duplicity/fix-local-backend-validation
 lp:~ross-ross-williams/duplicity/gpg-agent-fix
 lp:~mterry/duplicity/rbNoneNone
+lp:~ed.so/duplicity/UnicodeDecodeError
 
 
 New in v0.6.15 (2011/08/19)
