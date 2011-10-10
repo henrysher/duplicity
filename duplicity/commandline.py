@@ -171,9 +171,12 @@ class DupOption(optparse.Option):
 
 """ 
 Fix:
-File "/usr/lib/pythonX.X/optparse.py", line XXXX, in print_help
+    File "/usr/lib/pythonX.X/optparse.py", line XXXX, in print_help
     file.write(self.format_help().encode(encoding, "replace"))
-    UnicodeDecodeError: 'ascii' codec can't decode byte 0xXX in position XXXX: 
+    UnicodeDecodeError: 'ascii' codec can't decode byte 0xXX in position XXXX:
+See:
+    http://bugs.python.org/issue2931
+    http://mail.python.org/pipermail/python-dev/2006-May/065458.html
 """
 class OPHelpFix(optparse.OptionParser):
     def _get_encoding(self, file):
