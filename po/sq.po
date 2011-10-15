@@ -1,16 +1,16 @@
-# Esperanto translation for duplicity
-# Copyright (c) 2009 Rosetta Contributors and Canonical Ltd 2009
+# Albanian translation for duplicity
+# Copyright (c) 2011 Rosetta Contributors and Canonical Ltd 2011
 # This file is distributed under the same license as the duplicity package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2009.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
-"Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-10-10 16:25-0500\n"
-"PO-Revision-Date: 2010-05-23 16:48+0000\n"
-"Last-Translator: Kenneth Loafman <kenneth@loafman.com>\n"
-"Language-Team: Esperanto <eo@li.org>\n"
+"PO-Revision-Date: 2011-08-28 21:31+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Albanian <sq@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -100,7 +100,7 @@ msgstr ""
 #: ../duplicity-bin:630
 #, python-format
 msgid "Processed volume %d of %d"
-msgstr "Traktis la savkopieron %d el %d"
+msgstr ""
 
 #: ../duplicity-bin:655
 #, python-format
@@ -131,15 +131,15 @@ msgstr ""
 #, python-format
 msgid "%d file compared"
 msgid_plural "%d files compared"
-msgstr[0] "Komparis %d dosieron."
-msgstr[1] "Komparis %d dosierojn."
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../duplicity-bin:729
 #, python-format
 msgid "%d difference found"
 msgid_plural "%d differences found"
-msgstr[0] "Trovis %d diferencon."
-msgstr[1] "Trovis %d diferencojn."
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../duplicity-bin:748
 msgid "No extraneous files found, nothing deleted in cleanup."
@@ -154,16 +154,16 @@ msgstr[1] ""
 #: ../duplicity-bin:765
 msgid "Found the following file to delete:"
 msgid_plural "Found the following files to delete:"
-msgstr[0] "Trovis la jenan forigendan dosieron:"
-msgstr[1] "Trovis la jenajn forigendajn dosierojn:"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../duplicity-bin:769
 msgid "Run duplicity again with the --force option to actually delete."
-msgstr "Denove kurigu duplicity kun la opcio --force por vere forigi."
+msgstr ""
 
 #: ../duplicity-bin:808
 msgid "There are backup set(s) at time(s):"
-msgstr "Estas savkopiaro(j) de la horo(j):"
+msgstr ""
 
 #: ../duplicity-bin:810
 msgid "Which can't be deleted because newer sets depend on them."
@@ -182,14 +182,14 @@ msgstr ""
 #: ../duplicity-bin:823
 msgid "Deleting backup set at time:"
 msgid_plural "Deleting backup sets at times:"
-msgstr[0] "Forigas la savkopiaron de la horo:"
-msgstr[1] "Forigas la savkopiarojn de la horoj:"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../duplicity-bin:840
 msgid "Found old backup set at the following time:"
 msgid_plural "Found old backup sets at the following times:"
-msgstr[0] "Trovis malnovan savkopiaron de la jena horo:"
-msgstr[1] "Trovis malnovajn savkopiarojn de la jenaj horoj:"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../duplicity-bin:844
 msgid "Rerun command with --force option to actually delete."
@@ -281,7 +281,7 @@ msgstr ""
 #: ../duplicity-bin:1233
 #, python-format
 msgid "Last %s backup left a partial set, restarting."
-msgstr "La lasta %s konservkopiado lasis nekompletan aron. Rekomencanta."
+msgstr ""
 
 #: ../duplicity-bin:1237
 #, python-format
@@ -433,27 +433,27 @@ msgstr ""
 
 #: ../duplicity/collections.py:400
 msgid "Time:"
-msgstr "Tempo:"
+msgstr "Koha:"
 
 #: ../duplicity/collections.py:400
 msgid "Num volumes:"
-msgstr "Kvanto da savkopiaroj:"
+msgstr ""
 
 #: ../duplicity/collections.py:404
 msgid "Full"
-msgstr "Plena"
+msgstr "I Plotë"
 
 #: ../duplicity/collections.py:407
 msgid "Incremental"
-msgstr "Suplementa"
+msgstr ""
 
 #: ../duplicity/collections.py:467
 msgid "local"
-msgstr ""
+msgstr "lokal"
 
 #: ../duplicity/collections.py:469
 msgid "remote"
-msgstr ""
+msgstr "i largët"
 
 #: ../duplicity/collections.py:622
 msgid "Collection Status"
@@ -616,7 +616,7 @@ msgstr ""
 #: ../duplicity/commandline.py:231
 #, python-format
 msgid "Error opening file %s"
-msgstr ""
+msgstr "Gabim gjatë hapjes së skedarit %s"
 
 #. Used in usage help to represent a Unix-style path name. Example:
 #. --archive-dir <path>
@@ -624,14 +624,14 @@ msgstr ""
 #: ../duplicity/commandline.py:277 ../duplicity/commandline.py:331
 #: ../duplicity/commandline.py:484 ../duplicity/commandline.py:699
 msgid "path"
-msgstr ""
+msgstr "pozicioni"
 
 #. Used in usage help to represent an ID for a GnuPG key. Example:
 #. --encrypt-key <gpg_key_id>
 #: ../duplicity/commandline.py:272 ../duplicity/commandline.py:279
 #: ../duplicity/commandline.py:473 ../duplicity/commandline.py:672
 msgid "gpg-key-id"
-msgstr ""
+msgstr "gpg-key-id"
 
 #. Used in usage help to represent a "glob" style pattern for
 #. matching one or more files, as described in the documentation.
@@ -649,7 +649,7 @@ msgstr ""
 #: ../duplicity/commandline.py:378 ../duplicity/commandline.py:389
 #: ../duplicity/commandline.py:668
 msgid "filename"
-msgstr ""
+msgstr "emri i skedarit"
 
 #. Used in usage help to represent a regular expression (regexp).
 #: ../duplicity/commandline.py:312 ../duplicity/commandline.py:380
@@ -662,7 +662,7 @@ msgstr ""
 #: ../duplicity/commandline.py:343 ../duplicity/commandline.py:433
 #: ../duplicity/commandline.py:754
 msgid "time"
-msgstr ""
+msgstr "koha"
 
 #. Used in usage help. (Should be consistent with the "Options:"
 #. header.) Example:
@@ -670,7 +670,7 @@ msgstr ""
 #: ../duplicity/commandline.py:347 ../duplicity/commandline.py:481
 #: ../duplicity/commandline.py:687
 msgid "options"
-msgstr ""
+msgstr "mundësitë"
 
 #: ../duplicity/commandline.py:356
 #, python-format
@@ -682,7 +682,7 @@ msgstr ""
 #. Used in usage help to represent an imap mailbox
 #: ../duplicity/commandline.py:369
 msgid "imap_mailbox"
-msgstr ""
+msgstr "imap_mailbox"
 
 #: ../duplicity/commandline.py:383
 msgid "file_descriptor"
@@ -699,24 +699,24 @@ msgstr ""
 #: ../duplicity/commandline.py:410 ../duplicity/commandline.py:454
 #: ../duplicity/commandline.py:514 ../duplicity/commandline.py:682
 msgid "number"
-msgstr ""
+msgstr "numër"
 
 #. noun
 #: ../duplicity/commandline.py:459 ../duplicity/commandline.py:463
 #: ../duplicity/commandline.py:653
 msgid "command"
-msgstr ""
+msgstr "komandë"
 
 #. Used in usage help. Example:
 #. --timeout <seconds>
 #: ../duplicity/commandline.py:489 ../duplicity/commandline.py:716
 msgid "seconds"
-msgstr ""
+msgstr "sekonda"
 
 #. abbreviation for "character" (noun)
 #: ../duplicity/commandline.py:495 ../duplicity/commandline.py:650
 msgid "char"
-msgstr ""
+msgstr "char"
 
 #: ../duplicity/commandline.py:616
 #, python-format
@@ -771,39 +771,39 @@ msgstr ""
 #. Used in usage help to represent the name of a file directory
 #: ../duplicity/commandline.py:664
 msgid "directory"
-msgstr ""
+msgstr "direktori"
 
 #. Used in usage help, e.g. to represent the name of a code
 #. module. Example:
 #. rsync://user[:password]@other.host[:port]::/module/some_dir
 #: ../duplicity/commandline.py:677
 msgid "module"
-msgstr ""
+msgstr "moduli"
 
 #. Used in usage help to represent an internet hostname. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:691
 msgid "other.host"
-msgstr ""
+msgstr "other.host"
 
 #. Used in usage help. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:695
 msgid "password"
-msgstr ""
+msgstr "fjalëkalimi"
 
 #. Used in usage help to represent a TCP port number. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:703
 msgid "port"
-msgstr ""
+msgstr "port"
 
 #. Used in usage help. This represents a string to be used as a
 #. prefix to names for backup files created by Duplicity. Example:
 #. s3://other.host/bucket_name[/prefix]
 #: ../duplicity/commandline.py:708
 msgid "prefix"
-msgstr ""
+msgstr "prefiks"
 
 #. Used in usage help to represent a Unix-style path name. Example:
 #. rsync://user[:password]@other.host[:port]/relative_path
@@ -853,7 +853,7 @@ msgstr ""
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:759
 msgid "user"
-msgstr ""
+msgstr "përdoruesi"
 
 #. Header in usage help
 #: ../duplicity/commandline.py:776
@@ -863,7 +863,7 @@ msgstr ""
 #. Header in usage help
 #: ../duplicity/commandline.py:798
 msgid "Commands:"
-msgstr ""
+msgstr "Komandat:"
 
 #: ../duplicity/commandline.py:822
 #, python-format
@@ -931,12 +931,12 @@ msgstr ""
 #: ../duplicity/diffdir.py:160
 #, python-format
 msgid "A %s"
-msgstr ""
+msgstr "A %s"
 
 #: ../duplicity/diffdir.py:167
 #, python-format
 msgid "M %s"
-msgstr ""
+msgstr "M %s"
 
 #: ../duplicity/diffdir.py:189
 #, python-format
@@ -946,7 +946,7 @@ msgstr ""
 #: ../duplicity/diffdir.py:195
 #, python-format
 msgid "D %s"
-msgstr ""
+msgstr "D %s"
 
 #: ../duplicity/dup_time.py:48
 #, python-format

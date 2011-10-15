@@ -1,20 +1,21 @@
-# Esperanto translation for duplicity
-# Copyright (c) 2009 Rosetta Contributors and Canonical Ltd 2009
+# Slovenian translation for duplicity
+# Copyright (c) 2011 Rosetta Contributors and Canonical Ltd 2011
 # This file is distributed under the same license as the duplicity package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2009.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
-"Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-10-10 16:25-0500\n"
-"PO-Revision-Date: 2010-05-23 16:48+0000\n"
-"Last-Translator: Kenneth Loafman <kenneth@loafman.com>\n"
-"Language-Team: Esperanto <eo@li.org>\n"
+"PO-Revision-Date: 2011-08-27 12:46+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Slovenian <sl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || "
+"n%100==4 ? 3 : 0);\n"
 "X-Launchpad-Export-Date: 2011-10-11 05:36+0000\n"
 "X-Generator: Launchpad (build 14123)\n"
 
@@ -29,31 +30,34 @@ msgstr ""
 #: ../duplicity-bin:139
 msgid "PASSPHRASE variable not set, asking user."
 msgstr ""
+"Spremenljivka ŠIFRIRNA_FRAZA ni nastavljena, zato bo vprašan uporabnik"
 
 #: ../duplicity-bin:154
 msgid "GnuPG passphrase for signing key:"
-msgstr ""
+msgstr "Šifrirna fraza GnuPG za ključ podpisovanja:"
 
 #: ../duplicity-bin:159
 msgid "GnuPG passphrase:"
-msgstr ""
+msgstr "Šifrirna fraza GnuPG:"
 
 #: ../duplicity-bin:164
 msgid "Retype passphrase for signing key to confirm: "
-msgstr ""
+msgstr "Ponovno vnesite šifrirno frazo za ključ podpisovanja za potrditev: "
 
 #: ../duplicity-bin:166
 msgid "Retype passphrase to confirm: "
-msgstr ""
+msgstr "Ponovno vnesite šifrirno frazo za potrditev: "
 
 #: ../duplicity-bin:169
 msgid "First and second passphrases do not match!  Please try again."
-msgstr ""
+msgstr "Prva in druga šifrirna fraza se ne ujemati! Poskusite znova."
 
 #: ../duplicity-bin:174
 msgid ""
 "Cannot use empty passphrase with symmetric encryption!  Please try again."
 msgstr ""
+"Prazne šifrirne fraze ni mogoče uporabiti s simetričnim šifriranjem! "
+"Poskusite znova."
 
 #: ../duplicity-bin:223
 #, python-format
@@ -61,6 +65,8 @@ msgid ""
 "File %s complete in backup set.\n"
 "Continuing restart on file %s."
 msgstr ""
+"Datoteka %s je celotna v zbirki varnostnih kopij.\n"
+"Nadaljevanje ponovnega zagona na datoteki %s."
 
 #: ../duplicity-bin:229
 #, python-format
@@ -68,6 +74,8 @@ msgid ""
 "File %s missing in backup set.\n"
 "Continuing restart on file %s."
 msgstr ""
+"Datoteka %s manjka v zbirki varnostnih kopij.\n"
+"Nadaljevanje ponovnega zagona na datoteki %s."
 
 #: ../duplicity-bin:281
 #, python-format
@@ -79,175 +87,204 @@ msgid ""
 "Fatal Error: Unable to start incremental backup.  Old signatures not found "
 "and incremental specified"
 msgstr ""
+"Usodna napaka: ni mogoče začetni koračne varnostne kopije. Starih podpisov "
+"ni mogoče najti in korak ni določen"
 
 #: ../duplicity-bin:499
 msgid "No signatures found, switching to full backup."
-msgstr ""
+msgstr "Ni bilo mogoče najti podpisov. Preklop na polno varnostno kopijo."
 
 #: ../duplicity-bin:513
 msgid "Backup Statistics"
-msgstr ""
+msgstr "Statistika varnostne kopije"
 
 #: ../duplicity-bin:593
 #, python-format
 msgid "%s not found in archive, no files restored."
-msgstr ""
+msgstr "%s ni bilo mogoče najti v arhivu. Datoteke niso bilo obnovljene."
 
 #: ../duplicity-bin:597
 msgid "No files found in archive - nothing restored."
-msgstr ""
+msgstr "V arhivu ni bilo mogoče najti datotek - nič ni bilo obnovljenega."
 
 #: ../duplicity-bin:630
 #, python-format
 msgid "Processed volume %d of %d"
-msgstr "Traktis la savkopieron %d el %d"
+msgstr "Obdelan je bil nosilec %d od %d"
 
 #: ../duplicity-bin:655
 #, python-format
 msgid "Invalid data - %s hash mismatch for file:"
-msgstr ""
+msgstr "Neveljavni podatki - neujemanje razpršil %s za datoteko:"
 
 #: ../duplicity-bin:657
 #, python-format
 msgid "Calculated hash: %s"
-msgstr ""
+msgstr "Izračunano razpršilo: %s"
 
 #: ../duplicity-bin:658
 #, python-format
 msgid "Manifest hash: %s"
-msgstr ""
+msgstr "Razpršilo manifesta: %s"
 
 #: ../duplicity-bin:696
 #, python-format
 msgid "Volume was signed by key %s, not %s"
-msgstr ""
+msgstr "Nosilec je bil podpisan s ključem %s, ne %s"
 
 #: ../duplicity-bin:726
 #, python-format
 msgid "Verify complete: %s, %s."
-msgstr ""
+msgstr "Potrditev veljavnosti je končana: %s, %s."
 
 #: ../duplicity-bin:727
 #, python-format
 msgid "%d file compared"
 msgid_plural "%d files compared"
-msgstr[0] "Komparis %d dosieron."
-msgstr[1] "Komparis %d dosierojn."
+msgstr[0] "%d datotek je bilo primerjanih"
+msgstr[1] "%d datoteka je bila primerjana"
+msgstr[2] "%d datoteki sta bili primerjani"
+msgstr[3] "%d datoteke so bile primerjane"
 
 #: ../duplicity-bin:729
 #, python-format
 msgid "%d difference found"
 msgid_plural "%d differences found"
-msgstr[0] "Trovis %d diferencon."
-msgstr[1] "Trovis %d diferencojn."
+msgstr[0] "Najdenih je bilo %d razlik"
+msgstr[1] "Najdena je bila %d razlika"
+msgstr[2] "Najdeni sta bili %d razliki"
+msgstr[3] "Najdene so bile %d razlike"
 
 #: ../duplicity-bin:748
 msgid "No extraneous files found, nothing deleted in cleanup."
 msgstr ""
+"Zunanje datoteke niso bile najdene. Med čiščenjem ni bilo nič izbrisanega."
 
 #: ../duplicity-bin:753
 msgid "Deleting this file from backend:"
 msgid_plural "Deleting these files from backend:"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Brisanje teh datotek iz zaledja:"
+msgstr[1] "Brisanje te datoteke iz zaledja:"
+msgstr[2] "Brisanje teh datotek iz zaledja:"
+msgstr[3] "Brisanje teh datotek iz zaledja:"
 
 #: ../duplicity-bin:765
 msgid "Found the following file to delete:"
 msgid_plural "Found the following files to delete:"
-msgstr[0] "Trovis la jenan forigendan dosieron:"
-msgstr[1] "Trovis la jenajn forigendajn dosierojn:"
+msgstr[0] "Najdene so bile naslednje datoteke za izbris:"
+msgstr[1] "Najdena je bila naslednja datoteka za izbris:"
+msgstr[2] "Najdeni sta bili naslednji datoteki za izbris:"
+msgstr[3] "Najdene so bile naslednje datoteke za izbris:"
 
 #: ../duplicity-bin:769
 msgid "Run duplicity again with the --force option to actually delete."
-msgstr "Denove kurigu duplicity kun la opcio --force por vere forigi."
+msgstr "Za dejanski izbris ponovno poženite duplicity z možnostjo --force."
 
 #: ../duplicity-bin:808
 msgid "There are backup set(s) at time(s):"
-msgstr "Estas savkopiaro(j) de la horo(j):"
+msgstr "Obstajajo naslednje zbirke varnostnih kopij ob časih:"
 
 #: ../duplicity-bin:810
 msgid "Which can't be deleted because newer sets depend on them."
-msgstr ""
+msgstr "Ki jih ni mogoče izbrisati, ker so od njih odvisne novejše zbirke."
 
 #: ../duplicity-bin:814
 msgid ""
 "Current active backup chain is older than specified time.  However, it will "
 "not be deleted.  To remove all your backups, manually purge the repository."
 msgstr ""
+"Trenutno dejavna veriga varnostnih kopij je starejša od določenega časa. "
+"Vendar ne bo izbrisana. Za odstranitev vseh svojih varnostnih kopij ročno "
+"počistite skladišče."
 
 #: ../duplicity-bin:820
 msgid "No old backup sets found, nothing deleted."
 msgstr ""
+"Starejših zbirk varnostnih kopij ni bilo mogoče najti. Nič ne bo izbrisano."
 
 #: ../duplicity-bin:823
 msgid "Deleting backup set at time:"
 msgid_plural "Deleting backup sets at times:"
-msgstr[0] "Forigas la savkopiaron de la horo:"
-msgstr[1] "Forigas la savkopiarojn de la horoj:"
+msgstr[0] "Brisanje zbirk varnostnih kopij ob časih:"
+msgstr[1] "Brisanje zbirke varnostnih kopij ob času:"
+msgstr[2] "Brisanje zbirk varnostnih kopij ob časih:"
+msgstr[3] "Brisanje zbirk varnostnih kopij ob časih:"
 
 #: ../duplicity-bin:840
 msgid "Found old backup set at the following time:"
 msgid_plural "Found old backup sets at the following times:"
-msgstr[0] "Trovis malnovan savkopiaron de la jena horo:"
-msgstr[1] "Trovis malnovajn savkopiarojn de la jenaj horoj:"
+msgstr[0] ""
+"Najdene so bile stare zbirke varnostnih kopij ob naslednjih časih:"
+msgstr[1] ""
+"Najdena je bila stara zbirka varnostnih kopij ob naslednjih časih:"
+msgstr[2] ""
+"Najdeni sta bili stari zbirki varnostnih kopij ob naslednjih časih:"
+msgstr[3] ""
+"Najdene so bile stare zbirke varnostnih kopij ob naslednjih časih:"
 
 #: ../duplicity-bin:844
 msgid "Rerun command with --force option to actually delete."
-msgstr ""
+msgstr "Ponovno zaženite ukaz z možnostjo --force za dejanski izbris."
 
 #: ../duplicity-bin:922
 #, python-format
 msgid "Deleting local %s (not authoritative at backend)."
-msgstr ""
+msgstr "Izbris krajevnega %s (ni overitveno na ozadju)."
 
 #: ../duplicity-bin:926
 #, python-format
 msgid "Unable to delete %s: %s"
-msgstr ""
+msgstr "Ni mogoče izbrisati %s: %s"
 
 #: ../duplicity-bin:954 ../duplicity/dup_temp.py:260
 #, python-format
 msgid "Failed to read %s: %s"
-msgstr ""
+msgstr "Ni mogoče brati %s: %s"
 
 #: ../duplicity-bin:965
 #, python-format
 msgid "Copying %s to local cache."
-msgstr ""
+msgstr "Kopiranje %s v krajevni medpomnilnik."
 
 #: ../duplicity-bin:1013
 msgid "Local and Remote metadata are synchronized, no sync needed."
 msgstr ""
+"Krajevni in oddaljeni metapodatki so usklajeni. Ni potrebe po usklajevanju."
 
 #: ../duplicity-bin:1018
 msgid "Synchronizing remote metadata to local cache..."
-msgstr ""
+msgstr "Usklajevanje oddaljenih metapodatkov s krajevnim predpomnilnikom ..."
 
 #: ../duplicity-bin:1031
 msgid "Sync would copy the following from remote to local:"
 msgstr ""
+"Usklajevanje bi kopiralo naslednje datoteke z oddaljenega na krajevni "
+"računalnik:"
 
 #: ../duplicity-bin:1034
 msgid "Sync would remove the following spurious local files:"
-msgstr ""
+msgstr "Usklajevanje bi odstranilo naslednje odvečne krajevne datoteke:"
 
 #: ../duplicity-bin:1077
 msgid "Unable to get free space on temp."
-msgstr ""
+msgstr "Ni mogoče dobiti nezasedenega prostora v začasni mapi."
 
 #: ../duplicity-bin:1085
 #, python-format
 msgid "Temp space has %d available, backup needs approx %d."
 msgstr ""
+"Začasni prostor ima na voljo %d, varnostna kopija potrebuje %d prostora."
 
 #: ../duplicity-bin:1088
 #, python-format
 msgid "Temp has %d available, backup will use approx %d."
 msgstr ""
+"Začasni prostor ima na voljo %d prostora, varnostna kopija bo uporabila "
+"približno %d."
 
 #: ../duplicity-bin:1096
 msgid "Unable to get max open files."
-msgstr ""
+msgstr "Ni mogoče dobiti največjega števila odprtih datotek."
 
 #: ../duplicity-bin:1100
 #, python-format
@@ -255,12 +292,17 @@ msgid ""
 "Max open files of %s is too low, should be >= 1024.\n"
 "Use 'ulimit -n 1024' or higher to correct.\n"
 msgstr ""
+"Največje število odprtih datotek %s je prenizko. Moralo bi biti >=1024.\n"
+"Uporabite 'ulimit -n 1024' ali višji za popravilo.\n"
 
 #: ../duplicity-bin:1149
 msgid ""
 "RESTART: The first volume failed to upload before termination.\n"
 "         Restart is impossible...starting backup from beginning."
 msgstr ""
+"PONOVEN ZAGON: pošiljanje prvega nosilca pred končanjem je spodletelo.\n"
+"          Ponovni zagon je nemogoč ... začenjanje ustvarjanja varnostne "
+"kopije od začetka."
 
 #: ../duplicity-bin:1155
 #, python-format
@@ -268,6 +310,8 @@ msgid ""
 "RESTART: Volumes %d to %d failed to upload before termination.\n"
 "         Restarting backup at volume %d."
 msgstr ""
+"PONOVEN ZAGON: pošiljanje nosilcev %d od %d pred končanjem je spodletelo.\n"
+"          Ponovno začenjanje ustvarjanja varnostne kopije pri nosilcu %d."
 
 #: ../duplicity-bin:1162
 #, python-format
@@ -277,95 +321,106 @@ msgid ""
 "partial\n"
 "         backup then restart the backup from the beginning."
 msgstr ""
+"PONOVEN ZAGON: nemogoče stanje varnostne kopije: nosilec ima %d nosilcev, "
+"oddaljeno mesto ima %d nosilcev.\n"
+"          Ponoven zagon je nemogoč. Duplicity bo počistil zadnjo delno\n"
+"          nadgradnjo in nato ponovno začel ustvarjanje varnostne kopije od "
+"začetka."
 
 #: ../duplicity-bin:1233
 #, python-format
 msgid "Last %s backup left a partial set, restarting."
-msgstr "La lasta %s konservkopiado lasis nekompletan aron. Rekomencanta."
+msgstr "Zadnja varnostna kopija %s je pustila delno zbirko, ponoven zagon."
 
 #: ../duplicity-bin:1237
 #, python-format
 msgid "Cleaning up previous partial %s backup set, restarting."
 msgstr ""
+"Čiščenje predhodne delne zbirke varnostne kopije %s, ponovno zaganjanje."
 
 #: ../duplicity-bin:1248
 msgid "Last full backup date:"
-msgstr ""
+msgstr "Datum zadnje polne varnostne kopije:"
 
 #: ../duplicity-bin:1250
 msgid "Last full backup date: none"
-msgstr ""
+msgstr "Datum zadnje polne varnostne kopije: brez"
 
 #: ../duplicity-bin:1252
 msgid "Last full backup is too old, forcing full backup"
 msgstr ""
+"Zadnja polna varnostna kopija je prestara. Vsiljena bo polna varnostna "
+"kopija."
 
 #: ../duplicity-bin:1360
 msgid "INT intercepted...exiting."
-msgstr ""
+msgstr "Prestrežen je bil INT ... končanje."
 
 #: ../duplicity-bin:1366
 #, python-format
 msgid "GPG error detail: %s"
-msgstr ""
+msgstr "Podrobnosti napake GPG: %s"
 
 #: ../duplicity-bin:1375
 #, python-format
 msgid "User error detail: %s"
-msgstr ""
+msgstr "Podrobnosti napake uporabnika: %s"
 
 #: ../duplicity-bin:1384
 #, python-format
 msgid "Backend error detail: %s"
-msgstr ""
+msgstr "Podrobnosti napake zaledja: %s"
 
 #: ../duplicity/asyncscheduler.py:66
 #, python-format
 msgid "instantiating at concurrency %d"
-msgstr ""
+msgstr "začenjanje na privolitvi %d"
 
 #: ../duplicity/asyncscheduler.py:93
 msgid "inserting barrier"
-msgstr ""
+msgstr "vstavljanje prepreke"
 
 #: ../duplicity/asyncscheduler.py:142
 msgid "running task synchronously (asynchronicity disabled)"
-msgstr ""
+msgstr "usklajeno izvajanje naloge (neusklajenost je onemogočena)"
 
 #: ../duplicity/asyncscheduler.py:148
 msgid "scheduling task for asynchronous execution"
-msgstr ""
+msgstr "razporejanje naloge za neusklajeno izvajanje"
 
 #: ../duplicity/asyncscheduler.py:177
 msgid "task completed successfully"
-msgstr ""
+msgstr "naloga se je uspešno izvedla"
 
 #: ../duplicity/asyncscheduler.py:188
 msgid ""
 "a previously scheduled task has failed; propagating the result immediately"
 msgstr ""
+"Predhodno razporejena naloga je spodletela, hipno množenje rezultata."
 
 #: ../duplicity/asyncscheduler.py:211 ../duplicity/asyncscheduler.py:232
 #, python-format
 msgid "active workers = %d"
-msgstr ""
+msgstr "dejavni delavci = %d"
 
 #: ../duplicity/asyncscheduler.py:252
 #, python-format
 msgid "task execution done (success: %s)"
-msgstr ""
+msgstr "izvajanje naloge je končano (uspeh: %s)"
 
 #: ../duplicity/backend.py:485 ../duplicity/backend.py:509
 #, python-format
 msgid "Reading results of '%s'"
-msgstr ""
+msgstr "Branje rezultatov '%s'"
 
 #: ../duplicity/backend.py:524
 #, python-format
 msgid "Running '%s' failed with code %d (attempt #%d)"
 msgid_plural "Running '%s' failed with code %d (attempt #%d)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Izvajanje '%s' je spodletelo s kodo %d (poskus št. %d)"
+msgstr[1] "Izvajanje '%s' je spodletelo s kodo %d (poskus št. %d)"
+msgstr[2] "Izvajanje '%s' je spodletelo s kodo %d (poskus št. %d)"
+msgstr[3] "Izvajanje '%s' je spodletelo s kodo %d (poskus št. %d)"
 
 #: ../duplicity/backend.py:528
 #, python-format
@@ -373,226 +428,285 @@ msgid ""
 "Error is:\n"
 "%s"
 msgstr ""
+"Napaka je:\n"
+"%s"
 
 #: ../duplicity/backend.py:530
 #, python-format
 msgid "Giving up trying to execute '%s' after %d attempt"
 msgid_plural "Giving up trying to execute '%s' after %d attempts"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Prenehanje poskušanja izvajanja '%s' po %d poskusih"
+msgstr[1] "Prenehanje poskušanja izvajanja '%s' po %d poskusu"
+msgstr[2] "Prenehanje poskušanja izvajanja '%s' po %d poskusih"
+msgstr[3] "Prenehanje poskušanja izvajanja '%s' po %d poskusih"
 
 #: ../duplicity/collections.py:188
 msgid "Fatal Error: No manifests found for most recent backup"
 msgstr ""
+"Usodna napaka: za najbolj nedavno varnostno kopijo ni bilo mogoče najti "
+"manifesta"
 
 #: ../duplicity/collections.py:197
 msgid ""
 "Fatal Error: Remote manifest does not match local one.  Either the remote "
 "backup set or the local archive directory has been corrupted."
 msgstr ""
+"Usodna napaka: oddaljeni manifest se ne ujema s krajevnim. Oddaljena zbirka "
+"varnostne kopija ali krajevna mapa arhivov je okvarjena."
 
 #: ../duplicity/collections.py:205
 msgid "Fatal Error: Neither remote nor local manifest is readable."
 msgstr ""
+"Usodna napaka: prebrati ni mogoče niti oddaljenega niti krajevnega manifesta."
 
 #: ../duplicity/collections.py:316
 msgid "Preferring Backupset over previous one!"
-msgstr ""
+msgstr "Prednostna zbirka varnostnih kopij nad predhodno!"
 
 #: ../duplicity/collections.py:319
 #, python-format
 msgid "Ignoring incremental Backupset (start_time: %s; needed: %s)"
 msgstr ""
+"Prezrtje koračne zbirke varnostnih kopij (začetni_čas: %s, zahtevano: %s)"
 
 #: ../duplicity/collections.py:324
 #, python-format
 msgid "Added incremental Backupset (start_time: %s / end_time: %s)"
 msgstr ""
+"Dodana je bila koračna varnostna kopija (začetni_čas: %s / končni_čas: %s)"
 
 #: ../duplicity/collections.py:394
 msgid "Chain start time: "
-msgstr ""
+msgstr "Začetni čas verige: "
 
 #: ../duplicity/collections.py:395
 msgid "Chain end time: "
-msgstr ""
+msgstr "Končni čas verige: "
 
 #: ../duplicity/collections.py:396
 #, python-format
 msgid "Number of contained backup sets: %d"
-msgstr ""
+msgstr "Število vsebovanih zbirk varnostnih kopij: %d"
 
 #: ../duplicity/collections.py:398
 #, python-format
 msgid "Total number of contained volumes: %d"
-msgstr ""
+msgstr "Skupno število vsebovanih nosilcev: %d"
 
 #: ../duplicity/collections.py:400
 msgid "Type of backup set:"
-msgstr ""
+msgstr "Vrsta zbirke varnostne kopije"
 
 #: ../duplicity/collections.py:400
 msgid "Time:"
-msgstr "Tempo:"
+msgstr "Čas:"
 
 #: ../duplicity/collections.py:400
 msgid "Num volumes:"
-msgstr "Kvanto da savkopiaroj:"
+msgstr "Število nosilcev:"
 
 #: ../duplicity/collections.py:404
 msgid "Full"
-msgstr "Plena"
+msgstr "Polno"
 
 #: ../duplicity/collections.py:407
 msgid "Incremental"
-msgstr "Suplementa"
+msgstr "Koračna"
 
 #: ../duplicity/collections.py:467
 msgid "local"
-msgstr ""
+msgstr "krajevno"
 
 #: ../duplicity/collections.py:469
 msgid "remote"
-msgstr ""
+msgstr "oddaljeno"
 
 #: ../duplicity/collections.py:622
 msgid "Collection Status"
-msgstr ""
+msgstr "Stanje zbirke"
 
 #: ../duplicity/collections.py:624
 #, python-format
 msgid "Connecting with backend: %s"
-msgstr ""
+msgstr "Povezovanje z zaledjem: %s"
 
 #: ../duplicity/collections.py:626
 #, python-format
 msgid "Archive dir: %s"
-msgstr ""
+msgstr "Mapa arhiva: %s"
 
 #: ../duplicity/collections.py:629
 #, python-format
 msgid "Found %d secondary backup chain."
 msgid_plural "Found %d secondary backup chains."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Najdenih je bilo %d drugotnih verig varnostnih kopij."
+msgstr[1] "Najdena je bila %d drugotna veriga varnostnih kopij."
+msgstr[2] "Najdeni sta bili %d drugotni verigi varnostnih kopij."
+msgstr[3] "Najdene so bile %d drugotne verige varnostnih kopij."
 
 #: ../duplicity/collections.py:634
 #, python-format
 msgid "Secondary chain %d of %d:"
-msgstr ""
+msgstr "Drugotna veriga %d od %d:"
 
 #: ../duplicity/collections.py:640
 msgid "Found primary backup chain with matching signature chain:"
 msgstr ""
+"Najdena je bila osnovna veriga varnostnih kopij z ujemajočo se verigo "
+"podpisa:"
 
 #: ../duplicity/collections.py:644
 msgid "No backup chains with active signatures found"
-msgstr ""
+msgstr "Verig varnostnih kopij s podpisi ni bilo mogoče najti"
 
 #: ../duplicity/collections.py:647
 #, python-format
 msgid "Also found %d backup set not part of any chain,"
 msgid_plural "Also found %d backup sets not part of any chain,"
 msgstr[0] ""
+"Najdenih je bilo tudi %d zbirk varnostnih kopij, ki niso del nobene verige,"
 msgstr[1] ""
+"Najdena je bila tudi %d zbirka varnostnih kopij, ki niso del nobene verige,"
+msgstr[2] ""
+"Najdeni sta bili tudi %d zbirki varnostnih kopij, ki niso del nobene verige,"
+msgstr[3] ""
+"Najdene so bile tudi %d zbirke varnostnih kopij, ki niso del nobene verige,"
 
 #: ../duplicity/collections.py:651
 #, python-format
 msgid "and %d incomplete backup set."
 msgid_plural "and %d incomplete backup sets."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "in %d nedokončanih zbirk varnostnih kopij."
+msgstr[1] "in %d nedokončana zbirka varnostnih kopij."
+msgstr[2] "in %d nedokončani zbirki varnostnih kopij."
+msgstr[3] "in %d nedokončane zbirke varnostnih kopij."
 
 #. "cleanup" is a hard-coded command, so do not translate it
 #: ../duplicity/collections.py:656
 msgid ""
 "These may be deleted by running duplicity with the \"cleanup\" command."
 msgstr ""
+"Lahko jih izbrišete s poganjanjem programa duplicity z ukazom \"cleanup\"."
 
 #: ../duplicity/collections.py:659
 msgid "No orphaned or incomplete backup sets found."
 msgstr ""
+"Osirotelih ali nedokončanih zbirk varnostnih kopij ni bilo mogoče najti."
 
 #: ../duplicity/collections.py:675
 #, python-format
 msgid "%d file exists on backend"
 msgid_plural "%d files exist on backend"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "V začelju obstaja %d datotek"
+msgstr[1] "V začelju obstaja %d datoteka"
+msgstr[2] "V začelju obstajata %d datoteki"
+msgstr[3] "V začelju obstajajo %d datoteke"
 
 #: ../duplicity/collections.py:682
 #, python-format
 msgid "%d file exists in cache"
 msgid_plural "%d files exist in cache"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "V predpomnilniku obstaja %d datotek"
+msgstr[1] "V predpomnilniku obstaja %d datoteka"
+msgstr[2] "V predpomnilniku obstajata %d datoteki"
+msgstr[3] "V predpomnilniku obstajajo %d datoteke"
 
 #: ../duplicity/collections.py:734
 msgid ""
 "Warning, discarding last backup set, because of missing signature file."
 msgstr ""
+"Opozorilo, zadnja zbirka varnostnih kopij je bila zavržena zaradi manjkajoče "
+"datoteke podpisa."
 
 #: ../duplicity/collections.py:757
 msgid "Warning, found the following local orphaned signature file:"
 msgid_plural "Warning, found the following local orphaned signature files:"
 msgstr[0] ""
+"Opozorilo. Najdene so bile naslednje krajevne datoteke z osirotelim podpisom:"
 msgstr[1] ""
+"Opozorilo. Najdena je bila naslednja krajevna datoteka z osirotelim podpisom:"
+msgstr[2] ""
+"Opozorilo. Najdeni sta bili naslednji krajevni datoteki z osirotelim "
+"podpisom:"
+msgstr[3] ""
+"Opozorilo. Najdene so bile naslednje krajevne datoteke z osirotelim podpisom:"
 
 #: ../duplicity/collections.py:766
 msgid "Warning, found the following remote orphaned signature file:"
 msgid_plural "Warning, found the following remote orphaned signature files:"
 msgstr[0] ""
+"Opozorilo. Najdene so bile naslednje oddaljene datoteke z osirotelim "
+"podpisom:"
 msgstr[1] ""
+"Opozorilo. Najdena je bila naslednja oddaljena datoteka z osirotelim "
+"podpisom:"
+msgstr[2] ""
+"Opozorilo. Najdeni sta bili naslednji oddaljeni datoteki z osirotelim "
+"podpisom:"
+msgstr[3] ""
+"Opozorilo. Najdene so bile naslednje oddaljene datoteke z osirotelim "
+"podpisom:"
 
 #: ../duplicity/collections.py:775
 msgid "Warning, found signatures but no corresponding backup files"
 msgstr ""
+"Opozorilo. Najdeni so bili podpisi, ne pa tudi ustrezne datoteke varnostnih "
+"kopij"
 
 #: ../duplicity/collections.py:779
 msgid ""
 "Warning, found incomplete backup sets, probably left from aborted session"
 msgstr ""
+"Opozorilo. Najdene so bile nepopolne zbirke varnostnih kopij. Verjetno so "
+"ostale iz prekinjene seje."
 
 #: ../duplicity/collections.py:783
 msgid "Warning, found the following orphaned backup file:"
 msgid_plural "Warning, found the following orphaned backup files:"
 msgstr[0] ""
+"Opozorilo. Najdene so bile naslednje datoteke z osirotelim podpisom:"
 msgstr[1] ""
+"Opozorilo. Najdena je bila naslednja datoteka z osirotelim podpisom:"
+msgstr[2] ""
+"Opozorilo. Najdeni sta bili naslednji datoteki z osirotelim podpisom:"
+msgstr[3] ""
+"Opozorilo. Najdene so bile naslednje datoteke z osirotelim podpisom:"
 
 #: ../duplicity/collections.py:801
 #, python-format
 msgid "Extracting backup chains from list of files: %s"
-msgstr ""
+msgstr "Izvleka verig varnostnih kopij s seznama datotek: %s"
 
 #: ../duplicity/collections.py:811
 #, python-format
 msgid "File %s is part of known set"
-msgstr ""
+msgstr "Datoteka %s je del znanega niza"
 
 #: ../duplicity/collections.py:814
 #, python-format
 msgid "File %s is not part of a known set; creating new set"
-msgstr ""
+msgstr "Datoteka %s ni del znanega niza, ustvarjanje novega niza"
 
 #: ../duplicity/collections.py:819
 #, python-format
 msgid "Ignoring file (rejected by backup set) '%s'"
 msgstr ""
+"Preziranje datoteke (zavrnjeno s strani zbirke varnostnih kopij) '%s'"
 
 #: ../duplicity/collections.py:832
 #, python-format
 msgid "Found backup chain %s"
-msgstr ""
+msgstr "Najdena je bila veriga varnostnih kopij %s"
 
 #: ../duplicity/collections.py:837
 #, python-format
 msgid "Added set %s to pre-existing chain %s"
-msgstr ""
+msgstr "Zbirka %s je bila dodana k že obstoječi verigi %s"
 
 #: ../duplicity/collections.py:841
 #, python-format
 msgid "Found orphaned set %s"
-msgstr ""
+msgstr "Najdena je bila osirotela zbirka %s"
 
 #: ../duplicity/collections.py:993
 #, python-format
@@ -600,6 +714,8 @@ msgid ""
 "No signature chain for the requested time.  Using oldest available chain, "
 "starting at time %s."
 msgstr ""
+"Za zahtevan čas ni mogoče najti verige podpisa. Uporabljena bo najstarejša "
+"razpoložljiva veriga, ki se začenja ob času %s."
 
 #: ../duplicity/commandline.py:67
 #, python-format
@@ -608,15 +724,18 @@ msgid ""
 "release.\n"
 "Use of default filenames is strongly suggested."
 msgstr ""
+"Opozorilo: možnost %s čaka na zastaranje in bo bila odstranjena v prihodnji "
+"različici.\n"
+"Uporaba privzetih imen datotek je močno priporočena."
 
 #: ../duplicity/commandline.py:209
 msgid "Unable to load gio module"
-msgstr ""
+msgstr "Modula gio ni mogoče naložiti"
 
 #: ../duplicity/commandline.py:231
 #, python-format
 msgid "Error opening file %s"
-msgstr ""
+msgstr "Napaka med odpiranjem datoteke %s"
 
 #. Used in usage help to represent a Unix-style path name. Example:
 #. --archive-dir <path>
@@ -624,14 +743,14 @@ msgstr ""
 #: ../duplicity/commandline.py:277 ../duplicity/commandline.py:331
 #: ../duplicity/commandline.py:484 ../duplicity/commandline.py:699
 msgid "path"
-msgstr ""
+msgstr "pot"
 
 #. Used in usage help to represent an ID for a GnuPG key. Example:
 #. --encrypt-key <gpg_key_id>
 #: ../duplicity/commandline.py:272 ../duplicity/commandline.py:279
 #: ../duplicity/commandline.py:473 ../duplicity/commandline.py:672
 msgid "gpg-key-id"
-msgstr ""
+msgstr "id-ključa-gpg"
 
 #. Used in usage help to represent a "glob" style pattern for
 #. matching one or more files, as described in the documentation.
@@ -640,7 +759,7 @@ msgstr ""
 #: ../duplicity/commandline.py:287 ../duplicity/commandline.py:371
 #: ../duplicity/commandline.py:722
 msgid "shell_pattern"
-msgstr ""
+msgstr "vzorec-lupine"
 
 #. Used in usage help to represent the name of a file. Example:
 #. --log-file <filename>
@@ -649,12 +768,12 @@ msgstr ""
 #: ../duplicity/commandline.py:378 ../duplicity/commandline.py:389
 #: ../duplicity/commandline.py:668
 msgid "filename"
-msgstr ""
+msgstr "ime_datoteke"
 
 #. Used in usage help to represent a regular expression (regexp).
 #: ../duplicity/commandline.py:312 ../duplicity/commandline.py:380
 msgid "regular_expression"
-msgstr ""
+msgstr "logični_izaz"
 
 #. Used in usage help to represent a time spec for a previous
 #. point in time, as described in the documentation. Example:
@@ -662,7 +781,7 @@ msgstr ""
 #: ../duplicity/commandline.py:343 ../duplicity/commandline.py:433
 #: ../duplicity/commandline.py:754
 msgid "time"
-msgstr ""
+msgstr "čas"
 
 #. Used in usage help. (Should be consistent with the "Options:"
 #. header.) Example:
@@ -670,7 +789,7 @@ msgstr ""
 #: ../duplicity/commandline.py:347 ../duplicity/commandline.py:481
 #: ../duplicity/commandline.py:687
 msgid "options"
-msgstr ""
+msgstr "možnosti"
 
 #: ../duplicity/commandline.py:356
 #, python-format
@@ -678,20 +797,22 @@ msgid ""
 "Running in 'ignore errors' mode due to %s; please re-consider if this was "
 "not intended"
 msgstr ""
+"Izvajanje v načinu 'prezri napake' zaradi %s. Ponovno premislite ali je bilo "
+"to namenjeno."
 
 #. Used in usage help to represent an imap mailbox
 #: ../duplicity/commandline.py:369
 msgid "imap_mailbox"
-msgstr ""
+msgstr "poštni_predal_imap"
 
 #: ../duplicity/commandline.py:383
 msgid "file_descriptor"
-msgstr ""
+msgstr "opisnik_datotek"
 
 #. Used in usage help (noun)
 #: ../duplicity/commandline.py:394
 msgid "backup name"
-msgstr ""
+msgstr "ime varnostne kopije"
 
 #. Used in usage help to represent a desired number of
 #. something. Example:
@@ -699,124 +820,124 @@ msgstr ""
 #: ../duplicity/commandline.py:410 ../duplicity/commandline.py:454
 #: ../duplicity/commandline.py:514 ../duplicity/commandline.py:682
 msgid "number"
-msgstr ""
+msgstr "število"
 
 #. noun
 #: ../duplicity/commandline.py:459 ../duplicity/commandline.py:463
 #: ../duplicity/commandline.py:653
 msgid "command"
-msgstr ""
+msgstr "ukaz"
 
 #. Used in usage help. Example:
 #. --timeout <seconds>
 #: ../duplicity/commandline.py:489 ../duplicity/commandline.py:716
 msgid "seconds"
-msgstr ""
+msgstr "sekunde"
 
 #. abbreviation for "character" (noun)
 #: ../duplicity/commandline.py:495 ../duplicity/commandline.py:650
 msgid "char"
-msgstr ""
+msgstr "znak"
 
 #: ../duplicity/commandline.py:616
 #, python-format
 msgid "Using archive dir: %s"
-msgstr ""
+msgstr "Uporaba mape arhivov: %s"
 
 #: ../duplicity/commandline.py:617
 #, python-format
 msgid "Using backup name: %s"
-msgstr ""
+msgstr "Uporaba imena varnostne kopije: %s"
 
 #: ../duplicity/commandline.py:624
 #, python-format
 msgid "Command line error: %s"
-msgstr ""
+msgstr "Napaka ukazne vrstice: %s"
 
 #: ../duplicity/commandline.py:625
 msgid "Enter 'duplicity --help' for help screen."
-msgstr ""
+msgstr "Za zaslon pomoči vnesite 'duplicity --help'."
 
 #. Used in usage help to represent a Unix-style path name. Example:
 #. rsync://user[:password]@other_host[:port]//absolute_path
 #: ../duplicity/commandline.py:638
 msgid "absolute_path"
-msgstr ""
+msgstr "absolutna_pot"
 
 #. Used in usage help. Example:
 #. tahoe://alias/some_dir
 #: ../duplicity/commandline.py:642
 msgid "alias"
-msgstr ""
+msgstr "vzdevek"
 
 #. Used in help to represent a "bucket name" for Amazon Web
 #. Services' Simple Storage Service (S3). Example:
 #. s3://other.host/bucket_name[/prefix]
 #: ../duplicity/commandline.py:647
 msgid "bucket_name"
-msgstr ""
+msgstr "ime_korita"
 
 #. Used in usage help to represent the name of a container in
 #. Amazon Web Services' Cloudfront. Example:
 #. cf+http://container_name
 #: ../duplicity/commandline.py:658
 msgid "container_name"
-msgstr ""
+msgstr "ime_vsebnika"
 
 #. noun
 #: ../duplicity/commandline.py:661
 msgid "count"
-msgstr ""
+msgstr "število"
 
 #. Used in usage help to represent the name of a file directory
 #: ../duplicity/commandline.py:664
 msgid "directory"
-msgstr ""
+msgstr "mapa"
 
 #. Used in usage help, e.g. to represent the name of a code
 #. module. Example:
 #. rsync://user[:password]@other.host[:port]::/module/some_dir
 #: ../duplicity/commandline.py:677
 msgid "module"
-msgstr ""
+msgstr "modul"
 
 #. Used in usage help to represent an internet hostname. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:691
 msgid "other.host"
-msgstr ""
+msgstr "drug.gostitelj"
 
 #. Used in usage help. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:695
 msgid "password"
-msgstr ""
+msgstr "geslo"
 
 #. Used in usage help to represent a TCP port number. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:703
 msgid "port"
-msgstr ""
+msgstr "vrata"
 
 #. Used in usage help. This represents a string to be used as a
 #. prefix to names for backup files created by Duplicity. Example:
 #. s3://other.host/bucket_name[/prefix]
 #: ../duplicity/commandline.py:708
 msgid "prefix"
-msgstr ""
+msgstr "predpona"
 
 #. Used in usage help to represent a Unix-style path name. Example:
 #. rsync://user[:password]@other.host[:port]/relative_path
 #: ../duplicity/commandline.py:712
 msgid "relative_path"
-msgstr ""
+msgstr "relativna_pot"
 
 #. Used in usage help to represent the name of a single file
 #. directory or a Unix-style path to a directory. Example:
 #. file:///some_dir
 #: ../duplicity/commandline.py:727
 msgid "some_dir"
-msgstr ""
+msgstr "ena_mapa"
 
 #. Used in usage help to represent the name of a single file
 #. directory or a Unix-style path to a directory where files will be
@@ -824,14 +945,14 @@ msgstr ""
 #. duplicity [full|incremental] [options] source_dir target_url
 #: ../duplicity/commandline.py:733
 msgid "source_dir"
-msgstr ""
+msgstr "izvirna_mapa"
 
 #. Used in usage help to represent a URL files will be coming
 #. FROM. Example:
 #. duplicity [restore] [options] source_url target_dir
 #: ../duplicity/commandline.py:738
 msgid "source_url"
-msgstr ""
+msgstr "izvirni_url"
 
 #. Used in usage help to represent the name of a single file
 #. directory or a Unix-style path to a directory. where files will be
@@ -839,37 +960,37 @@ msgstr ""
 #. duplicity [restore] [options] source_url target_dir
 #: ../duplicity/commandline.py:744
 msgid "target_dir"
-msgstr ""
+msgstr "ciljna_mapa"
 
 #. Used in usage help to represent a URL files will be going TO.
 #. Example:
 #. duplicity [full|incremental] [options] source_dir target_url
 #: ../duplicity/commandline.py:749
 msgid "target_url"
-msgstr ""
+msgstr "ciljni_url"
 
 #. Used in usage help to represent a user name (i.e. login).
 #. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:759
 msgid "user"
-msgstr ""
+msgstr "uporabnik"
 
 #. Header in usage help
 #: ../duplicity/commandline.py:776
 msgid "Backends and their URL formats:"
-msgstr ""
+msgstr "Zaledja in njihove oblike URL"
 
 #. Header in usage help
 #: ../duplicity/commandline.py:798
 msgid "Commands:"
-msgstr ""
+msgstr "Ukazi:"
 
 #: ../duplicity/commandline.py:822
 #, python-format
 msgid ""
 "Specified archive directory '%s' does not exist, or is not a directory"
-msgstr ""
+msgstr "Navedena mapa arhivov '%s' še ne obstaja ali pa ni mapa"
 
 #: ../duplicity/commandline.py:831
 #, python-format
@@ -877,6 +998,8 @@ msgid ""
 "Sign key should be an 8 character hex string, like 'AA0E73D2'.\n"
 "Received '%s' instead."
 msgstr ""
+"Ključ podpisa bi moral biti 8 znakovni šestnajstiški niz kot je 'AA0E73D2'.\n"
+"Namesto tega je bila prejet ključ '%s'."
 
 #: ../duplicity/commandline.py:889
 #, python-format
@@ -884,27 +1007,32 @@ msgid ""
 "Restore destination directory %s already exists.\n"
 "Will not overwrite."
 msgstr ""
+"Cilja mapa obnovitve %s že obstaja.\n"
+"Ne bo prepisana."
 
 #: ../duplicity/commandline.py:894
 #, python-format
 msgid "Verify directory %s does not exist"
-msgstr ""
+msgstr "Mapa potrjevanja veljavnosti %s ne obstaja"
 
 #: ../duplicity/commandline.py:900
 #, python-format
 msgid "Backup source directory %s does not exist."
-msgstr ""
+msgstr "Mapa vira varnostnih kopij %s ne obstaja."
 
 #: ../duplicity/commandline.py:929
 #, python-format
 msgid "Command line warning: %s"
-msgstr ""
+msgstr "Opozorilo ukazne vrstice: %s"
 
 #: ../duplicity/commandline.py:929
 msgid ""
 "Selection options --exclude/--include\n"
 "currently work only when backing up,not restoring."
 msgstr ""
+"Možnosti izbire --exclude/--include\n"
+"trenutno trenutno delujejo le pri ustvarjanju varnostne kopije, ne "
+"obnavljanju."
 
 #: ../duplicity/commandline.py:977
 #, python-format
@@ -913,40 +1041,43 @@ msgid ""
 "Examples of URL strings are \"scp://user@host.net:1234/path\" and\n"
 "\"file:///usr/local\".  See the man page for more information."
 msgstr ""
+"Slab URL '%s'.\n"
+"Primera nizov URL sta  \"scp://uporabnik@gostitelj.net:1234/pot\" in\n"
+"\"file:///usr/local\". Za več podrobnosti si oglejte stran man."
 
 #: ../duplicity/commandline.py:1002
 msgid "Main action: "
-msgstr ""
+msgstr "Glavno dejanje: "
 
 #: ../duplicity/diffdir.py:101 ../duplicity/diffdir.py:390
 #, python-format
 msgid "Error %s getting delta for %s"
-msgstr ""
+msgstr "Napaka %s med pridobivanjem razlike za %s"
 
 #: ../duplicity/diffdir.py:115
 #, python-format
 msgid "Getting delta of %s and %s"
-msgstr ""
+msgstr "Pridobivanje razlike %s in %s"
 
 #: ../duplicity/diffdir.py:160
 #, python-format
 msgid "A %s"
-msgstr ""
+msgstr "A %s"
 
 #: ../duplicity/diffdir.py:167
 #, python-format
 msgid "M %s"
-msgstr ""
+msgstr "M %s"
 
 #: ../duplicity/diffdir.py:189
 #, python-format
 msgid "Comparing %s and %s"
-msgstr ""
+msgstr "Primerjanje %s in %s"
 
 #: ../duplicity/diffdir.py:195
 #, python-format
 msgid "D %s"
-msgstr ""
+msgstr "D %s"
 
 #: ../duplicity/dup_time.py:48
 #, python-format
@@ -957,6 +1088,11 @@ msgid ""
 "allowed special characters are s, m, h, D, W, M, and Y.  See the man\n"
 "page for more information."
 msgstr ""
+"Slab niz intervala \"%s\"\n"
+"\n"
+"Intervali so navedeni kot 2Y (2 leti) ali 2h30m (2,5 ure). Dovoljeni\n"
+"znaki so s, m, h, D, W, M in Y. Za več podrobnosti si oglejte\n"
+"stran man."
 
 #: ../duplicity/dup_time.py:54
 #, python-format
@@ -970,21 +1106,28 @@ msgid ""
 "(various combinations are acceptable, but the month always precedes\n"
 "the day)."
 msgstr ""
+"Slab niz intervala \"%s\"\n"
+"\n"
+"Sprejemljivi časovni nizi so intervali (kot \"3D64s\"), nizi w3-datetime\n"
+"kot je  \"2002-04-26T04:22:01-07:00\" (sprejemljivi so tudi nizi kot je\n"
+"\"2002-04-26T04:22:01\" - duplicity bo uporabil trenutni časovni pas),\n"
+"ali običajnih datumov kot sta 2/4/1997 or 2001-04-23 (sprejemljive so\n"
+"različne kombinacije, vendar je mesec vedno pred dnevom)."
 
 #: ../duplicity/lazy.py:325
 #, python-format
 msgid "Warning: oldindex %s >= newindex %s"
-msgstr ""
+msgstr "Opozorilo: staro kazalo %s >= novo kazalo %s"
 
 #: ../duplicity/lazy.py:400
 #, python-format
 msgid "Error '%s' processing %s"
-msgstr ""
+msgstr "Napaka '%s' med obdelovanjem %s"
 
 #: ../duplicity/lazy.py:408
 #, python-format
 msgid "Skipping %s because of previous error"
-msgstr ""
+msgstr "Preskakovanje %s zaradi predhodne napake"
 
 #: ../duplicity/manifest.py:87
 #, python-format
@@ -993,6 +1136,9 @@ msgid ""
 "Current hostname: %s\n"
 "Previous hostname: %s"
 msgstr ""
+"Usodna napaka: gostitelj vira varnostne kopije se je spremenil.\n"
+"Trenutno ime gostitelja: %s\n"
+"Predhodno ime gostitelja: %s"
 
 #: ../duplicity/manifest.py:94
 #, python-format
@@ -1001,6 +1147,9 @@ msgid ""
 "Current directory: %s\n"
 "Previous directory: %s"
 msgstr ""
+"Usodna napaka: izvorna mapa varnostne kopije se je spremenila.\n"
+"Trenutna mapa: %s\n"
+"Predhodna mapa: %s"
 
 #: ../duplicity/manifest.py:103
 msgid ""
@@ -1009,47 +1158,51 @@ msgid ""
 "If this is not a mistake, use the --allow-source-mismatch switch to avoid "
 "seeing this message"
 msgstr ""
+"Preklic ker ste po nesreči poskusili ustvariti varnostno kopijo dveh "
+"različnih zbirk podatkov na isto oddaljeno mesto ali z uporabo enake mape "
+"arhiva. V primeru da to ni napaka uporabite stikalo --allow-source-mismatch "
+"za izogib ogleda tega sporočila."
 
 #: ../duplicity/manifest.py:198
 msgid "Manifests not equal because different volume numbers"
-msgstr ""
+msgstr "Manifesta nista enaka zaradi različnih številk nosilcev"
 
 #: ../duplicity/manifest.py:203
 msgid "Manifests not equal because volume lists differ"
-msgstr ""
+msgstr "Manifesta nista enaka ker se seznama nosilcev razlikujeta"
 
 #: ../duplicity/manifest.py:208
 msgid "Manifests not equal because hosts or directories differ"
-msgstr ""
+msgstr "Manifesta nista enaka, ker se gostitelja ali mapi razlikujeta"
 
 #: ../duplicity/manifest.py:355
 msgid "Warning, found extra Volume identifier"
-msgstr ""
+msgstr "Opozorilo, najdeno je bilo dodatno določilo nosilca"
 
 #: ../duplicity/manifest.py:381
 msgid "Other is not VolumeInfo"
-msgstr ""
+msgstr "Nosilec ni Volumeinfo"
 
 #: ../duplicity/manifest.py:384
 msgid "Volume numbers don't match"
-msgstr ""
+msgstr "Številki nosilcev se ne ujemata"
 
 #: ../duplicity/manifest.py:387
 msgid "start_indicies don't match"
-msgstr ""
+msgstr "indica_začetka se ne ujemata"
 
 #: ../duplicity/manifest.py:390
 msgid "end_index don't match"
-msgstr ""
+msgstr "kazalo_konca se ne ujema"
 
 #: ../duplicity/manifest.py:397
 msgid "Hashes don't match"
-msgstr ""
+msgstr "razpršili se ne ujemata"
 
 #: ../duplicity/misc.py:99
 #, python-format
 msgid "Starting to write %s"
-msgstr ""
+msgstr "Začenjanje pisanja na %s"
 
 #: ../duplicity/misc.py:107
 #, python-format
@@ -1057,116 +1210,118 @@ msgid ""
 "One only volume required.\n"
 "Renaming %s to %s"
 msgstr ""
+"Zahtevan je le en nosilec.\n"
+"Preimenovanje %s v %s."
 
 #: ../duplicity/patchdir.py:74 ../duplicity/patchdir.py:79
 #, python-format
 msgid "Patching %s"
-msgstr ""
+msgstr "Popravljanje %s"
 
 #: ../duplicity/patchdir.py:568
 #, python-format
 msgid "Writing %s of type %s"
-msgstr ""
+msgstr "Pisanje %s vrste %s"
 
 #: ../duplicity/path.py:221 ../duplicity/path.py:280
 #, python-format
 msgid "Warning: %s has negative mtime, treating as 0."
-msgstr ""
+msgstr "Opozorilo: %s ima negativen mtime, obravnavanje kot 0."
 
 #: ../duplicity/path.py:345
 msgid "Difference found:"
-msgstr ""
+msgstr "Najdena je bila razlika:"
 
 #: ../duplicity/path.py:351
 #, python-format
 msgid "New file %s"
-msgstr ""
+msgstr "Nova datoteka %s"
 
 #: ../duplicity/path.py:354
 #, python-format
 msgid "File %s is missing"
-msgstr ""
+msgstr "Datoteka %s manjka"
 
 #: ../duplicity/path.py:357
 #, python-format
 msgid "File %%s has type %s, expected %s"
-msgstr ""
+msgstr "Datoteka %%s ima vrsto %s, pričakovana je bila vrsta %s"
 
 #: ../duplicity/path.py:363 ../duplicity/path.py:389
 #, python-format
 msgid "File %%s has permissions %s, expected %s"
-msgstr ""
+msgstr "Datoteka %%s ima dovoljenja %s, pričakovana so bila dovoljenja %s"
 
 #: ../duplicity/path.py:368
 #, python-format
 msgid "File %%s has mtime %s, expected %s"
-msgstr ""
+msgstr "Datoteka %%s ima mtime %s, pričakovan je bil %s"
 
 #: ../duplicity/path.py:376
 #, python-format
 msgid "Data for file %s is different"
-msgstr ""
+msgstr "Podatki za datoteko %s so različni"
 
 #: ../duplicity/path.py:384
 #, python-format
 msgid "Symlink %%s points to %s, expected %s"
-msgstr ""
+msgstr "Simbolna povezava %%s kaže na %s, pričakovan je bil %s"
 
 #: ../duplicity/path.py:393
 #, python-format
 msgid "Device file %%s has numbers %s, expected %s"
-msgstr ""
+msgstr "Datoteka naprave %%s ima števila %s, pričakovana so bila %s"
 
 #: ../duplicity/path.py:553
 #, python-format
 msgid "Making directory %s"
-msgstr ""
+msgstr "Ustvarjanje mape %s"
 
 #: ../duplicity/path.py:563
 #, python-format
 msgid "Deleting %s"
-msgstr ""
+msgstr "Brisanje %s"
 
 #: ../duplicity/path.py:572
 #, python-format
 msgid "Touching %s"
-msgstr ""
+msgstr "Dotikanje %s"
 
 #: ../duplicity/path.py:579
 #, python-format
 msgid "Deleting tree %s"
-msgstr ""
+msgstr "Brisanje drevesa %s"
 
 #: ../duplicity/robust.py:59
 #, python-format
 msgid "Error listing directory %s"
-msgstr ""
+msgstr "Napaka med izpisom mape %s"
 
 #: ../duplicity/selection.py:119
 #, python-format
 msgid "Skipping socket %s"
-msgstr ""
+msgstr "Preskakovanje vtiča %s"
 
 #: ../duplicity/selection.py:123
 #, python-format
 msgid "Error initializing file %s"
-msgstr ""
+msgstr "Napaka med začenjanjem datoteke %s"
 
 #: ../duplicity/selection.py:127 ../duplicity/selection.py:148
 #, python-format
 msgid "Error accessing possibly locked file %s"
-msgstr ""
+msgstr "Napaka med dostopanjem do morda zaklenjene datoteke %s"
 
 #: ../duplicity/selection.py:163
 #, python-format
 msgid "Warning: base %s doesn't exist, continuing"
-msgstr ""
+msgstr "Opozorilo: osnova %s ne obstaja, nadaljevanje"
 
 #: ../duplicity/selection.py:166 ../duplicity/selection.py:184
 #: ../duplicity/selection.py:187
 #, python-format
 msgid "Selecting %s"
-msgstr ""
+msgstr "Izbiranje %s"
 
 #: ../duplicity/selection.py:268
 #, python-format
@@ -1178,6 +1333,12 @@ msgid ""
 "Useful file specifications begin with the base directory or some\n"
 "pattern (such as '**') which matches the base directory."
 msgstr ""
+"Usodna napaka: Določilo datoteke\n"
+"    %s\n"
+"se ne more ujemati z datotekami v osnovni mapi\n"
+"    %s\n"
+"Uporabna določila datoteke se začnejo z osnovno mapo ali\n"
+"z vzorcem, ki se ujema z osnovno mapo."
 
 #: ../duplicity/selection.py:276
 #, python-format
@@ -1185,6 +1346,8 @@ msgid ""
 "Fatal Error while processing expression\n"
 "%s"
 msgstr ""
+"Usodna napaka med obdelovanjem izraza\n"
+"%s"
 
 #: ../duplicity/selection.py:286
 #, python-format
@@ -1195,16 +1358,21 @@ msgid ""
 "include all files, the expression is redundant.  Exiting because this\n"
 "probably isn't what you meant."
 msgstr ""
+"Izraz zadnje izbire:\n"
+"    %s\n"
+"določa le datoteke za vključitev. Ker so privzeto vključene vse datoteke,\n"
+"je ta izraz odvečen. Program se bo končal, ker verjetno niste želeli vnesti\n"
+"takšnega izraza."
 
 #: ../duplicity/selection.py:311
 #, python-format
 msgid "Reading filelist %s"
-msgstr ""
+msgstr "Branje seznama datotek %s"
 
 #: ../duplicity/selection.py:314
 #, python-format
 msgid "Sorting filelist %s"
-msgstr ""
+msgstr "Razvrščanje seznama datotek %s"
 
 #: ../duplicity/selection.py:341
 #, python-format
@@ -1212,83 +1380,97 @@ msgid ""
 "Warning: file specification '%s' in filelist %s\n"
 "doesn't start with correct prefix %s.  Ignoring."
 msgstr ""
+"Opozorilo: določilo datoteke '%s' na seznamu datotek %s\n"
+"se ne začne s pravilno predpono %s. Prezrtje."
 
 #: ../duplicity/selection.py:345
 msgid "Future prefix errors will not be logged."
-msgstr ""
+msgstr "Prihodnje napake predpona ne bodo zabeležene."
 
 #: ../duplicity/selection.py:361
 #, python-format
 msgid "Error closing filelist %s"
-msgstr ""
+msgstr "Napaka med zapiranjem seznama datotek %s"
 
 #: ../duplicity/selection.py:428
 #, python-format
 msgid "Reading globbing filelist %s"
-msgstr ""
+msgstr "Branje seznama datotek globbing %s"
 
 #: ../duplicity/selection.py:461
 #, python-format
 msgid "Error compiling regular expression %s"
-msgstr ""
+msgstr "Napaka med kodnim prevajanjem logičnega izraza %s"
 
 #: ../duplicity/selection.py:477
 msgid ""
 "Warning: exclude-device-files is not the first selector.\n"
 "This may not be what you intended"
 msgstr ""
+"Opozorilo: exclude-device-files ni prvi izbirnik.\n"
+"To morda ni kar želite"
 
 #: ../duplicity/tempdir.py:119
 #, python-format
 msgid "Using temporary directory %s"
-msgstr ""
+msgstr "Uporabljanje začasne mape %s"
 
 #: ../duplicity/tempdir.py:157
 #, python-format
 msgid "Registering (mktemp) temporary file %s"
-msgstr ""
+msgstr "Vpisovanje (mktemp) začasne datoteke %s"
 
 #: ../duplicity/tempdir.py:179
 #, python-format
 msgid "Registering (mkstemp) temporary file %s"
-msgstr ""
+msgstr "Vpisovanje (mkstemp) začasne datoteke %s"
 
 #: ../duplicity/tempdir.py:211
 #, python-format
 msgid "Forgetting temporary file %s"
-msgstr ""
+msgstr "Pozabljanje začasne datoteke %s"
 
 #: ../duplicity/tempdir.py:214
 #, python-format
 msgid "Attempt to forget unknown tempfile %s - this is probably a bug."
 msgstr ""
+"Poskušanje pozabljanje neznane začasne datoteke %s - to je verjetno hrošč."
 
 #: ../duplicity/tempdir.py:233
 #, python-format
 msgid "Removing still remembered temporary file %s"
-msgstr ""
+msgstr "Odstranjevanje še vedno zapomnjene začasne datoteke %s"
 
 #: ../duplicity/tempdir.py:236
 #, python-format
 msgid "Cleanup of temporary file %s failed"
-msgstr ""
+msgstr "Čiščenje začasne datoteke %s je spodletelo"
 
 #: ../duplicity/tempdir.py:241
 #, python-format
 msgid "Cleanup of temporary directory %s failed - this is probably a bug."
-msgstr ""
+msgstr "Čiščenje začasne mape %s je spodletelo - to je verjetno hrošč."
 
 #: ../duplicity/util.py:68
 #, python-format
 msgid "IGNORED_ERROR: Warning: ignoring error as requested: %s: %s"
 msgstr ""
+"PREZRTA_NAPAKA: opozorilo: preziranje napake kot je bilo zahtevano: %s: %s"
 
 #: ../duplicity/backends/giobackend.py:89
 #, python-format
 msgid "Connection failed, please check your password: %s"
-msgstr ""
+msgstr "Povezava je spodletela, preverite svoje geslo: %s"
 
 #: ../duplicity/backends/giobackend.py:113
 #, python-format
 msgid "Writing %s"
-msgstr ""
+msgstr "Pisanje %s"
+
+#~ msgid "Reuse already set SIGNING_PASSPHRASE as PASSPHRASE"
+#~ msgstr ""
+#~ "Ponovno uporabi že nastavljeno PODPISUJOČO_ŠIFRIRNO_FRAZO kot ŠIFRIRNO_FRAZO"
+
+#~ msgid "Reuse already set PASSPHRASE as SIGNING_PASSPHRASE"
+#~ msgstr ""
+#~ "Ponovno uporabi že nastavljeno ŠIFRIRNO_FRAZO kot PODPISUJOČO_ŠIFRIRNO_FRAZO"

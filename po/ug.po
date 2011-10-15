@@ -1,22 +1,22 @@
-# Esperanto translation for duplicity
-# Copyright (c) 2009 Rosetta Contributors and Canonical Ltd 2009
+# Uyghur translation for duplicity
+# Copyright (c) 2011 Rosetta Contributors and Canonical Ltd 2011
 # This file is distributed under the same license as the duplicity package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2009.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
-"Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-10-10 16:25-0500\n"
-"PO-Revision-Date: 2010-05-23 16:48+0000\n"
-"Last-Translator: Kenneth Loafman <kenneth@loafman.com>\n"
-"Language-Team: Esperanto <eo@li.org>\n"
+"PO-Revision-Date: 2011-10-11 08:31+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Uyghur <ug@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-10-11 05:36+0000\n"
-"X-Generator: Launchpad (build 14123)\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Launchpad-Export-Date: 2011-10-12 04:41+0000\n"
+"X-Generator: Launchpad (build 14124)\n"
 
 #: ../duplicity-bin:94
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -100,7 +100,7 @@ msgstr ""
 #: ../duplicity-bin:630
 #, python-format
 msgid "Processed volume %d of %d"
-msgstr "Traktis la savkopieron %d el %d"
+msgstr ""
 
 #: ../duplicity-bin:655
 #, python-format
@@ -131,15 +131,15 @@ msgstr ""
 #, python-format
 msgid "%d file compared"
 msgid_plural "%d files compared"
-msgstr[0] "Komparis %d dosieron."
-msgstr[1] "Komparis %d dosierojn."
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../duplicity-bin:729
 #, python-format
 msgid "%d difference found"
 msgid_plural "%d differences found"
-msgstr[0] "Trovis %d diferencon."
-msgstr[1] "Trovis %d diferencojn."
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../duplicity-bin:748
 msgid "No extraneous files found, nothing deleted in cleanup."
@@ -154,16 +154,16 @@ msgstr[1] ""
 #: ../duplicity-bin:765
 msgid "Found the following file to delete:"
 msgid_plural "Found the following files to delete:"
-msgstr[0] "Trovis la jenan forigendan dosieron:"
-msgstr[1] "Trovis la jenajn forigendajn dosierojn:"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../duplicity-bin:769
 msgid "Run duplicity again with the --force option to actually delete."
-msgstr "Denove kurigu duplicity kun la opcio --force por vere forigi."
+msgstr ""
 
 #: ../duplicity-bin:808
 msgid "There are backup set(s) at time(s):"
-msgstr "Estas savkopiaro(j) de la horo(j):"
+msgstr ""
 
 #: ../duplicity-bin:810
 msgid "Which can't be deleted because newer sets depend on them."
@@ -182,14 +182,14 @@ msgstr ""
 #: ../duplicity-bin:823
 msgid "Deleting backup set at time:"
 msgid_plural "Deleting backup sets at times:"
-msgstr[0] "Forigas la savkopiaron de la horo:"
-msgstr[1] "Forigas la savkopiarojn de la horoj:"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../duplicity-bin:840
 msgid "Found old backup set at the following time:"
 msgid_plural "Found old backup sets at the following times:"
-msgstr[0] "Trovis malnovan savkopiaron de la jena horo:"
-msgstr[1] "Trovis malnovajn savkopiarojn de la jenaj horoj:"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../duplicity-bin:844
 msgid "Rerun command with --force option to actually delete."
@@ -281,7 +281,7 @@ msgstr ""
 #: ../duplicity-bin:1233
 #, python-format
 msgid "Last %s backup left a partial set, restarting."
-msgstr "La lasta %s konservkopiado lasis nekompletan aron. Rekomencanta."
+msgstr ""
 
 #: ../duplicity-bin:1237
 #, python-format
@@ -433,19 +433,19 @@ msgstr ""
 
 #: ../duplicity/collections.py:400
 msgid "Time:"
-msgstr "Tempo:"
+msgstr ""
 
 #: ../duplicity/collections.py:400
 msgid "Num volumes:"
-msgstr "Kvanto da savkopiaroj:"
+msgstr ""
 
 #: ../duplicity/collections.py:404
 msgid "Full"
-msgstr "Plena"
+msgstr ""
 
 #: ../duplicity/collections.py:407
 msgid "Incremental"
-msgstr "Suplementa"
+msgstr ""
 
 #: ../duplicity/collections.py:467
 msgid "local"

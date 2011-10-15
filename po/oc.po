@@ -1,20 +1,20 @@
-# Esperanto translation for duplicity
-# Copyright (c) 2009 Rosetta Contributors and Canonical Ltd 2009
+# Occitan (post 1500) translation for duplicity
+# Copyright (c) 2011 Rosetta Contributors and Canonical Ltd 2011
 # This file is distributed under the same license as the duplicity package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2009.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
-"Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-10-10 16:25-0500\n"
-"PO-Revision-Date: 2010-05-23 16:48+0000\n"
-"Last-Translator: Kenneth Loafman <kenneth@loafman.com>\n"
-"Language-Team: Esperanto <eo@li.org>\n"
+"PO-Revision-Date: 2011-08-20 10:44+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Occitan (post 1500) <oc@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
 "X-Launchpad-Export-Date: 2011-10-11 05:36+0000\n"
 "X-Generator: Launchpad (build 14123)\n"
 
@@ -79,28 +79,32 @@ msgid ""
 "Fatal Error: Unable to start incremental backup.  Old signatures not found "
 "and incremental specified"
 msgstr ""
+"Error fatala : impossible d'aviar lo salvament incremental, ancianas "
+"signaturas pas trobadas pel metòde incremental indicat"
 
 #: ../duplicity-bin:499
 msgid "No signatures found, switching to full backup."
 msgstr ""
+"Cap de signatura de salvament pas trobat, bascuola cap a un salvament "
+"complet."
 
 #: ../duplicity-bin:513
 msgid "Backup Statistics"
-msgstr ""
+msgstr "Estatisticas de salvament"
 
 #: ../duplicity-bin:593
 #, python-format
 msgid "%s not found in archive, no files restored."
-msgstr ""
+msgstr "%s es pas estat trobat dins l’archiu, cap de fichièr pas restablit."
 
 #: ../duplicity-bin:597
 msgid "No files found in archive - nothing restored."
-msgstr ""
+msgstr "Cap de fichièr pas trobat dins l’archiu – pas res a restablir."
 
 #: ../duplicity-bin:630
 #, python-format
 msgid "Processed volume %d of %d"
-msgstr "Traktis la savkopieron %d el %d"
+msgstr "Lo volum %d sus %d es estat tractat"
 
 #: ../duplicity-bin:655
 #, python-format
@@ -110,64 +114,67 @@ msgstr ""
 #: ../duplicity-bin:657
 #, python-format
 msgid "Calculated hash: %s"
-msgstr ""
+msgstr "Emprencha calculada : %s"
 
 #: ../duplicity-bin:658
 #, python-format
 msgid "Manifest hash: %s"
-msgstr ""
+msgstr "Emprencha manifèsta : %s"
 
 #: ../duplicity-bin:696
 #, python-format
 msgid "Volume was signed by key %s, not %s"
-msgstr ""
+msgstr "Lo volum es estat signat per la clau %s e non pas %s"
 
 #: ../duplicity-bin:726
 #, python-format
 msgid "Verify complete: %s, %s."
-msgstr ""
+msgstr "Verificacion completa : %s, %s."
 
 #: ../duplicity-bin:727
 #, python-format
 msgid "%d file compared"
 msgid_plural "%d files compared"
-msgstr[0] "Komparis %d dosieron."
-msgstr[1] "Komparis %d dosierojn."
+msgstr[0] "%d fichièr comparat"
+msgstr[1] "%d fichièrs comparats"
 
 #: ../duplicity-bin:729
 #, python-format
 msgid "%d difference found"
 msgid_plural "%d differences found"
-msgstr[0] "Trovis %d diferencon."
-msgstr[1] "Trovis %d diferencojn."
+msgstr[0] "%d diferéncia trobada"
+msgstr[1] "%d diferéncias trobadas"
 
 #: ../duplicity-bin:748
 msgid "No extraneous files found, nothing deleted in cleanup."
 msgstr ""
+"Cap de fichièr estrangièr pas detectat, cap de supression pas efectuada al "
+"moment del netejatge."
 
 #: ../duplicity-bin:753
 msgid "Deleting this file from backend:"
 msgid_plural "Deleting these files from backend:"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Suprimir aqueste fichièr del rèire plan :"
+msgstr[1] "Suprimir aquestes fichièrs del rèire plan :"
 
 #: ../duplicity-bin:765
 msgid "Found the following file to delete:"
 msgid_plural "Found the following files to delete:"
-msgstr[0] "Trovis la jenan forigendan dosieron:"
-msgstr[1] "Trovis la jenajn forigendajn dosierojn:"
+msgstr[0] "Lo fichièr seguent es estat trobat per la supression :"
+msgstr[1] "Los fichièrs seguents son estats trobats per la supression :"
 
 #: ../duplicity-bin:769
 msgid "Run duplicity again with the --force option to actually delete."
-msgstr "Denove kurigu duplicity kun la opcio --force por vere forigi."
+msgstr ""
+"Reexecutatz duplicity amb l’opcion --force per suprimir vertadièrament."
 
 #: ../duplicity-bin:808
 msgid "There are backup set(s) at time(s):"
-msgstr "Estas savkopiaro(j) de la horo(j):"
+msgstr "I a un o mantun jòc de salvament datats del :"
 
 #: ../duplicity-bin:810
 msgid "Which can't be deleted because newer sets depend on them."
-msgstr ""
+msgstr "Que pòdon pas èsser suprimits perque de jòcs novèls ne dependon."
 
 #: ../duplicity-bin:814
 msgid ""
@@ -182,18 +189,18 @@ msgstr ""
 #: ../duplicity-bin:823
 msgid "Deleting backup set at time:"
 msgid_plural "Deleting backup sets at times:"
-msgstr[0] "Forigas la savkopiaron de la horo:"
-msgstr[1] "Forigas la savkopiarojn de la horoj:"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../duplicity-bin:840
 msgid "Found old backup set at the following time:"
 msgid_plural "Found old backup sets at the following times:"
-msgstr[0] "Trovis malnovan savkopiaron de la jena horo:"
-msgstr[1] "Trovis malnovajn savkopiarojn de la jenaj horoj:"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../duplicity-bin:844
 msgid "Rerun command with --force option to actually delete."
-msgstr ""
+msgstr "Reaviatz la comanda amb l'opcion --force per forçar la supression."
 
 #: ../duplicity-bin:922
 #, python-format
@@ -208,7 +215,7 @@ msgstr ""
 #: ../duplicity-bin:954 ../duplicity/dup_temp.py:260
 #, python-format
 msgid "Failed to read %s: %s"
-msgstr ""
+msgstr "Impossible de legir %s : %s"
 
 #: ../duplicity-bin:965
 #, python-format
@@ -222,6 +229,7 @@ msgstr ""
 #: ../duplicity-bin:1018
 msgid "Synchronizing remote metadata to local cache..."
 msgstr ""
+"Sincronizacion de las metadonadas distantas cap a l'escondedor local..."
 
 #: ../duplicity-bin:1031
 msgid "Sync would copy the following from remote to local:"
@@ -233,7 +241,7 @@ msgstr ""
 
 #: ../duplicity-bin:1077
 msgid "Unable to get free space on temp."
-msgstr ""
+msgstr "Impossible de determinar l’espaci liure dins lo dorsièr temporari."
 
 #: ../duplicity-bin:1085
 #, python-format
@@ -247,7 +255,7 @@ msgstr ""
 
 #: ../duplicity-bin:1096
 msgid "Unable to get max open files."
-msgstr ""
+msgstr "Impossible d’obténer lo maximum de fichièrs dobèrts."
 
 #: ../duplicity-bin:1100
 #, python-format
@@ -281,7 +289,7 @@ msgstr ""
 #: ../duplicity-bin:1233
 #, python-format
 msgid "Last %s backup left a partial set, restarting."
-msgstr "La lasta %s konservkopiado lasis nekompletan aron. Rekomencanta."
+msgstr ""
 
 #: ../duplicity-bin:1237
 #, python-format
@@ -290,11 +298,11 @@ msgstr ""
 
 #: ../duplicity-bin:1248
 msgid "Last full backup date:"
-msgstr ""
+msgstr "Data del darrièr salvament integral :"
 
 #: ../duplicity-bin:1250
 msgid "Last full backup date: none"
-msgstr ""
+msgstr "Data del darrièr salvament integral : pas cap"
 
 #: ../duplicity-bin:1252
 msgid "Last full backup is too old, forcing full backup"
@@ -307,26 +315,26 @@ msgstr ""
 #: ../duplicity-bin:1366
 #, python-format
 msgid "GPG error detail: %s"
-msgstr ""
+msgstr "Detalhs de l’error GPG : %s"
 
 #: ../duplicity-bin:1375
 #, python-format
 msgid "User error detail: %s"
-msgstr ""
+msgstr "Detalhs de l’error utilizaire : %s"
 
 #: ../duplicity-bin:1384
 #, python-format
 msgid "Backend error detail: %s"
-msgstr ""
+msgstr "Detalhs de l’error de salvament : %s"
 
 #: ../duplicity/asyncscheduler.py:66
 #, python-format
 msgid "instantiating at concurrency %d"
-msgstr ""
+msgstr "instanciacion al nivèl de concurréncia %d"
 
 #: ../duplicity/asyncscheduler.py:93
 msgid "inserting barrier"
-msgstr ""
+msgstr "insercion d’una barrièra"
 
 #: ../duplicity/asyncscheduler.py:142
 msgid "running task synchronously (asynchronicity disabled)"
@@ -348,17 +356,17 @@ msgstr ""
 #: ../duplicity/asyncscheduler.py:211 ../duplicity/asyncscheduler.py:232
 #, python-format
 msgid "active workers = %d"
-msgstr ""
+msgstr "executants actius = %d"
 
 #: ../duplicity/asyncscheduler.py:252
 #, python-format
 msgid "task execution done (success: %s)"
-msgstr ""
+msgstr "execucion de prètzfach realizada (succès : %s)"
 
 #: ../duplicity/backend.py:485 ../duplicity/backend.py:509
 #, python-format
 msgid "Reading results of '%s'"
-msgstr ""
+msgstr "Lectura dels resultats de « %s »"
 
 #: ../duplicity/backend.py:524
 #, python-format
@@ -393,11 +401,11 @@ msgstr ""
 
 #: ../duplicity/collections.py:205
 msgid "Fatal Error: Neither remote nor local manifest is readable."
-msgstr ""
+msgstr "Error fatala : ni lo manifèste local, ni lo distant es pas lisible."
 
 #: ../duplicity/collections.py:316
 msgid "Preferring Backupset over previous one!"
-msgstr ""
+msgstr "Jòc de salvament preferit al precedent !"
 
 #: ../duplicity/collections.py:319
 #, python-format
@@ -411,63 +419,63 @@ msgstr ""
 
 #: ../duplicity/collections.py:394
 msgid "Chain start time: "
-msgstr ""
+msgstr "Data de començament de cadena : "
 
 #: ../duplicity/collections.py:395
 msgid "Chain end time: "
-msgstr ""
+msgstr "Date de fin de cadena : "
 
 #: ../duplicity/collections.py:396
 #, python-format
 msgid "Number of contained backup sets: %d"
-msgstr ""
+msgstr "Nombre de jòcs de salvament contenguts : %d"
 
 #: ../duplicity/collections.py:398
 #, python-format
 msgid "Total number of contained volumes: %d"
-msgstr ""
+msgstr "Nombre total de volums contenguts : %d"
 
 #: ../duplicity/collections.py:400
 msgid "Type of backup set:"
-msgstr ""
+msgstr "Tipe de jòc de salvament :"
 
 #: ../duplicity/collections.py:400
 msgid "Time:"
-msgstr "Tempo:"
+msgstr "Durada :"
 
 #: ../duplicity/collections.py:400
 msgid "Num volumes:"
-msgstr "Kvanto da savkopiaroj:"
+msgstr "Nombre de volums :"
 
 #: ../duplicity/collections.py:404
 msgid "Full"
-msgstr "Plena"
+msgstr "Integrala"
 
 #: ../duplicity/collections.py:407
 msgid "Incremental"
-msgstr "Suplementa"
+msgstr "Incremental"
 
 #: ../duplicity/collections.py:467
 msgid "local"
-msgstr ""
+msgstr "locala"
 
 #: ../duplicity/collections.py:469
 msgid "remote"
-msgstr ""
+msgstr "referencial distant"
 
 #: ../duplicity/collections.py:622
 msgid "Collection Status"
-msgstr ""
+msgstr "Estat de la colleccion"
 
 #: ../duplicity/collections.py:624
 #, python-format
 msgid "Connecting with backend: %s"
-msgstr ""
+msgstr "Connexion al servidor central : %s"
 
 #: ../duplicity/collections.py:626
 #, python-format
 msgid "Archive dir: %s"
-msgstr ""
+msgstr "Dorsièr d’archiu : %s"
 
 #: ../duplicity/collections.py:629
 #, python-format
@@ -517,15 +525,15 @@ msgstr ""
 #, python-format
 msgid "%d file exists on backend"
 msgid_plural "%d files exist on backend"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d fichièr existís sul servidor central"
+msgstr[1] "%d fichièrs existisson sul servidor central"
 
 #: ../duplicity/collections.py:682
 #, python-format
 msgid "%d file exists in cache"
 msgid_plural "%d files exist in cache"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d fichièr existís dins l'escondedor"
+msgstr[1] "%d fichièrs existisson dins l'escondedor"
 
 #: ../duplicity/collections.py:734
 msgid ""
@@ -567,7 +575,7 @@ msgstr ""
 #: ../duplicity/collections.py:811
 #, python-format
 msgid "File %s is part of known set"
-msgstr ""
+msgstr "Lo fichièr %s fa partida d’un jòc conegut"
 
 #: ../duplicity/collections.py:814
 #, python-format
@@ -582,7 +590,7 @@ msgstr ""
 #: ../duplicity/collections.py:832
 #, python-format
 msgid "Found backup chain %s"
-msgstr ""
+msgstr "Cadena de salvament %s trobada"
 
 #: ../duplicity/collections.py:837
 #, python-format
@@ -592,7 +600,7 @@ msgstr ""
 #: ../duplicity/collections.py:841
 #, python-format
 msgid "Found orphaned set %s"
-msgstr ""
+msgstr "Jòc orfanèl %s trobat"
 
 #: ../duplicity/collections.py:993
 #, python-format
@@ -611,12 +619,12 @@ msgstr ""
 
 #: ../duplicity/commandline.py:209
 msgid "Unable to load gio module"
-msgstr ""
+msgstr "Impossible de cargar lo modul gio"
 
 #: ../duplicity/commandline.py:231
 #, python-format
 msgid "Error opening file %s"
-msgstr ""
+msgstr "Error al moment de la dobertura del fichièr %s"
 
 #. Used in usage help to represent a Unix-style path name. Example:
 #. --archive-dir <path>
@@ -624,14 +632,14 @@ msgstr ""
 #: ../duplicity/commandline.py:277 ../duplicity/commandline.py:331
 #: ../duplicity/commandline.py:484 ../duplicity/commandline.py:699
 msgid "path"
-msgstr ""
+msgstr "camin"
 
 #. Used in usage help to represent an ID for a GnuPG key. Example:
 #. --encrypt-key <gpg_key_id>
 #: ../duplicity/commandline.py:272 ../duplicity/commandline.py:279
 #: ../duplicity/commandline.py:473 ../duplicity/commandline.py:672
 msgid "gpg-key-id"
-msgstr ""
+msgstr "identificant_clau_gpg"
 
 #. Used in usage help to represent a "glob" style pattern for
 #. matching one or more files, as described in the documentation.
@@ -640,7 +648,7 @@ msgstr ""
 #: ../duplicity/commandline.py:287 ../duplicity/commandline.py:371
 #: ../duplicity/commandline.py:722
 msgid "shell_pattern"
-msgstr ""
+msgstr "motiu_shell"
 
 #. Used in usage help to represent the name of a file. Example:
 #. --log-file <filename>
@@ -649,12 +657,12 @@ msgstr ""
 #: ../duplicity/commandline.py:378 ../duplicity/commandline.py:389
 #: ../duplicity/commandline.py:668
 msgid "filename"
-msgstr ""
+msgstr "nom del fichièr"
 
 #. Used in usage help to represent a regular expression (regexp).
 #: ../duplicity/commandline.py:312 ../duplicity/commandline.py:380
 msgid "regular_expression"
-msgstr ""
+msgstr "expression_regulara"
 
 #. Used in usage help to represent a time spec for a previous
 #. point in time, as described in the documentation. Example:
@@ -662,7 +670,7 @@ msgstr ""
 #: ../duplicity/commandline.py:343 ../duplicity/commandline.py:433
 #: ../duplicity/commandline.py:754
 msgid "time"
-msgstr ""
+msgstr "temps | ora"
 
 #. Used in usage help. (Should be consistent with the "Options:"
 #. header.) Example:
@@ -670,7 +678,7 @@ msgstr ""
 #: ../duplicity/commandline.py:347 ../duplicity/commandline.py:481
 #: ../duplicity/commandline.py:687
 msgid "options"
-msgstr ""
+msgstr "opcions"
 
 #: ../duplicity/commandline.py:356
 #, python-format
@@ -682,16 +690,16 @@ msgstr ""
 #. Used in usage help to represent an imap mailbox
 #: ../duplicity/commandline.py:369
 msgid "imap_mailbox"
-msgstr ""
+msgstr "bóstia_de_letras_IMAP"
 
 #: ../duplicity/commandline.py:383
 msgid "file_descriptor"
-msgstr ""
+msgstr "descriptor_fichièr"
 
 #. Used in usage help (noun)
 #: ../duplicity/commandline.py:394
 msgid "backup name"
-msgstr ""
+msgstr "nom_salvat"
 
 #. Used in usage help to represent a desired number of
 #. something. Example:
@@ -699,55 +707,55 @@ msgstr ""
 #: ../duplicity/commandline.py:410 ../duplicity/commandline.py:454
 #: ../duplicity/commandline.py:514 ../duplicity/commandline.py:682
 msgid "number"
-msgstr ""
+msgstr "nombre"
 
 #. noun
 #: ../duplicity/commandline.py:459 ../duplicity/commandline.py:463
 #: ../duplicity/commandline.py:653
 msgid "command"
-msgstr ""
+msgstr "comanda"
 
 #. Used in usage help. Example:
 #. --timeout <seconds>
 #: ../duplicity/commandline.py:489 ../duplicity/commandline.py:716
 msgid "seconds"
-msgstr ""
+msgstr "segondas"
 
 #. abbreviation for "character" (noun)
 #: ../duplicity/commandline.py:495 ../duplicity/commandline.py:650
 msgid "char"
-msgstr ""
+msgstr "caract."
 
 #: ../duplicity/commandline.py:616
 #, python-format
 msgid "Using archive dir: %s"
-msgstr ""
+msgstr "Utilizacion del repertòri d’archiu : %s"
 
 #: ../duplicity/commandline.py:617
 #, python-format
 msgid "Using backup name: %s"
-msgstr ""
+msgstr "Utilizacion del nom de salvament : %s"
 
 #: ../duplicity/commandline.py:624
 #, python-format
 msgid "Command line error: %s"
-msgstr ""
+msgstr "Error de linha de comanda : %s"
 
 #: ../duplicity/commandline.py:625
 msgid "Enter 'duplicity --help' for help screen."
-msgstr ""
+msgstr "Entratz « duplicity --help » per afichar l’ecran d’ajuda."
 
 #. Used in usage help to represent a Unix-style path name. Example:
 #. rsync://user[:password]@other_host[:port]//absolute_path
 #: ../duplicity/commandline.py:638
 msgid "absolute_path"
-msgstr ""
+msgstr "camin_absolut"
 
 #. Used in usage help. Example:
 #. tahoe://alias/some_dir
 #: ../duplicity/commandline.py:642
 msgid "alias"
-msgstr ""
+msgstr "aliàs"
 
 #. Used in help to represent a "bucket name" for Amazon Web
 #. Services' Simple Storage Service (S3). Example:
@@ -766,19 +774,19 @@ msgstr ""
 #. noun
 #: ../duplicity/commandline.py:661
 msgid "count"
-msgstr ""
+msgstr "compte"
 
 #. Used in usage help to represent the name of a file directory
 #: ../duplicity/commandline.py:664
 msgid "directory"
-msgstr ""
+msgstr "dorsièr"
 
 #. Used in usage help, e.g. to represent the name of a code
 #. module. Example:
 #. rsync://user[:password]@other.host[:port]::/module/some_dir
 #: ../duplicity/commandline.py:677
 msgid "module"
-msgstr ""
+msgstr "modul"
 
 #. Used in usage help to represent an internet hostname. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
@@ -790,33 +798,33 @@ msgstr ""
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:695
 msgid "password"
-msgstr ""
+msgstr "senhal"
 
 #. Used in usage help to represent a TCP port number. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:703
 msgid "port"
-msgstr ""
+msgstr "pòrt"
 
 #. Used in usage help. This represents a string to be used as a
 #. prefix to names for backup files created by Duplicity. Example:
 #. s3://other.host/bucket_name[/prefix]
 #: ../duplicity/commandline.py:708
 msgid "prefix"
-msgstr ""
+msgstr "prefix"
 
 #. Used in usage help to represent a Unix-style path name. Example:
 #. rsync://user[:password]@other.host[:port]/relative_path
 #: ../duplicity/commandline.py:712
 msgid "relative_path"
-msgstr ""
+msgstr "relative_path"
 
 #. Used in usage help to represent the name of a single file
 #. directory or a Unix-style path to a directory. Example:
 #. file:///some_dir
 #: ../duplicity/commandline.py:727
 msgid "some_dir"
-msgstr ""
+msgstr "some_dir"
 
 #. Used in usage help to represent the name of a single file
 #. directory or a Unix-style path to a directory where files will be
@@ -824,14 +832,14 @@ msgstr ""
 #. duplicity [full|incremental] [options] source_dir target_url
 #: ../duplicity/commandline.py:733
 msgid "source_dir"
-msgstr ""
+msgstr "source_dir"
 
 #. Used in usage help to represent a URL files will be coming
 #. FROM. Example:
 #. duplicity [restore] [options] source_url target_dir
 #: ../duplicity/commandline.py:738
 msgid "source_url"
-msgstr ""
+msgstr "source_url"
 
 #. Used in usage help to represent the name of a single file
 #. directory or a Unix-style path to a directory. where files will be
@@ -839,21 +847,21 @@ msgstr ""
 #. duplicity [restore] [options] source_url target_dir
 #: ../duplicity/commandline.py:744
 msgid "target_dir"
-msgstr ""
+msgstr "target_dir"
 
 #. Used in usage help to represent a URL files will be going TO.
 #. Example:
 #. duplicity [full|incremental] [options] source_dir target_url
 #: ../duplicity/commandline.py:749
 msgid "target_url"
-msgstr ""
+msgstr "target_url"
 
 #. Used in usage help to represent a user name (i.e. login).
 #. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:759
 msgid "user"
-msgstr ""
+msgstr "utilizaire"
 
 #. Header in usage help
 #: ../duplicity/commandline.py:776
@@ -863,7 +871,7 @@ msgstr ""
 #. Header in usage help
 #: ../duplicity/commandline.py:798
 msgid "Commands:"
-msgstr ""
+msgstr "Comandas :"
 
 #: ../duplicity/commandline.py:822
 #, python-format
@@ -1125,7 +1133,7 @@ msgstr ""
 #: ../duplicity/path.py:563
 #, python-format
 msgid "Deleting %s"
-msgstr ""
+msgstr "Supression de %s"
 
 #: ../duplicity/path.py:572
 #, python-format
