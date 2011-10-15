@@ -1,4 +1,8 @@
-testing/config.py
-testing/*.log
-Releases
+.project
+.pydevproject
+.settings
+.settings/*
 patch
+Releases
+testing/*.log
+testing/config.py
