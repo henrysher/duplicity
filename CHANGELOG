@@ -1,10 +1,12 @@
-New in v0.6.16 (2011/10/??)
+New in v0.6.16 (2011/10/16)
 ----------------------------
 Enhancements:
-- usability enhancement: sign passphrase prompt has no second
+- Usability enhancement: sign passphrase prompt has no second
   verification prompt anymore, symmetric passphrases are
   still verified
 - Fixed Unicode errors when translations are used.
+- Replaced old tarfile.py with Python 2.7 version, modded
+  to support Python 2.4 syntax.
 
 Bugs closed in this release:
 485219     Fixed fields are not fixed, leading to buffer overflows...
@@ -15,6 +17,7 @@ Bugs closed in this release:
 835892     duplicity crash: "AssertionError: rb None None"
 838162     Duplicity URL Parser is not parsing IPv6 properly
 838264     Duplicity thinks partial encrypted backups are not encrypted
+870116     Duplicity does not handle UIDs higher than 60001
 
 Merges:
 lp:~ed.so/duplicity/reuse-passphrase-for-signing-fix

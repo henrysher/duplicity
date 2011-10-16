@@ -26,7 +26,12 @@ if [ "`id -ur`" != '0' ]; then
 fi
 
 # run against all supported python versions
-for v in 2.6; do
+for v in 2.4 2.5 2.6 2.7; do
+    if [ ! -e /usr/bin/python$v ]; then
+        echo "python$v not found on system"
+        continue
+    fi
+
     # Go to directory housing this script
     cd `dirname $0`
 
