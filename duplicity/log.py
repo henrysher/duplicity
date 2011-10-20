@@ -190,6 +190,7 @@ class ErrorCode:
     source_dir_mismatch = 42 # 41 is reserved for par2
     ftps_lftp_missing = 43
     volume_wrong_size = 44
+    enryption_mismatch = 45
 
     # 50->69 reserved for backend errors
     backend_error = 50

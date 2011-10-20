@@ -295,6 +295,32 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
             tdp.delete()
         return putsize
 
+    def validate_encryption_settings(backup_set, manifest):
+        """
+        When restarting a backup, we have no way to verify that the current
+        passphrase is the same as the one used for the beginning of the backup.
+        This is because the local copy of the manifest is unencrypted and we
+        don't need to decrypt the existing volumes on the backend.  To ensure
+        that we are using the same passphrase, we manually download volume 1
+        and decrypt it with the current passphrase.  We also want to confirm
+        that we're using the same encryption settings (i.e. we don't switch
+        from encrypted to non in the middle of a backup chain), so we check
+        that the vol1 filename on the server matches the settings of this run.
+        """
+        vol1_filename = file_naming.get(backup_type, 1,
+                                        encrypted=globals.encryption,
+                                        gzipped=not globals.encryption)
+        if vol1_filename != backup_set.volume_name_dict[1]:
+            log.FatalError(_("Restarting backup, but current encryption "
+                             "settings do not match original settings"),
+                           log.ErrorCode.enryption_mismatch)
+
+        # Settings are same, let's check passphrase itself if we are encrypted
+        if globals.encryption:
+            fileobj = restore_get_enc_fileobj(globals.backend, vol1_filename,
+                                              manifest.volume_info_dict[1])
+            fileobj.close()
+
     if not globals.restart:
         # normal backup start
         vol_num = 0
@@ -305,6 +331,7 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
         mf = globals.restart.last_backup.get_local_manifest()
         globals.restart.checkManifest(mf)
         globals.restart.setLastSaved(mf)
+        validate_encryption_settings(globals.restart.last_backup, mf)
         mf.fh = man_outfp
         last_block = globals.restart.last_block
         log.Notice("Restarting after volume %s, file %s, block %s" %
