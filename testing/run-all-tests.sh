@@ -40,10 +40,10 @@ for v in 2.4 2.5 2.6 2.7; do
     python$v ./compilec.py
     popd
 
-    for t in `cat alltests`; do
+    for t in `ls manual`; do
         echo "========== Running $t for python$v =========="
         pushd .
-        python$v -u $t -v 2>&1 | grep -v "unsafe ownership"
+        python$v -u manual/$t -v 2>&1 | grep -v "unsafe ownership"
         popd
         echo "========== Finished $t for python$v =========="
         echo
