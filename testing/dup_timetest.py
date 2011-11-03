@@ -139,6 +139,10 @@ class TimeTest:
         self.assertRaises(dup_time.TimeException, g2t, "hello")
         self.assertRaises(dup_time.TimeException, g2t, "")
         self.assertRaises(dup_time.TimeException, g2t, "3q")
+    
+    def testConvertion(self):
+        t = int(time.time())
+        assert dup_time.stringtotime(dup_time.timetostring(t)) == t
 
 class TimeTest1(TimeTest, unittest.TestCase):
     
