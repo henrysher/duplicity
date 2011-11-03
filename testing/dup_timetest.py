@@ -21,7 +21,7 @@
 
 import config
 import sys, unittest, time, types
-
+from copy import copy
 from duplicity import globals
 from duplicity import dup_time
 
@@ -41,9 +41,12 @@ class TimeTest:
 
     def testConversion_separator(self):
         """Same as testConversion, but change time Separator"""
-        globals.time_separator = "_"
-        self.testConversion()
-        globals.time_separator = ":"
+        prev_sep = copy(globals.time_separator)
+        try:
+            globals.time_separator = "_"
+            self.testConversion()
+        finally:
+            globals.time_separator = prev_sep
 
     def testCmp(self):
         """Test time comparisons"""
@@ -61,16 +64,19 @@ class TimeTest:
 
     def testCmp_separator(self):
         """Like testCmp but with new separator"""
-        globals.time_separator = "_"
-        cmp = dup_time.cmp
-        assert cmp(1,2) == -1
-        assert cmp(2,2) == 0
-        assert cmp(5,1) == 1
-        assert cmp("2001-09-01T21_49_04Z", "2001-08-01T21_49_04Z") == 1
-        assert cmp("2001-09-01T04_49_04+03_23", "2001-09-01T21_49_04Z") == -1
-        assert cmp("2001-09-01T12_00_00Z", "2001-09-01T04_00_00-08_00") == 0
-        assert cmp("2001-09-01T12_00_00-08_00", "2001-09-01T12_00_00-07_00") == 1
-        globals.time_separator = ":"
+        prev_sep = copy(globals.time_separator)
+        try:
+            globals.time_separator = "_"
+            cmp = dup_time.cmp
+            assert cmp(1,2) == -1
+            assert cmp(2,2) == 0
+            assert cmp(5,1) == 1
+            assert cmp("2001-09-01T21_49_04Z", "2001-08-01T21_49_04Z") == 1
+            assert cmp("2001-09-01T04_49_04+03_23", "2001-09-01T21_49_04Z") == -1
+            assert cmp("2001-09-01T12_00_00Z", "2001-09-01T04_00_00-08_00") == 0
+            assert cmp("2001-09-01T12_00_00-08_00", "2001-09-01T12_00_00-07_00") == 1
+        finally:
+            globals.time_separator = prev_sep
 
     def testStringtotime(self):
         """Test converting string to time"""
