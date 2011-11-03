@@ -2,6 +2,7 @@
 #
 # Copyright 2002 Ben Escoto <ben@emerose.org>
 # Copyright 2007 Kenneth Loafman <kenneth@loafman.com>
+# Copyright 2011 Canonical Ltd
 #
 # This file is part of duplicity.
 #
@@ -19,12 +20,6 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-# Check permissions
-if [ "`id -ur`" != '0' ]; then
-    echo 'Error: you must be root.'
-    exit 1
-fi
-
 # run against all supported python versions
 for v in 2.4 2.5 2.6 2.7; do
     if [ ! -e /usr/bin/python$v ]; then
@@ -40,13 +35,16 @@ for v in 2.4 2.5 2.6 2.7; do
     python$v ./compilec.py
     popd
 
-    for t in `ls manual/*.py`; do
-        if [ "$t" = "manual/config.py" ]; then
+    for t in `ls auto/*.py`; do
+        if [ "$t" = "auto/helper.py" ]; then
             continue
         fi
         echo "========== Running $t for python$v =========="
         pushd .
-        python$v -u $t -v 2>&1 | grep -v "unsafe ownership"
+        if ! env PYTHONPATH=.. python$v -u $t -v 2>&1; then
+          echo "Test failed"
+          exit 1
+        fi
         popd
         echo "========== Finished $t for python$v =========="
         echo
