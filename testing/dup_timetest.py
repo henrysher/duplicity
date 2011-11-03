@@ -135,10 +135,14 @@ class TimeTest:
         self.assertRaises(dup_time.TimeException, g2t, "3q")
 
 class TimeTest1(TimeTest, unittest.TestCase):
-    globals.old_filenames = False
+    
+    def setUp(self):
+        globals.old_filenames = False
 
 class TimeTest2(TimeTest, unittest.TestCase):
-    globals.old_filenames = True
+    
+    def setUp(self):
+        globals.old_filenames = True
 
 if __name__ == '__main__':
     unittest.main()
