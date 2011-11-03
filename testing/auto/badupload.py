@@ -20,11 +20,10 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import config
+import helper
 import os, unittest, sys
-sys.path.insert(0, "../")
 
-config.setup()
+helper.setup()
 
 # This can be changed to select the URL to use
 backend_url = 'file://testfiles/output'
@@ -40,7 +39,7 @@ class BadUploadTest(unittest.TestCase):
     Test missing volume upload using duplicity binary
     """
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
+        assert not os.system("tar xzf autofiles.tar.gz > /dev/null 2>&1")
 
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
