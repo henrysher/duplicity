@@ -19,15 +19,14 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import config
+import helper
 import sys, unittest
-sys.path.insert(0, "../")
 
 import duplicity.backend
 import duplicity.backends #@UnusedImport
 from duplicity.errors import * #@UnusedWildImport
 
-config.setup()
+helper.setup()
 
 class ParsedUrlTest(unittest.TestCase):
     """Test the ParsedUrl class"""

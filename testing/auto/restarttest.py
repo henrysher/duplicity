@@ -19,13 +19,13 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import config
+import helper
 import sys, os, unittest
 
 import duplicity.backend
 from duplicity import path
 
-config.setup()
+helper.setup()
 
 # This can be changed to select the URL to use
 backend_url = "file://testfiles/output"

@@ -19,7 +19,7 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import config
+import helper
 import sys, unittest
 
 from duplicity import dup_time
@@ -27,7 +27,7 @@ from duplicity import file_naming
 from duplicity import log
 from duplicity import globals
 
-config.setup()
+helper.setup()
 
 class Test36(unittest.TestCase):
     def test_base36(self):
