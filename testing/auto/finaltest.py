@@ -19,7 +19,7 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import config
+import helper
 import sys, os, unittest
 
 import duplicity.backend
@@ -28,7 +28,7 @@ from duplicity import collections
 from duplicity import commandline
 from duplicity import globals
 
-config.setup()
+helper.setup()
 
 # This can be changed to select the URL to use
 backend_url = "file://testfiles/output"
@@ -160,11 +160,11 @@ class FinalTest:
 
     def test_asym_cycle(self):
         """Like test_basic_cycle but use asymmetric encryption and signing"""
-        backup_options = ["--encrypt-key " + config.encrypt_key1,
-                          "--sign-key " + config.sign_key]
-        restore_options = ["--encrypt-key " + config.encrypt_key1,
-                           "--sign-key " + config.sign_key]
-        config.set_environ("SIGN_PASSPHRASE", config.sign_passphrase)
+        backup_options = ["--encrypt-key " + helper.encrypt_key1,
+                          "--sign-key " + helper.sign_key]
+        restore_options = ["--encrypt-key " + helper.encrypt_key1,
+                           "--sign-key " + helper.sign_key]
+        helper.set_environ("SIGN_PASSPHRASE", helper.sign_passphrase)
         self.test_basic_cycle(backup_options = backup_options,
                               restore_options = restore_options)
 
@@ -179,15 +179,18 @@ class FinalTest:
 
     def test_long_filenames(self):
         """Test backing up a directory with long filenames in it"""
+        # Note that some versions of ecryptfs (at least through Ubuntu 11.10)
+        # have a bug where they treat the max path segment length as 143
+        # instead of 255.  So make sure that these segments don't break that.
         lf_dir = path.Path("testfiles/long_filenames")
         if lf_dir.exists():
             lf_dir.deltree()
         lf_dir.mkdir()
-        lf1 = lf_dir.append("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        lf1 = lf_dir.append("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
         lf1.mkdir()
-        lf2 = lf1.append("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
+        lf2 = lf1.append("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
         lf2.mkdir()
-        lf3 = lf2.append("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
+        lf3 = lf2.append("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
         lf3.mkdir()
         lf4 = lf3.append("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
         lf4.touch()
@@ -195,7 +198,7 @@ class FinalTest:
         os.symlink("SYMLINK-DESTINATION-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------", lf4_1.name)
         lf4_1.setdata()
         assert lf4_1.issym()
-        lf4_2 = lf3.append("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
+        lf4_2 = lf3.append("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
         fp = lf4_2.open("wb")
         fp.write("hello" * 1000)
         assert not fp.close()

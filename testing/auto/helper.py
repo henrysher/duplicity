@@ -19,6 +19,7 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
+import os
 from duplicity import backend
 from duplicity import globals
 from duplicity import log
@@ -34,3 +35,12 @@ def setup():
     log.setverbosity(log.WARNING)
     globals.print_statistics = 0
     backend.import_backends()
+
+def set_environ(varname, value):
+    if value is not None:
+        os.environ[varname] = value
+    else:
+        try:
+            del os.environ[varname]
+        except Exception:
+            pass
