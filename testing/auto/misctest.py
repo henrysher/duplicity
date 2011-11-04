@@ -19,12 +19,12 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import config
+import helper
 import sys, os, unittest, cStringIO
 
 from duplicity import misc
 
-config.setup()
+helper.setup()
 
 class MiscTest(unittest.TestCase):
     """Test functions/classes in misc.py"""
