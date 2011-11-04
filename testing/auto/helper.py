@@ -23,6 +23,11 @@ from duplicity import backend
 from duplicity import globals
 from duplicity import log
 
+sign_key = '56538CCF'
+sign_passphrase = 'test'
+encrypt_key1 = 'B5FA894F'
+encrypt_key2 = '9B736B2A'
+
 def setup():
     """ setup for unit tests """
     log.setup()

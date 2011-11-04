@@ -20,7 +20,13 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 # Go to directory housing this script
-cd `dirname $0`
+cd $(dirname $0)
+
+THISDIR=$(pwd)
+export TZ=US/Central
+export LANG=
+export PYTHONPATH=$(dirname "$THISDIR")
+export GNUPGHOME="$THISDIR/home/gnupg"
 
 # skip if test does not exist
 if [ ! -e $1 ]; then
@@ -42,7 +48,7 @@ for v in 2.4 2.5 2.6 2.7; do
 
     echo "========== Running $1 for python$v =========="
     pushd .
-    if ! env TZ=US/Central LANG= PYTHONPATH=.. python$v -u $1 -v 2>&1; then
+    if ! python$v -u $1 -v 2>&1; then
       echo "Test failed"
       exit 1
     fi

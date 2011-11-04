@@ -19,14 +19,13 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import config
+import helper
 import sys, os, unittest, random
-sys.path.insert(0, "../")
 
 from duplicity import gpg
 from duplicity import path
 
-config.setup()
+helper.setup()
 
 default_profile = gpg.GPGProfile(passphrase = "foobar")
 
@@ -79,13 +78,13 @@ class GPGTest(unittest.TestCase):
 
     def test_gpg_asym(self):
         """Test GPG asymmetric encryption"""
-        profile = gpg.GPGProfile(passphrase = config.sign_passphrase,
-                                 recipients = [config.encrypt_key1,
-                                               config.encrypt_key2])
+        profile = gpg.GPGProfile(passphrase = helper.sign_passphrase,
+                                 recipients = [helper.encrypt_key1,
+                                               helper.encrypt_key2])
         self.gpg_cycle("aoensutha aonetuh saoe", profile)
 
-        profile2 = gpg.GPGProfile(passphrase = config.sign_passphrase,
-                                  recipients = [config.encrypt_key1])
+        profile2 = gpg.GPGProfile(passphrase = helper.sign_passphrase,
+                                  recipients = [helper.encrypt_key1])
         self.gpg_cycle("aoeu" * 10000, profile2)
 
     def test_gpg_signing(self):
@@ -93,9 +92,9 @@ class GPGTest(unittest.TestCase):
         self.deltmp()
         plaintext = "hello" * 50000
 
-        signing_profile = gpg.GPGProfile(passphrase = config.sign_passphrase,
-                                         sign_key = config.sign_key,
-                                         recipients = [config.encrypt_key1])
+        signing_profile = gpg.GPGProfile(passphrase = helper.sign_passphrase,
+                                         sign_key = helper.sign_key,
+                                         recipients = [helper.encrypt_key1])
 
         epath = path.Path("testfiles/output/encrypted_file")
         encrypted_signed_file = gpg.GPGFile(1, epath, signing_profile)
@@ -106,7 +105,7 @@ class GPGTest(unittest.TestCase):
         assert decrypted_file.read() == plaintext
         decrypted_file.close()
         sig = decrypted_file.get_signature()
-        assert sig == config.sign_key, sig
+        assert sig == helper.sign_key, sig
 
     def test_GPGWriteFile(self):
         """Test GPGWriteFile"""
