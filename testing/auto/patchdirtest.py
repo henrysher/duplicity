@@ -19,9 +19,8 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import config
+import helper
 import sys, cStringIO, unittest
-sys.path.insert(0, "../")
 
 from duplicity import diffdir
 from duplicity import patchdir
@@ -31,7 +30,7 @@ from duplicity import tarfile #@UnusedImport
 from duplicity import librsync #@UnusedImport
 from duplicity.path import * #@UnusedWildImport
 
-config.setup()
+helper.setup()
 
 class PatchingTest(unittest.TestCase):
     """Test patching"""
@@ -89,39 +88,6 @@ class PatchingTest(unittest.TestCase):
             patchdir.Patch(seq_path, diff.open("rb"))
             #print "#########", seq_path, new_path
             assert seq_path.compare_recursive(new_path, 1)
-
-    def test_root(self):
-        """Test changing uid/gid, devices"""
-        self.deltmp()
-        os.system("cp -pR testfiles/root1 testfiles/output/sequence")
-        seq_path = Path("testfiles/output/sequence")
-        new_path = Path("testfiles/root2")
-        sig = Path("testfiles/output/sig.tar")
-        diff = Path("testfiles/output/diff.tar")
-
-        diffdir.write_block_iter(diffdir.DirSig(self.get_sel(seq_path)), sig)
-        deltablock = diffdir.DirDelta(self.get_sel(new_path), sig.open("rb"))
-        diffdir.write_block_iter(deltablock, diff)
-
-        patchdir.Patch(seq_path, diff.open("rb"))
-
-        # since we are not running as root, don't even both comparing,
-        # just make sure file5 exists and file4 doesn't.
-        file5 = seq_path.append("file5")
-        assert file5.isreg()
-        file4 = seq_path.append("file4")
-        assert file4.type is None
-
-    def test_root2(self):
-        """Again test files we don't have access to, this time Tar_WriteSig"""
-        self.deltmp()
-        sig_path = Path("testfiles/output/sig.sigtar")
-        tar_path = Path("testfiles/output/tar.tar")
-        basis_path = Path("testfiles/root1")
-
-        deltablock = diffdir.DirFull_WriteSig(self.get_sel(basis_path),
-                                              sig_path.open("wb"))
-        diffdir.write_block_iter(deltablock, tar_path)
 
     def test_block_tar(self):
         """Test building block tar from a number of files"""
@@ -325,10 +291,12 @@ class TestInnerFuncs(unittest.TestCase):
             assert not fout.close()
             assert contents == buf, (contents, buf)
 
-        testseq([self.snapshot()], ("0:0 600"), "hello, world!")
-        testseq([self.snapshot(), self.delta1()], ("0:0 640"),
+        ids = "%d:%d" % (os.getuid(), os.getgid())
+
+        testseq([self.snapshot()], ("%s 600" % ids), "hello, world!")
+        testseq([self.snapshot(), self.delta1()], ("%s 640" % ids),
                 "aonseuth aosetnuhaonsuhtansoetuhaoe")
-        testseq([self.snapshot(), self.delta1(), self.delta2()], ("0:0 644"),
+        testseq([self.snapshot(), self.delta1(), self.delta2()], ("%s 644" % ids),
                 "3499 34957839485792357 458348573")
 
 

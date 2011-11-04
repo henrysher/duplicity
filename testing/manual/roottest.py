@@ -40,6 +40,7 @@ class RootTest(unittest.TestCase):
         os.setuid(os.geteuid())
         os.setgid(os.getegid())
         assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
+        assert not os.system("tar xzf rootfiles.tar.gz > /dev/null 2>&1")
 
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
@@ -58,6 +59,10 @@ class RootTest(unittest.TestCase):
         """Delete temporary directories"""
         assert not os.system("rm -rf testfiles/output")
         os.mkdir("testfiles/output")
+
+    def get_sel(self, path):
+        """Get selection iter over the given directory"""
+        return selection.Select(path).set_iter()
 
     def total_sequence(self, filelist):
         """Test signatures, diffing, and patching on directory list"""
@@ -85,6 +90,39 @@ class RootTest(unittest.TestCase):
     def test_basic_cycle(self):
         """Test cycle on dir with devices, changing uid/gid, etc."""
         self.total_sequence(['testfiles/root1', 'testfiles/root2'])
+
+    def test_patchdir(self):
+        """Test changing uid/gid, devices"""
+        self.deltmp()
+        os.system("cp -pR testfiles/root1 testfiles/output/sequence")
+        seq_path = Path("testfiles/output/sequence")
+        new_path = Path("testfiles/root2")
+        sig = Path("testfiles/output/sig.tar")
+        diff = Path("testfiles/output/diff.tar")
+
+        diffdir.write_block_iter(diffdir.DirSig(self.get_sel(seq_path)), sig)
+        deltablock = diffdir.DirDelta(self.get_sel(new_path), sig.open("rb"))
+        diffdir.write_block_iter(deltablock, diff)
+
+        patchdir.Patch(seq_path, diff.open("rb"))
+
+        # since we are not running as root, don't even both comparing,
+        # just make sure file5 exists and file4 doesn't.
+        file5 = seq_path.append("file5")
+        assert file5.isreg()
+        file4 = seq_path.append("file4")
+        assert file4.type is None
+
+    def test_patchdir2(self):
+        """Again test files we don't have access to, this time Tar_WriteSig"""
+        self.deltmp()
+        sig_path = Path("testfiles/output/sig.sigtar")
+        tar_path = Path("testfiles/output/tar.tar")
+        basis_path = Path("testfiles/root1")
+
+        deltablock = diffdir.DirFull_WriteSig(self.get_sel(basis_path),
+                                              sig_path.open("wb"))
+        diffdir.write_block_iter(deltablock, tar_path)
 
 def runtests(): unittest.main()
 
