@@ -154,9 +154,7 @@ class RestartTest(unittest.TestCase):
         Test basic Checkpoint/Restart
         """
         excludes = ["--exclude **/output",
-                    "--exclude **/cache",
-                    "--exclude **/root1",
-                    "--exclude **/root2",]
+                    "--exclude **/cache",]
         self.deltmp()
         # we know we're going to fail this one, its forced
         try:
@@ -172,9 +170,7 @@ class RestartTest(unittest.TestCase):
         Test multiple Checkpoint/Restart
         """
         excludes = ["--exclude **/output",
-                    "--exclude **/cache",
-                    "--exclude **/root1",
-                    "--exclude **/root2",]
+                    "--exclude **/cache",]
         self.deltmp()
         # we know we're going to fail these, they are forced
         try:
@@ -199,9 +195,7 @@ class RestartTest(unittest.TestCase):
         Caused when duplicity fails before the first transfer.
         """
         excludes = ["--exclude **/output",
-                    "--exclude **/cache",
-                    "--exclude **/root1",
-                    "--exclude **/root2",]
+                    "--exclude **/cache",]
         self.deltmp()
         # we know we're going to fail these, they are forced
         try:

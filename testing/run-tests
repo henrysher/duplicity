@@ -2,6 +2,7 @@
 #
 # Copyright 2002 Ben Escoto <ben@emerose.org>
 # Copyright 2007 Kenneth Loafman <kenneth@loafman.com>
+# Copyright 2011 Canonical Ltd
 #
 # This file is part of duplicity.
 #
@@ -25,14 +26,26 @@ cd $(dirname $0)
 THISDIR=$(pwd)
 export TZ=US/Central
 export LANG=
-export PYTHONPATH=$(dirname "$THISDIR")
-export GNUPGHOME="$THISDIR/home/gnupg"
+# up for 'duplicity' module and here for 'helper.py'
+export PYTHONPATH="$(dirname $THISDIR):$THISDIR/helpers"
+export GNUPGHOME="$THISDIR/gnupg"
 
-# skip if test does not exist
-if [ ! -e $1 ]; then
-    echo "No test named $1"
-    exit 1
+TOP_TESTS=$*
+if [ "x$TOP_TESTS" = "x" ]; then
+  TOP_TESTS="auto"
+elif [ "$TOP_TESTS" = "all" ]; then
+  TOP_TESTS="auto manual"
 fi
+
+# Expand arguments if directories
+TESTS=
+for t in $TOP_TESTS; do
+  if [ -d "$t" ]; then
+    TESTS="$TESTS $(ls $t/*.py)"
+  else
+    TESTS="$TESTS $t"
+  fi
+done
 
 # run against all supported python versions
 for v in 2.4 2.5 2.6 2.7; do
@@ -46,14 +59,16 @@ for v in 2.4 2.5 2.6 2.7; do
     python$v ./compilec.py
     popd
 
-    echo "========== Running $1 for python$v =========="
-    pushd .
-    if ! python$v -u $1 -v 2>&1; then
-      echo "Test failed"
-      exit 1
-    fi
-    popd
-    echo "========== Finished $1 for python$v =========="
-    echo
-    echo
+    for t in $TESTS; do
+        echo "========== Running $t for python$v =========="
+        pushd .
+        if ! python$v -u $t -v 2>&1; then
+          echo "Test failed"
+          exit 1
+        fi
+        popd
+        echo "========== Finished $t for python$v =========="
+        echo
+        echo
+    done
 done
