@@ -70,7 +70,7 @@ filename_list2 = ["duplicity-full.2001-01-01T16:17:01-07:00.manifest.gpg",
                   "duplicity-inc.2000-08-17T16:17:01-07:00.to.2000-08-18T00:04:30-07:00.vol1.difftar.gpg",
                   "Extra stuff to be ignored"]
 
-assert not os.system("tar xzf autofiles.tar.gz > /dev/null 2>&1")
+assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
 
 col_test_dir = path.Path("testfiles/collectionstest")
 archive_dir = col_test_dir.append("archive_dir")
@@ -88,7 +88,7 @@ output_dir_backend = backend.get_backend("file://testfiles/output")
 class CollectionTest(unittest.TestCase):
     """Test collections"""
     def setUp(self):
-        assert not os.system("tar xzf autofiles.tar.gz > /dev/null 2>&1")
+        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
         assert not os.system("mkdir testfiles/output")
 
     def tearDown(self):

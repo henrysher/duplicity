@@ -19,15 +19,8 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-# Check permissions
-if [ "`id -ur`" != '0' ]; then
-    echo 'Error: you must be root.'
-    exit 1
-fi
-
 # Go to directory housing this script
 cd `dirname $0`
-pwd
 
 # skip if test does not exist
 if [ ! -e $1 ]; then
@@ -36,9 +29,11 @@ if [ ! -e $1 ]; then
 fi
 
 # run against all supported python versions
-for v in 2.6; do
-    # Go to directory housing this script
-    cd `dirname $0`
+for v in 2.4 2.5 2.6 2.7; do
+    if [ ! -e /usr/bin/python$v ]; then
+        echo "python$v not found on system"
+        continue
+    fi
 
     echo "========== Compiling librsync for python$v =========="
     pushd ../duplicity
@@ -47,7 +42,10 @@ for v in 2.6; do
 
     echo "========== Running $1 for python$v =========="
     pushd .
-    python$v -u $1 -v 2>&1 | grep -v "unsafe ownership"
+    if ! env PYTHONPATH=.. python$v -u $1 -v 2>&1; then
+      echo "Test failed"
+      exit 1
+    fi
     popd
     echo "========== Finished $1 for python$v =========="
     echo
