@@ -36,7 +36,7 @@ if [ -z "$TOP_TESTS" ]; then
 fi
 
 if [ "$TOP_TESTS" = "all" ]; then
-  TOP_TESTS="auto" # don't include manual tests unless they were asked for
+  TOP_TESTS="tests" # don't include manual tests unless they were asked for
 fi
 
 # Expand arguments if directories
