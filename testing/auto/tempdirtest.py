@@ -19,13 +19,12 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import config
+import helper
 import sys, os, unittest
-sys.path.insert(0, "../")
 
 from duplicity import tempdir
 
-config.setup()
+helper.setup()
 
 class TempDirTest(unittest.TestCase):
     def test_all(self):
