@@ -41,7 +41,7 @@ for v in 2.4 2.5 2.6 2.7; do
         fi
         echo "========== Running $t for python$v =========="
         pushd .
-        if ! env PYTHONPATH=.. python$v -u $t -v 2>&1; then
+        if ! env TZ=US/Central LANG= PYTHONPATH=.. python$v -u $t -v 2>&1; then
           echo "Test failed"
           exit 1
         fi

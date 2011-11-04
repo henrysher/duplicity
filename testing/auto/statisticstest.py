@@ -19,13 +19,13 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import config
+import helper
 import sys, unittest
 
 from duplicity.statistics import * #@UnusedWildImport
 from duplicity import path
 
-config.setup()
+helper.setup()
 
 class StatsObjTest(unittest.TestCase):
     """Test StatsObj class"""
@@ -62,7 +62,7 @@ class StatsObjTest(unittest.TestCase):
         assert s1.get_stat('SourceFiles') == 0
 
     def test_get_stats_string(self):
-        """Test conversion of stat object into string (adjust for your tz)"""
+        """Test conversion of stat object into string"""
         s = StatsObj()
         stats_string = s.get_stats_string()
         assert stats_string == "", stats_string
