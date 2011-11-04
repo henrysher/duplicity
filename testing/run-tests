@@ -31,10 +31,12 @@ export PYTHONPATH="$(dirname $THISDIR):$THISDIR/helpers"
 export GNUPGHOME="$THISDIR/gnupg"
 
 TOP_TESTS=$*
-if [ "x$TOP_TESTS" = "x" ]; then
-  TOP_TESTS="auto"
-elif [ "$TOP_TESTS" = "all" ]; then
-  TOP_TESTS="auto manual"
+if [ -z "$TOP_TESTS" ]; then
+  TOP_TESTS="all"
+fi
+
+if [ "$TOP_TESTS" = "all" ]; then
+  TOP_TESTS="auto" # don't include manual tests unless they were asked for
 fi
 
 # Expand arguments if directories
@@ -48,7 +50,7 @@ for t in $TOP_TESTS; do
 done
 
 # run against all supported python versions
-for v in 2.4 2.5 2.6 2.7; do
+for v in 2.7; do
     if [ ! -e /usr/bin/python$v ]; then
         echo "python$v not found on system"
         continue
@@ -59,10 +61,14 @@ for v in 2.4 2.5 2.6 2.7; do
     python$v ./compilec.py
     popd
 
+    rm -rf counts coverage
+    touch counts
+    mkdir coverage
+
     for t in $TESTS; do
         echo "========== Running $t for python$v =========="
         pushd .
-        if ! python$v -u $t -v 2>&1; then
+        if ! python$v -u -m trace --count --file=counts --coverdir=coverage $t -v 2>&1; then
           echo "Test failed"
           exit 1
         fi
@@ -71,4 +77,6 @@ for v in 2.4 2.5 2.6 2.7; do
         echo
         echo
     done
+
+    python$v -m trace --report --missing --file=counts --coverdir=coverage --summary
 done
