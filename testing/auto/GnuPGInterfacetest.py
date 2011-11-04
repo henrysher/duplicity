@@ -26,7 +26,6 @@ import unittest
 
 import tempfile
 import sys
-sys.path.insert(0, "../")
 
 from duplicity import GnuPGInterface
 
