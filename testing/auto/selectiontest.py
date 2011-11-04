@@ -20,14 +20,13 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import types
-import config
+import helper
 import StringIO, unittest, sys
-sys.path.insert(0, "../")
 
 from duplicity.selection import * #@UnusedWildImport
 from duplicity.lazy import * #@UnusedWildImport
 
-config.setup()
+helper.setup()
 
 class MatchingTest(unittest.TestCase):
     """Test matching of file names against various selection functions"""

@@ -24,12 +24,12 @@
 #
 # $Id: test_tarfile.py,v 1.11 2009/04/02 14:47:12 loafman Exp $
 
-import config
+import helper
 import sys, os, shutil, StringIO, tempfile, unittest, stat
 
 from duplicity import tarfile
 
-config.setup()
+helper.setup()
 
 SAMPLETAR = "testtar.tar"
 TEMPDIR   = tempfile.mktemp()

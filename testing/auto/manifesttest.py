@@ -19,14 +19,14 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import config
+import helper
 import sys, unittest, types
 
 from duplicity import manifest
 from duplicity import globals
 from duplicity import path
 
-config.setup()
+helper.setup()
 
 class VolumeInfoTest(unittest.TestCase):
     """Test VolumeInfo"""
