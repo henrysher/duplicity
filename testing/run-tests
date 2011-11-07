@@ -29,6 +29,7 @@ export LANG=
 # up for 'duplicity' module and here for 'helper.py'
 export PYTHONPATH="$(dirname $THISDIR):$THISDIR/helpers"
 export GNUPGHOME="$THISDIR/gnupg"
+export PATH="$(dirname $THISDIR)/bin:$PATH"
 
 TOP_TESTS=$*
 if [ -z "$TOP_TESTS" ]; then

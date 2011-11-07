@@ -44,7 +44,7 @@ class RdiffdirTest(unittest.TestCase):
 
     def run_rdiffdir(self, argstring):
         """Run rdiffdir with given arguments"""
-        self.run_cmd("../rdiffdir " + argstring)
+        self.run_cmd("rdiffdir " + argstring)
 
     def run_cycle(self, dirname_list):
         """Run diff/patch cycle on directories in dirname_list"""

@@ -1,7 +1,7 @@
 [encoding: UTF-8]
 
-duplicity-bin
-rdiffdir
+bin/duplicity
+bin/rdiffdir
 duplicity/_librsyncmodule.c
 duplicity/asyncscheduler.py
 duplicity/backend.py

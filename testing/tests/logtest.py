@@ -24,8 +24,6 @@ import os
 class LogTest(unittest.TestCase):
     """Test machine-readable functions/classes in log.py"""
 
-    duplicity_bin = "../duplicity-bin"
-
     def setUp(self):
         assert not os.system("rm -f /tmp/duplicity.log")
 
@@ -36,7 +34,7 @@ class LogTest(unittest.TestCase):
         """Check notification of a simple error code"""
 
         # Run actual duplicity command (will fail, because no arguments passed)
-        os.system("%s --log-file=/tmp/duplicity.log >/dev/null 2>&1" % self.duplicity_bin)
+        os.system("duplicity --log-file=/tmp/duplicity.log >/dev/null 2>&1")
 
         # The format of the file should be:
         # """ERROR 2

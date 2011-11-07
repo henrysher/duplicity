@@ -49,7 +49,7 @@ class BadUploadTest(unittest.TestCase):
         Run duplicity binary with given arguments and options
         """
         options.append("--archive-dir testfiles/cache")
-        cmd_list = ["../duplicity-bin"]
+        cmd_list = ["duplicity"]
         cmd_list.extend(options + ["--allow-source-mismatch"])
         cmd_list.extend(arglist)
         cmdline = " ".join(cmd_list)

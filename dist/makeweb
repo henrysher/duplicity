@@ -60,9 +60,9 @@ def run(commandline):
 def upload_new():
     run("scp %s %s %s bescoto@savannah.nongnu.org:/upload/duplicity"
         % (tarball, srcrpm, i386rpm))
-    run("cp CHANGELOG duplicity.1 rdiffdir.1 %s" % (duplicity_mirror,))
-    run("rman -f html duplicity.1 > %s/duplicity.1.html" % (duplicity_mirror,))
-    run("rman -f html rdiffdir.1 > %s/rdiffdir.1.html" % (duplicity_mirror,))
+    run("cp CHANGELOG bin/duplicity.1 bin/rdiffdir.1 %s" % (duplicity_mirror,))
+    run("rman -f html bin/duplicity.1 > %s/duplicity.1.html" % (duplicity_mirror,))
+    run("rman -f html bin/rdiffdir.1 > %s/rdiffdir.1.html" % (duplicity_mirror,))
 
 def move_old():
     """Move old files from upload area to OLD directory

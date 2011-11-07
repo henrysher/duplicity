@@ -53,7 +53,7 @@ class FinalTest:
     def run_duplicity(self, arglist, options = [], current_time = None):
         """Run duplicity binary with given arguments and options"""
         options.append("--archive-dir testfiles/cache")
-        cmd_list = ["../duplicity-bin"]
+        cmd_list = ["duplicity"]
         cmd_list.extend(options + ["--allow-source-mismatch"])
         if current_time:
             cmd_list.append("--current-time %s" % (current_time,))
