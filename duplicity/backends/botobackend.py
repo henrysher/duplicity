@@ -2,6 +2,7 @@
 #
 # Copyright 2002 Ben Escoto <ben@emerose.org>
 # Copyright 2007 Kenneth Loafman <kenneth@loafman.com>
+# Copyright 2011 Henrique Carvalho Alves <hcarvalhoalves@gmail.com>
 #
 # This file is part of duplicity.
 #
@@ -20,20 +21,27 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import os
+import sys
 import time
-import multiprocessing
-
-from filechunkio import FileChunkIO
 
 import duplicity.backend
+
 from duplicity import globals
 from duplicity import log
 from duplicity.errors import * #@UnusedWildImport
 from duplicity.util import exception_traceback
 from duplicity.backend import retry
+from duplicity.filechunkio import FileChunkIO
+
+# Multiprocessing is not supported on *BSD
+if sys.platform not in ('darwin', 'linux2'):
+    from multiprocessing import dummy as multiprocessing
+    log.Debug('Multiprocessing is not supported on %s, will use threads instead.' % sys.platform)
+else:
+    import multiprocessing
 
 
-def get_connection(scheme, url):
+def get_connection(scheme, parsed_url):
     try:
         from boto.s3.connection import S3Connection
         assert hasattr(S3Connection, 'lookup')
@@ -95,9 +103,9 @@ def get_connection(scheme, url):
         # Use the default Amazon S3 host.
         conn = S3Connection(is_secure=(not globals.s3_unencrypted_connection))
     else:
-        assert self.scheme == 's3'
+        assert scheme == 's3'
         conn = S3Connection(
-            host=parsed_url.hostname,
+            host = parsed_url.hostname,
             is_secure=(not globals.s3_unencrypted_connection))
 
     if hasattr(conn, 'calling_format'):
@@ -366,7 +374,7 @@ class BotoBackend(duplicity.backend.Backend):
         return mp.complete_upload()
 
 
-def multipart_upload_worker(scheme, url, bucket_name, multipart_id, filename,
+def multipart_upload_worker(scheme, parsed_url, bucket_name, multipart_id, filename,
                             offset, bytes, num_retries):
     """
     Worker method for uploading a file chunk to S3 using multipart upload.
@@ -383,12 +391,12 @@ def multipart_upload_worker(scheme, url, bucket_name, multipart_id, filename,
         worker_name = multiprocessing.current_process().name
         log.Debug("%s: Uploading chunk %d" % (worker_name, offset + 1))
         try:
-            conn = get_connection(scheme, url)
+            conn = get_connection(scheme, parsed_url)
             bucket = conn.lookup(bucket_name)
 
             for mp in bucket.get_all_multipart_uploads():
                 if mp.id == multipart_id:
-                    with FileChunkIO(filename, 'r', offset=offset, bytes=bytes) as fd:
+                    with FileChunkIO(filename, 'r', offset=offset * bytes, bytes=bytes) as fd:
                         mp.upload_part_from_file(fd, offset + 1, cb=_upload_callback)
                     break
         except Exception, e:
