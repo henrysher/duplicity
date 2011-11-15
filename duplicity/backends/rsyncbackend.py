@@ -24,7 +24,7 @@ import tempfile
 
 import duplicity.backend
 from duplicity.errors import * #@UnusedWildImport
-from duplicity import tempdir, util
+from duplicity import globals, tempdir, util
 
 class RsyncBackend(duplicity.backend.Backend):
     """Connect to remote store using rsync
@@ -80,11 +80,15 @@ class RsyncBackend(duplicity.backend.Backend):
         password = self.get_password()
         if password:
             os.environ['RSYNC_PASSWORD'] = password
-        # build cmd
         if self.over_rsyncd():
-            self.cmd = "rsync%s" % port
+            portOption = port
         else:
-            self.cmd = "rsync -e 'ssh -oBatchMode=yes%s'" % port
+            portOption = " -e 'ssh -oBatchMode=yes%s'" % port
+        rsyncOptions = globals.rsync_options
+        if rsyncOptions:
+            rsyncOptions= " " + rsyncOptions
+        # build cmd
+        self.cmd = "rsync%s%s" % (portOption, rsyncOptions)
 
     def over_rsyncd(self):
         url = self.parsed_url.url_string
