@@ -29,8 +29,6 @@ from duplicity import path
 from duplicity import util
 from duplicity.errors import * #@UnusedWildImport
 
-testing_in_progress = False
-
 
 class LocalBackend(duplicity.backend.Backend):
     """Use this backend when saving to local disk
@@ -71,25 +69,24 @@ class LocalBackend(duplicity.backend.Backend):
         target_path = self.remote_pathdir.append(remote_filename)
         log.Info("Writing %s" % target_path.name)
         """Try renaming first (if allowed to), copying if doesn't work"""
-        if not testing_in_progress:
-            if rename_instead:
-                try:
-                    source_path.rename(target_path)
-                except OSError:
-                    pass
-                except Exception, e:
-                    self.handle_error(e, 'put', source_path.name, target_path.name)
-                else:
-                    return
+        if rename_instead:
             try:
-                target_path.writefileobj(source_path.open("rb"))
+                source_path.rename(target_path)
+            except OSError:
+                pass
             except Exception, e:
                 self.handle_error(e, 'put', source_path.name, target_path.name)
+            else:
+                return
+        try:
+            target_path.writefileobj(source_path.open("rb"))
+        except Exception, e:
+            self.handle_error(e, 'put', source_path.name, target_path.name)
 
-            """If we get here, renaming failed previously"""
-            if rename_instead:
-                """We need to simulate its behaviour"""
-                source_path.delete()
+        """If we get here, renaming failed previously"""
+        if rename_instead:
+            """We need to simulate its behaviour"""
+            source_path.delete()
 
     def get(self, filename, local_path):
         """Get file and put in local_path (Path object)"""

@@ -76,7 +76,7 @@ class UnivTest:
             blist.sort()
             l.sort()
             assert blist == l, \
-                   ("Got list: %s\nWanted: %s\n" % (repr(blist), repr(l)))
+                   ("Got list: %s  Wanted: %s\n" % (repr(blist), repr(l)))
 
         # Identify test that's running
         print self.my_test_id, "... ",
