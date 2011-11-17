@@ -1,8 +1,5 @@
 .project
 .pydevproject
 .settings
-.settings/*
-patch
-Releases
-testing/*.log
-testing/config.py
+config.py
+*.log

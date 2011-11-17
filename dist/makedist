@@ -20,7 +20,7 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import os, re, shutil, time, sys
+import os, re, shutil, time, sys, subprocess
 
 SourceDir = "duplicity"
 DistDir = "dist"
@@ -66,17 +66,17 @@ def MakeTar():
         "LOG-README",
         "README",
         "tarfile-LICENSE",
-        SourceDir + "/_librsyncmodule.c",
         DistDir + "/setup.py",
         ]:
         assert not os.system("cp %s %s" % (filename, tardir)), filename
 
-    os.mkdir(os.path.join(tardir, "src"))
+    os.mkdir(os.path.join(tardir, "duplicity"))
     for filename in [
         "asyncscheduler.py",
         "backend.py",
         "collections.py",
         "commandline.py",
+        "compilec.py",
         "diffdir.py",
         "dup_temp.py",
         "dup_threading.py",
@@ -89,6 +89,7 @@ def MakeTar():
         "__init__.py",
         "lazy.py",
         "librsync.py",
+        "_librsyncmodule.c",
         "log.py",
         "manifest.py",
         "misc.py",
@@ -104,9 +105,9 @@ def MakeTar():
         "urlparse_2_5.py",
         "util.py",
         ]:
-        assert not os.system("cp %s/%s %s/src" % (SourceDir, filename, tardir)), filename
+        assert not os.system("cp %s/%s %s/duplicity" % (SourceDir, filename, tardir)), filename
 
-    os.mkdir(os.path.join(tardir, "src", "backends"))
+    os.mkdir(os.path.join(tardir, "duplicity", "backends"))
     for filename in [
         "backends/botobackend.py",
         "backends/cloudfilesbackend.py",
@@ -124,8 +125,18 @@ def MakeTar():
         "backends/webdavbackend.py",
         "backends/gdocsbackend.py",
         ]:
-        assert not os.system("cp %s/%s %s/src/backends" %
+        assert not os.system("cp %s/%s %s/duplicity/backends" %
                              (SourceDir, filename, tardir)), filename
+
+    os.mkdir(os.path.join(tardir, "testing"))
+    bzr = subprocess.Popen(["bzr", "ls", "-RV", "testing"], stdout=subprocess.PIPE)
+    testfiles = bzr.communicate()[0].split()
+    for filename in testfiles:
+        if os.path.isdir(filename):
+            os.mkdir(os.path.join(tardir, filename))
+        else:
+            assert not os.system("cp --parents %s %s" %
+                                 (filename, tardir)), filename
 
     os.mkdir(os.path.join(tardir, "po"))
     assert not os.system("cd po && ./update-pot")
@@ -142,21 +153,22 @@ def MakeTar():
             assert not os.system("msgfmt po/%s.po -o %s/po/%s/duplicity.mo" % (lang, tardir, lang)), lang
     linguas.close()
 
+    os.mkdir(os.path.join(tardir, "bin"))
     VersionedCopy(os.path.join(SourceDir, "globals.py"),
-                  os.path.join(tardir, "src", "globals.py"))
-    VersionedCopy("duplicity-bin",
-                  os.path.join(tardir, "duplicity"))
-    VersionedCopy("rdiffdir",
-                  os.path.join(tardir, "rdiffdir"))
-    VersionedCopy("duplicity.1",
-                  os.path.join(tardir, "duplicity.1"))
-    VersionedCopy("rdiffdir.1",
-                  os.path.join(tardir, "rdiffdir.1"))
+                  os.path.join(tardir, "duplicity", "globals.py"))
+    VersionedCopy(os.path.join("bin", "duplicity"),
+                  os.path.join(tardir, "bin", "duplicity"))
+    VersionedCopy(os.path.join("bin", "rdiffdir"),
+                  os.path.join(tardir, "bin", "rdiffdir"))
+    VersionedCopy(os.path.join("bin", "duplicity.1"),
+                  os.path.join(tardir, "bin", "duplicity.1"))
+    VersionedCopy(os.path.join("bin", "rdiffdir.1"),
+                  os.path.join(tardir, "bin", "rdiffdir.1"))
     VersionedCopy(os.path.join(DistDir, "setup.py"),
                   os.path.join(tardir, "setup.py"))
 
     os.chmod(os.path.join(tardir, "setup.py"), 0755)
-    os.chmod(os.path.join(tardir, "rdiffdir"), 0644)
+    os.chmod(os.path.join(tardir, "bin", "rdiffdir"), 0644)
     os.system("tar -czf %s %s" % (tarfile, tardir))
     shutil.rmtree(tardir)
     return tarfile

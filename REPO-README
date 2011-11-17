@@ -11,27 +11,19 @@ By the numbers:
 2) cd $DUP_ROOT/duplicity
 3) run "python compilec.py" to create _librsync.so
 4) cd ..
-5) run "./duplicity-bin -V". You will see "duplicity $version" instead
+5) run "./bin/duplicity -V". You will see "duplicity $version" instead
 of the normal version number. Versioning comes during the release.
 
 To run outside this directory, use PYTHONPATH to set the path. 
 
-PYTHONPATH=$DUP_ROOT duplicity-bin
+PYTHONPATH=$DUP_ROOT bin/duplicity
 
 or
 
-PYTHONPATH=$DUP_ROOT rdiffdir
+PYTHONPATH=$DUP_ROOT bin/rdiffdir
 
 
 Running the unit tests:
 -----------------------
 
-If you want to try some of tests, you first have to untar the
-testfiles.tar.gz as root (the tarball contains device files, files
-with various uid/gid, etc):
-
-cd testing; tar -xvzf testfiles.tar.gz
-
-Then run the various *test.py files, for instance:
-
-cd testing; python lazytest.py
+cd testing; ./run-tests
