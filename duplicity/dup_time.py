@@ -21,8 +21,7 @@
 
 """Provide time related exceptions and functions"""
 
-import time, types, re
-
+import time, types, re, calendar
 from duplicity import globals
 
 
@@ -119,12 +118,20 @@ def stringtotime(timestring):
         # works in terms of the current timezone and we have a
         # timezone offset in the string.
         timetuple = (year, month, day, hour, minute, second, -1, -1, 0)
-        local_in_secs = time.mktime(timetuple)
-        # mktime assumed that the tuple was a local time. Compensate
-        # by subtracting the value for the current timezone.
-        # We don't need to worry about DST here because we turned it
-        # off in the tuple
-        utc_in_secs = local_in_secs - time.timezone
+        
+        if len(timestring) == 16:
+            # as said in documentation, time.gmtime() and timegm() are each others' inverse.
+            # As far as UTC format is used in new file format,
+            # do not rely on system's python DST and tzdata settings
+            # and use functions that working with UTC 
+            utc_in_secs = calendar.timegm(timetuple)
+        else:
+            # mktime assumed that the tuple was a local time. Compensate
+            # by subtracting the value for the current timezone.
+            # We don't need to worry about DST here because we turned it
+            # off in the tuple
+            local_in_secs = time.mktime(timetuple)
+            utc_in_secs = local_in_secs - time.timezone
         # Now apply the offset that we were given in the time string
         # This gives the correct number of seconds from the epoch
         # even when we're not in the same timezone that wrote the
