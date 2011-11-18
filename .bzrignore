@@ -1,5 +1,7 @@
+*.log
 .project
 .pydevproject
 .settings
 config.py
-*.log
+testfiles
+random_seed
