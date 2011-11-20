@@ -85,11 +85,9 @@ class BackupSet:
             if (pr.start_time != self.start_time or
                 pr.end_time != self.end_time):
                 return False
-            if pr.encrypted != self.encrypted:
+            if bool(pr.encrypted) != bool(self.encrypted):
                 if self.partial and pr.encrypted:
                     self.encrypted = pr.encrypted
-                else:
-                    return False
 
         if pr.manifest:
             self.set_manifest(filename)
@@ -98,6 +96,7 @@ class BackupSet:
             assert not self.volume_name_dict.has_key(pr.volume_number), \
                    (self.volume_name_dict, filename)
             self.volume_name_dict[pr.volume_number] = filename
+
         return True
 
     def set_info(self, pr):
