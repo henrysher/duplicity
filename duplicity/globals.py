@@ -166,6 +166,9 @@ s3_unencrypted_connection = False
 # Whether to use S3 Reduced Redudancy Storage
 s3_use_rrs = False
 
+# True if we should use boto multiprocessing version
+s3_use_multiprocessing = False
+
 # Chunk size used for S3 multipart uploads.The number of parallel uploads to
 # S3 be given by chunk size / volume size. Use this to maximize the use of
 # your bandwidth. Defaults to 25MB

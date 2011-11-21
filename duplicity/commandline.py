@@ -145,6 +145,7 @@ def check_verbosity(option, opt, value):
 
     return verb
 
+
 class DupOption(optparse.Option):
     TYPES = optparse.Option.TYPES + ("file", "time", "verbosity",)
     TYPE_CHECKER = copy(optparse.Option.TYPE_CHECKER)
@@ -169,7 +170,7 @@ class DupOption(optparse.Option):
             optparse.Option.take_action(
                 self, action, dest, opt, value, values, parser)
 
-""" 
+"""
 Fix:
     File "/usr/lib/pythonX.X/optparse.py", line XXXX, in print_help
     file.write(self.format_help().encode(encoding, "replace"))
@@ -195,6 +196,7 @@ class OPHelpFix(optparse.OptionParser):
             file = sys.stdout
         encoding = self._get_encoding(file)
         file.write(self.format_help().decode('utf-8').encode(encoding, "replace"))
+
 
 def parse_cmdline_options(arglist):
     """Parse argument list"""
@@ -275,7 +277,7 @@ def parse_cmdline_options(arglist):
 
     # secret keyring in which the private encrypt key can be found
     parser.add_option("--encrypt-secret-keyring", type="string", metavar=_("path"))
-    
+
     parser.add_option("--encrypt-sign-key", type="string", metavar=_("gpg-key-id"),
                       dest="", action="callback",
                       callback=lambda o, s, v, p: ( globals.gpg_profile.recipients.append(v), set_sign_key(v)) )
@@ -454,6 +456,11 @@ def parse_cmdline_options(arglist):
     parser.add_option("--s3-multipart-chunk-size", type="int", action="callback", metavar=_("number"),
                       callback=lambda o, s, v, p: setattr(p.values, "s3_multipart_chunk_size", v*1024*1024))
 
+    # option to make the s3/boto backend use the multiprocessing version
+    # by default it is off since it does not work for 2.4, 2.5 Python or
+    # Mac or BSD
+    parser.add_option("--s3-use-multiprocessing", action="store_true")
+
     # scp command to use
     # TRANSL: noun
     parser.add_option("--scp-command", metavar=_("command"))
@@ -514,6 +521,7 @@ def parse_cmdline_options(arglist):
     parser.add_option("--volsize", type="int", action="callback", metavar=_("number"),
                       callback=lambda o, s, v, p: setattr(p.values, "volsize", v*1024*1024))
 
+    # parse the options
     (options, args) = parser.parse_args()
 
     # Copy all arguments and their values to the globals module.  Don't copy
@@ -841,6 +849,7 @@ def set_selection():
     sel.ParseArgs(select_opts, select_files)
     globals.select = sel.set_iter()
 
+
 def args_to_path_backend(arg1, arg2):
     """
     Given exactly two arguments, arg1 and arg2, figure out which one
@@ -863,6 +872,7 @@ page for more information.""")
         return (arg1, arg2)
     else:
         raise AssertionError('should not be reached')
+
 
 def set_backend(arg1, arg2):
     """Figure out which arg is url, set backend

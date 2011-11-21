@@ -30,6 +30,10 @@
 import getpass, gzip, os, sys, time, types
 import traceback, platform, statvfs, resource, re
 
+pwd = os.path.dirname(sys.argv[0])
+if os.path.exists("../duplicity"):
+    sys.path.insert(0, os.path.join(pwd, "../"))
+
 import gettext
 gettext.install('duplicity')
 
