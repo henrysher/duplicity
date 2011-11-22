@@ -185,8 +185,9 @@ class SSHBackend(duplicity.backend.Backend):
                 elif match == 3:
                     child.sendline(self.password)
                 elif match == 4:
-                    log.Warn("Invalid SSH password")
-                    break
+                    if not child.before.strip().startswith("mkdir"):
+                        log.Warn("Invalid SSH password")
+                        break
                 elif match == 5:
                     log.Warn("Host key authenticity could not be verified (missing known_hosts entry?)")
                     break

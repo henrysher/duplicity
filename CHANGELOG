@@ -1,3 +1,15 @@
+New in v0.6.17 (2011/11/??)
+----------------------------
+Enhancements:
+
+Bugs closed in this release:
+411145     Misleading error message: "Invalid SSH password"
+878220	   UnsupportedBackendScheme: scheme not supported in url: s3+http
+881070	   Bugfix for S3 multipart upload on 0.6.16
+881727	   duplicity 0.6.16 lists all backup sets as incomplete
+885670	   Duplicity fails to add incremental backups to chain...
+
+
 New in v0.6.16 (2011/10/16)
 ----------------------------
 Enhancements:
