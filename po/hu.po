@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-11-07 16:17+0000\n"
-"PO-Revision-Date: 2011-11-18 15:27+0000\n"
+"PO-Revision-Date: 2011-11-21 16:17+0000\n"
 "Last-Translator: SanskritFritz <Unknown>\n"
 "Language-Team: Hungarian <hu@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-11-19 05:13+0000\n"
+"X-Launchpad-Export-Date: 2011-11-22 05:01+0000\n"
 "X-Generator: Launchpad (build 14299)\n"
 
 #: ../duplicity-bin:94
@@ -81,11 +81,11 @@ msgid ""
 "and incremental specified"
 msgstr ""
 "Súlyos hiba: Nem tudom elkezdeni a növekményes biztonsági mentést. Nem "
-"találok régi szignatúrákat, pedig növekményes mentést kezdeményeztél."
+"találok régi aláírásokat, pedig növekményes mentést kezdeményeztél."
 
 #: ../duplicity-bin:499
 msgid "No signatures found, switching to full backup."
-msgstr "Nem találtam szignatúrákat, átkapcsolok teljes biztonsági mentésre."
+msgstr "Nem találtam aláírásokat, átváltok teljes biztonsági mentésre."
 
 #: ../duplicity-bin:513
 msgid "Backup Statistics"
@@ -119,7 +119,7 @@ msgstr "Számított hash: %s"
 #: ../duplicity-bin:658
 #, python-format
 msgid "Manifest hash: %s"
-msgstr "KImutatás hash: %s"
+msgstr ""
 
 #: ../duplicity-bin:696
 #, python-format
@@ -266,7 +266,7 @@ msgstr ""
 
 #: ../duplicity-bin:1096
 msgid "Unable to get max open files."
-msgstr ""
+msgstr "Nem sikerült lekérdezni, hogy hány állomány nyitható meg egy időben."
 
 #: ../duplicity-bin:1100
 #, python-format
@@ -274,12 +274,17 @@ msgid ""
 "Max open files of %s is too low, should be >= 1024.\n"
 "Use 'ulimit -n 1024' or higher to correct.\n"
 msgstr ""
+"Egyszerre csak %s állomány nyitható meg a rendszerben, ez kevés, legalább "
+">=1024 kellene.\n"
+"A megoldás: 'ulimit -n 1024' (vagy még magasabb érték).\n"
 
 #: ../duplicity-bin:1149
 msgid ""
 "RESTART: The first volume failed to upload before termination.\n"
 "         Restart is impossible...starting backup from beginning."
 msgstr ""
+"ÚJRAKEZDÉS: Az első köteget nem sikerült feltölteni a tárhelyre.\n"
+"            Nem tudom helyreállítani... biztonsági mentés újraindítása."
 
 #: ../duplicity-bin:1155
 #, python-format
@@ -287,6 +292,8 @@ msgid ""
 "RESTART: Volumes %d to %d failed to upload before termination.\n"
 "         Restarting backup at volume %d."
 msgstr ""
+"ÚJRAKEZDÉS: Az %d - %d köteget nem sikerült feltölteni a tárhelyre.\n"
+"            Biztonsági mentés újraindítása a %d. kötegnél."
 
 #: ../duplicity-bin:1162
 #, python-format
@@ -296,47 +303,54 @@ msgid ""
 "partial\n"
 "         backup then restart the backup from the beginning."
 msgstr ""
+"ÚJRAKEZDÉS: Lehetetlen állapot: a bizonylatok szerint %d kötegünk van, a "
+"tárhelyen %d.\n"
+"            Újraindítani sem lehet... törlöm a legutolső sérült mentés "
+"kötegeit,\n"
+"            majd újraindítom a biztonsági mentést."
 
 #: ../duplicity-bin:1233
 #, python-format
 msgid "Last %s backup left a partial set, restarting."
 msgstr ""
+"Az utolsó %s biztonsági mentés hiányos készletet hagyott maga után, "
+"újraindítás."
 
 #: ../duplicity-bin:1237
 #, python-format
 msgid "Cleaning up previous partial %s backup set, restarting."
-msgstr ""
+msgstr "Előző %s hiányos biztonsági mentés tisztítása, újraindítás."
 
 #: ../duplicity-bin:1248
 msgid "Last full backup date:"
-msgstr ""
+msgstr "Utolsó teljes biztonsági mentés dátuma:"
 
 #: ../duplicity-bin:1250
 msgid "Last full backup date: none"
-msgstr ""
+msgstr "Legutolsó teljes biztonsági mentés dátuma: nincs."
 
 #: ../duplicity-bin:1252
 msgid "Last full backup is too old, forcing full backup"
-msgstr ""
+msgstr "Legutolsó teljes biztonsági mentés túl régi, teljes mentés kell."
 
 #: ../duplicity-bin:1360
 msgid "INT intercepted...exiting."
-msgstr ""
+msgstr "INT jelzés érkezett... kilépés."
 
 #: ../duplicity-bin:1366
 #, python-format
 msgid "GPG error detail: %s"
-msgstr ""
+msgstr "GPG hiba részletei: %s"
 
 #: ../duplicity-bin:1375
 #, python-format
 msgid "User error detail: %s"
-msgstr ""
+msgstr "Felhasználói hiba: %s"
 
 #: ../duplicity-bin:1384
 #, python-format
 msgid "Backend error detail: %s"
-msgstr ""
+msgstr "Tárhely hiba részletei: %s"
 
 #: ../duplicity/asyncscheduler.py:66
 #, python-format
@@ -345,46 +359,46 @@ msgstr ""
 
 #: ../duplicity/asyncscheduler.py:93
 msgid "inserting barrier"
-msgstr ""
+msgstr "korlát beillesztése"
 
 #: ../duplicity/asyncscheduler.py:142
 msgid "running task synchronously (asynchronicity disabled)"
-msgstr ""
+msgstr "feladatok szinkronizált futtatása (aszinkron letiltva)"
 
 #: ../duplicity/asyncscheduler.py:148
 msgid "scheduling task for asynchronous execution"
-msgstr ""
+msgstr "feladatok ütemezése aszinkron futtatáshoz"
 
 #: ../duplicity/asyncscheduler.py:177
 msgid "task completed successfully"
-msgstr ""
+msgstr "sikeres feladatvégrehajtás"
 
 #: ../duplicity/asyncscheduler.py:188
 msgid ""
 "a previously scheduled task has failed; propagating the result immediately"
-msgstr ""
+msgstr "egy előző ütemezett feladat hibára futott; az eredmény közlése indul"
 
 #: ../duplicity/asyncscheduler.py:211 ../duplicity/asyncscheduler.py:232
 #, python-format
 msgid "active workers = %d"
-msgstr ""
+msgstr "aktív munkások = %d"
 
 #: ../duplicity/asyncscheduler.py:252
 #, python-format
 msgid "task execution done (success: %s)"
-msgstr ""
+msgstr "feladat végrehajtva (siker: %s)"
 
 #: ../duplicity/backend.py:485 ../duplicity/backend.py:509
 #, python-format
 msgid "Reading results of '%s'"
-msgstr ""
+msgstr "'%s' eredményeinek beolvasása"
 
 #: ../duplicity/backend.py:524
 #, python-format
 msgid "Running '%s' failed with code %d (attempt #%d)"
 msgid_plural "Running '%s' failed with code %d (attempt #%d)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "'%s' futtatása sikertelen volt, kód: %d ( #%d. próbálkozás)"
+msgstr[1] "'%s' futtatása sikertelen volt, kód: %d ( #%d. próbálkozás)"
 
 #: ../duplicity/backend.py:528
 #, python-format
@@ -392,27 +406,30 @@ msgid ""
 "Error is:\n"
 "%s"
 msgstr ""
+"A hiba:\n"
+"%s"
 
 #: ../duplicity/backend.py:530
 #, python-format
 msgid "Giving up trying to execute '%s' after %d attempt"
 msgid_plural "Giving up trying to execute '%s' after %d attempts"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Feladom, megpróbáltam futtatni: '%s', volt %d próbálkozásom"
+msgstr[1] "Feladom, megpróbáltam futtatni: '%s', volt %d próbálkozásom"
 
 #: ../duplicity/collections.py:188
 msgid "Fatal Error: No manifests found for most recent backup"
 msgstr ""
+"Súlyos hiba: A legutóbbi biztonsági mentéshez nem találtam bizonylatot"
 
 #: ../duplicity/collections.py:197
 msgid ""
 "Fatal Error: Remote manifest does not match local one.  Either the remote "
 "backup set or the local archive directory has been corrupted."
-msgstr ""
+msgstr "Súlyos hiba:"
 
 #: ../duplicity/collections.py:205
 msgid "Fatal Error: Neither remote nor local manifest is readable."
-msgstr ""
+msgstr "Súlyos hiba: Sem a helyi, sem a távoli kimutatás nem olvasható."
 
 #: ../duplicity/collections.py:316
 msgid "Preferring Backupset over previous one!"
@@ -422,196 +439,205 @@ msgstr ""
 #, python-format
 msgid "Ignoring incremental Backupset (start_time: %s; needed: %s)"
 msgstr ""
+"Növekményes készlet figyelmen kívül hagyása (kezdésidő: %s; ez kellene: %s)"
 
 #: ../duplicity/collections.py:324
 #, python-format
 msgid "Added incremental Backupset (start_time: %s / end_time: %s)"
-msgstr ""
+msgstr "Növekményes biztonsági mentés hozzáadva (kezdésidő: %s; vége: %s)"
 
 #: ../duplicity/collections.py:394
 msgid "Chain start time: "
-msgstr ""
+msgstr "Lánc kezdődiő: "
 
 #: ../duplicity/collections.py:395
 msgid "Chain end time: "
-msgstr ""
+msgstr "Lánc vége: "
 
 #: ../duplicity/collections.py:396
 #, python-format
 msgid "Number of contained backup sets: %d"
-msgstr ""
+msgstr "Tartalmazott biztonsági mentés készletek száma: %d"
 
 #: ../duplicity/collections.py:398
 #, python-format
 msgid "Total number of contained volumes: %d"
-msgstr ""
+msgstr "Összes tartalmazott köteg száma: %d"
 
 #: ../duplicity/collections.py:400
 msgid "Type of backup set:"
-msgstr ""
+msgstr "Biztonsági mentés készlet típusa:"
 
 #: ../duplicity/collections.py:400
 msgid "Time:"
-msgstr ""
+msgstr "Idő:"
 
 #: ../duplicity/collections.py:400
 msgid "Num volumes:"
-msgstr ""
+msgstr "Kötegek száma:"
 
 #: ../duplicity/collections.py:404
 msgid "Full"
-msgstr ""
+msgstr "Teljes"
 
 #: ../duplicity/collections.py:407
 msgid "Incremental"
-msgstr ""
+msgstr "Növekményes"
 
 #: ../duplicity/collections.py:467
 msgid "local"
-msgstr ""
+msgstr "helyi"
 
 #: ../duplicity/collections.py:469
 msgid "remote"
-msgstr ""
+msgstr "távoli"
 
 #: ../duplicity/collections.py:622
 msgid "Collection Status"
-msgstr ""
+msgstr "Gyűjtemény állapota"
 
 #: ../duplicity/collections.py:624
 #, python-format
 msgid "Connecting with backend: %s"
-msgstr ""
+msgstr "Kapcsolódás a tárhelyhez: %s"
 
 #: ../duplicity/collections.py:626
 #, python-format
 msgid "Archive dir: %s"
-msgstr ""
+msgstr "Archívum könyvtár: %s"
 
 #: ../duplicity/collections.py:629
 #, python-format
 msgid "Found %d secondary backup chain."
 msgid_plural "Found %d secondary backup chains."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d másodlagos mentés-láncot találtam"
+msgstr[1] "%d másodlagos mentés-láncot találtam"
 
 #: ../duplicity/collections.py:634
 #, python-format
 msgid "Secondary chain %d of %d:"
-msgstr ""
+msgstr "Mentés-lánc %d, összesen %d"
 
 #: ../duplicity/collections.py:640
 msgid "Found primary backup chain with matching signature chain:"
-msgstr ""
+msgstr "Találtam elsődleges mentés-láncot amire illik az aláíráslánc:"
 
 #: ../duplicity/collections.py:644
 msgid "No backup chains with active signatures found"
-msgstr ""
+msgstr "Nem találtam mentés-láncot aminek aktív aláírása lenne"
 
 #: ../duplicity/collections.py:647
 #, python-format
 msgid "Also found %d backup set not part of any chain,"
 msgid_plural "Also found %d backup sets not part of any chain,"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Találtam még %d mentés-készletet, ami nem része láncnak."
+msgstr[1] "Találtam még %d mentés-készletet, ami nem része láncnak."
 
 #: ../duplicity/collections.py:651
 #, python-format
 msgid "and %d incomplete backup set."
 msgid_plural "and %d incomplete backup sets."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "és %d félkész mentés-készlet."
+msgstr[1] "és %d félkész mentés-készlet."
 
 #. TRANSL: "cleanup" is a hard-coded command, so do not translate it
 #: ../duplicity/collections.py:656
 msgid ""
 "These may be deleted by running duplicity with the \"cleanup\" command."
-msgstr ""
+msgstr "Ezeket le lehet törölni a duplicity \"cleanup\" parancsával."
 
 #: ../duplicity/collections.py:659
 msgid "No orphaned or incomplete backup sets found."
-msgstr ""
+msgstr "Nem találtam elárvult vagy félkész biztonsági mentés készletet."
 
 #: ../duplicity/collections.py:675
 #, python-format
 msgid "%d file exists on backend"
 msgid_plural "%d files exist on backend"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d állomány található a tárhelyen"
+msgstr[1] "%d állomány található a tárhelyen"
 
 #: ../duplicity/collections.py:682
 #, python-format
 msgid "%d file exists in cache"
 msgid_plural "%d files exist in cache"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d állomány található a gyorsítótárban"
+msgstr[1] "%d állomány található a gyorsítótárban"
 
 #: ../duplicity/collections.py:734
 msgid ""
 "Warning, discarding last backup set, because of missing signature file."
 msgstr ""
+"Figyelem, törlöm az utolsó mentés készletet, mert hiányzik az aláírás-"
+"állomány."
 
 #: ../duplicity/collections.py:757
 msgid "Warning, found the following local orphaned signature file:"
 msgid_plural "Warning, found the following local orphaned signature files:"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Figyelem, az alábbi elárvult aláírás-állományt találtam:"
+msgstr[1] "Figyelem, az alábbi elárvult aláírás-állományokat találtam:"
 
 #: ../duplicity/collections.py:766
 msgid "Warning, found the following remote orphaned signature file:"
 msgid_plural "Warning, found the following remote orphaned signature files:"
 msgstr[0] ""
+"Figyelem, az alábbi elárvult aláírás-állományt találtam a tárhelyen:"
 msgstr[1] ""
+"Figyelem, az alábbi elárvult aláírás-állományokat találtam a tárhelyen:"
 
 #: ../duplicity/collections.py:775
 msgid "Warning, found signatures but no corresponding backup files"
 msgstr ""
+"Figyelem, találtam aláírásokat, de nincs hozzátartozó mentés állomány"
 
 #: ../duplicity/collections.py:779
 msgid ""
 "Warning, found incomplete backup sets, probably left from aborted session"
 msgstr ""
+"Figyelem, találtam félkész mentés készleteket, valószínűleg egy előző mentés "
+"félbeszakadt"
 
 #: ../duplicity/collections.py:783
 msgid "Warning, found the following orphaned backup file:"
 msgid_plural "Warning, found the following orphaned backup files:"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Figyelem, az alábbi elárvult mentés állományt találtam:"
+msgstr[1] "Figyelem, az alábbi elárvult mentés állományokat találtam:"
 
 #: ../duplicity/collections.py:801
 #, python-format
 msgid "Extracting backup chains from list of files: %s"
-msgstr ""
+msgstr "Biztonsági mentés láncok kiemelése állománylistából: %s"
 
 #: ../duplicity/collections.py:811
 #, python-format
 msgid "File %s is part of known set"
-msgstr ""
+msgstr "A %s állomány nem része bármely ismert készletnek"
 
 #: ../duplicity/collections.py:814
 #, python-format
 msgid "File %s is not part of a known set; creating new set"
 msgstr ""
+"A %s állomány nem része bármely ismert készletnek; új készlet létrehozása"
 
 #: ../duplicity/collections.py:819
 #, python-format
 msgid "Ignoring file (rejected by backup set) '%s'"
-msgstr ""
+msgstr "Állomány kihagyása (mentés készlet utasította el) '%s'"
 
 #: ../duplicity/collections.py:832
 #, python-format
 msgid "Found backup chain %s"
-msgstr ""
+msgstr "Megvan a biztonsági mentés lánc: %s"
 
 #: ../duplicity/collections.py:837
 #, python-format
 msgid "Added set %s to pre-existing chain %s"
-msgstr ""
+msgstr "%s készletet hozzáadtam a már létező %s lánchoz"
 
 #: ../duplicity/collections.py:841
 #, python-format
 msgid "Found orphaned set %s"
-msgstr ""
+msgstr "Elárvult %s készletet találtam"
 
 #: ../duplicity/collections.py:993
 #, python-format
@@ -619,6 +645,8 @@ msgid ""
 "No signature chain for the requested time.  Using oldest available chain, "
 "starting at time %s."
 msgstr ""
+"Nincs aláíráslánc a kért időpontban. A legrégebbi láncot veszem elő, "
+"időpontja %s."
 
 #: ../duplicity/commandline.py:67
 #, python-format
@@ -627,15 +655,17 @@ msgid ""
 "release.\n"
 "Use of default filenames is strongly suggested."
 msgstr ""
+"Figyelem: a %s opció már elavult, és későbbi verziókban meg is fog szűnni.\n"
+"Alapértelmezett állománynevek használata erősen javasolt."
 
 #: ../duplicity/commandline.py:209
 msgid "Unable to load gio module"
-msgstr ""
+msgstr "Nem tudtam betölteni a gio modult"
 
 #: ../duplicity/commandline.py:231
 #, python-format
 msgid "Error opening file %s"
-msgstr ""
+msgstr "Hiba a %s állomány megnyitása közben"
 
 #. TRANSL: Used in usage help to represent a Unix-style path name. Example:
 #. --archive-dir <path>
@@ -643,14 +673,14 @@ msgstr ""
 #: ../duplicity/commandline.py:277 ../duplicity/commandline.py:331
 #: ../duplicity/commandline.py:484 ../duplicity/commandline.py:699
 msgid "path"
-msgstr ""
+msgstr "útvonal"
 
 #. TRANSL: Used in usage help to represent an ID for a GnuPG key. Example:
 #. --encrypt-key <gpg_key_id>
 #: ../duplicity/commandline.py:272 ../duplicity/commandline.py:279
 #: ../duplicity/commandline.py:473 ../duplicity/commandline.py:672
 msgid "gpg-key-id"
-msgstr ""
+msgstr "gpg-kulcs-azon"
 
 #. TRANSL: Used in usage help to represent a "glob" style pattern for
 #. matching one or more files, as described in the documentation.
@@ -659,7 +689,7 @@ msgstr ""
 #: ../duplicity/commandline.py:287 ../duplicity/commandline.py:371
 #: ../duplicity/commandline.py:722
 msgid "shell_pattern"
-msgstr ""
+msgstr "héj_minta"
 
 #. TRANSL: Used in usage help to represent the name of a file. Example:
 #. --log-file <filename>
@@ -668,12 +698,12 @@ msgstr ""
 #: ../duplicity/commandline.py:378 ../duplicity/commandline.py:389
 #: ../duplicity/commandline.py:668
 msgid "filename"
-msgstr ""
+msgstr "állománynév"
 
 #. TRANSL: Used in usage help to represent a regular expression (regexp).
 #: ../duplicity/commandline.py:312 ../duplicity/commandline.py:380
 msgid "regular_expression"
-msgstr ""
+msgstr "reguláris_kifejezés"
 
 #. TRANSL: Used in usage help to represent a time spec for a previous
 #. point in time, as described in the documentation. Example:
@@ -681,7 +711,7 @@ msgstr ""
 #: ../duplicity/commandline.py:343 ../duplicity/commandline.py:433
 #: ../duplicity/commandline.py:754
 msgid "time"
-msgstr ""
+msgstr "időpont"
 
 #. TRANSL: Used in usage help. (Should be consistent with the "Options:"
 #. header.) Example:
@@ -689,7 +719,7 @@ msgstr ""
 #: ../duplicity/commandline.py:347 ../duplicity/commandline.py:481
 #: ../duplicity/commandline.py:687
 msgid "options"
-msgstr ""
+msgstr "opciók"
 
 #: ../duplicity/commandline.py:356
 #, python-format
@@ -697,20 +727,22 @@ msgid ""
 "Running in 'ignore errors' mode due to %s; please re-consider if this was "
 "not intended"
 msgstr ""
+"'Hibák figyelmen kívül hagyása' módban vagyunk, emiatt: %s; kérlek gondold "
+"át, ez volt-e a szándékod"
 
 #. TRANSL: Used in usage help to represent an imap mailbox
 #: ../duplicity/commandline.py:369
 msgid "imap_mailbox"
-msgstr ""
+msgstr "imap_postaláda"
 
 #: ../duplicity/commandline.py:383
 msgid "file_descriptor"
-msgstr ""
+msgstr "állomány_leíró"
 
 #. TRANSL: Used in usage help (noun)
 #: ../duplicity/commandline.py:394
 msgid "backup name"
-msgstr ""
+msgstr "biztonsági mentés neve"
 
 #. TRANSL: Used in usage help to represent a desired number of
 #. something. Example:
@@ -718,124 +750,124 @@ msgstr ""
 #: ../duplicity/commandline.py:410 ../duplicity/commandline.py:454
 #: ../duplicity/commandline.py:514 ../duplicity/commandline.py:682
 msgid "number"
-msgstr ""
+msgstr "szám"
 
 #. TRANSL: noun
 #: ../duplicity/commandline.py:459 ../duplicity/commandline.py:463
 #: ../duplicity/commandline.py:653
 msgid "command"
-msgstr ""
+msgstr "parancs"
 
 #. TRANSL: Used in usage help. Example:
 #. --timeout <seconds>
 #: ../duplicity/commandline.py:489 ../duplicity/commandline.py:716
 msgid "seconds"
-msgstr ""
+msgstr "másodpercek"
 
 #. TRANSL: abbreviation for "character" (noun)
 #: ../duplicity/commandline.py:495 ../duplicity/commandline.py:650
 msgid "char"
-msgstr ""
+msgstr "kar"
 
 #: ../duplicity/commandline.py:616
 #, python-format
 msgid "Using archive dir: %s"
-msgstr ""
+msgstr "Archívum-könyvtár: %s"
 
 #: ../duplicity/commandline.py:617
 #, python-format
 msgid "Using backup name: %s"
-msgstr ""
+msgstr "Biztonsági mentés neve: %s"
 
 #: ../duplicity/commandline.py:624
 #, python-format
 msgid "Command line error: %s"
-msgstr ""
+msgstr "Parancssori hiba: %s"
 
 #: ../duplicity/commandline.py:625
 msgid "Enter 'duplicity --help' for help screen."
-msgstr ""
+msgstr "A súgó megjeleníthető a következő parancssal: 'duplicity --help'."
 
 #. TRANSL: Used in usage help to represent a Unix-style path name. Example:
 #. rsync://user[:password]@other_host[:port]//absolute_path
 #: ../duplicity/commandline.py:638
 msgid "absolute_path"
-msgstr ""
+msgstr "teljes_útvonal"
 
 #. TRANSL: Used in usage help. Example:
 #. tahoe://alias/some_dir
 #: ../duplicity/commandline.py:642
 msgid "alias"
-msgstr ""
+msgstr "alias"
 
 #. TRANSL: Used in help to represent a "bucket name" for Amazon Web
 #. Services' Simple Storage Service (S3). Example:
 #. s3://other.host/bucket_name[/prefix]
 #: ../duplicity/commandline.py:647
 msgid "bucket_name"
-msgstr ""
+msgstr "bucket_name"
 
 #. TRANSL: Used in usage help to represent the name of a container in
 #. Amazon Web Services' Cloudfront. Example:
 #. cf+http://container_name
 #: ../duplicity/commandline.py:658
 msgid "container_name"
-msgstr ""
+msgstr "container_name"
 
 #. TRANSL: noun
 #: ../duplicity/commandline.py:661
 msgid "count"
-msgstr ""
+msgstr "száma"
 
 #. TRANSL: Used in usage help to represent the name of a file directory
 #: ../duplicity/commandline.py:664
 msgid "directory"
-msgstr ""
+msgstr "könyvtár"
 
 #. TRANSL: Used in usage help, e.g. to represent the name of a code
 #. module. Example:
 #. rsync://user[:password]@other.host[:port]::/module/some_dir
 #: ../duplicity/commandline.py:677
 msgid "module"
-msgstr ""
+msgstr "modul"
 
 #. TRANSL: Used in usage help to represent an internet hostname. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:691
 msgid "other.host"
-msgstr ""
+msgstr "egyéb.kiszolgáló"
 
 #. TRANSL: Used in usage help. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:695
 msgid "password"
-msgstr ""
+msgstr "jelszó"
 
 #. TRANSL: Used in usage help to represent a TCP port number. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:703
 msgid "port"
-msgstr ""
+msgstr "port"
 
 #. TRANSL: Used in usage help. This represents a string to be used as a
 #. prefix to names for backup files created by Duplicity. Example:
 #. s3://other.host/bucket_name[/prefix]
 #: ../duplicity/commandline.py:708
 msgid "prefix"
-msgstr ""
+msgstr "prefix"
 
 #. TRANSL: Used in usage help to represent a Unix-style path name. Example:
 #. rsync://user[:password]@other.host[:port]/relative_path
 #: ../duplicity/commandline.py:712
 msgid "relative_path"
-msgstr ""
+msgstr "relatív_útvonal"
 
 #. TRANSL: Used in usage help to represent the name of a single file
 #. directory or a Unix-style path to a directory. Example:
 #. file:///some_dir
 #: ../duplicity/commandline.py:727
 msgid "some_dir"
-msgstr ""
+msgstr "valami_könyvtár"
 
 #. TRANSL: Used in usage help to represent the name of a single file
 #. directory or a Unix-style path to a directory where files will be
@@ -843,14 +875,14 @@ msgstr ""
 #. duplicity [full|incremental] [options] source_dir target_url
 #: ../duplicity/commandline.py:733
 msgid "source_dir"
-msgstr ""
+msgstr "forrás_könyvtár"
 
 #. TRANSL: Used in usage help to represent a URL files will be coming
 #. FROM. Example:
 #. duplicity [restore] [options] source_url target_dir
 #: ../duplicity/commandline.py:738
 msgid "source_url"
-msgstr ""
+msgstr "forrás_url"
 
 #. TRANSL: Used in usage help to represent the name of a single file
 #. directory or a Unix-style path to a directory. where files will be
@@ -858,37 +890,37 @@ msgstr ""
 #. duplicity [restore] [options] source_url target_dir
 #: ../duplicity/commandline.py:744
 msgid "target_dir"
-msgstr ""
+msgstr "cél_könyvtár"
 
 #. TRANSL: Used in usage help to represent a URL files will be going TO.
 #. Example:
 #. duplicity [full|incremental] [options] source_dir target_url
 #: ../duplicity/commandline.py:749
 msgid "target_url"
-msgstr ""
+msgstr "cél_url"
 
 #. TRANSL: Used in usage help to represent a user name (i.e. login).
 #. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:759
 msgid "user"
-msgstr ""
+msgstr "felhasználó"
 
 #. TRANSL: Header in usage help
 #: ../duplicity/commandline.py:776
 msgid "Backends and their URL formats:"
-msgstr ""
+msgstr "Tárhelyek és azok URL formátumai:"
 
 #. TRANSL: Header in usage help
 #: ../duplicity/commandline.py:798
 msgid "Commands:"
-msgstr ""
+msgstr "Parancsok:"
 
 #: ../duplicity/commandline.py:822
 #, python-format
 msgid ""
 "Specified archive directory '%s' does not exist, or is not a directory"
-msgstr ""
+msgstr "A megadott '%s' archív könyvtár nem létezik, vagy nem könyvtár"
 
 #: ../duplicity/commandline.py:831
 #, python-format
@@ -896,6 +928,8 @@ msgid ""
 "Sign key should be an 8 character hex string, like 'AA0E73D2'.\n"
 "Received '%s' instead."
 msgstr ""
+"Az aláíró kulcs egy 8 karakter hosszú hex szöveg, pl. 'AA0E73D2'.\n"
+"Ehelyett ezt kaptam: '%s'."
 
 #: ../duplicity/commandline.py:889
 #, python-format
@@ -903,27 +937,31 @@ msgid ""
 "Restore destination directory %s already exists.\n"
 "Will not overwrite."
 msgstr ""
+"A visszaállításhoz kért %s könyvár már létezik.\n"
+"Nem írom felül."
 
 #: ../duplicity/commandline.py:894
 #, python-format
 msgid "Verify directory %s does not exist"
-msgstr ""
+msgstr "Az ellenőrzéshez kért %s könyvtár nem létezik"
 
 #: ../duplicity/commandline.py:900
 #, python-format
 msgid "Backup source directory %s does not exist."
-msgstr ""
+msgstr "Biztonsági mentés %s forráskönyvtár nem létezik."
 
 #: ../duplicity/commandline.py:929
 #, python-format
 msgid "Command line warning: %s"
-msgstr ""
+msgstr "Parancssori figyelmetetés: %s"
 
 #: ../duplicity/commandline.py:929
 msgid ""
 "Selection options --exclude/--include\n"
 "currently work only when backing up,not restoring."
 msgstr ""
+"Az --exclude/--include állományválasztó opciók jelenleg csak \n"
+"biztonsági mentéshez használhatók, visszaállításhoz nem."
 
 #: ../duplicity/commandline.py:977
 #, python-format
