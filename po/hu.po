@@ -8,23 +8,23 @@ msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-11-07 16:17+0000\n"
-"PO-Revision-Date: 2011-11-21 16:17+0000\n"
+"PO-Revision-Date: 2011-11-22 11:00+0000\n"
 "Last-Translator: SanskritFritz <Unknown>\n"
 "Language-Team: Hungarian <hu@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-11-22 05:01+0000\n"
-"X-Generator: Launchpad (build 14299)\n"
+"X-Launchpad-Export-Date: 2011-11-23 05:21+0000\n"
+"X-Generator: Launchpad (build 14336)\n"
 
 #: ../duplicity-bin:94
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
-msgstr ""
+msgstr "A beállított PASSPHRASE újrafelhasználása mint SIGN_PASSPHRASE"
 
 #: ../duplicity-bin:100
 msgid "Reuse configured SIGN_PASSPHRASE as PASSPHRASE"
-msgstr ""
+msgstr "A beállított SIGN_PASSPHRASE újrafelhasználása mint PASSPHRASE"
 
 #: ../duplicity-bin:139
 msgid "PASSPHRASE variable not set, asking user."
@@ -62,6 +62,8 @@ msgid ""
 "File %s complete in backup set.\n"
 "Continuing restart on file %s."
 msgstr ""
+"A %s állomány elkészült a biztonsági mentés készletben.\n"
+"Folytatom ezzel a állománnyal: %s."
 
 #: ../duplicity-bin:229
 #, python-format
@@ -69,6 +71,8 @@ msgid ""
 "File %s missing in backup set.\n"
 "Continuing restart on file %s."
 msgstr ""
+"A %s állomány hiányzik a biztonsági mentés készletből.\n"
+"Folytatom ezzel a állománnyal: %s."
 
 #: ../duplicity-bin:281
 #, python-format
@@ -119,7 +123,7 @@ msgstr "Számított hash: %s"
 #: ../duplicity-bin:658
 #, python-format
 msgid "Manifest hash: %s"
-msgstr ""
+msgstr "KImutatás hash: %s"
 
 #: ../duplicity-bin:696
 #, python-format
@@ -211,7 +215,7 @@ msgstr ""
 #: ../duplicity-bin:922
 #, python-format
 msgid "Deleting local %s (not authoritative at backend)."
-msgstr ""
+msgstr "Helyi %s törlése (nem hiteles a tárhelyen)."
 
 #: ../duplicity-bin:926
 #, python-format
@@ -433,7 +437,7 @@ msgstr "Súlyos hiba: Sem a helyi, sem a távoli kimutatás nem olvasható."
 
 #: ../duplicity/collections.py:316
 msgid "Preferring Backupset over previous one!"
-msgstr ""
+msgstr "Mentés-készlet előnyben részesítve az előzővel szemben!"
 
 #: ../duplicity/collections.py:319
 #, python-format
@@ -970,20 +974,23 @@ msgid ""
 "Examples of URL strings are \"scp://user@host.net:1234/path\" and\n"
 "\"file:///usr/local\".  See the man page for more information."
 msgstr ""
+"Rossz URL '%s'.\n"
+"Néhány példa-URL: \"scp://user@host.net:1234/path\" vagy\n"
+"\"file:///usr/local\". Olvass utána a \"man\" oldalon."
 
 #: ../duplicity/commandline.py:1002
 msgid "Main action: "
-msgstr ""
+msgstr "Fő művelet: "
 
 #: ../duplicity/diffdir.py:101 ../duplicity/diffdir.py:390
 #, python-format
 msgid "Error %s getting delta for %s"
-msgstr ""
+msgstr "%s hiba a %s különbségi állományának kinyerése közben"
 
 #: ../duplicity/diffdir.py:115
 #, python-format
 msgid "Getting delta of %s and %s"
-msgstr ""
+msgstr "%s és %s különbségi állományának kinyerése"
 
 #: ../duplicity/diffdir.py:160
 #, python-format
@@ -998,7 +1005,7 @@ msgstr ""
 #: ../duplicity/diffdir.py:189
 #, python-format
 msgid "Comparing %s and %s"
-msgstr ""
+msgstr "%s és %s összehasonlítása"
 
 #: ../duplicity/diffdir.py:195
 #, python-format
@@ -1014,6 +1021,11 @@ msgid ""
 "allowed special characters are s, m, h, D, W, M, and Y.  See the man\n"
 "page for more information."
 msgstr ""
+"Rossz intervallum szöveg \"%s\"\n"
+"\n"
+"Az intervallumok ilyenek: 2Y (2 év) vagy 2h30m (2.5 óra).\n"
+"A megengedett speciális karakterek: s, m, h, D, W, M, és Y.\n"
+"Olvass utána a \"man\" oldalon."
 
 #: ../duplicity/dup_time.py:54
 #, python-format
@@ -1027,21 +1039,28 @@ msgid ""
 "(various combinations are acceptable, but the month always precedes\n"
 "the day)."
 msgstr ""
+"Rosszul adtad meg az időt: \"%s\"\n"
+"\n"
+"Elfogadom a következőket. Intervallumok (pl. \"3D64s\"), w3-időpecsét,\n"
+"pl. \"2002-04-26T04:22:01-07:00\" (vagy \"2002-04-26T04:22:01\" - duplicity\n"
+"az érvényes időzónát használja) vagy hétköznapi dátumok, mint 2/4/1997\n"
+"vagy 2001-04-23 (kölönböző kombinációk lehetnek, de a hónap mindig\n"
+"előzze meg a napot)."
 
 #: ../duplicity/lazy.py:325
 #, python-format
 msgid "Warning: oldindex %s >= newindex %s"
-msgstr ""
+msgstr "Figyelem: régi index %s >= új index %s"
 
 #: ../duplicity/lazy.py:400
 #, python-format
 msgid "Error '%s' processing %s"
-msgstr ""
+msgstr "'%s' hiba a %s feldolgozása közben"
 
 #: ../duplicity/lazy.py:408
 #, python-format
 msgid "Skipping %s because of previous error"
-msgstr ""
+msgstr "%s átugrása az előző hiba miatt"
 
 #: ../duplicity/manifest.py:87
 #, python-format
@@ -1050,6 +1069,9 @@ msgid ""
 "Current hostname: %s\n"
 "Previous hostname: %s"
 msgstr ""
+"Súlyos hiba: A biztonsági mentést kérő forrásrendszer neve megváltozott.\n"
+"Jelenlegi név: %s\n"
+"Előző név: %s"
 
 #: ../duplicity/manifest.py:94
 #, python-format
@@ -1058,6 +1080,9 @@ msgid ""
 "Current directory: %s\n"
 "Previous directory: %s"
 msgstr ""
+"Súlyos hiba: A biztonsági mentést kérő forráskönyvtár megváltozott.\n"
+"Jelenlegi könyvtár: %s\n"
+"Előző könyvtár: %s"
 
 #: ../duplicity/manifest.py:103
 msgid ""
@@ -1066,47 +1091,53 @@ msgid ""
 "If this is not a mistake, use the --allow-source-mismatch switch to avoid "
 "seeing this message"
 msgstr ""
+"Leállok, mert lehet, hogy véletlenül megpróbáltál mentést készíteni két "
+"különböző adatkészletről ugyanarra a távoli tárhelyre, vagy "
+"archívumkönyvtárba. Ha nincs szó hibázásról, használd az --allow-source-"
+"mismatch kapcsolót, és nem küldök ilyen figyelmeztetést."
 
 #: ../duplicity/manifest.py:198
 msgid "Manifests not equal because different volume numbers"
-msgstr ""
+msgstr "A kimutatások nem egyformák, mert a kötegek száma különbözik"
 
 #: ../duplicity/manifest.py:203
 msgid "Manifests not equal because volume lists differ"
-msgstr ""
+msgstr "A kimutatások nem egyformák, mert a kötegek listája különbözik"
 
 #: ../duplicity/manifest.py:208
 msgid "Manifests not equal because hosts or directories differ"
 msgstr ""
+"A kimutatások nem egyformák, mert a célrendszerek vagy célkönyvtárak "
+"különböznek"
 
 #: ../duplicity/manifest.py:355
 msgid "Warning, found extra Volume identifier"
-msgstr ""
+msgstr "Figyelem, ráadás Kötegazonosítót találtam"
 
 #: ../duplicity/manifest.py:381
 msgid "Other is not VolumeInfo"
-msgstr ""
+msgstr "A másik nem Köteginfo"
 
 #: ../duplicity/manifest.py:384
 msgid "Volume numbers don't match"
-msgstr ""
+msgstr "A kötegszámok nem egyeznek"
 
 #: ../duplicity/manifest.py:387
 msgid "start_indicies don't match"
-msgstr ""
+msgstr "A start_mutatószámok nem egyeznek"
 
 #: ../duplicity/manifest.py:390
 msgid "end_index don't match"
-msgstr ""
+msgstr "A vég_mutatószám nem egyezik"
 
 #: ../duplicity/manifest.py:397
 msgid "Hashes don't match"
-msgstr ""
+msgstr "A hash-ek nem egyeznek"
 
 #: ../duplicity/misc.py:99
 #, python-format
 msgid "Starting to write %s"
-msgstr ""
+msgstr "Elkezdem írni: %s"
 
 #: ../duplicity/misc.py:107
 #, python-format
@@ -1114,116 +1145,118 @@ msgid ""
 "One only volume required.\n"
 "Renaming %s to %s"
 msgstr ""
+"Csak egy kötegre van szükség.\n"
+"Átnevezem ezt: %s erre: %s"
 
 #: ../duplicity/patchdir.py:74 ../duplicity/patchdir.py:79
 #, python-format
 msgid "Patching %s"
-msgstr ""
+msgstr "%s foltozása (patch)"
 
 #: ../duplicity/patchdir.py:568
 #, python-format
 msgid "Writing %s of type %s"
-msgstr ""
+msgstr "%s írása, mely %s típusú"
 
 #: ../duplicity/path.py:221 ../duplicity/path.py:280
 #, python-format
 msgid "Warning: %s has negative mtime, treating as 0."
-msgstr ""
+msgstr "Figyelem: %s negatív m_idővel rendelkezik, 0-nak értelmezem."
 
 #: ../duplicity/path.py:345
 msgid "Difference found:"
-msgstr ""
+msgstr "Találtam különbséget:"
 
 #: ../duplicity/path.py:351
 #, python-format
 msgid "New file %s"
-msgstr ""
+msgstr "Új állomány: %s"
 
 #: ../duplicity/path.py:354
 #, python-format
 msgid "File %s is missing"
-msgstr ""
+msgstr "%s állomány hiányzik"
 
 #: ../duplicity/path.py:357
 #, python-format
 msgid "File %%s has type %s, expected %s"
-msgstr ""
+msgstr "A %%s állomány típusa %s, nekem %s kell"
 
 #: ../duplicity/path.py:363 ../duplicity/path.py:389
 #, python-format
 msgid "File %%s has permissions %s, expected %s"
-msgstr ""
+msgstr "A %%s állomány engedélyei: %s, nekem %s kell"
 
 #: ../duplicity/path.py:368
 #, python-format
 msgid "File %%s has mtime %s, expected %s"
-msgstr ""
+msgstr "A %%s állomány m_ideje %s, nekem %s kell"
 
 #: ../duplicity/path.py:376
 #, python-format
 msgid "Data for file %s is different"
-msgstr ""
+msgstr "A %s állománynak szánt adat kölönböző"
 
 #: ../duplicity/path.py:384
 #, python-format
 msgid "Symlink %%s points to %s, expected %s"
-msgstr ""
+msgstr "Szimbólikus link %%s ide mutat: %s, nekem %s kell"
 
 #: ../duplicity/path.py:393
 #, python-format
 msgid "Device file %%s has numbers %s, expected %s"
-msgstr ""
+msgstr "Eszközállomány %%s számai %s, nekem %s kell"
 
 #: ../duplicity/path.py:553
 #, python-format
 msgid "Making directory %s"
-msgstr ""
+msgstr "Könyvtár létrehozása: %s"
 
 #: ../duplicity/path.py:563
 #, python-format
 msgid "Deleting %s"
-msgstr ""
+msgstr "Törlés: %s"
 
 #: ../duplicity/path.py:572
 #, python-format
 msgid "Touching %s"
-msgstr ""
+msgstr "%s megérintése (touch)"
 
 #: ../duplicity/path.py:579
 #, python-format
 msgid "Deleting tree %s"
-msgstr ""
+msgstr "Fa törlése: %s"
 
 #: ../duplicity/robust.py:59
 #, python-format
 msgid "Error listing directory %s"
-msgstr ""
+msgstr "Hiba történt a %s könyvtár listázása során"
 
 #: ../duplicity/selection.py:119
 #, python-format
 msgid "Skipping socket %s"
-msgstr ""
+msgstr "Konnektor (socket) átugrása: %s"
 
 #: ../duplicity/selection.py:123
 #, python-format
 msgid "Error initializing file %s"
-msgstr ""
+msgstr "Hiba történt a %s állomány inicializálása során"
 
 #: ../duplicity/selection.py:127 ../duplicity/selection.py:148
 #, python-format
 msgid "Error accessing possibly locked file %s"
-msgstr ""
+msgstr "Valószínűleg zárolt a %s állomány, nem érem el"
 
 #: ../duplicity/selection.py:163
 #, python-format
 msgid "Warning: base %s doesn't exist, continuing"
-msgstr ""
+msgstr "Figyelem: %s alap nem létezik, folytatom"
 
 #: ../duplicity/selection.py:166 ../duplicity/selection.py:184
 #: ../duplicity/selection.py:187
 #, python-format
 msgid "Selecting %s"
-msgstr ""
+msgstr "%s kiválasztása"
 
 #: ../duplicity/selection.py:268
 #, python-format
@@ -1235,6 +1268,12 @@ msgid ""
 "Useful file specifications begin with the base directory or some\n"
 "pattern (such as '**') which matches the base directory."
 msgstr ""
+"Súlyos hiba: Az állomány specifikáció\n"
+"    %s\n"
+"nem illik az alapkönyvtárban található állományokra\n"
+"    %s\n"
+"Egy állományspecifikáció az alapkönyvtárral kezdődjön, vagy\n"
+"valamilyen minta (mint pl. a '**') illeszkedjen az alapkönyvtárra."
 
 #: ../duplicity/selection.py:276
 #, python-format
@@ -1242,6 +1281,8 @@ msgid ""
 "Fatal Error while processing expression\n"
 "%s"
 msgstr ""
+"Súlyos hiba: A kifejezés feldolgozása során hiba történt:\n"
+"%s"
 
 #: ../duplicity/selection.py:286
 #, python-format
@@ -1252,16 +1293,21 @@ msgid ""
 "include all files, the expression is redundant.  Exiting because this\n"
 "probably isn't what you meant."
 msgstr ""
+"Legutolsó kiválasztó kifejezés:\n"
+"    %s\n"
+"csak azt fejezi ki, hogy állományokat foglaljunk be. \n"
+"Mivel az alapértelmezés szerint minden állományt befoglalunk,\n"
+"a kifejezés felesleges. Kilépek, mert valószínűleg nem ezt akartad."
 
 #: ../duplicity/selection.py:311
 #, python-format
 msgid "Reading filelist %s"
-msgstr ""
+msgstr "%s állománylista beolvasása"
 
 #: ../duplicity/selection.py:314
 #, python-format
 msgid "Sorting filelist %s"
-msgstr ""
+msgstr "%s állománylista sorbarendezése"
 
 #: ../duplicity/selection.py:341
 #, python-format
@@ -1269,83 +1315,92 @@ msgid ""
 "Warning: file specification '%s' in filelist %s\n"
 "doesn't start with correct prefix %s.  Ignoring."
 msgstr ""
+"Figyelem: a '%s' állományspecifikáció a %s állománylistában\n"
+"nem a helyes %s előtaggal kezdődik. Kihagyom."
 
 #: ../duplicity/selection.py:345
 msgid "Future prefix errors will not be logged."
-msgstr ""
+msgstr "A további előtag hibákat nem jegyzem le."
 
 #: ../duplicity/selection.py:361
 #, python-format
 msgid "Error closing filelist %s"
-msgstr ""
+msgstr "Hiba történt a %s állománylista lezárása során"
 
 #: ../duplicity/selection.py:428
 #, python-format
 msgid "Reading globbing filelist %s"
-msgstr ""
+msgstr "Globbing állománylista %s beolvasása"
 
 #: ../duplicity/selection.py:461
 #, python-format
 msgid "Error compiling regular expression %s"
-msgstr ""
+msgstr "Hiba történt a %s reguláris kifejezés lefordítása során"
 
 #: ../duplicity/selection.py:477
 msgid ""
 "Warning: exclude-device-files is not the first selector.\n"
 "This may not be what you intended"
 msgstr ""
+"Figyelem: az exclude-device-files nem az első kiválasztó.\n"
+"Valószínűleg nem ezt akarod"
 
 #: ../duplicity/tempdir.py:119
 #, python-format
 msgid "Using temporary directory %s"
-msgstr ""
+msgstr "Ideiglenes könyvtár: %s"
 
 #: ../duplicity/tempdir.py:157
 #, python-format
 msgid "Registering (mktemp) temporary file %s"
-msgstr ""
+msgstr "Ideiglenes állomány regisztrálása (mktemp): %s"
 
 #: ../duplicity/tempdir.py:179
 #, python-format
 msgid "Registering (mkstemp) temporary file %s"
-msgstr ""
+msgstr "Ideiglenes állomány regisztrálása (mkstemp): %s"
 
 #: ../duplicity/tempdir.py:211
 #, python-format
 msgid "Forgetting temporary file %s"
-msgstr ""
+msgstr "Ideiglenes állomány elfelejtése: %s"
 
 #: ../duplicity/tempdir.py:214
 #, python-format
 msgid "Attempt to forget unknown tempfile %s - this is probably a bug."
 msgstr ""
+"Ismeretlen %s ideiglenes állomány felejtésére tett kísérlet - ez "
+"valószínűleg egy hiba (bug)."
 
 #: ../duplicity/tempdir.py:233
 #, python-format
 msgid "Removing still remembered temporary file %s"
-msgstr ""
+msgstr "Ismert ideiglenes %s állomány törlése"
 
 #: ../duplicity/tempdir.py:236
 #, python-format
 msgid "Cleanup of temporary file %s failed"
-msgstr ""
+msgstr "A %s ideiglenes állomány törlése sikertelen volt"
 
 #: ../duplicity/tempdir.py:241
 #, python-format
 msgid "Cleanup of temporary directory %s failed - this is probably a bug."
 msgstr ""
+"A %s ideiglenes állomány törlése sikertelen volt - ez valószínűleg egy hiba "
+"(bug)."
 
 #: ../duplicity/util.py:68
 #, python-format
 msgid "IGNORED_ERROR: Warning: ignoring error as requested: %s: %s"
 msgstr ""
+"IGNORED_ERROR: Figyelem: a hibát figyelmen kívül hagyom, ahogy kérted: %s: %s"
 
 #: ../duplicity/backends/giobackend.py:89
 #, python-format
 msgid "Connection failed, please check your password: %s"
-msgstr ""
+msgstr "Kapcsolódás sikertelen, kérlek ellenőrizd a jelszót: %s"
 
 #: ../duplicity/backends/giobackend.py:113
 #, python-format
 msgid "Writing %s"
-msgstr ""
+msgstr "%s írása"
