@@ -1,6 +1,6 @@
-New in v0.6.17 (2011/11/??)
+New in v0.6.17 (2011/11/23)
 ----------------------------
-Enhancements:
+This is bug fix release.
 
 Bugs closed in this release:
 411145     Misleading error message: "Invalid SSH password"
