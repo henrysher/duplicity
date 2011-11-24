@@ -4,10 +4,16 @@ This is bug fix release.
 
 Bugs closed in this release:
 411145     Misleading error message: "Invalid SSH password"
+871875     File ... was corrupted during upload.
 878220	   UnsupportedBackendScheme: scheme not supported in url: s3+http
+878964     Resuming a backup with a different password should throw an error
 881070	   Bugfix for S3 multipart upload on 0.6.16
 881727	   duplicity 0.6.16 lists all backup sets as incomplete
 885670	   Duplicity fails to add incremental backups to chain...
+
+Merges:
+lp:~mterry/duplicity/check-passphrase-on-restart
+lp:~moss-d/duplicity/rsync-options
 
 
 New in v0.6.16 (2011/10/16)

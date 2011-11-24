@@ -566,6 +566,20 @@ duplicity restore --rename Documents/metal Music/metal scp://uid@other.host/some
 .RE
 
 .TP
+.BI "--rsync-options " options
+Allows you to pass options to the rsync backend.  The
+.I options
+list should be of the form "opt1=parm1 opt2=parm2" where the option string is
+quoted and the only spaces allowed are between options. The option string
+will be passed verbatim to rsync, after any internally generated option
+designating the remote port to use.  Here is a possibly useful example:
+.PP
+.RS
+duplicity --rsync-options="--partial-dir=.rsync-partial" /home/me scp://uid@other.host/some_dir
+.PP
+.RE
+
+.TP
 .BI "--s3-european-buckets"
 When using the Amazon S3 backend, create buckets in Europe instead of
 the default (requires

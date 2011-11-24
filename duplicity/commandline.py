@@ -434,6 +434,9 @@ def parse_cmdline_options(arglist):
     # duplicity remove-older-than time [options] target_url
     parser.add_option("--restore-time", "--time", "-t", type="time", metavar=_("time"))
 
+    # user added rsync options
+    parser.add_option("--rsync-options", action="extend", metavar=_("options"))
+
     # Whether to create European buckets (sorry, hard-coded to only
     # support european for now).
     parser.add_option("--s3-european-buckets", action="store_true")
