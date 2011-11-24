@@ -1,3 +1,208 @@
+2011-11-23  Kenneth Loafman  <kenneth@loafman.com>
+
+	Don't assume dir location for Python.
+
+2011-11-23  Kenneth Loafman  <kenneth@loafman.com>
+
+	Added --rsync-options flag to allow user to pass options to rsync at will.
+
+2011-11-15  Eliot Moss  <moss@cs.umass.edu>
+
+	Adds --rsync-options to command line
+	Allows uer to pass additional options to the rsync backend
+	Commit include paragraph in man page, new global variable,
+	and the small changes needed to the backend itself
+
+2011-11-23  Kenneth Loafman  <kenneth@loafman.com>
+
+	878964: Resuming a backup with a different password should throw an error
+
+2011-11-23  Launchpad Translations on behalf of duplicity-team
+
+	Launchpad automatic translations update.
+
+2011-11-22  Launchpad Translations on behalf of duplicity-team
+
+	Launchpad automatic translations update.
+
+2011-11-19  Launchpad Translations on behalf of duplicity-team
+
+	Launchpad automatic translations update.
+
+2011-11-08  Launchpad Translations on behalf of duplicity-team
+
+	Launchpad automatic translations update.
+
+2011-10-30  Launchpad Translations on behalf of duplicity-team
+
+	Launchpad automatic translations update.
+
+2011-10-22  Launchpad Translations on behalf of duplicity-team
+
+	Launchpad automatic translations update.
+
+2011-10-17  Launchpad Translations on behalf of duplicity-team
+
+	Launchpad automatic translations update.
+
+2011-10-16  Launchpad Translations on behalf of duplicity-team
+
+	Launchpad automatic translations update.
+
+2011-10-20  Michael Terry  <michael.terry@canonical.com>
+
+	check that we have the right passphrase when restarting a backup
+
+2011-11-22  Kenneth Loafman  <kenneth@loafman.com>
+
+	411145  Misleading error message: "Invalid SSH password"
+
+2011-11-21  Kenneth Loafman  <kenneth@loafman.com>
+
+	Split botobackend.py into two parts, _boto_single.py which is the older single-processing version and _boto_multi.py which is the newer multi-processing version.  The default is single processing and can be overridden with --s3-use-multiprocessing.
+
+2011-11-20  Kenneth Loafman  <kenneth@loafman.com>
+
+	The function add_filename was rejecting anything non-encrypted as a legit file.  This fixes that problem and the bug.
+
+2011-11-20  Kenneth Loafman  <kenneth@loafman.com>
+
+	Fix to allow debugging from pydev.  The check for --pydevd must be done after command line is parsed.
+
+2011-11-18  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in bzr merge lp:~summer-is-gone/duplicity/tz-incremental-fix.
+
+2011-11-03  Ivan Gromov  <ivan.gromov@redsolution.ru>
+
+	Changed functions working with UTC time file format from localtime() to gmtime() and timegm()
+
+2011-11-03  ivan.gromov  <ivan.gromov@C0011>
+
+	Fixed time_separator global attribute usage in some tests
+
+2011-11-03  Ivan Gromov  <ivan.gromov@redsolution.ru>
+
+	Made proper setUp method for tests in dup_timetest.py.
+
+2011-11-18  Kenneth Loafman  <kenneth@loafman.com>
+
+	Remove random_seed from VCS, adjust .bzrignore.
+
+2011-11-17  ken
+
+	Remove localbackend.testing_in_progress since all it accomplished was to make the local backend test fail.
+
+2011-11-17  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~mterry/duplicity/ship-tests and moved a couple of things around to get manual tests working
+
+2011-11-07  Michael Terry  <michael.terry@canonical.com>
+
+	Make tarball layout match bzr layout much more closely; ship tests in tarballs and adjust things so that they can work
+
+2011-11-04  Michael Terry  <michael.terry@canonical.com>
+
+	rename auto/ to tests/
+
+2011-11-04  Michael Terry  <michael.terry@canonical.com>
+
+	undo accidental changes to run-tests and convert pathtest and rdiffdirtest (for both of which, I uncommented a failing test I didn't understand)
+
+2011-11-04  Michael Terry  <michael.terry@canonical.com>
+
+	move some more custom scripts to manual/
+
+2011-11-04  Michael Terry  <michael.terry@canonical.com>
+
+	move some things around; converge on one script for running any kind of test or list of tests
+
+2011-11-04  Michael Terry  <michael.terry@canonical.com>
+
+	convert patchdirtest to auto; rip out its root-requiring tests and move them to roottest script; fix roottest script to work now with the new rootfiles.tar.gz, whoops
+
+2011-11-04  Michael Terry  <michael.terry@canonical.com>
+
+	convert finaltest to auto; workaround an ecryptfs bug with long filenames in the test
+
+2011-11-04  Michael Terry  <michael.terry@canonical.com>
+
+	drop state file random_seed from test gnupg home
+
+2011-11-04  Michael Terry  <michael.terry@canonical.com>
+
+	convert gpgtest to auto; add testing keys to the suite, so testers don't have to make their own; delete gpgtest2, as it didn't do anything
+
+2011-11-04  Michael Terry  <michael.terry@canonical.com>
+
+	drop unused darwin tarball and util file
+
+2011-11-04  Michael Terry  <michael.terry@canonical.com>
+
+	convert GnuPGInterfacetest and dup_timetest to auto
+
+2011-11-04  Michael Terry  <michael.terry@canonical.com>
+
+	convert file_namingtest, parsedurltest, and restarttest to auto
+
+2011-11-04  Michael Terry  <michael.terry@canonical.com>
+
+	convert manifesttest, selectiontest, and test_tarfile to auto
+
+2011-11-04  Michael Terry  <michael.terry@canonical.com>
+
+	convert cleanuptest, dup_temptest, and misctest to auto
+
+2011-11-04  Michael Terry  <michael.terry@canonical.com>
+
+	convert statisticstest to auto; make sure tests are run in English and in US/Central timezone
+
+2011-11-04  Michael Terry  <michael.terry@canonical.com>
+
+	convert statictest to auto
+
+2011-11-04  Michael Terry  <michael.terry@canonical.com>
+
+	convert tempdirtest to auto
+
+2011-11-04  Michael Terry  <michael.terry@canonical.com>
+
+	convert logtest to auto
+
+2011-11-04  Michael Terry  <michael.terry@canonical.com>
+
+	convert lazytest to auto
+
+2011-11-04  Michael Terry  <michael.terry@canonical.com>
+
+	clean up run scripts a little bit, rename testfiles.tgz to rootfiles.tgz
+
+2011-11-03  Michael Terry  <michael.terry@canonical.com>
+
+	make diffdirtest auto
+
+2011-11-03  Michael Terry  <michael.terry@canonical.com>
+
+	make badupload auto
+
+2011-11-03  Michael Terry  <michael.terry@canonical.com>
+
+	make collectionstest auto
+
+2011-11-02  Michael Terry  <michael.terry@canonical.com>
+
+	move all manual tets into their own subdirectory
+
+2011-11-07  ken
+
+	-- Applied patch 0616.diff from bug 881070.
+	-- Fixed compile issues in reset_connection.
+	-- Changed 'url' to 'parsed_url' to make consistent with backends.
+
+2011-10-16  ken
+
+	Changes for 0.6.16.
+
 2011-10-16  ken
 
 	Changes for 0.6.16.

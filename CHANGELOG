@@ -1,6 +1,10 @@
 New in v0.6.17 (2011/11/23)
 ----------------------------
-This is bug fix release.
+Enhancements:
+- Added --rsync-options flag to allow user to pass options to rsync at will
+- Added --s3-use-multiprocessing to select the new s3 multiprocessing backend.
+  Default is to use the single processing backend.  A helper, filechunkio.py,
+  requires Python 2.6+, so this option is not usable in earlier versions.
 
 Bugs closed in this release:
 411145     Misleading error message: "Invalid SSH password"
