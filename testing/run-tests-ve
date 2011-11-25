@@ -1,0 +1,81 @@
+#!/bin/bash
+#
+# Copyright 2002 Ben Escoto <ben@emerose.org>
+# Copyright 2007 Kenneth Loafman <kenneth@loafman.com>
+# Copyright 2011 Canonical Ltd
+#
+# This file is part of duplicity.
+#
+# Duplicity is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 2 of the License, or (at your
+# option) any later version.
+#
+# Duplicity is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with duplicity; if not, write to the Free Software Foundation,
+# Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+# Go to directory housing this script
+cd $(dirname $0)
+
+THISDIR=$(pwd)
+export TZ=US/Central
+export LANG=
+# up for 'duplicity' module and here for 'helper.py'
+export PYTHONPATH="$(dirname $THISDIR):$THISDIR/helpers"
+export GNUPGHOME="$THISDIR/gnupg"
+export PATH="$(dirname $THISDIR)/bin:$PATH"
+
+TOP_TESTS=$*
+if [ -z "$TOP_TESTS" ]; then
+      TOP_TESTS="all"
+fi
+
+if [ "$TOP_TESTS" = "all" ]; then
+      TOP_TESTS="tests" # don't include manual tests unless they were asked for
+fi
+
+# Expand arguments if directories
+TESTS=
+for t in $TOP_TESTS; do
+      if [ -d "$t" ]; then
+        TESTS="$TESTS $(ls $t/*.py)"
+      else
+        TESTS="$TESTS $t"
+      fi
+done
+
+# run against all supported python versions
+for v in 2.4 2.5 2.6 2.7; do
+    ve=~/virtual$v
+    if [ $? == 1 ]; then
+        echo "virtual$v not found on system"
+        continue
+    fi
+    source $ve/bin/activate
+
+    echo "========== Compiling librsync for virtual$v =========="
+    pushd ../duplicity
+    python ./compilec.py
+    popd
+
+    for t in $TESTS; do
+        echo "========== Running $t for virtual$v =========="
+        pushd .
+        if ! python -u $t -v 2>&1; then
+          echo "Test failed"
+          exit 1
+        fi
+        popd
+        echo "========== Finished $t for virtual$v =========="
+        echo
+        echo
+    done
+
+    deactivate
+done
