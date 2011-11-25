@@ -33,6 +33,8 @@ from duplicity.util import exception_traceback
 from duplicity.backend import retry
 from duplicity.filechunkio import FileChunkIO
 
+BOTO_MIN_VERSION = "1.6a"
+
 # Multiprocessing is not supported on *BSD
 if sys.platform not in ('darwin', 'linux2'):
     from multiprocessing import dummy as multiprocessing
@@ -43,6 +45,9 @@ else:
 
 def get_connection(scheme, parsed_url):
     try:
+        import boto
+        assert boto.Version >= BOTO_MIN_VERSION
+
         from boto.s3.connection import S3Connection
         assert hasattr(S3Connection, 'lookup')
 
@@ -96,9 +101,10 @@ def get_connection(scheme, parsed_url):
                 calling_format = None
 
     except ImportError:
-        log.FatalError("This backend  (s3) requires boto library, version 0.9d or later, "
-                       "(http://code.google.com/p/boto/).",
+        log.FatalError("This backend (s3) requires boto library, version %s or later, "
+                       "(http://code.google.com/p/boto/)." % BOTO_MIN_VERSION,
                        log.ErrorCode.boto_lib_too_old)
+
     if scheme == 's3+http':
         # Use the default Amazon S3 host.
         conn = S3Connection(is_secure=(not globals.s3_unencrypted_connection))

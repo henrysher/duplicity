@@ -28,6 +28,9 @@ from duplicity.errors import * #@UnusedWildImport
 from duplicity.util import exception_traceback
 from duplicity.backend import retry
 
+BOTO_MIN_VERSION = "1.6a"
+
+
 class BotoBackend(duplicity.backend.Backend):
     """
     Backend for Amazon's Simple Storage System, (aka Amazon S3), though
@@ -42,6 +45,9 @@ class BotoBackend(duplicity.backend.Backend):
 
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
+
+        import boto
+        assert boto.Version >= BOTO_MIN_VERSION
 
         from boto.s3.key import Key
 
@@ -129,9 +135,10 @@ class BotoBackend(duplicity.backend.Backend):
                     calling_format = None
 
         except ImportError:
-            log.FatalError("This backend  (s3) requires boto library, version 0.9d or later, "
-                           "(http://code.google.com/p/boto/).",
+            log.FatalError("This backend (s3) requires boto library, version %s or later, "
+                           "(http://code.google.com/p/boto/)." % BOTO_MIN_VERSION,
                            log.ErrorCode.boto_lib_too_old)
+
         if self.scheme == 's3+http':
             # Use the default Amazon S3 host.
             self.conn = S3Connection(is_secure=(not globals.s3_unencrypted_connection))

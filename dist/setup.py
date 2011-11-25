@@ -25,7 +25,7 @@ from distutils.core import setup, Extension
 
 version_string = "$version"
 
-if sys.version_info[:2] < (2,3):
+if sys.version_info[:2] < (2,4):
     print "Sorry, duplicity requires version 2.4 or later of python"
     sys.exit(1)
 
@@ -47,10 +47,11 @@ data_files = [('share/man/man1',
                 'bin/rdiffdir.1']),
               ('share/doc/duplicity-%s' % version_string,
                ['COPYING',
-                'REPO-README',
-                'LOG-README',
                 'README',
+                'README-REPO',
+                'README-LOG',
                 'tarfile-LICENSE',
+                'tarfile-CHANGES',
                 'CHANGELOG']),
               ]
 
@@ -72,7 +73,6 @@ setup(name="duplicity",
       maintainer="Kenneth Loafman <kenneth@loafman.com>",
       maintainer_email="kenneth@loafman.com",
       url="http://duplicity.nongnu.org/index.html",
-      install_requires = ['filechunkio'],
       packages = ['duplicity',
                   'duplicity.backends',],
       package_dir = {"duplicity" : "duplicity",

@@ -10,8 +10,8 @@ Source: http://savannah.nongnu.org/download/duplicity/%{name}-%{version}.tar.gz
 License: GPL
 Group: Applications/Archiving
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-requires: librsync >= 0.9.6, %{PYTHON_NAME} >= 2.2, gnupg >= 1.0.6
-BuildPrereq: %{PYTHON_NAME}-devel >= 2.2, librsync-devel >= 0.9.6
+requires: librsync >= 0.9.6, %{PYTHON_NAME} >= 2.4, gnupg >= 1.0.6
+BuildPrereq: %{PYTHON_NAME}-devel >= 2.4, librsync-devel >= 0.9.6
 
 %description
 Duplicity incrementally backs up files and directory by encrypting
@@ -46,10 +46,11 @@ hard links.
 %doc CHANGELOG COPYING README
 
 %changelog
+* Fri Nov 25 2011 Kenneth Loafman <kenneth@loafman.com>
+- Upgrade to Python 2.4 minimal
 * Sat Aug 09 2003 Ben Escoto <bescoto@stanford.edu>
 - Repackaging for Fedora
 - autodetect python version
 - require librsync >=0.9.6
 * Sun Aug 30 2002 Ben Escoto <bescoto@stanford.edu>
 - Initial RPM
-

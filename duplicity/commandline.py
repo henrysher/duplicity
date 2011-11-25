@@ -459,10 +459,10 @@ def parse_cmdline_options(arglist):
     parser.add_option("--s3-multipart-chunk-size", type="int", action="callback", metavar=_("number"),
                       callback=lambda o, s, v, p: setattr(p.values, "s3_multipart_chunk_size", v*1024*1024))
 
-    # option to make the s3/boto backend use the multiprocessing version
-    # by default it is off since it does not work for 2.4, 2.5 Python or
-    # Mac or BSD
-    parser.add_option("--s3-use-multiprocessing", action="store_true")
+    # Option to allow the s3/boto backend use the multiprocessing version.
+    # By default it is off since it does not work for Python 2.4 or 2.5.
+    if sys.version_info[:2] >= (2,6):
+        parser.add_option("--s3-use-multiprocessing", action="store_true")
 
     # scp command to use
     # TRANSL: noun

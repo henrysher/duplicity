@@ -23,6 +23,9 @@
 from duplicity import globals
 
 if globals.s3_use_multiprocessing:
+    if sys.version_info[:2] < (2,6):
+        print "Sorry, S3 multiprocessing requires version 2.6 or later of python"
+        sys.exit(1)
     import _boto_multi.py
 else:
     import _boto_single.py

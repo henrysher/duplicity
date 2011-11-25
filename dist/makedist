@@ -57,79 +57,9 @@ def MakeTar():
         os.system("rm -rf " + tardir)
     except OSError: pass
 
+    # tarball contains the entire versioned release
     os.mkdir(tardir)
-    for filename in [
-        "CHANGELOG",
-        "Changelog.GNU",
-        "COPYING",
-        "REPO-README",
-        "LOG-README",
-        "README",
-        "tarfile-LICENSE",
-        DistDir + "/setup.py",
-        ]:
-        assert not os.system("cp %s %s" % (filename, tardir)), filename
-
-    os.mkdir(os.path.join(tardir, "duplicity"))
-    for filename in [
-        "asyncscheduler.py",
-        "backend.py",
-        "collections.py",
-        "commandline.py",
-        "compilec.py",
-        "diffdir.py",
-        "dup_temp.py",
-        "dup_threading.py",
-        "dup_time.py",
-        "errors.py",
-        "file_naming.py",
-        "globals.py",
-        "GnuPGInterface.py",
-        "gpg.py",
-        "__init__.py",
-        "lazy.py",
-        "librsync.py",
-        "_librsyncmodule.c",
-        "log.py",
-        "manifest.py",
-        "misc.py",
-        "patchdir.py",
-        "path.py",
-        "pexpect.py",
-        "robust.py",
-        "selection.py",
-        "static.py",
-        "statistics.py",
-        "tarfile.py",
-        "tempdir.py",
-        "urlparse_2_5.py",
-        "util.py",
-        ]:
-        assert not os.system("cp %s/%s %s/duplicity" % (SourceDir, filename, tardir)), filename
-
-    os.mkdir(os.path.join(tardir, "duplicity", "backends"))
-    for filename in [
-        "backends/botobackend.py",
-        "backends/cloudfilesbackend.py",
-        "backends/ftpbackend.py",
-        "backends/ftpsbackend.py",
-        "backends/giobackend.py",
-        "backends/hsibackend.py",
-        "backends/imapbackend.py",
-        "backends/__init__.py",
-        "backends/localbackend.py",
-        "backends/rsyncbackend.py",
-        "backends/sshbackend.py",
-        "backends/tahoebackend.py",
-        "backends/u1backend.py",
-        "backends/webdavbackend.py",
-        "backends/gdocsbackend.py",
-        ]:
-        assert not os.system("cp %s/%s %s/duplicity/backends" %
-                             (SourceDir, filename, tardir)), filename
-
-    os.mkdir(os.path.join(tardir, "testing"))
-    bzr = subprocess.Popen(["bzr", "ls", "-RV", "testing"], stdout=subprocess.PIPE)
+    bzr = subprocess.Popen(["bzr", "ls", "-RV", "."], stdout=subprocess.PIPE)
     testfiles = bzr.communicate()[0].split()
     for filename in testfiles:
         if os.path.isdir(filename):
@@ -138,22 +68,17 @@ def MakeTar():
             assert not os.system("cp --parents %s %s" %
                                  (filename, tardir)), filename
 
-    os.mkdir(os.path.join(tardir, "po"))
+    # msgfmt the translation files that we have for release
     assert not os.system("cd po && ./update-pot")
-    for filename in [
-        "duplicity.pot",
-        ]:
-        assert not os.system("cp po/%s %s/po" % (filename, tardir)), filename
-    linguas = open('po/LINGUAS')
+    linguas = open('po/LINGUAS').readlines()
     for line in linguas:
         langs = line.split()
         for lang in langs:
             assert not os.mkdir(os.path.join(tardir, "po", lang)), lang
             assert not os.system("cp po/%s.po %s/po/%s" % (lang, tardir, lang)), lang
             assert not os.system("msgfmt po/%s.po -o %s/po/%s/duplicity.mo" % (lang, tardir, lang)), lang
-    linguas.close()
 
-    os.mkdir(os.path.join(tardir, "bin"))
+    # recopy the versioned files and add correct version
     VersionedCopy(os.path.join(SourceDir, "globals.py"),
                   os.path.join(tardir, "duplicity", "globals.py"))
     VersionedCopy(os.path.join("bin", "duplicity"),
@@ -167,8 +92,10 @@ def MakeTar():
     VersionedCopy(os.path.join(DistDir, "setup.py"),
                   os.path.join(tardir, "setup.py"))
 
+    # make sure executables are
     os.chmod(os.path.join(tardir, "setup.py"), 0755)
-    os.chmod(os.path.join(tardir, "bin", "rdiffdir"), 0644)
+    os.chmod(os.path.join(tardir, "bin", "duplicity"), 0755)
+    os.chmod(os.path.join(tardir, "bin", "rdiffdir"), 0755)
     os.system("tar -czf %s %s" % (tarfile, tardir))
     shutil.rmtree(tardir)
     return tarfile
