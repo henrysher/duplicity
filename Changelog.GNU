@@ -1,3 +1,21 @@
+2011-11-25  Kenneth Loafman  <kenneth@loafman.com>
+
+	Not used.
+
+2011-11-25  Kenneth Loafman  <kenneth@loafman.com>
+
+	Run tests using virtualenv for each.
+
+2011-11-25  Kenneth Loafman  <kenneth@loafman.com>
+
+	- Make adjustments for the new structure.
+	- Adjust boto requirements to be 1.6a or higher.
+	- Cleanup install scripts.
+
+2011-11-24  Kenneth Loafman  <kenneth@loafman.com>
+
+	Some doc changes including new requirements.
+
 2011-11-23  Kenneth Loafman  <kenneth@loafman.com>
 
 	Don't assume dir location for Python.
