@@ -216,13 +216,13 @@ class RestartTest(unittest.TestCase):
         self.deltmp()
         # we know we're going to fail these, they are forced
         try:
-            self.backup("full", "/etc", options = ["--vol 1", "--fail 3"])
+            self.backup("full", "/bin", options = ["--vol 1", "--fail 3"])
         except CmdError:
             pass
         assert not os.system("rm testfiles/output/duplicity-full*vol[23].difftar*")
         # this one should pass OK
-        self.backup("full", "/etc", options = ["--vol 1"])
-        self.verify("/etc")
+        self.backup("full", "/bin", options = ["--vol 1"])
+        self.verify("/bin")
 
     def test_last_file_missing_in_middle(self):
         """
