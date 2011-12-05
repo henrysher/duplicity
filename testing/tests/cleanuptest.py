@@ -20,7 +20,7 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import helper
-import sys, os, unittest
+import sys, os, unittest, time
 
 import duplicity.backend
 from duplicity import path
@@ -81,6 +81,10 @@ class CleanupTest(unittest.TestCase):
             options.insert(0, 'full')
         args = [input_dir, "'%s'" % backend_url]
         self.run_duplicity(args, options, current_time)
+        # If a chain ends with time X and the next full chain begins at time X,
+        # we may trigger an assert in collections.py.  This way, we avoid
+        # such problems
+        time.sleep(1)
 
     def restore(self, file_to_restore = None, time = None, options = [],
                 current_time = None):
