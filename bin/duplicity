@@ -551,11 +551,12 @@ def incremental_backup(sig_chain):
     @rtype: void
     @return: void
     """
-    dup_time.setprevtime(sig_chain.end_time)
-    if dup_time.curtime == dup_time.prevtime:
-        time.sleep(2)
-        dup_time.setcurtime()
-        assert dup_time.curtime != dup_time.prevtime, "time not moving forward at appropriate pace - system clock issues?"
+    if not globals.restart:
+        dup_time.setprevtime(sig_chain.end_time)
+        if dup_time.curtime == dup_time.prevtime:
+            time.sleep(2)
+            dup_time.setcurtime()
+            assert dup_time.curtime != dup_time.prevtime, "time not moving forward at appropriate pace - system clock issues?"
     if globals.dry_run:
         tarblock_iter = diffdir.DirDelta(globals.select,
                                          sig_chain.get_fileobjs())
