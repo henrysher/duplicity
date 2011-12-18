@@ -252,10 +252,24 @@ testfiles/select/1/1
         select = Select(root)
         sf = select.other_filesystems_get_sf(0)
         assert sf(root) is None
-        assert sf(Path("/usr/bin")) is None, \
+        if os.path.ismount("/usr/bin"):
+            sfval = 0
+        else:
+            sfval = None
+        assert sf(Path("/usr/bin")) == sfval, \
                "Assumption: /usr/bin is on the same filesystem as /"
-        assert sf(Path("/dev")) == 0, \
+        if os.path.ismount("/dev"):
+            sfval = 0
+        else:
+            sfval = None
+        assert sf(Path("/dev")) == sfval, \
                "Assumption: /dev is on a different filesystem"
+        if os.path.ismount("/proc"):
+            sfval = 0
+        else:
+            sfval = None
+        assert sf(Path("/proc")) == sfval, \
+               "Assumption: /proc is on a different filesystem"
 
 class ParseArgsTest(unittest.TestCase):
     """Test argument parsing"""
