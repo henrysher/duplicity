@@ -25,47 +25,74 @@ import re
 from duplicity import dup_time
 from duplicity import globals
 
-full_vol_re = re.compile("^duplicity-full"
+full_vol_re = None
+full_vol_re_short = None
+full_manifest_re = None
+full_manifest_re_short = None
+inc_vol_re = None
+inc_vol_re_short = None
+inc_manifest_re = None
+inc_manifest_re_short = None
+full_sig_re = None
+full_sig_re_short = None
+new_sig_re = None
+new_sig_re_short = None
+
+def prepare_regex():
+    global full_vol_re
+    global full_vol_re_short
+    global full_manifest_re
+    global full_manifest_re_short
+    global inc_vol_re
+    global inc_vol_re_short
+    global inc_manifest_re
+    global inc_manifest_re_short
+    global full_sig_re
+    global full_sig_re_short
+    global new_sig_re
+    global new_sig_re_short
+
+    full_vol_re = re.compile("^" + globals.file_prefix + "duplicity-full"
                          "\\.(?P<time>.*?)"
                          "\\.vol(?P<num>[0-9]+)"
                          "\\.difftar"
                          "(?P<partial>(\\.part))?"
                          "($|\\.)")
 
-full_vol_re_short = re.compile("^df"
+    full_vol_re_short = re.compile("^" + globals.file_prefix + "df"
                                "\\.(?P<time>[0-9a-z]+?)"
                                "\\.(?P<num>[0-9a-z]+)"
                                "\\.dt"
                                "(?P<partial>(\\.p))?"
                                "($|\\.)")
 
-full_manifest_re = re.compile("^duplicity-full"
+    full_manifest_re = re.compile("^" + globals.file_prefix + "duplicity-full"
                               "\\.(?P<time>.*?)"
                               "\\.manifest"
                               "(?P<partial>(\\.part))?"
                               "($|\\.)")
 
-full_manifest_re_short = re.compile("^df"
+    full_manifest_re_short = re.compile("^" + globals.file_prefix + "df"
                                     "\\.(?P<time>[0-9a-z]+?)"
                                     "\\.m"
                                     "(?P<partial>(\\.p))?"
                                     "($|\\.)")
 
-inc_vol_re = re.compile("^duplicity-inc"
+    inc_vol_re = re.compile("^" + globals.file_prefix + "duplicity-inc"
                         "\\.(?P<start_time>.*?)"
                         "\\.to\\.(?P<end_time>.*?)"
                         "\\.vol(?P<num>[0-9]+)"
                         "\\.difftar"
                         "($|\\.)")
 
-inc_vol_re_short = re.compile("^di"
+    inc_vol_re_short = re.compile("^" + globals.file_prefix + "di"
                               "\\.(?P<start_time>[0-9a-z]+?)"
                               "\\.(?P<end_time>[0-9a-z]+?)"
                               "\\.(?P<num>[0-9a-z]+)"
                               "\\.dt"
                               "($|\\.)")
 
-inc_manifest_re = re.compile("^duplicity-inc"
+    inc_manifest_re = re.compile("^" + globals.file_prefix + "duplicity-inc"
                              "\\.(?P<start_time>.*?)"
                              "\\.to"
                              "\\.(?P<end_time>.*?)"
@@ -73,26 +100,26 @@ inc_manifest_re = re.compile("^duplicity-inc"
                              "(?P<partial>(\\.part))?"
                              "(\\.|$)")
 
-inc_manifest_re_short = re.compile("^di"
+    inc_manifest_re_short = re.compile("^" + globals.file_prefix + "di"
                                    "\\.(?P<start_time>[0-9a-z]+?)"
                                    "\\.(?P<end_time>[0-9a-z]+?)"
                                    "\\.m"
                                    "(?P<partial>(\\.p))?"
                                    "(\\.|$)")
 
-full_sig_re = re.compile("^duplicity-full-signatures"
+    full_sig_re = re.compile("^" + globals.file_prefix + "duplicity-full-signatures"
                          "\\.(?P<time>.*?)"
                          "\\.sigtar"
                          "(?P<partial>(\\.part))?"
                          "(\\.|$)")
 
-full_sig_re_short = re.compile("^dfs"
+    full_sig_re_short = re.compile("^" + globals.file_prefix + "dfs"
                                "\\.(?P<time>[0-9a-z]+?)"
                                "\\.st"
                                "(?P<partial>(\\.p))?"
                                "(\\.|$)")
 
-new_sig_re = re.compile("^duplicity-new-signatures"
+    new_sig_re = re.compile("^" + globals.file_prefix + "duplicity-new-signatures"
                         "\\.(?P<start_time>.*?)"
                         "\\.to"
                         "\\.(?P<end_time>.*?)"
@@ -100,7 +127,7 @@ new_sig_re = re.compile("^duplicity-new-signatures"
                         "(?P<partial>(\\.part))?"
                         "(\\.|$)")
 
-new_sig_re_short = re.compile("^dns"
+    new_sig_re_short = re.compile("^" + globals.file_prefix + "dns"
                               "\\.(?P<start_time>[0-9a-z]+?)"
                               "\\.(?P<end_time>[0-9a-z]+?)"
                               "\\.st"
