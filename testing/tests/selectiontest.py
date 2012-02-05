@@ -328,6 +328,28 @@ testfiles/select/1/1
 - **
 """])
 
+    def test_globbing_filelist_bug_884371_a(self):
+        """Filelist glob test related to bug 884371"""
+        self.ParseTest([("--include-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '1'),
+                        ('1', '1', '2'), ('1', '1', '3')],
+                       ["""
+**/select/1/1
+- **
+"""])
+
+    def test_globbing_filelist_bug_884371_b(self):
+        """Filelist glob test related to bug 884371"""
+        self.ParseTest([("--include-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '2'),
+                        ('1', '1', '3')],
+                       ["""
+- **/select/1/1/1
+**/select/1/1
+- **/select/1
+- **
+"""])
+
     def testGlob(self):
         """Test globbing expression"""
         self.ParseTest([("--exclude", "**[3-5]"),
