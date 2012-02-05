@@ -313,7 +313,7 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
         """
         vol1_filename = file_naming.get(backup_type, 1,
                                         encrypted=globals.encryption,
-                                        gzipped=not globals.encryption)
+                                        gzipped=globals.compression)
         if vol1_filename != backup_set.volume_name_dict[1]:
             log.FatalError(_("Restarting backup, but current encryption "
                              "settings do not match original settings"),
@@ -369,7 +369,7 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
         vol_num += 1
         dest_filename = file_naming.get(backup_type, vol_num,
                                         encrypted=globals.encryption,
-                                        gzipped=not globals.encryption)
+                                        gzipped=globals.compression)
         tdp = dup_temp.new_tempduppath(file_naming.parse(dest_filename))
 
         # write volume
@@ -467,7 +467,7 @@ def get_sig_fileobj(sig_type):
     perm_sig_filename = file_naming.get(sig_type,
                                         gzipped=True)
     remote_sig_filename = file_naming.get(sig_type, encrypted=globals.encryption,
-                                          gzipped=not globals.encryption)
+                                          gzipped=globals.compression)
 
     fh = dup_temp.get_fileobj_duppath(globals.archive_dir,
                                       part_sig_filename,

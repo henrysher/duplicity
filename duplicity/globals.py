@@ -128,6 +128,9 @@ dry_run = False
 # If set to false, then do not encrypt files on remote system
 encryption = True
 
+# If set to false, then do not compress files on remote system
+compression = True
+
 # volume size. default 25M
 volsize = 25*1024*1024
 

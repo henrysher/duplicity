@@ -398,6 +398,9 @@ def parse_cmdline_options(arglist):
     # If set to false, then do not encrypt files on remote system
     parser.add_option("--no-encryption", action="store_false", dest="encryption")
 
+    # If set to false, then do not compress files on remote system
+    parser.add_option("--no-compression", action="store_false", dest="compression")
+
     # If set, print the statistics after every backup session
     parser.add_option("--no-print-statistics", action="store_false", dest="print_statistics")
 

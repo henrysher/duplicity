@@ -1,3 +1,7 @@
+2011-12-21  Tobias Genannt  <tobias.genannt@goolemail.com>
+
+	Added --no-compression to disable compression when no encryption is used.
+
 2011-11-25  Kenneth Loafman  <kenneth@loafman.com>
 
 	Not used.
