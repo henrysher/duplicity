@@ -20,11 +20,12 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
+from __future__ import with_statement
 from duplicity import globals
 
 if globals.s3_use_multiprocessing:
     if sys.version_info[:2] < (2,6):
-        print "Sorry, S3 multiprocessing requires version 2.6 or later of python"
+        print "Sorry, S3 multiprocessing requires version 2.5 or later of python"
         sys.exit(1)
     import _boto_multi
 else:
