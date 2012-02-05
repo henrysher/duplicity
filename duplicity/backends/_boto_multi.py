@@ -359,17 +359,9 @@ class BotoBackend(duplicity.backend.Backend):
 
         pool = multiprocessing.Pool(processes=chunks)
         for n in range(chunks):
-            params = {
-                'scheme': self.scheme,
-                'url': self.parsed_url,
-                'bucket_name': self.bucket_name,
-                'multipart_id': mp.id,
-                'filename': filename,
-                'offset': n,
-                'bytes': chunk_size,
-                'num_retries': globals.num_retries,
-            }
-            pool.apply_async(multipart_upload_worker, kwds=params)
+             params = [self.scheme, self.parsed_url, self.bucket_name, 
+                 mp.id, filename, n, chunk_size, globals.num_retries]
+             pool.apply_async(multipart_upload_worker, params)
         pool.close()
         pool.join()
 
