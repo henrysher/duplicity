@@ -68,6 +68,9 @@ def old_fn_deprecation(opt):
                           "and will be removed in a future release.\n"
                           "Use of default filenames is strongly suggested.") % opt
 
+def scp_deprecation(o,s,v,p):
+    print >>sys.stderr, "Warning: Option %s is deprecated and ignored. Use --ssh-options instead." % o
+
 
 def expand_fn(filename):
     return os.path.expanduser(os.path.expandvars(filename))
@@ -472,11 +475,13 @@ def parse_cmdline_options(arglist):
 
     # scp command to use
     # TRANSL: noun
-    parser.add_option("--scp-command", metavar=_("command"))
+    parser.add_option("--scp-command", nargs=1, type="string",
+                      action="callback", callback=scp_deprecation)
 
     # sftp command to use
     # TRANSL: noun
-    parser.add_option("--sftp-command", metavar=_("command"))
+    parser.add_option("--sftp-command", nargs=1, type="string",
+                      action="callback", callback=scp_deprecation)
 
     # If set, use short (< 30 char) filenames for all the remote files.
     parser.add_option("--short-filenames", action="callback",

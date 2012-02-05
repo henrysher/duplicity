@@ -62,7 +62,7 @@ duplicity \- Encrypted backup using rsync algorithm
 .SH DESCRIPTION
 Duplicity incrementally backs up files and directory
 by encrypting tar-format volumes with GnuPG and uploading them to a
-remote (or local) file server.  Currently local, ftp, ssh/scp, rsync,
+remote (or local) file server.  Currently local, ftp, sftp/scp, rsync,
 WebDAV, WebDAVs, Google Docs, HSi and Amazon S3 backends are available.
 Because duplicity uses
 librsync, the incremental archives are space efficient and only record
@@ -611,24 +611,13 @@ is not backwards compatible if your bucket name contains upper-case
 characters or other characters that are not valid in a hostname.
 .TP
 .BI "--scp-command " command
-This option only matters when using the ssh/scp backend.  The
-.I command
-will be used instead of scp to send or receive files.  The default command
-is "scp". To list and delete existing files, the sftp command is used.  See
-.BR --ssh-options
-and
-.BR --sftp-command .
+Deprecated and ignored. The sftp/scp backend does no longer use an external
+scp client program.
 
 .TP
 .BI "--sftp-command " command
-This option only matters when using the ssh/scp backend.  The
-.I command
-will be used instead of sftp for listing and deleting files.  The
-default is "sftp". File transfers are done using the sftp command. See
-.BR --ssh-options ,
-.BR --use-scp ,
-and
-.BR --scp-command .
+Deprecated and ignored. The sftp/scp backend does no longer use an external
+sftp client program.
 
 .TP
 .BI "--sign-key " key
@@ -648,25 +637,24 @@ see also
 
 .TP
 .B --ssh-askpass
-Tells the ssh/scp backend to use FTP_PASSWORD from the environment,
+Tells the sftp/scp backend to use FTP_PASSWORD from the environment,
 or, if that is not present, to prompt the user for the remote system
-password.
+password. This password is also used for ssh keys that are passphrase-protected.
+Without this option the password is expected in the url.
 
 .TP
 .BI "--ssh-options " options
 Allows you to pass options to the ssh/scp/sftp backend.  The
 .I options
-list should be of the form "opt1=parm1 opt2=parm2" where the option string is
-quoted and the only spaces allowed are between options. The option string
-will be passed verbatim to both scp and sftp, whose command line syntax
-differs slightly: options passed with
-.BR --ssh-options
-should therefore be given in the long option format described in
-.BR ssh_config(5) ,
+list should be of the form "-oopt1=parm1 -oopt2=parm2" where the option string is
+quoted and the only spaces allowed are between options. Options must 
+be given in the long option format described in
+.BR ssh_config(5) .
+The sftp/scp backend currently supports only one ssh option, IdentityFile
 like in this example:
 .PP
 .RS
-duplicity --ssh-options="-oProtocol=2 -oIdentityFile=/my/backup/id" /home/me scp://uid@other.host/some_dir
+duplicity --ssh-options="-oIdentityFile=/my/backup/id" /home/me sftp://uid@other.host/some_dir
 .PP
 .RE
 
@@ -720,17 +708,9 @@ if no passphrase was delivered.
 
 .TP
 .BI --use-scp
-If this option is specified, then the ssh backend will use
-.I scp
-rather than
-.I sftp
-for the get and put backend operations.  The default is to use
-.I sftp
-for all operations.  With this option, duplicity will use
-.I sftp
-for list and delete operations, and
-.I scp
-for put and get operations
+If this option is specified, then the sftp/scp backend will use the
+scp protocol rather than sftp for backend operations. The default is to use
+sftp, because it does not suffer from shell quoting issues like scp.
 
 .TP
 .BI "--verbosity " level ", -v" level
@@ -843,16 +823,13 @@ u1+http://volume_path
 .br
 see also
 .BI "A NOTE ON UBUNTU ONE"
+.br
 .PP
-.BI "ssh protocols"
+scp://.. or ssh://.. are synonymous with
 .br
-scp://.. or sftp://.. are synonymous for
-.br
-ssh://user[:password]@other.host[:port]/[/]some_dir
+sftp://user[:password]@other.host[:port]/[/]some_dir
 .br
 see also
-.BI "A NOTE ON SSH/SCP PROTOCOLS"
-and
 .BI "--use-scp"
 .PP
 tahoe://alias/directory
@@ -1206,29 +1183,6 @@ the "From" address in the IMAP server.  Then on a restore (or list) command
 the
 .B from_address_prefix
 will distinguish between different backups.
-
-.SH A NOTE ON SSH/SCP PROTOCOLS
-Duplicity specifies two protocol names for the same protocol.  This is
-a known and user-confusing issue.  Both use the same protocol suite, namely
-.I ssh
-through its' utility routines
-.I scp
-and
-.I sftp.
-Older versions
-of duplicity used
-.I scp
-for get and put operations and
-.I sftp
-for list and
-delete operations.  The current version uses
-.I sftp
-for all four supported
-operations, unless the
-.I --use-scp
-option is used to revert to old behavior.  The change was made to
-all-sftp in order to allow the remote system to chroot the backup,
-thus providing better security.
 
 .SH A NOTE ON UBUNTU ONE
 Connecting to Ubuntu One requires that you be running duplicity inside of an X
