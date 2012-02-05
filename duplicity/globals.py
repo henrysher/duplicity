@@ -26,6 +26,9 @@ import socket, os
 # The current version of duplicity
 version = "$version"
 
+# Default file_prefix value
+file_prefix = ""
+
 # The name of the current host, or None if it cannot be set
 hostname = socket.getfqdn()
 

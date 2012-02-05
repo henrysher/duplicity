@@ -321,6 +321,9 @@ def parse_cmdline_options(arglist):
     parser.add_option("--fail-on-volume", type="int",
                       help=optparse.SUPPRESS_HELP)
 
+    # used to provide a prefix on top of the defaul tar file name
+    parser.add_option("--file-prefix", type="string", dest="file_prefix", action="store")
+
     # used in testing only - skips upload for a given volume
     parser.add_option("--skip-volume", type="int",
                       help=optparse.SUPPRESS_HELP)

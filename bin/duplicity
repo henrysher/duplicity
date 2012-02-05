@@ -1221,6 +1221,9 @@ def main():
     # determine what action we're performing and process command line
     action = commandline.ProcessCommandLine(sys.argv[1:])
 
+    # update the regex with provided file-prefix
+    file_naming.prepare_regex()
+
     # The following is for starting remote debugging in Eclipse with Pydev.
     # Adjust the path to your location and version of Eclipse and Pydev.
     if globals.pydevd:
