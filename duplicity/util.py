@@ -71,6 +71,10 @@ def maybe_ignore_errors(fn):
         else:
             raise
 
+class BlackHoleList(list):
+    def append(self, x):
+        pass
+
 class FakeTarFile:
     debug = 0
     def __iter__(self):
@@ -83,7 +87,12 @@ def make_tarfile(mode, fp):
     # yet.  So we want to ignore ReadError exceptions, which are used to signal
     # this.
     try:
-        return tarfile.TarFile("arbitrary", mode, fp)
+        tf = tarfile.TarFile("arbitrary", mode, fp)
+        # Now we cause TarFile to not cache TarInfo objects.  It would end up
+        # consuming a lot of memory over the lifetime of our long-lasting
+        # signature files otherwise.
+        tf.members = BlackHoleList()
+        return tf
     except tarfile.ReadError:
         return FakeTarFile()
 
