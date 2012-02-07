@@ -52,6 +52,9 @@ def prepare_regex():
     global new_sig_re
     global new_sig_re_short
 
+    if full_vol_re:
+        return
+
     full_vol_re = re.compile("^" + globals.file_prefix + "duplicity-full"
                          "\\.(?P<time>.*?)"
                          "\\.vol(?P<num>[0-9]+)"
@@ -172,7 +175,8 @@ def get_suffix(encrypted, gzipped):
     Return appropriate suffix depending on status of
     encryption, compression, and short_filenames.
     """
-    assert not (encrypted and gzipped)
+    if encrypted:
+        gzipped = False
     if encrypted:
         if globals.short_filenames:
             suffix = '.g'
@@ -198,7 +202,8 @@ def get(type, volume_number = None, manifest = False,
     filename is of a full or inc manifest file.
     """
     assert dup_time.curtimestr
-    assert not (encrypted and gzipped)
+    if encrypted:
+        gzipped = False
     suffix = get_suffix(encrypted, gzipped)
     part_string = ""
     if globals.short_filenames:
@@ -291,6 +296,7 @@ def parse(filename):
         """
         Return ParseResults if file is from full backup, None otherwise
         """
+        prepare_regex()
         short = True
         m1 = full_vol_re_short.search(filename)
         m2 = full_manifest_re_short.search(filename)
@@ -313,6 +319,7 @@ def parse(filename):
         """
         Return ParseResults if file is from inc backup, None otherwise
         """
+        prepare_regex()
         short = True
         m1 = inc_vol_re_short.search(filename)
         m2 = inc_manifest_re_short.search(filename)
@@ -336,6 +343,7 @@ def parse(filename):
         """
         Return ParseResults if file is a signature, None otherwise
         """
+        prepare_regex()
         short = True
         m = full_sig_re_short.search(filename)
         if not m and not globals.short_filenames:
