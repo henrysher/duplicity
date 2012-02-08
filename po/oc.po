@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-02-05 19:10+0000\n"
+"POT-Creation-Date: 2012-02-07 22:52+0000\n"
 "PO-Revision-Date: 2011-08-20 10:44+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Occitan (post 1500) <oc@li.org>\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2012-02-06 04:46+0000\n"
+"X-Launchpad-Export-Date: 2012-02-08 06:10+0000\n"
 "X-Generator: Launchpad (build 14747)\n"
 
 #: ../bin/duplicity:98
@@ -292,43 +292,43 @@ msgid ""
 "         backup then restart the backup from the beginning."
 msgstr ""
 
-#: ../bin/duplicity:1277
+#: ../bin/duplicity:1274
 #, python-format
 msgid "Last %s backup left a partial set, restarting."
 msgstr ""
 
-#: ../bin/duplicity:1281
+#: ../bin/duplicity:1278
 #, python-format
 msgid "Cleaning up previous partial %s backup set, restarting."
 msgstr ""
 
-#: ../bin/duplicity:1292
+#: ../bin/duplicity:1289
 msgid "Last full backup date:"
 msgstr "Data del darrièr salvament integral :"
 
-#: ../bin/duplicity:1294
+#: ../bin/duplicity:1291
 msgid "Last full backup date: none"
 msgstr "Data del darrièr salvament integral : pas cap"
 
-#: ../bin/duplicity:1296
+#: ../bin/duplicity:1293
 msgid "Last full backup is too old, forcing full backup"
 msgstr ""
 
-#: ../bin/duplicity:1394
+#: ../bin/duplicity:1391
 msgid "INT intercepted...exiting."
 msgstr ""
 
-#: ../bin/duplicity:1400
+#: ../bin/duplicity:1397
 #, python-format
 msgid "GPG error detail: %s"
 msgstr "Detalhs de l’error GPG : %s"
 
-#: ../bin/duplicity:1409
+#: ../bin/duplicity:1406
 #, python-format
 msgid "User error detail: %s"
 msgstr "Detalhs de l’error utilizaire : %s"
 
-#: ../bin/duplicity:1418
+#: ../bin/duplicity:1415
 #, python-format
 msgid "Backend error detail: %s"
 msgstr "Detalhs de l’error de salvament : %s"

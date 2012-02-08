@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-02-05 19:10+0000\n"
+"POT-Creation-Date: 2012-02-07 22:52+0000\n"
 "PO-Revision-Date: 2010-12-07 21:11+0000\n"
 "Last-Translator: Hertatijanto Hartono <dvertx@gmail.com>\n"
 "Language-Team: Indonesian <id@li.org>\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2012-02-06 04:46+0000\n"
+"X-Launchpad-Export-Date: 2012-02-08 06:10+0000\n"
 "X-Generator: Launchpad (build 14747)\n"
 
 #: ../bin/duplicity:98
@@ -302,44 +302,44 @@ msgstr ""
 "membuang potongan backup terakhir\n"
 "                backup kemudian akan dimulai kembali dari awal."
 
-#: ../bin/duplicity:1277
+#: ../bin/duplicity:1274
 #, python-format
 msgid "Last %s backup left a partial set, restarting."
 msgstr "Backup terakhir %s menghasilkan potongan parsial, memulai kembali."
 
-#: ../bin/duplicity:1281
+#: ../bin/duplicity:1278
 #, python-format
 msgid "Cleaning up previous partial %s backup set, restarting."
 msgstr ""
 "Membenahi potongan %s pada kelompok backup sebelumnya, memulai kembali."
 
-#: ../bin/duplicity:1292
+#: ../bin/duplicity:1289
 msgid "Last full backup date:"
 msgstr "Tanggal backup penuh terakhir:"
 
-#: ../bin/duplicity:1294
+#: ../bin/duplicity:1291
 msgid "Last full backup date: none"
 msgstr "Tanggal backup penuh terakhir: Kosong"
 
-#: ../bin/duplicity:1296
+#: ../bin/duplicity:1293
 msgid "Last full backup is too old, forcing full backup"
 msgstr "Backup penuh terakhir terlalu tua, melaksanakan backup penuh."
 
-#: ../bin/duplicity:1394
+#: ../bin/duplicity:1391
 msgid "INT intercepted...exiting."
 msgstr ""
 
-#: ../bin/duplicity:1400
+#: ../bin/duplicity:1397
 #, python-format
 msgid "GPG error detail: %s"
 msgstr "Detil kesalahan GPG: %s"
 
-#: ../bin/duplicity:1409
+#: ../bin/duplicity:1406
 #, python-format
 msgid "User error detail: %s"
 msgstr "Detil kesalahan pengguna: %s"
 
-#: ../bin/duplicity:1418
+#: ../bin/duplicity:1415
 #, python-format
 msgid "Backend error detail: %s"
 msgstr "Detil kesalahan latar: %s"

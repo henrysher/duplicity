@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-02-05 19:10+0000\n"
+"POT-Creation-Date: 2012-02-07 22:52+0000\n"
 "PO-Revision-Date: 2009-10-23 20:31+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Italian <it@li.org>\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-02-06 04:46+0000\n"
+"X-Launchpad-Export-Date: 2012-02-08 06:10+0000\n"
 "X-Generator: Launchpad (build 14747)\n"
 
 #: ../bin/duplicity:98
@@ -321,44 +321,44 @@ msgstr ""
 "         Riavvio impossibile...duplicity ripulirà l'ultimo backup\n"
 "         parziale quindi verrà riavviato il backup dall'inizio."
 
-#: ../bin/duplicity:1277
+#: ../bin/duplicity:1274
 #, python-format
 msgid "Last %s backup left a partial set, restarting."
 msgstr "L'ultimo backup %s ha lasciato un set parziale. Riavvio."
 
-#: ../bin/duplicity:1281
+#: ../bin/duplicity:1278
 #, python-format
 msgid "Cleaning up previous partial %s backup set, restarting."
 msgstr "Pulizia del precedente set di backup %s parziale, riavvio."
 
-#: ../bin/duplicity:1292
+#: ../bin/duplicity:1289
 msgid "Last full backup date:"
 msgstr "Data dell'ultimo backup completo:"
 
-#: ../bin/duplicity:1294
+#: ../bin/duplicity:1291
 msgid "Last full backup date: none"
 msgstr "Data dell'ultimo backup completo: nessuna"
 
-#: ../bin/duplicity:1296
+#: ../bin/duplicity:1293
 msgid "Last full backup is too old, forcing full backup"
 msgstr ""
 "L'ultimo backup completo è troppo vecchio, viene forzato il backup completo"
 
-#: ../bin/duplicity:1394
+#: ../bin/duplicity:1391
 msgid "INT intercepted...exiting."
 msgstr "Intercettato INT...uscita."
 
-#: ../bin/duplicity:1400
+#: ../bin/duplicity:1397
 #, python-format
 msgid "GPG error detail: %s"
 msgstr "Dettagli errore GPG: %s"
 
-#: ../bin/duplicity:1409
+#: ../bin/duplicity:1406
 #, python-format
 msgid "User error detail: %s"
 msgstr "Dettagli errore utente: %s"
 
-#: ../bin/duplicity:1418
+#: ../bin/duplicity:1415
 #, python-format
 msgid "Backend error detail: %s"
 msgstr "Dettagli errore backend: %s"
