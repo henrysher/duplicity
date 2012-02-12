@@ -77,7 +77,7 @@ class FTPSBackend(duplicity.backend.Backend):
         os.write(self.tempfile, "set ftp:ssl-protect-data true\n")
         os.write(self.tempfile, "set ftp:ssl-protect-list true\n")
         os.write(self.tempfile, "set net:timeout %s\n" % globals.timeout)
-        os.write(self.tempfile, "set net:max-retries 1\n")
+        os.write(self.tempfile, "set net:max-retries %s\n" % globals.num_retries)
         os.write(self.tempfile, "set ftp:passive-mode %s\n" % self.conn_opt)
         os.write(self.tempfile, "open %s %s\n" % (self.portflag, self.parsed_url.hostname))
         os.write(self.tempfile, "user %s %s\n" % (self.parsed_url.username, self.password))
