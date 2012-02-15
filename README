@@ -22,6 +22,7 @@ REQUIREMENTS:
  * Python v2.4 or later
  * librsync v0.9.6 or later
  * GnuPG v1.x for encryption
+ * for scp/sftp -- python-paramiko and python-pycryptopp
  * for normal ftp -- NcFTP version 3.1.9 or later, but not 3.2.0
  * for ftp over SSL -- lftp version 3.7.15 or later
  * Boto 1.6a or later for single-processing S3 access (default)
