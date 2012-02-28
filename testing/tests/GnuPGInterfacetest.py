@@ -123,7 +123,7 @@ class GnuPGTests(BasicTest):
 
     def test_attach_fhs(self):
         """Do GnuPG operations using the attach_fhs feature"""
-        plaintext_source = '/etc/motd'
+        plaintext_source = __file__
 
         plainfile = open(plaintext_source)
         temp1 = tempfile.TemporaryFile()
