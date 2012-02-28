@@ -77,9 +77,11 @@ def import_backends():
             try:
                 __import__(imp)
                 res = "Succeeded"
+                level = log.INFO
             except Exception:
                 res = "Failed: " + str(sys.exc_info()[1])
-            log.Info("Import of %s %s" % (imp, res))
+                level = log.NOTICE
+            log.Log("Import of %s %s" % (imp, res), level)
         else:
             continue
 
