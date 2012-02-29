@@ -13,6 +13,7 @@ Enhancements:
 - two changes that help the test suite pass
 - raise log level on backend import failure so it will be visible under default conditions
 - file /etc/motd may not exist in test environment.  Use __file__ instead to point to a known plaintext source file.
+- some code/import changes to make the ssh and boto backends compatible with Python 2.4.
 
 Bugs closed in this release:
 884638     Python 2.5 / boto error
