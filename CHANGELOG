@@ -14,6 +14,7 @@ Enhancements:
 - raise log level on backend import failure so it will be visible under default conditions
 - file /etc/motd may not exist in test environment.  Use __file__ instead to point to a known plaintext source file.
 - some code/import changes to make the ssh and boto backends compatible with Python 2.4.
+- some changes to make roottest.py compatible with the new dir structure.
 
 Bugs closed in this release:
 884638     Python 2.5 / boto error
