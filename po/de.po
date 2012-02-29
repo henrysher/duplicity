@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-02-15 16:16+0000\n"
+"POT-Creation-Date: 2012-02-28 21:59+0000\n"
 "PO-Revision-Date: 2011-06-06 19:20+0000\n"
 "Last-Translator: Patrick <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
@@ -15,20 +15,20 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-02-16 05:07+0000\n"
-"X-Generator: Launchpad (build 14781)\n"
+"X-Launchpad-Export-Date: 2012-02-29 04:42+0000\n"
+"X-Generator: Launchpad (build 14874)\n"
 
 #: ../bin/duplicity:98
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
-msgstr ""
+msgstr "Eingestellte PASSPHRASE als SIGN_PASSPHRASE benutzen"
 
 #: ../bin/duplicity:104
 msgid "Reuse configured SIGN_PASSPHRASE as PASSPHRASE"
-msgstr ""
+msgstr "Eingestellte SIGN_PASSPHRASE als PASSPHRASE benutzen"
 
 #: ../bin/duplicity:143
 msgid "PASSPHRASE variable not set, asking user."
-msgstr ""
+msgstr "Variable PASSPHRASE nicht gesetzt, Benutzer wird gefragt."
 
 #: ../bin/duplicity:158
 msgid "GnuPG passphrase for signing key:"
@@ -36,7 +36,7 @@ msgstr ""
 
 #: ../bin/duplicity:163
 msgid "GnuPG passphrase:"
-msgstr ""
+msgstr "GnuPG-Schlüssel:"
 
 #: ../bin/duplicity:168
 msgid "Retype passphrase for signing key to confirm: "
@@ -49,11 +49,14 @@ msgstr ""
 #: ../bin/duplicity:173
 msgid "First and second passphrases do not match!  Please try again."
 msgstr ""
+"Erstes und zweites Passwort sind nicht identisch, bitte nochmal versuchen."
 
 #: ../bin/duplicity:178
 msgid ""
 "Cannot use empty passphrase with symmetric encryption!  Please try again."
 msgstr ""
+"Bei symmetrischer Verschlüsselung kann kein leeres Passwort benutzt werden! "
+"Bitte nochmal versuchen."
 
 #: ../bin/duplicity:227
 #, python-format
@@ -76,7 +79,7 @@ msgstr ""
 #: ../bin/duplicity:285
 #, python-format
 msgid "File %s was corrupted during upload."
-msgstr ""
+msgstr "Datei %s während des Hochladens beschädigt."
 
 #: ../bin/duplicity:318
 msgid ""
@@ -396,19 +399,19 @@ msgstr "aktive Arbeiter = %d"
 msgid "task execution done (success: %s)"
 msgstr "Aufgabenausführung abgeschlossen (erfolgreich: %s)"
 
-#: ../duplicity/backend.py:487 ../duplicity/backend.py:511
+#: ../duplicity/backend.py:489 ../duplicity/backend.py:513
 #, python-format
 msgid "Reading results of '%s'"
 msgstr "Lese Ergebnisse von '%s'"
 
-#: ../duplicity/backend.py:526
+#: ../duplicity/backend.py:528
 #, python-format
 msgid "Running '%s' failed with code %d (attempt #%d)"
 msgid_plural "Running '%s' failed with code %d (attempt #%d)"
 msgstr[0] "Ausführung von '%s' ist mit Code %d fehlgeschlagen (Versuch #%d)"
 msgstr[1] "Ausführung von '%s' ist mit Code %d fehlgeschlagen (Versuch #%d)"
 
-#: ../duplicity/backend.py:530
+#: ../duplicity/backend.py:532
 #, python-format
 msgid ""
 "Error is:\n"
@@ -417,7 +420,7 @@ msgstr ""
 "Fehler:\n"
 "%s"
 
-#: ../duplicity/backend.py:532
+#: ../duplicity/backend.py:534
 #, python-format
 msgid "Giving up trying to execute '%s' after %d attempt"
 msgid_plural "Giving up trying to execute '%s' after %d attempts"
@@ -870,14 +873,14 @@ msgstr "passwort"
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:725
 msgid "port"
-msgstr ""
+msgstr "Port"
 
 #. TRANSL: Used in usage help. This represents a string to be used as a
 #. prefix to names for backup files created by Duplicity. Example:
 #. s3://other.host/bucket_name[/prefix]
 #: ../duplicity/commandline.py:730
 msgid "prefix"
-msgstr ""
+msgstr "Präfix"
 
 #. TRANSL: Used in usage help to represent a Unix-style path name. Example:
 #. rsync://user[:password]@other.host[:port]/relative_path
@@ -986,6 +989,8 @@ msgid ""
 "Selection options --exclude/--include\n"
 "currently work only when backing up,not restoring."
 msgstr ""
+"Die Optionen --exclude/--include funktionieren\n"
+"im Moment nur bei der Sicherung, nicht bei der Wiederherstellung."
 
 #: ../duplicity/commandline.py:1001
 #, python-format
@@ -1237,7 +1242,7 @@ msgstr "Erstelle Verzeichnis %s"
 #: ../duplicity/path.py:563
 #, python-format
 msgid "Deleting %s"
-msgstr ""
+msgstr "»%s« wird gelöscht"
 
 #: ../duplicity/path.py:572
 #, python-format
