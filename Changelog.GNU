@@ -1,6 +1,151 @@
-2011-12-21  Tobias Genannt  <tobias.genannt@goolemail.com>
+2012-02-29  kenneth@loafman.com
 
-	Added --no-compression to disable compression when no encryption is used.
+	Fix for bug 931175 'duplicity crashes when PYTHONOPTIMIZE is set'
+
+2012-02-28  kenneth@loafman.com
+
+	Remove duplicate line.
+
+2012-02-28  kenneth@loafman.com
+
+	File /etc/motd may not exist in test environment.  Use __file__ instead to point to a known plaintext source file.
+
+2012-02-28  kenneth@loafman.com
+
+	Remove tests for 884371.  Can't test that yet.
+
+2012-02-28  kenneth@loafman.com
+
+	Raise log level on backend import failure so it will be visible under default conditions.
+
+2012-02-15  kenneth@loafman.com
+
+	Fix for bug 929465 -- UnsupportedBackendScheme: scheme not supported in url: scp://u123@u123.example.com/foo/
+
+2012-02-12  kenneth@loafman.com
+
+	Applied patch from 930727
+	
+	ftpsbackend should respect num_retries for ftp commands
+
+2012-02-07  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~mterry/duplicity/nopexpect
+	
+	Just a simple branch that drops the now-unused local copy of pexpect.py. (The ssh backend now uses paramiko)
+
+2012-02-07  Michael Terry  <michael.terry@canonical.com>
+
+	drop unused pexpect.py
+
+2012-02-07  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~mterry/duplicity/testfixes
+	
+	Here are two changes that help the test suite pass (it got broken after the recent round of merges).
+	
+	1) When file_naming is asked for a name, don't assert if compression AND encryption are turned on.  They are by default now.  But globals.compression is only meant to take effect if encryption is turned off.  So when encryption is on, just turn off gzip suffixes.
+	
+	2) Some tests are unit tests that directly import the relevant duplicity code.  So make sure that regular expressions are setup lazily as needed, not once at the start of bin/duplicity.
+
+2012-02-07  Michael Terry  <michael.terry@canonical.com>
+
+	a couple small code fixes to help tests pass
+
+2012-02-05  Kenneth Loafman  <kenneth@loafman.com>
+
+	Applied patch by Alexander Zangerl from bug 909031, "SSH-Backend: Creating dirs separately causes a permissons-problems".
+
+2012-02-05  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~nguyenqmai/duplicity/file-prefix-option.
+	
+	Adding --file-prefix option so different sets of backups can be stored in the same bucket.  See blueprint at https://blueprints.launchpad.net/duplicity/+spec/file-prefix-option
+
+2012-01-19  nguyenqmai
+
+	change the way the file_naming regular expressions are created to support --file-prefix option
+
+2012-02-05  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~mterry/duplicity/memleak
+	
+	Don't cache TarInfo files. Tests still pass, so I don't believe we need the members cache (and in the old tarfile.py, we didn't cache either).
+
+2012-01-20  Michael Terry  <michael.terry@canonical.com>
+
+	Don't have TarFile objects cache member TarInfo objects; it takes too much space
+
+2012-02-05  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~mterry/duplicity/always-delay
+	
+	always delay a little bit when a backend gives us errors
+
+2012-01-09  Michael Terry  <michael.terry@canonical.com>
+
+	always delay a little bit when a backend gives us errors
+
+2012-02-05  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~tobias-genannt/duplicity/nocompress
+	
+	Added option to not compress the backup, when no encryption is selected
+
+2011-12-21  Tobias Genannt  <tobias.genannt@googlemail.com>
+
+	- changelog update
+	- fixed comment
+
+2011-12-21  Tobias Genannt  <tobias.genannt@googlemail.com>
+
+	Added option to not compress the backup, when no encryption is selected
+
+2012-02-05  kenneth@loafman.com
+
+	Added patch for testing of bug 884371, 'Globbing patterns fail to include some files if prefix is "**"'
+	
+	Note: This patch does not fix the bug, it's just for testing.
+
+2012-02-05  kenneth@loafman.com
+
+	Applied patch from 916689 "multipart upload fails on python 2.7.2"
+
+2012-02-05  kenneth@loafman.com
+
+	Applied patch from 884638 and fixed version check to allow Python 2.5 and above.
+
+2011-12-18  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~mterry/duplicity/resume-inc
+
+2011-12-06  Michael Terry  <michael.terry@canonical.com>
+
+	resuming an incremental results in a 'Restarting backup, but current encryption settings do not match original settings' error because curtime is incorrectly set away from previous incremental value
+
+2011-12-18  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~mterry/duplicity/more-test-fixes
+
+2011-12-05  Michael Terry  <michael.terry@canonical.com>
+
+	tests: make other-filesystem check more robust against certain directories being mounts or not
+
+2011-12-05  Michael Terry  <michael.terry@canonical.com>
+
+	tests: use backup source that is more likely to be larger than 1M compressed
+
+2011-12-05  Michael Terry  <michael.terry@canonical.com>
+
+	tests: add delay between backups to avoid assertion error
+
+2011-12-01  Kenneth Loafman  <kenneth@loafman.com>
+
+	Fix extraneous '.py' that keeps import from working.
+
+2011-11-25  Kenneth Loafman  <kenneth@loafman.com>
+
+	Changes for 0.6.17
 
 2011-11-25  Kenneth Loafman  <kenneth@loafman.com>
 

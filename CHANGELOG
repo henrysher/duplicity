@@ -1,3 +1,38 @@
+New in v0.6.18 (2012/02/29)
+----------------------------
+Enhancements:
+- fix extraneous '.py' in botobackend.py include
+- tests: add delay between backups to avoid assertion error
+- tests: use backup source that is more likely to be larger than 1M compressed
+- tests: make other-filesystem check more robust against certain directories being mounts or not
+- resuming an incremental results in a 'Restarting backup, but current encryption settings do not match original settings' error because curtime is incorrectly set away from previous incremental value
+- added option to not compress the backup, when no encryption is selected
+- always delay a little bit when a backend gives us errors
+- Don't cache TarInfo files. Tests still pass, so I don't believe we need the members cache (and in the old tarfile.py, we didn't cache either).
+- Adding --file-prefix option so different sets of backups can be stored in the same bucket.  See blueprint at https://blueprints.launchpad.net/duplicity/+spec/file-prefix-option
+- two changes that help the test suite pass
+- raise log level on backend import failure so it will be visible under default conditions
+- file /etc/motd may not exist in test environment.  Use __file__ instead to point to a known plaintext source file.
+
+Bugs closed in this release:
+884638     Python 2.5 / boto error
+908228     possible memory leak
+909031     SSH-Backend: Creating dirs separately causes a permissons-problems
+916689     multipart upload fails on python 2.7.2
+929465     UnsupportedBackendScheme: scheme not supported in url: scp://u123@u123.example.com/foo/
+930727     ftpsbackend should respect num_retries for ftp commands
+931175     duplicity crashes when PYTHONOPTIMIZE is set
+
+Merges:
+lp:~mterry/duplicity/resume-inc
+lp:~tobias-genannt/duplicity/nocompress
+lp:~mterry/duplicity/always-delay
+lp:~mterry/duplicity/memleak
+lp:~nguyenqmai/duplicity/file-prefix-option
+lp:~mterry/duplicity/testfixes
+lp:~mterry/duplicity/nopexpect
+
+
 New in v0.6.17 (2011/11/25)
 ----------------------------
 Enhancements:
