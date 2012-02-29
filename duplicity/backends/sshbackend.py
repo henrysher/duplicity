@@ -2,7 +2,7 @@
 #
 # Copyright 2002 Ben Escoto <ben@emerose.org>
 # Copyright 2007 Kenneth Loafman <kenneth@loafman.com>
-# Copyright 2011 Alexander Zangerl <az@snafu.priv.at> 
+# Copyright 2011 Alexander Zangerl <az@snafu.priv.at>
 #
 # $Id: sshbackend.py,v 1.2 2011/12/31 04:44:12 az Exp $
 #
@@ -31,11 +31,10 @@ import getpass
 
 # debian squeeze's paramiko is a bit old, so we silence randompool depreciation warning
 # note also: passphrased private keys work with squeeze's paramiko only if done with DES, not AES
-import warnings                 
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore")
-    import paramiko
-
+import warnings
+warnings.simplefilter("ignore")
+import paramiko
+warnings.resetwarnings()
 
 import duplicity.backend
 from duplicity import globals
@@ -46,8 +45,8 @@ read_blocksize=65635            # for doing scp retrievals, where we need to rea
 
 class SftpBackend(duplicity.backend.Backend):
     """This backend accesses files using the sftp protocol, or scp when the --use-scp option is given.
-    It does not need any local client programs, but an ssh server and the sftp program must be installed on the remote 
-    side (or with --use-scp, the programs scp, ls, mkdir, rm and a POSIX-compliant shell). 
+    It does not need any local client programs, but an ssh server and the sftp program must be installed on the remote
+    side (or with --use-scp, the programs scp, ls, mkdir, rm and a POSIX-compliant shell).
 
     Authentication keys are requested from an ssh agent if present, then ~/.ssh/id_rsa/dsa are tried.
     If -oIdentityFile=path is present in --ssh-options, then that file is also tried.
@@ -96,19 +95,22 @@ class SftpBackend(duplicity.backend.Backend):
             self.client.load_system_host_keys()
         except Exception, e:
             raise BackendException("could not load ~/.ssh/known_hosts, maybe corrupt?")
-    
+
         # alternative ssh private key?
         keyfilename=None
         m=re.search("-oidentityfile=(\S+)",globals.ssh_options,re.I)
         if (m!=None):
             keyfilename=m.group(1)
 
-        portnumber=(parsed_url.port if parsed_url.port else 22)
+        if parsed_url.port:
+            portnumber=parsed_url.port
+        else:
+            portnumber=22
         try:
             self.client.connect(hostname=parsed_url.hostname, port=portnumber,
                                 username=username, password=password,
                                 allow_agent=True, look_for_keys=True,
-                                key_filename=keyfilename) 
+                                key_filename=keyfilename)
         except Exception, e:
             raise BackendException("ssh connection to %s:%d failed: %s" % (parsed_url.hostname,portnumber,e))
         self.client.get_transport().set_keepalive((int)(globals.timeout / 2))
@@ -128,7 +130,7 @@ class SftpBackend(duplicity.backend.Backend):
                 raise BackendException("sftp negotiation failed: %s" % e)
 
 
-            # move to the appropriate directory, possibly after creating it and its parents 
+            # move to the appropriate directory, possibly after creating it and its parents
             dirs = self.remote_dir.split(os.sep)
             if len(dirs) > 0:
                 if not dirs[0]:
@@ -137,7 +139,7 @@ class SftpBackend(duplicity.backend.Backend):
                 for d in dirs:
                     if (d == ''):
                         continue
-                    try: 
+                    try:
                         attrs=self.sftp.stat(d)
                     except IOError, e:
                         if e.errno == errno.ENOENT:
@@ -154,7 +156,7 @@ class SftpBackend(duplicity.backend.Backend):
 
     def put(self, source_path, remote_filename = None):
         """transfers a single file to the remote side.
-        In scp mode unavoidable quoting issues will make this fail if the remote directory or file name 
+        In scp mode unavoidable quoting issues will make this fail if the remote directory or file name
         contain single quotes."""
         if not remote_filename:
             remote_filename = source_path.get_filename()
@@ -168,7 +170,7 @@ class SftpBackend(duplicity.backend.Backend):
                 raise BackendException("scp execution failed: %s" % e)
             # scp protocol: one 0x0 after startup, one after the Create meta, one after saving
             # if there's a problem: 0x1 or 0x02 and some error text
-            response=chan.recv(1) 
+            response=chan.recv(1)
             if (response!="\0"):
                 raise BackendException("scp remote error: %s" % chan.recv(-1))
             fstat=os.stat(source_path.name)
@@ -183,7 +185,7 @@ class SftpBackend(duplicity.backend.Backend):
                 raise BackendException("scp remote error: %s" % chan.recv(-1))
             chan.close()
         else:
-            try: 
+            try:
                 self.sftp.put(source_path.name,remote_filename)
             except Exception, e:
                 raise BackendException("sftp put of %s (as %s) failed: %s" % (source_path.name,remote_filename,e))
@@ -191,7 +193,7 @@ class SftpBackend(duplicity.backend.Backend):
 
     def get(self, remote_filename, local_path):
         """retrieves a single file from the remote side.
-        In scp mode unavoidable quoting issues will make this fail if the remote directory or file names 
+        In scp mode unavoidable quoting issues will make this fail if the remote directory or file names
         contain single quotes."""
         if (globals.use_scp):
             try:
@@ -214,13 +216,17 @@ class SftpBackend(duplicity.backend.Backend):
             chan.send('\0')     # ready for data
             try:
                 while togo>0:
-                    buff=chan.recv(read_blocksize if (togo>read_blocksize) else togo)
+                    if togo>read_blocksize:
+                        blocksize = read_blocksize
+                    else:
+                        blocksize = togo
+                    buff=chan.recv(blocksize)
                     f.write(buff)
                     togo-=len(buff)
             except Exception, e:
                 raise BackendException("scp get %s failed: %s" % (remote_filename,e))
-            
-            msg=chan.recv(1)    # check the final status 
+
+            msg=chan.recv(1)    # check the final status
             if msg!='\0':
                 raise BackendException("scp get %s failed: %s" % (remote_filename,chan.recv(-1)))
             f.close()
@@ -235,7 +241,7 @@ class SftpBackend(duplicity.backend.Backend):
 
     def list(self):
         """lists the contents of the one-and-only duplicity dir on the remote side.
-        In scp mode unavoidable quoting issues will make this fail if the directory name 
+        In scp mode unavoidable quoting issues will make this fail if the directory name
         contains single quotes."""
         if (globals.use_scp):
             output=self.runremote("ls -1 '%s'" % self.remote_dir,False,"scp dir listing ")
@@ -247,7 +253,7 @@ class SftpBackend(duplicity.backend.Backend):
                 raise BackendException("sftp listing of %s failed: %s" % (self.sftp.getcwd(),e))
 
     def delete(self, filename_list):
-        """deletes all files in the list on the remote side. In scp mode unavoidable quoting issues 
+        """deletes all files in the list on the remote side. In scp mode unavoidable quoting issues
         will cause failures if filenames containing single quotes are encountered."""
         for fn in filename_list:
             if (globals.use_scp):
@@ -259,7 +265,7 @@ class SftpBackend(duplicity.backend.Backend):
                     raise BackendException("sftp rm %s failed: %s" % (fn,e))
 
     def runremote(self,cmd,ignoreexitcode=False,errorprefix=""):
-        """small convenience function that opens a shell channel, runs remote command and returns 
+        """small convenience function that opens a shell channel, runs remote command and returns
         stdout of command. throws an exception if exit code!=0 and not ignored"""
         try:
             chan=self.client.get_transport().open_session()

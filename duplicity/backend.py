@@ -80,7 +80,7 @@ def import_backends():
                 level = log.INFO
             except Exception:
                 res = "Failed: " + str(sys.exc_info()[1])
-                level = log.NOTICE
+                level = log.WARNING
             log.Log("Import of %s %s" % (imp, res), level)
         else:
             continue

@@ -20,8 +20,8 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-from __future__ import with_statement
 from duplicity import globals
+import sys
 
 if globals.s3_use_multiprocessing:
     if sys.version_info[:2] < (2,6):
