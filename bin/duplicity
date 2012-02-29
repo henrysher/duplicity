@@ -1208,6 +1208,19 @@ def main():
     """
     Start/end here
     """
+    # per bug https://bugs.launchpad.net/duplicity/+bug/931175
+    # duplicity crashes when PYTHONOPTIMIZE is set, so check
+    # and refuse to run if it is set.
+    if 'PYTHONOPTIMIZE' in os.environ:
+        log.FatalError(
+"""
+PYTHONOPTIMIZE in the environment causes duplicity to fail to
+recognize its own backups.  Please remove PYTHONOPTIMIZE from
+the environment and rerun the backup.
+
+See https://bugs.launchpad.net/duplicity/+bug/931175
+""", log.ErrorCode.pythonoptimize_set)
+
     # if python is run setuid, it's only partway set,
     # so make sure to run with euid/egid of root
     if os.geteuid() == 0:

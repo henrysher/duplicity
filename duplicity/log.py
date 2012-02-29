@@ -191,6 +191,7 @@ class ErrorCode:
     ftps_lftp_missing = 43
     volume_wrong_size = 44
     enryption_mismatch = 45
+    pythonoptimize_set = 46
 
     # 50->69 reserved for backend errors
     backend_error = 50
