@@ -1,5 +1,9 @@
 2012-02-29  kenneth@loafman.com
 
+	Changes for 0.6.18.
+
+2012-02-29  kenneth@loafman.com
+
 	Fix for bug 931175 'duplicity crashes when PYTHONOPTIMIZE is set'
 
 2012-02-28  kenneth@loafman.com

@@ -24,13 +24,13 @@ Bugs closed in this release:
 931175     duplicity crashes when PYTHONOPTIMIZE is set
 
 Merges:
-lp:~mterry/duplicity/resume-inc
-lp:~tobias-genannt/duplicity/nocompress
 lp:~mterry/duplicity/always-delay
 lp:~mterry/duplicity/memleak
-lp:~nguyenqmai/duplicity/file-prefix-option
-lp:~mterry/duplicity/testfixes
 lp:~mterry/duplicity/nopexpect
+lp:~mterry/duplicity/resume-inc
+lp:~mterry/duplicity/testfixes
+lp:~nguyenqmai/duplicity/file-prefix-option
+lp:~tobias-genannt/duplicity/nocompress
 
 
 New in v0.6.17 (2011/11/25)
