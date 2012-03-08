@@ -3,6 +3,7 @@
 # Copyright 2002 Ben Escoto <ben@emerose.org>
 # Copyright 2007 Kenneth Loafman <kenneth@loafman.com>
 # Copyright 2011 Alexander Zangerl <az@snafu.priv.at>
+# Copyright 2012 edso (ssh_config added)
 #
 # $Id: sshbackend.py,v 1.2 2011/12/31 04:44:12 az Exp $
 #
@@ -62,27 +63,12 @@ class SftpBackend(duplicity.backend.Backend):
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
 
-        # host string could be [user@]hostname
-        if parsed_url.username:
-            username=parsed_url.username
-        else:
-            username=getpass.getuser()
-
         if parsed_url.path:
             # remove first leading '/'
             self.remote_dir = re.sub(r'^/', r'', parsed_url.path, 1)
         else:
             self.remote_dir = '.'
 
-
-        # set up password
-        if globals.ssh_askpass:
-            password = self.get_password()
-        else:
-            if parsed_url.password:
-                password = parsed_url.password
-            else:
-                password = None
         self.client = paramiko.SSHClient()
         # load known_hosts files
         # paramiko is very picky wrt format and bails out on any problem...
@@ -96,23 +82,64 @@ class SftpBackend(duplicity.backend.Backend):
         except Exception, e:
             raise BackendException("could not load ~/.ssh/known_hosts, maybe corrupt?")
 
-        # alternative ssh private key?
-        keyfilename=None
+        """ the next block reorganizes all host parameters into a
+        dictionary like SSHConfig does. this dictionary 'self.config' 
+        becomes the authorative source for these values from here on.
+        rationale is that it is easiest to deal wrt overwriting multiple 
+        values from ssh_config file. (ede 03/2012)
+        """
+        self.config={'hostname':parsed_url.hostname}
+        # get system host config entries
+        self.config.update(self.gethostconfig('/etc/ssh/ssh_config',parsed_url.hostname))
+        # update with user's config file
+        self.config.update(self.gethostconfig('~/.ssh/config',parsed_url.hostname))
+        # update with url values
+        ## username from url
+        if parsed_url.username:
+            self.config.update({'user':parsed_url.username})
+        ## username from input
+        if not 'user' in self.config:
+            self.config.update({'user':getpass.getuser()})
+        ## port from url
+        if parsed_url.port:
+            self.config.update({'port':parsed_url.port})
+        ## ensure there is deafult 22 or an int value
+        if 'port' in self.config:
+            self.config.update({'port':int(self.config['port'])})
+        else:
+            self.config.update({'port':22})
+        ## alternative ssh private key, identity file
         m=re.search("-oidentityfile=(\S+)",globals.ssh_options,re.I)
         if (m!=None):
             keyfilename=m.group(1)
-
-        if parsed_url.port:
-            portnumber=parsed_url.port
+            self.config['identityfile'] = keyfilename
+        ## ensure ~ is expanded and identity exists in dictionary
+        if 'identityfile' in self.config:
+            self.config['identityfile'] = os.path.expanduser(
+                                            self.config['identityfile'])
         else:
-            portnumber=22
+            self.config['identityfile'] = None
+
+        # get password, enable prompt if askpass is set
+        self.use_getpass = globals.ssh_askpass
+        ## set url values for beautiful login prompt
+        parsed_url.username = self.config['user']
+        parsed_url.hostname = self.config['hostname']
+        password = self.get_password()
+
         try:
-            self.client.connect(hostname=parsed_url.hostname, port=portnumber,
-                                username=username, password=password,
-                                allow_agent=True, look_for_keys=True,
-                                key_filename=keyfilename)
+            self.client.connect(hostname=self.config['hostname'], 
+                                port=self.config['port'], 
+                                username=self.config['user'], 
+                                password=password,
+                                allow_agent=True, 
+                                look_for_keys=True,
+                                key_filename=self.config['identityfile'])
         except Exception, e:
-            raise BackendException("ssh connection to %s:%d failed: %s" % (parsed_url.hostname,portnumber,e))
+            raise BackendException("ssh connection to %s@%s:%d failed: %s" % (
+                                    self.config['user'],
+                                    self.config['hostname'],
+                                    self.config['port'],e))
         self.client.get_transport().set_keepalive((int)(globals.timeout / 2))
 
         # scp or sftp?
@@ -278,6 +305,21 @@ class SftpBackend(duplicity.backend.Backend):
         if (res!=0 and not ignoreexitcode):
             raise BackendException("%sfailed(%d): %s" % (errorprefix,res,chan.recv_stderr(4096)))
         return output
+
+    def gethostconfig(self, file, host):
+        file = os.path.expanduser(file)
+        if not os.path.isfile(file):
+            return {}
+        
+        sshconfig = paramiko.SSHConfig()
+        try:
+            sshconfig.parse(open(file))
+        except Exception, e:
+            raise BackendException("could not load '%s', maybe corrupt?" % (file))
+        
+        return sshconfig.lookup(host)
+
+
 
 duplicity.backend.register_backend("sftp", SftpBackend)
 duplicity.backend.register_backend("scp", SftpBackend)
