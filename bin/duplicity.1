@@ -1,73 +1,91 @@
 .TH DUPLICITY 1 "$reldate" "Version $version" "User Manuals" \"  -*- nroff -*-
 
 .SH NAME
-duplicity \- Encrypted backup using rsync algorithm
+duplicity \- Encrypted incremental backup to local or remote storage.
+
+.SH REQUIREMENTS
+Duplicity requires a POSIX-like operating system. 
+It is best used under GNU/Linux.
+
+Some backends also require additional components:
+.IP * 2
+.B "ssh backend"
+(scp/sftp/ssh)
+.RS
+.IP - 2
+.B paramiko 
+SSH2 for python - http://www.lag.net/paramiko/
+.IP - 2
+.B pycrypto 
+Python Cryptography Toolkit - http://www.dlitz.net/software/pycrypto/
+.RE
+.IP * 2
+.B "boto backend"
+(S3 Amazon Web Services)
+.RS
+.IP - 2
+.B boto
+- http://github.com/boto/boto
+.RE
 
 .SH SYNOPSIS
-.B duplicity
-.BI [ options ]
+.B duplicity [full|incremental]
+.I [options]
 .I source_directory target_url
-
-.B duplicity
-.BI [ options ]
-.I source_url target_directory
-
-.B duplicity full
-.BI [ options ]
-.I source_directory target_url
-
-.B duplicity incremental
-.BI [ options ]
-.I source_directory target_url
-
-.B duplicity restore
-.BI [ options ]
-.I source_url target_directory
 
 .B duplicity verify
-.BI [ options ]
+.I [options]
+.I [--file-to-restore <relpath>]
 .I source_url target_directory
 
 .B duplicity collection-status
-.BI [ options ]
+.I [options]
 .I target_url
 
 .B duplicity list-current-files
-.BI [ options ]
+.I [options]
+.I [--time time]
 .I target_url
 
-.B duplicity cleanup
-.BI [ options ]
-.BI [ --force ]
-.I target_url
+.B duplicity [restore]
+.I [options]
+.I [--file-to-restore <relpath>]
+.I [--time time]
+.I source_url target_directory
 
 .B duplicity remove-older-than
 .I time
-.BI [ options ]
-.BI [ --force ]
+.I [options]
+.I [--force]
 .I target_url
 
 .B duplicity remove-all-but-n-full
 .I count
-.BI [ options ]
-.BI [ --force ]
+.I [options]
+.I [--force]
 .I target_url
 
 .B duplicity remove-all-inc-of-but-n-full
 .I count
-.BI [ options ]
-.BI [ --force ]
+.I [options]
+.I [--force]
+.I target_url
+
+.B duplicity cleanup
+.I [options]
+.I [--force]
 .I target_url
 
 .SH DESCRIPTION
 Duplicity incrementally backs up files and directory
 by encrypting tar-format volumes with GnuPG and uploading them to a
-remote (or local) file server.  Currently local, ftp, sftp/scp, rsync,
-WebDAV, WebDAVs, Google Docs, HSi and Amazon S3 backends are available.
+remote (or local) file server.  See
+.B URL FORMAT
+for a list all supported backends and how to address them.
 Because duplicity uses
 librsync, the incremental archives are space efficient and only record
 the parts of files that have changed since the last backup.  Currently
-duplicity supports deleted files, full Unix permissions, directories,
+duplicity supports deleted files, full Unix permissions, uid/gid, directories,
 symbolic links, fifos, etc., but not hard links.
 
 If you are backing up the root directory /, remember to --exclude
@@ -79,7 +97,7 @@ Here is an example of a backup, using scp to back up /home/me to
 some_dir on the other.host machine:
 .PP
 .RS
-duplicity /home/me scp://uid@other.host/some_dir
+duplicity /home/me sftp://uid@other.host/some_dir
 .PP
 .RE
 If the above is run repeatedly, the first will be a full backup, and
@@ -88,14 +106,14 @@ subsequent ones will be incremental.  To force a full backup, use the
 action:
 .PP
 .RS
-duplicity full /home/me scp://uid@other.host/some_dir
+duplicity full /home/me sftp://uid@other.host/some_dir
 .PP
 .RE
 Now suppose we accidentally delete /home/me and want to restore it
 the way it was at the time of last backup:
 .PP
 .RS
-duplicity scp://uid@other.host/some_dir /home/me
+duplicity sftp://uid@other.host/some_dir /home/me
 .PP
 .RE
 Duplicity enters restore mode because the URL comes before the local
@@ -103,14 +121,14 @@ directory.  If we wanted to restore just the file "Mail/article" in
 /home/me as it was three days ago into /home/me/restored_file:
 .PP
 .RS
-duplicity -t 3D --file-to-restore Mail/article scp://uid@other.host/some_dir /home/me/restored_file
+duplicity -t 3D --file-to-restore Mail/article sftp://uid@other.host/some_dir /home/me/restored_file
 .PP
 .RE
 The following command compares the files we backed up, so see what has
 changed since then:
 .PP
 .RS
-duplicity verify scp://uid@other.host/some_dir /home/me
+duplicity verify sftp://uid@other.host/some_dir /home/me
 .PP
 .RE
 Finally, duplicity recognizes several include/exclude options.  For
@@ -139,15 +157,24 @@ password:
 FTP_PASSWORD=mypassword duplicity /local/dir ftp://user@other.host/some_dir
 
 .SH ACTIONS
+Duplicity knows actions, which can be finetuned with options.
+The actions for backup (full,incr) and restoration (restore) can as well be
+left out as duplicity detects in what mode it should switch to by the order
+of target URL and local folder. If the target URL comes before the local folder
+a restore is in order, is the local folder before target URL then this folder
+is about to be backed up to the target URL.
 
 .TP
-.B cleanup
-Delete the extraneous duplicity files on the given backend.
-Non-duplicity files, or files in complete data sets will not be
-deleted.  This should only be necessary after a duplicity session
-fails or is aborted prematurely.  Note that
-.I --force
-will be needed to delete the files rather than just list them.
+.B full
+Perform a full backup. If this is set, a new backup chain is started even if
+signatures are available for an incremental backup.
+
+.TP
+.BR incr
+If this is requested an incremental backup will be performed.
+Duplicity will abort if old signatures cannot be
+found. The default is to switch to full backup under these
+conditions.
 
 .TP
 .B collection-status
@@ -155,24 +182,28 @@ Summarize the status of the backup repository by printing the chains
 and sets found, and the number of volumes in each.
 
 .TP
-.B full
-Indicate full backup.  If this is set, perform full backup even if
-signatures are available.
-
-.TP
-.BR incr
-If this is requested an incremental backup will be performed.
-Duplicity will abort if old signatures cannot be
-found.  The default is to switch to full backup under these
-conditions.
-
-.TP
-.B list-current-files
-Lists the files currently backed up in the archive.  The information
-will be extracted from the signature files, not the archive data
-itself.  Thus the whole archive does not have to be downloaded, but on
+.BI "list-current-files " "[--time <time>]"
+Lists the files contained in the most current backup or backup at time.
+The information will be extracted from the signature files, not the archive data
+itself. Thus the whole archive does not have to be downloaded, but on
 the other hand if the archive has been deleted or corrupted, this
-command may not detect it.
+command will not detect it.
+
+.TP
+.BI "verify " "[--file-to-restore <relpath>]"
+Enter verify mode instead of restore.  If the --file-to-restore option
+is given, restrict verify to that file or directory.  duplicity will
+exit with a non-zero error level if any files are different.  On
+verbosity level 4 or higher, log a message for each file that has
+changed.
+
+.TP
+.BI "restore " "[--file-to-restore <relpath>] [--time <time>]"
+You can restore the full monty or selected folders/files from a specific time.
+Use the relative path as it is printed by
+.BR list-current-files .
+Usually not needed as duplicity enters restore mode when it detects that the URL
+comes before the local folder.
 
 .TP
 .BI "remove-older-than " time
@@ -209,12 +240,13 @@ recent backup chain will be kept intact.  Note that
 will be needed to delete the files rather than just list them.
 
 .TP
-.B verify
-Enter verify mode instead of restore.  If the --file-to-restore option
-is given, restrict verify to that file or directory.  duplicity will
-exit with a non-zero error level if any files are different.  On
-verbosity level 4 or higher, log a message for each file that has
-changed.
+.B cleanup
+Delete the extraneous duplicity files on the given backend.
+Non-duplicity files, or files in complete data sets will not be
+deleted.  This should only be necessary after a duplicity session
+fails or is aborted prematurely.  Note that
+.I --force
+will be needed to delete the files rather than just list them.
 
 .SH OPTIONS
 
@@ -561,7 +593,7 @@ in the backup as if it were the path
 Can be passed multiple times.  An example:
 .PP
 .RS
-duplicity restore --rename Documents/metal Music/metal scp://uid@other.host/some_dir /home/me
+duplicity restore --rename Documents/metal Music/metal sftp://uid@other.host/some_dir /home/me
 .PP
 .RE
 
@@ -575,7 +607,7 @@ will be passed verbatim to rsync, after any internally generated option
 designating the remote port to use.  Here is a possibly useful example:
 .PP
 .RS
-duplicity --rsync-options="--partial-dir=.rsync-partial" /home/me scp://uid@other.host/some_dir
+duplicity --rsync-options="--partial-dir=.rsync-partial" /home/me rsync://uid@other.host/some_dir
 .PP
 .RE
 
@@ -609,14 +641,15 @@ When operating on Amazon S3 buckets, use new-style subdomain bucket
 addressing. This is now the preferred method to access Amazon S3, but
 is not backwards compatible if your bucket name contains upper-case
 characters or other characters that are not valid in a hostname.
+
 .TP
 .BI "--scp-command " command
-Deprecated and ignored. The sftp/scp backend does no longer use an external
+Deprecated and ignored. The ssh backend does no longer use an external
 scp client program.
 
 .TP
 .BI "--sftp-command " command
-Deprecated and ignored. The sftp/scp backend does no longer use an external
+Deprecated and ignored. The ssh backend does no longer use an external
 sftp client program.
 
 .TP
@@ -637,10 +670,9 @@ see also
 
 .TP
 .B --ssh-askpass
-Tells the sftp/scp backend to use FTP_PASSWORD from the environment,
-or, if that is not present, to prompt the user for the remote system
-password. This password is also used for ssh keys that are passphrase-protected.
-Without this option the password is expected in the url.
+Tells the ssh backend to prompt the user for the remote system password, 
+if it was not defined in target url and no FTP_PASSWORD env var is set.
+This password is also used for passphrase-protected ssh keys.
 
 .TP
 .BI "--ssh-options " options
