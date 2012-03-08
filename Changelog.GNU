@@ -1,3 +1,8 @@
+2012-03-08  edso
+	add ssh_config support (/etc/ssh/ssh_config + ~/.ssh/config) to paramiko sshbackend
+	@Ken: would you please announce that sshbackend is paramiko based native python now in the Changelog for the next release?
+		this was missing in 0.6.18's Changelog
+
 2012-02-29  kenneth@loafman.com
 
 	Changes for 0.6.18.
