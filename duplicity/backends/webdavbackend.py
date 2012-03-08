@@ -51,13 +51,15 @@ class WebDAVBackend(duplicity.backend.Backend):
 
     webdav backend contributed in 2006 by Jesper Zedlitz <jesper@zedlitz.de>
     """
-    listbody = """\
-<?xml version="1.0" encoding="utf-8" ?>
-<D:propfind xmlns:D="DAV:">
-<D:allprop/>
-</D:propfind>
 
-"""
+    """
+    for better compatibility we send an empty listbody as described in
+    http://www.ietf.org/rfc/rfc4918.txt
+    "  A client may choose not to submit a request body.  An empty PROPFIND
+       request body MUST be treated as if it were an 'allprop' request.  "
+    it was retired because e.g. box.net didn't support <D:allprop/>
+    """
+    listbody =""
 
     """Connect to remote store using WebDAV Protocol"""
     def __init__(self, parsed_url):
@@ -74,7 +76,7 @@ class WebDAVBackend(duplicity.backend.Backend):
             self.directory = '/'
 
         log.Info("Using WebDAV host %s" % (parsed_url.hostname,))
-        log.Info("Using WebDAV port %s" % (parsed_url.port,))	
+        log.Info("Using WebDAV port %s" % (parsed_url.port,))
         log.Info("Using WebDAV directory %s" % (self.directory,))
         log.Info("Using WebDAV protocol %s" % (globals.webdav_proto,))
 
@@ -167,12 +169,15 @@ class WebDAVBackend(duplicity.backend.Backend):
             del self.headers['Depth']
             # if the target collection does not exist, create it.
             if response.status == 404:
+                response.close()
                 log.Info("Directory '%s' being created." % self.directory)
-                res = self.request("MKCOL", self.directory)
-                log.Info("WebDAV MKCOL status: %s %s" % (res.status, res.reason))
+                response = self.request("MKCOL", self.directory)
+                log.Info("WebDAV MKCOL status: %s %s" % (response.status, response.reason))
+                response.close()
                 continue
             if response.status == 207:
                 document = response.read()
+                response.close()
                 break
             log.Info("WebDAV PROPFIND attempt #%d failed: %s %s" % (n, response.status, response.reason))
             if n == globals.num_retries +1:
