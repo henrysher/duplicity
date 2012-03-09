@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-03-07 12:24+0000\n"
+"POT-Creation-Date: 2012-03-08 14:42+0000\n"
 "PO-Revision-Date: 2011-06-06 19:20+0000\n"
 "Last-Translator: Patrick <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-03-08 04:44+0000\n"
+"X-Launchpad-Export-Date: 2012-03-09 04:52+0000\n"
 "X-Generator: Launchpad (build 14914)\n"
 
 #: ../bin/duplicity:98
@@ -86,6 +86,8 @@ msgid ""
 "Restarting backup, but current encryption settings do not match original "
 "settings"
 msgstr ""
+"Datensicherung wird neu gestartet, jedoch entsprechen die aktuellen "
+"Verschlüsselungseinstellungen nicht den ursprünglichen Einstellungen"
 
 #: ../bin/duplicity:526
 msgid ""
@@ -982,7 +984,7 @@ msgstr "Sicherungs-Quellverzeichnis %s existiert nicht."
 #: ../duplicity/commandline.py:953
 #, python-format
 msgid "Command line warning: %s"
-msgstr ""
+msgstr "Befehlszeilen-Warnung: %s"
 
 #: ../duplicity/commandline.py:953
 msgid ""
@@ -1212,7 +1214,7 @@ msgstr "Datei %%s ist vom Typ %s, erwartet %s"
 #: ../duplicity/path.py:363 ../duplicity/path.py:389
 #, python-format
 msgid "File %%s has permissions %s, expected %s"
-msgstr ""
+msgstr "Datei %%s hat die Zugriffsrechte %s, erwartet wurde %s"
 
 #: ../duplicity/path.py:368
 #, python-format
