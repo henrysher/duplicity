@@ -1,3 +1,7 @@
+2012-03-12  edso
+
+	add missing_host_key prompt to new sshbackend similar to ssh procedure
+
 2012-02-29  kenneth@loafman.com
 
 	Changes for 0.6.18.
