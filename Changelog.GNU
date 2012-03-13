@@ -1,6 +1,88 @@
+2012-03-13  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~ed.so/duplicity/0.6-ssh_add_missinghostkey
+	
+	add missing_host_key prompt to new sshbackend similar to ssh procedure
+
 2012-03-12  edso
 
-	add missing_host_key prompt to new sshbackend similar to ssh procedure
+	changelog entry
+
+2012-03-12  edso
+
+	add missing_host_key prompt similar to ssh procedure
+
+2012-03-13  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~carlos-abalde/duplicity/gdocs-backend-gdata-2.0.16.-upgrade.
+
+2012-03-12  Carlos Abalde  <carlos.abalde@gmail.com>
+
+	Fixing most basic stuff. Pending all testing
+
+2012-03-08  edso  <edgar.soldin@web.de>
+
+	Merged in lp:~ed.so/duplicity/0.6-ssh_config
+	
+	add ssh_config support (/etc/ssh/ssh_config + ~/.ssh/config) to paramiko sshbackend
+	@Ken: would you please announce that sshbackend is paramiko based native python now in the Changelog for the next release? 
+	this was missing in 0.6.18's Changelog
+
+2012-03-08  edso
+
+	changelog entry
+
+2012-03-08  edso
+
+	add ssh_config support (/etc/ssh/ssh_config + ~/.ssh/config) to paramiko sshbackend
+
+2012-03-08  edso  <edgar.soldin@web.de>
+
+	Merged in lp:~ed.so/duplicity/0.6-webdav_fixes.
+
+2012-03-08  edso
+
+	- empty listbody for enhanced webdav compatibility
+	- bugfix: initial folder creation on backend does not result in a ResponseNotReady anymore
+
+2012-03-08  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~ed.so/duplicity/0.6-manpage
+	
+	- added REQUIREMENTS section
+
+2012-03-08  edso
+
+	- added REQUIREMENTS section
+	- restructure SYNOPSIS/ACTIONS to have commands sorted by backup lifecycle
+	- added restore and some more hints when --time or --file-to-restore are supported
+	- replaced scp:// with sftp:// in examples as this is the suggested protocol anyway
+	- added an intro text to ACTIONS section
+	- adapted --ssh-askpass description to latest functionality
+
+2012-02-29  kenneth@loafman.com
+
+	Changes for 0.6.18.
+
+2012-02-29  kenneth@loafman.com
+
+	Use correct dir name for cleanup.
+
+2012-02-29  kenneth@loafman.com
+
+	Adjust roottest.py to new test dir structure.
+
+2012-02-29  kenneth@loafman.com
+
+	Changes for 0.6.18.
+
+2012-02-29  kenneth@loafman.com
+
+	Some code/import changes to make the ssh and boto backends compatible with Python 2.4.
+
+2012-02-29  kenneth@loafman.com
+
+	Changes for 0.6.18.
 
 2012-02-29  kenneth@loafman.com
 
