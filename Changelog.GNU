@@ -4,14 +4,6 @@
 	
 	add missing_host_key prompt to new sshbackend similar to ssh procedure
 
-2012-03-12  edso
-
-	changelog entry
-
-2012-03-12  edso
-
-	add missing_host_key prompt similar to ssh procedure
-
 2012-03-13  Kenneth Loafman  <kenneth@loafman.com>
 
 	Merged in lp:~carlos-abalde/duplicity/gdocs-backend-gdata-2.0.16.-upgrade.
@@ -28,14 +20,6 @@
 	@Ken: would you please announce that sshbackend is paramiko based native python now in the Changelog for the next release? 
 	this was missing in 0.6.18's Changelog
 
-2012-03-08  edso
-
-	changelog entry
-
-2012-03-08  edso
-
-	add ssh_config support (/etc/ssh/ssh_config + ~/.ssh/config) to paramiko sshbackend
-
 2012-03-08  edso  <edgar.soldin@web.de>
 
 	Merged in lp:~ed.so/duplicity/0.6-webdav_fixes.
@@ -48,10 +32,6 @@
 2012-03-08  Kenneth Loafman  <kenneth@loafman.com>
 
 	Merged in lp:~ed.so/duplicity/0.6-manpage
-	
-	- added REQUIREMENTS section
-
-2012-03-08  edso
 
 	- added REQUIREMENTS section
 	- restructure SYNOPSIS/ACTIONS to have commands sorted by backup lifecycle
@@ -82,7 +62,6 @@
 
 2012-02-29  kenneth@loafman.com
 
-	Changes for 0.6.18.
 
 2012-02-29  kenneth@loafman.com
 
