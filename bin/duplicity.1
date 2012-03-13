@@ -4,13 +4,54 @@
 duplicity \- Encrypted incremental backup to local or remote storage.
 
 .SH REQUIREMENTS
-Duplicity requires a POSIX-like operating system. 
+Duplicity requires a POSIX-like operating system with a 
+.B python
+interpreter version 2.4+ installed. 
 It is best used under GNU/Linux.
 
-Some backends also require additional components:
+Some backends also require additional components (probably available as packages for your specific platform):
 .IP * 2
-.B "ssh backend"
-(scp/sftp/ssh)
+.B "boto backend"
+(S3 Amazon Web Services)
+.RS
+.IP - 2
+.B boto
+- http://github.com/boto/boto
+.RE
+.IP * 2
+.B "ftp backend"
+.RS
+.IP - 2
+.B NcFTP Client
+- http://www.ncftp.com/
+.RE
+.IP * 2
+.B "ftps backend"
+.RS
+.IP - 2
+.B LFTP Client
+- http://lftp.yar.ru/
+.RE
+.IP * 2
+.B "gio backend"
+(Gnome VFS API)
+.RS
+.IP - 2
+.B PyGObject
+- http://live.gnome.org/PyGObject
+.IP - 2
+.B D-Bus
+(dbus)- http://www.freedesktop.org/wiki/Software/dbus
+.RE
+.IP * 2
+.B "ssh backends"
+(scp/sftp/ssh see 
+.B --ssh-backend
+)
+.RS
+.IP * 2
+.B ssh paramiko backend
+(default)
 .RS
 .IP - 2
 .B paramiko 
@@ -20,12 +61,12 @@ SSH2 for python - http://www.lag.net/paramiko/
 Python Cryptography Toolkit - http://www.dlitz.net/software/pycrypto/
 .RE
 .IP * 2
-.B "boto backend"
-(S3 Amazon Web Services)
+.B ssh pexpect backend
 .RS
 .IP - 2
-.B boto
-- http://github.com/boto/boto
+.B sftp/scp client binaries
+OpenSSH - http://www.openssh.com/
+.RE
 .RE
 
 .SH SYNOPSIS
@@ -644,13 +685,33 @@ characters or other characters that are not valid in a hostname.
 
 .TP
 .BI "--scp-command " command
-Deprecated and ignored. The ssh backend does no longer use an external
-scp client program.
+.B (only ssh pexpect backend)
+The
+.I command
+will be used instead of scp to send or receive files.  The default command
+is "scp". To list and delete existing files, the sftp command is used.  See
+.BR --ssh-options
+and
+.BR --sftp-command .
 
 .TP
 .BI "--sftp-command " command
-Deprecated and ignored. The ssh backend does no longer use an external
-sftp client program.
+.B (only ssh pexpect backend)
+The
+.I command
+will be used instead of sftp for listing and deleting files.  The
+default is "sftp". File transfers are done using the sftp command. See
+.BR --ssh-options ,
+.BR --use-scp ,
+and
+.BR --scp-command .
+
+.TP
+.BI --short-filenames
+If this option is specified, the names of the files duplicity writes
+will be shorter (about 30 chars) but less understandable.  This may be
+useful when backing up to MacOS or another OS or FS that doesn't
+support long filenames.
 
 .TP
 .BI "--sign-key " key
@@ -675,28 +736,38 @@ if it was not defined in target url and no FTP_PASSWORD env var is set.
 This password is also used for passphrase-protected ssh keys.
 
 .TP
-.BI "--ssh-options " options
-Allows you to pass options to the ssh/scp/sftp backend.  The
-.I options
-list should be of the form "-oopt1=parm1 -oopt2=parm2" where the option string is
-quoted and the only spaces allowed are between options. Options must 
-be given in the long option format described in
-.BR ssh_config(5) .
-The sftp/scp backend currently supports only one ssh option, IdentityFile
-like in this example:
-.PP
-.RS
-duplicity --ssh-options="-oIdentityFile=/my/backup/id" /home/me sftp://uid@other.host/some_dir
-.PP
-.RE
-
+.BI "--ssh-backend " backend
+Allows the explicit selection of a ssh backend. Defaults to 
+.BR paramiko .
+Alternatively you might choose 
+.BR pexpect .
+see also
+.B "A NOTE ON SSH BACKENDS"
 
 .TP
-.BI --short-filenames
-If this option is specified, the names of the files duplicity writes
-will be shorter (about 30 chars) but less understandable.  This may be
-useful when backing up to MacOS or another OS or FS that doesn't
-support long filenames.
+.BI "--ssh-options " options
+Allows you to pass options to the ssh backend.  The
+.I options
+list should be of the form "-oOpt1=parm1 -oOpt2=parm2" where the option string is
+quoted and the only spaces allowed are between options. The option string
+will be passed verbatim to both scp and sftp, whose command line syntax
+differs slightly hence the options should therefore be given in the long option format described in
+.BR ssh_config(5) ,
+like in this example:
+.RS
+.PP
+.ad l
+duplicity --ssh-options="-oProtocol=2 -oIdentityFile=/my/backup/id" /home/me scp://uid@other.host/some_dir
+.TP
+.B NOTE:
+.I ssh paramiko backend
+currently supports only the
+.nh
+.B -oIdentityFile
+.hy
+setting.
+.RE
+.ad n
 
 .TP
 .BI "--tempdir " directory
@@ -740,9 +811,10 @@ if no passphrase was delivered.
 
 .TP
 .BI --use-scp
-If this option is specified, then the sftp/scp backend will use the
-scp protocol rather than sftp for backend operations. The default is to use
-sftp, because it does not suffer from shell quoting issues like scp.
+If this option is specified, then the ssh backend will use the
+scp protocol rather than sftp for backend operations.
+see also
+.B "A NOTE ON SSH BACKENDS"
 
 .TP
 .BI "--verbosity " level ", -v" level
@@ -862,7 +934,10 @@ scp://.. or ssh://.. are synonymous with
 sftp://user[:password]@other.host[:port]/[/]some_dir
 .br
 see also
-.BI "--use-scp"
+.BR --ssh-backend ,
+.B --use-scp
+and
+.B "A NOTE ON SSH BACKENDS"
 .PP
 tahoe://alias/directory
 .PP
@@ -1215,6 +1290,56 @@ the "From" address in the IMAP server.  Then on a restore (or list) command
 the
 .B from_address_prefix
 will distinguish between different backups.
+
+.SH A NOTE ON SSH BACKENDS
+The 
+.I ssh backends
+support sftp and scp transports. This is a known user-confusing issue.
+These are fundamentally different. If you plan to access your backend via one
+of those please inform yourself about the requirements for a server to support
+scp or sftp.
+To make it even more confusing the user can choose between two ssh backends 
+see
+.nh 
+.B --ssh\-backend
+.hy
+for details.
+.PP
+.BR "SSH paramiko backend " "(selected by default)"
+is complete reimplementation of ssh protocols natively in python. Advantages 
+are speed and maintainability. Minor disadvantage is that extra packages are 
+needed see
+.nh
+.B REQUIREMENTS
+.hy
+above. In
+.I sftp
+(default) mode all operations are done via the according sftp commands. In
+.I scp
+mode (
+.I --use-scp
+) though scp access is used for put/get operations but listing is done via ssh remote shell.
+.PP
+.B SSH pexpect backend
+is the legacy ssh backend using the command line ssh binaries via pexpect.
+Older versions used
+.I scp
+for get and put operations and
+.I sftp
+for list and
+delete operations.  The current version uses
+.I sftp
+for all four supported
+operations, unless the
+.I --use-scp
+option is used to revert to old behavior. 
+.PP
+.B Why use sftp instead of scp?
+The change to sftp was made in order to allow the remote system to chroot the backup,
+thus providing better security and because it does not suffer from shell quoting issues like scp. 
+Scp also does not support any kind of file listing, so sftp or ssh access will always be needed 
+in addition for this backend mode to work properly. Sftp does not have these limitations but needs
+an sftp service running on the backend server, which is sometimes not an option.
 
 .SH A NOTE ON UBUNTU ONE
 Connecting to Ubuntu One requires that you be running duplicity inside of an X
