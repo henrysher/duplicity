@@ -64,7 +64,8 @@ class GDocsBackend(duplicity.backend.Backend):
                 if len(entries) == 1:
                     parent_folder = entries[0]
                 elif len(entries) == 0:
-                    parent_folder = self.client.create(gdata.docs.data.FOLDER_LABEL, folder_name, parent_folder)
+                    folder = gdata.docs.data.Resource(type='folder', title=folder_name)
+                    parent_folder = self.client.create_resource(folder, collection=parent_folder)
                 else:
                     parent_folder = None
                 if parent_folder:
@@ -98,16 +99,16 @@ class GDocsBackend(duplicity.backend.Backend):
             uploader = gdata.client.ResumableUploader(
               self.client, file, GDocsBackend.BACKUP_DOCUMENT_TYPE, os.path.getsize(file.name),
               chunk_size=gdata.client.ResumableUploader.DEFAULT_CHUNK_SIZE,
-              desired_class=gdata.docs.data.DocsEntry)
+              desired_class=gdata.docs.data.Resource)
             if uploader:
                 # Chunked upload.
-                entry = gdata.docs.data.DocsEntry(title = atom.data.Title(text = remote_filename))
+                entry = gdata.docs.data.Resource(title = atom.data.Title(text = remote_filename))
                 uri = '/feeds/upload/create-session/default/private/full?convert=false'
                 entry = uploader.UploadFile(uri, entry = entry)
                 if entry:
                     # Move to destination folder.
                     # TODO: any ideas on how to avoid this step?
-                    if self.client.Move(entry, self.folder):
+                    if self.client.MoveResource(entry, self.folder):
                         assert not file.close()
                         return
                     else:
@@ -133,7 +134,7 @@ class GDocsBackend(duplicity.backend.Backend):
                                            remote_filename)
             if len(entries) == 1:
                 entry = entries[0]
-                self.client.Download(entry, local_path.name)
+                self.client.DownloadResource(entry, local_path.name)
                 local_path.setdata()
                 return
             else:
@@ -219,22 +220,22 @@ class GDocsBackend(duplicity.backend.Backend):
             uri += '&title=' + urllib.quote(title) + '&title-exact=true'
         
         try:
-            # Fetch entries
-            entries = self.client.get_everything(uri = uri)
+            # Fetch entries.
+            entries = self.client.get_all_resources(uri = uri)
             
             # When filtering by entry title, API is returning (don't know why) documents in other
             # folders (apart from folder_id) matching the title, so some extra filtering is required.
             if title:
                 result = []
                 for entry in entries:
-                    if (not type) or (entry.get_document_type() == type):
+                    if (not type) or (entry.get_resource_type() == type):
                         if folder_id != GDocsBackend.ROOT_FOLDER_ID:
-                            for link in entry.in_folders():
+                            for link in entry.in_collections():
                                 folder_entry = self.client.get_entry(link.href, None, None,
-                                                                     desired_class=gdata.docs.data.DocsEntry)
+                                                                     desired_class=gdata.docs.data.Resource)
                                 if folder_entry and (folder_entry.resource_id.text == folder_id):
                                     result.append(entry)
-                        elif len(entry.in_folders()) == 0:
+                        elif len(entry.in_collections()) == 0:
                             result.append(entry)
             else:
                 result = entries
