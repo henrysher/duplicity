@@ -55,10 +55,21 @@ class DupMountOperation(gio.MountOperation):
     def __init__(self, backend):
         gio.MountOperation.__init__(self)
         self.backend = backend
-        self.connect('ask-password', self.ask_password)
+        self.connect('ask-password', self.ask_password_cb)
+        self.connect('ask-question', self.ask_question_cb)
 
-    def ask_password(self, *args, **kwargs):
+    def ask_password_cb(self, *args, **kwargs):
         self.set_password(self.backend.get_password())
+        self.reply(gio.MOUNT_OPERATION_HANDLED)
+
+    def ask_question_cb(self, *args, **kwargs):
+        # Obviously just always answering with the first choice is a naive
+        # approach.  But there's no easy way to allow for answering questions
+        # in duplicity's typical run-from-cron mode with environment variables.
+        # And only a couple gvfs backends ask questions: 'sftp' does about
+        # new hosts and 'afc' does if the device is locked.  0 should be a
+        # safe choice.
+        self.set_choice(0)
         self.reply(gio.MOUNT_OPERATION_HANDLED)
 
 class GIOBackend(duplicity.backend.Backend):
