@@ -397,7 +397,9 @@ class ITRBranch:
             filename = os.path.join(*self.index)
         else:
             filename = "."
-        log.Warn(_("Error '%s' processing %s") % (exc, filename))
+        log.Warn(_("Error '%s' processing %s") % (exc, filename),
+                 log.WarningCode.cannot_process,
+                 util.escape(filename))
 
     def log_prev_error(self, index):
         """Call function if no pending exception"""
@@ -405,8 +407,11 @@ class ITRBranch:
             index_str = "."
         else:
             index_str = os.path.join(*index)
-        log.Warn(_("Skipping %s because of previous error") % index_str)
+        log.Warn(_("Skipping %s because of previous error") % index_str,
+                 log.WarningCode.process_skipped,
+                 util.escape(index_str))
 
 
 from duplicity import log
 from duplicity import robust
+from duplicity import util
