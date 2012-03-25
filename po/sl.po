@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-03-13 22:16+0000\n"
+"POT-Creation-Date: 2012-03-24 11:57+0000\n"
 "PO-Revision-Date: 2011-08-27 12:46+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Slovenian <sl@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || "
 "n%100==4 ? 3 : 0);\n"
-"X-Launchpad-Export-Date: 2012-03-14 04:43+0000\n"
-"X-Generator: Launchpad (build 14933)\n"
+"X-Launchpad-Export-Date: 2012-03-25 05:05+0000\n"
+"X-Generator: Launchpad (build 14981)\n"
 
 #: ../bin/duplicity:98
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -1136,7 +1136,7 @@ msgstr "Opozorilo: staro kazalo %s >= novo kazalo %s"
 msgid "Error '%s' processing %s"
 msgstr "Napaka '%s' med obdelovanjem %s"
 
-#: ../duplicity/lazy.py:408
+#: ../duplicity/lazy.py:410
 #, python-format
 msgid "Skipping %s because of previous error"
 msgstr "Preskakovanje %s zaradi predhodne napake"
@@ -1469,12 +1469,12 @@ msgid "IGNORED_ERROR: Warning: ignoring error as requested: %s: %s"
 msgstr ""
 "PREZRTA_NAPAKA: opozorilo: preziranje napake kot je bilo zahtevano: %s: %s"
 
-#: ../duplicity/backends/giobackend.py:89
+#: ../duplicity/backends/giobackend.py:100
 #, python-format
 msgid "Connection failed, please check your password: %s"
 msgstr "Povezava je spodletela, preverite svoje geslo: %s"
 
-#: ../duplicity/backends/giobackend.py:113
+#: ../duplicity/backends/giobackend.py:124
 #, python-format
 msgid "Writing %s"
 msgstr "Pisanje %s"

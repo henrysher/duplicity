@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-03-13 22:16+0000\n"
+"POT-Creation-Date: 2012-03-24 11:57+0000\n"
 "PO-Revision-Date: 2010-12-07 21:11+0000\n"
 "Last-Translator: Hertatijanto Hartono <dvertx@gmail.com>\n"
 "Language-Team: Indonesian <id@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2012-03-14 04:43+0000\n"
-"X-Generator: Launchpad (build 14933)\n"
+"X-Launchpad-Export-Date: 2012-03-25 05:05+0000\n"
+"X-Generator: Launchpad (build 14981)\n"
 
 #: ../bin/duplicity:98
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -1046,7 +1046,7 @@ msgstr "Peringatan: indekstua %s >= indeksbaru %s"
 msgid "Error '%s' processing %s"
 msgstr "Kesalahan '%s' saat memproses %s"
 
-#: ../duplicity/lazy.py:408
+#: ../duplicity/lazy.py:410
 #, python-format
 msgid "Skipping %s because of previous error"
 msgstr "Melompati %s karena kesalahan sebelumnya"
@@ -1384,12 +1384,12 @@ msgstr ""
 "KESALAHAN_TERABAIKAN: Perhatian: mengabaikan kesalahan sesuai permintaan: "
 "%s: %s"
 
-#: ../duplicity/backends/giobackend.py:89
+#: ../duplicity/backends/giobackend.py:100
 #, python-format
 msgid "Connection failed, please check your password: %s"
 msgstr "Hubungan gagal, periksa kata sandi anda: %s"
 
-#: ../duplicity/backends/giobackend.py:113
+#: ../duplicity/backends/giobackend.py:124
 #, python-format
 msgid "Writing %s"
 msgstr "Menulis %s"
