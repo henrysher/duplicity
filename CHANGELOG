@@ -1,5 +1,36 @@
+New in v0.6.19 (2012/05/15)
+---------------------------
+Enhancements:
+- lots of work on the man page to clean up requirements, etc.
+- use empty listbody for enhanced webdav compatibility
+- initial folder creation on backend does not result in a ResponseNotReady anymore
+- add ssh_config support (/etc/ssh/ssh_config + ~/.ssh/config) to paramiko sshbackend
+- add missing_host_key prompt to new sshbackend similar to ssh procedure
+- added --ssh-backend parameter to switch between paramiko,pexpect
+- allow answering gio mount questions (albeit naively)
+- if the gio backend wants to ask a question during its mount phase, it previously just aborted.
+- a couple more warning error codes that Deja Dup is interested in noticing.
+- ssh paramiko backend respects --num-retries now
+- set retry delay for ssh backends to 10s
+- ssh pexpect backend
+ + sftp part does not claim 'Invalid SSH password' although it's only 'Permission denied' now
+ + sftp errors are now more talkative
+- gpg.py
+ + commented assert which broke otherwise working verify run
+
+Bugs closed in this release:
+588541     Connection failed, please check your password: Login dialog cancelled
+
+Merges:
+lp:~ed.so/duplicity/0.6-manpage
+lp:~ed.so/duplicity/0.6-webdav_fixes
+lp:~carlos-abalde/duplicity/gdocs-backend-gdata-2.0.16.-upgrade.
+lp:~ed.so/duplicity/0.6-ssh_add_missinghostkey
+lp:~ed.so/duplicity/0.6-readd_sshpexpect
+
+
 New in v0.6.18 (2012/02/29)
-----------------------------
+---------------------------
 Enhancements:
 - fix extraneous '.py' in botobackend.py include
 - tests: add delay between backups to avoid assertion error
@@ -36,7 +67,7 @@ lp:~tobias-genannt/duplicity/nocompress
 
 
 New in v0.6.17 (2011/11/25)
-----------------------------
+---------------------------
 Enhancements:
 - Added --rsync-options flag to allow user to pass options to rsync at will
 - Added --s3-use-multiprocessing to select the new s3 multiprocessing backend.
@@ -91,7 +122,7 @@ lp:~ed.so/duplicity/UnicodeDecodeError
 
 
 New in v0.6.15 (2011/08/19)
-----------------------------
+---------------------------
 Enhancements:
 - Ignore 404 errors when deleting a file on Ubuntu One.
 - Ignore ENOENT (file missing) errors where it is safe.
@@ -129,7 +160,7 @@ lp:~ed.so/duplicity/numowner+hashverbose
 
 
 New in v0.6.14 (2011/06/18)
-----------------------------
+---------------------------
 Enhancements:
 452342     Provide Ubuntu One integration
 
@@ -166,7 +197,7 @@ lp:~mterry/duplicity/u1-status
 
 
 New in v0.6.13 (2011/04/02)
-----------------------------
+---------------------------
 Enhancements added this release:
 New manual test to make Ctrl-C issues easier to replicate.
 Use python-virtualenv to make testing multiple Python versions easier.
@@ -179,7 +210,7 @@ Bugs closed in this release:
 
 
 New in v0.6.12 (2011/03/08)
-----------------------------
+---------------------------
 Enhancements added this release:
 626915     ftps support using lftp (ftpsbackend)
 
@@ -202,7 +233,7 @@ lp:~blueyed/duplicity/path-enodev-bugfix
 
 
 New in v0.6.11 (2010/11/20)
-----------------------------
+---------------------------
 Bugs closed in this release:
 433970     Add an option to connect to S3 with regular HTTP (and not HTTPS)
 578663     Use log codes for common backend errors
@@ -225,7 +256,7 @@ lp:~mbp/duplicity/433970-non-ssl
 
 
 New in v0.6.10 (2010/09/19)
-----------------------------
+---------------------------
 Bugs closed in this release:
 542482     Offer command to remove old incremental backups from target
 578663     Use log codes for common backend errors
@@ -236,7 +267,7 @@ Bugs closed in this release:
 
 
 New in v0.6.09 (2010/07/25)
-----------------------------
+---------------------------
 Bugs closed in this release:
 502609     Unknown error while uploading duplicity-full-signatures
 539393     Duplicity returns 1 when continuing an interrupted backup
@@ -1138,7 +1169,7 @@ patch #6282, collection-status: output in more consistent order
 
 
 New in v0.4.4 (2007/11/23)
-------------------------------
+--------------------------
 All the changes in RC1 through RC4 plus:
 
 Changes to ftpBackend to use a temp login config file rather

@@ -65,34 +65,34 @@ class U1Backend(duplicity.backend.Backend):
 
         ensure_dbus()
 
-	    if not self.login():
+        if not self.login():
             from duplicity import log
-		    log.FatalError(_("Could not obtain Ubuntu One credentials"),
+            log.FatalError(_("Could not obtain Ubuntu One credentials"),
                            log.ErrorCode.backend_error)
 
         # Create volume in case it doesn't exist yet
         self.create_volume()
 
     def login(self):
-	    from gobject import MainLoop
-	    from dbus.mainloop.glib import DBusGMainLoop
-	    from ubuntuone.platform.credentials import CredentialsManagementTool
+        from gobject import MainLoop
+        from dbus.mainloop.glib import DBusGMainLoop
+        from ubuntuone.platform.credentials import CredentialsManagementTool
 
-	    self.login_success = False
+        self.login_success = False
 
-	    DBusGMainLoop(set_as_default=True)
-	    loop = MainLoop()
+        DBusGMainLoop(set_as_default=True)
+        loop = MainLoop()
 
-	    def quit(result):
-		    loop.quit()
-		    if result:
-			    self.login_success = True
+        def quit(result):
+            loop.quit()
+            if result:
+                self.login_success = True
 
-	    cd = CredentialsManagementTool()
-	    d = cd.login()
-	    d.addCallbacks(quit)
-	    loop.run()
-	    return self.login_success
+        cd = CredentialsManagementTool()
+        d = cd.login()
+        d.addCallbacks(quit)
+        loop.run()
+        return self.login_success
 
     def quote(self, url):
         import urllib
@@ -182,7 +182,7 @@ class U1Backend(duplicity.backend.Backend):
         content_type = mimetypes.guess_type(source_path.name)[0]
         content_type = content_type or 'application/octet-stream'
         headers = {"Content-Length": str(size),
-    	           "Content-Type": content_type}
+                   "Content-Type": content_type}
         answer = auth.request(remote_full, http_method="PUT",
                               headers=headers, request_body=data)
         self.handle_error(raise_errors, 'put', answer, source_path.name, remote_full)
@@ -229,7 +229,7 @@ class U1Backend(duplicity.backend.Backend):
         assert type(filename_list) is not types.StringType
         for filename in filename_list:
             remote_full = self.meta_base + self.quote(filename)
-    	    answer = auth.request(remote_full, http_method="DELETE")
+            answer = auth.request(remote_full, http_method="DELETE")
             self.handle_error(raise_errors, 'delete', answer, remote_full, ignore=[404])
 
     @retry

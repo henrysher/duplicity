@@ -386,7 +386,7 @@ def get_hash(hash, path, hex = 1):
     hash should be "MD5" or "SHA1".  The output will be in hexadecimal
     form if hex is true, and in text (base64) otherwise.
     """
-    assert path.isreg()
+    #assert path.isreg()
     fp = path.open("rb")
     if hash == "SHA1":
         hash_obj = sha1()

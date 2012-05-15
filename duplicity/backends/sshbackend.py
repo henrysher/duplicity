@@ -24,11 +24,10 @@ def warn_option(option, optionvar):
     if optionvar:
         log.Warn("Warning: Option %s is supported by ssh pexpect backend only and will be ignored. " % option)
 
-if globals.ssh_backend and \
-   globals.ssh_backend.lower().strip() == 'pexpect':
+if (globals.ssh_backend and
+    globals.ssh_backend.lower().strip() == 'pexpect'):
     import _ssh_pexpect
 else:
     warn_option("--scp-command", globals.scp_command)
     warn_option("--sftp-command", globals.sftp_command)
     import _ssh_paramiko
-
