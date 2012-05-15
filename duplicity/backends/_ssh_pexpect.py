@@ -41,6 +41,8 @@ class SSHPExpectBackend(duplicity.backend.Backend):
         """scpBackend initializer"""
         duplicity.backend.Backend.__init__(self, parsed_url)
 
+        self.retry_delay = 10
+
         self.scp_command = "scp"
         if globals.scp_command: self.scp_command = globals.scp_command
 
@@ -82,7 +84,7 @@ class SSHPExpectBackend(duplicity.backend.Backend):
         for n in range(1, globals.num_retries+1):
             if n > 1:
                 # sleep before retry
-                time.sleep(30)
+                time.sleep(self.retry_delay)
             log.Info("Running '%s' (attempt #%d)" % (commandline, n))
             child = pexpect.spawn(commandline, timeout = None)
             if globals.ssh_askpass:
@@ -165,10 +167,11 @@ class SSHPExpectBackend(duplicity.backend.Backend):
         for n in range(1, globals.num_retries+1):
             if n > 1:
                 # sleep before retry
-                time.sleep(30)
+                time.sleep(self.retry_delay)
             log.Info("Running '%s' (attempt #%d)" % (commandline, n))
             child = pexpect.spawn(commandline, timeout = None, maxread=maxread)
             cmdloc = 0
+            passprompt = 0
             while 1:
                 match = child.expect(responses,
                                      searchwindowsize=maxread+max_response_len)
@@ -176,7 +179,7 @@ class SSHPExpectBackend(duplicity.backend.Backend):
                 if match == 0:
                     break
                 elif match == 1:
-                    log.Info("Timeout waiting for response")
+                    msg = "Timeout waiting for response"
                     break
                 if match == 2:
                     if cmdloc < len(commands):
@@ -189,34 +192,36 @@ class SSHPExpectBackend(duplicity.backend.Backend):
                         child.sendline(command)
                         res = child.before
                 elif match == 3:
+                    passprompt += 1
                     child.sendline(self.password)
+                    if (passprompt>1):
+                        raise BackendException("Invalid SSH password.")
                 elif match == 4:
                     if not child.before.strip().startswith("mkdir"):
-                        log.Warn("Invalid SSH password")
+                        msg = "Permission denied"
                         break
                 elif match == 5:
-                    log.Warn("Host key authenticity could not be verified (missing known_hosts entry?)")
+                    msg = "Host key authenticity could not be verified (missing known_hosts entry?)"
                     break
                 elif match == 6:
                     if not child.before.strip().startswith("rm"):
-                        log.Warn("Remote file or directory does not exist in command='%s'" % (commandline,))
+                        msg = "Remote file or directory does not exist in command='%s'" % (commandline,)
                         break
                 elif match == 7:
                     if not child.before.strip().startswith("Removing"):
-                        log.Warn("Could not delete file in command='%s'" % (commandline,))
+                        msg = "Could not delete file in command='%s'" % (commandline,)
                         break;
                 elif match == 8:
-                    log.Warn("Could not delete file in command='%s'" % (commandline,))
+                    msg = "Could not delete file in command='%s'" % (commandline,)
                     break
                 elif match == 9:
-                    log.Warn("Could not open file in command='%s'" % (commandline,))
+                    msg = "Could not open file in command='%s'" % (commandline,)
                     break
             child.close(force = True)
             if child.exitstatus == 0:
                 return res
-            log.Warn("Running '%s' failed (attempt #%d)" % (commandline, n))
-        log.Warn("Giving up trying to execute '%s' after %d attempts" % (commandline, globals.num_retries))
-        raise BackendException("Error running '%s'" % commandline)
+            log.Warn("Running '%s' with commands:\n %s\n failed (attempt #%d): %s" % (commandline, "\n ".join(commands), n, msg))
+        raise BackendException("Giving up trying to execute '%s' with commands:\n %s\n after %d attempts" % (commandline, "\n ".join(commands), globals.num_retries))
 
     def put(self, source_path, remote_filename = None):
         if globals.use_scp:
