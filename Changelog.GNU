@@ -1,3 +1,35 @@
+2012-05-15  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged  in  lp:~ed.so/duplicity/ssh-fixes
+	
+	- ssh paramiko backend respects --num-retries now
+	- set retry delay for ssh backends to 10s
+	- ssh pexpect backend
+	+ sftp part does not claim 'Invalid SSH password' although it's only 'Permission denied' now
+	+ sftp errors are now more talkative
+	- gpg.py
+	+ commented assert which broke otherwise working verify run
+
+2012-05-15  edso
+
+	- ssh paramiko backend respects --num-retries now
+	- set retry delay for ssh backends to 10s
+	- ssh pexpect backend 
+	+ sftp part does not claim 'Invalid SSH password' although it's only 'Permission denied' now
+	+ sftp errors are now more talkative 
+	- gpg.py
+	+ commented assert which broke otherwise working verify run
+
+2012-05-15  edso
+
+	- ssh paramiko backend respects --num-retries now
+	- set retry delay for ssh backends to 10s
+	- ssh pexpect backend 
+	+ sftp part does not claim 'Invalid SSH password' although it's only 'Permission denied' now
+	+ sftp errors are now more talkative 
+	- gpg.py
+	+ commented assert which broke otherwise working verify run
+
 2012-03-24  Kenneth Loafman  <kenneth@loafman.com>
 
 	A couple more warning error codes that Deja Dup is interested in noticing.
