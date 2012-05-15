@@ -28,6 +28,7 @@ import string
 import os
 import errno
 import sys
+import time
 import getpass
 from binascii import hexlify
 
@@ -63,6 +64,8 @@ class SSHParamikoBackend(duplicity.backend.Backend):
     """
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
+
+        self.retry_delay = 10
 
         if parsed_url.path:
             # remove first leading '/'
@@ -195,109 +198,149 @@ class SSHParamikoBackend(duplicity.backend.Backend):
         contain single quotes."""
         if not remote_filename:
             remote_filename = source_path.get_filename()
-        if (globals.use_scp):
-            f=file(source_path.name,'rb')
+        
+        for n in range(1, globals.num_retries+1):
+            if n > 1:
+                # sleep before retry
+                time.sleep(self.retry_delay)
             try:
-                chan=self.client.get_transport().open_session()
-                chan.settimeout(globals.timeout)
-                chan.exec_command("scp -t '%s'" % self.remote_dir) # scp in sink mode uses the arg as base directory
+                if (globals.use_scp):
+                    f=file(source_path.name,'rb')
+                    try:
+                        chan=self.client.get_transport().open_session()
+                        chan.settimeout(globals.timeout)
+                        chan.exec_command("scp -t '%s'" % self.remote_dir) # scp in sink mode uses the arg as base directory
+                    except Exception, e:
+                        raise BackendException("scp execution failed: %s" % e)
+                    # scp protocol: one 0x0 after startup, one after the Create meta, one after saving
+                    # if there's a problem: 0x1 or 0x02 and some error text
+                    response=chan.recv(1)
+                    if (response!="\0"):
+                        raise BackendException("scp remote error: %s" % chan.recv(-1))
+                    fstat=os.stat(source_path.name)
+                    chan.send('C%s %d %s\n' %(oct(fstat.st_mode)[-4:], fstat.st_size, remote_filename))
+                    response=chan.recv(1)
+                    if (response!="\0"):
+                        raise BackendException("scp remote error: %s" % chan.recv(-1))
+                    chan.sendall(f.read()+'\0')
+                    f.close()
+                    response=chan.recv(1)
+                    if (response!="\0"):
+                        raise BackendException("scp remote error: %s" % chan.recv(-1))
+                    chan.close()
+                    return
+                else:
+                    try:
+                        self.sftp.put(source_path.name,remote_filename)
+                        return
+                    except Exception, e:
+                        raise BackendException("sftp put of %s (as %s) failed: %s" % (source_path.name,remote_filename,e))
             except Exception, e:
-                raise BackendException("scp execution failed: %s" % e)
-            # scp protocol: one 0x0 after startup, one after the Create meta, one after saving
-            # if there's a problem: 0x1 or 0x02 and some error text
-            response=chan.recv(1)
-            if (response!="\0"):
-                raise BackendException("scp remote error: %s" % chan.recv(-1))
-            fstat=os.stat(source_path.name)
-            chan.send('C%s %d %s\n' %(oct(fstat.st_mode)[-4:], fstat.st_size, remote_filename))
-            response=chan.recv(1)
-            if (response!="\0"):
-                raise BackendException("scp remote error: %s" % chan.recv(-1))
-            chan.sendall(f.read()+'\0')
-            f.close()
-            response=chan.recv(1)
-            if (response!="\0"):
-                raise BackendException("scp remote error: %s" % chan.recv(-1))
-            chan.close()
-        else:
-            try:
-                self.sftp.put(source_path.name,remote_filename)
-            except Exception, e:
-                raise BackendException("sftp put of %s (as %s) failed: %s" % (source_path.name,remote_filename,e))
+                log.Warn("%s (Try %d of %d) Will retry in %d seconds." % (e,n,globals.num_retries,self.retry_delay))
+        raise BackendException("Giving up trying to upload '%s' after %d attempts" % (remote_filename,n))
 
 
     def get(self, remote_filename, local_path):
         """retrieves a single file from the remote side.
         In scp mode unavoidable quoting issues will make this fail if the remote directory or file names
         contain single quotes."""
-        if (globals.use_scp):
+        
+        for n in range(1, globals.num_retries+1):
+            if n > 1:
+                # sleep before retry
+                time.sleep(self.retry_delay)
             try:
-                chan=self.client.get_transport().open_session()
-                chan.settimeout(globals.timeout)
-                chan.exec_command("scp -f '%s/%s'" % (self.remote_dir,remote_filename))
-            except Exception, e:
-                raise BackendException("scp execution failed: %s" % e)
+                if (globals.use_scp):
+                    try:
+                        chan=self.client.get_transport().open_session()
+                        chan.settimeout(globals.timeout)
+                        chan.exec_command("scp -f '%s/%s'" % (self.remote_dir,remote_filename))
+                    except Exception, e:
+                        raise BackendException("scp execution failed: %s" % e)
 
-            chan.send('\0')     # overall ready indicator
-            msg=chan.recv(-1)
-            m=re.match(r"C([0-7]{4})\s+(\d+)\s+(\S.*)$",msg)
-            if (m==None or m.group(3)!=remote_filename):
-                raise BackendException("scp get %s failed: incorrect response '%s'" % (remote_filename,msg))
-            chan.recv(1)        # dispose of the newline trailing the C message
+                    chan.send('\0')     # overall ready indicator
+                    msg=chan.recv(-1)
+                    m=re.match(r"C([0-7]{4})\s+(\d+)\s+(\S.*)$",msg)
+                    if (m==None or m.group(3)!=remote_filename):
+                        raise BackendException("scp get %s failed: incorrect response '%s'" % (remote_filename,msg))
+                    chan.recv(1)        # dispose of the newline trailing the C message
 
-            size=int(m.group(2))
-            togo=size
-            f=file(local_path.name,'wb')
-            chan.send('\0')     # ready for data
-            try:
-                while togo>0:
-                    if togo>read_blocksize:
-                        blocksize = read_blocksize
-                    else:
-                        blocksize = togo
-                    buff=chan.recv(blocksize)
-                    f.write(buff)
-                    togo-=len(buff)
-            except Exception, e:
-                raise BackendException("scp get %s failed: %s" % (remote_filename,e))
+                    size=int(m.group(2))
+                    togo=size
+                    f=file(local_path.name,'wb')
+                    chan.send('\0')     # ready for data
+                    try:
+                        while togo>0:
+                            if togo>read_blocksize:
+                                blocksize = read_blocksize
+                            else:
+                                blocksize = togo
+                            buff=chan.recv(blocksize)
+                            f.write(buff)
+                            togo-=len(buff)
+                    except Exception, e:
+                        raise BackendException("scp get %s failed: %s" % (remote_filename,e))
 
-            msg=chan.recv(1)    # check the final status
-            if msg!='\0':
-                raise BackendException("scp get %s failed: %s" % (remote_filename,chan.recv(-1)))
-            f.close()
-            chan.send('\0')     # send final done indicator
-            chan.close()
-        else:
-            try:
-                self.sftp.get(remote_filename,local_path.name)
+                    msg=chan.recv(1)    # check the final status
+                    if msg!='\0':
+                        raise BackendException("scp get %s failed: %s" % (remote_filename,chan.recv(-1)))
+                    f.close()
+                    chan.send('\0')     # send final done indicator
+                    chan.close()
+                    return
+                else:
+                    try:
+                        self.sftp.get(remote_filename,local_path.name)
+                        return
+                    except Exception, e:
+                        raise BackendException("sftp get of %s (to %s) failed: %s" % (remote_filename,local_path.name,e))
+                local_path.setdata()
             except Exception, e:
-                raise BackendException("sftp get of %s (to %s) failed: %s" % (remote_filename,local_path.name,e))
-        local_path.setdata()
+                log.Warn("%s (Try %d of %d) Will retry in %d seconds." % (e,n,globals.num_retries,self.retry_delay))
+        raise BackendException("Giving up trying to download '%s' after %d attempts" % (remote_filename,n))
 
     def list(self):
         """lists the contents of the one-and-only duplicity dir on the remote side.
         In scp mode unavoidable quoting issues will make this fail if the directory name
         contains single quotes."""
-        if (globals.use_scp):
-            output=self.runremote("ls -1 '%s'" % self.remote_dir,False,"scp dir listing ")
-            return output.splitlines()
-        else:
+        for n in range(1, globals.num_retries+1):
+            if n > 1:
+                # sleep before retry
+                time.sleep(self.retry_delay)
             try:
-                return self.sftp.listdir()
+                if (globals.use_scp):
+                    output=self.runremote("ls -1 '%s'" % self.remote_dir,False,"scp dir listing ")
+                    return output.splitlines()
+                else:
+                    try:
+                        return self.sftp.listdir()
+                    except Exception, e:
+                        raise BackendException("sftp listing of %s failed: %s" % (self.sftp.getcwd(),e))
             except Exception, e:
-                raise BackendException("sftp listing of %s failed: %s" % (self.sftp.getcwd(),e))
+                log.Warn("%s (Try %d of %d) Will retry in %d seconds." % (e,n,globals.num_retries,self.retry_delay))
+        raise BackendException("Giving up trying to list '%s' after %d attempts" % (self.remote_dir,n))
 
     def delete(self, filename_list):
         """deletes all files in the list on the remote side. In scp mode unavoidable quoting issues
         will cause failures if filenames containing single quotes are encountered."""
-        for fn in filename_list:
-            if (globals.use_scp):
-                self.runremote("rm '%s/%s'" % (self.remote_dir,fn),False,"scp rm ")
-            else:
-                try:
-                    self.sftp.remove(fn)
-                except Exception, e:
-                    raise BackendException("sftp rm %s failed: %s" % (fn,e))
+        for n in range(1, globals.num_retries+1):
+            if n > 1:
+                # sleep before retry
+                time.sleep(self.retry_delay)
+            try:
+                for fn in filename_list:
+                    if (globals.use_scp):
+                        self.runremote("rm '%s/%s'" % (self.remote_dir,fn),False,"scp rm ")
+                        return
+                    else:
+                        try:
+                            self.sftp.remove(fn)
+                            return
+                        except Exception, e:
+                            raise BackendException("sftp rm %s failed: %s" % (fn,e))
+            except Exception, e:
+                log.Warn("%s (Try %d of %d) Will retry in %d seconds." % (e,n,globals.num_retries,self.retry_delay))
+        raise BackendException("Giving up trying to delete '%s' after %d attempts" % (", ".join(filename_list),n))
 
     def runremote(self,cmd,ignoreexitcode=False,errorprefix=""):
         """small convenience function that opens a shell channel, runs remote command and returns
