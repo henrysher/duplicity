@@ -207,7 +207,7 @@ def parse_cmdline_options(arglist):
             import duplicity.backends.giobackend
             backend.force_backend(duplicity.backends.giobackend.GIOBackend)
         except ImportError:
-            log.FatalError(_("Unable to load gio module"), log.ErrorCode.gio_not_available)
+            log.FatalError(_("Unable to load gio backend: %s") % str(sys.exc_info()[1]), log.ErrorCode.gio_not_available)
 
     def set_log_fd(fd):
         if fd < 1:

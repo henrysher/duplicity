@@ -74,6 +74,8 @@ def import_backends():
         if fn.endswith("backend.py"):
             fn = fn[:-3]
             imp = "duplicity.backends.%s" % (fn,)
+            # ignore gio as it is explicitly loaded in commandline.parse_cmdline_options()
+            if fn == "giobackend": continue
             try:
                 __import__(imp)
                 res = "Succeeded"
@@ -155,7 +157,10 @@ def get_backend(url_string):
     elif not pu.scheme in _backends:
         raise UnsupportedBackendScheme(url_string)
     else:
-        return _backends[pu.scheme](pu)
+        try:
+            return _backends[pu.scheme](pu)
+        except ImportError:
+            raise BackendException(_("Could not initialize backend: %s") % str(sys.exc_info()[1]))
 
 
 _urlparser_initialized = False
