@@ -32,13 +32,6 @@ import time
 import getpass
 from binascii import hexlify
 
-# debian squeeze's paramiko is a bit old, so we silence randompool depreciation warning
-# note also: passphrased private keys work with squeeze's paramiko only if done with DES, not AES
-import warnings
-warnings.simplefilter("ignore")
-import paramiko
-warnings.resetwarnings()
-
 import duplicity.backend
 from duplicity import globals
 from duplicity import log
@@ -72,6 +65,42 @@ class SSHParamikoBackend(duplicity.backend.Backend):
             self.remote_dir = re.sub(r'^/', r'', parsed_url.path, 1)
         else:
             self.remote_dir = '.'
+
+        # lazily import paramiko when we need it
+        # debian squeeze's paramiko is a bit old, so we silence randompool depreciation warning
+        # note also: passphrased private keys work with squeeze's paramiko only if done with DES, not AES
+        import warnings
+        warnings.simplefilter("ignore")
+        import paramiko
+        warnings.resetwarnings()
+
+        class AgreedAddPolicy (paramiko.AutoAddPolicy):
+            """
+            Policy for showing a yes/no prompt and adding the hostname and new 
+            host key to the known host file accordingly.
+            
+            This class simply extends the AutoAddPolicy class with a yes/no prompt.
+            """
+            def missing_host_key(self, client, hostname, key):
+                fp = hexlify(key.get_fingerprint())
+                fingerprint = ':'.join(a+b for a,b in zip(fp[::2], fp[1::2]))
+                question = """The authenticity of host '%s' can't be established.
+%s key fingerprint is %s.
+Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_name().upper(), fingerprint)
+                while True:
+                    sys.stdout.write(question)
+                    choice = raw_input().lower()
+                    if choice in ['yes','y']:
+                        super(AgreedAddPolicy, self).missing_host_key(client, hostname, key)
+                        return
+                    elif choice in ['no','n']:
+                        raise AuthenticityException( hostname )
+                    else:
+                        question = "Please type 'yes' or 'no': "
+        
+        class AuthenticityException (paramiko.SSHException):
+            def __init__(self, hostname):
+                paramiko.SSHException.__init__(self, 'Host key verification for server %s failed.' % hostname)
 
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(AgreedAddPolicy())
@@ -358,6 +387,8 @@ class SSHParamikoBackend(duplicity.backend.Backend):
         return output
 
     def gethostconfig(self, file, host):
+        import paramiko
+        
         file = os.path.expanduser(file)
         if not os.path.isfile(file):
             return {}
@@ -369,35 +400,6 @@ class SSHParamikoBackend(duplicity.backend.Backend):
             raise BackendException("could not load '%s', maybe corrupt?" % (file))
         
         return sshconfig.lookup(host)
-
-class AgreedAddPolicy (paramiko.AutoAddPolicy):
-    """
-    Policy for showing a yes/no prompt and adding the hostname and new 
-    host key to the known host file accordingly.
-    
-    This class simply extends the AutoAddPolicy class with a yes/no prompt.
-    """
-    def missing_host_key(self, client, hostname, key):
-        fp = hexlify(key.get_fingerprint())
-        fingerprint = ':'.join(a+b for a,b in zip(fp[::2], fp[1::2]))
-        question = """The authenticity of host '%s' can't be established.
-%s key fingerprint is %s.
-Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_name().upper(), fingerprint)
-        while True:
-            sys.stdout.write(question)
-            choice = raw_input().lower()
-            if choice in ['yes','y']:
-                super(AgreedAddPolicy, self).missing_host_key(client, hostname, key)
-                return
-            elif choice in ['no','n']:
-                raise AuthenticityException( hostname )
-            else:
-                question = "Please type 'yes' or 'no': "
-
-class AuthenticityException (paramiko.SSHException):
-    def __init__(self, hostname):
-        paramiko.SSHException.__init__(self, 'Host key verification for server %s failed.' % hostname)
-
 
 duplicity.backend.register_backend("sftp", SSHParamikoBackend)
 duplicity.backend.register_backend("scp", SSHParamikoBackend)
