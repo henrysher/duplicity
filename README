@@ -35,6 +35,27 @@ If you install from the source package, you will also need:
  * librsync development files, normally found in module 'librsync-dev'.
 
 
+A NOTE ON GnuPGInterface.py AND MULTIPLE GPG PROCESSES:
+
+GnuPGInterface is used to access GPG from duplicity.  The original
+works quite well and has no bugs, however, we have patched the one
+used in duplicity.  Why?  Duplicity is not perfect, yet, and has a
+problem when handling long chains of incremental backup or restore
+operations.  The problem is that the waitpid() call only happens
+after all the iterations complete, and with a long chain, that can
+be a long while.  Unless the waitpid() call is made, the child process
+remains active.  Duplicity's GnuPGInterface is patched to start an
+immediate threaded waitpid() for each GPG task, thus harvesting the
+task and freeing it's resources in a timely manner.  This does not
+affect the operation of duplicity, merely frees resources on time.
+
+Why the note?  Some distro's remove duplicity's GnuPGInterface in
+error, thinking that this change is not important.  So, if you have
+the problem where lots of GPG tasks are hanging around, check to see
+if this has been done in your distro, then, report the bug to the
+distro's maintainer and/or package manager.
+
+
 HELP:
 
 For more information see the duplicity home page at:
