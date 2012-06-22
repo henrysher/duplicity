@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-05-15 14:37+0000\n"
+"POT-Creation-Date: 2012-06-21 19:27+0000\n"
 "PO-Revision-Date: 2011-08-27 12:46+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Slovenian <sl@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || "
 "n%100==4 ? 3 : 0);\n"
-"X-Launchpad-Export-Date: 2012-05-16 04:52+0000\n"
-"X-Generator: Launchpad (build 15247)\n"
+"X-Launchpad-Export-Date: 2012-06-22 04:48+0000\n"
+"X-Generator: Launchpad (build 15461)\n"
 
 #: ../bin/duplicity:98
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -416,12 +416,17 @@ msgstr "dejavni delavci = %d"
 msgid "task execution done (success: %s)"
 msgstr "izvajanje naloge je končano (uspeh: %s)"
 
-#: ../duplicity/backend.py:489 ../duplicity/backend.py:513
+#: ../duplicity/backend.py:163
+#, python-format
+msgid "Could not initialize backend: %s"
+msgstr ""
+
+#: ../duplicity/backend.py:494 ../duplicity/backend.py:518
 #, python-format
 msgid "Reading results of '%s'"
 msgstr "Branje rezultatov '%s'"
 
-#: ../duplicity/backend.py:528
+#: ../duplicity/backend.py:533
 #, python-format
 msgid "Running '%s' failed with code %d (attempt #%d)"
 msgid_plural "Running '%s' failed with code %d (attempt #%d)"
@@ -430,7 +435,7 @@ msgstr[1] "Izvajanje '%s' je spodletelo s kodo %d (poskus št. %d)"
 msgstr[2] "Izvajanje '%s' je spodletelo s kodo %d (poskus št. %d)"
 msgstr[3] "Izvajanje '%s' je spodletelo s kodo %d (poskus št. %d)"
 
-#: ../duplicity/backend.py:532
+#: ../duplicity/backend.py:537
 #, python-format
 msgid ""
 "Error is:\n"
@@ -439,7 +444,7 @@ msgstr ""
 "Napaka je:\n"
 "%s"
 
-#: ../duplicity/backend.py:534
+#: ../duplicity/backend.py:539
 #, python-format
 msgid "Giving up trying to execute '%s' after %d attempt"
 msgid_plural "Giving up trying to execute '%s' after %d attempts"
@@ -737,8 +742,9 @@ msgstr ""
 "Uporaba privzetih imen datotek je močno priporočena."
 
 #: ../duplicity/commandline.py:210
-msgid "Unable to load gio module"
-msgstr "Modula gio ni mogoče naložiti"
+#, python-format
+msgid "Unable to load gio backend: %s"
+msgstr ""
 
 #: ../duplicity/commandline.py:232
 #, python-format
@@ -1479,6 +1485,20 @@ msgstr "Povezava je spodletela, preverite svoje geslo: %s"
 msgid "Writing %s"
 msgstr "Pisanje %s"
 
+#: ../duplicity/backends/sshbackend.py:25
+#, python-format
+msgid ""
+"Warning: Option %s is supported by ssh pexpect backend only and will be "
+"ignored."
+msgstr ""
+
+#: ../duplicity/backends/sshbackend.py:33
+#, python-format
+msgid ""
+"Warning: Selected ssh backend '%s' is neither 'paramiko nor 'pexpect'. Will "
+"use default paramiko instead."
+msgstr ""
+
 #~ msgid "Reuse already set SIGNING_PASSPHRASE as PASSPHRASE"
 #~ msgstr ""
 #~ "Ponovno uporabi že nastavljeno PODPISUJOČO_ŠIFRIRNO_FRAZO kot ŠIFRIRNO_FRAZO"
@@ -1486,3 +1506,6 @@ msgstr "Pisanje %s"
 #~ msgid "Reuse already set PASSPHRASE as SIGNING_PASSPHRASE"
 #~ msgstr ""
 #~ "Ponovno uporabi že nastavljeno ŠIFRIRNO_FRAZO kot PODPISUJOČO_ŠIFRIRNO_FRAZO"
+
+#~ msgid "Unable to load gio module"
+#~ msgstr "Modula gio ni mogoče naložiti"

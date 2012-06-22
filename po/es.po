@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-05-15 14:37+0000\n"
+"POT-Creation-Date: 2012-06-21 19:27+0000\n"
 "PO-Revision-Date: 2011-10-21 05:49+0000\n"
 "Last-Translator: Paco Molinero <paco@byasl.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-05-16 04:52+0000\n"
-"X-Generator: Launchpad (build 15247)\n"
+"X-Launchpad-Export-Date: 2012-06-22 04:48+0000\n"
+"X-Generator: Launchpad (build 15461)\n"
 
 #: ../bin/duplicity:98
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -402,19 +402,24 @@ msgstr "trabajadores activos = %d"
 msgid "task execution done (success: %s)"
 msgstr "ejecución de la tarea realizada (éxito: %s)"
 
-#: ../duplicity/backend.py:489 ../duplicity/backend.py:513
+#: ../duplicity/backend.py:163
+#, python-format
+msgid "Could not initialize backend: %s"
+msgstr ""
+
+#: ../duplicity/backend.py:494 ../duplicity/backend.py:518
 #, python-format
 msgid "Reading results of '%s'"
 msgstr "Leyendo resultados de «%s»"
 
-#: ../duplicity/backend.py:528
+#: ../duplicity/backend.py:533
 #, python-format
 msgid "Running '%s' failed with code %d (attempt #%d)"
 msgid_plural "Running '%s' failed with code %d (attempt #%d)"
 msgstr[0] "La ejecución de «%s» falló con el código %d (intento #%d)"
 msgstr[1] "La ejecución de «%s» falló con el código %d (intentos #%d)"
 
-#: ../duplicity/backend.py:532
+#: ../duplicity/backend.py:537
 #, python-format
 msgid ""
 "Error is:\n"
@@ -423,7 +428,7 @@ msgstr ""
 "El error es:\n"
 "%s"
 
-#: ../duplicity/backend.py:534
+#: ../duplicity/backend.py:539
 #, python-format
 msgid "Giving up trying to execute '%s' after %d attempt"
 msgid_plural "Giving up trying to execute '%s' after %d attempts"
@@ -688,8 +693,9 @@ msgstr ""
 "El uso de nombres de archivo predeterminados es muy recomendable."
 
 #: ../duplicity/commandline.py:210
-msgid "Unable to load gio module"
-msgstr "No se puede cargar el módulo gio"
+#, python-format
+msgid "Unable to load gio backend: %s"
+msgstr ""
 
 #: ../duplicity/commandline.py:232
 #, python-format
@@ -1437,6 +1443,23 @@ msgstr "Falló la conexión, compruebe su contraseña: %s"
 msgid "Writing %s"
 msgstr "Escribiendo %s"
 
+#: ../duplicity/backends/sshbackend.py:25
+#, python-format
+msgid ""
+"Warning: Option %s is supported by ssh pexpect backend only and will be "
+"ignored."
+msgstr ""
+
+#: ../duplicity/backends/sshbackend.py:33
+#, python-format
+msgid ""
+"Warning: Selected ssh backend '%s' is neither 'paramiko nor 'pexpect'. Will "
+"use default paramiko instead."
+msgstr ""
+
 #, python-format
 #~ msgid "Invalid data - %s hash mismatch:"
 #~ msgstr "Datos inválidos - falta el hash %s:"
+
+#~ msgid "Unable to load gio module"
+#~ msgstr "No se puede cargar el módulo gio"
