@@ -21,8 +21,8 @@
 
 import re #@UnusedImport
 import types
-import tempfile
 import os
+import tempfile
 
 from duplicity import tarfile #@UnusedImport
 from duplicity import librsync #@UnusedImport
@@ -30,6 +30,7 @@ from duplicity import log #@UnusedImport
 from duplicity import diffdir
 from duplicity import misc
 from duplicity import selection
+from duplicity import tempdir
 from duplicity import util #@UnusedImport
 from duplicity.path import * #@UnusedWildImport
 from duplicity.lazy import * #@UnusedWildImport
@@ -470,8 +471,11 @@ def patch_seq2ropath( patch_seq ):
     for delta_ropath in patch_seq[1:]:
         assert delta_ropath.difftype == "diff", delta_ropath.difftype
         if not isinstance( current_file, file ):
-            # librsync needs true file
-            tempfp = os.tmpfile()
+            """
+            librsync insists on a real file object, which we create manually
+            by using the duplicity.tempdir to tell us where.
+            """
+            tempfp = tempfile.TemporaryFile( dir=tempdir.default().dir() )
             misc.copyfileobj( current_file, tempfp )
             assert not current_file.close()
             tempfp.seek( 0 )
