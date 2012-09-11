@@ -181,11 +181,11 @@ See:
 class OPHelpFix(optparse.OptionParser):
     def _get_encoding(self, file):
         """
-        try to get the encoding or switch to UTF-8
+        try to get the encoding or use UTF-8
         which is default encoding in python3 and most recent unixes
         """
-        encoding = getattr(file, "encoding", "UTF-8")
-        return encoding
+        encoding = getattr(file, "encoding", None)
+        return encoding if encoding else 'utf-8'
 
     def print_help(self, file=None):
         """
