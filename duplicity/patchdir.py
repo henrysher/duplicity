@@ -22,6 +22,7 @@
 import re #@UnusedImport
 import types
 import os
+import tempfile
 
 from duplicity import tarfile #@UnusedImport
 from duplicity import librsync #@UnusedImport
@@ -470,18 +471,11 @@ def patch_seq2ropath( patch_seq ):
     for delta_ropath in patch_seq[1:]:
         assert delta_ropath.difftype == "diff", delta_ropath.difftype
         if not isinstance( current_file, file ):
-            """ TODO: the following is suboptimal and should be reworked
-            librsync insists on a real file object, which we create manually
-            by using the duplicity.tempdir to tell us where. unfortunately
-            these files can't have an autodelete handler attached, so they
-            are deleted only after the whole restore process is finished,
-            meaning the space needed for a restore is 1 volume plus all files
-            which need to be patched. in the worst case this means space for 
-            the whole restore is needed in the TMP fs additionally to the 
-            space needed in the target file system.
             """
-            tempfp_fd = tempdir.default().mkstemp()[0]
-            tempfp = os.fdopen(tempfp_fd,'w+b')
+            librsync insists on a real file object, which we create manually
+            by using the duplicity.tempdir to tell us where.
+            """
+            tempfp = tempfile.TemporaryFile( dir=tempdir.default().dir() )
             misc.copyfileobj( current_file, tempfp )
             assert not current_file.close()
             tempfp.seek( 0 )
