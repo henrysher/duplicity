@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-06-21 19:27+0000\n"
+"POT-Creation-Date: 2012-09-11 14:27+0000\n"
 "PO-Revision-Date: 2009-10-23 20:31+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Italian <it@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-06-22 04:48+0000\n"
-"X-Generator: Launchpad (build 15461)\n"
+"X-Launchpad-Export-Date: 2012-09-12 04:37+0000\n"
+"X-Generator: Launchpad (build 15930)\n"
 
 #: ../bin/duplicity:98
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -1177,12 +1177,12 @@ msgstr ""
 "È richiesto un solo volume.\n"
 "Rinomina di %s in %s"
 
-#: ../duplicity/patchdir.py:74 ../duplicity/patchdir.py:79
+#: ../duplicity/patchdir.py:75 ../duplicity/patchdir.py:80
 #, python-format
 msgid "Patching %s"
 msgstr "Applicazione patch a %s"
 
-#: ../duplicity/patchdir.py:568
+#: ../duplicity/patchdir.py:572
 #, python-format
 msgid "Writing %s of type %s"
 msgstr "Scrittura di %s di tipo %s"
@@ -1381,39 +1381,39 @@ msgstr ""
 msgid "Using temporary directory %s"
 msgstr "Utilizzo della directory temporanea %s"
 
-#: ../duplicity/tempdir.py:157
+#: ../duplicity/tempdir.py:163
 #, python-format
 msgid "Registering (mktemp) temporary file %s"
 msgstr "Registrazione (mktemp) del file temporaneo %s"
 
-#: ../duplicity/tempdir.py:179
+#: ../duplicity/tempdir.py:185
 #, python-format
 msgid "Registering (mkstemp) temporary file %s"
 msgstr "Registrazione (mkstemp) del file temporaneo %s"
 
-#: ../duplicity/tempdir.py:211
+#: ../duplicity/tempdir.py:217
 #, python-format
 msgid "Forgetting temporary file %s"
 msgstr "File temporaneo %s dimenticato"
 
-#: ../duplicity/tempdir.py:214
+#: ../duplicity/tempdir.py:220
 #, python-format
 msgid "Attempt to forget unknown tempfile %s - this is probably a bug."
 msgstr ""
 "Tentativo di dimenticare il file temporaneo sconosciuto %s - questo è "
 "probabilmente un bug."
 
-#: ../duplicity/tempdir.py:233
+#: ../duplicity/tempdir.py:239
 #, python-format
 msgid "Removing still remembered temporary file %s"
 msgstr "Rimozione del file temporaneo %s ancora ricordato"
 
-#: ../duplicity/tempdir.py:236
+#: ../duplicity/tempdir.py:242
 #, python-format
 msgid "Cleanup of temporary file %s failed"
 msgstr "Pulizia del file temporaneo %s non riuscita"
 
-#: ../duplicity/tempdir.py:241
+#: ../duplicity/tempdir.py:247
 #, python-format
 msgid "Cleanup of temporary directory %s failed - this is probably a bug."
 msgstr ""

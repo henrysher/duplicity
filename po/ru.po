@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-06-21 19:27+0000\n"
+"POT-Creation-Date: 2012-09-11 14:27+0000\n"
 "PO-Revision-Date: 2010-03-11 14:36+0000\n"
 "Last-Translator: Kenneth Loafman <kenneth@loafman.com>\n"
 "Language-Team: Russian <ru@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2012-06-22 04:48+0000\n"
-"X-Generator: Launchpad (build 15461)\n"
+"X-Launchpad-Export-Date: 2012-09-12 04:37+0000\n"
+"X-Generator: Launchpad (build 15930)\n"
 
 #: ../bin/duplicity:98
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -863,7 +863,7 @@ msgstr "полный_путь"
 #. tahoe://alias/some_dir
 #: ../duplicity/commandline.py:659
 msgid "alias"
-msgstr ""
+msgstr "псевдоним"
 
 #. TRANSL: Used in help to represent a "bucket name" for Amazon Web
 #. Services' Simple Storage Service (S3). Example:
@@ -1213,12 +1213,12 @@ msgstr ""
 "Требуется только один том.\n"
 "Переименовывается %s в %s"
 
-#: ../duplicity/patchdir.py:74 ../duplicity/patchdir.py:79
+#: ../duplicity/patchdir.py:75 ../duplicity/patchdir.py:80
 #, python-format
 msgid "Patching %s"
 msgstr "Внесение изменений в %s"
 
-#: ../duplicity/patchdir.py:568
+#: ../duplicity/patchdir.py:572
 #, python-format
 msgid "Writing %s of type %s"
 msgstr "Запись %s типа %s"
@@ -1416,39 +1416,39 @@ msgstr ""
 msgid "Using temporary directory %s"
 msgstr "Используется временный каталог %s"
 
-#: ../duplicity/tempdir.py:157
+#: ../duplicity/tempdir.py:163
 #, python-format
 msgid "Registering (mktemp) temporary file %s"
 msgstr "Регистрация (mktemp) временного файла %s"
 
-#: ../duplicity/tempdir.py:179
+#: ../duplicity/tempdir.py:185
 #, python-format
 msgid "Registering (mkstemp) temporary file %s"
 msgstr "Регистрация (mkstemp) временного файла %s"
 
-#: ../duplicity/tempdir.py:211
+#: ../duplicity/tempdir.py:217
 #, python-format
 msgid "Forgetting temporary file %s"
 msgstr "Удаление временного файла %s"
 
-#: ../duplicity/tempdir.py:214
+#: ../duplicity/tempdir.py:220
 #, python-format
 msgid "Attempt to forget unknown tempfile %s - this is probably a bug."
 msgstr ""
 "Попытка удалить неизвестный временный файл %s - похоже, что это ошибка в "
 "программе."
 
-#: ../duplicity/tempdir.py:233
+#: ../duplicity/tempdir.py:239
 #, python-format
 msgid "Removing still remembered temporary file %s"
 msgstr "Удаление всё ещё нужного временного файла %s"
 
-#: ../duplicity/tempdir.py:236
+#: ../duplicity/tempdir.py:242
 #, python-format
 msgid "Cleanup of temporary file %s failed"
 msgstr "Не удалось очистить временный файл %s"
 
-#: ../duplicity/tempdir.py:241
+#: ../duplicity/tempdir.py:247
 #, python-format
 msgid "Cleanup of temporary directory %s failed - this is probably a bug."
 msgstr ""

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-06-21 19:27+0000\n"
+"POT-Creation-Date: 2012-09-11 14:27+0000\n"
 "PO-Revision-Date: 2011-08-27 12:46+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Slovenian <sl@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || "
 "n%100==4 ? 3 : 0);\n"
-"X-Launchpad-Export-Date: 2012-06-22 04:48+0000\n"
-"X-Generator: Launchpad (build 15461)\n"
+"X-Launchpad-Export-Date: 2012-09-12 04:37+0000\n"
+"X-Generator: Launchpad (build 15930)\n"
 
 #: ../bin/duplicity:98
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -1231,12 +1231,12 @@ msgstr ""
 "Zahtevan je le en nosilec.\n"
 "Preimenovanje %s v %s."
 
-#: ../duplicity/patchdir.py:74 ../duplicity/patchdir.py:79
+#: ../duplicity/patchdir.py:75 ../duplicity/patchdir.py:80
 #, python-format
 msgid "Patching %s"
 msgstr "Popravljanje %s"
 
-#: ../duplicity/patchdir.py:568
+#: ../duplicity/patchdir.py:572
 #, python-format
 msgid "Writing %s of type %s"
 msgstr "Pisanje %s vrste %s"
@@ -1433,38 +1433,38 @@ msgstr ""
 msgid "Using temporary directory %s"
 msgstr "Uporabljanje začasne mape %s"
 
-#: ../duplicity/tempdir.py:157
+#: ../duplicity/tempdir.py:163
 #, python-format
 msgid "Registering (mktemp) temporary file %s"
 msgstr "Vpisovanje (mktemp) začasne datoteke %s"
 
-#: ../duplicity/tempdir.py:179
+#: ../duplicity/tempdir.py:185
 #, python-format
 msgid "Registering (mkstemp) temporary file %s"
 msgstr "Vpisovanje (mkstemp) začasne datoteke %s"
 
-#: ../duplicity/tempdir.py:211
+#: ../duplicity/tempdir.py:217
 #, python-format
 msgid "Forgetting temporary file %s"
 msgstr "Pozabljanje začasne datoteke %s"
 
-#: ../duplicity/tempdir.py:214
+#: ../duplicity/tempdir.py:220
 #, python-format
 msgid "Attempt to forget unknown tempfile %s - this is probably a bug."
 msgstr ""
 "Poskušanje pozabljanje neznane začasne datoteke %s - to je verjetno hrošč."
 
-#: ../duplicity/tempdir.py:233
+#: ../duplicity/tempdir.py:239
 #, python-format
 msgid "Removing still remembered temporary file %s"
 msgstr "Odstranjevanje še vedno zapomnjene začasne datoteke %s"
 
-#: ../duplicity/tempdir.py:236
+#: ../duplicity/tempdir.py:242
 #, python-format
 msgid "Cleanup of temporary file %s failed"
 msgstr "Čiščenje začasne datoteke %s je spodletelo"
 
-#: ../duplicity/tempdir.py:241
+#: ../duplicity/tempdir.py:247
 #, python-format
 msgid "Cleanup of temporary directory %s failed - this is probably a bug."
 msgstr "Čiščenje začasne mape %s je spodletelo - to je verjetno hrošč."
