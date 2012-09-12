@@ -1,3 +1,56 @@
+2012-09-11  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~ed.so/duplicity/duplicity.tmpspacefix
+
+2012-09-11  edso
+
+	use tempfile.TemporaryFile() so unused temp files are deleted automagically
+
+2012-09-10  edso
+
+	propbably solve bug 'Out of space error while restoring a file'
+	see bug tracker/mailing list
+	https://bugs.launchpad.net/duplicity/+bug/1005901 
+	http://lists.gnu.org/archive/html/duplicity-talk/2012-09/msg00000.html
+
+2012-09-11  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~ed.so/duplicity/duplicity.helpfix
+
+2012-09-10  edso
+
+	fix rare 'TypeError: encode() argument 1 must be string, not None'
+	read here
+	http://lists.nongnu.org/archive/html/duplicity-talk/2012-09/msg00016.html
+
+2012-06-21  Michael Terry  <michael.terry@canonical.com>
+
+	log.py: add a couple comments to reserve error codes 126 and 127 because they conflict with running duplicity under pkexec (very similar to how 255 is reserved because gksu uses it)
+
+2012-05-18  Kenneth Loafman  <kenneth@loafman.com>
+
+	Add note on GnuPGInterface and multiple GPG processes.
+
+2012-05-16  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~ed.so/duplicity/backend_fixes
+	
+	- fixed ssh/gio backend import warnings
+	+ ssh paramiko backend imports paramiko lazily now
+	+ gio backend is not imported automatically but on request when --gio option is used
+	- added a warning when --ssh-backend is used with an incorrect value
+
+2012-05-16  edso
+
+	- fixed ssh/gio backend import warnings 
+	+ ssh paramiko backend imports paramiko lazily now
+	+ gio backend is not imported automatically but on request when --gio option is used
+	- added a warning when --ssh-backend is used with an incorrect value
+
+2012-05-15  Kenneth Loafman  <kenneth@loafman.com>
+
+	Update changelogs, remove misleading date.
+
 2012-05-15  Kenneth Loafman  <kenneth@loafman.com>
 
 	Merged  in  lp:~ed.so/duplicity/ssh-fixes

@@ -1,4 +1,19 @@
-New in v0.6.19 (2012/05/??)
+New in v0.6.19 (2012/??/??)
+---------------------------
+Enhancements:
+- Merged in lp:~ed.so/duplicity/duplicity.helpfix
+  + fix rare 'TypeError: encode() argument 1 must be string, not None'
+  + http://lists.nongnu.org/archive/html/duplicity-talk/2012-09/msg00016.html
+- Merged in lp:~ed.so/duplicity/duplicity.tmpspacefix
+  + use tempfile.TemporaryFile() so unused temp files are deleted automagically
+  + propbably solve bug 'Out of space error while restoring a file'
+  + https://bugs.launchpad.net/duplicity/+bug/1005901
+  + http://lists.gnu.org/archive/html/duplicity-talk/2012-09/msg00000.html
+
+Bugs closed in this release:
+
+
+New in v0.6.19 (2012/05/22)
 ---------------------------
 Enhancements:
 - lots of work on the man page to clean up requirements, etc.
