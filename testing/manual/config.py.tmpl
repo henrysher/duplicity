@@ -25,7 +25,7 @@ newpath = os.path.abspath(os.path.join(testing, "../../."))
 sys.path.insert(0, newpath)
 
 import gettext
-gettext.install('duplicity')
+gettext.install('duplicity', codeset='utf8')
 
 from duplicity import globals
 from duplicity import log
