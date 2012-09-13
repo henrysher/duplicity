@@ -1,7 +1,6 @@
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
-# Copyright 2002 Ben Escoto <ben@emerose.org>
-# Copyright 2007 Kenneth Loafman <kenneth@loafman.com>
+# Copyright 2012 Canonical Ltd
 #
 # This file is part of duplicity.
 #
@@ -19,5 +18,22 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import gettext
-gettext.install('duplicity', codeset='utf8')
+import sys
+import unittest
+from mock import patch
+
+
+class UTF8Test(unittest.TestCase):
+
+    def setUp(self):
+        if 'duplicity' in sys.modules:
+            del(sys.modules["duplicity"])
+
+    @patch('gettext.install')
+    def test_module_install(self, inst_mock):
+        """Make sure we convert po files to utf8"""
+        import duplicity
+        inst_mock.assert_called_once_with('duplicity', codeset='utf8')
+
+if __name__ == "__main__":
+    unittest.main()

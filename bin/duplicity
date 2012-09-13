@@ -35,7 +35,7 @@ if os.path.exists(os.path.join(pwd, "../duplicity")):
     sys.path.insert(0, os.path.abspath(os.path.join(pwd, "../.")))
 
 import gettext
-gettext.install('duplicity')
+gettext.install('duplicity', codeset='utf8')
 
 from duplicity import log
 log.setup()
