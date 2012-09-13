@@ -9,6 +9,12 @@ Enhancements:
   + propbably solve bug 'Out of space error while restoring a file'
   + https://bugs.launchpad.net/duplicity/+bug/1005901
   + http://lists.gnu.org/archive/html/duplicity-talk/2012-09/msg00000.html
+- Merged in lp:~mterry/duplicity/utf8-po
+  + For some crazy reason, the gettext module defaults to giving you strings in
+    whatever charset the po file happened to define.  Which means you never know
+    what string of bytes you're going to get.  This module makes sure we always
+    get utf-8 byte strings.  So we're at least predictable and reduces one source
+    of UnicodeDecodeErrors (like in bug 989496)
 
 Bugs closed in this release:
 

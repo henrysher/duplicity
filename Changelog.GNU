@@ -1,3 +1,20 @@
+2012-09-13  Kenneth Loafman  <kenneth@loafman.com>
+
+	Merged in lp:~mterry/duplicity/utf8-po.
+
+2012-09-13  Michael Terry  <michael.terry@canonical.com>
+
+	make sure translations are in utf-8
+
+2012-09-12  Kenneth Loafman  <kenneth@loafman.com>
+
+	Fix dates.
+
+2012-09-12  Kenneth Loafman  <kenneth@loafman.com>
+
+	Update CHANGELOG and Changelog.GNU to reflect recent changes.
+	Update location path in mkGNUChangelog.sh.
+
 2012-09-11  Kenneth Loafman  <kenneth@loafman.com>
 
 	Merged in lp:~ed.so/duplicity/duplicity.tmpspacefix
