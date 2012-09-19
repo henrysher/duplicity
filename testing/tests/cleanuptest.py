@@ -27,15 +27,9 @@ from duplicity import path
 
 helper.setup()
 
-# This can be changed to select the URL to use
-backend_url = "file://testfiles/output"
-
 # Extra arguments to be passed to duplicity
 other_args = ["-v0", "--no-print-statistics"]
 #other_args = []
-
-# If this is set to true, after each backup, verify contents
-verify = 1
 
 class CmdError(Exception):
     """Indicates an error running an external command"""
@@ -47,6 +41,7 @@ class CleanupTest(unittest.TestCase):
     """
     def setUp(self):
         assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
+        self.deltmp()
 
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
@@ -55,6 +50,7 @@ class CleanupTest(unittest.TestCase):
         """
         Run duplicity binary with given arguments and options
         """
+        before_files = set(os.listdir("testfiles/output"))
         options.append("--archive-dir testfiles/cache")
         cmd_list = ["duplicity"]
         cmd_list.extend(options + ["--allow-source-mismatch"])
@@ -71,6 +67,8 @@ class CleanupTest(unittest.TestCase):
         return_val = os.system(cmdline)
         if return_val:
             raise CmdError(return_val)
+        after_files = set(os.listdir("testfiles/output"))
+        return after_files - before_files
 
     def backup(self, type, input_dir, options = [], current_time = None):
         """
@@ -79,87 +77,43 @@ class CleanupTest(unittest.TestCase):
         options = options[:]
         if type == "full":
             options.insert(0, 'full')
-        args = [input_dir, "'%s'" % backend_url]
-        self.run_duplicity(args, options, current_time)
+        args = [input_dir, "file://testfiles/output"]
+        new_files = self.run_duplicity(args, options, current_time)
         # If a chain ends with time X and the next full chain begins at time X,
         # we may trigger an assert in collections.py.  This way, we avoid
         # such problems
         time.sleep(1)
-
-    def restore(self, file_to_restore = None, time = None, options = [],
-                current_time = None):
-        options = options[:] # just nip any mutability problems in bud
-        assert not os.system("rm -rf testfiles/restore_out")
-        args = ["'%s'" % backend_url, "testfiles/restore_out"]
-        if file_to_restore:
-            options.extend(['--file-to-restore', file_to_restore])
-        if time:
-            options.extend(['--restore-time', str(time)])
-        self.run_duplicity(args, options, current_time)
+        return new_files
 
     def verify(self, dirname, file_to_verify = None, time = None, options = [],
                current_time = None):
         options = ["verify"] + options[:]
-        args = ["'%s'" % backend_url, dirname]
+        args = ["file://testfiles/output", dirname]
         if file_to_verify:
             options.extend(['--file-to-restore', file_to_verify])
         if time:
             options.extend(['--restore-time', str(time)])
-        self.run_duplicity(args, options, current_time)
+        return self.run_duplicity(args, options, current_time)
 
     def cleanup(self, options = []):
         """
         Run duplicity cleanup to default directory
         """
         options = ["cleanup"] + options[:]
-        args = ["'%s'" % backend_url]
-        self.run_duplicity(args, options)
+        args = ["file://testfiles/output"]
+        return self.run_duplicity(args, options)
 
     def deltmp(self):
         """
         Delete temporary directories
         """
-        assert not os.system("rm -rf testfiles/output "
-                             "testfiles/restore_out testfiles/cache")
+        assert not os.system("rm -rf testfiles/output testfiles/cache")
         assert not os.system("mkdir testfiles/output testfiles/cache")
-        backend = duplicity.backend.get_backend(backend_url)
+        backend = duplicity.backend.get_backend("file://testfiles/output")
         bl = backend.list()
         if bl:
             backend.delete(backend.list())
         backend.close()
-
-    def runtest(self, dirlist, backup_options = [], restore_options = []):
-        """
-        Run backup/restore test on directories in dirlist
-        """
-        assert len(dirlist) >= 1
-        self.deltmp()
-
-        # Back up directories to local backend
-        current_time = 100000
-        self.backup("full", dirlist[0], current_time = current_time,
-                    options = backup_options)
-        for new_dir in dirlist[1:]:
-            current_time += 100000
-            self.backup("inc", new_dir, current_time = current_time,
-                        options = backup_options)
-
-        # Restore each and compare them
-        for i in range(len(dirlist)):
-            dirname = dirlist[i]
-            current_time = 100000*(i + 1)
-            self.restore(time = current_time, options = restore_options)
-            self.check_same(dirname, "testfiles/restore_out")
-            if verify:
-                self.verify(dirname,
-                            time = current_time, options = restore_options)
-
-    def check_same(self, filename1, filename2):
-        """
-        Verify two filenames are the same
-        """
-        path1, path2 = path.Path(filename1), path.Path(filename2)
-        assert path1.compare_recursive(path2, verbose = 1)
 
     def test_cleanup_after_partial(self):
         """
@@ -167,20 +121,46 @@ class CleanupTest(unittest.TestCase):
         where duplicity deletes all the signatures during a cleanup
         after a failed backup.
         """
-        #TODO: find something better than /etc for source
-        self.deltmp()
-        self.backup("full", "/etc", options = ["--vol 1"])
-        self.backup("inc", "/etc", options = ["--vol 1"])
-        self.backup("inc", "/etc", options = ["--vol 1"])
+        good_files = self.backup("full", "/bin", options = ["--vol 1"])
+        good_files |= self.backup("inc", "/bin", options = ["--vol 1"])
+        good_files |= self.backup("inc", "/bin", options = ["--vol 1"])
         # we know we're going to fail these, they are forced
         try:
-            self.backup("full", "/etc", options = ["--vol 1", "--fail 1"])
+            self.backup("full", "/bin", options = ["--vol 1", "--fail 1"])
+            self.fail("Not supposed to reach this far")
         except CmdError:
-            pass
+            bad_files = set(os.listdir("testfiles/output"))
+            bad_files -= good_files
+            self.assertNotEqual(bad_files, set())
         # the cleanup should go OK
         self.cleanup(options = ["--force"])
-        self.backup("inc", "/etc", options = ["--vol 1"])
-        self.verify("/etc")
+        leftovers = set(os.listdir("testfiles/output"))
+        self.assertSetEqual(good_files, leftovers)
+        self.backup("inc", "/bin", options = ["--vol 1"])
+        self.verify("/bin")
+
+    def test_remove_all_but_n(self):
+        """
+        Test that remove-all-but-n works in the simple case.
+        """
+        full1_files = self.backup("full", "testfiles/empty_dir")
+        full2_files = self.backup("full", "testfiles/empty_dir")
+        self.run_duplicity(["file://testfiles/output"],
+                           ["remove-all-but-n", "1", "--force"])
+        leftovers = set(os.listdir("testfiles/output"))
+        self.assertSetEqual(full2_files, leftovers)
+
+    def test_remove_all_inc_of_but_n(self):
+        """
+        Test that remove-all-inc-of-but-n-full works in the simple case.
+        """
+        full1_files = self.backup("full", "testfiles/empty_dir")
+        inc1_files = self.backup("inc", "testfiles/empty_dir")
+        full2_files = self.backup("full", "testfiles/empty_dir")
+        self.run_duplicity(["file://testfiles/output"],
+                           ["remove-all-inc-of-but-n-full", "1", "--force"])
+        leftovers = set(os.listdir("testfiles/output"))
+        self.assertSetEqual(full1_files | full2_files, leftovers)
 
 
 if __name__ == "__main__":

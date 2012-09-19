@@ -326,13 +326,13 @@ class BackupChain:
         assert self.end_time
         return True
 
-    def delete(self):
+    def delete(self, keep_full=False):
         """
         Delete all sets in chain, in reverse order
         """
         for i in range(len(self.incset_list)-1, -1, -1):
             self.incset_list[i].delete()
-        if self.fullset:
+        if self.fullset and not keep_full:
             self.fullset.delete()
 
     def get_sets_at_time(self, time):
@@ -530,7 +530,7 @@ class SignatureChain:
             filename_to_fileobj = self.backend.get_fileobj_read
         return map(filename_to_fileobj, self.get_filenames(time))
 
-    def delete(self):
+    def delete(self, keep_full=False):
         """
         Remove all files in signature set
         """
@@ -538,12 +538,14 @@ class SignatureChain:
         if self.archive_dir:
             for i in range(len(self.inclist)-1, -1, -1):
                 self.archive_dir.append(self.inclist[i]).delete()
-            self.archive_dir.append(self.fullsig).delete()
+            if not keep_full:
+                self.archive_dir.append(self.fullsig).delete()
         else:
             assert self.backend
             inclist_copy = self.inclist[:]
             inclist_copy.reverse()
-            inclist_copy.append(self.fullsig)
+            if not keep_full:
+                inclist_copy.append(self.fullsig)
             self.backend.delete(inclist_copy)
 
     def get_filenames(self, time = None):
@@ -1009,8 +1011,6 @@ class CollectionsStatus:
             if self.matched_chain_pair:
                 matched_sig_chain = self.matched_chain_pair[0]
                 for sig_chain in self.all_sig_chains:
-                    print sig_chain.start_time, matched_sig_chain.start_time,
-                    print sig_chain.end_time, matched_sig_chain.end_time
                     if (sig_chain.start_time == matched_sig_chain.start_time and
                         sig_chain.end_time == matched_sig_chain.end_time):
                         old_sig_chains.remove(sig_chain)
@@ -1032,10 +1032,43 @@ class CollectionsStatus:
 
     def get_chains_older_than(self, t):
         """
-        Return a list of chains older than time t
+        Returns a list of backup chains older than the given time t
+
+        All of the times will be associated with an intact chain.
+        Furthermore, none of the times will be of a chain which a newer
+        set may depend on.  For instance, if set A is a full set older
+        than t, and set B is an incremental based on A which is newer
+        than t, then the time of set A will not be returned.
         """
         assert self.values_set
-        return filter(lambda c: c.end_time < t, self.all_backup_chains)
+        old_chains = []
+        for chain in self.all_backup_chains:
+            if chain.end_time < t and (
+                not self.matched_chain_pair or
+                chain is not self.matched_chain_pair[1]):
+                # don't delete the active (matched) chain
+                old_chains.append(chain)
+        return old_chains
+
+    def get_signature_chains_older_than(self, t):
+        """
+        Returns a list of signature chains older than the given time t
+
+        All of the times will be associated with an intact chain.
+        Furthermore, none of the times will be of a chain which a newer
+        set may depend on.  For instance, if set A is a full set older
+        than t, and set B is an incremental based on A which is newer
+        than t, then the time of set A will not be returned.
+        """
+        assert self.values_set
+        old_chains = []
+        for chain in self.all_sig_chains:
+            if chain.end_time < t and (
+                not self.matched_chain_pair or
+                chain is not self.matched_chain_pair[0]):
+                # don't delete the active (matched) chain
+                old_chains.append(chain)
+        return old_chains
 
     def get_last_full_backup_time(self):
         """
@@ -1098,10 +1131,7 @@ class CollectionsStatus:
         """
         old_sets = []
         for chain in self.get_chains_older_than(t):
-            if (not self.matched_chain_pair or
-                chain is not self.matched_chain_pair[1]):
-                # don't delete the active (matched) chain
-                old_sets.extend(chain.get_all_sets())
+            old_sets.extend(chain.get_all_sets())
         return self.sort_sets(old_sets)
 
     def get_older_than_required(self, t):
