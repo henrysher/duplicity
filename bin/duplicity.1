@@ -1,4 +1,9 @@
 .TH DUPLICITY 1 "$reldate" "Version $version" "User Manuals" \"  -*- nroff -*-
+.\" disable justification (adjust text to left margin only)
+.\" command line examples stay readable through that
+.ad l
+.\" disable hyphenation
+.nh
 
 .SH NAME
 duplicity \- Encrypted incremental backup to local or remote storage.
@@ -10,64 +15,43 @@ interpreter version 2.4+ installed.
 It is best used under GNU/Linux.
 
 Some backends also require additional components (probably available as packages for your specific platform):
-.IP * 2
-.B "boto backend"
-(S3 Amazon Web Services)
-.RS
-.IP - 2
+.TP
+.BR "boto backend" "(S3 Amazon Web Services)"
 .B boto
 - http://github.com/boto/boto
-.RE
-.IP * 2
+.TP
 .B "ftp backend"
-.RS
-.IP - 2
 .B NcFTP Client
 - http://www.ncftp.com/
-.RE
-.IP * 2
+.TP
 .B "ftps backend"
-.RS
-.IP - 2
 .B LFTP Client
 - http://lftp.yar.ru/
-.RE
-.IP * 2
-.B "gio backend"
-(Gnome VFS API)
-.RS
-.IP - 2
+.TP
+.BR "gio backend" " (Gnome VFS API)"
 .B PyGObject
 - http://live.gnome.org/PyGObject
-.IP - 2
+.br
 .B D-Bus
 (dbus)- http://www.freedesktop.org/wiki/Software/dbus
-.RE
-.IP * 2
-.B "ssh backends"
-(scp/sftp/ssh see 
-.B --ssh-backend
-)
-.RS
-.IP * 2
-.B ssh paramiko backend
-(default)
-.RS
-.IP - 2
-.B paramiko 
-SSH2 for python - http://www.lag.net/paramiko/
-.IP - 2
-.B pycrypto 
-Python Cryptography Toolkit - http://www.dlitz.net/software/pycrypto/
-.RE
-.IP * 2
+.PP
+There are two 
+.B ssh backends
+for scp/sftp/ssh access (also see 
+.BR --ssh-backend ).
+.TP
+.BR "ssh paramiko backend" " (enabled by default)"
+.B paramiko
+(SSH2 for python) 
+- http://www.lag.net/paramiko/
+.br
+.B pycrypto
+(Python Cryptography Toolkit) 
+- http://www.dlitz.net/software/pycrypto/
+.TP
 .B ssh pexpect backend
-.RS
-.IP - 2
 .B sftp/scp client binaries
 OpenSSH - http://www.openssh.com/
-.RE
-.RE
 
 .SH SYNOPSIS
 .B duplicity [full|incremental]
@@ -198,24 +182,25 @@ password:
 FTP_PASSWORD=mypassword duplicity /local/dir ftp://user@other.host/some_dir
 
 .SH ACTIONS
-Duplicity knows actions, which can be finetuned with options.
+Duplicity knows action commands, which can be finetuned with options.
 The actions for backup (full,incr) and restoration (restore) can as well be
 left out as duplicity detects in what mode it should switch to by the order
 of target URL and local folder. If the target URL comes before the local folder
 a restore is in order, is the local folder before target URL then this folder
 is about to be backed up to the target URL.
+.br
+If a backup is in order and old signatures can be found duplicity automatically
+performs an incremental backup.
 
 .TP
 .B full
-Perform a full backup. If this is set, a new backup chain is started even if
+Perform a full backup. A new backup chain is started even if
 signatures are available for an incremental backup.
 
 .TP
 .BR incr
 If this is requested an incremental backup will be performed.
-Duplicity will abort if old signatures cannot be
-found. The default is to switch to full backup under these
-conditions.
+Duplicity will abort if no old signatures can be found.
 
 .TP
 .B collection-status
@@ -756,18 +741,14 @@ differs slightly hence the options should therefore be given in the long option 
 like in this example:
 .RS
 .PP
-.ad l
 duplicity --ssh-options="-oProtocol=2 -oIdentityFile=/my/backup/id" /home/me scp://uid@other.host/some_dir
 .TP
 .B NOTE:
 .I ssh paramiko backend
 currently supports only the
-.nh
 .B -oIdentityFile
-.hy
 setting.
 .RE
-.ad n
 
 .TP
 .BI "--tempdir " directory
@@ -1300,18 +1281,14 @@ of those please inform yourself about the requirements for a server to support
 scp or sftp.
 To make it even more confusing the user can choose between two ssh backends 
 see
-.nh 
 .B --ssh\-backend
-.hy
 for details.
 .PP
 .BR "SSH paramiko backend " "(selected by default)"
 is complete reimplementation of ssh protocols natively in python. Advantages 
 are speed and maintainability. Minor disadvantage is that extra packages are 
 needed see
-.nh
 .B REQUIREMENTS
-.hy
 above. In
 .I sftp
 (default) mode all operations are done via the according sftp commands. In
