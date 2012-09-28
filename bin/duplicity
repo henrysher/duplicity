@@ -472,7 +472,8 @@ def get_sig_fileobj(sig_type):
     fh = dup_temp.get_fileobj_duppath(globals.archive_dir,
                                       part_sig_filename,
                                       perm_sig_filename,
-                                      remote_sig_filename)
+                                      remote_sig_filename,
+                                      overwrite=True)
     return fh
 
 
