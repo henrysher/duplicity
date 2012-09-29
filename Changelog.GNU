@@ -1,5 +1,22 @@
 2012-09-29  Kenneth Loafman  <kenneth@loafman.com>
 
+	- Merged in lp:~ed.so/duplicity/duplicity.manpage
+	+ disabled hyphenation and block justification for better readablility of command line examples.
+	+ reformatted REQUIREMENTS section for hopefully better online rendering
+	+ minor clarifications
+
+2012-09-21  ede
+
+	missing space
+
+2012-09-21  ede
+
+	- disabled hyphenation and block justification for better readablility of command line examples.
+	- reformatted REQUIREMENTS section for hopefully better online rendering
+	- minor clarifications
+
+2012-09-29  Kenneth Loafman  <kenneth@loafman.com>
+
 	- Merged in lp:~mterry/duplicity/leftover-sigtar
 	+ So currently, duplicity does not delete signature files when doing a remove-all-but-n operation. Seems wrong, since those signature files are now useless and take up space.
 	+ This branch does several things:

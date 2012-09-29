@@ -13,25 +13,37 @@ Enhancements:
   + For some crazy reason, the gettext module defaults to giving you strings in
     whatever charset the po file happened to define.  Which means you never know
     what string of bytes you're going to get.  This module makes sure we always
-    get utf-8 byte strings.  So we're at least predictable and reduces one source
-    of UnicodeDecodeErrors (like in bug 989496)
+    get utf-8 byte strings.  So we're at least predictable and reduces one
+    source of UnicodeDecodeErrors (like in bug 989496)
 - Merged in lp:~mterry/duplicity/1031277
   + ssh: actually delete all the requested files, not just the first one
 - Merged in lp:~mterry/duplicity/leftover-sigtar
-  + So currently, duplicity does not delete signature files when doing a remove-all-but-n operation. Seems wrong, since those signature files are now useless and take up space.
+  + So currently, duplicity does not delete signature files when doing a
+    remove-all-but-n operation. Seems wrong, since those signature files are now
+    useless and take up space.
   + This branch does several things:
-    1) Make remove-all-but-n operate on chains. In practice it did before, since the sets it operated on always came from complete chains (i.e. it never used only some of the sets from a chain)
+    1) Make remove-all-but-n operate on chains. In practice it did before, since
+       the sets it operated on always came from complete chains (i.e. it never
+       used only some of the sets from a chain)
     2) Add a new method to get all signature chains before a certain time.
-    3) Use this new method to also delete signature chains during remove-all-but operations.
+    3) Use this new method to also delete signature chains during remove-all-but
+       operations.
   + And it cleans up the cleanuptest.py file:
     1) Removes crufty, unused code
-    2) Disallows changing the destination folder for the test, which no one would ever want to do and isn't really supported anyway
+    2) Disallows changing the destination folder for the test, which no one
+       would ever want to do and isn't really supported anyway
     3) Add some additional checks to the existing test
-    4) Adds two new methods to test remove-all-but-n and remove-all-inc-of-but-n-full
+    4) Adds two new methods to test remove-all-but-n and
+       remove-all-inc-of-but-n-full
 - Merged in lp:~ed.so/duplicity/duplicity.manpage
-  + disabled hyphenation and block justification for better readablility of command line examples.
+  + disabled hyphenation and block justification for better readablility of
+    command line examples.
   + reformatted REQUIREMENTS section for hopefully better online rendering
   + minor clarifications
+- Merged in lp:~gregretkowski/duplicity/cf-retry-delete
+  + This will retry cloudfile delete commands. With large numbers of archive
+    files over mediocre links transient network errors will occasionally cause
+    deletes to fail and these should be retried.
 
 Bugs closed in this release:
 

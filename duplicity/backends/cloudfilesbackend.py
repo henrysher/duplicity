@@ -142,9 +142,33 @@ class CloudFilesBackend(duplicity.backend.Backend):
         raise BackendException("Error listing '%s'"
                                % (self.container))
 
+    def delete_one(self, remote_filename):
+        for n in range(1, globals.num_retries+1):
+            log.Info("Deleting '%s/%s'" % (self.container, remote_filename))
+            try:
+                self.container.delete_object(remote_filename)
+                return
+            except self.resp_exc, resperr:
+                if n > 1 and resperr.status == 404:
+                    # We failed on a timeout, but delete succeeded on the server
+                    log.Warn("Delete of '%s' missing after retry - must have succeded earler" % remote_filename )
+                    return
+                log.Warn("Delete of '%s' failed (attempt %s): CloudFiles returned: %s %s"
+                         % (remote_filename, n, resperr.status, resperr.reason))
+            except Exception, e:
+                log.Warn("Delete of '%s' failed (attempt %s): %s: %s"
+                         % (remote_filename, n, e.__class__.__name__, str(e)))
+                log.Debug("Backtrace of previous error: %s"
+                          % exception_traceback())
+            time.sleep(30)
+        log.Warn("Giving up deleting '%s' after %s attempts"
+                 % (remote_filename, globals.num_retries))
+        raise BackendException("Error deleting '%s/%s'"
+                               % (self.container, remote_filename))
+
     def delete(self, filename_list):
         for file in filename_list:
-            self.container.delete_object(file)
+            self.delete_one(file)
             log.Debug("Deleted '%s/%s'" % (self.container, file))
 
     @retry
