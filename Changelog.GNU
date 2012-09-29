@@ -1,5 +1,9 @@
 2012-09-13  Kenneth Loafman  <kenneth@loafman.com>
 
+	Update Changelog.GNU and CHANGELOG.
+
+2012-09-13  Kenneth Loafman  <kenneth@loafman.com>
+
 	Merged in lp:~mterry/duplicity/utf8-po.
 
 2012-09-13  Michael Terry  <michael.terry@canonical.com>

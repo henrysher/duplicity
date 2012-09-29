@@ -360,16 +360,16 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                 for fn in filename_list:
                     if (globals.use_scp):
                         self.runremote("rm '%s/%s'" % (self.remote_dir,fn),False,"scp rm ")
-                        return
                     else:
                         try:
                             self.sftp.remove(fn)
-                            return
                         except Exception, e:
                             raise BackendException("sftp rm %s failed: %s" % (fn,e))
             except Exception, e:
-                log.Warn("%s (Try %d of %d) Will retry in %d seconds." % (e,n,globals.num_retries,self.retry_delay))
-        raise BackendException("Giving up trying to delete '%s' after %d attempts" % (", ".join(filename_list),n))
+                if n == globals.num_retries:
+                    log.FatalError(str(e), log.ErrorCode.backend_error)
+                else:
+                    log.Warn("%s (Try %d of %d) Will retry in %d seconds." % (e,n,globals.num_retries,self.retry_delay))
 
     def runremote(self,cmd,ignoreexitcode=False,errorprefix=""):
         """small convenience function that opens a shell channel, runs remote command and returns

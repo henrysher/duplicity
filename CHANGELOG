@@ -15,6 +15,8 @@ Enhancements:
     what string of bytes you're going to get.  This module makes sure we always
     get utf-8 byte strings.  So we're at least predictable and reduces one source
     of UnicodeDecodeErrors (like in bug 989496)
+- Merged in lp:~mterry/duplicity/1031277
+  + ssh: actually delete all the requested files, not just the first one
 
 Bugs closed in this release:
 
