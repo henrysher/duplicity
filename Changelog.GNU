@@ -1,3 +1,30 @@
+2012-09-29  Kenneth Loafman  <kenneth@loafman.com>
+
+	- Merged in lp:~mterry/duplicity/leftover-sigtar
+	+ So currently, duplicity does not delete signature files when doing a remove-all-but-n operation. Seems wrong, since those signature files are now useless and take up space.
+	+ This branch does several things:
+	1) Make remove-all-but-n operate on chains. In practice it did before, since the sets it operated on always came from complete chains (i.e. it never used only some of the sets from a chain)
+	2) Add a new method to get all signature chains before a certain time.
+	3) Use this new method to also delete signature chains during remove-all-but operations.
+	+ And it cleans up the cleanuptest.py file:
+	1) Removes crufty, unused code
+	2) Disallows changing the destination folder for the test, which no one would ever want to do and isn't really supported anyway
+	3) Add some additional checks to the existing test
+	4) Adds two new methods to test remove-all-but-n and remove-all-inc-of-but-n-full
+
+2012-09-19  Michael Terry  <michael.terry@canonical.com>
+
+	delete signature files when doing remove-all-but
+
+2012-09-29  Kenneth Loafman  <kenneth@loafman.com>
+
+	- Merged in lp:~mterry/duplicity/1031277
+	+ ssh: actually delete all the requested files, not just the first one
+
+2012-09-19  Michael Terry  <michael.terry@canonical.com>
+
+	ssh: actually delete all the requested files, not just the first one
+
 2012-09-13  Kenneth Loafman  <kenneth@loafman.com>
 
 	Update Changelog.GNU and CHANGELOG.

@@ -28,6 +28,10 @@ Enhancements:
     2) Disallows changing the destination folder for the test, which no one would ever want to do and isn't really supported anyway
     3) Add some additional checks to the existing test
     4) Adds two new methods to test remove-all-but-n and remove-all-inc-of-but-n-full
+- Merged in lp:~ed.so/duplicity/duplicity.manpage
+  + disabled hyphenation and block justification for better readablility of command line examples.
+  + reformatted REQUIREMENTS section for hopefully better online rendering
+  + minor clarifications
 
 Bugs closed in this release:
 
