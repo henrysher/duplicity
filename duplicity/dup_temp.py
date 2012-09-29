@@ -60,7 +60,7 @@ class TempPath(path.Path):
         return fh
 
 
-def get_fileobj_duppath(dirpath, partname, permname, remname):
+def get_fileobj_duppath(dirpath, partname, permname, remname, overwrite=False):
     """
     Return a file object open for writing, will write to filename
 
@@ -76,7 +76,10 @@ def get_fileobj_duppath(dirpath, partname, permname, remname):
                            partname = partname, permname = permname, remname = remname)
     else:
         dp = path.DupPath(dirpath.name, index = (partname,))
-        fh = FileobjHooked(dp.filtered_open("ab"), tdp = None, dirpath = dirpath,
+        mode = "ab"
+        if overwrite:
+            mode = "wb"
+        fh = FileobjHooked(dp.filtered_open(mode), tdp = None, dirpath = dirpath,
                            partname = partname, permname = permname, remname = remname)
 
     def rename_and_forget():

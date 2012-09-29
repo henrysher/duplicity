@@ -44,6 +44,20 @@ Enhancements:
   + This will retry cloudfile delete commands. With large numbers of archive
     files over mediocre links transient network errors will occasionally cause
     deletes to fail and these should be retried.
+- Merged in lp:~mterry/duplicity/ropath.index
+  + This branch does two main things:
+    1) Skips base dir entries when compiling the list of deleted delta iters.
+       (this gracefully recovers from the sort of situations that lead to bug
+       929067). I'm reasonably confident this is an uninvasive change, but
+       please confirm.
+    2) Overwrites the sigtar file on backup-restart. This is because AFAICT,
+       duplicity will rewrite the entire sigtar each restart. But we were
+       opening the sigtar file as "ab", so we'd just dump the contents on top
+       of the previous contents. Which was causing some confusion in bug 929067.
+       If I'm wrong that we don't always rewrite the entire sigtar each time,
+       this needs some rethink. Please also confirm that.
+  + In addition, I added two tests for the above two changes and make some
+    improvements elsewhere in the restarttest.py file while I was at it.
 
 Bugs closed in this release:
 

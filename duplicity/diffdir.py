@@ -189,8 +189,10 @@ def get_delta_iter(new_iter, sig_iter, sig_fileobj=None):
         log.Debug(_("Comparing %s and %s") % (new_path and new_path.index,
                                               sig_path and sig_path.index))
         if not new_path or not new_path.type:
-            # file doesn't exist
-            if sig_path and sig_path.exists():
+            # File doesn't exist (but ignore attempts to delete base dir;
+            # old versions of duplicity could have written out the sigtar in
+            # such a way as to fool us; LP: #929067)
+            if sig_path and sig_path.exists() and sig_path.index != ():
                 # but signature says it did
                 log.Info(_("D %s") %
                          (sig_path.get_relative_path(),),
