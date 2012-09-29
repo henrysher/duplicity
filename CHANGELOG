@@ -67,17 +67,21 @@ New in v0.6.19 (2012/05/22)
 Enhancements:
 - lots of work on the man page to clean up requirements, etc.
 - use empty listbody for enhanced webdav compatibility
-- initial folder creation on backend does not result in a ResponseNotReady anymore
-- add ssh_config support (/etc/ssh/ssh_config + ~/.ssh/config) to paramiko sshbackend
+- initial folder creation on backend does not result in a ResponseNotReady
+  anymore
+- add ssh_config support (/etc/ssh/ssh_config + ~/.ssh/config) to paramiko
+  sshbackend
 - add missing_host_key prompt to new sshbackend similar to ssh procedure
 - added --ssh-backend parameter to switch between paramiko,pexpect
 - allow answering gio mount questions (albeit naively)
-- if the gio backend wants to ask a question during its mount phase, it previously just aborted.
+- if the gio backend wants to ask a question during its mount phase, it
+  previously just aborted.
 - a couple more warning error codes that Deja Dup is interested in noticing.
 - ssh paramiko backend respects --num-retries now
 - set retry delay for ssh backends to 10s
 - ssh pexpect backend
- + sftp part does not claim 'Invalid SSH password' although it's only 'Permission denied' now
+ + sftp part does not claim 'Invalid SSH password' although it's only
+   'Permission denied' now
  + sftp errors are now more talkative
 - gpg.py
  + commented assert which broke otherwise working verify run
@@ -99,16 +103,25 @@ Enhancements:
 - fix extraneous '.py' in botobackend.py include
 - tests: add delay between backups to avoid assertion error
 - tests: use backup source that is more likely to be larger than 1M compressed
-- tests: make other-filesystem check more robust against certain directories being mounts or not
-- resuming an incremental results in a 'Restarting backup, but current encryption settings do not match original settings' error because curtime is incorrectly set away from previous incremental value
+- tests: make other-filesystem check more robust against certain directories
+  being mounts or not
+- resuming an incremental results in a 'Restarting backup, but current
+  encryption settings do not match original settings' error because curtime is
+  incorrectly set away from previous incremental value
 - added option to not compress the backup, when no encryption is selected
 - always delay a little bit when a backend gives us errors
-- Don't cache TarInfo files. Tests still pass, so I don't believe we need the members cache (and in the old tarfile.py, we didn't cache either).
-- Adding --file-prefix option so different sets of backups can be stored in the same bucket.  See blueprint at https://blueprints.launchpad.net/duplicity/+spec/file-prefix-option
+- Don't cache TarInfo files. Tests still pass, so I don't believe we need the
+  members cache (and in the old tarfile.py, we didn't cache either).
+- Adding --file-prefix option so different sets of backups can be stored in the
+  same bucket.  See blueprint at
+  https://blueprints.launchpad.net/duplicity/+spec/file-prefix-option
 - two changes that help the test suite pass
-- raise log level on backend import failure so it will be visible under default conditions
-- file /etc/motd may not exist in test environment.  Use __file__ instead to point to a known plaintext source file.
-- some code/import changes to make the ssh and boto backends compatible with Python 2.4.
+- raise log level on backend import failure so it will be visible under default
+  conditions
+- file /etc/motd may not exist in test environment.  Use __file__ instead to
+  point to a known plaintext source file.
+- some code/import changes to make the ssh and boto backends compatible with
+  Python 2.4.
 - some changes to make roottest.py compatible with the new dir structure.
 
 Bugs closed in this release:
@@ -116,7 +129,8 @@ Bugs closed in this release:
 908228     possible memory leak
 909031     SSH-Backend: Creating dirs separately causes a permissons-problems
 916689     multipart upload fails on python 2.7.2
-929465     UnsupportedBackendScheme: scheme not supported in url: scp://u123@u123.example.com/foo/
+929465     UnsupportedBackendScheme: scheme not supported in url:
+           scp://u123@u123.example.com/foo/
 930727     ftpsbackend should respect num_retries for ftp commands
 931175     duplicity crashes when PYTHONOPTIMIZE is set
 
@@ -231,7 +245,7 @@ Enhancements:
 Bugs closed in this release:
 433591     AttributeError: FileobjHooked instance has no attribute 'name'
 487720     Restore fails with "Invalid data - SHA1 hash mismatch"
-507904     Cygwin: Full Backup fails with "IOError: [Errno 13] Permission denied"
+507904     Cygwin: Backup fails with "IOError: [Errno 13] Permission denied"
 512628     --exclude-filelist-stdin and gpg error with/without PASSPHRASE
 680425     Endless retype passphrase when typo
 705499     "include-filelist-stdin" not implemented on version 0.6.11
@@ -241,7 +255,7 @@ Bugs closed in this release:
 777377     collection-status asking for passphrase
 778215     ncftpls file delete fails in ftpbackend.py
 782294     create tomporary files with sftp
-782321     duplicity sftp backend should ignore removing a file which is not there
+782321     duplicity sftp backend should ignore removing a file not there
 792704     Webdav(s) url scheme lacks port support
 782294     create tomporary files with sftp
 782337     sftp backend cannot create new subdirs on new backup
@@ -363,7 +377,7 @@ New in v0.6.08 (2010/03/07)
 ---------------------------
 Bugs closed in this release:
 519110     Need accurate man page info on use of scp/sftp usage.
-532051     rdiffdir attempts to reference undefined variables with some command arguments
+532051     rdiffdir attempts to reference undefined vars with some command args
 529869     TypeError: unsupported operand type(s) for -: 'NoneType' and 'int'
 530910     TypeError: unsupported operand type(s) for +: 'NoneType' and 'str'
 
@@ -920,7 +934,8 @@ https://savannah.nongnu.org/patch/?6702
 GPG was throwing "gpg: [don't know]: invalid packet (ctb=14)" and apparently
 this is non-fatal.  There is a fix for this being rolled into GPG 2.x.
 http://lists.gnupg.org/pipermail/gnupg-devel/2006-September/023180.html
-Copied from collections.py.  Fix supplied by Simon Blandford <simon@onepointltd.com>
+Copied from collections.py.  Fix supplied by
+Simon Blandford <simon@onepointltd.com>
 
 
 New in v0.5.03 (2008/11/17)
