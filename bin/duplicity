@@ -833,6 +833,10 @@ def remove_old(col_stats):
         """Return string listing times of sets in setlist"""
         return "\n".join(map(lambda s: dup_time.timetopretty(s.get_time()),
                              setlist))
+    def chain_times_str(chainlist):
+        """Return string listing times of chains in chainlist"""
+        return "\n".join(map(lambda s: dup_time.timetopretty(s.end_time),
+                             chainlist))
 
     req_list = col_stats.get_older_than_required(globals.remove_time)
     if req_list:
@@ -847,32 +851,39 @@ def remove_old(col_stats):
                    "However, it will not be deleted.  To remove all your backups, "
                    "manually purge the repository."))
 
-    setlist = col_stats.get_older_than(globals.remove_time)
-    if not setlist:
+    chainlist = col_stats.get_chains_older_than(globals.remove_time)
+    if not chainlist:
         log.Notice(_("No old backup sets found, nothing deleted."))
         return
     if globals.force:
-        log.Notice(gettext.ngettext("Deleting backup set at time:",
-                                    "Deleting backup sets at times:",
-                                    len(setlist)) +
-                   "\n" + set_times_str(setlist))
-        setlist.reverse() # save oldest for last
-        for set in setlist:
+        log.Notice(gettext.ngettext("Deleting backup chain at time:",
+                                    "Deleting backup chains at times:",
+                                    len(chainlist)) +
+                   "\n" + chain_times_str(chainlist))
+        # Add signature files too, since they won't be needed anymore
+        chainlist += col_stats.get_signature_chains_older_than(globals.remove_time)
+        chainlist.reverse() # save oldest for last
+        for chain in chainlist:
             # if remove_all_inc_of_but_n_full_mode mode, remove only incrementals one and not full
-            if globals.dry_run:
-                log.Notice("(Not: dry-run) Deleting set " + set.type + " " + dup_time.timetopretty(set.get_time()))
+            if globals.remove_all_inc_of_but_n_full_mode:
+                if isinstance(chain, collections.SignatureChain):
+                    chain_desc = _("Deleting incremental signature chain %s")
+                else:
+                    chain_desc = _("Deleting incremental backup chain %s")
             else:
-                if globals.remove_all_inc_of_but_n_full_mode and (set.type != "inc") :
-                    log.Notice("Not deleting set " + set.type + " " + dup_time.timetopretty(set.get_time()))
-                else :
-                    log.Notice("Deleting set " + set.type + " " + dup_time.timetopretty(set.get_time()))
-                    set.delete()
+                if isinstance(chain, collections.SignatureChain):
+                    chain_desc = _("Deleting complete signature chain %s")
+                else:
+                    chain_desc = _("Deleting complete backup chain %s")
+            log.Notice(chain_desc % dup_time.timetopretty(chain.end_time))
+            if not globals.dry_run:
+                chain.delete(keep_full=globals.remove_all_inc_of_but_n_full_mode)
         col_stats.set_values(sig_chain_warning=None)
     else:
-        log.Notice(gettext.ngettext("Found old backup set at the following time:",
-                                    "Found old backup sets at the following times:",
-                                    len(setlist)) +
-                   "\n" + set_times_str(setlist) + "\n" +
+        log.Notice(gettext.ngettext("Found old backup chain at the following time:",
+                                    "Found old backup chains at the following times:",
+                                    len(chainlist)) +
+                   "\n" + chain_times_str(chainlist) + "\n" +
                    _("Rerun command with --force option to actually delete."))
 
 
