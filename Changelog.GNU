@@ -1,5 +1,41 @@
 2012-09-29  Kenneth Loafman  <kenneth@loafman.com>
 
+	- Merged in lp:~mterry/duplicity/ropath.index
+	+ This branch does two main things:
+	1) Skips base dir entries when compiling the list of deleted delta iters.
+	(this gracefully recovers from the sort of situations that lead to bug
+	929067). I'm reasonably confident this is an uninvasive change, but
+	please confirm.
+	2) Overwrites the sigtar file on backup-restart. This is because AFAICT,
+	duplicity will rewrite the entire sigtar each restart. But we were
+	opening the sigtar file as "ab", so we'd just dump the contents on top
+	of the previous contents. Which was causing some confusion in bug 929067.
+	If I'm wrong that we don't always rewrite the entire sigtar each time,
+	this needs some rethink. Please also confirm that.
+	+ In addition, I added two tests for the above two changes and make some
+	improvements elsewhere in the restarttest.py file while I was at it.
+
+2012-09-28  Michael Terry  <michael.terry@canonical.com>
+
+	gracefully handle multiple duplicate base dir entries in the sigtar; avoid writing such entries out
+
+2012-09-29  Kenneth Loafman  <kenneth@loafman.com>
+
+	- Merged in lp:~gregretkowski/duplicity/cf-retry-delete
+	+ This will retry cloudfile delete commands. With large numbers of archive
+	files over mediocre links transient network errors will occasionally cause
+	deletes to fail and these should be retried.
+
+2012-09-27  Greg Retkowski  <greg@thud.pao.int.nebula.com>
+
+	Retry cloudfiles deletes
+	
+	This will retry cloudfile delete commands with large numbers of
+	archive files over mediocre links deletes occasionally fail
+	and should be retried.
+
+2012-09-29  Kenneth Loafman  <kenneth@loafman.com>
+
 	- Merged in lp:~ed.so/duplicity/duplicity.manpage
 	+ disabled hyphenation and block justification for better readablility of command line examples.
 	+ reformatted REQUIREMENTS section for hopefully better online rendering
