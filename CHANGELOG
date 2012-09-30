@@ -58,6 +58,9 @@ Enhancements:
        this needs some rethink. Please also confirm that.
   + In addition, I added two tests for the above two changes and make some
     improvements elsewhere in the restarttest.py file while I was at it.
+- Merged in lp:~ed.so/duplicity/ssh-pexpect-msgbug
+  + Fixes 'UnboundLocalError: local variable 'msg' referenced before assignment'
+    in _ssh_pexpect.py
 
 Bugs closed in this release:
 

@@ -173,6 +173,7 @@ class SSHPExpectBackend(duplicity.backend.Backend):
             cmdloc = 0
             passprompt = 0
             while 1:
+                msg = ""
                 match = child.expect(responses,
                                      searchwindowsize=maxread+max_response_len)
                 log.Debug("State = sftp, Before = '%s'" % (child.before.strip()))
