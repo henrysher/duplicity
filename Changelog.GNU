@@ -1,3 +1,25 @@
+2012-09-30  Kenneth Loafman  <kenneth@loafman.com>
+
+	- Merged in lp:~ed.so/duplicity/ssh-pexpect-msgbug
+	+ Fixes 'UnboundLocalError: local variable 'msg' referenced before assignment'
+	in _ssh_pexpect.py
+
+2012-09-30  ede
+
+	probably fix
+	
+	File "/usr/local/lib/python2.7/dist-packages/duplicity/backends/_ssh_pexpect.py", line 223, in run_sftp_command
+	log.Warn("Running '%s' with commands:\n %s\n failed (attempt #%d): %s" % (commandline, "\n ".join(commands), n, msg))
+	UnboundLocalError: local variable 'msg' referenced before assignment
+
+2012-09-29  Kenneth Loafman  <kenneth@loafman.com>
+
+	Wrap CHANGELOG to col 80.
+
+2012-09-29  Kenneth Loafman  <kenneth@loafman.com>
+
+	Update Changelog.GNU
+
 2012-09-29  Kenneth Loafman  <kenneth@loafman.com>
 
 	- Merged in lp:~mterry/duplicity/ropath.index
