@@ -135,7 +135,7 @@ class CleanupTest(unittest.TestCase):
         # the cleanup should go OK
         self.cleanup(options = ["--force"])
         leftovers = set(os.listdir("testfiles/output"))
-        self.assertSetEqual(good_files, leftovers)
+        self.assertEqual(good_files, leftovers)
         self.backup("inc", "/bin", options = ["--vol 1"])
         self.verify("/bin")
 
@@ -148,7 +148,7 @@ class CleanupTest(unittest.TestCase):
         self.run_duplicity(["file://testfiles/output"],
                            ["remove-all-but-n", "1", "--force"])
         leftovers = set(os.listdir("testfiles/output"))
-        self.assertSetEqual(full2_files, leftovers)
+        self.assertEqual(full2_files, leftovers)
 
     def test_remove_all_inc_of_but_n(self):
         """
@@ -160,7 +160,7 @@ class CleanupTest(unittest.TestCase):
         self.run_duplicity(["file://testfiles/output"],
                            ["remove-all-inc-of-but-n-full", "1", "--force"])
         leftovers = set(os.listdir("testfiles/output"))
-        self.assertSetEqual(full1_files | full2_files, leftovers)
+        self.assertEqual(full1_files | full2_files, leftovers)
 
 
 if __name__ == "__main__":
