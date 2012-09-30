@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-09-13 14:29+0000\n"
+"POT-Creation-Date: 2012-09-29 19:50+0000\n"
 "PO-Revision-Date: 2011-10-21 05:49+0000\n"
 "Last-Translator: Paco Molinero <paco@byasl.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-09-14 04:37+0000\n"
-"X-Generator: Launchpad (build 15944)\n"
+"X-Launchpad-Export-Date: 2012-09-30 04:46+0000\n"
+"X-Generator: Launchpad (build 16049)\n"
 
 #: ../bin/duplicity:98
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -90,7 +90,7 @@ msgstr ""
 "Reiniciando copia de respaldo, pero la configuración actual de cifrado no "
 "coincide con la configuración original"
 
-#: ../bin/duplicity:526
+#: ../bin/duplicity:527
 msgid ""
 "Fatal Error: Unable to start incremental backup.  Old signatures not found "
 "and incremental specified"
@@ -98,98 +98,98 @@ msgstr ""
 "Error Fatal: No se puede iniciar respaldo incremental. Firmas de edad y que "
 "no se encuentran especificados incremental"
 
-#: ../bin/duplicity:530
+#: ../bin/duplicity:531
 msgid "No signatures found, switching to full backup."
 msgstr "Firmas no encontradas, cambiando a un backup completo."
 
-#: ../bin/duplicity:544
+#: ../bin/duplicity:545
 msgid "Backup Statistics"
 msgstr "Estadísticas de respaldo"
 
-#: ../bin/duplicity:625
+#: ../bin/duplicity:626
 #, python-format
 msgid "%s not found in archive, no files restored."
 msgstr "No se encontró %s en el archivo, no se restauran archivos."
 
-#: ../bin/duplicity:629
+#: ../bin/duplicity:630
 msgid "No files found in archive - nothing restored."
 msgstr "No se encontraron archivos en el archivador - nada que restaurar."
 
-#: ../bin/duplicity:662
+#: ../bin/duplicity:663
 #, python-format
 msgid "Processed volume %d of %d"
 msgstr "Volumen procesado %d de %d"
 
-#: ../bin/duplicity:687
+#: ../bin/duplicity:688
 #, python-format
 msgid "Invalid data - %s hash mismatch for file:"
 msgstr "datos no válidos - %s hash no coincide con archivo:"
 
-#: ../bin/duplicity:689
+#: ../bin/duplicity:690
 #, python-format
 msgid "Calculated hash: %s"
 msgstr "hash calculado: %s"
 
-#: ../bin/duplicity:690
+#: ../bin/duplicity:691
 #, python-format
 msgid "Manifest hash: %s"
 msgstr "Manifestar hass: %s"
 
-#: ../bin/duplicity:728
+#: ../bin/duplicity:729
 #, python-format
 msgid "Volume was signed by key %s, not %s"
 msgstr "El volumen fue firmado por %s clave, no %s"
 
-#: ../bin/duplicity:758
+#: ../bin/duplicity:759
 #, python-format
 msgid "Verify complete: %s, %s."
 msgstr "Verificación completa: %s, %s."
 
-#: ../bin/duplicity:759
+#: ../bin/duplicity:760
 #, python-format
 msgid "%d file compared"
 msgid_plural "%d files compared"
 msgstr[0] "%d archivo comparado"
 msgstr[1] "%d archivos comparados"
 
-#: ../bin/duplicity:761
+#: ../bin/duplicity:762
 #, python-format
 msgid "%d difference found"
 msgid_plural "%d differences found"
 msgstr[0] "%d diferencia encontrada"
 msgstr[1] "%d diferencias encontradas"
 
-#: ../bin/duplicity:780
+#: ../bin/duplicity:781
 msgid "No extraneous files found, nothing deleted in cleanup."
 msgstr "Ningún archivo raro encontrado, nada borrado al acabar."
 
-#: ../bin/duplicity:785
+#: ../bin/duplicity:786
 msgid "Deleting this file from backend:"
 msgid_plural "Deleting these files from backend:"
 msgstr[0] "Eliminando este archivo del respaldo:"
 msgstr[1] "Eliminando estos archivos de la copia de seguridad:"
 
-#: ../bin/duplicity:797
+#: ../bin/duplicity:798
 msgid "Found the following file to delete:"
 msgid_plural "Found the following files to delete:"
 msgstr[0] "Encontrado el siguiente archivo a eliminar:"
 msgstr[1] "Encontrados los siguientes archivos a eliminar:"
 
-#: ../bin/duplicity:801
+#: ../bin/duplicity:802
 msgid "Run duplicity again with the --force option to actually delete."
 msgstr ""
 "Ejecutar duplicity de nuevo con la opción --foirce para eliminar realmente."
 
-#: ../bin/duplicity:840
+#: ../bin/duplicity:845
 msgid "There are backup set(s) at time(s):"
 msgstr "Hay conjuntos de respaldo con hora:"
 
-#: ../bin/duplicity:842
+#: ../bin/duplicity:847
 msgid "Which can't be deleted because newer sets depend on them."
 msgstr ""
 "Que no se puede eliminar porque los nuevos conjuntos dependen de ellos."
 
-#: ../bin/duplicity:846
+#: ../bin/duplicity:851
 msgid ""
 "Current active backup chain is older than specified time.  However, it will "
 "not be deleted.  To remove all your backups, manually purge the repository."
@@ -198,86 +198,106 @@ msgstr ""
 "lo que no se eliminará. Para eliminar todos sus respaldos, purgue "
 "manualmente el repositiorio."
 
-#: ../bin/duplicity:852
+#: ../bin/duplicity:857
 msgid "No old backup sets found, nothing deleted."
 msgstr "No se encontraron respaldos. nada que eliminar."
 
-#: ../bin/duplicity:855
-msgid "Deleting backup set at time:"
-msgid_plural "Deleting backup sets at times:"
-msgstr[0] "Eliminar grupo de respaldo en el momento:"
-msgstr[1] "Eliminar grupod de respaldo en el momento:"
+#: ../bin/duplicity:860
+msgid "Deleting backup chain at time:"
+msgid_plural "Deleting backup chains at times:"
+msgstr[0] ""
+msgstr[1] ""
 
-#: ../bin/duplicity:872
-msgid "Found old backup set at the following time:"
-msgid_plural "Found old backup sets at the following times:"
-msgstr[0] "Buscar configuración de respaldo antigua la próxima vez:"
-msgstr[1] "Buscar configuración de respaldo antigua las próximas veces:"
+#: ../bin/duplicity:871
+#, python-format
+msgid "Deleting incremental signature chain %s"
+msgstr ""
+
+#: ../bin/duplicity:873
+#, python-format
+msgid "Deleting incremental backup chain %s"
+msgstr ""
 
 #: ../bin/duplicity:876
+#, python-format
+msgid "Deleting complete signature chain %s"
+msgstr ""
+
+#: ../bin/duplicity:878
+#, python-format
+msgid "Deleting complete backup chain %s"
+msgstr ""
+
+#: ../bin/duplicity:884
+msgid "Found old backup chain at the following time:"
+msgid_plural "Found old backup chains at the following times:"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../bin/duplicity:888
 msgid "Rerun command with --force option to actually delete."
 msgstr ""
 "Volviendo a ejecutar orden con la opción --force para eliminar realmente."
 
-#: ../bin/duplicity:954
+#: ../bin/duplicity:966
 #, python-format
 msgid "Deleting local %s (not authoritative at backend)."
 msgstr "Eliminación local %s (No es una autoridad en el procesamiento)"
 
-#: ../bin/duplicity:958
+#: ../bin/duplicity:970
 #, python-format
 msgid "Unable to delete %s: %s"
 msgstr "No se puede eliminar %s: %s"
 
-#: ../bin/duplicity:986 ../duplicity/dup_temp.py:260
+#: ../bin/duplicity:998 ../duplicity/dup_temp.py:263
 #, python-format
 msgid "Failed to read %s: %s"
 msgstr "No se pudo leer %s: %s"
 
-#: ../bin/duplicity:997
+#: ../bin/duplicity:1009
 #, python-format
 msgid "Copying %s to local cache."
 msgstr "Copiando %s a la caché local."
 
-#: ../bin/duplicity:1045
+#: ../bin/duplicity:1057
 msgid "Local and Remote metadata are synchronized, no sync needed."
 msgstr ""
 "Los metadatos en local y remoto están sincronizados, no es necesario "
 "sincronizar."
 
-#: ../bin/duplicity:1050
+#: ../bin/duplicity:1062
 msgid "Synchronizing remote metadata to local cache..."
 msgstr "Sincronizando metadatos remotos con la caché local..."
 
-#: ../bin/duplicity:1063
+#: ../bin/duplicity:1075
 msgid "Sync would copy the following from remote to local:"
 msgstr "Sync copiaría lo siguiente de remoto a local:"
 
-#: ../bin/duplicity:1066
+#: ../bin/duplicity:1078
 msgid "Sync would remove the following spurious local files:"
 msgstr "Sync eliminaría los siguientes archivos locales:"
 
-#: ../bin/duplicity:1109
+#: ../bin/duplicity:1121
 msgid "Unable to get free space on temp."
 msgstr "Imposible conseguir espacio libre en temp."
 
-#: ../bin/duplicity:1117
+#: ../bin/duplicity:1129
 #, python-format
 msgid "Temp space has %d available, backup needs approx %d."
 msgstr ""
 "Espacio temporal tiene %d disponibles, copias de seguridad necesitan "
 "aproximadamente %d."
 
-#: ../bin/duplicity:1120
+#: ../bin/duplicity:1132
 #, python-format
 msgid "Temp has %d available, backup will use approx %d."
 msgstr "Temp tiene %d disponible, el respaldo usará aproximadamente %d."
 
-#: ../bin/duplicity:1128
+#: ../bin/duplicity:1140
 msgid "Unable to get max open files."
 msgstr "No se puede obtener archivos de máxima apertura."
 
-#: ../bin/duplicity:1132
+#: ../bin/duplicity:1144
 #, python-format
 msgid ""
 "Max open files of %s is too low, should be >= 1024.\n"
@@ -287,7 +307,7 @@ msgstr ""
 "1.024.\n"
 "Utilice «ulimit -n 1024» o más alto para corregirlo.\n"
 
-#: ../bin/duplicity:1181
+#: ../bin/duplicity:1193
 msgid ""
 "RESTART: The first volume failed to upload before termination.\n"
 "         Restart is impossible...starting backup from beginning."
@@ -295,7 +315,7 @@ msgstr ""
 "REINICIAR: El primer volumen no se han cargado antes de la terminación.\n"
 "         Reiniciar es imposible... iniciando respaldo desde el principio."
 
-#: ../bin/duplicity:1187
+#: ../bin/duplicity:1199
 #, python-format
 msgid ""
 "RESTART: Volumes %d to %d failed to upload before termination.\n"
@@ -304,7 +324,7 @@ msgstr ""
 "REINICIAR: Volúmenes %d a %d fallaron al cargar antes de terminar.\n"
 "         Reiniciar copia de respaldo en el volumen %d."
 
-#: ../bin/duplicity:1194
+#: ../bin/duplicity:1206
 #, python-format
 msgid ""
 "RESTART: Impossible backup state: manifest has %d vols, remote has %d vols.\n"
@@ -318,48 +338,48 @@ msgstr ""
 "respaldo parcial\n"
 "         y reiniciará la copia desde el principio."
 
-#: ../bin/duplicity:1287
+#: ../bin/duplicity:1299
 #, python-format
 msgid "Last %s backup left a partial set, restarting."
 msgstr ""
 "La última copia de seguridad %s dejó una configuración parcial, reiniciar."
 
-#: ../bin/duplicity:1291
+#: ../bin/duplicity:1303
 #, python-format
 msgid "Cleaning up previous partial %s backup set, restarting."
 msgstr ""
 "Limpiar la configuración parcial de la copia de seguridad %s previa, "
 "reiniciar."
 
-#: ../bin/duplicity:1302
+#: ../bin/duplicity:1314
 msgid "Last full backup date:"
 msgstr "Fecha del último respaldo completo:"
 
-#: ../bin/duplicity:1304
+#: ../bin/duplicity:1316
 msgid "Last full backup date: none"
 msgstr "Fecha del último respaldo completo: ninguna"
 
-#: ../bin/duplicity:1306
+#: ../bin/duplicity:1318
 msgid "Last full backup is too old, forcing full backup"
 msgstr ""
 "El último respaldo completo es demasiado viejo, lo que obligó a una copia de "
 "seguridad completa"
 
-#: ../bin/duplicity:1404
+#: ../bin/duplicity:1416
 msgid "INT intercepted...exiting."
 msgstr "INT interceptado... saliendo."
 
-#: ../bin/duplicity:1410
+#: ../bin/duplicity:1422
 #, python-format
 msgid "GPG error detail: %s"
 msgstr "Detalle de error GPG: %s"
 
-#: ../bin/duplicity:1419
+#: ../bin/duplicity:1431
 #, python-format
 msgid "User error detail: %s"
 msgstr "Detalle de error del usuario: %s"
 
-#: ../bin/duplicity:1428
+#: ../bin/duplicity:1440
 #, python-format
 msgid "Backend error detail: %s"
 msgstr "Detalle de error del motor: %s"
@@ -517,43 +537,43 @@ msgstr "local"
 msgid "remote"
 msgstr "remoto"
 
-#: ../duplicity/collections.py:621
+#: ../duplicity/collections.py:623
 msgid "Collection Status"
 msgstr "Estado de la colección"
 
-#: ../duplicity/collections.py:623
+#: ../duplicity/collections.py:625
 #, python-format
 msgid "Connecting with backend: %s"
 msgstr "Conectar con el motor: %s"
 
-#: ../duplicity/collections.py:625
+#: ../duplicity/collections.py:627
 #, python-format
 msgid "Archive dir: %s"
 msgstr "Directorio de archivador: %s"
 
-#: ../duplicity/collections.py:628
+#: ../duplicity/collections.py:630
 #, python-format
 msgid "Found %d secondary backup chain."
 msgid_plural "Found %d secondary backup chains."
 msgstr[0] "Se encontró %d cadena de respaldo secundaria"
 msgstr[1] "Se encontraron %d cadenas de respaldo secundaria"
 
-#: ../duplicity/collections.py:633
+#: ../duplicity/collections.py:635
 #, python-format
 msgid "Secondary chain %d of %d:"
 msgstr "Cadena secundaria %d de %d:"
 
-#: ../duplicity/collections.py:639
+#: ../duplicity/collections.py:641
 msgid "Found primary backup chain with matching signature chain:"
 msgstr ""
 "Encontró cadena de copia de seguridad primaria con cadena de firma "
 "coincidente:"
 
-#: ../duplicity/collections.py:643
+#: ../duplicity/collections.py:645
 msgid "No backup chains with active signatures found"
 msgstr "No encontró cadenas con firmas activas"
 
-#: ../duplicity/collections.py:646
+#: ../duplicity/collections.py:648
 #, python-format
 msgid "Also found %d backup set not part of any chain,"
 msgid_plural "Also found %d backup sets not part of any chain,"
@@ -564,7 +584,7 @@ msgstr[1] ""
 "También encontró %d configuraciones de copia de seguridad no incluidas en "
 "niguna cadena,"
 
-#: ../duplicity/collections.py:650
+#: ../duplicity/collections.py:652
 #, python-format
 msgid "and %d incomplete backup set."
 msgid_plural "and %d incomplete backup sets."
@@ -572,107 +592,107 @@ msgstr[0] "y %d conjunto de respaldo incompleto"
 msgstr[1] "y %d conjuntos de respaldos incompletos"
 
 #. TRANSL: "cleanup" is a hard-coded command, so do not translate it
-#: ../duplicity/collections.py:655
+#: ../duplicity/collections.py:657
 msgid ""
 "These may be deleted by running duplicity with the \"cleanup\" command."
 msgstr "Esto se puede eliminar ejecutando duplicity con la orden «cleanup»"
 
-#: ../duplicity/collections.py:658
+#: ../duplicity/collections.py:660
 msgid "No orphaned or incomplete backup sets found."
 msgstr "No se han encontrado respaldos huérfanos o incompletos."
 
-#: ../duplicity/collections.py:674
+#: ../duplicity/collections.py:676
 #, python-format
 msgid "%d file exists on backend"
 msgid_plural "%d files exist on backend"
 msgstr[0] "%d archivo existe en la copia de seguridad"
 msgstr[1] "%d archivos existen en la copia de seguridad"
 
-#: ../duplicity/collections.py:681
+#: ../duplicity/collections.py:683
 #, python-format
 msgid "%d file exists in cache"
 msgid_plural "%d files exist in cache"
 msgstr[0] "existe %d arcvhivo en cahé"
 msgstr[1] "existen %d arcvhivos en cahé"
 
-#: ../duplicity/collections.py:733
+#: ../duplicity/collections.py:735
 msgid ""
 "Warning, discarding last backup set, because of missing signature file."
 msgstr ""
 "Aviso, descartando el último conjunto de respaldo, debido a la falta archivo "
 "de firma."
 
-#: ../duplicity/collections.py:756
+#: ../duplicity/collections.py:758
 msgid "Warning, found the following local orphaned signature file:"
 msgid_plural "Warning, found the following local orphaned signature files:"
 msgstr[0] "Aviso, encontró el siguiente archivo huérfano local con firma:"
 msgstr[1] ""
 "Aviso, encontró los siguientes archivos huérfanos locales con firma:"
 
-#: ../duplicity/collections.py:765
+#: ../duplicity/collections.py:767
 msgid "Warning, found the following remote orphaned signature file:"
 msgid_plural "Warning, found the following remote orphaned signature files:"
 msgstr[0] "Aviso, encontró el siguiente archivo huérfano remoto con firma:"
 msgstr[1] ""
 "Aviso, encontró los siguientes archivos huérfanos remotos con firma:"
 
-#: ../duplicity/collections.py:774
+#: ../duplicity/collections.py:776
 msgid "Warning, found signatures but no corresponding backup files"
 msgstr ""
 "Aviso, se encontraron firmas pero no coinciden con los archivos de copia de "
 "seguridad"
 
-#: ../duplicity/collections.py:778
+#: ../duplicity/collections.py:780
 msgid ""
 "Warning, found incomplete backup sets, probably left from aborted session"
 msgstr ""
 "Aviso, encontró conjuntos de copia de seguridad incompletos, probablemente "
 "de la sesión abortada"
 
-#: ../duplicity/collections.py:782
+#: ../duplicity/collections.py:784
 msgid "Warning, found the following orphaned backup file:"
 msgid_plural "Warning, found the following orphaned backup files:"
 msgstr[0] "Aviso, se encuentra el siguiente archivo de respaldo huérfano:"
 msgstr[1] ""
 "Aviso, se encuentran los siguientes archivos de copia de seguridad huérfanos:"
 
-#: ../duplicity/collections.py:800
+#: ../duplicity/collections.py:802
 #, python-format
 msgid "Extracting backup chains from list of files: %s"
 msgstr "Extrayendo cadenas de respaldo de la lista de archivos: %s"
 
-#: ../duplicity/collections.py:810
+#: ../duplicity/collections.py:812
 #, python-format
 msgid "File %s is part of known set"
 msgstr "El archivo %s es parte del conjunto conocido"
 
-#: ../duplicity/collections.py:813
+#: ../duplicity/collections.py:815
 #, python-format
 msgid "File %s is not part of a known set; creating new set"
 msgstr ""
 "El archivo %s no es parte de un conjunto conocido; creando un conjunto nuevo"
 
-#: ../duplicity/collections.py:818
+#: ../duplicity/collections.py:820
 #, python-format
 msgid "Ignoring file (rejected by backup set) '%s'"
 msgstr "Ignorando archivo (rechazado por el conjunto) «%s»"
 
-#: ../duplicity/collections.py:831
+#: ../duplicity/collections.py:833
 #, python-format
 msgid "Found backup chain %s"
 msgstr "Se encontró una cadena de respaldo %s"
 
-#: ../duplicity/collections.py:836
+#: ../duplicity/collections.py:838
 #, python-format
 msgid "Added set %s to pre-existing chain %s"
 msgstr "conjunto %s añadido a la cadena %s preexistente"
 
-#: ../duplicity/collections.py:840
+#: ../duplicity/collections.py:842
 #, python-format
 msgid "Found orphaned set %s"
 msgstr "Se encontró un conjunto huérfano %s"
 
-#: ../duplicity/collections.py:992
+#: ../duplicity/collections.py:994
 #, python-format
 msgid ""
 "No signature chain for the requested time.  Using oldest available chain, "
@@ -1018,7 +1038,7 @@ msgstr ""
 msgid "Main action: "
 msgstr "Acción principal: "
 
-#: ../duplicity/diffdir.py:101 ../duplicity/diffdir.py:390
+#: ../duplicity/diffdir.py:101 ../duplicity/diffdir.py:392
 #, python-format
 msgid "Error %s getting delta for %s"
 msgstr "Error %s consiguiendo el delta para %s"
@@ -1043,7 +1063,7 @@ msgstr "M %s"
 msgid "Comparing %s and %s"
 msgstr "Comparando %s y %s"
 
-#: ../duplicity/diffdir.py:195
+#: ../duplicity/diffdir.py:197
 #, python-format
 msgid "D %s"
 msgstr "D %s"
@@ -1463,3 +1483,13 @@ msgstr ""
 
 #~ msgid "Unable to load gio module"
 #~ msgstr "No se puede cargar el módulo gio"
+
+#~ msgid "Deleting backup set at time:"
+#~ msgid_plural "Deleting backup sets at times:"
+#~ msgstr[0] "Eliminar grupo de respaldo en el momento:"
+#~ msgstr[1] "Eliminar grupod de respaldo en el momento:"
+
+#~ msgid "Found old backup set at the following time:"
+#~ msgid_plural "Found old backup sets at the following times:"
+#~ msgstr[0] "Buscar configuración de respaldo antigua la próxima vez:"
+#~ msgstr[1] "Buscar configuración de respaldo antigua las próximas veces:"

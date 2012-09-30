@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-09-13 14:29+0000\n"
+"POT-Creation-Date: 2012-09-29 19:50+0000\n"
 "PO-Revision-Date: 2011-11-29 08:34+0000\n"
 "Last-Translator: SanskritFritz <Unknown>\n"
 "Language-Team: Hungarian <hu@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-09-14 04:36+0000\n"
-"X-Generator: Launchpad (build 15944)\n"
+"X-Launchpad-Export-Date: 2012-09-30 04:45+0000\n"
+"X-Generator: Launchpad (build 16049)\n"
 
 #: ../bin/duplicity:98
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -87,7 +87,7 @@ msgstr ""
 "Újraindítom a biztonsági mentést, de a jelenlegi titkosítási beállítások nem "
 "azonosak azokkal amik eredetileg be voltak állítva."
 
-#: ../bin/duplicity:526
+#: ../bin/duplicity:527
 msgid ""
 "Fatal Error: Unable to start incremental backup.  Old signatures not found "
 "and incremental specified"
@@ -95,101 +95,101 @@ msgstr ""
 "Súlyos hiba: Nem tudom elkezdeni a növekményes biztonsági mentést. Nem "
 "találok régi aláírásokat, pedig növekményes mentést kezdeményeztél."
 
-#: ../bin/duplicity:530
+#: ../bin/duplicity:531
 msgid "No signatures found, switching to full backup."
 msgstr "Nem találtam aláírásokat, átváltok teljes biztonsági mentésre."
 
-#: ../bin/duplicity:544
+#: ../bin/duplicity:545
 msgid "Backup Statistics"
 msgstr "Biztonsági mentés statisztikák"
 
-#: ../bin/duplicity:625
+#: ../bin/duplicity:626
 #, python-format
 msgid "%s not found in archive, no files restored."
 msgstr ""
 "%s állományt nem találtam meg az archívban, nem állítottam vissza semmit."
 
-#: ../bin/duplicity:629
+#: ../bin/duplicity:630
 msgid "No files found in archive - nothing restored."
 msgstr "Nem találtam állományt az archívban - nem állítottam vissza semmit."
 
-#: ../bin/duplicity:662
+#: ../bin/duplicity:663
 #, python-format
 msgid "Processed volume %d of %d"
 msgstr "%d köteg feldolgozva a %d-ból"
 
-#: ../bin/duplicity:687
+#: ../bin/duplicity:688
 #, python-format
 msgid "Invalid data - %s hash mismatch for file:"
 msgstr "Érvénytelen adat - %s"
 
-#: ../bin/duplicity:689
+#: ../bin/duplicity:690
 #, python-format
 msgid "Calculated hash: %s"
 msgstr "Számított hash: %s"
 
-#: ../bin/duplicity:690
+#: ../bin/duplicity:691
 #, python-format
 msgid "Manifest hash: %s"
 msgstr "KImutatás hash: %s"
 
-#: ../bin/duplicity:728
+#: ../bin/duplicity:729
 #, python-format
 msgid "Volume was signed by key %s, not %s"
 msgstr "A köteget %s kulccsal hitelesítették, nem %s kulccsal"
 
-#: ../bin/duplicity:758
+#: ../bin/duplicity:759
 #, python-format
 msgid "Verify complete: %s, %s."
 msgstr "Ellenőrizve: %s, %s."
 
-#: ../bin/duplicity:759
+#: ../bin/duplicity:760
 #, python-format
 msgid "%d file compared"
 msgid_plural "%d files compared"
 msgstr[0] "%d file összehasonlítva"
 msgstr[1] "%d file összehasonlítva"
 
-#: ../bin/duplicity:761
+#: ../bin/duplicity:762
 #, python-format
 msgid "%d difference found"
 msgid_plural "%d differences found"
 msgstr[0] "%d különbséget találtam"
 msgstr[1] "%d különbséget találtam"
 
-#: ../bin/duplicity:780
+#: ../bin/duplicity:781
 msgid "No extraneous files found, nothing deleted in cleanup."
 msgstr ""
 "Nem találtam extra állományt, nem töröltem semmit az adattiszítás során."
 
-#: ../bin/duplicity:785
+#: ../bin/duplicity:786
 msgid "Deleting this file from backend:"
 msgid_plural "Deleting these files from backend:"
 msgstr[0] "A következő állomány törlése a tárhelyről:"
 msgstr[1] "A következő állományok törlése a tárhelyről:"
 
-#: ../bin/duplicity:797
+#: ../bin/duplicity:798
 msgid "Found the following file to delete:"
 msgid_plural "Found the following files to delete:"
 msgstr[0] "A következő törlendő állományt találtam:"
 msgstr[1] "A következő törlendő állományokat találtam:"
 
-#: ../bin/duplicity:801
+#: ../bin/duplicity:802
 msgid "Run duplicity again with the --force option to actually delete."
 msgstr ""
 "Indítsd el a duplicity-t újra a --force kapcsolóval, hogy valóban töröljek."
 
-#: ../bin/duplicity:840
+#: ../bin/duplicity:845
 msgid "There are backup set(s) at time(s):"
 msgstr ""
 "A következő biztonsági mentés készlet(ek)et találtam a megadott "
 "időpont(ok)ban:"
 
-#: ../bin/duplicity:842
+#: ../bin/duplicity:847
 msgid "Which can't be deleted because newer sets depend on them."
 msgstr "Amiket nem lehet törölni, mert újabb készletek függnek tőlük."
 
-#: ../bin/duplicity:846
+#: ../bin/duplicity:851
 msgid ""
 "Current active backup chain is older than specified time.  However, it will "
 "not be deleted.  To remove all your backups, manually purge the repository."
@@ -198,89 +198,108 @@ msgstr ""
 "ellenére nem törlöm ezeket. Az összes biztonsági mentést manuálisan töröld a "
 "raktárból."
 
-#: ../bin/duplicity:852
+#: ../bin/duplicity:857
 msgid "No old backup sets found, nothing deleted."
 msgstr "Nem találtam régi biztonsági mentés készletet, nem töröltem semmit."
 
-#: ../bin/duplicity:855
-msgid "Deleting backup set at time:"
-msgid_plural "Deleting backup sets at times:"
-msgstr[0] "Következő idő szerinti biztonsági mentés készlet törlése:"
-msgstr[1] "Következő idők szerinti biztonsági mentés készletek törlése:"
-
-#: ../bin/duplicity:872
-msgid "Found old backup set at the following time:"
-msgid_plural "Found old backup sets at the following times:"
-msgstr[0] "Következő idő szerinti régi biztonsági mentés készletet találtam:"
+#: ../bin/duplicity:860
+msgid "Deleting backup chain at time:"
+msgid_plural "Deleting backup chains at times:"
+msgstr[0] ""
 msgstr[1] ""
-"Következő idők szerinti régi biztonsági mentés készleteket találtam:"
+
+#: ../bin/duplicity:871
+#, python-format
+msgid "Deleting incremental signature chain %s"
+msgstr ""
+
+#: ../bin/duplicity:873
+#, python-format
+msgid "Deleting incremental backup chain %s"
+msgstr ""
 
 #: ../bin/duplicity:876
+#, python-format
+msgid "Deleting complete signature chain %s"
+msgstr ""
+
+#: ../bin/duplicity:878
+#, python-format
+msgid "Deleting complete backup chain %s"
+msgstr ""
+
+#: ../bin/duplicity:884
+msgid "Found old backup chain at the following time:"
+msgid_plural "Found old backup chains at the following times:"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../bin/duplicity:888
 msgid "Rerun command with --force option to actually delete."
 msgstr ""
 "Futtasd le a parancsot újra a --force kapcsolóval, hogy valóban töröljem."
 
-#: ../bin/duplicity:954
+#: ../bin/duplicity:966
 #, python-format
 msgid "Deleting local %s (not authoritative at backend)."
 msgstr "Helyi %s törlése (nem hiteles a tárhelyen)."
 
-#: ../bin/duplicity:958
+#: ../bin/duplicity:970
 #, python-format
 msgid "Unable to delete %s: %s"
 msgstr "Nem tudtam törölni: %s: %s"
 
-#: ../bin/duplicity:986 ../duplicity/dup_temp.py:260
+#: ../bin/duplicity:998 ../duplicity/dup_temp.py:263
 #, python-format
 msgid "Failed to read %s: %s"
 msgstr "Nem tudtam beolvasni: %s: %s"
 
-#: ../bin/duplicity:997
+#: ../bin/duplicity:1009
 #, python-format
 msgid "Copying %s to local cache."
 msgstr "%s másolása a helyi gyorsítótárba."
 
-#: ../bin/duplicity:1045
+#: ../bin/duplicity:1057
 msgid "Local and Remote metadata are synchronized, no sync needed."
 msgstr ""
 "Helyi és távoli metaadatok szinkronban vannak, nem kell szinkronizálni."
 
-#: ../bin/duplicity:1050
+#: ../bin/duplicity:1062
 msgid "Synchronizing remote metadata to local cache..."
 msgstr "Távoli metaadatok letöltése a helyi gyorsítótárba..."
 
-#: ../bin/duplicity:1063
+#: ../bin/duplicity:1075
 msgid "Sync would copy the following from remote to local:"
 msgstr "A következőt nem tudtam letölteni a helyi gyorsítótárba:"
 
-#: ../bin/duplicity:1066
+#: ../bin/duplicity:1078
 msgid "Sync would remove the following spurious local files:"
 msgstr ""
 "Szinkronizálás során le kell törölni a következő hamis helyi állományokat:"
 
-#: ../bin/duplicity:1109
+#: ../bin/duplicity:1121
 msgid "Unable to get free space on temp."
 msgstr "Nincs már szabad hely az átmeneti (temp) tárolóban."
 
-#: ../bin/duplicity:1117
+#: ../bin/duplicity:1129
 #, python-format
 msgid "Temp space has %d available, backup needs approx %d."
 msgstr ""
 "Az átmeneti (temp) tárolóban %d hely van, a biztonsági mentéshez kb. %d "
 "kellene."
 
-#: ../bin/duplicity:1120
+#: ../bin/duplicity:1132
 #, python-format
 msgid "Temp has %d available, backup will use approx %d."
 msgstr ""
 "Az átmeneti (temp) tárolóban %d hely van, a biztonsági mentéshez kb. %d "
 "kellene."
 
-#: ../bin/duplicity:1128
+#: ../bin/duplicity:1140
 msgid "Unable to get max open files."
 msgstr "Nem sikerült lekérdezni, hogy hány állomány nyitható meg egy időben."
 
-#: ../bin/duplicity:1132
+#: ../bin/duplicity:1144
 #, python-format
 msgid ""
 "Max open files of %s is too low, should be >= 1024.\n"
@@ -290,7 +309,7 @@ msgstr ""
 ">=1024 kellene.\n"
 "A megoldás: 'ulimit -n 1024' (vagy még magasabb érték).\n"
 
-#: ../bin/duplicity:1181
+#: ../bin/duplicity:1193
 msgid ""
 "RESTART: The first volume failed to upload before termination.\n"
 "         Restart is impossible...starting backup from beginning."
@@ -298,7 +317,7 @@ msgstr ""
 "ÚJRAKEZDÉS: Az első köteget nem sikerült feltölteni a tárhelyre.\n"
 "            Nem tudom helyreállítani... biztonsági mentés újraindítása."
 
-#: ../bin/duplicity:1187
+#: ../bin/duplicity:1199
 #, python-format
 msgid ""
 "RESTART: Volumes %d to %d failed to upload before termination.\n"
@@ -307,7 +326,7 @@ msgstr ""
 "ÚJRAKEZDÉS: Az %d - %d köteget nem sikerült feltölteni a tárhelyre.\n"
 "            Biztonsági mentés újraindítása a %d. kötegnél."
 
-#: ../bin/duplicity:1194
+#: ../bin/duplicity:1206
 #, python-format
 msgid ""
 "RESTART: Impossible backup state: manifest has %d vols, remote has %d vols.\n"
@@ -321,45 +340,45 @@ msgstr ""
 "kötegeit,\n"
 "            majd újraindítom a biztonsági mentést."
 
-#: ../bin/duplicity:1287
+#: ../bin/duplicity:1299
 #, python-format
 msgid "Last %s backup left a partial set, restarting."
 msgstr ""
 "Az utolsó %s biztonsági mentés hiányos készletet hagyott maga után, "
 "újraindítás."
 
-#: ../bin/duplicity:1291
+#: ../bin/duplicity:1303
 #, python-format
 msgid "Cleaning up previous partial %s backup set, restarting."
 msgstr "Előző %s hiányos biztonsági mentés tisztítása, újraindítás."
 
-#: ../bin/duplicity:1302
+#: ../bin/duplicity:1314
 msgid "Last full backup date:"
 msgstr "Utolsó teljes biztonsági mentés dátuma:"
 
-#: ../bin/duplicity:1304
+#: ../bin/duplicity:1316
 msgid "Last full backup date: none"
 msgstr "Legutolsó teljes biztonsági mentés dátuma: nincs."
 
-#: ../bin/duplicity:1306
+#: ../bin/duplicity:1318
 msgid "Last full backup is too old, forcing full backup"
 msgstr "Legutolsó teljes biztonsági mentés túl régi, teljes mentés kell."
 
-#: ../bin/duplicity:1404
+#: ../bin/duplicity:1416
 msgid "INT intercepted...exiting."
 msgstr "INT jelzés érkezett... kilépés."
 
-#: ../bin/duplicity:1410
+#: ../bin/duplicity:1422
 #, python-format
 msgid "GPG error detail: %s"
 msgstr "GPG hiba részletei: %s"
 
-#: ../bin/duplicity:1419
+#: ../bin/duplicity:1431
 #, python-format
 msgid "User error detail: %s"
 msgstr "Felhasználói hiba: %s"
 
-#: ../bin/duplicity:1428
+#: ../bin/duplicity:1440
 #, python-format
 msgid "Backend error detail: %s"
 msgstr "Tárhely hiba részletei: %s"
@@ -509,48 +528,48 @@ msgstr "helyi"
 msgid "remote"
 msgstr "távoli"
 
-#: ../duplicity/collections.py:621
+#: ../duplicity/collections.py:623
 msgid "Collection Status"
 msgstr "Gyűjtemény állapota"
 
-#: ../duplicity/collections.py:623
+#: ../duplicity/collections.py:625
 #, python-format
 msgid "Connecting with backend: %s"
 msgstr "Kapcsolódás a tárhelyhez: %s"
 
-#: ../duplicity/collections.py:625
+#: ../duplicity/collections.py:627
 #, python-format
 msgid "Archive dir: %s"
 msgstr "Archívum könyvtár: %s"
 
-#: ../duplicity/collections.py:628
+#: ../duplicity/collections.py:630
 #, python-format
 msgid "Found %d secondary backup chain."
 msgid_plural "Found %d secondary backup chains."
 msgstr[0] "%d másodlagos mentés-láncot találtam"
 msgstr[1] "%d másodlagos mentés-láncot találtam"
 
-#: ../duplicity/collections.py:633
+#: ../duplicity/collections.py:635
 #, python-format
 msgid "Secondary chain %d of %d:"
 msgstr "Mentés-lánc %d, összesen %d"
 
-#: ../duplicity/collections.py:639
+#: ../duplicity/collections.py:641
 msgid "Found primary backup chain with matching signature chain:"
 msgstr "Találtam elsődleges mentés-láncot amire illik az aláíráslánc:"
 
-#: ../duplicity/collections.py:643
+#: ../duplicity/collections.py:645
 msgid "No backup chains with active signatures found"
 msgstr "Nem találtam mentés-láncot aminek aktív aláírása lenne"
 
-#: ../duplicity/collections.py:646
+#: ../duplicity/collections.py:648
 #, python-format
 msgid "Also found %d backup set not part of any chain,"
 msgid_plural "Also found %d backup sets not part of any chain,"
 msgstr[0] "Találtam még %d mentés-készletet, ami nem része láncnak."
 msgstr[1] "Találtam még %d mentés-készletet, ami nem része láncnak."
 
-#: ../duplicity/collections.py:650
+#: ../duplicity/collections.py:652
 #, python-format
 msgid "and %d incomplete backup set."
 msgid_plural "and %d incomplete backup sets."
@@ -558,43 +577,43 @@ msgstr[0] "és %d félkész mentés-készlet."
 msgstr[1] "és %d félkész mentés-készlet."
 
 #. TRANSL: "cleanup" is a hard-coded command, so do not translate it
-#: ../duplicity/collections.py:655
+#: ../duplicity/collections.py:657
 msgid ""
 "These may be deleted by running duplicity with the \"cleanup\" command."
 msgstr "Ezeket le lehet törölni a duplicity \"cleanup\" parancsával."
 
-#: ../duplicity/collections.py:658
+#: ../duplicity/collections.py:660
 msgid "No orphaned or incomplete backup sets found."
 msgstr "Nem találtam elárvult vagy félkész biztonsági mentés készletet."
 
-#: ../duplicity/collections.py:674
+#: ../duplicity/collections.py:676
 #, python-format
 msgid "%d file exists on backend"
 msgid_plural "%d files exist on backend"
 msgstr[0] "%d állomány található a tárhelyen"
 msgstr[1] "%d állomány található a tárhelyen"
 
-#: ../duplicity/collections.py:681
+#: ../duplicity/collections.py:683
 #, python-format
 msgid "%d file exists in cache"
 msgid_plural "%d files exist in cache"
 msgstr[0] "%d állomány található a gyorsítótárban"
 msgstr[1] "%d állomány található a gyorsítótárban"
 
-#: ../duplicity/collections.py:733
+#: ../duplicity/collections.py:735
 msgid ""
 "Warning, discarding last backup set, because of missing signature file."
 msgstr ""
 "Figyelem, törlöm az utolsó mentés készletet, mert hiányzik az aláírás-"
 "állomány."
 
-#: ../duplicity/collections.py:756
+#: ../duplicity/collections.py:758
 msgid "Warning, found the following local orphaned signature file:"
 msgid_plural "Warning, found the following local orphaned signature files:"
 msgstr[0] "Figyelem, az alábbi elárvult aláírás-állományt találtam:"
 msgstr[1] "Figyelem, az alábbi elárvult aláírás-állományokat találtam:"
 
-#: ../duplicity/collections.py:765
+#: ../duplicity/collections.py:767
 msgid "Warning, found the following remote orphaned signature file:"
 msgid_plural "Warning, found the following remote orphaned signature files:"
 msgstr[0] ""
@@ -602,61 +621,61 @@ msgstr[0] ""
 msgstr[1] ""
 "Figyelem, az alábbi elárvult aláírás-állományokat találtam a tárhelyen:"
 
-#: ../duplicity/collections.py:774
+#: ../duplicity/collections.py:776
 msgid "Warning, found signatures but no corresponding backup files"
 msgstr ""
 "Figyelem, találtam aláírásokat, de nincs hozzátartozó mentés állomány"
 
-#: ../duplicity/collections.py:778
+#: ../duplicity/collections.py:780
 msgid ""
 "Warning, found incomplete backup sets, probably left from aborted session"
 msgstr ""
 "Figyelem, találtam félkész mentés készleteket, valószínűleg egy előző mentés "
 "félbeszakadt"
 
-#: ../duplicity/collections.py:782
+#: ../duplicity/collections.py:784
 msgid "Warning, found the following orphaned backup file:"
 msgid_plural "Warning, found the following orphaned backup files:"
 msgstr[0] "Figyelem, az alábbi elárvult mentés állományt találtam:"
 msgstr[1] "Figyelem, az alábbi elárvult mentés állományokat találtam:"
 
-#: ../duplicity/collections.py:800
+#: ../duplicity/collections.py:802
 #, python-format
 msgid "Extracting backup chains from list of files: %s"
 msgstr "Biztonsági mentés láncok kiemelése állománylistából: %s"
 
-#: ../duplicity/collections.py:810
+#: ../duplicity/collections.py:812
 #, python-format
 msgid "File %s is part of known set"
 msgstr "A %s állomány nem része bármely ismert készletnek"
 
-#: ../duplicity/collections.py:813
+#: ../duplicity/collections.py:815
 #, python-format
 msgid "File %s is not part of a known set; creating new set"
 msgstr ""
 "A %s állomány nem része bármely ismert készletnek; új készlet létrehozása"
 
-#: ../duplicity/collections.py:818
+#: ../duplicity/collections.py:820
 #, python-format
 msgid "Ignoring file (rejected by backup set) '%s'"
 msgstr "Állomány kihagyása (mentés készlet utasította el) '%s'"
 
-#: ../duplicity/collections.py:831
+#: ../duplicity/collections.py:833
 #, python-format
 msgid "Found backup chain %s"
 msgstr "Megvan a biztonsági mentés lánc: %s"
 
-#: ../duplicity/collections.py:836
+#: ../duplicity/collections.py:838
 #, python-format
 msgid "Added set %s to pre-existing chain %s"
 msgstr "%s készletet hozzáadtam a már létező %s lánchoz"
 
-#: ../duplicity/collections.py:840
+#: ../duplicity/collections.py:842
 #, python-format
 msgid "Found orphaned set %s"
 msgstr "Elárvult %s készletet találtam"
 
-#: ../duplicity/collections.py:992
+#: ../duplicity/collections.py:994
 #, python-format
 msgid ""
 "No signature chain for the requested time.  Using oldest available chain, "
@@ -1000,7 +1019,7 @@ msgstr ""
 msgid "Main action: "
 msgstr "Fő művelet: "
 
-#: ../duplicity/diffdir.py:101 ../duplicity/diffdir.py:390
+#: ../duplicity/diffdir.py:101 ../duplicity/diffdir.py:392
 #, python-format
 msgid "Error %s getting delta for %s"
 msgstr "%s hiba a %s különbségi állományának kinyerése közben"
@@ -1025,7 +1044,7 @@ msgstr "* %s"
 msgid "Comparing %s and %s"
 msgstr "%s és %s összehasonlítása"
 
-#: ../duplicity/diffdir.py:195
+#: ../duplicity/diffdir.py:197
 #, python-format
 msgid "D %s"
 msgstr "- %s"
@@ -1436,6 +1455,17 @@ msgid ""
 "Warning: Selected ssh backend '%s' is neither 'paramiko nor 'pexpect'. Will "
 "use default paramiko instead."
 msgstr ""
+
+#~ msgid "Found old backup set at the following time:"
+#~ msgid_plural "Found old backup sets at the following times:"
+#~ msgstr[0] "Következő idő szerinti régi biztonsági mentés készletet találtam:"
+#~ msgstr[1] ""
+#~ "Következő idők szerinti régi biztonsági mentés készleteket találtam:"
+
+#~ msgid "Deleting backup set at time:"
+#~ msgid_plural "Deleting backup sets at times:"
+#~ msgstr[0] "Következő idő szerinti biztonsági mentés készlet törlése:"
+#~ msgstr[1] "Következő idők szerinti biztonsági mentés készletek törlése:"
 
 #~ msgid "Unable to load gio module"
 #~ msgstr "Nem tudtam betölteni a gio modult"
