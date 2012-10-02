@@ -311,7 +311,7 @@ class RestartTest(unittest.TestCase):
         output = subprocess.Popen(["tar", "t", "--file=%s" % sigtar], stdout=subprocess.PIPE).communicate()[0]
         self.assertEqual(1, output.split("\n").count("snapshot/"))
 
-    def xtest_ignore_double_snapshot(self):
+    def test_ignore_double_snapshot(self):
         """
         Test that we gracefully ignore double snapshot entries in a signature
         file.  This winds its way through duplicity as a deleted base dir,
@@ -340,7 +340,7 @@ class RestartTest(unittest.TestCase):
         self.assertEqual(0, os.system("rm -r testfiles/cache"))
         # Try a follow on incremental (which in buggy versions, would create
         # a deleted entry for the base dir)
-        self.backup("inc", "testfiles/blocktartest")
+        self.backup("inc", "testfiles/blocktartest", options = ["--no-encryption"])
         self.assertEqual(1, len(glob.glob("testfiles/output/duplicity-new*.sigtar.gz")))
         # Confirm we can restore it (which in buggy versions, would fail)
         self.restore()
