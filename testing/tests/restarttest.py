@@ -220,16 +220,17 @@ class RestartTest(unittest.TestCase):
         than the local manifest has on record.  Caused when duplicity
         fails the last queued transfer(s).
         """
+        self.make_largefiles()
         # we know we're going to fail these, they are forced
         try:
-            self.backup("full", "/bin", options = ["--vol 1", "--fail 3"])
+            self.backup("full", "testfiles/largefiles", options = ["--vol 1", "--fail 3"])
             self.fail()
         except CmdError, e:
             self.assertEqual(30, e.exit_status)
         assert not os.system("rm testfiles/output/duplicity-full*vol[23].difftar*")
         # this one should pass OK
-        self.backup("full", "/bin", options = ["--vol 1"])
-        self.verify("/bin")
+        self.backup("full", "testfiles/largefiles", options = ["--vol 1"])
+        self.verify("testfiles/largefiles")
 
     def test_last_file_missing_in_middle(self):
         """
