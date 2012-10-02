@@ -308,7 +308,7 @@ class RestartTest(unittest.TestCase):
         sigtars = glob.glob("testfiles/output/duplicity-full*.sigtar.gz")
         self.assertEqual(1, len(sigtars))
         sigtar = sigtars[0]
-        output = subprocess.check_output(["tar", "t", "--file=%s" % sigtar])
+        output = subprocess.Popen(["tar", "t", "--file=%s" % sigtar], stdout=subprocess.PIPE).communicate()[0]
         self.assertEqual(1, output.split("\n").count("snapshot/"))
 
     def xtest_ignore_double_snapshot(self):
