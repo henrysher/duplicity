@@ -875,13 +875,17 @@ or preceded by a double slash, '//path', to represent an absolute
 filesystem path.
 .PP
 Formats of each of the URL schemes follow:
-.PP
 .RS
+.PP
 cf+http://container_name
 .PP
-file:///some_dir
+file:///absolute_local_path
+.br
+file://relative_local_path
 .PP
 ftp[s]://user[:password]@other.host[:port]/some_dir
+.PP
+gdocs://user[:password]@other.host/some_dir
 .PP
 hsi://user[:password]@other.host/some_dir
 .PP
@@ -907,16 +911,6 @@ s3+http://bucket_name[/prefix]
 See also
 .BI "A NOTE ON EUROPEAN S3 BUCKETS"
 .PP
-.BI "Ubuntu One"
-.br
-u1://host/volume_path
-.br
-u1+http://volume_path
-.br
-See also
-.BI "A NOTE ON UBUNTU ONE"
-.br
-.PP
 scp://.. or ssh://.. are synonymous with
 .br
 sftp://user[:password]@other.host[:port]/[/]some_dir
@@ -931,10 +925,16 @@ and
 .PP
 tahoe://alias/directory
 .PP
-webdav[s]://user[:password]@other.host/some_dir
+.BI "Ubuntu One"
+.br
+u1://host/volume_path
+.br
+u1+http://volume_path
+.br
+See also
+.BI "A NOTE ON UBUNTU ONE"
 .PP
-gdocs://user[:password]@other.host/some_dir
-
+webdav[s]://user[:password]@other.host/some_dir
 .RE
 
 .SH TIME FORMATS
