@@ -38,7 +38,7 @@ Some backends also require additional components (probably available as packages
 There are two 
 .B ssh backends
 for scp/sftp/ssh access (also see 
-.BR --ssh-backend ).
+.BR "A NOTE ON SSH BACKENDS" ).
 .TP
 .BR "ssh paramiko backend" " (enabled by default)"
 .B paramiko
@@ -670,26 +670,28 @@ characters or other characters that are not valid in a hostname.
 
 .TP
 .BI "--scp-command " command
-.B (only ssh pexpect backend)
+.B (only ssh pexpect backend with --use-scp enabled)
 The
 .I command
-will be used instead of scp to send or receive files.  The default command
-is "scp". To list and delete existing files, the sftp command is used.  See
-.BR --ssh-options
-and
-.BR --sftp-command .
+will be used instead of "scp" to send or receive files.
+To list and delete existing files, the sftp command is used.
+.br
+See also
+.B "A NOTE ON SSH BACKENDS"
+section
+.BR "SSH pexpect backend" .
 
 .TP
 .BI "--sftp-command " command
 .B (only ssh pexpect backend)
 The
 .I command
-will be used instead of sftp for listing and deleting files.  The
-default is "sftp". File transfers are done using the sftp command. See
-.BR --ssh-options ,
-.BR --use-scp ,
-and
-.BR --scp-command .
+will be used instead of "sftp". 
+.br
+See also
+.B "A NOTE ON SSH BACKENDS"
+section
+.BR "SSH pexpect backend" .
 
 .TP
 .BI --short-filenames
@@ -711,7 +713,7 @@ Should be specified only once because currently only
 .B one
 signing key is supported. Last entry overrides all other entries.
 .br
-see also
+See also
 .BI "A NOTE ON SYMMETRIC ENCRYPTION AND SIGNING"
 
 .TP
@@ -726,8 +728,9 @@ Allows the explicit selection of a ssh backend. Defaults to
 .BR paramiko .
 Alternatively you might choose 
 .BR pexpect .
-see also
-.B "A NOTE ON SSH BACKENDS"
+.br
+See also
+.BR "A NOTE ON SSH BACKENDS" .
 
 .TP
 .BI "--ssh-options " options
@@ -755,6 +758,9 @@ setting.
 Use this existing directory for duplicity temporary files instead of
 the system default, which is usually the /tmp directory. This option
 supersedes any environment variable.
+.br
+See also
+.BR "ENVIRONMENT VARIABLES" .
 
 .TP
 .BI -t time ", --time " time ", --restore-time " time
@@ -794,8 +800,9 @@ if no passphrase was delivered.
 .BI --use-scp
 If this option is specified, then the ssh backend will use the
 scp protocol rather than sftp for backend operations.
-see also
-.B "A NOTE ON SSH BACKENDS"
+.br
+See also
+.BR "A NOTE ON SSH BACKENDS" .
 
 .TP
 .BI "--verbosity " level ", -v" level
@@ -845,7 +852,7 @@ prompted for the passphrase.
 The passphrase to be used for
 .B --sign-key
 , if SIGN_PASSPHRASE is not set but PASSPHRASE is set, the latter will be used.
-Otherwise, if no passphrase is available, the user will be prompted for it.
+Otherwise, if passphrase is needed but not set the user will be prompted for it.
 
 .SH URL FORMAT
 Duplicity tries to maintain a standard URL format as much as possible.
@@ -880,7 +887,7 @@ hsi://user[:password]@other.host/some_dir
 .PP
 imap[s]://user[:password]@host.com[/from_address_prefix]
 .br
-see also
+See also
 .BI "A NOTE ON IMAP"
 .PP
 .BI "using rsync daemon"
@@ -897,7 +904,7 @@ s3://host/bucket_name[/prefix]
 .br
 s3+http://bucket_name[/prefix]
 .br
-see also
+See also
 .BI "A NOTE ON EUROPEAN S3 BUCKETS"
 .PP
 .BI "Ubuntu One"
@@ -906,7 +913,7 @@ u1://host/volume_path
 .br
 u1+http://volume_path
 .br
-see also
+See also
 .BI "A NOTE ON UBUNTU ONE"
 .br
 .PP
@@ -914,11 +921,13 @@ scp://.. or ssh://.. are synonymous with
 .br
 sftp://user[:password]@other.host[:port]/[/]some_dir
 .br
-see also
+See also
 .BR --ssh-backend ,
-.B --use-scp
+.BR --ssh-askpass ,
+.BR --use-scp ,
+.B  --ssh-options
 and
-.B "A NOTE ON SSH BACKENDS"
+.BR "A NOTE ON SSH BACKENDS" .
 .PP
 tahoe://alias/directory
 .PP
@@ -1275,19 +1284,33 @@ will distinguish between different backups.
 .SH A NOTE ON SSH BACKENDS
 The 
 .I ssh backends
-support sftp and scp transports. This is a known user-confusing issue.
-These are fundamentally different. If you plan to access your backend via one
-of those please inform yourself about the requirements for a server to support
-scp or sftp.
-To make it even more confusing the user can choose between two ssh backends 
-see
-.B --ssh\-backend
-for details.
+support
+.I sftp
+and
+.I scp/ssh
+transport protocols.
+This is a known user-confusing issue as they are fundamentally different.
+If you plan to access your backend via one of those please inform yourself 
+about the requirements for a server to support
+.IR scp ,
+.IR sftp or
+.I ssh
+access.
+To make it even more confusing the user can choose between two ssh backends via
+.BR --ssh-backend " option."
+.br
+Both support
+.BR --use-scp ,
+.BR --ssh-askpass " and"
+.BR --ssh-options "."
+Pexpect additionally allows to define
+.BR --scp-command " and"
+.BR --sftp-command .
 .PP
 .BR "SSH paramiko backend " "(selected by default)"
-is complete reimplementation of ssh protocols natively in python. Advantages 
+is a complete reimplementation of ssh protocols natively in python. Advantages 
 are speed and maintainability. Minor disadvantage is that extra packages are 
-needed see
+needed as listed in
 .B REQUIREMENTS
 above. In
 .I sftp
