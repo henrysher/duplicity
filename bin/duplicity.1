@@ -1289,12 +1289,11 @@ support
 and
 .I scp/ssh
 transport protocols.
-This is a known user-confusing issue as they are fundamentally different.
+This is a known user-confusing issue as these are fundamentally different.
 If you plan to access your backend via one of those please inform yourself 
 about the requirements for a server to support
-.IR scp ,
 .IR sftp or
-.I ssh
+.I scp/ssh
 access.
 To make it even more confusing the user can choose between two ssh backends via
 .BR --ssh-backend " option."
@@ -1303,7 +1302,9 @@ Both support
 .BR --use-scp ,
 .BR --ssh-askpass " and"
 .BR --ssh-options "."
-Pexpect additionally allows to define
+Only the 
+.B pexpect
+backend allows to define
 .BR --scp-command " and"
 .BR --sftp-command .
 .PP
