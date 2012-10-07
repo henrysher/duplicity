@@ -61,6 +61,9 @@ Enhancements:
 - Merged in lp:~ed.so/duplicity/ssh-pexpect-msgbug
   + Fixes 'UnboundLocalError: local variable 'msg' referenced before assignment'
     in _ssh_pexpect.py
+- Merged in lp:~ed.so/duplicity/gpg.tmp
+  + place gpg.py tempfiles in duplicity's tmp subfolder which is cleaned
+    whatever happens
 
 Bugs closed in this release:
 

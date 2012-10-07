@@ -220,16 +220,17 @@ class RestartTest(unittest.TestCase):
         than the local manifest has on record.  Caused when duplicity
         fails the last queued transfer(s).
         """
+        self.make_largefiles()
         # we know we're going to fail these, they are forced
         try:
-            self.backup("full", "/bin", options = ["--vol 1", "--fail 3"])
+            self.backup("full", "testfiles/largefiles", options = ["--vol 1", "--fail 3"])
             self.fail()
         except CmdError, e:
             self.assertEqual(30, e.exit_status)
         assert not os.system("rm testfiles/output/duplicity-full*vol[23].difftar*")
         # this one should pass OK
-        self.backup("full", "/bin", options = ["--vol 1"])
-        self.verify("/bin")
+        self.backup("full", "testfiles/largefiles", options = ["--vol 1"])
+        self.verify("testfiles/largefiles")
 
     def test_last_file_missing_in_middle(self):
         """
@@ -308,10 +309,10 @@ class RestartTest(unittest.TestCase):
         sigtars = glob.glob("testfiles/output/duplicity-full*.sigtar.gz")
         self.assertEqual(1, len(sigtars))
         sigtar = sigtars[0]
-        output = subprocess.check_output(["tar", "t", "--file=%s" % sigtar])
+        output = subprocess.Popen(["tar", "t", "--file=%s" % sigtar], stdout=subprocess.PIPE).communicate()[0]
         self.assertEqual(1, output.split("\n").count("snapshot/"))
 
-    def xtest_ignore_double_snapshot(self):
+    def test_ignore_double_snapshot(self):
         """
         Test that we gracefully ignore double snapshot entries in a signature
         file.  This winds its way through duplicity as a deleted base dir,
@@ -340,7 +341,7 @@ class RestartTest(unittest.TestCase):
         self.assertEqual(0, os.system("rm -r testfiles/cache"))
         # Try a follow on incremental (which in buggy versions, would create
         # a deleted entry for the base dir)
-        self.backup("inc", "testfiles/blocktartest")
+        self.backup("inc", "testfiles/blocktartest", options = ["--no-encryption"])
         self.assertEqual(1, len(glob.glob("testfiles/output/duplicity-new*.sigtar.gz")))
         # Confirm we can restore it (which in buggy versions, would fail)
         self.restore()
