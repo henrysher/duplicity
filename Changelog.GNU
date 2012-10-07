@@ -1,3 +1,33 @@
+2012-10-07  Kenneth Loafman  <kenneth@loafman.com>
+
+	- Merged in lp:~ed.so/duplicity/gpg.tmp
+	+ place gpg.py tempfiles in duplicity's tmp subfolder which is cleaned
+	whatever happens
+
+2012-10-07  ede
+
+	place gpg.py tempfiles in duplicity's tmp subfolder which is cleaned whatever happens
+
+2012-10-02  Michael Terry  <michael.terry@canonical.com>
+
+	tests: apparently on hardy chroots, /bin can be smaller than 3MB compressed, so instead of using /bin in test_multi_volume_failure, use largefiles
+
+2012-10-02  Michael Terry  <michael.terry@canonical.com>
+
+	tests: whoops, I had accidentally disabled one of the new tests for ignoring double entries in a tarball
+
+2012-10-02  Michael Terry  <michael.terry@canonical.com>
+
+	tests: don't use subprocess.check_output, which was only added in Python 2.7
+
+2012-09-30  Michael Terry  <michael.terry@canonical.com>
+
+	don't use unittest.TestCase.assertSetEqual, which isn't supported in older Python versions
+
+2012-09-30  Kenneth Loafman  <kenneth@loafman.com>
+
+	Update Changelog.GNU
+
 2012-09-30  Kenneth Loafman  <kenneth@loafman.com>
 
 	- Merged in lp:~ed.so/duplicity/ssh-pexpect-msgbug
