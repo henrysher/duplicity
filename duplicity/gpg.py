@@ -21,13 +21,15 @@
 
 """
 duplicity's gpg interface, builds upon Frank Tobin's GnuPGInterface
+which is now patched with some code for iterative threaded execution
+see duplicity's README for details
 """
 
 import os, types, tempfile, re, gzip
 
 from duplicity import misc
 from duplicity import globals
-from duplicity import GnuPGInterface
+from duplicity import gpginterface
 from duplicity import tempdir
 
 try:
@@ -100,7 +102,7 @@ class GPGFile:
         self.byte_count = 0
 
         # Start GPG process - copied from GnuPGInterface docstring.
-        gnupg = GnuPGInterface.GnuPG()
+        gnupg = gpginterface.GnuPG()
         gnupg.options.meta_interactive = 0
         gnupg.options.extra_args.append('--no-secmem-warning')
         if globals.use_agent:

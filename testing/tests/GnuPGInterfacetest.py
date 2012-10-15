@@ -27,7 +27,7 @@ import unittest
 import tempfile
 import sys
 
-from duplicity import GnuPGInterface
+from duplicity import gpginterface
 
 __author__   = "Frank J. Tobin, ftobin@neverending.org"
 __version__  = "0.2.2"
@@ -37,7 +37,7 @@ class BasicTest(unittest.TestCase):
     """an initializer superclass"""
 
     def __init__(self, methodName=None):
-        self.gnupg = GnuPGInterface.GnuPG()
+        self.gnupg = gpginterface.GnuPG()
         unittest.TestCase.__init__(self, methodName)
 
 
@@ -152,7 +152,7 @@ class OptionsTests(BasicTest):
         self.reset_options()
 
     def reset_options(self):
-        self.gnupg.options = GnuPGInterface.Options()
+        self.gnupg.options = gpginterface.Options()
 
     def option_to_arg(self, option):
         return '--' + option.replace('_', '-')
@@ -229,7 +229,7 @@ class PipesTests(unittest.TestCase):
     """Tests for Pipes class"""
 
     def test_constructor(self):
-        self.pipe = GnuPGInterface.Pipe(1, 2, 0)
+        self.pipe = gpginterface.Pipe(1, 2, 0)
         assert self.pipe.parent == 1
         assert self.pipe.child  == 2
         assert not self.pipe.direct
