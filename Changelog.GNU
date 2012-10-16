@@ -1,3 +1,22 @@
+2012-10-16  Kenneth Loafman  <kenneth@loafman.com>
+
+	- Merged in lp:~ed.so/duplicity/gpginterface
+	+ refactor GnuPGInterface to gpginterface.py
+	reasoning can be found in README
+
+2012-10-15  ede
+
+	some clarifications in README
+
+2012-10-15  ede
+
+	refactor GnuPGInterface to gpginterface.py
+	reasoning can be found in README
+
+2012-10-07  Kenneth Loafman  <kenneth@loafman.com>
+
+	Update Changelog.GNU
+
 2012-10-07  Kenneth Loafman  <kenneth@loafman.com>
 
 	- Merged in lp:~ed.so/duplicity/gpg.tmp

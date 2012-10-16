@@ -1,11 +1,14 @@
 [not to be removed until the end of 2013]
 Dear package maintainer! If you are packaging duplicity for some distribution
-and used to remove GnuPGInterface.py please note this: 
+and used to remove GnuPGInterface.py please note this:
 We really need our _own_ patched GnuPGInterface. See README for details.
 
 New in v0.6.20 (2012/??/??)
 ---------------------------
 Enhancements:
+- Merged in lp:~ed.so/duplicity/gpginterface
+  + refactor GnuPGInterface to gpginterface.py
+    reasoning can be found in README
 - Merged in lp:~ed.so/duplicity/duplicity.helpfix
   + fix rare 'TypeError: encode() argument 1 must be string, not None'
   + http://lists.nongnu.org/archive/html/duplicity-talk/2012-09/msg00016.html
