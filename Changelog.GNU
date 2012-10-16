@@ -1,5 +1,41 @@
 2012-10-16  Kenneth Loafman  <kenneth@loafman.com>
 
+	- Merged in lp:~ed.so/duplicity/ssh.manpage
+	+ added gdocs and rsync REQUIREMENTS
+	+ added cloudfiles documentation
+
+2012-10-16  ede
+
+	added gdocs, rsync REQUIREMENTS
+
+2012-10-13  ede
+
+	some refinements
+	add cloudfiles documentation
+
+2012-10-03  ede
+
+	sort urls alphabetically
+	add abs vs. relative file urls
+
+2012-10-03  ede
+
+	typo
+
+2012-10-03  ede
+
+	minor fix
+
+2012-10-03  ede
+
+	some clarifications mostly for ssh pexpect backend
+
+2012-10-16  Kenneth Loafman  <kenneth@loafman.com>
+
+	Update Changelog.GNU
+
+2012-10-16  Kenneth Loafman  <kenneth@loafman.com>
+
 	- Merged in lp:~ed.so/duplicity/gpginterface
 	+ refactor GnuPGInterface to gpginterface.py
 	reasoning can be found in README
