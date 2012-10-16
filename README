@@ -49,18 +49,24 @@ immediate threaded waitpid() for each GPG task, thus harvesting the
 task and freeing it's resources in a timely manner.  This does not
 affect the operation of duplicity, merely frees resources on time.
 
-Why the note?  Some distro's remove duplicity's GnuPGInterface in
-error, thinking that this change is not important.  So, if you have
-the problem where lots of GPG tasks are hanging around, check to see
-if this has been done in your distro, then, report the bug to the
-distro's maintainer and/or package manager.
+Why the note?  Some package maintainers remove duplicity's GnuPGInterface
+in error, obviously unknowing of this issue and patch duplicity to use 
+the old unmaintained unpatched GnuPGInterface interface again.
+So, if you have the problem that lots of GPG tasks are hanging around, 
+check and see if this has been done in your distro, and if so, report this 
+matter as a bug to the distro or package maintainer.
+
+As of october 2012 we pull the handbrake and refactor our code and rename
+the class to gpginterface in the hope that package maintainers will stumble 
+over it and stop this problematic behaviour for good.
 
 
 HELP:
 
 For more information see the duplicity home page at:
 
-    http://www.nongnu.org/duplicity
+  http://www.nongnu.org/duplicity
 
 or post to the mailing list at
-http://mail.nongnu.org/mailman/listinfo/duplicity-talk/.
+  
+  http://mail.nongnu.org/mailman/listinfo/duplicity-talk/.

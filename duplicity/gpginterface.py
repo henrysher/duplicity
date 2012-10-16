@@ -1,6 +1,10 @@
 """Interface to GNU Privacy Guard (GnuPG)
 
-GnuPGInterface is a Python module to interface with GnuPG.
+!!! This was renamed to gpginterface.py.
+    Please refer to duplicity's README for the reason. !!!
+
+gpginterface is a Python module to interface with GnuPG which based on 
+GnuPGInterface by Frank J. Tobin.
 It concentrates on interacting with GnuPG via filehandles,
 providing access to control GnuPG via versatile and extensible means.
 
@@ -15,12 +19,12 @@ Process object, which contains the filehandles to talk to GnuPG with.
 
 Example code:
 
->>> import GnuPGInterface
+>>> import gpginterface
 >>>
 >>> plaintext  = "Three blind mice"
 >>> passphrase = "This is the passphrase"
 >>>
->>> gnupg = GnuPGInterface.GnuPG()
+>>> gnupg = gpginterface.GnuPG()
 >>> gnupg.options.armor = 1
 >>> gnupg.options.meta_interactive = 0
 >>> gnupg.options.extra_args.append('--no-secmem-warning')
@@ -122,16 +126,16 @@ gnupg.passphrase = 'My passphrase'
 gnupg.options.recipients = [ 'bob@foobar.com' ]
 gnupg.run( ['--sign', '--encrypt'], create_fhs=..., attach_fhs=...)
 
-Here is an example of subclassing GnuPGInterface.GnuPG,
+Here is an example of subclassing gpginterface.GnuPG,
 so that it has an encrypt_string() method that returns
 ciphertext.
 
->>> import GnuPGInterface
+>>> import gpginterface
 >>>
->>> class MyGnuPG(GnuPGInterface.GnuPG):
+>>> class MyGnuPG(gpginterface.GnuPG):
 ...
 ...     def __init__(self):
-...         GnuPGInterface.GnuPG.__init__(self)
+...         gpginterface.GnuPG.__init__(self)
 ...         self.setup_my_options()
 ...
 ...     def setup_my_options(self):
@@ -162,8 +166,8 @@ ciphertext.
            "What GnuPG gave back is not a string!"
 
 Here is an example of generating a key:
->>> import GnuPGInterface
->>> gnupg = GnuPGInterface.GnuPG()
+>>> import gpginterface
+>>> gnupg = gpginterface.GnuPG()
 >>> gnupg.options.meta_interactive = 0
 >>>
 >>> # We will be creative and use the logger filehandle to capture
@@ -271,7 +275,7 @@ class GnuPG:
       then GnuPG instnace will take care of sending the passphrase to
       GnuPG, the executable instead of having the user sent it in manually.
 
-    * options -- Object of type GnuPGInterface.Options.
+    * options -- Object of type gpginterface.Options.
       Attribute-setting in options determines
       the command-line options used when calling GnuPG.
     """
@@ -286,7 +290,7 @@ class GnuPG:
         complete with prefixing dashes.
         For example, gnupg_commands could be
         '["--sign", "--encrypt"]'
-        Returns a GnuPGInterface.Process object.
+        Returns a gpginterface.Process object.
 
         args is an optional list of GnuPG command arguments (not options),
         such as keyID's to export, filenames to process, etc.
@@ -524,9 +528,9 @@ class Options:
     extra_args -- Extra option arguments may be passed in
     via the attribute extra_args, a list.
 
-    >>> import GnuPGInterface
+    >>> import gpginterface
     >>>
-    >>> gnupg = GnuPGInterface.GnuPG()
+    >>> gnupg = gpginterface.GnuPG()
     >>> gnupg.options.armor = 1
     >>> gnupg.options.recipients = ['Alice', 'Bob']
     >>> gnupg.options.extra_args = ['--no-secmem-warning']
@@ -673,7 +677,7 @@ def threaded_waitpid(process):
 
 
 def _run_doctests():
-    import doctest, GnuPGInterface #@UnresolvedImport
+    import doctest, gpginterface #@UnresolvedImport
     return doctest.testmod(GnuPGInterface)
 
 # deprecated

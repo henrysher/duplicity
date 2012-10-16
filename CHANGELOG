@@ -1,3 +1,8 @@
+[not to be removed until the end of 2013]
+Dear package maintainer! If you are packaging duplicity for some distribution
+and used to remove GnuPGInterface.py please note this: 
+We really need our _own_ patched GnuPGInterface. See README for details.
+
 New in v0.6.20 (2012/??/??)
 ---------------------------
 Enhancements:
