@@ -20,6 +20,10 @@ Some backends also require additional components (probably available as packages
 .B boto
 - http://github.com/boto/boto
 .TP
+.BR "cloudfiles backend" " (e.g. Rackspace Open Cloud)"
+.B Cloud Files Python API
+- http://www.rackspace.com/knowledge_center/article/python-api-installation-for-cloud-files
+.TP
 .B "ftp backend"
 .B NcFTP Client
 - http://www.ncftp.com/
@@ -28,17 +32,25 @@ Some backends also require additional components (probably available as packages
 .B LFTP Client
 - http://lftp.yar.ru/
 .TP
+.BR "gdocs backend" " (Google Docs)"
+.B Google Data APIs Python Client Library
+- http://code.google.com/p/gdata-python-client/
+.TP
 .BR "gio backend" " (Gnome VFS API)"
 .B PyGObject
 - http://live.gnome.org/PyGObject
 .br
 .B D-Bus
 (dbus)- http://www.freedesktop.org/wiki/Software/dbus
+.TP
+.B "rsync backend"
+.B rsync client binary
+- http://rsync.samba.org/
 .PP
 There are two 
 .B ssh backends
 for scp/sftp/ssh access (also see 
-.BR --ssh-backend ).
+.BR "A NOTE ON SSH BACKENDS" ).
 .TP
 .BR "ssh paramiko backend" " (enabled by default)"
 .B paramiko
@@ -118,7 +130,7 @@ If you are backing up the root directory /, remember to --exclude
 there.
 
 .SH EXAMPLES
-Here is an example of a backup, using scp to back up /home/me to
+Here is an example of a backup, using sftp to back up /home/me to
 some_dir on the other.host machine:
 .PP
 .RS
@@ -670,26 +682,28 @@ characters or other characters that are not valid in a hostname.
 
 .TP
 .BI "--scp-command " command
-.B (only ssh pexpect backend)
+.B (only ssh pexpect backend with --use-scp enabled)
 The
 .I command
-will be used instead of scp to send or receive files.  The default command
-is "scp". To list and delete existing files, the sftp command is used.  See
-.BR --ssh-options
-and
-.BR --sftp-command .
+will be used instead of "scp" to send or receive files.
+To list and delete existing files, the sftp command is used.
+.br
+See also
+.B "A NOTE ON SSH BACKENDS"
+section
+.BR "SSH pexpect backend" .
 
 .TP
 .BI "--sftp-command " command
 .B (only ssh pexpect backend)
 The
 .I command
-will be used instead of sftp for listing and deleting files.  The
-default is "sftp". File transfers are done using the sftp command. See
-.BR --ssh-options ,
-.BR --use-scp ,
-and
-.BR --scp-command .
+will be used instead of "sftp". 
+.br
+See also
+.B "A NOTE ON SSH BACKENDS"
+section
+.BR "SSH pexpect backend" .
 
 .TP
 .BI --short-filenames
@@ -711,7 +725,7 @@ Should be specified only once because currently only
 .B one
 signing key is supported. Last entry overrides all other entries.
 .br
-see also
+See also
 .BI "A NOTE ON SYMMETRIC ENCRYPTION AND SIGNING"
 
 .TP
@@ -726,8 +740,9 @@ Allows the explicit selection of a ssh backend. Defaults to
 .BR paramiko .
 Alternatively you might choose 
 .BR pexpect .
-see also
-.B "A NOTE ON SSH BACKENDS"
+.br
+See also
+.BR "A NOTE ON SSH BACKENDS" .
 
 .TP
 .BI "--ssh-options " options
@@ -755,6 +770,9 @@ setting.
 Use this existing directory for duplicity temporary files instead of
 the system default, which is usually the /tmp directory. This option
 supersedes any environment variable.
+.br
+See also
+.BR "ENVIRONMENT VARIABLES" .
 
 .TP
 .BI -t time ", --time " time ", --restore-time " time
@@ -794,8 +812,9 @@ if no passphrase was delivered.
 .BI --use-scp
 If this option is specified, then the ssh backend will use the
 scp protocol rather than sftp for backend operations.
-see also
-.B "A NOTE ON SSH BACKENDS"
+.br
+See also
+.BR "A NOTE ON SSH BACKENDS" .
 
 .TP
 .BI "--verbosity " level ", -v" level
@@ -831,6 +850,9 @@ Mb. Default is 25Mb.
 .B TMPDIR, TEMP, TMP
 In decreasing order of importance, specifies the directory to use for
 temporary files (inherited from Python's tempfile module).
+Eventually the option
+.B --tempdir
+supercedes any of these.
 .TP
 .B FTP_PASSWORD
 Supported by most backends which are password capable. More secure than
@@ -845,22 +867,22 @@ prompted for the passphrase.
 The passphrase to be used for
 .B --sign-key
 , if SIGN_PASSPHRASE is not set but PASSPHRASE is set, the latter will be used.
-Otherwise, if no passphrase is available, the user will be prompted for it.
+Otherwise, if passphrase is needed but not set the user will be prompted for it.
 
 .SH URL FORMAT
-Duplicity tries to maintain a standard URL format as much as possible.
+Duplicity uses the URL format (as standard as possible) to define data locations.
 The generic format for a URL is:
 .PP
 .RS
-scheme://user[:password]@host[:port]/[/]path
+scheme://[user[:password]@]host[:port]/[/]path
 .PP
 .RE
 It is not recommended to expose the password on the command line since
 it could be revealed to anyone with permissions to do process listings,
-however, it is permitted.
-Consider setting the environment variable FTP_PASSWORD instead, which
-is supported by most, but not all backends. Regardless of its name it
-can be used with other backends.
+it is permitted however.
+Consider setting the environment variable 
+.B FTP_PASSWORD 
+instead, which is used by most, but not all backends, regardless of it's name.
 .PP
 In protocols that support it, the path may be preceded by a single
 slash, '/path', to represent a relative path to the target home directory,
@@ -868,37 +890,54 @@ or preceded by a double slash, '//path', to represent an absolute
 filesystem path.
 .PP
 Formats of each of the URL schemes follow:
-.PP
 .RS
-cf+http://container_name
 .PP
-file:///some_dir
+cf+http://container_name
+.br
+See also
+.B "A NOTE ON CLOUD FILES ACCESS"
+.PP
+file://[relative|/absolute]/local/path
 .PP
 ftp[s]://user[:password]@other.host[:port]/some_dir
+.PP
+gdocs://user[:password]@other.host/some_dir
 .PP
 hsi://user[:password]@other.host/some_dir
 .PP
 imap[s]://user[:password]@host.com[/from_address_prefix]
 .br
-see also
-.BI "A NOTE ON IMAP"
+See also
+.B "A NOTE ON IMAP"
 .PP
-.BI "using rsync daemon"
+.B "using rsync daemon"
 .br
 rsync://user[:password]@host.com[:port]::[/]module/some_dir
-.PP
-.BI "using rsync over ssh (only key auth)"
 .br
-rsync://user@host.com[:port]/relative_path
+.B "using rsync over ssh (only key auth)"
 .br
-rsync://user@host.com[:port]//absolute_path
+rsync://user@host.com[:port]/[relative|/absolute]_path
 .PP
 s3://host/bucket_name[/prefix]
 .br
 s3+http://bucket_name[/prefix]
 .br
-see also
-.BI "A NOTE ON EUROPEAN S3 BUCKETS"
+See also
+.B "A NOTE ON EUROPEAN S3 BUCKETS"
+.PP
+scp://.. or ssh://.. are synonymous with
+.br
+sftp://user[:password]@other.host[:port]/[/]some_dir
+.br
+See also
+.BR --ssh-backend ,
+.BR --ssh-askpass ,
+.BR --use-scp ,
+.B  --ssh-options
+and
+.BR "A NOTE ON SSH BACKENDS" .
+.PP
+tahoe://alias/directory
 .PP
 .BI "Ubuntu One"
 .br
@@ -906,26 +945,10 @@ u1://host/volume_path
 .br
 u1+http://volume_path
 .br
-see also
+See also
 .BI "A NOTE ON UBUNTU ONE"
-.br
-.PP
-scp://.. or ssh://.. are synonymous with
-.br
-sftp://user[:password]@other.host[:port]/[/]some_dir
-.br
-see also
-.BR --ssh-backend ,
-.B --use-scp
-and
-.B "A NOTE ON SSH BACKENDS"
-.PP
-tahoe://alias/directory
 .PP
 webdav[s]://user[:password]@other.host/some_dir
-.PP
-gdocs://user[:password]@other.host/some_dir
-
 .RE
 
 .SH TIME FORMATS
@@ -1224,6 +1247,27 @@ matches any files whose full pathnames contain 7 consecutive digits
 which aren't followed by 'foo'.  However, it wouldn't match /home even
 if /home/ben/1234567 existed.
 
+.SH A NOTE ON CLOUD FILES ACCESS
+Cloudfiles is Rackspace's implementation of OpenStack Object Storage
+protocol.
+
+The backend requires python-cloudfiles to be installed on the system.
+See 
+.B REQUIREMENTS 
+above.
+
+It uses three environment variables for authentification:
+.BR CLOUDFILES_USERNAME " (required),"
+.BR CLOUDFILES_APIKEY " (required),"
+.BR CLOUDFILES_AUTHURL " (optional)"
+
+If 
+.B CLOUDFILES_AUTHURL 
+is unspecified it will default to the value
+provided by python-cloudfiles, which points to rackspace, hence this value 
+.I must 
+be set in order to use other cloud files providers.
+
 .SH A NOTE ON EUROPEAN S3 BUCKETS
 Amazon S3 provides the ability to choose the location of a bucket upon
 its creation. The purpose is to enable the user to choose a location
@@ -1275,19 +1319,34 @@ will distinguish between different backups.
 .SH A NOTE ON SSH BACKENDS
 The 
 .I ssh backends
-support sftp and scp transports. This is a known user-confusing issue.
-These are fundamentally different. If you plan to access your backend via one
-of those please inform yourself about the requirements for a server to support
-scp or sftp.
-To make it even more confusing the user can choose between two ssh backends 
-see
-.B --ssh\-backend
-for details.
+support
+.I sftp
+and
+.I scp/ssh
+transport protocols.
+This is a known user-confusing issue as these are fundamentally different.
+If you plan to access your backend via one of those please inform yourself 
+about the requirements for a server to support
+.IR sftp " or"
+.I scp/ssh
+access.
+To make it even more confusing the user can choose between two ssh backends via
+.BR --ssh-backend " option."
+.br
+Both support
+.BR --use-scp ,
+.BR --ssh-askpass " and"
+.BR --ssh-options "."
+Only the 
+.B pexpect
+backend allows to define
+.BR --scp-command " and"
+.BR --sftp-command .
 .PP
 .BR "SSH paramiko backend " "(selected by default)"
-is complete reimplementation of ssh protocols natively in python. Advantages 
+is a complete reimplementation of ssh protocols natively in python. Advantages 
 are speed and maintainability. Minor disadvantage is that extra packages are 
-needed see
+needed as listed in
 .B REQUIREMENTS
 above. In
 .I sftp

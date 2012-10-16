@@ -6,6 +6,9 @@ We really need our _own_ patched GnuPGInterface. See README for details.
 New in v0.6.20 (2012/??/??)
 ---------------------------
 Enhancements:
+- Merged in lp:~ed.so/duplicity/ssh.manpage
+  + added gdocs and rsync REQUIREMENTS
+  + added cloudfiles documentation
 - Merged in lp:~ed.so/duplicity/gpginterface
   + refactor GnuPGInterface to gpginterface.py
     reasoning can be found in README
