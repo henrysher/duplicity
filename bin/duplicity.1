@@ -360,9 +360,13 @@ enough storage space is required to store two volumes.
 Calculate what would be done, but do not perform any backend actions
 
 .TP
-.BI "--encrypt-key " key
+.BI "--encrypt-key " key-id
 When backing up, encrypt to the given public key, instead of using
 symmetric (traditional) encryption.  Can be specified multiple times.
+The key-id can be given in any of the formats supported by GnuPG; see 
+.BR gpg (1),
+section "HOW TO SPECIFY A USER ID" for details.
+
 
 .TP
 .BI "--encrypt-secret-keyring " filename
@@ -374,12 +378,12 @@ This keyring is not used when creating a backup. If not specified, the
 default secret keyring is used which is usually located at .gnupg/secring.gpg
 
 .TP
-.BI "--encrypt-sign-key " key
+.BI "--encrypt-sign-key " key-id
 Convenience parameter. Same as
 .BR --encrypt-key 
-.IR key 
+.IR key-id
 .BR --sign-key 
-.IR "key" .
+.IR "key-id" .
 
 .TP
 .BI "--exclude " shell_pattern
@@ -713,14 +717,15 @@ useful when backing up to MacOS or another OS or FS that doesn't
 support long filenames.
 
 .TP
-.BI "--sign-key " key
+.BI "--sign-key " key-id
 This option can be used when backing up, restoring or verifying. 
 When backing up, all backup files will be signed with keyid
 .IR key .
 When restoring, duplicity will signal an error if any remote file is
-not signed with the given keyid.
-.I key
-should be an 8 character hex string, like AA0E73D2. 
+not signed with the given key-id. The key-id can be givein in any of 
+the formats supported by GnuPG; see 
+.BR gpg (1),
+section "HOW TO SPECIFY A USER ID" for details.
 Should be specified only once because currently only 
 .B one
 signing key is supported. Last entry overrides all other entries.

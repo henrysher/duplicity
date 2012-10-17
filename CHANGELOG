@@ -77,8 +77,8 @@ Enhancements:
     whatever happens
 
 Bugs closed in this release:
-1066625     ubuntu one backend does not work without gnome/dbus/x11 session
-            https://bugs.launchpad.net/duplicity/+bug/1066625
+1066625    ubuntu one backend does not work without gnome/dbus/x11 session
+995851     doc improvement for --encrypt-key, --sign-key
 
 
 New in v0.6.19 (2012/05/22)
