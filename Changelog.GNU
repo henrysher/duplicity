@@ -1,3 +1,11 @@
+2012-10-17  Kenneth Loafman  <kenneth@loafman.com>
+
+	1066625 ubuntu one backend does not work without gnome/dbus/x11 session
+
+2012-10-16  Kenneth Loafman  <kenneth@loafman.com>
+
+	Updated Changelog.GNU
+
 2012-10-16  Kenneth Loafman  <kenneth@loafman.com>
 
 	- Merged in lp:~ed.so/duplicity/ssh.manpage
