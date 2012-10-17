@@ -77,7 +77,9 @@ Enhancements:
     whatever happens
 
 Bugs closed in this release:
-1066625    ubuntu one backend does not work without gnome/dbus/x11 session
+519948     remove-* commands don't remove signature-files
+907077     assert len(chain_list) == 2 AssertionError
+929067     crash during restore: "assert ropath.index == (), ropath.index"
 995851     doc improvement for --encrypt-key, --sign-key
 1039001    --exclude-if-present and --exclude-other-filesystems causes crash
            with inaccessible other fs

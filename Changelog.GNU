@@ -1,5 +1,17 @@
 2012-10-17  Kenneth Loafman  <kenneth@loafman.com>
 
+	1039001 --exclude-if-present and --exclude-other-filesystems causes crash with inaccessible other fs
+
+2012-10-17  Kenneth Loafman  <kenneth@loafman.com>
+
+	995851 doc improvement for --encrypt-key, --sign-key
+
+2012-10-17  Kenneth Loafman  <kenneth@loafman.com>
+
+	Update Changelog.GNU
+
+2012-10-17  Kenneth Loafman  <kenneth@loafman.com>
+
 	1066625 ubuntu one backend does not work without gnome/dbus/x11 session
 
 2012-10-16  Kenneth Loafman  <kenneth@loafman.com>
