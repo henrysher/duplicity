@@ -506,6 +506,11 @@ probably isn't what you meant.""") %
         assert include == 0 or include == 1
 
         def exclude_sel_func(path):
+            # do not follow symbolic links when checking for file existence!
+            # path.append creates a new path object, which in turn uses setdata
+            # which in turn follows symbolic links...
+            if path.issym():
+                return None
             if path.append(filename).exists():
                 return 0
             else:

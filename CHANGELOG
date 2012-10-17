@@ -79,6 +79,9 @@ Enhancements:
 Bugs closed in this release:
 1066625    ubuntu one backend does not work without gnome/dbus/x11 session
 995851     doc improvement for --encrypt-key, --sign-key
+1039001    --exclude-if-present and --exclude-other-filesystems causes crash
+           with inaccessible other fs
+1066625    ubuntu one backend does not work without gnome/dbus/x11 session
 
 
 New in v0.6.19 (2012/05/22)
