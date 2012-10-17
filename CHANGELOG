@@ -1,6 +1,6 @@
 [not to be removed until the end of 2013]
-Dear package maintainer! If you are packaging duplicity for some distribution
-and used to remove GnuPGInterface.py please note this:
+Dear package maintainer! If you are packaging duplicity for some
+distribution and used to remove GnuPGInterface.py please note this:
 We really need our _own_ patched GnuPGInterface. See README for details.
 
 New in v0.6.20 (2012/??/??)
@@ -77,6 +77,8 @@ Enhancements:
     whatever happens
 
 Bugs closed in this release:
+1066625     ubuntu one backend does not work without gnome/dbus/x11 session
+            https://bugs.launchpad.net/duplicity/+bug/1066625
 
 
 New in v0.6.19 (2012/05/22)

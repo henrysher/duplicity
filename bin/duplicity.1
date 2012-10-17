@@ -941,7 +941,7 @@ tahoe://alias/directory
 .PP
 .BI "Ubuntu One"
 .br
-u1://host/volume_path
+u1://host_is_ignored/volume_path
 .br
 u1+http://volume_path
 .br
@@ -1378,9 +1378,16 @@ in addition for this backend mode to work properly. Sftp does not have these lim
 an sftp service running on the backend server, which is sometimes not an option.
 
 .SH A NOTE ON UBUNTU ONE
-Connecting to Ubuntu One requires that you be running duplicity inside of an X
-session so that you can be prompted for your credentials if necessary by the
-Ubuntu One session daemon.
+
+To use Ubuntu One you must have an Ubuntu One OAuth access token. Such 
+OAuth tokens have a practically unlimited lifetime; you can have multiple 
+active tokens and you can revoke tokens using the Ubuntu One web interface.
+.PP
+duplicity expects th token in the environment variable FTP_PASSWORD
+(in the format "consumer_key:consumer_secret:token:token_secret"). If no
+token is present, duplicity asks for your Ubuntu One email address and password
+and requests an access token from the Ubuntu SSO service. The newly 
+acquired token is then printed to the console.
 .PP
 See https://one.ubuntu.com/ for more information about Ubuntu One.
 
