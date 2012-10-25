@@ -91,10 +91,10 @@ class OAuthHttpClient(object):
                 return resp, content
 
             ecode = log.ErrorCode.backend_error
-            if numcode == 404:
-                ecode = log.ErrorCode.backend_not_found
-            elif numcode == 507:  # webdav no space
+            if numcode == 402:  # Payment Required
                 ecode = log.ErrorCode.backend_no_space
+            elif numcode == 404:
+                ecode = log.ErrorCode.backend_not_found
 
             if n >= globals.num_retries + 1:
                 log.FatalError("Giving up on request after %d attempts, last status %d %s" % (n, numcode.resp.reason), ecode)

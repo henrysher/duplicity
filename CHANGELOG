@@ -75,6 +75,8 @@ Enhancements:
 - Merged in lp:~ed.so/duplicity/gpg.tmp
   + place gpg.py tempfiles in duplicity's tmp subfolder which is cleaned
     whatever happens
+- Merged in lp:~mterry/duplicity/u1-402
+  + Switch the code we check for out-of-space in u1backend.
 
 Bugs closed in this release:
 519948     remove-* commands don't remove signature-files
