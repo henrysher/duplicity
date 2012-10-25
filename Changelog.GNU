@@ -1,3 +1,16 @@
+2012-10-25  Kenneth Loafman  <kenneth@loafman.com>
+
+	- Merged in lp:~mterry/duplicity/u1-402
+	+ Switch the code we check for out-of-space in u1backend.
+
+2012-10-25  Michael Terry  <michael.terry@canonical.com>
+
+	u1backend: interpret http code 402 as no-space-left rather than 507
+
+2012-10-17  Kenneth Loafman  <kenneth@loafman.com>
+
+	Update CHANGELOG and Changelog.GNU
+
 2012-10-17  Kenneth Loafman  <kenneth@loafman.com>
 
 	1039001 --exclude-if-present and --exclude-other-filesystems causes crash with inaccessible other fs
