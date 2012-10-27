@@ -2,7 +2,7 @@
 #
 # Copyright 2011 Canonical Ltd
 # Authors: Michael Terry <michael.terry@canonical.com>
-# 		   Alexander Zangerl <az@debian.org>
+#          Alexander Zangerl <az@debian.org>
 #
 # This file is part of duplicity.
 #
@@ -32,6 +32,7 @@ import urllib
 import getpass
 import os
 import sys
+import time
 
 class OAuthHttpClient(object):
     """a simple HTTP client with OAuth added on"""
@@ -46,38 +47,39 @@ class OAuthHttpClient(object):
                                             consumer_secret)
 
     def set_token(self, token, token_secret):
-        self.token = oauth.OAuthToken(token, token_secret)
+        self.token = oauth.OAuthToken( token, token_secret)
 
     def _get_oauth_request_header(self, url, method):
         """Get an oauth request header given the token and the url"""
         query = urlparse(url).query
 
         oauth_request = oauth.OAuthRequest.from_consumer_and_token(
-            http_url = url,
-            http_method = method,
-            oauth_consumer = self.consumer,
-            token = self.token,
-            parameters = dict(parse_qsl(query))
+            http_url=url,
+            http_method=method,
+            oauth_consumer=self.consumer,
+            token=self.token,
+            parameters=dict(parse_qsl(query))
         )
         oauth_request.sign_request(oauth.OAuthSignatureMethod_HMAC_SHA1(),
                                    self.consumer, self.token)
         return oauth_request.to_header()
 
-    def request(self, url, method = "GET", body = None, headers = {}, ignore = None):
+    def request(self, url, method="GET", body=None, headers={}, ignore=None):
         oauth_header = self._get_oauth_request_header(url, method)
         headers.update(oauth_header)
 
-        for n in range(1, globals.num_retries + 1):
-            log.Info("making %s request to %s (attempt %d)" % (method, url, n))
+        for n in range(1, globals.num_retries+1):
+            log.Info("making %s request to %s (attempt %d)" % (method,url,n))
             try:
-                resp, content = self.client.request(url, method, headers = headers, body = body)
+                resp, content = self.client.request(url, method, headers=headers, body=body)
             except Exception, e:
-                log.Info("request failed, exception %s" % e)
-                if n >= globals.num_retries + 1:
-                    log.FatalError("Giving up on request after %d attempts, last exception %s" % (n, e))
+                log.Info("request failed, exception %s" % e);
+                if n == globals.num_retries:
+                    log.FatalError("Giving up on request after %d attempts, last exception %s" % (n,e))
+                time.sleep(30)
                 continue
 
-            log.Info("completed request with status %s %s" % (resp.status, resp.reason))
+            log.Info("completed request with status %s %s" % (resp.status,resp.reason))
             oops_id = resp.get('x-oops-id', None)
             if oops_id:
                 log.Debug("Server Error: method %s url %s Oops-ID %s" % (method, url, oops_id))
@@ -86,8 +88,8 @@ class OAuthHttpClient(object):
                 content = loads(content)
 
             # were we successful? status either 2xx or code we're told to ignore
-            numcode = int(resp.status)
-            if (numcode >= 200 and numcode < 300) or (ignore and numcode in ignore):
+            numcode=int(resp.status)
+            if (numcode>=200 and numcode<300) or (ignore and numcode in ignore):
                 return resp, content
 
             ecode = log.ErrorCode.backend_error
@@ -96,31 +98,34 @@ class OAuthHttpClient(object):
             elif numcode == 404:
                 ecode = log.ErrorCode.backend_not_found
 
-            if n >= globals.num_retries + 1:
-                log.FatalError("Giving up on request after %d attempts, last status %d %s" % (n, numcode.resp.reason), ecode)
+            if n < globals.num_retries:
+                time.sleep(30)
+
+        log.FatalError("Giving up on request after %d attempts, last status %d %s" % (n,numcode,resp.reason),
+                       ecode)
 
 
-    def get_and_set_token(self, email, password, hostname):
+    def get_and_set_token(self,email, password, hostname):
         """Acquire an Ubuntu One access token via OAuth with the Ubuntu SSO service.
         See https://one.ubuntu.com/developer/account_admin/auth/otherplatforms for details.
         """
 
         # Request new access token from the Ubuntu SSO service
-        self.client.add_credentials(email, password)
+        self.client.add_credentials(email,password)
         resp, content = self.client.request('https://login.ubuntu.com/api/1.0/authentications?'
-                                            + 'ws.op=authenticate&token_name=Ubuntu%%20One%%20@%%20%s' % hostname)
-        if resp.status != 200:
-            log.FatalError("Token request failed: Incorrect Ubuntu One credentials", log.ErrorCode.backend_permission_denied)
+                                            +'ws.op=authenticate&token_name=Ubuntu%%20One%%20@%%20%s' % hostname)
+        if resp.status!=200:
+            log.FatalError("Token request failed: Incorrect Ubuntu One credentials",log.ErrorCode.backend_permission_denied)
             self.client.clear_credentials()
 
-        tokendata = loads(content)
-        self.set_consumer(tokendata['consumer_key'], tokendata['consumer_secret'])
-        self.set_token(tokendata['token'], tokendata['token_secret'])
+        tokendata=loads(content)
+        self.set_consumer(tokendata['consumer_key'],tokendata['consumer_secret'])
+        self.set_token(tokendata['token'],tokendata['token_secret'])
 
         # and finally tell Ubuntu One about the token
         resp, content = self.request('https://one.ubuntu.com/oauth/sso-finished-so-get-tokens/')
-        if resp.status != 200:
-            log.FatalError("Ubuntu One token was not accepted: %s %s" % (resp.status, resp.reason))
+        if resp.status!=200:
+            log.FatalError("Ubuntu One token was not accepted: %s %s" % (resp.status,resp.reason))
 
         return tokendata
 
@@ -141,36 +146,36 @@ class U1Backend(duplicity.backend.Backend):
         self.volume_uri = "%s/volumes/~/%s" % (self.api_base, path)
         self.meta_base = "%s/~/%s/" % (self.api_base, path)
 
-        self.client = OAuthHttpClient()
+        self.client=OAuthHttpClient();
 
         if 'FTP_PASSWORD' not in os.environ:
             sys.stderr.write("No Ubuntu One token found in $FTP_PASSWORD, requesting a new one\n")
-            email = raw_input('Enter Ubuntu One account email: ')
-            password = getpass.getpass("Enter Ubuntu One password: ")
-            hostname = os.uname()[1]
+            email=raw_input('Enter Ubuntu One account email: ')
+            password=getpass.getpass("Enter Ubuntu One password: ")
+            hostname=os.uname()[1]
 
-            tokendata = self.client.get_and_set_token(email, password, hostname)
+            tokendata=self.client.get_and_set_token(email,password,hostname)
             sys.stderr.write("\nPlease record your new Ubuntu One access token for future use with duplicity:\n"
-                             + "FTP_PASSWORD=%s:%s:%s:%s\n\n"
-                             % (tokendata['consumer_key'], tokendata['consumer_secret'],
-                                tokendata['token'], tokendata['token_secret']))
+                             +"FTP_PASSWORD=%s:%s:%s:%s\n\n"
+                             % (tokendata['consumer_key'],tokendata['consumer_secret'],
+                                tokendata['token'],tokendata['token_secret']))
         else:
-            (consumer, consumer_secret, token, token_secret) = os.environ['FTP_PASSWORD'].split(':')
+            (consumer,consumer_secret,token,token_secret) = os.environ['FTP_PASSWORD'].split(':')
             self.client.set_consumer(consumer, consumer_secret)
             self.client.set_token(token, token_secret)
 
-        resp, content = self.client.request(self.api_base, ignore = [400, 401, 403])
-        if resp['status'] != '200':
-            log.FatalError("Access failed: Ubuntu One credentials incorrect",
+        resp, content = self.client.request(self.api_base,ignore=[400,401,403])
+        if resp['status']!='200':
+           log.FatalError("Access failed: Ubuntu One credentials incorrect",
                            log.ErrorCode.user_error)
 
         # Create volume, but check existence first
-        resp, content = self.client.request(self.volume_uri, ignore = [404])
-        if resp['status'] == '404':
-            resp, content = self.client.request(self.volume_uri, "PUT")
+        resp, content = self.client.request(self.volume_uri,ignore=[404])
+        if resp['status']=='404':
+            resp, content = self.client.request(self.volume_uri,"PUT")
 
     def quote(self, url):
-        return urllib.quote(url, safe = "/~").replace(" ", "%20")
+        return urllib.quote(url, safe="/~").replace(" ","%20")
 
     def put(self, source_path, remote_filename = None):
         """Copy file to remote"""
@@ -178,14 +183,14 @@ class U1Backend(duplicity.backend.Backend):
             remote_filename = source_path.get_filename()
         remote_full = self.meta_base + self.quote(remote_filename)
         # check if it exists already, returns existing content_path
-        resp, content = self.client.request(remote_full, ignore = [404])
-        if resp['status'] == '404':
+        resp, content = self.client.request(remote_full,ignore=[404])
+        if resp['status']=='404':
             # put with path returns new content_path
             resp, content = self.client.request(remote_full,
-                                                method = "PUT",
+                                                method="PUT",
                                                 headers = { 'content-type': 'application/json' },
-                                                body = dumps({"kind":"file"}))
-        elif resp['status'] != '200':
+                                                body=dumps({"kind":"file"}))
+        elif resp['status']!='200':
             raise BackendException("access to %s failed, code %s" % (remote_filename, resp['status']))
 
         assert(content['content_path'] is not None)
@@ -193,7 +198,7 @@ class U1Backend(duplicity.backend.Backend):
         remote_full = self.content_base + self.quote(content['content_path'])
         log.Info("uploading file %s to location %s" % (remote_filename, remote_full))
 
-        fh = open(source_path.name, 'rb')
+        fh=open(source_path.name,'rb')
         data = bytearray(fh.read())
         fh.close()
 
@@ -201,9 +206,9 @@ class U1Backend(duplicity.backend.Backend):
         headers = {"Content-Length": str(len(data)),
                    "Content-Type": content_type}
         resp, content = self.client.request(remote_full,
-                                            method = "PUT",
-                                            body = str(data),
-                                            headers = headers)
+                                            method="PUT",
+                                            body=str(data),
+                                            headers=headers)
 
     def get(self, filename, local_path):
         """Get file and put in local_path (Path object)"""
@@ -242,7 +247,7 @@ class U1Backend(duplicity.backend.Backend):
 
         for filename in filename_list:
             remote_full = self.meta_base + self.quote(filename)
-            resp, content = self.client.request(remote_full, method = "DELETE")
+            resp, content = self.client.request(remote_full,method="DELETE")
 
     def _query_file_info(self, filename):
         """Query attributes on filename"""

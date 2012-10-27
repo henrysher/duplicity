@@ -77,6 +77,8 @@ Enhancements:
     whatever happens
 - Merged in lp:~mterry/duplicity/u1-402
   + Switch the code we check for out-of-space in u1backend.
+- Applied patch for #1066625 ubuntu one backend
+  + add delay between retries
 
 Bugs closed in this release:
 519948     remove-* commands don't remove signature-files
