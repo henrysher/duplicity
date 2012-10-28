@@ -1,12 +1,17 @@
+2012-10-28  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Remove dist/mkGNUchangelog script.
+    * Prep files for 0.6.20 release.
+
 2012-10-27  Kenneth Loafman  <kenneth@loafman.com>
 
-    - Applied patch from az for bug #1066625 u1backend
-      + add delay between retries
+    * Applied patch from az for bug #1066625 u1backend
+      - add delay between retries
 
 2012-10-25  Kenneth Loafman  <kenneth@loafman.com>
 
-    - Merged in lp:~mterry/duplicity/u1-402
-      + Switch the code we check for out-of-space in u1backend.
+    * Merged in lp:~mterry/duplicity/u1-402
+      - Switch the code we check for out-of-space in u1backend.
 
 2012-10-25  Michael Terry  <michael.terry@canonical.com>
 
@@ -38,9 +43,9 @@
 
 2012-10-16  Kenneth Loafman  <kenneth@loafman.com>
 
-    - Merged in lp:~ed.so/duplicity/ssh.manpage
-      + added gdocs and rsync REQUIREMENTS
-      + added cloudfiles documentation
+    * Merged in lp:~ed.so/duplicity/ssh.manpage
+      - added gdocs and rsync REQUIREMENTS
+      - added cloudfiles documentation
 
 2012-10-16  ede
 
@@ -74,8 +79,8 @@
 
 2012-10-16  Kenneth Loafman  <kenneth@loafman.com>
 
-    - Merged in lp:~ed.so/duplicity/gpginterface
-      + refactor GnuPGInterface to gpginterface.py
+    * Merged in lp:~ed.so/duplicity/gpginterface
+      - refactor GnuPGInterface to gpginterface.py
         reasoning can be found in README
 
 2012-10-15  ede
@@ -93,8 +98,8 @@
 
 2012-10-07  Kenneth Loafman  <kenneth@loafman.com>
 
-    - Merged in lp:~ed.so/duplicity/gpg.tmp
-      + place gpg.py tempfiles in duplicity's tmp subfolder which is cleaned
+    * Merged in lp:~ed.so/duplicity/gpg.tmp
+      - place gpg.py tempfiles in duplicity's tmp subfolder which is cleaned
         whatever happens
 
 2012-10-07  ede
@@ -123,8 +128,8 @@
 
 2012-09-30  Kenneth Loafman  <kenneth@loafman.com>
 
-    - Merged in lp:~ed.so/duplicity/ssh-pexpect-msgbug
-      + Fixes 'UnboundLocalError: local variable 'msg' referenced before assignment'
+    * Merged in lp:~ed.so/duplicity/ssh-pexpect-msgbug
+      - Fixes 'UnboundLocalError: local variable 'msg' referenced before assignment'
         in _ssh_pexpect.py
 
 2012-09-30  ede

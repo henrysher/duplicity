@@ -1,62 +1,64 @@
 [not to be removed until the end of 2013]
-Dear package maintainer! If you are packaging duplicity for some
+Dear package maintainer: If you are packaging duplicity for some
 distribution and used to remove GnuPGInterface.py please note this:
-We really need our _own_ patched GnuPGInterface. See README for details.
+**Duplicity really does need its patched version of GnuPGInterface**
+See README for details.
 
-New in v0.6.20 (2012/??/??)
+
+New in v0.6.20 (2012/10/28)
 ---------------------------
 Enhancements:
-- Merged in lp:~ed.so/duplicity/ssh.manpage
-  + added gdocs and rsync REQUIREMENTS
-  + added cloudfiles documentation
-- Merged in lp:~ed.so/duplicity/gpginterface
-  + refactor GnuPGInterface to gpginterface.py
+* Merged in lp:~ed.so/duplicity/ssh.manpage
+  - added gdocs and rsync REQUIREMENTS
+  - added cloudfiles documentation
+* Merged in lp:~ed.so/duplicity/gpginterface
+  - refactor GnuPGInterface to gpginterface.py
     reasoning can be found in README
-- Merged in lp:~ed.so/duplicity/duplicity.helpfix
-  + fix rare 'TypeError: encode() argument 1 must be string, not None'
-  + http://lists.nongnu.org/archive/html/duplicity-talk/2012-09/msg00016.html
-- Merged in lp:~ed.so/duplicity/duplicity.tmpspacefix
-  + use tempfile.TemporaryFile() so unused temp files are deleted automagically
-  + propbably solve bug 'Out of space error while restoring a file'
-  + https://bugs.launchpad.net/duplicity/+bug/1005901
-  + http://lists.gnu.org/archive/html/duplicity-talk/2012-09/msg00000.html
-- Merged in lp:~mterry/duplicity/utf8-po
-  + For some crazy reason, the gettext module defaults to giving you strings in
+* Merged in lp:~ed.so/duplicity/duplicity.helpfix
+  - fix rare 'TypeError: encode() argument 1 must be string, not None'
+  - http://lists.nongnu.org/archive/html/duplicity-talk/2012-09/msg00016.html
+* Merged in lp:~ed.so/duplicity/duplicity.tmpspacefix
+  - use tempfile.TemporaryFile() so unused temp files are deleted automagically
+  - propbably solve bug 'Out of space error while restoring a file'
+  - https://bugs.launchpad.net/duplicity/+bug/1005901
+  - http://lists.gnu.org/archive/html/duplicity-talk/2012-09/msg00000.html
+* Merged in lp:~mterry/duplicity/utf8-po
+  - For some crazy reason, the gettext module defaults to giving you strings in
     whatever charset the po file happened to define.  Which means you never know
     what string of bytes you're going to get.  This module makes sure we always
     get utf-8 byte strings.  So we're at least predictable and reduces one
     source of UnicodeDecodeErrors (like in bug 989496)
-- Merged in lp:~mterry/duplicity/1031277
-  + ssh: actually delete all the requested files, not just the first one
-- Merged in lp:~mterry/duplicity/leftover-sigtar
-  + So currently, duplicity does not delete signature files when doing a
+* Merged in lp:~mterry/duplicity/1031277
+  - ssh: actually delete all the requested files, not just the first one
+* Merged in lp:~mterry/duplicity/leftover-sigtar
+  - So currently, duplicity does not delete signature files when doing a
     remove-all-but-n operation. Seems wrong, since those signature files are now
     useless and take up space.
-  + This branch does several things:
+  - This branch does several things:
     1) Make remove-all-but-n operate on chains. In practice it did before, since
        the sets it operated on always came from complete chains (i.e. it never
        used only some of the sets from a chain)
     2) Add a new method to get all signature chains before a certain time.
     3) Use this new method to also delete signature chains during remove-all-but
        operations.
-  + And it cleans up the cleanuptest.py file:
+  - And it cleans up the cleanuptest.py file:
     1) Removes crufty, unused code
     2) Disallows changing the destination folder for the test, which no one
        would ever want to do and isn't really supported anyway
     3) Add some additional checks to the existing test
     4) Adds two new methods to test remove-all-but-n and
        remove-all-inc-of-but-n-full
-- Merged in lp:~ed.so/duplicity/duplicity.manpage
-  + disabled hyphenation and block justification for better readablility of
+* Merged in lp:~ed.so/duplicity/duplicity.manpage
+  - disabled hyphenation and block justification for better readablility of
     command line examples.
-  + reformatted REQUIREMENTS section for hopefully better online rendering
-  + minor clarifications
-- Merged in lp:~gregretkowski/duplicity/cf-retry-delete
-  + This will retry cloudfile delete commands. With large numbers of archive
+  - reformatted REQUIREMENTS section for hopefully better online rendering
+  - minor clarifications
+* Merged in lp:~gregretkowski/duplicity/cf-retry-delete
+  - This will retry cloudfile delete commands. With large numbers of archive
     files over mediocre links transient network errors will occasionally cause
     deletes to fail and these should be retried.
-- Merged in lp:~mterry/duplicity/ropath.index
-  + This branch does two main things:
+* Merged in lp:~mterry/duplicity/ropath.index
+  - This branch does two main things:
     1) Skips base dir entries when compiling the list of deleted delta iters.
        (this gracefully recovers from the sort of situations that lead to bug
        929067). I'm reasonably confident this is an uninvasive change, but
@@ -67,18 +69,18 @@ Enhancements:
        of the previous contents. Which was causing some confusion in bug 929067.
        If I'm wrong that we don't always rewrite the entire sigtar each time,
        this needs some rethink. Please also confirm that.
-  + In addition, I added two tests for the above two changes and make some
+  - In addition, I added two tests for the above two changes and make some
     improvements elsewhere in the restarttest.py file while I was at it.
-- Merged in lp:~ed.so/duplicity/ssh-pexpect-msgbug
-  + Fixes 'UnboundLocalError: local variable 'msg' referenced before assignment'
+* Merged in lp:~ed.so/duplicity/ssh-pexpect-msgbug
+  - Fixes 'UnboundLocalError: local variable 'msg' referenced before assignment'
     in _ssh_pexpect.py
-- Merged in lp:~ed.so/duplicity/gpg.tmp
-  + place gpg.py tempfiles in duplicity's tmp subfolder which is cleaned
+* Merged in lp:~ed.so/duplicity/gpg.tmp
+  - place gpg.py tempfiles in duplicity's tmp subfolder which is cleaned
     whatever happens
-- Merged in lp:~mterry/duplicity/u1-402
-  + Switch the code we check for out-of-space in u1backend.
-- Applied patch for #1066625 ubuntu one backend
-  + add delay between retries
+* Merged in lp:~mterry/duplicity/u1-402
+  - Switch the code we check for out-of-space in u1backend.
+* Applied patch for #1066625 ubuntu one backend
+  - add delay between retries
 
 Bugs closed in this release:
 519948     remove-* commands don't remove signature-files
@@ -93,25 +95,25 @@ Bugs closed in this release:
 New in v0.6.19 (2012/05/22)
 ---------------------------
 Enhancements:
-- lots of work on the man page to clean up requirements, etc.
-- use empty listbody for enhanced webdav compatibility
-- initial folder creation on backend does not result in a ResponseNotReady
+* lots of work on the man page to clean up requirements, etc.
+* use empty listbody for enhanced webdav compatibility
+* initial folder creation on backend does not result in a ResponseNotReady
   anymore
-- add ssh_config support (/etc/ssh/ssh_config + ~/.ssh/config) to paramiko
+* add ssh_config support (/etc/ssh/ssh_config + ~/.ssh/config) to paramiko
   sshbackend
-- add missing_host_key prompt to new sshbackend similar to ssh procedure
-- added --ssh-backend parameter to switch between paramiko,pexpect
-- allow answering gio mount questions (albeit naively)
-- if the gio backend wants to ask a question during its mount phase, it
+* add missing_host_key prompt to new sshbackend similar to ssh procedure
+* added --ssh-backend parameter to switch between paramiko,pexpect
+* allow answering gio mount questions (albeit naively)
+* if the gio backend wants to ask a question during its mount phase, it
   previously just aborted.
-- a couple more warning error codes that Deja Dup is interested in noticing.
-- ssh paramiko backend respects --num-retries now
-- set retry delay for ssh backends to 10s
-- ssh pexpect backend
+* a couple more warning error codes that Deja Dup is interested in noticing.
+* ssh paramiko backend respects --num-retries now
+* set retry delay for ssh backends to 10s
+* ssh pexpect backend
  + sftp part does not claim 'Invalid SSH password' although it's only
    'Permission denied' now
  + sftp errors are now more talkative
-- gpg.py
+* gpg.py
  + commented assert which broke otherwise working verify run
 
 Bugs closed in this release:
@@ -128,29 +130,29 @@ lp:~ed.so/duplicity/0.6-readd_sshpexpect
 New in v0.6.18 (2012/02/29)
 ---------------------------
 Enhancements:
-- fix extraneous '.py' in botobackend.py include
-- tests: add delay between backups to avoid assertion error
-- tests: use backup source that is more likely to be larger than 1M compressed
-- tests: make other-filesystem check more robust against certain directories
+* fix extraneous '.py' in botobackend.py include
+* tests: add delay between backups to avoid assertion error
+* tests: use backup source that is more likely to be larger than 1M compressed
+* tests: make other-filesystem check more robust against certain directories
   being mounts or not
-- resuming an incremental results in a 'Restarting backup, but current
+* resuming an incremental results in a 'Restarting backup, but current
   encryption settings do not match original settings' error because curtime is
   incorrectly set away from previous incremental value
-- added option to not compress the backup, when no encryption is selected
-- always delay a little bit when a backend gives us errors
-- Don't cache TarInfo files. Tests still pass, so I don't believe we need the
+* added option to not compress the backup, when no encryption is selected
+* always delay a little bit when a backend gives us errors
+* Don't cache TarInfo files. Tests still pass, so I don't believe we need the
   members cache (and in the old tarfile.py, we didn't cache either).
-- Adding --file-prefix option so different sets of backups can be stored in the
+* Adding --file-prefix option so different sets of backups can be stored in the
   same bucket.  See blueprint at
   https://blueprints.launchpad.net/duplicity/+spec/file-prefix-option
-- two changes that help the test suite pass
-- raise log level on backend import failure so it will be visible under default
+* two changes that help the test suite pass
+* raise log level on backend import failure so it will be visible under default
   conditions
-- file /etc/motd may not exist in test environment.  Use __file__ instead to
+* file /etc/motd may not exist in test environment.  Use __file__ instead to
   point to a known plaintext source file.
-- some code/import changes to make the ssh and boto backends compatible with
+* some code/import changes to make the ssh and boto backends compatible with
   Python 2.4.
-- some changes to make roottest.py compatible with the new dir structure.
+* some changes to make roottest.py compatible with the new dir structure.
 
 Bugs closed in this release:
 884638     Python 2.5 / boto error
@@ -175,8 +177,8 @@ lp:~tobias-genannt/duplicity/nocompress
 New in v0.6.17 (2011/11/25)
 ---------------------------
 Enhancements:
-- Added --rsync-options flag to allow user to pass options to rsync at will
-- Added --s3-use-multiprocessing to select the new s3 multiprocessing backend.
+* Added --rsync-options flag to allow user to pass options to rsync at will
+* Added --s3-use-multiprocessing to select the new s3 multiprocessing backend.
   Default is to use the single processing backend.  A helper, filechunkio.py,
   requires Python 2.6+, so this option is not usable in earlier versions.
 
@@ -197,11 +199,11 @@ lp:~moss-d/duplicity/rsync-options
 New in v0.6.16 (2011/10/16)
 ----------------------------
 Enhancements:
-- Usability enhancement: sign passphrase prompt has no second
+* Usability enhancement: sign passphrase prompt has no second
   verification prompt anymore, symmetric passphrases are
   still verified
-- Fixed Unicode errors when translations are used.
-- Replaced old tarfile.py with Python 2.7 version, modded
+* Fixed Unicode errors when translations are used.
+* Replaced old tarfile.py with Python 2.7 version, modded
   to support Python 2.4 syntax.
 
 Bugs closed in this release:
@@ -230,14 +232,14 @@ lp:~ed.so/duplicity/UnicodeDecodeError
 New in v0.6.15 (2011/08/19)
 ---------------------------
 Enhancements:
-- Ignore 404 errors when deleting a file on Ubuntu One.
-- Ignore ENOENT (file missing) errors where it is safe.
-- Set minimum Python version to 2.4 in README.
-- introduce --numeric-owner parameter
+* Ignore 404 errors when deleting a file on Ubuntu One.
+* Ignore ENOENT (file missing) errors where it is safe.
+* Set minimum Python version to 2.4 in README.
+* introduce --numeric-owner parameter
   patch courtesy of Lukas Anzinger <l.anzinger AT gmail.com>
-- duplicity:restore_check_hash
+* duplicity:restore_check_hash
   "Invalid data - *** hash mismatch" lists the offending filename
-- fixes to unit tests to support SIGN_PASSPHRASE
+* fixes to unit tests to support SIGN_PASSPHRASE
 
 Bugs closed in this release:
 524922     duplicity does not have numeric uid/gid support
@@ -1013,9 +1015,9 @@ https://savannah.nongnu.org/support/?106534
 
 New in v0.5.02 (2008/09/21)
 ---------------------------
-- Add -h option for help
+* Add -h option for help
 
-- Change gpg logging so that logs are always collected.
+* Change gpg logging so that logs are always collected.
 The log is printed in the case of gpg IO errors.  Also,
 verbosity level 5 or above (-v5) will print the logs.
 
