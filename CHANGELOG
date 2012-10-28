@@ -87,6 +87,8 @@ Bugs closed in this release:
 907077     assert len(chain_list) == 2 AssertionError
 929067     crash during restore: "assert ropath.index == (), ropath.index"
 995851     doc improvement for --encrypt-key, --sign-key
+997691     Ubuntu One backend should check for 402 error for out-of-space
+1031269    remove-all-but-n-full broken
 1039001    --exclude-if-present and --exclude-other-filesystems causes crash
            with inaccessible other fs
 1066625    ubuntu one backend does not work without gnome/dbus/x11 session
