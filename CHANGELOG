@@ -5,6 +5,13 @@ distribution and used to remove GnuPGInterface.py please note this:
 See README for details.
 
 
+New in v0.6.21 (2012/??/??)
+---------------------------
+Enhancements:
+* Merged in lp:~ed.so/duplicity/24syntaxfix
+  - fix python 2.4 vs 2.5 syntax error
+
+
 New in v0.6.20 (2012/10/28)
 ---------------------------
 Enhancements:

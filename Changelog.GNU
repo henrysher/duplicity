@@ -1,3 +1,8 @@
+2012-10-29  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~ed.so/duplicity/24syntaxfix
+      - fix python 2.4 vs 2.5 syntax error
+
 2012-10-28  Kenneth Loafman  <kenneth@loafman.com>
 
     * Remove dist/mkGNUchangelog script.
