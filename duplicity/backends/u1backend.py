@@ -207,7 +207,7 @@ class U1Backend(duplicity.backend.Backend):
                    "Content-Type": content_type}
         resp, content = self.client.request(remote_full,
                                             method="PUT",
-                                            body=str(data),
+                                            body=bytearray(data),
                                             headers=headers)
 
     def get(self, filename, local_path):
