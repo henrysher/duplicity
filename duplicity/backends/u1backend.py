@@ -25,7 +25,7 @@ from duplicity import log
 from duplicity import globals
 
 from httplib2 import Http
-from oauth import oauth
+from oauthlib import oauth1
 from urlparse import urlparse, parse_qsl
 from json import loads, dumps
 import urllib
@@ -37,32 +37,31 @@ import time
 class OAuthHttpClient(object):
     """a simple HTTP client with OAuth added on"""
     def __init__(self):
-        self.signature_method = oauth.OAuthSignatureMethod_HMAC_SHA1()
-        self.consumer = None
+        self.consumer_key = None
+        self.consumer_secret = None
         self.token = None
+        self.token_secret = None
         self.client = Http()
 
     def set_consumer(self, consumer_key, consumer_secret):
-        self.consumer = oauth.OAuthConsumer(consumer_key,
-                                            consumer_secret)
+        self.consumer_key = consumer_key
+        self.consumer_secret = consumer_secret
 
     def set_token(self, token, token_secret):
-        self.token = oauth.OAuthToken( token, token_secret)
+        self.token = token
+        self.token_secret = token_secret
 
     def _get_oauth_request_header(self, url, method):
         """Get an oauth request header given the token and the url"""
-        query = urlparse(url).query
-
-        oauth_request = oauth.OAuthRequest.from_consumer_and_token(
-            http_url=url,
-            http_method=method,
-            oauth_consumer=self.consumer,
-            token=self.token,
-            parameters=dict(parse_qsl(query))
-        )
-        oauth_request.sign_request(oauth.OAuthSignatureMethod_HMAC_SHA1(),
-                                   self.consumer, self.token)
-        return oauth_request.to_header()
+        client = oauth1.Client(
+            unicode(self.consumer_key),
+            client_secret=unicode(self.consumer_secret),
+            resource_owner_key=unicode(self.token),
+            resource_owner_secret=unicode(self.token_secret))
+        url, headers, body = client.sign(
+            unicode(url),
+            http_method=unicode(method))
+        return headers
 
     def request(self, url, method="GET", body=None, headers={}, ignore=None):
         oauth_header = self._get_oauth_request_header(url, method)
