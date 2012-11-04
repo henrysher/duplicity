@@ -1,3 +1,12 @@
+2012-11-03  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~mterry/duplicity/u1-oauthlib
+      - As the Ubuntu packager for duplicity, I would prefer u1backend.py
+        used oauthlib instead of oauth.  oauthlib is well maintained upstream
+        (unlike oauth), has a python3 port (for the future), and is in Ubuntu
+        main (so is oauth right now, but hopefully in the future we can drop
+        it to universe, in which case duplicity can't use it anymore).
+
 2012-10-29  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~ed.so/duplicity/24syntaxfix
