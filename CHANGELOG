@@ -26,6 +26,8 @@ Enhancements:
     wrong side of that problem to tackle.  Now that we handle the remote
     new-sigs better (by deleting them), I don't think we need this code anymore.
     Patch by az@debian.org.
+* Merged in lp:~mterry/duplicity/u1-ascii-error
+  - Fix for u1backend unicode error.  Patch by Paul Barker.
 
 
 New in v0.6.20 (2012/10/28)
