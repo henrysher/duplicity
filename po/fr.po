@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-10-29 11:35+0000\n"
+"POT-Creation-Date: 2012-11-04 03:36+0000\n"
 "PO-Revision-Date: 2010-05-23 16:47+0000\n"
 "Last-Translator: Kenneth Loafman <kenneth@loafman.com>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2012-10-30 05:37+0000\n"
-"X-Generator: Launchpad (build 16206)\n"
+"X-Launchpad-Export-Date: 2012-11-04 04:56+0000\n"
+"X-Generator: Launchpad (build 16218)\n"
 
 #: ../bin/duplicity:98
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -450,12 +450,12 @@ msgid_plural "Giving up trying to execute '%s' after %d attempts"
 msgstr[0] "Abandon des essais d’exécution de « %s » après %d tentative"
 msgstr[1] "Abandon des essais d’exécution de « %s » après %d tentatives"
 
-#: ../duplicity/collections.py:187
+#: ../duplicity/collections.py:182
 msgid "Fatal Error: No manifests found for most recent backup"
 msgstr ""
 "Erreur fatale : aucun manifeste présent pour la sauvegarde la plus récente"
 
-#: ../duplicity/collections.py:196
+#: ../duplicity/collections.py:191
 msgid ""
 "Fatal Error: Remote manifest does not match local one.  Either the remote "
 "backup set or the local archive directory has been corrupted."
@@ -464,110 +464,110 @@ msgstr ""
 "Soit le jeu de sauvegarde distant, soit le dossier local d’archive a été "
 "corrompu."
 
-#: ../duplicity/collections.py:204
+#: ../duplicity/collections.py:199
 msgid "Fatal Error: Neither remote nor local manifest is readable."
 msgstr "Erreur fatale : ni le manifeste local, ni le distant n’est lisible."
 
-#: ../duplicity/collections.py:315
+#: ../duplicity/collections.py:310
 msgid "Preferring Backupset over previous one!"
 msgstr "Jeu de sauvegarde préféré au précédent !"
 
-#: ../duplicity/collections.py:318
+#: ../duplicity/collections.py:313
 #, python-format
 msgid "Ignoring incremental Backupset (start_time: %s; needed: %s)"
 msgstr ""
 "Ignore le jeu de sauvegarde incrémentale (date_début : %s ; nécessaire : %s)"
 
-#: ../duplicity/collections.py:323
+#: ../duplicity/collections.py:318
 #, python-format
 msgid "Added incremental Backupset (start_time: %s / end_time: %s)"
 msgstr ""
 "Jeu de sauvegarde incrémentale ajouté (date_début : %s ; date_fin : %s)"
 
-#: ../duplicity/collections.py:393
+#: ../duplicity/collections.py:388
 msgid "Chain start time: "
 msgstr "Date de début de chaîne : "
 
-#: ../duplicity/collections.py:394
+#: ../duplicity/collections.py:389
 msgid "Chain end time: "
 msgstr "Date de fin de chaîne : "
 
-#: ../duplicity/collections.py:395
+#: ../duplicity/collections.py:390
 #, python-format
 msgid "Number of contained backup sets: %d"
 msgstr "Nombre de jeux de sauvegarde contenus : %d"
 
-#: ../duplicity/collections.py:397
+#: ../duplicity/collections.py:392
 #, python-format
 msgid "Total number of contained volumes: %d"
 msgstr "Nombre total de volumes contenus : %d"
 
-#: ../duplicity/collections.py:399
+#: ../duplicity/collections.py:394
 msgid "Type of backup set:"
 msgstr "Type de jeu de sauvegarde :"
 
-#: ../duplicity/collections.py:399
+#: ../duplicity/collections.py:394
 msgid "Time:"
 msgstr "Date :"
 
-#: ../duplicity/collections.py:399
+#: ../duplicity/collections.py:394
 msgid "Num volumes:"
 msgstr "Nombre de volumes :"
 
-#: ../duplicity/collections.py:403
+#: ../duplicity/collections.py:398
 msgid "Full"
 msgstr "Intégrale"
 
-#: ../duplicity/collections.py:406
+#: ../duplicity/collections.py:401
 msgid "Incremental"
 msgstr "Incrémentale"
 
-#: ../duplicity/collections.py:466
+#: ../duplicity/collections.py:461
 msgid "local"
 msgstr "local"
 
-#: ../duplicity/collections.py:468
+#: ../duplicity/collections.py:463
 msgid "remote"
 msgstr "distant"
 
-#: ../duplicity/collections.py:623
+#: ../duplicity/collections.py:618
 msgid "Collection Status"
 msgstr "État de la collection"
 
-#: ../duplicity/collections.py:625
+#: ../duplicity/collections.py:620
 #, python-format
 msgid "Connecting with backend: %s"
 msgstr "Connexion au serveur central : %s"
 
-#: ../duplicity/collections.py:627
+#: ../duplicity/collections.py:622
 #, python-format
 msgid "Archive dir: %s"
 msgstr "Dossier d’archive : %s"
 
-#: ../duplicity/collections.py:630
+#: ../duplicity/collections.py:625
 #, python-format
 msgid "Found %d secondary backup chain."
 msgid_plural "Found %d secondary backup chains."
 msgstr[0] "%d chaîne secondaire de sauvegarde a été trouvée."
 msgstr[1] "%d chaînes secondaires de sauvegarde ont été trouvées."
 
-#: ../duplicity/collections.py:635
+#: ../duplicity/collections.py:630
 #, python-format
 msgid "Secondary chain %d of %d:"
 msgstr "Chaîne secondaire %d sur %d :"
 
-#: ../duplicity/collections.py:641
+#: ../duplicity/collections.py:636
 msgid "Found primary backup chain with matching signature chain:"
 msgstr ""
 "Chaîne primaire de sauvegarde trouvée avec la signature de chaîne "
 "correspondante :"
 
-#: ../duplicity/collections.py:645
+#: ../duplicity/collections.py:640
 msgid "No backup chains with active signatures found"
 msgstr ""
 "Aucune chaîne de sauvegarde avec les signatures actives n’a été trouvée"
 
-#: ../duplicity/collections.py:648
+#: ../duplicity/collections.py:643
 #, python-format
 msgid "Also found %d backup set not part of any chain,"
 msgid_plural "Also found %d backup sets not part of any chain,"
@@ -577,7 +577,7 @@ msgstr[1] ""
 "%d jeux de sauvegarde ne faisant partie d’aucune chaîne ont été aussi "
 "trouvés,"
 
-#: ../duplicity/collections.py:652
+#: ../duplicity/collections.py:647
 #, python-format
 msgid "and %d incomplete backup set."
 msgid_plural "and %d incomplete backup sets."
@@ -585,39 +585,39 @@ msgstr[0] "ainsi que %d jeu incomplet de sauvegarde."
 msgstr[1] "ainsi que %d jeux incomplets de sauvegarde."
 
 #. TRANSL: "cleanup" is a hard-coded command, so do not translate it
-#: ../duplicity/collections.py:657
+#: ../duplicity/collections.py:652
 msgid ""
 "These may be deleted by running duplicity with the \"cleanup\" command."
 msgstr ""
 "Ceux-ci peuvent être supprimés en exécutant duplicity avec la commande "
 "« cleanup »."
 
-#: ../duplicity/collections.py:660
+#: ../duplicity/collections.py:655
 msgid "No orphaned or incomplete backup sets found."
 msgstr "Aucun jeu orphelin ou incomplet de sauvegarde n’a été trouvé."
 
-#: ../duplicity/collections.py:676
+#: ../duplicity/collections.py:671
 #, python-format
 msgid "%d file exists on backend"
 msgid_plural "%d files exist on backend"
 msgstr[0] "%d fichier existe sur le serveur central"
 msgstr[1] "%d fichiers existent sur le serveur central"
 
-#: ../duplicity/collections.py:683
+#: ../duplicity/collections.py:678
 #, python-format
 msgid "%d file exists in cache"
 msgid_plural "%d files exist in cache"
 msgstr[0] "%d fichier existe dans le cache"
 msgstr[1] "%d fichiers existent dans le cache"
 
-#: ../duplicity/collections.py:735
+#: ../duplicity/collections.py:730
 msgid ""
 "Warning, discarding last backup set, because of missing signature file."
 msgstr ""
 "Avertissement, rejet du dernier jeu de sauvegarde à cause de l’absence du "
 "fichier de signatures."
 
-#: ../duplicity/collections.py:758
+#: ../duplicity/collections.py:753
 msgid "Warning, found the following local orphaned signature file:"
 msgid_plural "Warning, found the following local orphaned signature files:"
 msgstr[0] ""
@@ -626,7 +626,7 @@ msgstr[1] ""
 "Avertissement, les fichiers orphelins locaux suivants de signatures ont été "
 "trouvés :"
 
-#: ../duplicity/collections.py:767
+#: ../duplicity/collections.py:762
 msgid "Warning, found the following remote orphaned signature file:"
 msgid_plural "Warning, found the following remote orphaned signature files:"
 msgstr[0] ""
@@ -636,20 +636,20 @@ msgstr[1] ""
 "Avertissement, les fichiers orphelins distants suivants de signatures ont "
 "été trouvés :"
 
-#: ../duplicity/collections.py:776
+#: ../duplicity/collections.py:771
 msgid "Warning, found signatures but no corresponding backup files"
 msgstr ""
 "Avertissement, signatures trouvées mais aucun fichier de sauvegarde "
 "correspondant"
 
-#: ../duplicity/collections.py:780
+#: ../duplicity/collections.py:775
 msgid ""
 "Warning, found incomplete backup sets, probably left from aborted session"
 msgstr ""
 "Avertissement, jeux de sauvegarde incomplets trouvés, probablement laissés "
 "par des sessions interrompues"
 
-#: ../duplicity/collections.py:784
+#: ../duplicity/collections.py:779
 msgid "Warning, found the following orphaned backup file:"
 msgid_plural "Warning, found the following orphaned backup files:"
 msgstr[0] ""
@@ -658,44 +658,44 @@ msgstr[1] ""
 "Avertissement, les fichiers orphelins suivants de sauvegarde ont été "
 "trouvés :"
 
-#: ../duplicity/collections.py:802
+#: ../duplicity/collections.py:797
 #, python-format
 msgid "Extracting backup chains from list of files: %s"
 msgstr ""
 "Extraction des chaînes de sauvegarde depuis la liste des fichiers : %s"
 
-#: ../duplicity/collections.py:812
+#: ../duplicity/collections.py:807
 #, python-format
 msgid "File %s is part of known set"
 msgstr "Le fichier %s fait partie d’un jeu connu"
 
-#: ../duplicity/collections.py:815
+#: ../duplicity/collections.py:810
 #, python-format
 msgid "File %s is not part of a known set; creating new set"
 msgstr ""
 "Le fichier %s ne fait pas partie d’un jeu connu ; création d’un nouveau jeu"
 
-#: ../duplicity/collections.py:820
+#: ../duplicity/collections.py:815
 #, python-format
 msgid "Ignoring file (rejected by backup set) '%s'"
 msgstr "Fichier ignoré (rejeté par le jeu de sauvegarde) « %s »"
 
-#: ../duplicity/collections.py:833
+#: ../duplicity/collections.py:828
 #, python-format
 msgid "Found backup chain %s"
 msgstr "Chaîne de sauvegarde %s trouvée"
 
-#: ../duplicity/collections.py:838
+#: ../duplicity/collections.py:833
 #, python-format
 msgid "Added set %s to pre-existing chain %s"
 msgstr "Jeu %s ajouté à la chaîne préexistante %s"
 
-#: ../duplicity/collections.py:842
+#: ../duplicity/collections.py:837
 #, python-format
 msgid "Found orphaned set %s"
 msgstr "Jeu orphelin %s trouvé"
 
-#: ../duplicity/collections.py:994
+#: ../duplicity/collections.py:989
 #, python-format
 msgid ""
 "No signature chain for the requested time.  Using oldest available chain, "

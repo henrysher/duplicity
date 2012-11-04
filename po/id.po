@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-10-29 11:35+0000\n"
+"POT-Creation-Date: 2012-11-04 03:36+0000\n"
 "PO-Revision-Date: 2010-12-07 21:11+0000\n"
 "Last-Translator: Hertatijanto Hartono <dvertx@gmail.com>\n"
 "Language-Team: Indonesian <id@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2012-10-30 05:37+0000\n"
-"X-Generator: Launchpad (build 16206)\n"
+"X-Launchpad-Export-Date: 2012-11-04 04:56+0000\n"
+"X-Generator: Launchpad (build 16218)\n"
 
 #: ../bin/duplicity:98
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -433,11 +433,11 @@ msgid "Giving up trying to execute '%s' after %d attempt"
 msgid_plural "Giving up trying to execute '%s' after %d attempts"
 msgstr[0] "Menyerah untuk melaksanakan '%s' setelah usaha %d (kali)"
 
-#: ../duplicity/collections.py:187
+#: ../duplicity/collections.py:182
 msgid "Fatal Error: No manifests found for most recent backup"
 msgstr "Kesalahan Fatal: Tiada daftar muatan untuk backup terakhir"
 
-#: ../duplicity/collections.py:196
+#: ../duplicity/collections.py:191
 msgid ""
 "Fatal Error: Remote manifest does not match local one.  Either the remote "
 "backup set or the local archive directory has been corrupted."
@@ -445,214 +445,214 @@ msgstr ""
 "Kesalahan Fatal: Daftar muatan remot tidak sesuai dengan yang lokal. "
 "Kemungkinan kumpulan backup remot atau direktori arsip lokal korup."
 
-#: ../duplicity/collections.py:204
+#: ../duplicity/collections.py:199
 msgid "Fatal Error: Neither remote nor local manifest is readable."
 msgstr "Kesalahan Fatal: Daftar muatan remot serta lokal tidak dapat dibaca."
 
-#: ../duplicity/collections.py:315
+#: ../duplicity/collections.py:310
 msgid "Preferring Backupset over previous one!"
 msgstr "Preferensi Backup ini dibanding sebelumnya!"
 
-#: ../duplicity/collections.py:318
+#: ../duplicity/collections.py:313
 #, python-format
 msgid "Ignoring incremental Backupset (start_time: %s; needed: %s)"
 msgstr ""
 "Mengabaikan kumpulan backup inkremental (waktu_mulai: %s; dibutuhkan: %s)"
 
-#: ../duplicity/collections.py:323
+#: ../duplicity/collections.py:318
 #, python-format
 msgid "Added incremental Backupset (start_time: %s / end_time: %s)"
 msgstr ""
 "Menambahkan kumpulan backup inkremental (waktu_mulai: %s / waktu_selesai: %s)"
 
-#: ../duplicity/collections.py:393
+#: ../duplicity/collections.py:388
 msgid "Chain start time: "
 msgstr "Waktu mulai untaian: "
 
-#: ../duplicity/collections.py:394
+#: ../duplicity/collections.py:389
 msgid "Chain end time: "
 msgstr "Waktu selesai untaian: "
 
-#: ../duplicity/collections.py:395
+#: ../duplicity/collections.py:390
 #, python-format
 msgid "Number of contained backup sets: %d"
 msgstr "Jumlah kumpulan backup: %d"
 
-#: ../duplicity/collections.py:397
+#: ../duplicity/collections.py:392
 #, python-format
 msgid "Total number of contained volumes: %d"
 msgstr "Jumlah volume: %d"
 
-#: ../duplicity/collections.py:399
+#: ../duplicity/collections.py:394
 msgid "Type of backup set:"
 msgstr "Jenis kumpulan backup:"
 
-#: ../duplicity/collections.py:399
+#: ../duplicity/collections.py:394
 msgid "Time:"
 msgstr "Waktu:"
 
-#: ../duplicity/collections.py:399
+#: ../duplicity/collections.py:394
 msgid "Num volumes:"
 msgstr "Jumlah volume:"
 
-#: ../duplicity/collections.py:403
+#: ../duplicity/collections.py:398
 msgid "Full"
 msgstr "Penuh"
 
-#: ../duplicity/collections.py:406
+#: ../duplicity/collections.py:401
 msgid "Incremental"
 msgstr "Inkremental"
 
-#: ../duplicity/collections.py:466
+#: ../duplicity/collections.py:461
 msgid "local"
 msgstr "lokal"
 
-#: ../duplicity/collections.py:468
+#: ../duplicity/collections.py:463
 msgid "remote"
 msgstr "remot"
 
-#: ../duplicity/collections.py:623
+#: ../duplicity/collections.py:618
 msgid "Collection Status"
 msgstr "Status Koleksi"
 
-#: ../duplicity/collections.py:625
+#: ../duplicity/collections.py:620
 #, python-format
 msgid "Connecting with backend: %s"
 msgstr "Menghubungkan dengan latar: %s"
 
-#: ../duplicity/collections.py:627
+#: ../duplicity/collections.py:622
 #, python-format
 msgid "Archive dir: %s"
 msgstr "Dir arsip: %s"
 
-#: ../duplicity/collections.py:630
+#: ../duplicity/collections.py:625
 #, python-format
 msgid "Found %d secondary backup chain."
 msgid_plural "Found %d secondary backup chains."
 msgstr[0] "Ditemui %d untaian backup sekunder."
 
-#: ../duplicity/collections.py:635
+#: ../duplicity/collections.py:630
 #, python-format
 msgid "Secondary chain %d of %d:"
 msgstr "Untaian sekunder %d dari %d:"
 
-#: ../duplicity/collections.py:641
+#: ../duplicity/collections.py:636
 msgid "Found primary backup chain with matching signature chain:"
 msgstr "Ditemui untaian backup primer dengan untaian penanda yang sesuai:"
 
-#: ../duplicity/collections.py:645
+#: ../duplicity/collections.py:640
 msgid "No backup chains with active signatures found"
 msgstr "Tidak ditemui untaian backup dengan penanda aktif"
 
-#: ../duplicity/collections.py:648
+#: ../duplicity/collections.py:643
 #, python-format
 msgid "Also found %d backup set not part of any chain,"
 msgid_plural "Also found %d backup sets not part of any chain,"
 msgstr[0] ""
 "Juga ditemui %d kelompok backup yang bukan merupakan bagian dari untaian."
 
-#: ../duplicity/collections.py:652
+#: ../duplicity/collections.py:647
 #, python-format
 msgid "and %d incomplete backup set."
 msgid_plural "and %d incomplete backup sets."
 msgstr[0] "dan %d kumpulan backup terpotong."
 
 #. TRANSL: "cleanup" is a hard-coded command, so do not translate it
-#: ../duplicity/collections.py:657
+#: ../duplicity/collections.py:652
 msgid ""
 "These may be deleted by running duplicity with the \"cleanup\" command."
 msgstr ""
 "Kesemuanya dapat dihapus dengan menjalankan duplicity dengan perintah "
 "\"cleanup\"."
 
-#: ../duplicity/collections.py:660
+#: ../duplicity/collections.py:655
 msgid "No orphaned or incomplete backup sets found."
 msgstr "Tidak ditemui kumpulan backup yatim atau terpotong."
 
-#: ../duplicity/collections.py:676
+#: ../duplicity/collections.py:671
 #, python-format
 msgid "%d file exists on backend"
 msgid_plural "%d files exist on backend"
 msgstr[0] "%d berkas ada pada latar"
 
-#: ../duplicity/collections.py:683
+#: ../duplicity/collections.py:678
 #, python-format
 msgid "%d file exists in cache"
 msgid_plural "%d files exist in cache"
 msgstr[0] "%d berkas ada dalam tembolok"
 
-#: ../duplicity/collections.py:735
+#: ../duplicity/collections.py:730
 msgid ""
 "Warning, discarding last backup set, because of missing signature file."
 msgstr ""
 "Peringatan, menghapus kumpulan backup terakhir, karena tiadanya berkas "
 "penanda."
 
-#: ../duplicity/collections.py:758
+#: ../duplicity/collections.py:753
 msgid "Warning, found the following local orphaned signature file:"
 msgid_plural "Warning, found the following local orphaned signature files:"
 msgstr[0] "Peringatan, ditemui berkas penanda yatim lokal berikut:"
 
-#: ../duplicity/collections.py:767
+#: ../duplicity/collections.py:762
 msgid "Warning, found the following remote orphaned signature file:"
 msgid_plural "Warning, found the following remote orphaned signature files:"
 msgstr[0] "Peringatan, ditemui berkas penanda yatim remot berikut:"
 
-#: ../duplicity/collections.py:776
+#: ../duplicity/collections.py:771
 msgid "Warning, found signatures but no corresponding backup files"
 msgstr ""
 "Peringatan, ditemui berkas penanda tapi tiada berkas backup pasangannya"
 
-#: ../duplicity/collections.py:780
+#: ../duplicity/collections.py:775
 msgid ""
 "Warning, found incomplete backup sets, probably left from aborted session"
 msgstr ""
 "Peringatan, ditemui kumpulan backup terpotong, kemungkinan berasal dari sesi "
 "yang digagalkan"
 
-#: ../duplicity/collections.py:784
+#: ../duplicity/collections.py:779
 msgid "Warning, found the following orphaned backup file:"
 msgid_plural "Warning, found the following orphaned backup files:"
 msgstr[0] "Peringatan, ditemui berkas backup yatim berikut:"
 
-#: ../duplicity/collections.py:802
+#: ../duplicity/collections.py:797
 #, python-format
 msgid "Extracting backup chains from list of files: %s"
 msgstr "Mengekstrak untaian backup dari daftar berkas: %s"
 
-#: ../duplicity/collections.py:812
+#: ../duplicity/collections.py:807
 #, python-format
 msgid "File %s is part of known set"
 msgstr "Berkas %s merupakan bagian dari kumpulan yang dikenali"
 
-#: ../duplicity/collections.py:815
+#: ../duplicity/collections.py:810
 #, python-format
 msgid "File %s is not part of a known set; creating new set"
 msgstr ""
 "Berkas %s bukan merupakan bagian dari kumpulan yang dikenali; membuat "
 "kumpulan baru"
 
-#: ../duplicity/collections.py:820
+#: ../duplicity/collections.py:815
 #, python-format
 msgid "Ignoring file (rejected by backup set) '%s'"
 msgstr "Mengabaikan berkas (yang ditolak oelh kumpulan backup) '%s'"
 
-#: ../duplicity/collections.py:833
+#: ../duplicity/collections.py:828
 #, python-format
 msgid "Found backup chain %s"
 msgstr "Ditemui untaian backup %s"
 
-#: ../duplicity/collections.py:838
+#: ../duplicity/collections.py:833
 #, python-format
 msgid "Added set %s to pre-existing chain %s"
 msgstr "Menambahkan kumpulan %s ke untaian %s yang sudah ada"
 
-#: ../duplicity/collections.py:842
+#: ../duplicity/collections.py:837
 #, python-format
 msgid "Found orphaned set %s"
 msgstr "Ditemui kumpulan yatim %s"
 
-#: ../duplicity/collections.py:994
+#: ../duplicity/collections.py:989
 #, python-format
 msgid ""
 "No signature chain for the requested time.  Using oldest available chain, "

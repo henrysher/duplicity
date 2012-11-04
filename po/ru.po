@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-10-29 11:35+0000\n"
+"POT-Creation-Date: 2012-11-04 03:36+0000\n"
 "PO-Revision-Date: 2010-03-11 14:36+0000\n"
 "Last-Translator: Kenneth Loafman <kenneth@loafman.com>\n"
 "Language-Team: Russian <ru@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2012-10-30 05:37+0000\n"
-"X-Generator: Launchpad (build 16206)\n"
+"X-Launchpad-Export-Date: 2012-11-04 04:56+0000\n"
+"X-Generator: Launchpad (build 16218)\n"
 
 #: ../bin/duplicity:98
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -465,12 +465,12 @@ msgstr[0] "Прекращение попыток запуска '%s' после 
 msgstr[1] "Прекращение попыток запуска '%s' после %d попыток"
 msgstr[2] "Прекращение попыток запуска '%s' после %d попыток"
 
-#: ../duplicity/collections.py:187
+#: ../duplicity/collections.py:182
 msgid "Fatal Error: No manifests found for most recent backup"
 msgstr ""
 "Критическая ошибка: отсутствуют манифесты для недавней резервной копии"
 
-#: ../duplicity/collections.py:196
+#: ../duplicity/collections.py:191
 msgid ""
 "Fatal Error: Remote manifest does not match local one.  Either the remote "
 "backup set or the local archive directory has been corrupted."
@@ -479,87 +479,87 @@ msgstr ""
 "Неисправен удалённый набор резервного копирования или папка локального "
 "архива."
 
-#: ../duplicity/collections.py:204
+#: ../duplicity/collections.py:199
 msgid "Fatal Error: Neither remote nor local manifest is readable."
 msgstr ""
 "Критическая ошибка: Нет доступа к чтению удалённого и локального манифеста."
 
-#: ../duplicity/collections.py:315
+#: ../duplicity/collections.py:310
 msgid "Preferring Backupset over previous one!"
 msgstr ""
 
-#: ../duplicity/collections.py:318
+#: ../duplicity/collections.py:313
 #, python-format
 msgid "Ignoring incremental Backupset (start_time: %s; needed: %s)"
 msgstr ""
 
-#: ../duplicity/collections.py:323
+#: ../duplicity/collections.py:318
 #, python-format
 msgid "Added incremental Backupset (start_time: %s / end_time: %s)"
 msgstr ""
 "Добавлена пошаговая резервная копия (время_начала: %s / время_конца: %s)"
 
-#: ../duplicity/collections.py:393
+#: ../duplicity/collections.py:388
 msgid "Chain start time: "
 msgstr "Цепочка начата: "
 
-#: ../duplicity/collections.py:394
+#: ../duplicity/collections.py:389
 msgid "Chain end time: "
 msgstr "Цепочка завершена: "
 
-#: ../duplicity/collections.py:395
+#: ../duplicity/collections.py:390
 #, python-format
 msgid "Number of contained backup sets: %d"
 msgstr "Количество содержащихся наборов резервного копирования: %d"
 
-#: ../duplicity/collections.py:397
+#: ../duplicity/collections.py:392
 #, python-format
 msgid "Total number of contained volumes: %d"
 msgstr "Общее число содержащихся томов: %d"
 
-#: ../duplicity/collections.py:399
+#: ../duplicity/collections.py:394
 msgid "Type of backup set:"
 msgstr "Тип резервной копии:"
 
-#: ../duplicity/collections.py:399
+#: ../duplicity/collections.py:394
 msgid "Time:"
 msgstr "Время:"
 
-#: ../duplicity/collections.py:399
+#: ../duplicity/collections.py:394
 msgid "Num volumes:"
 msgstr "Число томов:"
 
-#: ../duplicity/collections.py:403
+#: ../duplicity/collections.py:398
 msgid "Full"
 msgstr "Полная"
 
-#: ../duplicity/collections.py:406
+#: ../duplicity/collections.py:401
 msgid "Incremental"
 msgstr "Пошаговая"
 
-#: ../duplicity/collections.py:466
+#: ../duplicity/collections.py:461
 msgid "local"
 msgstr ""
 
-#: ../duplicity/collections.py:468
+#: ../duplicity/collections.py:463
 msgid "remote"
 msgstr ""
 
-#: ../duplicity/collections.py:623
+#: ../duplicity/collections.py:618
 msgid "Collection Status"
 msgstr "Состояние сбора"
 
-#: ../duplicity/collections.py:625
+#: ../duplicity/collections.py:620
 #, python-format
 msgid "Connecting with backend: %s"
 msgstr "Соединение с внутренним интерфейсом: %s"
 
-#: ../duplicity/collections.py:627
+#: ../duplicity/collections.py:622
 #, python-format
 msgid "Archive dir: %s"
 msgstr "Папка архива: %s"
 
-#: ../duplicity/collections.py:630
+#: ../duplicity/collections.py:625
 #, python-format
 msgid "Found %d secondary backup chain."
 msgid_plural "Found %d secondary backup chains."
@@ -567,24 +567,24 @@ msgstr[0] "Найдена %d вторичная цепочка резервны�
 msgstr[1] "Найдены %d вторичные цепочки резервных копий."
 msgstr[2] "Найдено %d вторичных цепочек резервных копий."
 
-#: ../duplicity/collections.py:635
+#: ../duplicity/collections.py:630
 #, python-format
 msgid "Secondary chain %d of %d:"
 msgstr "Вторичная цепочка %d из %d:"
 
-#: ../duplicity/collections.py:641
+#: ../duplicity/collections.py:636
 msgid "Found primary backup chain with matching signature chain:"
 msgstr ""
 "Найдена первичная цепочка резервного копирования с соответствующей цепочкой "
 "подписи:"
 
-#: ../duplicity/collections.py:645
+#: ../duplicity/collections.py:640
 msgid "No backup chains with active signatures found"
 msgstr ""
 "Отсутствуют цепочки резервного копирования с найденными, задействованными "
 "подписями"
 
-#: ../duplicity/collections.py:648
+#: ../duplicity/collections.py:643
 #, python-format
 msgid "Also found %d backup set not part of any chain,"
 msgid_plural "Also found %d backup sets not part of any chain,"
@@ -598,7 +598,7 @@ msgstr[2] ""
 "Также найдены %d наборов резервного копирования, не являющихся частью ни "
 "одной цепочки,"
 
-#: ../duplicity/collections.py:652
+#: ../duplicity/collections.py:647
 #, python-format
 msgid "and %d incomplete backup set."
 msgid_plural "and %d incomplete backup sets."
@@ -607,18 +607,18 @@ msgstr[1] "а также %d неполных набора резервного �
 msgstr[2] "а также %d неполных наборов резервного копирования."
 
 #. TRANSL: "cleanup" is a hard-coded command, so do not translate it
-#: ../duplicity/collections.py:657
+#: ../duplicity/collections.py:652
 msgid ""
 "These may be deleted by running duplicity with the \"cleanup\" command."
 msgstr ""
 "Это может быть удалено с помощью запуска duplicity с командой \"cleanup\"."
 
-#: ../duplicity/collections.py:660
+#: ../duplicity/collections.py:655
 msgid "No orphaned or incomplete backup sets found."
 msgstr ""
 "Отсутствуют изолированные или неполные наборы резервного копирования."
 
-#: ../duplicity/collections.py:676
+#: ../duplicity/collections.py:671
 #, python-format
 msgid "%d file exists on backend"
 msgid_plural "%d files exist on backend"
@@ -626,7 +626,7 @@ msgstr[0] "%d файл существует во внутреннем интер
 msgstr[1] "%d файлов существует во внутреннем интерфейсе"
 msgstr[2] "%d файлов существует во внутреннем интерфейсе"
 
-#: ../duplicity/collections.py:683
+#: ../duplicity/collections.py:678
 #, python-format
 msgid "%d file exists in cache"
 msgid_plural "%d files exist in cache"
@@ -634,14 +634,14 @@ msgstr[0] "%d файл существует во временных файлах
 msgstr[1] "%d файла существует во временных файлах"
 msgstr[2] "%d файлов существует во временных файлах"
 
-#: ../duplicity/collections.py:735
+#: ../duplicity/collections.py:730
 msgid ""
 "Warning, discarding last backup set, because of missing signature file."
 msgstr ""
 "Внимание, отозван последний набор резервного копирования, в связи с "
 "отсутствием файла подписи."
 
-#: ../duplicity/collections.py:758
+#: ../duplicity/collections.py:753
 msgid "Warning, found the following local orphaned signature file:"
 msgid_plural "Warning, found the following local orphaned signature files:"
 msgstr[0] "Внимание, найден следующий локальный изолированный файл подписи:"
@@ -650,7 +650,7 @@ msgstr[1] ""
 msgstr[2] ""
 "Внимание, найдены следующие локальные изолированные файлы подписей:"
 
-#: ../duplicity/collections.py:767
+#: ../duplicity/collections.py:762
 msgid "Warning, found the following remote orphaned signature file:"
 msgid_plural "Warning, found the following remote orphaned signature files:"
 msgstr[0] "Внимание, найден следующий удалённый изолированный файл подписи:"
@@ -659,19 +659,19 @@ msgstr[1] ""
 msgstr[2] ""
 "Внимание, найдены следующие удалённые изолированные файлы подписей:"
 
-#: ../duplicity/collections.py:776
+#: ../duplicity/collections.py:771
 msgid "Warning, found signatures but no corresponding backup files"
 msgstr ""
 "Внимание, найдены подписи, которые не соответствуют с файлами резервной копии"
 
-#: ../duplicity/collections.py:780
+#: ../duplicity/collections.py:775
 msgid ""
 "Warning, found incomplete backup sets, probably left from aborted session"
 msgstr ""
 "Внимание, обнаружены незавершённые наборы резервных копий, возможно они "
 "остались от прерванного сеанса"
 
-#: ../duplicity/collections.py:784
+#: ../duplicity/collections.py:779
 msgid "Warning, found the following orphaned backup file:"
 msgid_plural "Warning, found the following orphaned backup files:"
 msgstr[0] ""
@@ -681,42 +681,42 @@ msgstr[1] ""
 msgstr[2] ""
 "Внимание, найдены следующие изолированные файлы резервного копирования:"
 
-#: ../duplicity/collections.py:802
+#: ../duplicity/collections.py:797
 #, python-format
 msgid "Extracting backup chains from list of files: %s"
 msgstr "Извлечение цепочек резервного копирования из списка файлов: %s"
 
-#: ../duplicity/collections.py:812
+#: ../duplicity/collections.py:807
 #, python-format
 msgid "File %s is part of known set"
 msgstr "Файл %s является частью известного набора"
 
-#: ../duplicity/collections.py:815
+#: ../duplicity/collections.py:810
 #, python-format
 msgid "File %s is not part of a known set; creating new set"
 msgstr "Файл %s не является частью известного набора; создаётся новый набор"
 
-#: ../duplicity/collections.py:820
+#: ../duplicity/collections.py:815
 #, python-format
 msgid "Ignoring file (rejected by backup set) '%s'"
 msgstr "Пропуск файла (отклонено набором резервного копирования) '%s'"
 
-#: ../duplicity/collections.py:833
+#: ../duplicity/collections.py:828
 #, python-format
 msgid "Found backup chain %s"
 msgstr "Найдена резервная копия %s"
 
-#: ../duplicity/collections.py:838
+#: ../duplicity/collections.py:833
 #, python-format
 msgid "Added set %s to pre-existing chain %s"
 msgstr "Добавление набора %s для ранее существующей цепочки %s"
 
-#: ../duplicity/collections.py:842
+#: ../duplicity/collections.py:837
 #, python-format
 msgid "Found orphaned set %s"
 msgstr "Обнаружен изолированный набор %s"
 
-#: ../duplicity/collections.py:994
+#: ../duplicity/collections.py:989
 #, python-format
 msgid ""
 "No signature chain for the requested time.  Using oldest available chain, "
