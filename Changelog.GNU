@@ -6,6 +6,16 @@
         (unlike oauth), has a python3 port (for the future), and is in Ubuntu
         main (so is oauth right now, but hopefully in the future we can drop
         it to universe, in which case duplicity can't use it anymore).
+    * Merged in lp:~mterry/duplicity/delete-new-sig-in-cache
+      - In duplicity 0.6.20, we fixed bug 1031269. This means that we no longer
+        leave sig files on the remote location.  Leaving sig files on the remote
+        location also caused a bug with deleting cache files. Code used to leave
+        remote new-sig but delete the locale cache new-sig; this meant that we would
+        keep downloadoing the new-sig all the time from remote. We had worked around
+        that by just not deleting the new-sig in the cache, which was sort of the
+        wrong side of that problem to tackle.  Now that we handle the remote
+        new-sigs better (by deleting them), I don't think we need this code anymore.
+        Patch by az@debian.org.
 
 2012-10-29  Kenneth Loafman  <kenneth@loafman.com>
 
