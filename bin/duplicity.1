@@ -68,50 +68,39 @@ OpenSSH - http://www.openssh.com/
 .SH SYNOPSIS
 .B duplicity [full|incremental]
 .I [options]
-.I source_directory target_url
+source_directory target_url
 
 .B duplicity verify
-.I [options]
-.I [--file-to-restore <relpath>]
-.I source_url target_directory
+.I [options] [--file-to-restore <relpath>]
+source_url target_directory
 
 .B duplicity collection-status
 .I [options]
-.I target_url
+target_url
 
 .B duplicity list-current-files
-.I [options]
-.I [--time time]
-.I target_url
+.I [options] [--time time]
+target_url
 
 .B duplicity [restore]
-.I [options]
-.I [--file-to-restore <relpath>]
-.I [--time time]
-.I source_url target_directory
+.I [options] [--file-to-restore <relpath>] [--time time]
+source_url target_directory
 
-.B duplicity remove-older-than
-.I time
-.I [options]
-.I [--force]
-.I target_url
+.B duplicity remove-older-than <time>
+.I [options] [--force]
+target_url
 
-.B duplicity remove-all-but-n-full
-.I count
-.I [options]
-.I [--force]
-.I target_url
+.B duplicity remove-all-but-n-full  <count>
+.I [options] [--force]
+target_url
 
-.B duplicity remove-all-inc-of-but-n-full
-.I count
-.I [options]
-.I [--force]
-.I target_url
+.B duplicity remove-all-inc-of-but-n-full <count>
+.I [options] [--force]
+target_url
 
 .B duplicity cleanup
-.I [options]
-.I [--force]
-.I target_url
+.I [options] [--force] [--extra-clean]
+target_url
 
 .SH DESCRIPTION
 Duplicity incrementally backs up files and directory
@@ -291,7 +280,7 @@ will be needed to delete the files rather than just list them.
 .TP
 .BI --allow-source-mismatch
 Do not abort on attempts to use the same archive dir or remote backend
-to back up different directories.  duplicity will tell you if you need
+to back up different directories. duplicity will tell you if you need
 this switch.
 
 .TP
@@ -632,12 +621,9 @@ Treats the path
 .I orig
 in the backup as if it were the path
 .I new.
-Can be passed multiple times.  An example:
-.PP
-.RS
+Can be passed multiple times. An example:
+
 duplicity restore --rename Documents/metal Music/metal sftp://uid@other.host/some_dir /home/me
-.PP
-.RE
 
 .TP
 .BI "--rsync-options " options
@@ -646,12 +632,9 @@ Allows you to pass options to the rsync backend.  The
 list should be of the form "opt1=parm1 opt2=parm2" where the option string is
 quoted and the only spaces allowed are between options. The option string
 will be passed verbatim to rsync, after any internally generated option
-designating the remote port to use.  Here is a possibly useful example:
-.PP
-.RS
+designating the remote port to use. Here is a possibly useful example:
+
 duplicity --rsync-options="--partial-dir=.rsync-partial" /home/me rsync://uid@other.host/some_dir
-.PP
-.RE
 
 .TP
 .BI "--s3-european-buckets"
@@ -759,10 +742,9 @@ will be passed verbatim to both scp and sftp, whose command line syntax
 differs slightly hence the options should therefore be given in the long option format described in
 .BR ssh_config(5) ,
 like in this example:
-.RS
-.PP
+
 duplicity --ssh-options="-oProtocol=2 -oIdentityFile=/my/backup/id" /home/me scp://uid@other.host/some_dir
-.TP
+
 .B NOTE:
 .I ssh paramiko backend
 currently supports only the
@@ -1000,18 +982,29 @@ directory and backs up all the files specified by the file selection
 system.  The file selection system comprises a number of file
 selection conditions, which are set using one of the following command
 line options:
-.BR --exclude ,
-.BR --exclude-device-files ,
-.BR --exclude-filelist ,
-.BR --exclude-filelist-stdin ,
-.BR --exclude-globbing-filelist ,
-.BR --exclude-regexp ,
-.BR --include ,
-.BR --include-filelist ,
-.BR --include-filelist-stdin ,
-.BR --include-globbing-filelist ,
-and
-.BR --include-regexp .
+.RS
+--exclude
+.br
+--exclude-device-files
+.br
+--exclude-filelist
+.br
+--exclude-filelist-stdin
+.br
+--exclude-globbing-filelist
+.br
+--exclude-regexp
+.br
+--include
+.br
+--include-filelist
+.br
+--include-filelist-stdin
+.br
+--include-globbing-filelist
+.br
+--include-regexp
+.RE
 Each file selection condition either matches or doesn't match a given
 file.  A given file is excluded by the file selection system exactly
 when the first matching file selection condition specifies that the
@@ -1048,15 +1041,15 @@ The
 .BR include-globbing-filelist ,
 and
 .B exclude-globbing-filelist
-options accept
+options accept some
 .IR "extended shell globbing patterns" .
-These patterns can contain the special patterns
+These patterns can contain
 .BR * ,
 .BR ** ,
 .BR ? ,
 and
-.BR [...] .
-As in a normal shell,
+.B [...]
+(character ranges). As in a normal shell,
 .B *
 can be expanded to any string of characters not containing "/",
 .B ?
@@ -1076,66 +1069,52 @@ into a shell, so the shell does not interpret the globbing patterns
 before duplicity sees them.
 
 The
-.BI "--exclude " pattern
-option matches a file iff:
-
-.TP
-.B 1.
+.B --exclude
+pattern option matches a file if:
+.IP 1.
 .I pattern
 can be expanded into the file's filename, or
-
-.TP
-.B 2.
+.IP 2.
 the file is inside a directory matched by the option.
 .PP
-.RE
-Conversely,
-.BI "--include " pattern
-matches a file iff:
-
-.TP
-.B 1.
+Conversely, the 
+.B "--include " 
+pattern matches a file if:
+.IP 1.
 .I pattern
-can be expanded into the file's filename,
-
-.TP
-.B 2.
+can be expanded into the file's filename, or
+.IP 2.
 the file is inside a directory matched by the option, or
-
-.TP
-.B 3.
+.IP 3.
 the file is a directory which contains a file matched by the option.
 .PP
-.RE
 For example,
-.PP
-.RS
+
 .B --exclude
 /usr/local
-.PP
-.RE
-matches /usr/local, /usr/local/lib, and /usr/local/lib/netscape.  It
+
+matches e.g. /usr/local, /usr/local/lib, and /usr/local/lib/netscape.  It
 is the same as --exclude /usr/local --exclude '/usr/local/**'.
-.PP
-.RS
+
+Or
+.br
 .B --include
 /usr/local
-.PP
-.RE
+
 specifies that /usr, /usr/local, /usr/local/lib, and
-/usr/local/lib/netscape (but not /usr/doc) all be backed up.  Thus you
+/usr/local/lib/netscape (but not /usr/doc) all be backed up. Thus you
 don't have to worry about including parent directories to make sure
-that included subdirectories have somewhere to go.  Finally,
-.PP
-.RS
+that included subdirectories have somewhere to go. 
+
+Finally,
+.br
 .B --include
 ignorecase:'/usr/[a-z0-9]foo/*/**.py'
-.PP
-.RE
+
 would match a file like /usR/5fOO/hello/there/world.py.  If it did
 match anything, it would also match /usr.  If there is no existing
 file that the given pattern can be expanded into, the option will not
-match /usr.
+match /usr alone.
 
 The
 .BR --include-filelist ,
@@ -1151,9 +1130,7 @@ are separated by newlines or nulls, depending on whether the
 interpreted similarly to the way
 .I extended shell patterns
 are, with a few exceptions:
-
-.TP
-.B 1.
+.IP 1.
 Globbing patterns like
 .BR * ,
 .BR ** ,
@@ -1161,40 +1138,33 @@ Globbing patterns like
 and
 .B [...]
 are not expanded.
-
-.TP
-.B 2.
+.IP 2.
 Include patterns do not match files in a directory that is included.
 So /usr/local in an include file will not match /usr/local/doc.
-
-.TP
-.B 3.
+.IP 3.
 Lines starting with "+ " are interpreted as include directives, even
 if found in a filelist referenced by
 .BR --exclude-filelist .
 Similarly, lines starting with "- " exclude files even if they are
 found within an include filelist.
-
-.RE
+.PP
 For example, if file "list.txt" contains the lines:
 
 .RS
 /usr/local
-.RE
-.RS
+.br
 - /usr/local/doc
-.RE
-.RS
+.br
 /usr/local/bin
-.RE
-.RS
+.br
 + /var
-.RE
-.RS
+.br
 - /var
-
 .RE
-then "--include-filelist list.txt" would include /usr, /usr/local, and
+
+then 
+.B "--include-filelist list.txt"
+would include /usr, /usr/local, and
 /usr/local/bin.  It would exclude /usr/local/doc,
 /usr/local/doc/python, etc.  It neither excludes nor includes
 /usr/local/man, leaving the fate of this directory to the next
@@ -1215,26 +1185,25 @@ options are interpreted (although "+ " and "- " prefixing is still
 allowed).  For instance, if the file "globbing-list.txt" contains the
 lines:
 
-.RE
 .RS
 dir/foo
-.RE
-.RS
+.br
 + dir/bar
-.RE
-.RS
+.br
 - **
-
 .RE
-Then "--include-globbing-filelist globbing-list.txt" would be exactly
-the same as specifying "--include dir/foo --include dir/bar --exclude **"
+
+Then 
+.B "--include-globbing-filelist globbing-list.txt" 
+would be exactly the same as specifying 
+.B "--include dir/foo --include dir/bar --exclude **"
 on the command line.
 
 Finally, the
 .B --include-regexp
 and
 .B --exclude-regexp
-allow files to be included and excluded if their filenames match a
+options allow files to be included and excluded if their filenames match a
 python regular expression.  Regular expression syntax is too
 complicated to explain here, but is covered in Python's library
 reference.  Unlike the

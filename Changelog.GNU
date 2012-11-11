@@ -3,6 +3,8 @@
     * Merged in lp:~satwell/duplicity/caching
       - Add a cache for password and group lookups. This significantly improves
         runtime with very large password and group configurations.
+    * Merged in lp:~ed.so/duplicity/manpage
+      - more formatting fixes, clarifications in sections EXAMPLES, FILE SELECTION
 
 2012-11-03  Kenneth Loafman  <kenneth@loafman.com>
 
