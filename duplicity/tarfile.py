@@ -53,10 +53,8 @@ import copy
 import re
 import operator
 
-try:
-    import grp, pwd
-except ImportError:
-    grp = pwd = None
+from duplicity import cached_ops
+grp = pwd = cached_ops
 
 # from tarfile import *
 __all__ = ["TarFile", "TarInfo", "is_tarfile", "TarError"]

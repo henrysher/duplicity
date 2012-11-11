@@ -1,3 +1,9 @@
+2012-11-10  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~satwell/duplicity/caching
+      - Add a cache for password and group lookups. This significantly improves
+        runtime with very large password and group configurations.
+
 2012-11-03  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~mterry/duplicity/u1-oauthlib

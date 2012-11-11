@@ -28,6 +28,9 @@ Enhancements:
     Patch by az@debian.org.
 * Merged in lp:~mterry/duplicity/u1-ascii-error
   - Fix for u1backend unicode error.  Patch by Paul Barker.
+* Merged in lp:~satwell/duplicity/caching
+  - Add a cache for password and group lookups. This significantly improves
+    runtime with very large password and group configurations.
 
 
 New in v0.6.20 (2012/10/28)
