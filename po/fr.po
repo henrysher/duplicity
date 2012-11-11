@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-11-04 03:36+0000\n"
+"POT-Creation-Date: 2012-11-11 01:47+0000\n"
 "PO-Revision-Date: 2010-05-23 16:47+0000\n"
 "Last-Translator: Kenneth Loafman <kenneth@loafman.com>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2012-11-05 04:41+0000\n"
-"X-Generator: Launchpad (build 16232)\n"
+"X-Launchpad-Export-Date: 2012-11-11 04:57+0000\n"
+"X-Generator: Launchpad (build 16251)\n"
 
 #: ../bin/duplicity:98
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -1181,71 +1181,71 @@ msgstr ""
 msgid "Writing %s of type %s"
 msgstr ""
 
-#: ../duplicity/path.py:221 ../duplicity/path.py:280
+#: ../duplicity/path.py:222 ../duplicity/path.py:281
 #, python-format
 msgid "Warning: %s has negative mtime, treating as 0."
 msgstr ""
 
-#: ../duplicity/path.py:345
+#: ../duplicity/path.py:346
 msgid "Difference found:"
 msgstr ""
 
-#: ../duplicity/path.py:351
+#: ../duplicity/path.py:352
 #, python-format
 msgid "New file %s"
 msgstr ""
 
-#: ../duplicity/path.py:354
+#: ../duplicity/path.py:355
 #, python-format
 msgid "File %s is missing"
 msgstr ""
 
-#: ../duplicity/path.py:357
+#: ../duplicity/path.py:358
 #, python-format
 msgid "File %%s has type %s, expected %s"
 msgstr ""
 
-#: ../duplicity/path.py:363 ../duplicity/path.py:389
+#: ../duplicity/path.py:364 ../duplicity/path.py:390
 #, python-format
 msgid "File %%s has permissions %s, expected %s"
 msgstr ""
 
-#: ../duplicity/path.py:368
+#: ../duplicity/path.py:369
 #, python-format
 msgid "File %%s has mtime %s, expected %s"
 msgstr ""
 
-#: ../duplicity/path.py:376
+#: ../duplicity/path.py:377
 #, python-format
 msgid "Data for file %s is different"
 msgstr ""
 
-#: ../duplicity/path.py:384
+#: ../duplicity/path.py:385
 #, python-format
 msgid "Symlink %%s points to %s, expected %s"
 msgstr ""
 
-#: ../duplicity/path.py:393
+#: ../duplicity/path.py:394
 #, python-format
 msgid "Device file %%s has numbers %s, expected %s"
 msgstr ""
 
-#: ../duplicity/path.py:553
+#: ../duplicity/path.py:554
 #, python-format
 msgid "Making directory %s"
 msgstr ""
 
-#: ../duplicity/path.py:563
+#: ../duplicity/path.py:564
 #, python-format
 msgid "Deleting %s"
 msgstr ""
 
-#: ../duplicity/path.py:572
+#: ../duplicity/path.py:573
 #, python-format
 msgid "Touching %s"
 msgstr ""
 
-#: ../duplicity/path.py:579
+#: ../duplicity/path.py:580
 #, python-format
 msgid "Deleting tree %s"
 msgstr ""
