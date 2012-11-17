@@ -80,7 +80,9 @@ class FTPSBackend(duplicity.backend.Backend):
         os.write(self.tempfile, "set net:max-retries %s\n" % globals.num_retries)
         os.write(self.tempfile, "set ftp:passive-mode %s\n" % self.conn_opt)
         os.write(self.tempfile, "open %s %s\n" % (self.portflag, self.parsed_url.hostname))
-        os.write(self.tempfile, "user %s %s\n" % (self.parsed_url.username, self.password))
+        # allow .netrc auth by only setting user/pass when user was actually given
+        if self.parsed_url.username:
+            os.write(self.tempfile, "user %s %s\n" % (self.parsed_url.username, self.password))
         os.close(self.tempfile)
 
         self.flags = "-f %s" % self.tempname
