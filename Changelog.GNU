@@ -1,3 +1,12 @@
+2012-11-19  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~ed.so/duplicity/lftp.netrc
+      - Allow .netrc auth for lftp backend
+    * Merged in lp:~mterry/duplicity/946988
+      - This fixes bug 946988 by not duplicating the checks for when we should ask
+        for the password (those same checks are done more correctly inside
+        get_passphrase). And add a test to reproduce the bug.
+
 2012-11-10  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~satwell/duplicity/caching

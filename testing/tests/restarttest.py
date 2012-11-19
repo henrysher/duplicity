@@ -70,17 +70,21 @@ class RestartTest(unittest.TestCase):
         Run duplicity binary with given arguments and options
         """
         options.append("--archive-dir testfiles/cache")
-        cmd_list = ["duplicity"]
+        # We run under setsid and take input from /dev/null (below) because
+        # this way we force a failure if duplicity tries to read from the
+        # console (like for gpg password or such).
+        cmd_list = ["setsid", "duplicity"]
         cmd_list.extend(options + ["--allow-source-mismatch"])
         if current_time:
             cmd_list.append("--current-time %s" % (current_time,))
         if other_args:
             cmd_list.extend(other_args)
         cmd_list.extend(arglist)
+        cmd_list.extend(["<", "/dev/null"])
         cmdline = " ".join(cmd_list)
         #print "Running '%s'." % cmdline
-        if not os.environ.has_key('PASSPHRASE'):
-            os.environ['PASSPHRASE'] = 'foobar'
+        helper.set_environ('PASSPHRASE', helper.sign_passphrase)
+        self.addCleanup(lambda: helper.set_environ("PASSPHRASE", None))
 #        print "CMD: %s" % cmdline
         return_val = os.system(cmdline)
         if return_val:
@@ -230,6 +234,23 @@ class RestartTest(unittest.TestCase):
         assert not os.system("rm testfiles/output/duplicity-full*vol[23].difftar*")
         # this one should pass OK
         self.backup("full", "testfiles/largefiles", options = ["--vol 1"])
+        self.verify("testfiles/largefiles")
+
+    def test_restart_sign_and_encrypt(self):
+        """
+        Test restarting a backup using same key for sign and encrypt
+        https://bugs.launchpad.net/duplicity/+bug/946988
+        """
+        self.make_largefiles()
+        enc_opts = ["--sign-key " + helper.sign_key, "--encrypt-key " + helper.sign_key]
+        # Force a failure partway through
+        try:
+            self.backup("full", "testfiles/largefiles", options = ["--vols 1", "--fail 2"] + enc_opts)
+            self.fail()
+        except CmdError, e:
+            self.assertEqual(30, e.exit_status)
+        # Now finish that backup
+        self.backup("full", "testfiles/largefiles", options = enc_opts)
         self.verify("testfiles/largefiles")
 
     def test_last_file_missing_in_middle(self):

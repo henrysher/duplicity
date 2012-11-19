@@ -1321,10 +1321,8 @@ See https://bugs.launchpad.net/duplicity/+bug/931175
 
     os.umask(077)
 
-    # full/inc only needs a passphrase for symmetric keys
-    if not action in ["full", "inc"] or not globals.gpg_profile.recipients:
-        # get the passphrase if we need to based on action/options
-        globals.gpg_profile.passphrase = get_passphrase(1, action)
+    # get the passphrase if we need to based on action/options
+    globals.gpg_profile.passphrase = get_passphrase(1, action)
 
     if action == "restore":
         restore(col_stats)

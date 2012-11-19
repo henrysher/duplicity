@@ -33,6 +33,12 @@ Enhancements:
     runtime with very large password and group configurations.
 * Merged in lp:~ed.so/duplicity/manpage
   - more formatting fixes, clarifications in sections EXAMPLES, FILE SELECTION
+* Merged in lp:~ed.so/duplicity/lftp.netrc
+  - Allow .netrc auth for lftp backend
+* Merged in lp:~mterry/duplicity/946988
+  - This fixes bug 946988 by not duplicating the checks for when we should ask
+    for the password (those same checks are done more correctly inside
+    get_passphrase). And add a test to reproduce the bug.
 
 
 New in v0.6.20 (2012/10/28)
