@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-11-11 01:47+0000\n"
+"POT-Creation-Date: 2012-11-19 14:17+0000\n"
 "PO-Revision-Date: 2009-09-15 03:17+0000\n"
 "Last-Translator: Kenneth Loafman <kenneth@loafman.com>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-11-12 04:37+0000\n"
-"X-Generator: Launchpad (build 16251)\n"
+"X-Launchpad-Export-Date: 2012-11-20 04:52+0000\n"
+"X-Generator: Launchpad (build 16286)\n"
 
 #: ../bin/duplicity:98
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -346,21 +346,21 @@ msgstr ""
 "A última cópia de segurança completa é demasiado antiga. A forçar uma nova "
 "cópia de segurança completa"
 
-#: ../bin/duplicity:1416
+#: ../bin/duplicity:1414
 msgid "INT intercepted...exiting."
 msgstr ""
 
-#: ../bin/duplicity:1422
+#: ../bin/duplicity:1420
 #, python-format
 msgid "GPG error detail: %s"
 msgstr "Detalhe do erro do GPG: %s"
 
-#: ../bin/duplicity:1431
+#: ../bin/duplicity:1429
 #, python-format
 msgid "User error detail: %s"
 msgstr "Detalhe do erro de utilizador: %s"
 
-#: ../bin/duplicity:1440
+#: ../bin/duplicity:1438
 #, python-format
 msgid "Backend error detail: %s"
 msgstr "Detalhe do erro no motor de processamento: %s"

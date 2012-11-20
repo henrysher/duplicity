@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-11-11 01:47+0000\n"
+"POT-Creation-Date: 2012-11-19 14:17+0000\n"
 "PO-Revision-Date: 2011-08-08 04:18+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: English (Australia) <en_AU@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-11-12 04:38+0000\n"
-"X-Generator: Launchpad (build 16251)\n"
+"X-Launchpad-Export-Date: 2012-11-20 04:52+0000\n"
+"X-Generator: Launchpad (build 16286)\n"
 
 #: ../bin/duplicity:98
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -347,21 +347,21 @@ msgstr "Last full backup date: none"
 msgid "Last full backup is too old, forcing full backup"
 msgstr "Last full backup is too old, forcing full backup"
 
-#: ../bin/duplicity:1416
+#: ../bin/duplicity:1414
 msgid "INT intercepted...exiting."
 msgstr "INT intercepted...exiting."
 
-#: ../bin/duplicity:1422
+#: ../bin/duplicity:1420
 #, python-format
 msgid "GPG error detail: %s"
 msgstr "GPG error detail: %s"
 
-#: ../bin/duplicity:1431
+#: ../bin/duplicity:1429
 #, python-format
 msgid "User error detail: %s"
 msgstr "User error detail: %s"
 
-#: ../bin/duplicity:1440
+#: ../bin/duplicity:1438
 #, python-format
 msgid "Backend error detail: %s"
 msgstr "Backend error detail: %s"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-11-11 01:47+0000\n"
+"POT-Creation-Date: 2012-11-19 14:17+0000\n"
 "PO-Revision-Date: 2011-08-27 12:46+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Slovenian <sl@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || "
 "n%100==4 ? 3 : 0);\n"
-"X-Launchpad-Export-Date: 2012-11-12 04:37+0000\n"
-"X-Generator: Launchpad (build 16251)\n"
+"X-Launchpad-Export-Date: 2012-11-20 04:52+0000\n"
+"X-Generator: Launchpad (build 16286)\n"
 
 #: ../bin/duplicity:98
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -372,21 +372,21 @@ msgstr ""
 "Zadnja polna varnostna kopija je prestara. Vsiljena bo polna varnostna "
 "kopija."
 
-#: ../bin/duplicity:1416
+#: ../bin/duplicity:1414
 msgid "INT intercepted...exiting."
 msgstr "Prestrežen je bil INT ... končanje."
 
-#: ../bin/duplicity:1422
+#: ../bin/duplicity:1420
 #, python-format
 msgid "GPG error detail: %s"
 msgstr "Podrobnosti napake GPG: %s"
 
-#: ../bin/duplicity:1431
+#: ../bin/duplicity:1429
 #, python-format
 msgid "User error detail: %s"
 msgstr "Podrobnosti napake uporabnika: %s"
 
-#: ../bin/duplicity:1440
+#: ../bin/duplicity:1438
 #, python-format
 msgid "Backend error detail: %s"
 msgstr "Podrobnosti napake zaledja: %s"
@@ -749,7 +749,7 @@ msgid ""
 "release.\n"
 "Use of default filenames is strongly suggested."
 msgstr ""
-"Opozorilo: možnost %s čaka na zastaranje in bo bila odstranjena v prihodnji "
+"Opozorilo: možnost %s čaka na zastaranje in bo odstranjena v prihodnji "
 "različici.\n"
 "Uporaba privzetih imen datotek je močno priporočena."
 
