@@ -128,10 +128,10 @@ class TemporaryDirectory:
         self.__lock = threading.Lock()  # protect private resources *AND* mktemp/mkstemp calls
 
     def dir(self):
-    	"""
-    	Returns the absolute pathname of the temp folder.
-    	"""
-        return self.__dir 
+        """
+        Returns the absolute pathname of the temp folder.
+        """
+        return self.__dir
 
     def __del__(self):
         """
