@@ -480,8 +480,13 @@ Use the GIO backend and interpret any URLs as GIO would.
 .TP
 .BI "--hidden-encrypt-key " key-id
 Same as
-.B --encrypt-key
-, but it hides user's key id from encrypted file.
+.BR --encrypt-key ,
+but it hides user's key id from encrypted file. It uses the gpg's
+.B --hidden-recipient
+command to obfuscate the owner of the backup. On restore, gpg will 
+automatically try all available secret keys in order to decrypt the 
+backup. See gpg(1) for more details.
+
 
 .TP
 .B --ignore-errors
