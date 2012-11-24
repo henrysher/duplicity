@@ -253,6 +253,23 @@ class RestartTest(unittest.TestCase):
         self.backup("full", "testfiles/largefiles", options = enc_opts)
         self.verify("testfiles/largefiles")
 
+    def test_restart_sign_and_hidden_encrypt(self):
+        """
+        Test restarting a backup using same key for sign and encrypt (hidden key id)
+        https://bugs.launchpad.net/duplicity/+bug/946988
+        """
+        self.make_largefiles()
+        enc_opts = ["--sign-key " + helper.sign_key, "--hidden-encrypt-key " + helper.sign_key]
+        # Force a failure partway through
+        try:
+            self.backup("full", "testfiles/largefiles", options = ["--vols 1", "--fail 2"] + enc_opts)
+            self.fail()
+        except CmdError, e:
+            self.assertEqual(30, e.exit_status)
+        # Now finish that backup
+        self.backup("full", "testfiles/largefiles", options = enc_opts)
+        self.verify("testfiles/largefiles")
+
     def test_last_file_missing_in_middle(self):
         """
         Test restart when the last file being backed up is missing on restart.
