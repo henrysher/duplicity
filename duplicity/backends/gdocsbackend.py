@@ -20,12 +20,13 @@
 
 import os.path
 import string
-import urllib;
+import urllib
 
 import duplicity.backend
 from duplicity.backend import retry
 from duplicity import log
 from duplicity.errors import * #@UnusedWildImport
+
 
 class GDocsBackend(duplicity.backend.Backend):
     """Connect to remote store using Google Google Documents List API"""
@@ -77,7 +78,7 @@ class GDocsBackend(duplicity.backend.Backend):
         self.folder = parent_folder
 
     @retry
-    def put(self, source_path, remote_filename=None, raise_errors = False):
+    def put(self, source_path, remote_filename=None, raise_errors=False):
         """Transfer source_path to remote_filename"""
         # Default remote file name.
         if not remote_filename:
@@ -91,7 +92,7 @@ class GDocsBackend(duplicity.backend.Backend):
                                            remote_filename)
             for entry in entries:
                 self.client.delete(entry.get_edit_link().href + '?delete=true', force=True)
-            
+
             # Set uploader instance. Note that resumable uploads are required in order to
             # enable uploads for all file types.
             # (see http://googleappsdeveloper.blogspot.com/2011/05/upload-all-file-types-to-any-google.html)
@@ -102,20 +103,11 @@ class GDocsBackend(duplicity.backend.Backend):
               desired_class=gdata.docs.data.Resource)
             if uploader:
                 # Chunked upload.
-                entry = gdata.docs.data.Resource(title = atom.data.Title(text = remote_filename))
-                uri = '/feeds/upload/create-session/default/private/full?convert=false'
-                entry = uploader.UploadFile(uri, entry = entry)
-                if entry:
-                    # Move to destination folder.
-                    # TODO: any ideas on how to avoid this step?
-                    if self.client.MoveResource(entry, self.folder):
-                        assert not file.close()
-                        return
-                    else:
-                        self.__handle_error("Failed to move uploaded file '%s' to destination remote folder '%s'"
-                                            % (source_path.get_filename(), self.folder.title.text), raise_errors)
-                else:
-                    self.__handle_error("Failed to upload file '%s' to remote folder '%s'" 
+                entry = gdata.docs.data.Resource(title=atom.data.Title(text=remote_filename))
+                uri = self.folder.get_resumable_create_media_link().href + '?convert=false'
+                entry = uploader.UploadFile(uri, entry=entry)
+                if not entry:
+                    self.__handle_error("Failed to upload file '%s' to remote folder '%s'"
                                         % (source_path.get_filename(), self.folder.title.text), raise_errors)
             else:
                 self.__handle_error("Failed to initialize upload of file '%s' to remote folder '%s'"
@@ -126,7 +118,7 @@ class GDocsBackend(duplicity.backend.Backend):
                                 % (source_path.get_filename(), self.folder.title.text, str(e)), raise_errors)
 
     @retry
-    def get(self, remote_filename, local_path, raise_errors = False):
+    def get(self, remote_filename, local_path, raise_errors=False):
         """Get remote filename, saving it to local_path"""
         try:
             entries = self.__fetch_entries(self.folder.resource_id.text,
@@ -145,7 +137,7 @@ class GDocsBackend(duplicity.backend.Backend):
                                  % (remote_filename, self.folder.title.text, str(e)), raise_errors)
 
     @retry
-    def list(self, raise_errors = False):
+    def list(self, raise_errors=False):
         """List files in folder"""
         try:
             entries = self.__fetch_entries(self.folder.resource_id.text,
@@ -156,7 +148,7 @@ class GDocsBackend(duplicity.backend.Backend):
                                 % (self.folder.title.text, str(e)), raise_errors)
 
     @retry
-    def delete(self, filename_list, raise_errors = False):
+    def delete(self, filename_list, raise_errors=False):
         """Delete files in filename_list"""
         for filename in filename_list:
             try:
@@ -166,7 +158,7 @@ class GDocsBackend(duplicity.backend.Backend):
                 if len(entries) > 0:
                     success = True
                     for entry in entries:
-                        if not self.client.delete(entry.get_edit_link().href + '?delete=true', force = True):
+                        if not self.client.delete(entry.get_edit_link().href + '?delete=true', force=True):
                             success = False
                     if not success:
                         self.__handle_error("Failed to remove file '%s' in remote folder '%s'"
@@ -178,20 +170,20 @@ class GDocsBackend(duplicity.backend.Backend):
                 self.__handle_error("Failed to remove file '%s' in remote folder '%s': %s"
                                     % (filename, self.folder.title.text, str(e)), raise_errors)
 
-    def __handle_error(self, message, raise_errors = True):
+    def __handle_error(self, message, raise_errors=True):
         if raise_errors:
             raise BackendException(message)
         else:
             log.FatalError(message, log.ErrorCode.backend_error)
-    
-    def __authorize(self, email, password, captcha_token = None, captcha_response = None):
+
+    def __authorize(self, email, password, captcha_token=None, captcha_response=None):
         try:
             self.client.client_login(email,
                                      password,
-                                     source = 'duplicity $version',
-                                     service = 'writely',
-                                     captcha_token = captcha_token,
-                                     captcha_response = captcha_response)
+                                     source='duplicity $version',
+                                     service='writely',
+                                     captcha_token=captcha_token,
+                                     captcha_response=captcha_response)
         except gdata.client.CaptchaChallenge, challenge:
             print('A captcha challenge in required. Please visit ' + challenge.captcha_url)
             answer = None
@@ -207,7 +199,7 @@ class GDocsBackend(duplicity.backend.Backend):
         except Exception, e:
             self.__handle_error('Error while authenticating client: %s.' % str(e))
 
-    def __fetch_entries(self, folder_id, type, title = None):
+    def __fetch_entries(self, folder_id, type, title=None):
         # Build URI.
         uri = '/feeds/default/private/full/%s/contents' % folder_id
         if type == 'folder':
@@ -218,11 +210,11 @@ class GDocsBackend(duplicity.backend.Backend):
             uri += '?showfolders=true'
         if title:
             uri += '&title=' + urllib.quote(title) + '&title-exact=true'
-        
+
         try:
             # Fetch entries.
-            entries = self.client.get_all_resources(uri = uri)
-            
+            entries = self.client.get_all_resources(uri=uri)
+
             # When filtering by entry title, API is returning (don't know why) documents in other
             # folders (apart from folder_id) matching the title, so some extra filtering is required.
             if title:
@@ -239,7 +231,7 @@ class GDocsBackend(duplicity.backend.Backend):
                             result.append(entry)
             else:
                 result = entries
-            
+
             # Done!
             return result
         except Exception, e:
