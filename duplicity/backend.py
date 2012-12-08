@@ -329,13 +329,16 @@ def retry(fn):
     return iterate
 
 # same as above, a bit dumber and always dies fatally if last trial fails
-# hence no need for the raise_errors var ;)
+# hence no need for the raise_errors var ;), we really catch everything here
+# as we don't know what the underlying code comes up with and we really *do*
+# want to retry globals.num_retries times under all circumstances
 def retry_fatal(fn):
     def iterate(*args):
         for n in range(1, globals.num_retries):
             try:
                 return fn(*args)
-            except Exception, e:
+            except:
+                e = sys.exc_info()[1]
                 log.Warn("Attempt %s failed. %s: %s"
                          % (n, e.__class__.__name__, str(e)))
                 log.Debug("Backtrace of previous error: %s"
@@ -344,7 +347,8 @@ def retry_fatal(fn):
         # final trial, die on exception
         try:
             return fn(*args)
-        except Exception, e:
+        except:
+            e = sys.exc_info()[1]
             log.FatalError("Giving up after %s attempts. %s: %s"
                          % (globals.num_retries, e.__class__.__name__, str(e)))
             log.Debug("Backtrace of previous error: %s"
