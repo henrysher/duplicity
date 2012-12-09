@@ -22,7 +22,6 @@
 import base64
 import httplib
 import re
-import sys
 import urllib
 import urllib2
 import xml.dom.minidom
@@ -196,8 +195,7 @@ class WebDAVBackend(duplicity.backend.Backend):
                 if filename:
                     result.append(filename)
             return result
-        except:
-            cause = sys.exc_info()[1]
+        except Exception, cause:
             e = BackendException("Listing directory %s on WebDAV server failed. %s" % (self.directory,cause))
             raise e
 
@@ -256,8 +254,7 @@ class WebDAVBackend(duplicity.backend.Backend):
                 reason = response.reason
                 response.close()
                 raise BackendException("Bad status code %s reason %s." % (status,reason))
-        except:
-            cause = sys.exc_info()[1]
+        except Exception, cause:
             e = BackendException("Getting %s from WebDAV server failed. %s" % (url,cause))
             raise e
 
@@ -279,8 +276,7 @@ class WebDAVBackend(duplicity.backend.Backend):
                 reason = response.reason
                 response.close()
                 raise BackendException("Bad status code %s reason %s." % (status,reason))
-        except:
-            cause = sys.exc_info()[1]
+        except Exception, cause:
             e = BackendException("Putting %s on WebDAV server failed. %s" % (url,cause))
             raise e
 
@@ -300,8 +296,7 @@ class WebDAVBackend(duplicity.backend.Backend):
                     reason = response.reason
                     response.close()
                     raise BackendException("Bad status code %s reason %s." % (status,reason))
-            except:
-                cause = sys.exc_info()[1]
+            except Exception, cause:
                 e = BackendException("Deleting %s on WebDAV server failed. %s" % (url,cause))
                 raise e
 
