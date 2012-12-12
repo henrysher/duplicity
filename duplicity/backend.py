@@ -337,8 +337,7 @@ def retry_fatal(fn):
         for n in range(1, globals.num_retries):
             try:
                 return fn(*args)
-            except:
-                e = sys.exc_info()[1]
+            except Exception, e:
                 log.Warn("Attempt %s failed. %s: %s"
                          % (n, e.__class__.__name__, str(e)))
                 log.Debug("Backtrace of previous error: %s"
@@ -347,10 +346,10 @@ def retry_fatal(fn):
         # final trial, die on exception
         try:
             return fn(*args)
-        except:
-            e = sys.exc_info()[1]
+        except Exception, e:
             log.FatalError("Giving up after %s attempts. %s: %s"
-                         % (globals.num_retries, e.__class__.__name__, str(e)))
+                         % (globals.num_retries, e.__class__.__name__, str(e)),
+                          log.ErrorCode.backend_error)
             log.Debug("Backtrace of previous error: %s"
                         % exception_traceback())
     return iterate
