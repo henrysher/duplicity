@@ -44,6 +44,9 @@ Enhancements:
     via option --hidden-encrypt-key
 * Merged in lp:~mterry/duplicity/u1-utf8
   - Make sure u1backend returns filenames as utf8
+* Merged in lp:~carlos-abalde/duplicity/gdocs-backend-gdata-2.0.16.-upgrade
+  - Upgrade of GoogleDocs backend to python gdata lib >= 2.0.15:
+    Stop using get_everything method.
 
 
 New in v0.6.20 (2012/10/28)
