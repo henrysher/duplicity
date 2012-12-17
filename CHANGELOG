@@ -42,6 +42,8 @@ Enhancements:
 * Merged in lp:~lenharo-h/duplicity/duplicity
   - Generate encrypted backups without revealing the user's key id
     via option --hidden-encrypt-key
+* Merged in lp:~mterry/duplicity/u1-utf8
+  - Make sure u1backend returns filenames as utf8
 
 
 New in v0.6.20 (2012/10/28)

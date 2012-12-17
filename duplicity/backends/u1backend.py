@@ -236,7 +236,7 @@ class U1Backend(duplicity.backend.Backend):
         if 'children' in content:
             for child in content['children']:
                 path = urllib.unquote(child['path'].lstrip('/'))
-                filelist += [path]
+                filelist += [path.encode('utf-8')]
         return filelist
 
     def delete(self, filename_list):
