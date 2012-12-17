@@ -1,3 +1,9 @@
+2012-12-17  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~lenharo-h/duplicity/duplicity
+      - Generate encrypted backups without revealing the user's key id
+        via option --hidden-encrypt-key
+
 2012-11-19  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~ed.so/duplicity/lftp.netrc

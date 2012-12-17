@@ -87,6 +87,17 @@ class GPGTest(unittest.TestCase):
                                   recipients = [helper.encrypt_key1])
         self.gpg_cycle("aoeu" * 10000, profile2)
 
+    def test_gpg_hidden_asym(self):
+        """Test GPG asymmetric encryption with hidden key id"""
+        profile = gpg.GPGProfile(passphrase = helper.sign_passphrase,
+                                 hidden_recipients = [helper.encrypt_key1,
+                                               helper.encrypt_key2])
+        self.gpg_cycle("aoensutha aonetuh saoe", profile)
+
+        profile2 = gpg.GPGProfile(passphrase = helper.sign_passphrase,
+                                  hidden_recipients = [helper.encrypt_key1])
+        self.gpg_cycle("aoeu" * 10000, profile2)
+
     def test_gpg_signing(self):
         """Test to make sure GPG reports the proper signature key"""
         self.deltmp()
@@ -95,6 +106,26 @@ class GPGTest(unittest.TestCase):
         signing_profile = gpg.GPGProfile(passphrase = helper.sign_passphrase,
                                          sign_key = helper.sign_key,
                                          recipients = [helper.encrypt_key1])
+
+        epath = path.Path("testfiles/output/encrypted_file")
+        encrypted_signed_file = gpg.GPGFile(1, epath, signing_profile)
+        encrypted_signed_file.write(plaintext)
+        encrypted_signed_file.close()
+
+        decrypted_file = gpg.GPGFile(0, epath, signing_profile)
+        assert decrypted_file.read() == plaintext
+        decrypted_file.close()
+        sig = decrypted_file.get_signature()
+        assert sig == helper.sign_key, sig
+
+    def test_gpg_signing_and_hidden_encryption(self):
+        """Test to make sure GPG reports the proper signature key even with hidden encryption key id"""
+        self.deltmp()
+        plaintext = "hello" * 50000
+
+        signing_profile = gpg.GPGProfile(passphrase = helper.sign_passphrase,
+                                         sign_key = helper.sign_key,
+                                         hidden_recipients = [helper.encrypt_key1])
 
         epath = path.Path("testfiles/output/encrypted_file")
         encrypted_signed_file = gpg.GPGFile(1, epath, signing_profile)

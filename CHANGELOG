@@ -39,6 +39,9 @@ Enhancements:
   - This fixes bug 946988 by not duplicating the checks for when we should ask
     for the password (those same checks are done more correctly inside
     get_passphrase). And add a test to reproduce the bug.
+* Merged in lp:~lenharo-h/duplicity/duplicity
+  - Generate encrypted backups without revealing the user's key id
+    via option --hidden-encrypt-key
 
 
 New in v0.6.20 (2012/10/28)
