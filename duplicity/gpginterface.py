@@ -570,6 +570,7 @@ class Options:
         # lists
         self.encrypt_to = []
         self.recipients = []
+        self.hidden_recipients = []
 
         # miscellaneous arguments
         self.extra_args = []
@@ -602,6 +603,7 @@ class Options:
         if self.openpgp: args.append( '--openpgp' )
 
         for r in self.recipients: args.extend( [ '--recipient',  r ] )
+        for r in self.hidden_recipients: args.extend( [ '--hidden-recipient',  r ] )
         for r in self.encrypt_to: args.extend( [ '--encrypt-to', r ] )
 
         return args

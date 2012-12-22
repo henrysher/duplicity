@@ -168,6 +168,16 @@ class FinalTest:
         self.test_basic_cycle(backup_options = backup_options,
                               restore_options = restore_options)
 
+    def test_asym_with_hidden_recipient_cycle(self):
+        """Like test_basic_cycle but use asymmetric encryption (hidding key id) and signing"""
+        backup_options = ["--hidden-encrypt-key " + helper.encrypt_key1,
+                          "--sign-key " + helper.sign_key]
+        restore_options = ["--hidden-encrypt-key " + helper.encrypt_key1,
+                           "--sign-key " + helper.sign_key]
+        helper.set_environ("SIGN_PASSPHRASE", helper.sign_passphrase)
+        self.test_basic_cycle(backup_options = backup_options,
+                              restore_options = restore_options)
+
     def test_single_regfile(self):
         """Test backing and restoring up a single regular file"""
         self.runtest(["testfiles/various_file_types/regular_file"])

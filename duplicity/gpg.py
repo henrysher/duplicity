@@ -54,7 +54,7 @@ class GPGProfile:
     Just hold some GPG settings, avoid passing tons of arguments
     """
     def __init__(self, passphrase = None, sign_key = None,
-                 recipients = None):
+                 recipients = None, hidden_recipients = None):
         """
         Set all data with initializer
 
@@ -75,6 +75,12 @@ class GPGProfile:
             self.recipients = recipients
         else:
             self.recipients = []
+
+        if hidden_recipients is not None:
+            assert type(hidden_recipients) is types.ListType # must be list, not tuple
+            self.hidden_recipients = hidden_recipients
+        else:
+            self.hidden_recipients = []
 
 
 class GPGFile:
@@ -131,7 +137,10 @@ class GPGFile:
             if profile.recipients:
                 gnupg.options.recipients = profile.recipients
                 cmdlist.append('--encrypt')
-            else:
+            if profile.hidden_recipients:
+                gnupg.options.hidden_recipients = profile.hidden_recipients
+                cmdlist.append('--encrypt')
+            if not (profile.recipients or profile.hidden_recipients):
                 cmdlist.append('--symmetric')
                 # use integrity protection
                 gnupg.options.extra_args.append('--force-mdc')
@@ -149,7 +158,7 @@ class GPGFile:
                 p1.handles['passphrase'].close()
             self.gpg_input = p1.handles['stdin']
         else:
-            if profile.recipients and profile.encrypt_secring:
+            if (profile.recipients or profile.hidden_recipients) and profile.encrypt_secring:
                 cmdlist.append('--secret-keyring')
                 cmdlist.append(profile.encrypt_secring)
             self.status_fp = tempfile.TemporaryFile( dir=tempdir.default().dir() )

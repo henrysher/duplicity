@@ -6,6 +6,17 @@
         added a more generalized 'retry_fatal' decorator which makes retrying backend
         methods even easier
 
+2012-12-17  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~lenharo-h/duplicity/duplicity
+      - Generate encrypted backups without revealing the user's key id
+        via option --hidden-encrypt-key
+    * Merged in lp:~mterry/duplicity/u1-utf8
+      - Make sure u1backend returns filenames as utf8
+    * Merged in lp:~carlos-abalde/duplicity/gdocs-backend-gdata-2.0.16.-upgrade
+      - Upgrade of GoogleDocs backend to python gdata lib >= 2.0.15:
+        Stop using get_everything method.
+
 2012-11-19  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~ed.so/duplicity/lftp.netrc
