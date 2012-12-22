@@ -31,6 +31,7 @@ from duplicity import globals
 from duplicity import log
 from duplicity.errors import * #@UnusedWildImport
 from duplicity import urlparse_2_5 as urlparser
+from duplicity.backend import retry_fatal
 
 class CustomMethodRequest(urllib2.Request):
     """
@@ -160,10 +161,11 @@ class WebDAVBackend(duplicity.backend.Backend):
         auth_string = self.digest_auth_handler.get_authorization(dummy_req, self.digest_challenge)
         return 'Digest %s' % auth_string
 
+    @retry_fatal
     def list(self):
         """List files in directory"""
-        for n in range(1, globals.num_retries+1):
-            log.Info("Listing directory %s on WebDAV server" % (self.directory,))
+        log.Info("Listing directory %s on WebDAV server" % (self.directory,))
+        try:
             self.headers['Depth'] = "1"
             response = self.request("PROPFIND", self.directory, self.listbody)
             del self.headers['Depth']
@@ -174,24 +176,28 @@ class WebDAVBackend(duplicity.backend.Backend):
                 response = self.request("MKCOL", self.directory)
                 log.Info("WebDAV MKCOL status: %s %s" % (response.status, response.reason))
                 response.close()
-                continue
-            if response.status == 207:
+                # just created folder is so return empty
+                return []
+            elif response.status == 207:
                 document = response.read()
                 response.close()
-                break
-            log.Info("WebDAV PROPFIND attempt #%d failed: %s %s" % (n, response.status, response.reason))
-            if n == globals.num_retries +1:
-                log.Warn("WebDAV backend giving up after %d attempts to PROPFIND %s" % (globals.num_retries, self.directory))
-                raise BackendException((response.status, response.reason))
+            else:
+                status = response.status
+                reason = response.reason
+                response.close()
+                raise BackendException("Bad status code %s reason %s." % (status,reason))
 
-        log.Info("%s" % (document,))
-        dom = xml.dom.minidom.parseString(document)
-        result = []
-        for href in dom.getElementsByTagName('d:href') + dom.getElementsByTagName('D:href'):
-            filename = self.__taste_href(href)
-            if filename:
-                result.append(filename)
-        return result
+            log.Debug("%s" % (document,))
+            dom = xml.dom.minidom.parseString(document)
+            result = []
+            for href in dom.getElementsByTagName('d:href') + dom.getElementsByTagName('D:href'):
+                filename = self.__taste_href(href)
+                if filename:
+                    result.append(filename)
+            return result
+        except Exception, cause:
+            e = BackendException("Listing directory %s on WebDAV server failed. %s" % (self.directory,cause))
+            raise e
 
     def __taste_href(self, href):
         """
@@ -230,53 +236,69 @@ class WebDAVBackend(duplicity.backend.Backend):
         else:
             return None
 
+    @retry_fatal
     def get(self, remote_filename, local_path):
         """Get remote filename, saving it to local_path"""
         url = self.directory + remote_filename
-        target_file = local_path.open("wb")
-        for n in range(1, globals.num_retries+1):
-            log.Info("Retrieving %s from WebDAV server" % (url ,))
+        log.Info("Retrieving %s from WebDAV server" % (url ,))
+        try:
+            target_file = local_path.open("wb")
             response = self.request("GET", url)
             if response.status == 200:
                 target_file.write(response.read())
                 assert not target_file.close()
                 local_path.setdata()
-                return
-            log.Info("WebDAV GET attempt #%d failed: %s %s" % (n, response.status, response.reason))
-        log.Warn("WebDAV backend giving up after %d attempts to GET %s" % (globals.num_retries, url))
-        raise BackendException((response.status, response.reason))
+                response.close()
+            else:
+                status = response.status
+                reason = response.reason
+                response.close()
+                raise BackendException("Bad status code %s reason %s." % (status,reason))
+        except Exception, cause:
+            e = BackendException("Getting %s from WebDAV server failed. %s" % (url,cause))
+            raise e
 
+    @retry_fatal
     def put(self, source_path, remote_filename = None):
         """Transfer source_path to remote_filename"""
         if not remote_filename:
             remote_filename = source_path.get_filename()
         url = self.directory + remote_filename
-        source_file = source_path.open("rb")
-        for n in range(1, globals.num_retries+1):
-            log.Info("Saving %s on WebDAV server" % (url ,))
+        log.Info("Saving %s on WebDAV server" % (url ,))
+        try:
+            source_file = source_path.open("rb")
             response = self.request("PUT", url, source_file.read())
             if response.status == 201:
                 response.read()
-                assert not source_file.close()
-                return
-            log.Info("WebDAV PUT attempt #%d failed: %s %s" % (n, response.status, response.reason))
-        log.Warn("WebDAV backend giving up after %d attempts to PUT %s" % (globals.num_retries, url))
-        raise BackendException((response.status, response.reason))
+                response.close()
+            else:
+                status = response.status
+                reason = response.reason
+                response.close()
+                raise BackendException("Bad status code %s reason %s." % (status,reason))
+        except Exception, cause:
+            e = BackendException("Putting %s on WebDAV server failed. %s" % (url,cause))
+            raise e
 
+    @retry_fatal
     def delete(self, filename_list):
         """Delete files in filename_list"""
         for filename in filename_list:
             url = self.directory + filename
-            for n in range(1, globals.num_retries+1):
-                log.Info("Deleting %s from WebDAV server" % (url ,))
+            log.Info("Deleting %s from WebDAV server" % (url ,))
+            try:
                 response = self.request("DELETE", url)
                 if response.status == 204:
                     response.read()
-                    break
-                log.Info("WebDAV DELETE attempt #%d failed: %s %s" % (n, response.status, response.reason))
-                if n == globals.num_retries +1:
-                    log.Warn("WebDAV backend giving up after %d attempts to DELETE %s" % (globals.num_retries, url))
-                    raise BackendException((response.status, response.reason))
+                    response.close()
+                else:
+                    status = response.status
+                    reason = response.reason
+                    response.close()
+                    raise BackendException("Bad status code %s reason %s." % (status,reason))
+            except Exception, cause:
+                e = BackendException("Deleting %s on WebDAV server failed. %s" % (url,cause))
+                raise e
 
 duplicity.backend.register_backend("webdav", WebDAVBackend)
 duplicity.backend.register_backend("webdavs", WebDAVBackend)

@@ -1,7 +1,7 @@
 [not to be removed until the end of 2013]
-Dear package maintainer: If you are packaging duplicity for some
+DEAR PACKAGE MAINTAINER: If you are packaging duplicity for some
 distribution and used to remove GnuPGInterface.py please note this:
-**Duplicity really does need its patched version of GnuPGInterface**
+*** Duplicity really does need its patched version of GnuPGInterface ***
 See README for details.
 
 
@@ -39,7 +39,11 @@ Enhancements:
   - This fixes bug 946988 by not duplicating the checks for when we should ask
     for the password (those same checks are done more correctly inside
     get_passphrase). And add a test to reproduce the bug.
-
+* Merged in lp:~ed.so/duplicity/webdav.fix-retry
+  - bugfix: webdav retrying broke on ERRORS like "error: [Errno 32] Broken pipe" in
+    socket.pyas reported here https://answers.launchpad.net/duplicity/+question/212966
+    added a more generalized 'retry_fatal' decorator which makes retrying backend
+    methods even easier
 
 New in v0.6.20 (2012/10/28)
 ---------------------------

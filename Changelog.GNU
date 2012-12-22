@@ -1,3 +1,11 @@
+2012-12-22  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~ed.so/duplicity/webdav.fix-retry
+      - bugfix: webdav retrying broke on ERRORS like "error: [Errno 32] Broken pipe" in
+        socket.pyas reported here https://answers.launchpad.net/duplicity/+question/212966
+        added a more generalized 'retry_fatal' decorator which makes retrying backend
+        methods even easier
+
 2012-11-19  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~ed.so/duplicity/lftp.netrc

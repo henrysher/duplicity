@@ -63,6 +63,7 @@ class RestartTest(unittest.TestCase):
         backend.close()
 
     def tearDown(self):
+        helper.set_environ("PASSPHRASE", None)
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     def run_duplicity(self, arglist, options = [], current_time = None):
@@ -84,7 +85,6 @@ class RestartTest(unittest.TestCase):
         cmdline = " ".join(cmd_list)
         #print "Running '%s'." % cmdline
         helper.set_environ('PASSPHRASE', helper.sign_passphrase)
-        self.addCleanup(lambda: helper.set_environ("PASSPHRASE", None))
 #        print "CMD: %s" % cmdline
         return_val = os.system(cmdline)
         if return_val:
