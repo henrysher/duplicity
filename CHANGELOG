@@ -52,6 +52,8 @@ Enhancements:
     socket.pyas reported here https://answers.launchpad.net/duplicity/+question/212966
     added a more generalized 'retry_fatal' decorator which makes retrying backend
     methods even easier
+* Merged in lp:~ed.so/duplicity/manpage
+  - Clear up PASSPHRASE reusage as sign passphrase.  Minor fixes.
 
 
 New in v0.6.20 (2012/10/28)

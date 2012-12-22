@@ -862,9 +862,13 @@ This passphrase is passed to GnuPG. If this is not set, the user will be
 prompted for the passphrase.
 .TP
 .B SIGN_PASSPHRASE
-The passphrase to be used for
-.B --sign-key
-, if SIGN_PASSPHRASE is not set but PASSPHRASE is set, the latter will be used.
+The passphrase to be used for 
+.BR --sign-key .
+If ommitted 
+.B and
+sign key is also one of the keys to encrypt against 
+.B PASSPHRASE 
+will be reused instead.
 Otherwise, if passphrase is needed but not set the user will be prompted for it.
 
 .SH URL FORMAT
@@ -880,7 +884,7 @@ it could be revealed to anyone with permissions to do process listings,
 it is permitted however.
 Consider setting the environment variable 
 .B FTP_PASSWORD 
-instead, which is used by most, but not all backends, regardless of it's name.
+instead, which is used by most, if not all backends, regardless of it's name.
 .PP
 In protocols that support it, the path may be preceded by a single
 slash, '/path', to represent a relative path to the target home directory,
@@ -1368,7 +1372,8 @@ To use Ubuntu One you must have an Ubuntu One OAuth access token. Such
 OAuth tokens have a practically unlimited lifetime; you can have multiple 
 active tokens and you can revoke tokens using the Ubuntu One web interface.
 .PP
-duplicity expects th token in the environment variable FTP_PASSWORD
+Duplicity expects the token in the environment variable 
+.B FTP_PASSWORD
 (in the format "consumer_key:consumer_secret:token:token_secret"). If no
 token is present, duplicity asks for your Ubuntu One email address and password
 and requests an access token from the Ubuntu SSO service. The newly 
