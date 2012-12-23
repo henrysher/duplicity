@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-12-17 22:07+0000\n"
+"POT-Creation-Date: 2012-12-22 15:18+0000\n"
 "PO-Revision-Date: 2012-09-12 07:52+0000\n"
 "Last-Translator: abuyop <Unknown>\n"
 "Language-Team: Malay <ms@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-12-18 05:03+0000\n"
-"X-Generator: Launchpad (build 16372)\n"
+"X-Launchpad-Export-Date: 2012-12-23 04:42+0000\n"
+"X-Generator: Launchpad (build 16378)\n"
 
 #: ../bin/duplicity:99
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -414,19 +414,19 @@ msgstr "pelakuan tugas dibuat (berjaya: %s)"
 msgid "Could not initialize backend: %s"
 msgstr "Tidak dapat awalkan bahagian belakang: %s"
 
-#: ../duplicity/backend.py:494 ../duplicity/backend.py:518
+#: ../duplicity/backend.py:519 ../duplicity/backend.py:543
 #, python-format
 msgid "Reading results of '%s'"
 msgstr "Membaca keputusan '%s'"
 
-#: ../duplicity/backend.py:533
+#: ../duplicity/backend.py:558
 #, python-format
 msgid "Running '%s' failed with code %d (attempt #%d)"
 msgid_plural "Running '%s' failed with code %d (attempt #%d)"
 msgstr[0] "'%s' yang berjalan gagal dengan kod %d (percubaan #%d)"
 msgstr[1] "'%s' yang berjalan gagal dengan kod %d (percubaan #%d)"
 
-#: ../duplicity/backend.py:537
+#: ../duplicity/backend.py:562
 #, python-format
 msgid ""
 "Error is:\n"
@@ -435,7 +435,7 @@ msgstr ""
 "Ralat ialah:\n"
 "%s"
 
-#: ../duplicity/backend.py:539
+#: ../duplicity/backend.py:564
 #, python-format
 msgid "Giving up trying to execute '%s' after %d attempt"
 msgid_plural "Giving up trying to execute '%s' after %d attempts"
