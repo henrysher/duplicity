@@ -26,7 +26,11 @@ from duplicity import globals
 
 from urlparse import urlparse, parse_qsl
 from json import loads, dumps
-import urllib
+# python3 splitted urllib
+try:
+    import urllib
+except ImportError:
+    import urllib.request as urllib
 import getpass
 import os
 import sys
@@ -64,10 +68,10 @@ class OAuthHttpClient(object):
         url, headers, body = client.sign(
             unicode(url),
             http_method=unicode(method))
-        return headers
+        return [url, headers]
 
     def request(self, url, method="GET", body=None, headers={}, ignore=None):
-        oauth_header = self._get_oauth_request_header(url, method)
+        url, oauth_header = self._get_oauth_request_header(url, method)
         headers.update(oauth_header)
 
         for n in range(1, globals.num_retries+1):
