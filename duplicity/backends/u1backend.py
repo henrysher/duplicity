@@ -156,15 +156,16 @@ class U1Backend(duplicity.backend.Backend):
             password=getpass.getpass("Enter Ubuntu One password: ")
             hostname=os.uname()[1]
 
-            tokendata=self.client.get_and_set_token(email,password,hostname)
+            tokendata = self.client.get_and_set_token(email, password, hostname)
+            tokenstring = "%s:%s:%s:%s" % (tokendata['consumer_key'], tokendata['consumer_secret'],
+                                tokendata['token'], tokendata['token_secret'])
             sys.stderr.write("\nPlease record your new Ubuntu One access token for future use with duplicity:\n"
-                             +"FTP_PASSWORD=%s:%s:%s:%s\n\n"
-                             % (tokendata['consumer_key'],tokendata['consumer_secret'],
-                                tokendata['token'],tokendata['token_secret']))
-        else:
-            (consumer,consumer_secret,token,token_secret) = os.environ['FTP_PASSWORD'].split(':')
-            self.client.set_consumer(consumer, consumer_secret)
-            self.client.set_token(token, token_secret)
+                             + "FTP_PASSWORD=%s\n\n" % tokenstring)
+            os.environ['FTP_PASSWORD'] = tokenstring
+
+        (consumer,consumer_secret,token,token_secret) = os.environ['FTP_PASSWORD'].split(':')
+        self.client.set_consumer(consumer, consumer_secret)
+        self.client.set_token(token, token_secret)
 
         resp, content = self.client.request(self.api_base,ignore=[400,401,403])
         if resp['status']!='200':
