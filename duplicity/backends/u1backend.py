@@ -204,16 +204,14 @@ class U1Backend(duplicity.backend.Backend):
         log.Info("uploading file %s to location %s" % (remote_filename, remote_full))
 
         fh=open(source_path.name,'rb')
-        data = fh.read()
-        fh.close()
 
         content_type = 'application/octet-stream'
-        headers = {"Content-Length": str(len(data)),
-                   "Content-Type": content_type}
+        headers = {"Content-Type": content_type}
         resp, content = self.client.request(remote_full,
                                             method="PUT",
-                                            body=str(bytearray(data)),
+                                            body=fh,
                                             headers=headers)
+        fh.close()
 
     def get(self, filename, local_path):
         """Get file and put in local_path (Path object)"""
