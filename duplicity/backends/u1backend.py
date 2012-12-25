@@ -36,6 +36,7 @@ class OAuthHttpClient(object):
     """a simple HTTP client with OAuth added on"""
     def __init__(self):
         # lazily import non standard python libs
+        global oauth1, Http
         from oauthlib import oauth1
         from httplib2 import Http
 
