@@ -24,8 +24,6 @@ from duplicity.errors import BackendException
 from duplicity import log
 from duplicity import globals
 
-from httplib2 import Http
-from oauthlib import oauth1
 from urlparse import urlparse, parse_qsl
 from json import loads, dumps
 import urllib
@@ -37,6 +35,10 @@ import time
 class OAuthHttpClient(object):
     """a simple HTTP client with OAuth added on"""
     def __init__(self):
+        # lazily import non standard python libs
+        from oauthlib import oauth1
+        from httplib2 import Http
+
         self.consumer_key = None
         self.consumer_secret = None
         self.token = None

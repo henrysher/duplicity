@@ -64,6 +64,15 @@ for scp/sftp/ssh access (also see
 .B ssh pexpect backend
 .B sftp/scp client binaries
 OpenSSH - http://www.openssh.com/
+.TP
+.B "Ubuntu One"
+.B httplib2
+(python  HTTP client library)
+- http://code.google.com/p/httplib2/
+.br
+.B oauthlib
+(python OAuth request-signing logic)
+- http://pypi.python.org/pypi/oauthlib
 
 .SH SYNOPSIS
 .B duplicity [full|incremental]
@@ -1468,9 +1477,21 @@ The local signatures will not be encrypted and stored in the archive dir (see
 ).
 
 .SH AUTHOR
-Original Author - Ben Escoto <bescoto@stanford.edu>
-
-Current Maintainer - Kenneth Loafman <kenneth@loafman.com>
+.TP
+.BR "Original Author" " - Ben Escoto <bescoto@stanford.edu>"
+.TP
+.BR "Current Maintainer" " - Kenneth Loafman <kenneth@loafman.com>"
+.br
+.TP
+.B "Continuous Contributors"
+Edgar Soldin, Mike Terry
+.PP
+Most backends were contributed individually.
+Information about their authorship may be found in the according file's header.
+.br
+Also we'd like to thank everybody posting issue to the mailing list or on 
+launchpad, sending in patches or contributing otherwise. Duplicity wouldn't
+be as stable and useful if it weren't for you.
 
 .SH SEE ALSO
 .BR rdiffdir (1),
