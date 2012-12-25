@@ -76,6 +76,8 @@ class OAuthHttpClient(object):
                 resp, content = self.client.request(url, method, headers=headers, body=body)
             except Exception, e:
                 log.Info("request failed, exception %s" % e);
+                log.Debug("Backtrace of previous error: %s"
+                          % duplicity.util.exception_traceback())
                 if n == globals.num_retries:
                     log.FatalError("Giving up on request after %d attempts, last exception %s" % (n,e))
                 time.sleep(30)
@@ -202,7 +204,7 @@ class U1Backend(duplicity.backend.Backend):
         log.Info("uploading file %s to location %s" % (remote_filename, remote_full))
 
         fh=open(source_path.name,'rb')
-        data = bytearray(fh.read())
+        data = fh.read()
         fh.close()
 
         content_type = 'application/octet-stream'
@@ -210,7 +212,7 @@ class U1Backend(duplicity.backend.Backend):
                    "Content-Type": content_type}
         resp, content = self.client.request(remote_full,
                                             method="PUT",
-                                            body=bytearray(data),
+                                            body=str(bytearray(data)),
                                             headers=headers)
 
     def get(self, filename, local_path):
