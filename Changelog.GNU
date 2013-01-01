@@ -1,3 +1,16 @@
+2013-01-01  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~ed.so/duplicity/u1_and_manpage
+      - Manpage
+        - document Ubuntu One required python libs
+        - added continuous contributors and backend author notes
+      - U1backend
+        - lazily import non standard python libs, fixes
+        http://article.gmane.org/gmane.comp.sysutils.backup.duplicity.general/5753
+        - fix "not bytearray" prevents PUT with python 2.6
+        - don't hang after putting in credentials (cause it silently retries in background)
+          but go through with backup
+
 2012-12-22  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~ed.so/duplicity/webdav.fix-retry
