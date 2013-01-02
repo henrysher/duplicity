@@ -5,7 +5,7 @@ distribution and used to remove GnuPGInterface.py please note this:
 See README for details.
 
 
-New in v0.6.21 (2012/??/??)
+New in v0.6.21 (2013/01/??)
 ---------------------------
 Enhancements:
 * Merged in lp:~ed.so/duplicity/24syntaxfix
@@ -64,6 +64,11 @@ Enhancements:
     - fix "not bytearray" prevents PUT with python 2.6
     - don't hang after putting in credentials (cause it silently retries in background)
       but go through with backup
+* Fixed 1091269 Data corruption when resuming with --no-encryption
+  - Patches from Pascual Abellan that make block size consistent and
+    that add -n (no-encryption) option to manual-ctrl-c-test.sh.
+  - Modified gpg.py patch to use 64k block size so unit test passes.
+
 
 New in v0.6.20 (2012/10/28)
 ---------------------------

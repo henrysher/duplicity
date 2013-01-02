@@ -373,15 +373,16 @@ def GzipWriteFile(block_iter, filename,
         def close(self):
             return self.fileobj.close()
 
+    block_size = 64 * 1024
     file_counted = FileCounted(open(filename, "wb"))
     gzip_file = gzip.GzipFile(None, "wb", 6, file_counted)
     at_end_of_blockiter = 0
     while True:
         bytes_to_go = size - file_counted.byte_count
-        if bytes_to_go < 32 * 1024:
+        if bytes_to_go < block_size:
             break
         try:
-            new_block = block_iter.next(min(128*1024, bytes_to_go))
+            new_block = block_iter.next(min(block_size, bytes_to_go))
         except StopIteration:
             at_end_of_blockiter = 1
             break

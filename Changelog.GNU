@@ -1,3 +1,10 @@
+2013-01-02  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed 1091269 Data corruption when resuming with --no-encryption
+      - Patches from Pascual Abellan that make block size consistent and
+        that add no-encryption option to manual-ctrl-c-test.sh.
+      - Modified gpg.py patch to use 64k block size so unit test passes.
+
 2013-01-01  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~ed.so/duplicity/u1_and_manpage
