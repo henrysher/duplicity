@@ -333,10 +333,11 @@ def retry(fn):
 # as we don't know what the underlying code comes up with and we really *do*
 # want to retry globals.num_retries times under all circumstances
 def retry_fatal(fn):
-    def iterate(*args):
+    def _retry_fatal(self, *args):
         for n in range(1, globals.num_retries):
             try:
-                return fn(*args)
+                self.retry_count = n
+                return fn(self, *args)
             except Exception, e:
                 log.Warn("Attempt %s failed. %s: %s"
                          % (n, e.__class__.__name__, str(e)))
@@ -345,14 +346,16 @@ def retry_fatal(fn):
                 time.sleep(10) # wait a bit before trying again
         # final trial, die on exception
         try:
-            return fn(*args)
+            self.retry_count = globals.num_retries
+            return fn(self, *args)
         except Exception, e:
             log.FatalError("Giving up after %s attempts. %s: %s"
                          % (globals.num_retries, e.__class__.__name__, str(e)),
                           log.ErrorCode.backend_error)
             log.Debug("Backtrace of previous error: %s"
                         % exception_traceback())
-    return iterate
+        self.retry_count = 0
+    return _retry_fatal
 
 class Backend:
     """
@@ -371,6 +374,7 @@ class Backend:
 
       - move
     """
+    
     def __init__(self, parsed_url):
         self.parsed_url = parsed_url
 
