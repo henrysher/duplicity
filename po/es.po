@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-12-22 15:18+0000\n"
+"POT-Creation-Date: 2013-01-01 14:59+0000\n"
 "PO-Revision-Date: 2011-10-21 05:49+0000\n"
 "Last-Translator: Paco Molinero <paco@byasl.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-12-23 04:43+0000\n"
+"X-Launchpad-Export-Date: 2013-01-02 04:38+0000\n"
 "X-Generator: Launchpad (build 16378)\n"
 
 #: ../bin/duplicity:99
@@ -211,7 +211,7 @@ msgstr[1] ""
 #: ../bin/duplicity:873
 #, python-format
 msgid "Deleting incremental signature chain %s"
-msgstr ""
+msgstr "Eliminar la cadena de firma incremental %s"
 
 #: ../bin/duplicity:875
 #, python-format
@@ -425,7 +425,7 @@ msgstr "ejecución de la tarea realizada (éxito: %s)"
 #: ../duplicity/backend.py:163
 #, python-format
 msgid "Could not initialize backend: %s"
-msgstr ""
+msgstr "No se pudo inicializar el motor: %s"
 
 #: ../duplicity/backend.py:519 ../duplicity/backend.py:543
 #, python-format
@@ -820,7 +820,7 @@ msgstr "orden"
 
 #: ../duplicity/commandline.py:500
 msgid "paramiko|pexpect"
-msgstr ""
+msgstr "paramiko|pexpect"
 
 #. TRANSL: Used in usage help. Example:
 #. --timeout <seconds>

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-12-22 15:18+0000\n"
+"POT-Creation-Date: 2013-01-01 14:59+0000\n"
 "PO-Revision-Date: 2011-09-19 09:58+0000\n"
 "Last-Translator: dpdt1 <Unknown>\n"
 "Language-Team: Greek <el@li.org>\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-12-23 04:42+0000\n"
+"X-Launchpad-Export-Date: 2013-01-02 04:38+0000\n"
 "X-Generator: Launchpad (build 16378)\n"
 
 #: ../bin/duplicity:99
@@ -464,7 +464,7 @@ msgstr ""
 
 #: ../duplicity/collections.py:394
 msgid "Time:"
-msgstr ""
+msgstr "Ώρα:"
 
 #: ../duplicity/collections.py:394
 msgid "Num volumes:"
@@ -472,15 +472,15 @@ msgstr ""
 
 #: ../duplicity/collections.py:398
 msgid "Full"
-msgstr ""
+msgstr "Πλήρες"
 
 #: ../duplicity/collections.py:401
 msgid "Incremental"
-msgstr ""
+msgstr "Βηματικό"
 
 #: ../duplicity/collections.py:461
 msgid "local"
-msgstr ""
+msgstr "τοπικό"
 
 #: ../duplicity/collections.py:463
 msgid "remote"
@@ -648,7 +648,7 @@ msgstr ""
 #: ../duplicity/commandline.py:232
 #, python-format
 msgid "Error opening file %s"
-msgstr ""
+msgstr "Σφάλμα ανοίγματος αρχείου %s"
 
 #. TRANSL: Used in usage help to represent a Unix-style path name. Example:
 #. --archive-dir <path>
@@ -656,7 +656,7 @@ msgstr ""
 #: ../duplicity/commandline.py:278 ../duplicity/commandline.py:335
 #: ../duplicity/commandline.py:506 ../duplicity/commandline.py:722
 msgid "path"
-msgstr ""
+msgstr "Διαδρομή"
 
 #. TRANSL: Used in usage help to represent an ID for a GnuPG key. Example:
 #. --encrypt-key <gpg_key_id>
@@ -686,7 +686,7 @@ msgstr ""
 #: ../duplicity/commandline.py:388 ../duplicity/commandline.py:399
 #: ../duplicity/commandline.py:691
 msgid "filename"
-msgstr ""
+msgstr "όνομα αρχείου"
 
 #. TRANSL: Used in usage help to represent a regular expression (regexp).
 #: ../duplicity/commandline.py:313 ../duplicity/commandline.py:390
@@ -707,7 +707,7 @@ msgstr ""
 #: ../duplicity/commandline.py:351 ../duplicity/commandline.py:449
 #: ../duplicity/commandline.py:503 ../duplicity/commandline.py:710
 msgid "options"
-msgstr ""
+msgstr "επιλογές"
 
 #: ../duplicity/commandline.py:366
 #, python-format
@@ -736,13 +736,13 @@ msgstr ""
 #: ../duplicity/commandline.py:423 ../duplicity/commandline.py:470
 #: ../duplicity/commandline.py:536 ../duplicity/commandline.py:705
 msgid "number"
-msgstr ""
+msgstr "αριθμός"
 
 #. TRANSL: noun
 #: ../duplicity/commandline.py:479 ../duplicity/commandline.py:482
 #: ../duplicity/commandline.py:676
 msgid "command"
-msgstr ""
+msgstr "εντολή"
 
 #: ../duplicity/commandline.py:500
 msgid "paramiko|pexpect"
@@ -752,12 +752,12 @@ msgstr ""
 #. --timeout <seconds>
 #: ../duplicity/commandline.py:511 ../duplicity/commandline.py:739
 msgid "seconds"
-msgstr ""
+msgstr "δευτερόλεπτα"
 
 #. TRANSL: abbreviation for "character" (noun)
 #: ../duplicity/commandline.py:517 ../duplicity/commandline.py:673
 msgid "char"
-msgstr ""
+msgstr "χαρακτήρας"
 
 #: ../duplicity/commandline.py:639
 #, python-format
@@ -807,19 +807,19 @@ msgstr ""
 #. TRANSL: noun
 #: ../duplicity/commandline.py:684
 msgid "count"
-msgstr ""
+msgstr "υπολογισμός"
 
 #. TRANSL: Used in usage help to represent the name of a file directory
 #: ../duplicity/commandline.py:687
 msgid "directory"
-msgstr ""
+msgstr "κατάλογος"
 
 #. TRANSL: Used in usage help, e.g. to represent the name of a code
 #. module. Example:
 #. rsync://user[:password]@other.host[:port]::/module/some_dir
 #: ../duplicity/commandline.py:700
 msgid "module"
-msgstr ""
+msgstr "ενότητα"
 
 #. TRANSL: Used in usage help to represent an internet hostname. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
@@ -831,20 +831,20 @@ msgstr ""
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:718
 msgid "password"
-msgstr ""
+msgstr "κωδικός πρόσβασης"
 
 #. TRANSL: Used in usage help to represent a TCP port number. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:726
 msgid "port"
-msgstr ""
+msgstr "θύρα"
 
 #. TRANSL: Used in usage help. This represents a string to be used as a
 #. prefix to names for backup files created by Duplicity. Example:
 #. s3://other.host/bucket_name[/prefix]
 #: ../duplicity/commandline.py:731
 msgid "prefix"
-msgstr ""
+msgstr "πρόθεμα"
 
 #. TRANSL: Used in usage help to represent a Unix-style path name. Example:
 #. rsync://user[:password]@other.host[:port]/relative_path
@@ -894,7 +894,7 @@ msgstr ""
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:782
 msgid "user"
-msgstr ""
+msgstr "χρήστης"
 
 #. TRANSL: Header in usage help
 #: ../duplicity/commandline.py:799
@@ -904,7 +904,7 @@ msgstr ""
 #. TRANSL: Header in usage help
 #: ../duplicity/commandline.py:821
 msgid "Commands:"
-msgstr ""
+msgstr "Εντολές:"
 
 #: ../duplicity/commandline.py:845
 #, python-format
@@ -972,12 +972,12 @@ msgstr ""
 #: ../duplicity/diffdir.py:160
 #, python-format
 msgid "A %s"
-msgstr ""
+msgstr "A %s"
 
 #: ../duplicity/diffdir.py:167
 #, python-format
 msgid "M %s"
-msgstr ""
+msgstr "M %s"
 
 #: ../duplicity/diffdir.py:189
 #, python-format
@@ -987,7 +987,7 @@ msgstr ""
 #: ../duplicity/diffdir.py:197
 #, python-format
 msgid "D %s"
-msgstr ""
+msgstr "D %s"
 
 #: ../duplicity/dup_time.py:47
 #, python-format
