@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2013-01-01 14:59+0000\n"
+"POT-Creation-Date: 2013-01-02 14:06+0000\n"
 "PO-Revision-Date: 2012-09-12 07:52+0000\n"
 "Last-Translator: abuyop <Unknown>\n"
 "Language-Team: Malay <ms@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2013-01-02 04:38+0000\n"
-"X-Generator: Launchpad (build 16378)\n"
+"X-Launchpad-Export-Date: 2013-01-03 04:49+0000\n"
+"X-Generator: Launchpad (build 16393)\n"
 
 #: ../bin/duplicity:99
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -202,34 +202,34 @@ msgstr "Tiada set sandar lama ditemui, tiada apa dipadamkan."
 #: ../bin/duplicity:862
 msgid "Deleting backup chain at time:"
 msgid_plural "Deleting backup chains at times:"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Memadam rantaian sandar pada masa:"
+msgstr[1] "Memadam rantaian sandar pada masa:"
 
 #: ../bin/duplicity:873
 #, python-format
 msgid "Deleting incremental signature chain %s"
-msgstr ""
+msgstr "Memadam rantaian tandatangan menokok %s"
 
 #: ../bin/duplicity:875
 #, python-format
 msgid "Deleting incremental backup chain %s"
-msgstr ""
+msgstr "Memadam rantaian sandar menokok %s"
 
 #: ../bin/duplicity:878
 #, python-format
 msgid "Deleting complete signature chain %s"
-msgstr ""
+msgstr "Memadam rantaian tandatangan selesai %s"
 
 #: ../bin/duplicity:880
 #, python-format
 msgid "Deleting complete backup chain %s"
-msgstr ""
+msgstr "Memadam rantaian sandar selesai %s"
 
 #: ../bin/duplicity:886
 msgid "Found old backup chain at the following time:"
 msgid_plural "Found old backup chains at the following times:"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Temui rantaian sandar lama pada masa berikut:"
+msgstr[1] "Temui rantaian sandar lama pada masa berikut:"
 
 #: ../bin/duplicity:890
 msgid "Rerun command with --force option to actually delete."
