@@ -328,6 +328,13 @@ class RestartTest(unittest.TestCase):
         self.backup("inc", "testfiles/largefiles")
         self.verify("testfiles/largefiles")
 
+
+# Note that this class duplicates all the tests in RestartTest
+class RestartTestWithoutEncryption(RestartTest):
+    def setUp(self):
+        RestartTest.setUp(self)
+        self.class_args.extend(["--no-encryption"])
+
     def test_no_write_double_snapshot(self):
         """
         Test that restarting a full backup does not write duplicate entries
@@ -338,12 +345,12 @@ class RestartTest(unittest.TestCase):
         self.make_largefiles()
         # Start backup
         try:
-            self.backup("full", "testfiles/largefiles", options = ["--fail 2", "--vols 1", "--no-encryption"])
+            self.backup("full", "testfiles/largefiles", options = ["--fail 2", "--vols 1"])
             self.fail()
         except CmdError, e:
             self.assertEqual(30, e.exit_status)
         # Finish it
-        self.backup("full", "testfiles/largefiles", options = ["--no-encryption"])
+        self.backup("full", "testfiles/largefiles")
         # Now check sigtar
         sigtars = glob.glob("testfiles/output/duplicity-full*.sigtar.gz")
         self.assertEqual(1, len(sigtars))
@@ -360,7 +367,7 @@ class RestartTest(unittest.TestCase):
         https://launchpad.net/bugs/929067
         """
         # Intial normal backup
-        self.backup("full", "testfiles/blocktartest", options = ["--no-encryption"])
+        self.backup("full", "testfiles/blocktartest")
         # Create an exact clone of the snapshot folder in the sigtar already.
         # Permissions and mtime must match.
         os.mkdir("testfiles/snapshot", 0755)
@@ -380,16 +387,10 @@ class RestartTest(unittest.TestCase):
         self.assertEqual(0, os.system("rm -r testfiles/cache"))
         # Try a follow on incremental (which in buggy versions, would create
         # a deleted entry for the base dir)
-        self.backup("inc", "testfiles/blocktartest", options = ["--no-encryption"])
+        self.backup("inc", "testfiles/blocktartest")
         self.assertEqual(1, len(glob.glob("testfiles/output/duplicity-new*.sigtar.gz")))
         # Confirm we can restore it (which in buggy versions, would fail)
         self.restore()
-
-
-class RestartTestWithoutEncryption(RestartTest):
-    def setUp(self):
-        RestartTest.setUp(self)
-        self.class_args.extend(["--no-encryption"])
 
 if __name__ == "__main__":
     unittest.main()
