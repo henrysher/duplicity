@@ -36,7 +36,6 @@ backend_url = "file://testfiles/output"
 other_args = ["-v0", "--no-print-statistics"]
 #other_args = ["--short-filenames"]
 #other_args = ["--ssh-command 'ssh -v'", "--scp-command 'scp -C'"]
-#other_args = ['--no-encryption']
 
 # If this is set to true, after each backup, verify contents
 verify = 1
@@ -52,6 +51,7 @@ class RestartTest(unittest.TestCase):
     Test checkpoint/restart using duplicity binary
     """
     def setUp(self):
+        self.class_args = []
         assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
         assert not os.system("rm -rf testfiles/output "
                              "testfiles/restore_out testfiles/cache")
@@ -80,6 +80,7 @@ class RestartTest(unittest.TestCase):
             cmd_list.append("--current-time %s" % (current_time,))
         if other_args:
             cmd_list.extend(other_args)
+        cmd_list.extend(self.class_args)
         cmd_list.extend(arglist)
         cmd_list.extend(["<", "/dev/null"])
         cmdline = " ".join(cmd_list)
@@ -383,6 +384,12 @@ class RestartTest(unittest.TestCase):
         self.assertEqual(1, len(glob.glob("testfiles/output/duplicity-new*.sigtar.gz")))
         # Confirm we can restore it (which in buggy versions, would fail)
         self.restore()
+
+
+class RestartTestWithoutEncryption(RestartTest):
+    def setUp(self):
+        RestartTest.setUp(self)
+        self.class_args.extend(["--no-encryption"])
 
 if __name__ == "__main__":
     unittest.main()
