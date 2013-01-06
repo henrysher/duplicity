@@ -228,7 +228,8 @@ def restart_position_iterator(tarblock_iter):
                 # block.
                 if not last_block and not tarblock_iter.previous_block:
                     break
-                if (tarblock_iter.previous_block > last_block):
+                # Only check block number if last_block is also a number
+                if last_block and tarblock_iter.previous_block > last_block:
                     break
             if tarblock_iter.previous_index > last_index:
                 log.Warn(_("File %s complete in backup set.\n"
