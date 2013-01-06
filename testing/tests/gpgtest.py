@@ -165,7 +165,7 @@ class GPGTest(unittest.TestCase):
             #print os.stat("testfiles/output/gzwrite.gz").st_size-size
             assert size - 64 * 1024 <= os.stat("testfiles/output/gzwrite.gz").st_size <= size + 64 * 1024
         gwfh.set_at_end()
-        gpg.GzipWriteFile(gwfh, "testfiles/output/gzwrite.gpg", size = size)
+        gpg.GzipWriteFile(gwfh, "testfiles/output/gzwrite.gz", size = size)
         #print os.stat("testfiles/output/gzwrite.gz").st_size
 
 
@@ -188,12 +188,17 @@ class GPGWriteFile_Helper:
         s2 = size - s1
         return "a"*s1 + self.from_random_fp.read(s2)
 
-    def next(self, size):
+    def next(self):
         if self.at_end: raise StopIteration
-        if random.randrange(2): real_size = size
-        else: real_size = random.randrange(0, size)
-        block_data = self.get_buffer(real_size)
+        block_data = self.get_buffer(self.get_read_size())
         return GPGWriteHelper2(block_data)
+
+    def get_read_size(self):
+        size = 64 * 1024
+        if random.randrange(2):
+            return size
+        else:
+            return random.randrange(0, size)
 
     def get_footer(self):
         return "e" * random.randrange(0, 15000)
