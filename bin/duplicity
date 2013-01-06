@@ -223,6 +223,11 @@ def restart_position_iterator(tarblock_iter):
         # Just spin our wheels
         while tarblock_iter.next():
             if (tarblock_iter.previous_index == last_index):
+                # If both the previous index and this index are done, exit now
+                # before we hit the next index, to prevent skipping its first
+                # block.
+                if not last_block and not tarblock_iter.previous_block:
+                    break
                 if (tarblock_iter.previous_block > last_block):
                     break
             if tarblock_iter.previous_index > last_index:
