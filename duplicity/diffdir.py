@@ -481,14 +481,14 @@ class TarBlockIter:
             filler_data = ""
         return TarBlock(index, "%s%s%s" % (headers, file_data, filler_data))
 
-    def process(self, val, size):
+    def process(self, val):
         """
         Turn next value of input_iter into a TarBlock
         """
         assert not self.process_waiting
         XXX # Override in subclass @UndefinedVariable
 
-    def process_continued(self, size):
+    def process_continued(self):
         """
         Get more tarblocks
 
@@ -498,15 +498,15 @@ class TarBlockIter:
         assert self.process_waiting
         XXX # Override in subclass @UndefinedVariable
 
-    def next(self, size = 1024 * 1024):
+    def next(self):
         """
-        Return next block, no bigger than size, and update offset
+        Return next block and update offset
         """
         if self.process_waiting:
-            result = self.process_continued(size)
+            result = self.process_continued()
         else:
             # Below a StopIteration exception will just be passed upwards
-            result = self.process(self.input_iter.next(), size)
+            result = self.process(self.input_iter.next())
         block_number = self.process_next_vol_number
         self.offset += len(result.data)
         self.previous_index = result.index
@@ -516,6 +516,13 @@ class TarBlockIter:
             self.remember_block = block_number
             self.remember_next = False
         return result
+
+    def get_read_size(self):
+        # read size must always be the same, because if we are restarting a
+        # backup volume where the previous volume ended in a data block, we
+        # have to be able to assume it's length in order to continue reading
+        # the file from the right place.
+        return 64 * 1024
 
     def get_previous_index(self):
         """
@@ -553,7 +560,7 @@ class DummyBlockIter(TarBlockIter):
     """
     TarBlockIter that does no file reading
     """
-    def process(self, delta_ropath, size):
+    def process(self, delta_ropath):
         """
         Get a fake tarblock from delta_ropath
         """
@@ -577,13 +584,9 @@ class SigTarBlockIter(TarBlockIter):
     """
     TarBlockIter that yields blocks of a signature tar from path_iter
     """
-    def process(self, path, size):
+    def process(self, path):
         """
         Return associated signature TarBlock from path
-
-        Here size is just ignored --- let's hope a signature isn't too
-        big.  Also signatures are stored in multiple volumes so it
-        doesn't matter.
         """
         ti = path.get_tarinfo()
         if path.isreg():
@@ -606,7 +609,7 @@ class DeltaTarBlockIter(TarBlockIter):
     delta_path_iter, so the delta information has already been
     calculated.
     """
-    def process(self, delta_ropath, size):
+    def process(self, delta_ropath):
         """
         Get a tarblock from delta_ropath
         """
@@ -631,8 +634,7 @@ class DeltaTarBlockIter(TarBlockIter):
 
         # Now handle single volume block case
         fp = delta_ropath.open("rb")
-        # Below the 512 is the usual length of a tar header
-        data, last_block = self.get_data_block(fp, size - 512)
+        data, last_block = self.get_data_block(fp)
         if stats:
             stats.RawDeltaSize += len(data)
         if last_block:
@@ -654,11 +656,11 @@ class DeltaTarBlockIter(TarBlockIter):
         self.process_next_vol_number = 2
         return self.tarinfo2tarblock(index, ti, data)
 
-    def get_data_block(self, fp, max_size):
+    def get_data_block(self, fp):
         """
         Return pair (next data block, boolean last data block)
         """
-        read_size = min(64*1024, max(max_size, 512))
+        read_size = self.get_read_size()
         buf = fp.read(read_size)
         if len(buf) < read_size:
             if fp.close():
@@ -667,7 +669,7 @@ class DeltaTarBlockIter(TarBlockIter):
         else:
             return (buf, False)
 
-    def process_continued(self, size):
+    def process_continued(self):
         """
         Return next volume in multivol diff or snapshot
         """
@@ -675,7 +677,7 @@ class DeltaTarBlockIter(TarBlockIter):
         ropath = self.process_ropath
         ti, index = ropath.get_tarinfo(), ropath.index
         ti.name = "%s/%d" % (self.process_prefix, self.process_next_vol_number)
-        data, last_block = self.get_data_block(self.process_fp, size - 512)
+        data, last_block = self.get_data_block(self.process_fp)
         if stats:
             stats.RawDeltaSize += len(data)
         if last_block:

@@ -256,9 +256,9 @@ class SrcIter:
     def __init__(self, src):
         self.src = src
         self.fp = src.open("rb")
-    def next(self, size):
+    def next(self):
         try:
-            res = Block(self.fp.read(size))
+            res = Block(self.fp.read(self.get_read_size()))
         except Exception:
             log.FatalError(_("Failed to read %s: %s") %
                            (self.src.name, sys.exc_info()),
@@ -267,5 +267,7 @@ class SrcIter:
             self.fp.close()
             raise StopIteration
         return res
+    def get_read_size(self):
+        return 128 * 1024
     def get_footer(self):
         return ""

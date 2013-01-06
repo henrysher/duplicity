@@ -349,8 +349,8 @@ class RestartTest(unittest.TestCase):
         # Alright, everything is in order; fake a second interrupted volume
         assert not os.system("rm testfiles/output/*.manifest*")
         assert not os.system("rm testfiles/output/*.sigtar*")
-        assert not os.system("rm -fv testfiles/output/*.vol[23456789].*")
-        assert not os.system("rm -fv testfiles/output/*.vol1[^.]+.*")
+        assert not os.system("rm -f testfiles/output/*.vol[23456789].*")
+        assert not os.system("rm -f testfiles/output/*.vol1[^.]+.*")
         self.assertEqual(len(glob.glob("testfiles/output/*.difftar*")), 1)
         assert not os.system("rm testfiles/cache/%s/*.sigtar*" % name)
         assert not os.system("cp testfiles/output/*.difftar* "
