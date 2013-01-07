@@ -377,8 +377,8 @@ class RestartTest(unittest.TestCase):
         self.backup("full", source, options=["--name=backup1"])
         # Fake an interruption
         self.make_fake_second_volume("backup1")
-        # Add new small file
-        assert not os.system("echo hello > %s/newfile" % source)
+        # Add new file
+        assert not os.system("cp %s/file1 %s/newfile" % (source, source))
         # 'restart' the backup
         self.backup("full", source, options=["--name=backup1"])
         # Confirm we actually resumed the previous backup
@@ -397,8 +397,8 @@ class RestartTest(unittest.TestCase):
         self.backup("full", source, options=["--name=backup1"])
         # Fake an interruption
         self.make_fake_second_volume("backup1")
-        # Add new small file
-        assert not os.system("echo hello > %s/newfile" % source)
+        # Add new file
+        assert not os.system("cp %s/file1 %s/newfile" % (source, source))
         # 'restart' the backup
         self.backup("full", source, options=["--name=backup1"])
         # Confirm we actually resumed the previous backup
