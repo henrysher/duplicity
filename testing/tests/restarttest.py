@@ -423,6 +423,29 @@ class RestartTest(unittest.TestCase):
         self.restore()
         assert not os.system("diff -r %s testfiles/restore_out" % source)
 
+    def test_new_file(self):
+        """
+        If we restart right after a volume, but there are new files that would
+        have been backed up earlier in the volume, make sure we don't wig out.
+        (Expected result is to ignore new, ealier files, but pick up later
+        ones.)
+        """
+        source = 'testfiles/largefiles'
+        self.make_largefiles(count=1, size=1)
+        self.backup("full", source, options=["--name=backup1"])
+        # Fake an interruption
+        self.make_fake_second_volume("backup1")
+        # Add new files, earlier and later in filename sort order
+        assert not os.system("echo hello > %s/a" % source)
+        assert not os.system("echo hello > %s/z" % source)
+        # 'restart' the backup
+        self.backup("full", source, options=["--name=backup1"])
+        # Now make sure everything is the same once restored, except 'a'
+        self.restore()
+        assert not os.system("test ! -e testfiles/restore_out/a")
+        assert not os.system("diff %s/file1 testfiles/restore_out/file1" % source)
+        assert not os.system("diff %s/z testfiles/restore_out/z" % source)
+
 
 # Note that this class duplicates all the tests in RestartTest
 class RestartTestWithoutEncryption(RestartTest):
