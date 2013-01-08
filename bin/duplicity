@@ -223,7 +223,13 @@ def restart_position_iterator(tarblock_iter):
         # Just spin our wheels
         while tarblock_iter.next():
             if (tarblock_iter.previous_index == last_index):
-                if (tarblock_iter.previous_block > last_block):
+                # If both the previous index and this index are done, exit now
+                # before we hit the next index, to prevent skipping its first
+                # block.
+                if not last_block and not tarblock_iter.previous_block:
+                    break
+                # Only check block number if last_block is also a number
+                if last_block and tarblock_iter.previous_block > last_block:
                     break
             if tarblock_iter.previous_index > last_index:
                 log.Warn(_("File %s complete in backup set.\n"
@@ -937,11 +943,10 @@ def sync_archive(decrypt):
         """
         Copy data from src_iter to file at fn
         """
-        block_size = 128 * 1024
         file = open(filename, "wb")
         while True:
             try:
-                data = src_iter.next(block_size).data
+                data = src_iter.next().data
             except StopIteration:
                 break
             file.write(data)
@@ -989,9 +994,9 @@ def sync_archive(decrypt):
             def __init__(self, fileobj):
                 self.fileobj = fileobj
 
-            def next(self, size):
+            def next(self):
                 try:
-                    res = Block(self.fileobj.read(size))
+                    res = Block(self.fileobj.read(self.get_read_size()))
                 except Exception:
                     if hasattr(self.fileobj, 'name'):
                         name = self.fileobj.name
@@ -1004,6 +1009,9 @@ def sync_archive(decrypt):
                     self.fileobj.close()
                     raise StopIteration
                 return res
+
+            def get_read_size(self):
+                return 128 * 1024
 
             def get_footer(self):
                 return ""

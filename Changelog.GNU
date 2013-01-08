@@ -1,3 +1,33 @@
+2013-01-07  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~mterry/duplicity/static-corruption
+      - This branch fixes three possible ways a backup could get data-corrupted.
+        Inspired by bug 1091269.
+          A) If resuming after a volume that ended in a one-block file, we would
+             skip the first block of the next file.
+          B) If resuming after a volume that ended in a multi-block file, we would
+             skip the first block of the next file.
+          C) If resuming after a volume that spanned a multi-block file, we would
+             skip some data inside the file.
+      - A and B are because when finding the right place in the source files to
+        restart the backup, the iteration loop didn't handle None block numbers
+        very well (which are used to indicate the end of a file).
+      - C is what bug 1091269 talks about. This was because data block sizes would
+        get smaller as the difftar file got closer and closer to the volsize.
+        Standard block sizes were 64 * 1024.  But say we were close to the end of
+        the difftar... When resuming, duplicity doesn't know the custom block sizes
+        used by the previous run, so it uses standard block sizes. And it doesn't
+        always match up, as you can imagine. So we would leave chunks of data out
+        of the backed up file.
+      - Tests added for these cases.
+      - This branch is called 'static-corruption' because all these issues occur
+        even when the source data doesn't change. I still think there are some
+        corruption issues when a file changes in between duplicity runs. I haven't
+        started looking into that yet, but that's next on my list.
+      - C only happened without encryption (because the gpg writer function already
+        happened to force a constant data block size). A and B happened with or
+        without encryption.
+
 2013-01-02  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed 1091269 Data corruption when resuming with --no-encryption
