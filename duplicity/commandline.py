@@ -496,6 +496,11 @@ def parse_cmdline_options(arglist):
     # user added ssh options
     parser.add_option("--ssh-options", action="extend", metavar=_("options"))
 
+    # user added ssl options (webdav backend)
+    parser.add_option("--ssl-cacert-file", metavar=_("pem formatted bundle of certificate authorities"))
+
+    parser.add_option("--ssl-no-check-certificate", action="store_true")
+
     # Working directory for the tempfile module. Defaults to /tmp on most systems.
     parser.add_option("--tempdir", dest="temproot", type="file", metavar=_("path"))
 

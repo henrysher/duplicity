@@ -214,6 +214,10 @@ ssh_options = ""
 # whether to use scp for put/get, sftp is default
 use_scp = False
 
+# HTTPS ssl optons (currently only webdav)
+ssl_cacert_file = None
+ssl_no_check_certificate = False
+
 # user added rsync options
 rsync_options = ""
 
