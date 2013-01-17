@@ -26,6 +26,15 @@
 #include <librsync.h>
 #define RS_JOB_BLOCKSIZE 65536
 
+/* Support Python 2.4 and 2.5 */
+#ifndef PyVarObject_HEAD_INIT
+    #define PyVarObject_HEAD_INIT(type, size) \
+        PyObject_HEAD_INIT(type) size,
+#endif
+#ifndef Py_TYPE
+    #define Py_TYPE(ob) (((PyObject*)(ob))->ob_type)
+#endif
+
 static PyObject *librsyncError;
 
 /* Sets python error string from result */
@@ -39,11 +48,10 @@ _librsync_seterror(rs_result result, char *location)
 
 
 /* --------------- SigMaker Object for incremental signatures */
-staticforward PyTypeObject _librsync_SigMakerType;
+static PyTypeObject _librsync_SigMakerType;
 
 typedef struct {
   PyObject_HEAD
-  PyObject *x_attr;
   rs_job_t *sig_job;
 } _librsync_SigMakerObject;
 
@@ -58,7 +66,6 @@ _librsync_new_sigmaker(PyObject* self, PyObject* args)
 
   sm = PyObject_New(_librsync_SigMakerObject, &_librsync_SigMakerType);
   if (sm == NULL) return NULL;
-  sm->x_attr = NULL;
 
   sm->sig_job = rs_sig_begin((size_t)blocklen,
                              (size_t)RS_DEFAULT_STRONG_LEN);
@@ -111,64 +118,44 @@ static PyMethodDef _librsync_sigmaker_methods[] = {
   {NULL, NULL, 0, NULL}  /* sentinel */
 };
 
-static PyObject *
-_librsync_sigmaker_getattr(_librsync_SigMakerObject *sm,
-                                             char *name)
-{
-  if (sm->x_attr != NULL) {
-    PyObject *v = PyDict_GetItemString(sm->x_attr, name);
-    if (v != NULL) {
-      Py_INCREF(v);
-      return v;
-    }
-  }
-  return Py_FindMethod(_librsync_sigmaker_methods, (PyObject *)sm, name);
-}
-
-static int
-_librsync_sigmaker_setattr(_librsync_SigMakerObject *sm,
-                                       char *name, PyObject *v)
-{
-  if (sm->x_attr == NULL) {
-    sm->x_attr = PyDict_New();
-    if (sm->x_attr == NULL) return -1;
-  }
-  if (v == NULL) {
-    int rv = PyDict_DelItemString(sm->x_attr, name);
-    if (rv < 0)
-      PyErr_SetString(PyExc_AttributeError,
-                      "delete non-existing sigmaker attribute");
-    return rv;
-  }
-  else return PyDict_SetItemString(sm->x_attr, name, v);
-}
-
 static PyTypeObject _librsync_SigMakerType = {
-  PyObject_HEAD_INIT(NULL)
-  0,
+  PyVarObject_HEAD_INIT(NULL, 0)
   "sigmaker",
   sizeof(_librsync_SigMakerObject),
   0,
   _librsync_sigmaker_dealloc, /*tp_dealloc*/
   0,          /*tp_print*/
-  (getattrfunc)_librsync_sigmaker_getattr, /*tp_getattr*/
-  (setattrfunc)_librsync_sigmaker_setattr, /*tp_setattr*/
+  0,          /*tp_getattr*/
+  0,          /*tp_setattr*/
   0,          /*tp_compare*/
   0,          /*tp_repr*/
   0,          /*tp_as_number*/
   0,          /*tp_as_sequence*/
   0,          /*tp_as_mapping*/
   0,          /*tp_hash */
+  0,          /*tp_call*/
+  0,          /*tp_str*/
+  PyObject_GenericGetAttr, /*tp_getattro*/
+  PyObject_GenericSetAttr, /*tp_setattro*/
+  0,          /*tp_as_buffer*/
+  Py_TPFLAGS_DEFAULT, /*tp_flags*/
+  0,          /*tp_doc*/
+  0,          /*tp_traverse*/
+  0,          /*tp_clear*/
+  0,          /*tp_richcompare*/
+  0,          /*tp_weaklistoffset*/
+  0,          /*tp_iter*/
+  0,          /*tp_iternext*/
+  _librsync_sigmaker_methods, /*tp_methods*/
 };
 
 
 /* --------------- DeltaMaker Object for incremental deltas */
 
-staticforward PyTypeObject _librsync_DeltaMakerType;
+static PyTypeObject _librsync_DeltaMakerType;
 
 typedef struct {
   PyObject_HEAD
-  PyObject *x_attr;
   rs_job_t *delta_job;
   rs_signature_t *sig_ptr;
 } _librsync_DeltaMakerObject;
@@ -190,7 +177,6 @@ _librsync_new_deltamaker(PyObject* self, PyObject* args)
 
   dm = PyObject_New(_librsync_DeltaMakerObject, &_librsync_DeltaMakerType);
   if (dm == NULL) return NULL;
-  dm->x_attr = NULL;
 
   /* Put signature at sig_ptr and build hash */
   sig_loader = rs_loadsig_begin(&sig_ptr);
@@ -264,64 +250,45 @@ static PyMethodDef _librsync_deltamaker_methods[] = {
   {NULL, NULL, 0, NULL}  /* sentinel */
 };
 
-static PyObject *
-_librsync_deltamaker_getattr(_librsync_DeltaMakerObject *dm, char *name)
-{
-  if (dm->x_attr != NULL) {
-    PyObject *v = PyDict_GetItemString(dm->x_attr, name);
-    if (v != NULL) {
-      Py_INCREF(v);
-      return v;
-    }
-  }
-  return Py_FindMethod(_librsync_deltamaker_methods, (PyObject *)dm, name);
-}
-
-static int
-_librsync_deltamaker_setattr(_librsync_DeltaMakerObject *dm,
-                             char *name, PyObject *v)
-{
-  if (dm->x_attr == NULL) {
-    dm->x_attr = PyDict_New();
-    if (dm->x_attr == NULL) return -1;
-  }
-  if (v == NULL) {
-    int rv = PyDict_DelItemString(dm->x_attr, name);
-    if (rv < 0)
-      PyErr_SetString(PyExc_AttributeError,
-                      "delete non-existing deltamaker attribute");
-    return rv;
-  }
-  else return PyDict_SetItemString(dm->x_attr, name, v);
-}
-
 static PyTypeObject _librsync_DeltaMakerType = {
-  PyObject_HEAD_INIT(NULL)
-  0,
+  PyVarObject_HEAD_INIT(NULL, 0)
   "deltamaker",
   sizeof(_librsync_DeltaMakerObject),
   0,
   _librsync_deltamaker_dealloc, /*tp_dealloc*/
   0,          /*tp_print*/
-  (getattrfunc)_librsync_deltamaker_getattr, /*tp_getattr*/
-  (setattrfunc)_librsync_deltamaker_setattr, /*tp_setattr*/
+  0,          /*tp_getattr*/
+  0,          /*tp_setattr*/
   0,          /*tp_compare*/
   0,          /*tp_repr*/
   0,          /*tp_as_number*/
   0,          /*tp_as_sequence*/
   0,          /*tp_as_mapping*/
   0,          /*tp_hash */
+  0,          /*tp_call*/
+  0,          /*tp_str*/
+  PyObject_GenericGetAttr, /*tp_getattro*/
+  PyObject_GenericSetAttr, /*tp_setattro*/
+  0,          /*tp_as_buffer*/
+  Py_TPFLAGS_DEFAULT, /*tp_flags*/
+  0,          /*tp_doc*/
+  0,          /*tp_traverse*/
+  0,          /*tp_clear*/
+  0,          /*tp_richcompare*/
+  0,          /*tp_weaklistoffset*/
+  0,          /*tp_iter*/
+  0,          /*tp_iternext*/
+  _librsync_deltamaker_methods, /*tp_methods*/
 };
 
 
 /* --------------- PatchMaker Object for incremental patching */
 
 
-staticforward PyTypeObject _librsync_PatchMakerType;
+static PyTypeObject _librsync_PatchMakerType;
 
 typedef struct {
   PyObject_HEAD
-  PyObject *x_attr;
   rs_job_t *patch_job;
   PyObject *basis_file;
 } _librsync_PatchMakerObject;
@@ -332,11 +299,13 @@ _librsync_new_patchmaker(PyObject* self, PyObject* args)
 {
   _librsync_PatchMakerObject* pm;
   PyObject *python_file;
+  int fd;
   FILE *cfile;
 
   if (!PyArg_ParseTuple(args, "O:new_patchmaker", &python_file))
     return NULL;
-  if (!PyFile_Check(python_file)) {
+  fd = PyObject_AsFileDescriptor(python_file);
+  if (fd == -1) {
     PyErr_SetString(PyExc_TypeError, "Need true file object");
     return NULL;
   }
@@ -344,10 +313,9 @@ _librsync_new_patchmaker(PyObject* self, PyObject* args)
 
   pm = PyObject_New(_librsync_PatchMakerObject, &_librsync_PatchMakerType);
   if (pm == NULL) return NULL;
-  pm->x_attr = NULL;
 
   pm->basis_file = python_file;
-  cfile = PyFile_AsFile(python_file);
+  cfile = fdopen(fd, "rb");
   pm->patch_job = rs_patch_begin(rs_file_copy_cb, cfile);
 
   return (PyObject*)pm;
@@ -400,57 +368,49 @@ static PyMethodDef _librsync_patchmaker_methods[] = {
   {NULL, NULL, 0, NULL}  /* sentinel */
 };
 
-static PyObject *
-_librsync_patchmaker_getattr(_librsync_PatchMakerObject *pm, char *name)
-{
-  if (pm->x_attr != NULL) {
-    PyObject *v = PyDict_GetItemString(pm->x_attr, name);
-    if (v != NULL) {
-      Py_INCREF(v);
-      return v;
-    }
-  }
-  return Py_FindMethod(_librsync_patchmaker_methods, (PyObject *)pm, name);
-}
-
-static int
-_librsync_patchmaker_setattr(_librsync_PatchMakerObject *pm,
-                             char *name, PyObject *v)
-{
-  if (pm->x_attr == NULL) {
-    pm->x_attr = PyDict_New();
-    if (pm->x_attr == NULL) return -1;
-  }
-  if (v == NULL) {
-    int rv = PyDict_DelItemString(pm->x_attr, name);
-    if (rv < 0)
-      PyErr_SetString(PyExc_AttributeError,
-                      "delete non-existing patchmaker attribute");
-    return rv;
-  }
-  else return PyDict_SetItemString(pm->x_attr, name, v);
-}
-
 static PyTypeObject _librsync_PatchMakerType = {
-  PyObject_HEAD_INIT(NULL)
-  0,
+  PyVarObject_HEAD_INIT(NULL, 0)
   "patchmaker",
   sizeof(_librsync_PatchMakerObject),
   0,
   _librsync_patchmaker_dealloc, /*tp_dealloc*/
   0,          /*tp_print*/
-  (getattrfunc)_librsync_patchmaker_getattr, /*tp_getattr*/
-  (setattrfunc)_librsync_patchmaker_setattr, /*tp_setattr*/
+  0,          /*tp_getattr*/
+  0,          /*tp_setattr*/
   0,          /*tp_compare*/
   0,          /*tp_repr*/
   0,          /*tp_as_number*/
   0,          /*tp_as_sequence*/
   0,          /*tp_as_mapping*/
   0,          /*tp_hash */
+  0,          /*tp_call*/
+  0,          /*tp_str*/
+  PyObject_GenericGetAttr, /*tp_getattro*/
+  PyObject_GenericSetAttr, /*tp_setattro*/
+  0,          /*tp_as_buffer*/
+  Py_TPFLAGS_DEFAULT, /*tp_flags*/
+  0,          /*tp_doc*/
+  0,          /*tp_traverse*/
+  0,          /*tp_clear*/
+  0,          /*tp_richcompare*/
+  0,          /*tp_weaklistoffset*/
+  0,          /*tp_iter*/
+  0,          /*tp_iternext*/
+  _librsync_patchmaker_methods, /*tp_methods*/
 };
 
 
 /* --------------- _librsync module definition */
+
+#if PY_MAJOR_VERSION >= 3
+#define MOD_DEF(ob, name, doc, methods) \
+  static struct PyModuleDef moduledef = { \
+    PyModuleDef_HEAD_INIT, name, doc, -1, methods, }; \
+  ob = PyModule_Create(&moduledef);
+#else
+#define MOD_DEF(ob, name, doc, methods) \
+  ob = Py_InitModule3(name, methods, doc);
+#endif
 
 static PyMethodDef _librsyncMethods[] = {
   {"new_sigmaker", _librsync_new_sigmaker, METH_VARARGS,
@@ -462,13 +422,18 @@ static PyMethodDef _librsyncMethods[] = {
   {NULL, NULL, 0, NULL}
 };
 
-void init_librsync(void)
+static PyObject *
+moduleinit(void)
 {
   PyObject *m, *d;
 
-  _librsync_SigMakerType.ob_type = &PyType_Type;
-  _librsync_DeltaMakerType.ob_type = &PyType_Type;
-  m = Py_InitModule("_librsync", _librsyncMethods);
+  Py_TYPE(&_librsync_SigMakerType) = &PyType_Type;
+  Py_TYPE(&_librsync_DeltaMakerType) = &PyType_Type;
+
+  MOD_DEF(m, "_librsync", "", _librsyncMethods)
+  if (m == NULL)
+      return NULL;
+
   d = PyModule_GetDict(m);
   librsyncError = PyErr_NewException("_librsync.librsyncError", NULL, NULL);
   PyDict_SetItemString(d, "librsyncError", librsyncError);
@@ -476,4 +441,18 @@ void init_librsync(void)
                        Py_BuildValue("l", (long)RS_JOB_BLOCKSIZE));
   PyDict_SetItemString(d, "RS_DEFAULT_BLOCK_LEN",
                        Py_BuildValue("l", (long)RS_DEFAULT_BLOCK_LEN));
+
+  return m;
 }
+
+#if PY_MAJOR_VERSION < 3
+void init_librsync(void)
+{
+  moduleinit();
+}
+#else
+PyObject *PyInit__librsync(void)
+{
+  return moduleinit();
+}
+#endif
