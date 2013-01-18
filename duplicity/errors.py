@@ -70,6 +70,12 @@ class BackendException(DuplicityError):
     """
     pass
 
+class FatalBackendError(DuplicityError):
+    """
+    Raised to indicate a backend failed fatally.
+    """
+    pass
+
 class TemporaryLoadException(BackendException):
     """
     Raised to indicate a temporary issue on the backend.

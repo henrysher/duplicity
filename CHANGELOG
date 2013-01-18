@@ -95,6 +95,10 @@ Enhancements:
   - C only happened without encryption (because the gpg writer function already
     happened to force a constant data block size). A and B happened with or
     without encryption.
+* Merged in lp:~ed.so/duplicity/webdav.fix-retry
+  - added ssl certificate verification (see man page)
+  - more robust retry routine to survive ssl errors, broken pipe errors
+  - added http redirect support
 
 
 New in v0.6.20 (2012/10/28)
