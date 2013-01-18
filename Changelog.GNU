@@ -4,6 +4,8 @@
       - added ssl certificate verification (see man page)
       - more robust retry routine to survive ssl errors, broken pipe errors
       - added http redirect support
+    * Merged in lp:~ed.so/duplicity/webdav.manpage
+      - explanation of webdav changes above
 
 2013-01-07  Kenneth Loafman  <kenneth@loafman.com>
 

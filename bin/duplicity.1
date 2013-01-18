@@ -73,6 +73,14 @@ OpenSSH - http://www.openssh.com/
 .B oauthlib
 (python OAuth request-signing logic)
 - http://pypi.python.org/pypi/oauthlib
+.TP
+.B "webdav backend"
+.B certificate authority database file
+for ssl certificate verification of HTTPS connections
+- http://curl.haxx.se/docs/caextract.html
+.br
+(also see 
+.BR "A NOTE ON SSL CERTIFICATE VERIFICATION" ).
 
 .SH SYNOPSIS
 .B duplicity [full|incremental]
@@ -773,6 +781,22 @@ setting.
 .RE
 
 .TP
+.BI "--ssl-cacert-file " file
+.B (only webdav backend)
+Provide a cacert file for ssl certificate verification.
+.br
+See also
+.BR "A NOTE ON SSL CERTIFICATE VERIFICATION" .
+
+.TP
+.B --ssl-no-check-certificate
+.B (only webdav backend)
+Disable ssl certificate verification.
+.br
+See also
+.BR "A NOTE ON SSL CERTIFICATE VERIFICATION" .
+
+.TP
 .BI "--tempdir " directory
 Use this existing directory for duplicity temporary files instead of
 the system default, which is usually the /tmp directory. This option
@@ -1375,20 +1399,38 @@ Scp also does not support any kind of file listing, so sftp or ssh access will a
 in addition for this backend mode to work properly. Sftp does not have these limitations but needs
 an sftp service running on the backend server, which is sometimes not an option.
 
-.SH A NOTE ON UBUNTU ONE
-
-To use Ubuntu One you must have an Ubuntu One OAuth access token. Such 
-OAuth tokens have a practically unlimited lifetime; you can have multiple 
-active tokens and you can revoke tokens using the Ubuntu One web interface.
+.SH A NOTE ON SSL CERTIFICATE VERIFICATION
+Certificate verification as implemented right now [01.2013] only in the webdav backend needs a file
+based database of certification authority certificates (cacert file). It has to be a
+.B PEM
+formatted text file as currently provided by the 
+.B CURL
+project. See
 .PP
-Duplicity expects the token in the environment variable 
-.B FTP_PASSWORD
-(in the format "consumer_key:consumer_secret:token:token_secret"). If no
-token is present, duplicity asks for your Ubuntu One email address and password
-and requests an access token from the Ubuntu SSO service. The newly 
-acquired token is then printed to the console.
+.RS
+http://curl.haxx.se/docs/caextract.html
 .PP
-See https://one.ubuntu.com/ for more information about Ubuntu One.
+.RE
+After creating/retrieving a valid cacert file you should copy it to either
+.PP
+.RS
+~/.duplicity/cacert.pem
+.br
+~/duplicity_cacert.pem
+.br
+/etc/duplicity/cacert.pem
+.PP
+.RE
+Duplicity searches it there in the same order and will fail if it can't find it.
+You can however specify the option
+.BI --ssl-cacert-file " <file>"
+to point duplicity to a copy in a different location.
+.PP
+Finally there is the
+.B --ssl-no-check-certificate
+option to disable certificate verification alltogether, in case some ssl library 
+is missing or verification is not wanted. Use it with care, as even with self signed 
+servers manually providing the private ca certificate is definitely the safer option. 
 
 .SH A NOTE ON SYMMETRIC ENCRYPTION AND SIGNING
 Signing and symmetrically encrypt at the same time with the gpg binary on the
@@ -1408,6 +1450,21 @@ passphrase.
 3. The used
 .BI PASSPHRASE
 for symmetric encryption and the passphrase of the signing key are identical.
+
+.SH A NOTE ON UBUNTU ONE
+
+To use Ubuntu One you must have an Ubuntu One OAuth access token. Such 
+OAuth tokens have a practically unlimited lifetime; you can have multiple 
+active tokens and you can revoke tokens using the Ubuntu One web interface.
+.PP
+Duplicity expects the token in the environment variable 
+.B FTP_PASSWORD
+(in the format "consumer_key:consumer_secret:token:token_secret"). If no
+token is present, duplicity asks for your Ubuntu One email address and password
+and requests an access token from the Ubuntu SSO service. The newly 
+acquired token is then printed to the console.
+.PP
+See https://one.ubuntu.com/ for more information about Ubuntu One.
 
 .SH KNOWN ISSUES / BUGS
 Hard links currently unsupported (they will be treated as non-linked
