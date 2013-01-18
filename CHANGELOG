@@ -105,6 +105,13 @@ Enhancements:
   - Python bindings for the gobject stack (used in the gio backend) have changed
     from static to dynamically-generated bindings. The old static bindings are
     deprecated. So here's a branch to change the gio backend from old to new ones.
+* Merged in lp:~mterry/duplicity/py3rsync
+  - This branch lets one build the _librsync module with Python 3. You can't
+    really do anything useful with it, but it's a nicely-isolated piece to add
+    Python 3 support for.
+  - The changes are a mix of modernization and #ifdef logic.
+  - All tests still pass in Python 2.7 and 2.4. I tested manually that the module
+    worked as expected in Python 3.
 
 
 New in v0.6.20 (2012/10/28)
