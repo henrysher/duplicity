@@ -23,16 +23,14 @@ import types
 import subprocess
 import atexit
 import signal
-import gio #@UnresolvedImport
-import glib #@UnresolvedImport
+from gi.repository import Gio #@UnresolvedImport
+from gi.repository import GLib #@UnresolvedImport
 
 import duplicity.backend
 from duplicity.backend import retry
 from duplicity import log
-from duplicity import globals
 from duplicity import util
 from duplicity.errors import * #@UnusedWildImport
-from duplicity.util import exception_traceback
 
 def ensure_dbus():
     # GIO requires a dbus session bus which can start the gvfs daemons
@@ -48,19 +46,19 @@ def ensure_dbus():
                     atexit.register(os.kill, int(parts[1]), signal.SIGTERM)
                 os.environ[parts[0]] = parts[1]
 
-class DupMountOperation(gio.MountOperation):
+class DupMountOperation(Gio.MountOperation):
     """A simple MountOperation that grabs the password from the environment
        or the user.
     """
     def __init__(self, backend):
-        gio.MountOperation.__init__(self)
+        Gio.MountOperation.__init__(self)
         self.backend = backend
         self.connect('ask-password', self.ask_password_cb)
         self.connect('ask-question', self.ask_question_cb)
 
     def ask_password_cb(self, *args, **kwargs):
         self.set_password(self.backend.get_password())
-        self.reply(gio.MOUNT_OPERATION_HANDLED)
+        self.reply(Gio.MountOperationResult.HANDLED)
 
     def ask_question_cb(self, *args, **kwargs):
         # Obviously just always answering with the first choice is a naive
@@ -70,7 +68,7 @@ class DupMountOperation(gio.MountOperation):
         # new hosts and 'afc' does if the device is locked.  0 should be a
         # safe choice.
         self.set_choice(0)
-        self.reply(gio.MOUNT_OPERATION_HANDLED)
+        self.reply(Gio.MountOperationResult.HANDLED)
 
 class GIOBackend(duplicity.backend.Backend):
     """Use this backend when saving to a GIO URL.
@@ -82,21 +80,29 @@ class GIOBackend(duplicity.backend.Backend):
 
         ensure_dbus()
 
-        self.remote_file = gio.File(uri=parsed_url.url_string)
+        self.remote_file = Gio.File.new_for_uri(parsed_url.url_string)
 
         # Now we make sure the location is mounted
         op = DupMountOperation(self)
-        loop = glib.MainLoop()
-        self.remote_file.mount_enclosing_volume(op, self.done_with_mount,
-                                                0, user_data=loop)
+        loop = GLib.MainLoop()
+        self.remote_file.mount_enclosing_volume(Gio.MountMountFlags.NONE,
+                                                op, None, self.done_with_mount,
+                                                loop)
         loop.run() # halt program until we're done mounting
+
+        # Now make the directory if it doesn't exist
+        try:
+            self.remote_file.make_directory_with_parents(None)
+        except GLib.GError, e:
+            if e.code != Gio.IOErrorEnum.EXISTS:
+                raise
 
     def done_with_mount(self, fileobj, result, loop):
         try:
             fileobj.mount_enclosing_volume_finish(result)
-        except gio.Error, e:
+        except GLib.GError, e:
             # check for NOT_SUPPORTED because some schemas (e.g. file://) validly don't
-            if e.code != gio.ERROR_ALREADY_MOUNTED and e.code != gio.ERROR_NOT_SUPPORTED:
+            if e.code != Gio.IOErrorEnum.ALREADY_MOUNTED and e.code != Gio.IOErrorEnum.NOT_SUPPORTED:
                 log.FatalError(_("Connection failed, please check your password: %s")
                                % str(e), log.ErrorCode.connection_failed)
         loop.quit()
@@ -105,12 +111,12 @@ class GIOBackend(duplicity.backend.Backend):
         if raise_error:
             raise e
         code = log.ErrorCode.backend_error
-        if isinstance(e, gio.Error):
-            if e.code == gio.ERROR_PERMISSION_DENIED:
+        if isinstance(e, GLib.GError):
+            if e.code == Gio.IOErrorEnum.PERMISSION_DENIED:
                 code = log.ErrorCode.backend_permission_denied
-            elif e.code == gio.ERROR_NOT_FOUND:
+            elif e.code == Gio.IOErrorEnum.NOT_FOUND:
                 code = log.ErrorCode.backend_not_found
-            elif e.code == gio.ERROR_NO_SPACE:
+            elif e.code == Gio.IOErrorEnum.NO_SPACE:
                 code = log.ErrorCode.backend_no_space
         extra = ' '.join([util.escape(x) for x in [file1, file2] if x])
         extra = ' '.join([op, extra])
@@ -123,8 +129,9 @@ class GIOBackend(duplicity.backend.Backend):
     def copy_file(self, op, source, target, raise_errors=False):
         log.Info(_("Writing %s") % target.get_parse_name())
         try:
-            source.copy(target, self.copy_progress,
-                        gio.FILE_COPY_OVERWRITE | gio.FILE_COPY_NOFOLLOW_SYMLINKS)
+            source.copy(target,
+                        Gio.FileCopyFlags.OVERWRITE | Gio.FileCopyFlags.NOFOLLOW_SYMLINKS,
+                        None, self.copy_progress, None)
         except Exception, e:
             self.handle_error(raise_errors, e, op, source.get_parse_name(),
                               target.get_parse_name())
@@ -133,14 +140,14 @@ class GIOBackend(duplicity.backend.Backend):
         """Copy file to remote"""
         if not remote_filename:
             remote_filename = source_path.get_filename()
-        source_file = gio.File(path=source_path.name)
+        source_file = Gio.File.new_for_path(source_path.name)
         target_file = self.remote_file.get_child(remote_filename)
         self.copy_file('put', source_file, target_file)
 
     def get(self, filename, local_path):
         """Get file and put in local_path (Path object)"""
         source_file = self.remote_file.get_child(filename)
-        target_file = gio.File(path=local_path.name)
+        target_file = Gio.File.new_for_path(local_path.name)
         self.copy_file('get', source_file, target_file)
         local_path.setdata()
 
@@ -149,12 +156,13 @@ class GIOBackend(duplicity.backend.Backend):
         """List files in that directory"""
         files = []
         try:
-            enum = self.remote_file.enumerate_children(gio.FILE_ATTRIBUTE_STANDARD_NAME,
-                                                       gio.FILE_QUERY_INFO_NOFOLLOW_SYMLINKS)
-            info = enum.next_file()
+            enum = self.remote_file.enumerate_children(Gio.FILE_ATTRIBUTE_STANDARD_NAME,
+                                                       Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS,
+                                                       None)
+            info = enum.next_file(None)
             while info:
                 files.append(info.get_name())
-                info = enum.next_file()
+                info = enum.next_file(None)
         except Exception, e:
             self.handle_error(raise_errors, e, 'list',
                               self.remote_file.get_parse_name())
@@ -167,10 +175,10 @@ class GIOBackend(duplicity.backend.Backend):
         for filename in filename_list:
             target_file = self.remote_file.get_child(filename)
             try:
-                target_file.delete()
+                target_file.delete(None)
             except Exception, e:
-                if isinstance(e, gio.Error):
-                    if e.code == gio.ERROR_NOT_FOUND:
+                if isinstance(e, GLib.GError):
+                    if e.code == Gio.IOErrorEnum.NOT_FOUND:
                         continue
                 self.handle_error(raise_errors, e, 'delete',
                                   target_file.get_parse_name())
@@ -180,13 +188,14 @@ class GIOBackend(duplicity.backend.Backend):
     def _query_file_info(self, filename, raise_errors=False):
         """Query attributes on filename"""
         target_file = self.remote_file.get_child(filename)
-        attrs = gio.FILE_ATTRIBUTE_STANDARD_SIZE
+        attrs = Gio.FILE_ATTRIBUTE_STANDARD_SIZE
         try:
-            info = target_file.query_info(attrs, gio.FILE_QUERY_INFO_NONE)
+            info = target_file.query_info(attrs, Gio.FileQueryInfoFlags.NONE,
+                                          None)
             return {'size': info.get_size()}
         except Exception, e:
-            if isinstance(e, gio.Error):
-                if e.code == gio.ERROR_NOT_FOUND:
+            if isinstance(e, GLib.GError):
+                if e.code == Gio.IOErrorEnum.NOT_FOUND:
                     return {'size': -1} # early exit, no need to retry
             if raise_errors:
                 raise e

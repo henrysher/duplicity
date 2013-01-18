@@ -6,6 +6,10 @@
       - added http redirect support
     * Merged in lp:~ed.so/duplicity/webdav.manpage
       - explanation of webdav changes above
+    * Merged in lp:~mterry/duplicity/pygi
+      - Python bindings for the gobject stack (used in the gio backend) have changed
+        from static to dynamically-generated bindings. The old static bindings are
+        deprecated. So here's a branch to change the gio backend from old to new ones.
 
 2013-01-07  Kenneth Loafman  <kenneth@loafman.com>
 
