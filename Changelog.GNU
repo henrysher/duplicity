@@ -1,5 +1,11 @@
 2013-01-18  Kenneth Loafman  <kenneth@loafman.com>
 
+    * Merged in lp:~duplicity-team/duplicity/po-updates
+      - Updated translations
+    * Prep for 0.6.21 release
+
+2013-01-18  Kenneth Loafman  <kenneth@loafman.com>
+
     * Merged in lp:~ed.so/duplicity/webdav.fix-retry
       - added ssl certificate verification (see man page)
       - more robust retry routine to survive ssl errors, broken pipe errors

@@ -5,7 +5,7 @@ distribution and used to remove GnuPGInterface.py please note this:
 See README for details.
 
 
-New in v0.6.21 (2013/01/??)
+New in v0.6.21 (2013/01/23)
 ---------------------------
 Enhancements:
 * Merged in lp:~ed.so/duplicity/24syntaxfix
@@ -112,6 +112,8 @@ Enhancements:
   - The changes are a mix of modernization and #ifdef logic.
   - All tests still pass in Python 2.7 and 2.4. I tested manually that the module
     worked as expected in Python 3.
+* Merged in lp:~duplicity-team/duplicity/po-updates
+  - Updated translations
 
 
 New in v0.6.20 (2012/10/28)
