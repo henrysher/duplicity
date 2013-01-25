@@ -39,6 +39,7 @@ from duplicity import file_naming
 from duplicity import globals
 from duplicity import log
 from duplicity import urlparse_2_5 as urlparser
+from duplicity import progress
 
 from duplicity.util import exception_traceback
 

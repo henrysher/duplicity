@@ -23,6 +23,8 @@
 import os
 import sys
 import time
+import threading
+import Queue
 
 import duplicity.backend
 
@@ -32,6 +34,7 @@ from duplicity.errors import * #@UnusedWildImport
 from duplicity.util import exception_traceback
 from duplicity.backend import retry
 from duplicity.filechunkio import FileChunkIO
+from duplicity import progress
 
 BOTO_MIN_VERSION = "1.6a"
 
@@ -42,6 +45,27 @@ if sys.platform not in ('darwin', 'linux2'):
 else:
     import multiprocessing
 
+
+class ConsumerThread(threading.Thread):
+    """
+    A background thread that collects all written bytes from all
+    the pool workers, and reports it to the progress module.
+    Wakes up every second to check for termination
+    """
+    def __init__(self, queue):
+        super(ConsumerThread, self).__init__()
+        self.daemon = True
+        self.finish = False
+        self.queue = queue
+
+    def run(self):
+        while not self.finish:
+            try:
+                args = self.queue.get(True, 1) 
+                progress.report_transfer(args[0], args[1])
+            except Queue.Empty, e:
+                pass
+            
 
 def get_connection(scheme, parsed_url):
     try:
@@ -357,13 +381,28 @@ class BotoBackend(duplicity.backend.Backend):
 
         mp = self.bucket.initiate_multipart_upload(key, headers)
 
+        # Initiate a queue to share progress data between the pool
+        # workers and a consumer thread, that will collect and report
+        queue = None
+        if globals.progress:
+            manager = multiprocessing.Manager()
+            queue = manager.Queue()
+            consumer = ConsumerThread(queue)
+            consumer.start()
+
         pool = multiprocessing.Pool(processes=chunks)
         for n in range(chunks):
              params = [self.scheme, self.parsed_url, self.bucket_name, 
-                 mp.id, filename, n, chunk_size, globals.num_retries]
+                 mp.id, filename, n, chunk_size, globals.num_retries, 
+                 queue]
              pool.apply_async(multipart_upload_worker, params)
         pool.close()
         pool.join()
+
+        # Terminate the consumer thread, if any
+        if globals.progress:
+            consumer.finish = True
+            consumer.join()
 
         if len(mp.get_all_parts()) < chunks:
             mp.cancel_upload()
@@ -373,7 +412,7 @@ class BotoBackend(duplicity.backend.Backend):
 
 
 def multipart_upload_worker(scheme, parsed_url, bucket_name, multipart_id, filename,
-                            offset, bytes, num_retries):
+                            offset, bytes, num_retries, queue):
     """
     Worker method for uploading a file chunk to S3 using multipart upload.
     Note that the file chunk is read into memory, so it's important to keep
@@ -384,6 +423,8 @@ def multipart_upload_worker(scheme, parsed_url, bucket_name, multipart_id, filen
     def _upload_callback(uploaded, total):
         worker_name = multiprocessing.current_process().name
         log.Debug("%s: Uploaded %s/%s bytes" % (worker_name, uploaded, total))
+        if not queue is None:
+            queue.put([uploaded, total]) # Push data to the consumer thread
 
     def _upload(num_retries):
         worker_name = multiprocessing.current_process().name
@@ -395,7 +436,9 @@ def multipart_upload_worker(scheme, parsed_url, bucket_name, multipart_id, filen
             for mp in bucket.get_all_multipart_uploads():
                 if mp.id == multipart_id:
                     with FileChunkIO(filename, 'r', offset=offset * bytes, bytes=bytes) as fd:
-                        mp.upload_part_from_file(fd, offset + 1, cb=_upload_callback)
+                        mp.upload_part_from_file(fd, offset + 1, cb=_upload_callback,
+                                                    num_cb=max(2, 8 * bytes / (1024 * 1024))
+                                                ) # Max num of callbacks = 8 times x megabyte
                     break
         except Exception, e:
             traceback.print_exc()

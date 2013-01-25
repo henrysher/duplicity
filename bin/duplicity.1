@@ -644,6 +644,20 @@ Use the old filename format (incompatible with Windows/Samba) rather than
 the new filename format.
 
 .TP
+.B --progress
+When selected, duplicity will output the current upload progress and estimated
+upload time. To annotate changes, it will perform a first dry-run before a full
+or incremental, and then runs the real operation estimating the real upload
+progress.
+
+.TP
+.BI "--progress_rate " number
+Sets the update rate at which duplicity will output the upload progress
+messages (requires
+.B --progress
+option). Default is to prompt the status each 3 seconds.
+
+.TP
 .BI "--rename " "orig new"
 Treats the path
 .I orig

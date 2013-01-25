@@ -29,6 +29,8 @@
 
 import getpass, gzip, os, sys, time, types
 import traceback, platform, statvfs, resource, re
+import threading
+from datetime import datetime
 
 pwd = os.path.abspath(os.path.dirname(sys.argv[0]))
 if os.path.exists(os.path.join(pwd, "../duplicity")):
@@ -57,10 +59,10 @@ from duplicity import robust
 from duplicity import tempdir
 from duplicity import asyncscheduler
 from duplicity import util
+from duplicity import progress
 
 # If exit_val is not None, exit with given value at end.
 exit_val = None
-
 
 def get_passphrase(n, action, for_signing = False):
     """
@@ -307,6 +309,7 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
             tdp.delete()
         return putsize
 
+
     def validate_encryption_settings(backup_set, manifest):
         """
         When restarting a backup, we have no way to verify that the current
@@ -368,6 +371,11 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
 
     io_scheduler = asyncscheduler.AsyncScheduler(globals.async_concurrency)
     async_waiters = []
+    # If --progress option is given, initiate a background thread that will
+    # periodically report progress to the Log.
+    if globals.progress:
+        progress.progress_thread = progress.LogProgressThread()
+        progress.progress_thread.start()
 
     while not at_end:
         # set up iterator
@@ -419,6 +427,11 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
 
     # Upload the collection summary.
     #bytes_written += write_manifest(mf, backup_type, backend)
+
+    # Terminate the background thread now, if any
+    if globals.progress:
+        progress.progress_thread.finished = True
+        progress.progress_thread.join()
 
     return bytes_written
 
@@ -495,6 +508,17 @@ def full_backup(col_stats):
     @rtype: void
     @return: void
     """
+    if globals.progress:
+        progress.tracker = progress.ProgressTracker()
+        # Fake a backup to compute total of moving bytes
+        tarblock_iter = diffdir.DirFull(globals.select)
+        dummy_backup(tarblock_iter)
+        # Store computed stats to compute progress later
+        progress.tracker.set_evidence(diffdir.stats)
+        # Reinit the globals.select iterator, so
+        # the core of duplicity can rescan the paths
+        commandline.set_selection()
+
     if globals.dry_run:
         tarblock_iter = diffdir.DirFull(globals.select)
         bytes_written = dummy_backup(tarblock_iter)
@@ -566,6 +590,19 @@ def incremental_backup(sig_chain):
             time.sleep(2)
             dup_time.setcurtime()
             assert dup_time.curtime != dup_time.prevtime, "time not moving forward at appropriate pace - system clock issues?"
+
+    if globals.progress:
+        progress.tracker = progress.ProgressTracker()
+        # Fake a backup to compute total of moving bytes
+        tarblock_iter = diffdir.DirDelta(globals.select,
+                                         sig_chain.get_fileobjs())
+        dummy_backup(tarblock_iter)
+        # Store computed stats to compute progress later
+        progress.tracker.set_evidence(diffdir.stats)
+        # Reinit the globals.select iterator, so
+        # the core of duplicity can rescan the paths
+        commandline.set_selection()
+
     if globals.dry_run:
         tarblock_iter = diffdir.DirDelta(globals.select,
                                          sig_chain.get_fileobjs())
