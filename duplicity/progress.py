@@ -168,7 +168,8 @@ class ProgressTracker():
         projection = 1.0
         if self.progress_estimation > 0:
             projection = (1.0 - self.progress_estimation) / self.progress_estimation
-        self.time_estimation = long(projection * float(self.elapsed_sum.total_seconds()))
+        if self.elapsed_sum.total_seconds() > 0: 
+           self.time_estimation = long(projection * float(self.elapsed_sum.total_seconds()))
     
         # Apply values only when monotonic, so the estimates look more consistent to the human eye
         if self.progress_estimation < last_progress_estimation:
@@ -177,7 +178,8 @@ class ProgressTracker():
         """
         Compute Exponential Moving Average of speed as bytes/sec of the last 30 probes
         """
-        self.transfers.append(float(self.total_bytecount - self.last_total_bytecount) / float(elapsed.total_seconds()))
+        if self.elapsed.total_seconds() > 0: 
+            self.transfers.append(float(self.total_bytecount - self.last_total_bytecount) / float(elapsed.total_seconds()))
         self.last_total_bytecount = self.total_bytecount
         if len(self.transfers) > 30:
             self.transfers.popleft()
