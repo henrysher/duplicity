@@ -190,7 +190,7 @@ def TransferProgress(progress, eta, changed_bytes, elapsed, speed, stalled):
                                                           )
 
     controlLine = "%d %d %d %d %d %d" % (changed_bytes, elapsed, progress, eta, speed_amount, stalled)
-    Log(s, INFO, InfoCode.upload_progress, controlLine)
+    Log(s, NOTICE, InfoCode.upload_progress, controlLine)
 
 def PrintCollectionStatus(col_stats, force_print=False):
     """Prints a collection status to the log"""
