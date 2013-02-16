@@ -257,6 +257,8 @@ def parse_cmdline_options(arglist):
     parser.add_option("--asynchronous-upload", action="store_const", const=1,
                       dest="async_concurrency")
 
+    parser.add_option("--compare-data", action="store_true")
+
     # config dir for future use
     parser.add_option("--config-dir", type="file", metavar=_("path"),
                       help=optparse.SUPPRESS_HELP)
@@ -531,8 +533,6 @@ def parse_cmdline_options(arglist):
     parser.add_option("--verbosity", "-v", type="verbosity", metavar="[0-9]",
                       dest="", action="callback",
                       callback=lambda o, s, v, p: log.setverbosity(v))
-
-    parser.add_option("--verify-data", action="store_true")
 
     parser.add_option("-V", "--version", action="callback", callback=print_ver)
 

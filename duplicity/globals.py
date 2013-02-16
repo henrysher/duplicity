@@ -243,4 +243,4 @@ extra_clean = False
 rename = {}
 
 # enable data comparison on verify runs
-verify_data = False
+compare_data = False
