@@ -532,6 +532,8 @@ def parse_cmdline_options(arglist):
                       dest="", action="callback",
                       callback=lambda o, s, v, p: log.setverbosity(v))
 
+    parser.add_option("--verify-data", action="store_true")
+
     parser.add_option("-V", "--version", action="callback", callback=print_ver)
 
     # volume size
