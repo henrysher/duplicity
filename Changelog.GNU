@@ -2,6 +2,12 @@
 
     * Applied patches from Laszlo Ersek to rdiffdir to "consume a chain of sigtar
       files in rdiffdir delta mode" which supports incremental sigtar files.
+    * Merged in lp:~jnoster/duplicity/dpbx-added
+      - Add Dropbox backend
+      - NB! In order to use the backend one must:
+        1. Install Dropbox Python SDK first.
+        2. Run the duplicity with Dropbox backend (dpbx://) first time
+           *interactively* to catch and follow the oAuth URL.
 
 2013-01-18  Kenneth Loafman  <kenneth@loafman.com>
 

@@ -195,11 +195,15 @@ class ErrorCode:
     enryption_mismatch = 45
     pythonoptimize_set = 46
 
+    dpbx_nologin       = 47
+
     # 50->69 reserved for backend errors
     backend_error = 50
     backend_permission_denied = 51
     backend_not_found = 52
     backend_no_space = 53
+    backend_command_error = 54
+    backend_code_error    = 55
 
     # Reserve 126 because it is used as an error code for pkexec
     # Reserve 127 because it is used as an error code for pkexec

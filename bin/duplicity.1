@@ -81,6 +81,11 @@ for ssl certificate verification of HTTPS connections
 .br
 (also see 
 .BR "A NOTE ON SSL CERTIFICATE VERIFICATION" ).
+.TP
+.B "dpbx backend"
+.B Dropbox Python SDK
+- https://www.dropbox.com/developers/reference/sdk
+.br
 
 .SH SYNOPSIS
 .B duplicity [full|incremental]
@@ -984,6 +989,17 @@ See also
 .BI "A NOTE ON UBUNTU ONE"
 .PP
 webdav[s]://user[:password]@other.host/some_dir
+.PP
+.BI "Dropbox backend"
+.br
+dpbx:///some_dir
+.br
+.IP 1.
+The some_dir must already exist in your Dropbox Application folder.
+.IP 2.
+The first run of the backend must be ineractive!
+The code will print an URL that is to be followed in a browser
+in order to authorize the application to access your Dropbox account.
 .RE
 
 .SH TIME FORMATS
