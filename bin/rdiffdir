@@ -121,10 +121,10 @@ def check_does_not_exist(filename):
 
 def get_action(args):
     """Figure out the main action from the arguments"""
-    def require_args(num):
+    def require_args(num, upper_bound_too=True):
         if len(args)-1 < num:
             command_line_error("Too few arguments")
-        elif len(args)-1 > num:
+        elif upper_bound_too and len(args)-1 > num:
             command_line_error("Too many arguments")
 
     if not args:
@@ -136,7 +136,7 @@ def get_action(args):
     elif command == "tar":
         require_args(2)
     elif command == "delta":
-        require_args(3)
+        require_args(3, False)
     elif command == "patch":
         require_args(2)
     return command, args[1:]
@@ -208,13 +208,13 @@ def main():
     if action == "sig":
         write_sig(file_args[0], get_fileobj(file_args[1], "wb"))
     elif action == "delta":
-        sig_infp = get_fileobj(file_args[0], "rb")
-        delta_outfp = get_fileobj(file_args[2], "wb")
+        sig_infp = map(lambda fname: get_fileobj(fname, "rb"), file_args[0:-2])
+        delta_outfp = get_fileobj(file_args[-1], "wb")
         if sig_fileobj:
-            write_delta_and_sig(file_args[1], sig_infp,
+            write_delta_and_sig(file_args[-2], sig_infp,
                                 delta_outfp, sig_fileobj)
         else:
-            write_delta(file_args[1], sig_infp, delta_outfp)
+            write_delta(file_args[-2], sig_infp, delta_outfp)
     elif action == "patch":
         patch(file_args[0], get_fileobj(file_args[1], "rb"))
     elif action == "tar":

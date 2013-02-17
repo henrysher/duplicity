@@ -1,3 +1,8 @@
+2013-02-17  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Applied patches from Laszlo Ersek to rdiffdir to "consume a chain of sigtar
+      files in rdiffdir delta mode" which supports incremental sigtar files.
+
 2013-01-18  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~duplicity-team/duplicity/po-updates

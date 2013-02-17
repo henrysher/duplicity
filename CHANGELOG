@@ -5,6 +5,13 @@ distribution and used to remove GnuPGInterface.py please note this:
 See README for details.
 
 
+New in v0.6.22 (2013/0?/??)
+---------------------------
+Enhancements:
+* Applied patches from Laszlo Ersek to rdiffdir to "consume a chain of sigtar
+  files in rdiffdir delta mode" which supports incremental sigtar files.
+
+
 New in v0.6.21 (2013/01/23)
 ---------------------------
 Enhancements:

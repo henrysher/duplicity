@@ -10,7 +10,9 @@ rdiffdir \- compute and apply signatures and diffs to directories
 .B rdiffdir
 .BI [ options ]
 .B delta
-.I signature_file new_dir delta_file
+.I full_sigtar
+.BI { incr_sigtar }
+.I new_dir delta_file
 
 .B rdiffdir
 .BI [ options ]
@@ -33,6 +35,36 @@ are "-", the data will be read from stdin or written to stdout as appropriate.
 is supposed to be like rdiff, but can operate on directories.  See
 .BR rdiff (1)
 for more information.  The syntax is similar.
+
+Regarding the
+.B delta
+command, the
+.I full_sigtar
+operand is a
+.I signature_file
+written by an earlier
+.B signature
+or
+.B tar
+command (the latter using the
+.B --write-sig-to
+option). The optional
+.I incr_sigtar
+operands are signature files written by earlier
+.B delta
+commands using the
+.I --write-sig-to
+option. This way the Nth invocation of the
+.B delta
+command can parse (and extend) the signature chain that has been founded by the
+first
+.B signature
+or
+.B tar
+command with a full signature, and then extended by the subsequent N-1
+.B delta
+invocations with incremental signatures. It is the responsibility of the user
+to specify the sigtar operands in logical increment order.
 
 .SH OPTIONS
 .TP
