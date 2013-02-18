@@ -84,6 +84,7 @@ def command(login_required=True):
                 msg = e.user_error_msg or str(e)
                 log.FatalError('dpbx error: %s' % (msg,), log.ErrorCode.backend_command_error)
             except Exception, e:
+                log_exception(e)
                 log.FatalError('dpbx code error "%s"' % (e,), log.ErrorCode.backend_code_error)
 
         wrapper.__doc__ = f.__doc__
