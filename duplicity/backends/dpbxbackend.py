@@ -30,6 +30,7 @@ import urllib
 import re
 import locale, sys
 
+import traceback, StringIO
 from exceptions import Exception
 
 import duplicity.backend
@@ -57,6 +58,15 @@ ACCESS_TYPE = 'app_folder'
 # This file will store cached value of oAuth token
 _TOKEN_CACHE_FILE = os.path.expanduser("~/.dropbox.token_store.txt")
 
+def log_exception(e):
+  log.Error('Exception [%s]:'%(e,))
+  f = StringIO.StringIO()
+  traceback.print_exc(file=f)
+  f.seek(0)
+  for s in f.readlines():
+    log.Error('| %s'%(s.rstrip(),))
+  f.close()
+
 def command(login_required=True):
     """a decorator for handling authentication and exceptions"""
     def decorate(f):
@@ -68,6 +78,7 @@ def command(login_required=True):
             try:
                 return f(self, *args)
             except TypeError, e:
+                log_exception(e)
                 log.FatalError('dpbx type error "%s"' % (e,), log.ErrorCode.backend_code_error)
             except rest.ErrorResponse, e:
                 msg = e.user_error_msg or str(e)
