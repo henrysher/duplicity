@@ -119,10 +119,6 @@ class DPBXBackend(duplicity.backend.Backend):
             remote_filename = source_path.get_filename()
 
         remote_dir  = urllib.unquote(self.parsed_url.path.lstrip('/'))
-        try:
-          self._mkdir(remote_dir)
-        except Exception,e:
-          log.Info('dpbx.put mkdir(%s) failed: %s'%(remote_dir,e))
         remote_path = os.path.join(remote_dir, remote_filename).rstrip()
 
         from_file = open(source_path.name, "rb")
