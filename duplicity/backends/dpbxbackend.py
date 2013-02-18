@@ -59,7 +59,7 @@ ACCESS_TYPE = 'app_folder'
 _TOKEN_CACHE_FILE = os.path.expanduser("~/.dropbox.token_store.txt")
 
 def log_exception(e):
-  log.Error('Exception [%s]:'%(e,))
+  log.Log('Exception [%s]:'%(e,))
   f = StringIO.StringIO()
   traceback.print_exc(file=f)
   f.seek(0)
