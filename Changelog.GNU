@@ -8,6 +8,9 @@
         1. Install Dropbox Python SDK first.
         2. Run the duplicity with Dropbox backend (dpbx://) first time
            *interactively* to catch and follow the oAuth URL.
+    * Merged in lp:~ed.so/duplicity/verify.data
+      - add switch --compare-data, to selectively enable formerly always disabled
+        data comparison on verify runs
 
 2013-01-18  Kenneth Loafman  <kenneth@loafman.com>
 

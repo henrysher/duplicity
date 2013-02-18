@@ -257,6 +257,8 @@ def parse_cmdline_options(arglist):
     parser.add_option("--asynchronous-upload", action="store_const", const=1,
                       dest="async_concurrency")
 
+    parser.add_option("--compare-data", action="store_true")
+
     # config dir for future use
     parser.add_option("--config-dir", type="file", metavar=_("path"),
                       help=optparse.SUPPRESS_HELP)

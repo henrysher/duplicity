@@ -241,3 +241,6 @@ extra_clean = False
 
 # Renames (--rename)
 rename = {}
+
+# enable data comparison on verify runs
+compare_data = False

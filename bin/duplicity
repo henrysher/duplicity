@@ -759,7 +759,7 @@ def verify(col_stats):
             backup_ropath = path.ROPath(current_path.index)
         if not current_path:
             current_path = path.ROPath(backup_ropath.index)
-        if not backup_ropath.compare_verbose(current_path):
+        if not backup_ropath.compare_verbose(current_path, globals.compare_data):
             diff_count += 1
         total_count += 1
     # Unfortunately, ngettext doesn't handle multiple number variables, so we
