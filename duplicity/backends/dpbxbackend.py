@@ -64,7 +64,7 @@ def log_exception(e):
   traceback.print_exc(file=f)
   f.seek(0)
   for s in f.readlines():
-    log.Error('| %s'%(s.rstrip(),))
+    log.Error('| '+s.rstrip())
   f.close()
 
 def command(login_required=True):
@@ -82,10 +82,12 @@ def command(login_required=True):
                 log.FatalError('dpbx type error "%s"' % (e,), log.ErrorCode.backend_code_error)
             except rest.ErrorResponse, e:
                 msg = e.user_error_msg or str(e)
-                log.FatalError('dpbx error: %s' % (msg,), log.ErrorCode.backend_command_error)
+                log.Error('dpbx error: %s' % (msg,), log.ErrorCode.backend_command_error)
+                raise e
             except Exception, e:
                 log_exception(e)
-                log.FatalError('dpbx code error "%s"' % (e,), log.ErrorCode.backend_code_error)
+                log.Error('dpbx code error "%s"' % (e,), log.ErrorCode.backend_code_error)
+                raise e
 
         wrapper.__doc__ = f.__doc__
         return wrapper
