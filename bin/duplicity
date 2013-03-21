@@ -514,7 +514,7 @@ def full_backup(col_stats):
         tarblock_iter = diffdir.DirFull(globals.select)
         dummy_backup(tarblock_iter)
         # Store computed stats to compute progress later
-        progress.tracker.set_evidence(diffdir.stats)
+        progress.tracker.set_evidence(diffdir.stats, True)
         # Reinit the globals.select iterator, so
         # the core of duplicity can rescan the paths
         commandline.set_selection()
@@ -598,7 +598,7 @@ def incremental_backup(sig_chain):
                                          sig_chain.get_fileobjs())
         dummy_backup(tarblock_iter)
         # Store computed stats to compute progress later
-        progress.tracker.set_evidence(diffdir.stats)
+        progress.tracker.set_evidence(diffdir.stats, False)
         # Reinit the globals.select iterator, so
         # the core of duplicity can rescan the paths
         commandline.set_selection()

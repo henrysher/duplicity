@@ -75,8 +75,6 @@ class ProgressTracker():
         self.start_time = None
         self.change_mean_ratio = 0.0
         self.change_r_estimation = 0.0
-        self.compress_mean_ratio = 0.0
-        self.compress_r_estimation = 0.0
         self.progress_estimation = 0.0
         self.time_estimation = 0
         self.total_bytecount = 0
@@ -87,6 +85,7 @@ class ProgressTracker():
         self.elapsed_sum = timedelta()
         self.speed = 0.0
         self.transfers = sys_collections.deque()
+        self.is_full = False
     
     def has_collected_evidence(self):
         """
@@ -131,33 +130,42 @@ class ProgressTracker():
         The progress is estimated on the current bytes written vs the total bytes to
         change as estimated by a first-dry-run. The weight is the ratio of changing 
         data (Delta) against the total file sizes. (pessimistic estimation)
+        The method computes the upper bound for the progress, when using a sufficient 
+        large volsize to accomodate and changes, as using a small volsize may inject
+        statistical noise.
         """
         from duplicity import diffdir
         changes = diffdir.stats.NewFileSize + diffdir.stats.ChangedFileSize
         total_changes = self.total_stats.NewFileSize + self.total_stats.ChangedFileSize
-        if changes == 0 or total_changes == 0:
+        if total_changes == 0 or diffdir.stats.RawDeltaSize == 0:
             return
     
         # Snapshot current values for progress
         last_progress_estimation = self.progress_estimation
+
+        if self.is_full:
+            # Compute mean ratio of data transfer, assuming 1:1 data density
+            self.progress_estimation = float(self.total_bytecount) / float(total_changes)
+        else:
+            # Compute mean ratio of data transfer, estimating unknown progress
+            change_ratio = float(self.total_bytecount) / float(diffdir.stats.RawDeltaSize)
+            change_delta = change_ratio - self.change_mean_ratio
+            self.change_mean_ratio += change_delta / float(self.nsteps) # mean cumulated ratio
+            self.change_r_estimation += change_delta * (change_ratio - self.change_mean_ratio)
+            change_sigma = math.sqrt(math.fabs(self.change_r_estimation / float(self.nsteps)))
         
-        # Compute ratio of changes
-        change_ratio = diffdir.stats.RawDeltaSize / float(changes)
-        change_delta = change_ratio - self.change_mean_ratio
-        self.change_mean_ratio += change_delta / float(self.nsteps) # mean cumulated ratio
-        self.change_r_estimation += change_delta * (change_ratio - self.change_mean_ratio)
-        change_sigma = math.sqrt(math.fabs(self.change_r_estimation / float(self.nsteps)))
-    
-        # Compute ratio of compression of the deltas
-        compress_ratio = self.total_bytecount / float(diffdir.stats.RawDeltaSize)
-        compress_delta = compress_ratio - self.compress_mean_ratio
-        self.compress_mean_ratio += compress_delta / float(self.nsteps) # mean cumulated ratio
-        self.compress_r_estimation += compress_delta * (compress_ratio - self.compress_mean_ratio)
-        compress_sigma = math.sqrt(math.fabs(self.compress_r_estimation / float(self.nsteps)))
-    
-        # Combine 2 statistically independent variables (ratios) optimistically
-        self.progress_estimation = (self.change_mean_ratio * self.compress_mean_ratio 
-                                        + change_sigma + compress_sigma) * float(changes) / float(total_changes)
+            """
+            Combine variables for progress estimation
+            Fit a smoothed curve that covers the most common data density distributions, aiming for a large number of incremental changes.
+            The computation is:
+                Use 50% confidence interval lower bound during first half of the progression. Conversely, use 50% C.I. upper bound during
+                the second half. Scale it to the changes/total ratio
+            """
+            self.progress_estimation = float(changes) / float(total_changes) * ( 
+                                            (self.change_mean_ratio - 0.67 * change_sigma) * (1.0 - self.progress_estimation) + 
+                                            (self.change_mean_ratio + 0.67 * change_sigma) * self.progress_estimation 
+                                        )
+
         self.progress_estimation = max(0.0, min(self.progress_estimation, 1.0))
     
 
@@ -209,12 +217,13 @@ class ProgressTracker():
         if changing > 0:
             self.stall_last_time = datetime.now()
     
-    def set_evidence(self, stats):
+    def set_evidence(self, stats, is_full):
         """
         Stores the collected statistics from a first-pass dry-run, to use this
         information later so as to estimate progress
         """
         self.total_stats = stats
+        self.is_full = is_full
     
     def total_elapsed_seconds(self):
         """
