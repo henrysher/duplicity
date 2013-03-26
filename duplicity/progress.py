@@ -165,7 +165,23 @@ class ProgressTracker():
                                             (self.change_mean_ratio - 0.67 * change_sigma) * (1.0 - self.progress_estimation) + 
                                             (self.change_mean_ratio + 0.67 * change_sigma) * self.progress_estimation 
                                         )
+            """
+            In case that we overpassed the 100%, drop the confidence and trust more the mean as the sigma may be large.
+            """
+            if self.progress_estimation > 1.0:
+                self.progress_estimation = float(changes) / float(total_changes) * ( 
+                                                (self.change_mean_ratio - 0.33 * change_sigma) * (1.0 - self.progress_estimation) + 
+                                                (self.change_mean_ratio + 0.33 * change_sigma) * self.progress_estimation 
+                                            )
+            """
+            Meh!, if again overpassed the 100%, drop the confidence to 0 and trust only the mean.
+            """
+            if self.progress_estimation > 1.0:
+                self.progress_estimation = self.change_mean_ratio * float(changes) / float(total_changes)
 
+        """
+        Lastly, just cap it... nothing else we can do to approximate it better
+        """
         self.progress_estimation = max(0.0, min(self.progress_estimation, 1.0))
     
 
