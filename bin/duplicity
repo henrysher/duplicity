@@ -418,7 +418,8 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
         log.Progress('Processed volume %d' % vol_num, diffdir.stats.SourceFileSize)
         # Snapshot (serialize) progress now as a Volume has been completed. This is always the last restore point 
         # when it comes to restart a failed backup
-        progress.tracker.snapshot_progress(vol_num)
+        if globals.progress:
+            progress.tracker.snapshot_progress(vol_num)
 
         # for testing purposes only - assert on inc or full
         assert globals.fail_on_volume != vol_num, "Forced assertion for testing at volume %d" % vol_num
