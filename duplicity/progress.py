@@ -39,6 +39,8 @@ import time
 from datetime import datetime, timedelta
 from duplicity import globals
 from duplicity import log
+import pickle
+import os
 
 def import_non_local(name, custom_name=None):
     """
@@ -67,8 +69,65 @@ sys_collections = import_non_local('collections','sys_collections')
 tracker = None
 progress_thread = None
 
+class Snapshot(sys_collections.deque):
+    """
+    A convenience class for storing snapshots in a space/timing efficient manner
+    Stores up to 10 consecutive progress snapshots, one for each volume
+    """
+
+    @staticmethod
+    def unmarshall():
+        """
+        De-serializes cached data it if present
+        """
+        snapshot = Snapshot()
+        # If restarting Full, discard marshalled data and start over
+        if not globals.restart is None and globals.restart.start_vol > 1:
+            try:
+                progressfd = open('%s/progress' % globals.archive_dir.name, 'r')
+                snapshot = pickle.load(progressfd)
+                progressfd.close()
+            except:
+                log.Warn("Warning, cannot read stored progress information from previous backup", log.WarningCode.cannot_stat) 
+                snapshot = Snapshot()
+        # Reached here no cached data found or wrong marshalling
+        return snapshot
+        
+    def marshall(self):
+        """
+        Serializes object to cache
+        """
+        progressfd = open('%s/progress' % globals.archive_dir.name, 'w+')
+        pickle.dump(self, progressfd)
+        progressfd.close()
+
+
+    def __init__(self, iterable = [], maxlen = 10):
+        super(Snapshot, self).__init__(iterable, maxlen)
+        self.last_vol = 0
+
+    def get_snapshot(self, volume):
+        nitems = len(self)
+        k = max(nitems + volume - self.last_vol - 1, nitems - 1)
+        if k < 0:
+            return None
+        return self[k]
+
+    def push_snapshot(self, volume, snapshot_data):
+        self.append(snapshot_data)
+        self.last_vol = volume
+
+    def pop_snapshot(self):
+        return self.popleft()
+
+    def clear(self):
+        super(Snapshot, self).clear()
+        self.last_vol = 0
+
+
+
 class ProgressTracker():
-    
+
     def __init__(self):
         self.total_stats = None
         self.nsteps = 0
@@ -86,7 +145,21 @@ class ProgressTracker():
         self.speed = 0.0
         self.transfers = sys_collections.deque()
         self.is_full = False
-    
+        self.current_estimation = 0.0
+        self.prev_estimation = 0.0
+        self.prev_data = Snapshot.unmarshall() 
+        if not globals.restart is None and globals.restart.start_vol > 1:
+            self.prev_estimation = self.prev_data.get_snapshot(globals.restart.start_vol)
+            
+    def snapshot_progress(self, volume):
+        """
+        Snapshots the current progress status for each volume into the disk cache
+        If backup is interrupted, next restart will deserialize the data and try start
+        progress from the snapshot
+        """
+        self.prev_data.push_snapshot(volume, self.progress_estimation)
+        self.prev_data.marshall() 
+
     def has_collected_evidence(self):
         """
         Returns true if the progress computation is on and duplicity has not
@@ -145,7 +218,7 @@ class ProgressTracker():
 
         if self.is_full:
             # Compute mean ratio of data transfer, assuming 1:1 data density
-            self.progress_estimation = float(self.total_bytecount) / float(total_changes)
+            self.current_estimation = float(self.total_bytecount) / float(total_changes)
         else:
             # Compute mean ratio of data transfer, estimating unknown progress
             change_ratio = float(self.total_bytecount) / float(diffdir.stats.RawDeltaSize)
@@ -161,28 +234,28 @@ class ProgressTracker():
                 Use 50% confidence interval lower bound during first half of the progression. Conversely, use 50% C.I. upper bound during
                 the second half. Scale it to the changes/total ratio
             """
-            self.progress_estimation = float(changes) / float(total_changes) * ( 
-                                            (self.change_mean_ratio - 0.67 * change_sigma) * (1.0 - self.progress_estimation) + 
-                                            (self.change_mean_ratio + 0.67 * change_sigma) * self.progress_estimation 
+            self.current_estimation = float(changes) / float(total_changes) * ( 
+                                            (self.change_mean_ratio - 0.67 * change_sigma) * (1.0 - self.current_estimation) + 
+                                            (self.change_mean_ratio + 0.67 * change_sigma) * self.current_estimation 
                                         )
             """
             In case that we overpassed the 100%, drop the confidence and trust more the mean as the sigma may be large.
             """
-            if self.progress_estimation > 1.0:
-                self.progress_estimation = float(changes) / float(total_changes) * ( 
-                                                (self.change_mean_ratio - 0.33 * change_sigma) * (1.0 - self.progress_estimation) + 
-                                                (self.change_mean_ratio + 0.33 * change_sigma) * self.progress_estimation 
+            if self.current_estimation > 1.0:
+                self.current_estimation = float(changes) / float(total_changes) * ( 
+                                                (self.change_mean_ratio - 0.33 * change_sigma) * (1.0 - self.current_estimation) + 
+                                                (self.change_mean_ratio + 0.33 * change_sigma) * self.current_estimation 
                                             )
             """
             Meh!, if again overpassed the 100%, drop the confidence to 0 and trust only the mean.
             """
-            if self.progress_estimation > 1.0:
-                self.progress_estimation = self.change_mean_ratio * float(changes) / float(total_changes)
+            if self.current_estimation > 1.0:
+                self.current_estimation = self.change_mean_ratio * float(changes) / float(total_changes)
 
         """
         Lastly, just cap it... nothing else we can do to approximate it better
         """
-        self.progress_estimation = max(0.0, min(self.progress_estimation, 1.0))
+        self.progress_estimation = max(0.0, min(self.prev_estimation + (1.0 - self.prev_estimation) * self.current_estimation, 1.0))
     
 
         """
@@ -240,6 +313,7 @@ class ProgressTracker():
         """
         self.total_stats = stats
         self.is_full = is_full
+            
     
     def total_elapsed_seconds(self):
         """
