@@ -545,6 +545,11 @@ def full_backup(col_stats):
         man_outfp.to_remote()
         man_outfp.to_final()
 
+        if globals.progress:
+            log.TransferProgress(100.0, 0, progress.tracker.total_bytecount, 
+                                progress.tracker.total_elapsed_seconds(), 
+                                progress.tracker.speed, False)
+
         col_stats.set_values(sig_chain_warning=None)
 
     print_statistics(diffdir.stats, bytes_written)
@@ -629,6 +634,11 @@ def incremental_backup(sig_chain):
         new_man_outfp.close()
         new_man_outfp.to_remote()
         new_man_outfp.to_final()
+
+        if globals.progress:
+            log.TransferProgress(100.0, 0, progress.tracker.total_bytecount, 
+                                progress.tracker.total_elapsed_seconds(), 
+                                progress.tracker.speed, False)
 
     print_statistics(diffdir.stats, bytes_written)
 

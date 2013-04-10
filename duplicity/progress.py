@@ -253,9 +253,10 @@ class ProgressTracker():
                 self.current_estimation = self.change_mean_ratio * float(changes) / float(total_changes)
 
         """
-        Lastly, just cap it... nothing else we can do to approximate it better
+        Lastly, just cap it... nothing else we can do to approximate it better. Cap it to 99%, as the remaining 1% to 100% we reserve it
+        For the last step uploading of signature and manifests
         """
-        self.progress_estimation = max(0.0, min(self.prev_estimation + (1.0 - self.prev_estimation) * self.current_estimation, 1.0))
+        self.progress_estimation = max(0.0, min(self.prev_estimation + (1.0 - self.prev_estimation) * self.current_estimation, 0.99))
     
 
         """
@@ -350,5 +351,8 @@ class LogProgressThread(threading.Thread):
             while not self.finished:
                 tracker.log_upload_progress()
                 time.sleep(globals.progress_rate)
-            log.TransferProgress(100.0, 0, tracker.total_bytecount, tracker.total_elapsed_seconds(), tracker.speed, False)
+            log.TransferProgress(99.0, tracker.time_estimation, 
+                                    tracker.total_bytecount, 
+                                    tracker.total_elapsed_seconds(), 
+                                    tracker.speed, False)
 
