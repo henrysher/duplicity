@@ -359,6 +359,12 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
     at_end = 0
     bytes_written = 0
 
+    # If --progress option is given, initiate a background thread that will
+    # periodically report progress to the Log.
+    if globals.progress:
+        progress.tracker.set_start_volume(vol_num + 1)
+        progress.progress_thread.start()
+
     # This assertion must be kept until we have solved the problem
     # of concurrency at the backend level. Concurrency 1 is fine
     # because the actual I/O concurrency on backends is limited to
@@ -512,18 +518,13 @@ def full_backup(col_stats):
         # Reinit the globals.select iterator, so
         # the core of duplicity can rescan the paths
         commandline.set_selection()
+        progress.progress_thread = progress.LogProgressThread()
 
     if globals.dry_run:
         tarblock_iter = diffdir.DirFull(globals.select)
         bytes_written = dummy_backup(tarblock_iter)
         col_stats.set_values(sig_chain_warning=None)
     else:
-        # If --progress option is given, initiate a background thread that will
-        # periodically report progress to the Log.
-        if globals.progress:
-            progress.progress_thread = progress.LogProgressThread()
-            progress.progress_thread.start()
-
         sig_outfp = get_sig_fileobj("full-sig")
         man_outfp = get_man_fileobj("full")
         tarblock_iter = diffdir.DirFull_WriteSig(globals.select,
@@ -610,18 +611,13 @@ def incremental_backup(sig_chain):
         # Reinit the globals.select iterator, so
         # the core of duplicity can rescan the paths
         commandline.set_selection()
+        progress.progress_thread = progress.LogProgressThread()
 
     if globals.dry_run:
         tarblock_iter = diffdir.DirDelta(globals.select,
                                          sig_chain.get_fileobjs())
         bytes_written = dummy_backup(tarblock_iter)
     else:
-        # If --progress option is given, initiate a background thread that will
-        # periodically report progress to the Log.
-        if globals.progress:
-            progress.progress_thread = progress.LogProgressThread()
-            progress.progress_thread.start()
-
         new_sig_outfp = get_sig_fileobj("new-sig")
         new_man_outfp = get_man_fileobj("inc")
         tarblock_iter = diffdir.DirDelta_WriteSig(globals.select,

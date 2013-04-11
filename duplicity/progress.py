@@ -82,7 +82,7 @@ class Snapshot(sys_collections.deque):
         """
         snapshot = Snapshot()
         # If restarting Full, discard marshalled data and start over
-        if not globals.restart is None and globals.restart.start_vol > 1:
+        if not globals.restart is None and globals.restart.start_vol >= 1:
             try:
                 progressfd = open('%s/progress' % globals.archive_dir.name, 'r')
                 snapshot = pickle.load(progressfd)
@@ -108,10 +108,9 @@ class Snapshot(sys_collections.deque):
 
     def get_snapshot(self, volume):
         nitems = len(self)
-        k = max(nitems + volume - self.last_vol - 1, nitems - 1)
-        if k < 0:
-            return None
-        return self[k]
+        if nitems <= 0:
+            return 0.0
+        return self[max(0, min(nitems + volume - self.last_vol - 1, nitems - 1))]
 
     def push_snapshot(self, volume, snapshot_data):
         self.append(snapshot_data)
@@ -147,10 +146,7 @@ class ProgressTracker():
         self.is_full = False
         self.current_estimation = 0.0
         self.prev_estimation = 0.0
-        self.prev_data = Snapshot.unmarshall() 
-        if not globals.restart is None and globals.restart.start_vol > 1:
-            self.prev_estimation = self.prev_data.get_snapshot(globals.restart.start_vol)
-            self.progress_estimation = max(0.0, min(self.prev_estimation, 0.99))
+        self.prev_data = None
             
     def snapshot_progress(self, volume):
         """
@@ -158,8 +154,9 @@ class ProgressTracker():
         If backup is interrupted, next restart will deserialize the data and try start
         progress from the snapshot
         """
-        self.prev_data.push_snapshot(volume, self.progress_estimation)
-        self.prev_data.marshall() 
+        if not self.prev_data is None:
+            self.prev_data.push_snapshot(volume, self.progress_estimation)
+            self.prev_data.marshall() 
 
     def has_collected_evidence(self):
         """
@@ -316,7 +313,11 @@ class ProgressTracker():
         self.total_stats = stats
         self.is_full = is_full
             
-    
+    def set_start_volume(self, volume):
+        self.prev_data = Snapshot.unmarshall()
+        self.prev_estimation = self.prev_data.get_snapshot(volume)
+        self.progress_estimation = max(0.0, min(self.prev_estimation, 0.99))
+
     def total_elapsed_seconds(self):
         """
         Elapsed seconds since the first call to log_upload_progress method
