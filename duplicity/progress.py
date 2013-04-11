@@ -150,6 +150,7 @@ class ProgressTracker():
         self.prev_data = Snapshot.unmarshall() 
         if not globals.restart is None and globals.restart.start_vol > 1:
             self.prev_estimation = self.prev_data.get_snapshot(globals.restart.start_vol)
+            self.progress_estimation = max(0.0, min(self.prev_estimation, 0.99))
             
     def snapshot_progress(self, volume):
         """
@@ -351,8 +352,3 @@ class LogProgressThread(threading.Thread):
             while not self.finished:
                 tracker.log_upload_progress()
                 time.sleep(globals.progress_rate)
-            log.TransferProgress(99.0, tracker.time_estimation, 
-                                    tracker.total_bytecount, 
-                                    tracker.total_elapsed_seconds(), 
-                                    tracker.speed, False)
-

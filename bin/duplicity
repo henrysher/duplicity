@@ -371,11 +371,6 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
 
     io_scheduler = asyncscheduler.AsyncScheduler(globals.async_concurrency)
     async_waiters = []
-    # If --progress option is given, initiate a background thread that will
-    # periodically report progress to the Log.
-    if globals.progress:
-        progress.progress_thread = progress.LogProgressThread()
-        progress.progress_thread.start()
 
     while not at_end:
         # set up iterator
@@ -431,11 +426,6 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
 
     # Upload the collection summary.
     #bytes_written += write_manifest(mf, backup_type, backend)
-
-    # Terminate the background thread now, if any
-    if globals.progress:
-        progress.progress_thread.finished = True
-        progress.progress_thread.join()
 
     return bytes_written
 
@@ -528,6 +518,12 @@ def full_backup(col_stats):
         bytes_written = dummy_backup(tarblock_iter)
         col_stats.set_values(sig_chain_warning=None)
     else:
+        # If --progress option is given, initiate a background thread that will
+        # periodically report progress to the Log.
+        if globals.progress:
+            progress.progress_thread = progress.LogProgressThread()
+            progress.progress_thread.start()
+
         sig_outfp = get_sig_fileobj("full-sig")
         man_outfp = get_man_fileobj("full")
         tarblock_iter = diffdir.DirFull_WriteSig(globals.select,
@@ -547,6 +543,9 @@ def full_backup(col_stats):
         man_outfp.to_final()
 
         if globals.progress:
+            # Terminate the background thread now, if any
+            progress.progress_thread.finished = True
+            progress.progress_thread.join()
             log.TransferProgress(100.0, 0, progress.tracker.total_bytecount, 
                                 progress.tracker.total_elapsed_seconds(), 
                                 progress.tracker.speed, False)
@@ -617,6 +616,12 @@ def incremental_backup(sig_chain):
                                          sig_chain.get_fileobjs())
         bytes_written = dummy_backup(tarblock_iter)
     else:
+        # If --progress option is given, initiate a background thread that will
+        # periodically report progress to the Log.
+        if globals.progress:
+            progress.progress_thread = progress.LogProgressThread()
+            progress.progress_thread.start()
+
         new_sig_outfp = get_sig_fileobj("new-sig")
         new_man_outfp = get_man_fileobj("inc")
         tarblock_iter = diffdir.DirDelta_WriteSig(globals.select,
@@ -637,6 +642,9 @@ def incremental_backup(sig_chain):
         new_man_outfp.to_final()
 
         if globals.progress:
+            # Terminate the background thread now, if any
+            progress.progress_thread.finished = True
+            progress.progress_thread.join()
             log.TransferProgress(100.0, 0, progress.tracker.total_bytecount, 
                                 progress.tracker.total_elapsed_seconds(), 
                                 progress.tracker.speed, False)
