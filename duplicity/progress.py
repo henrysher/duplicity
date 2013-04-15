@@ -264,9 +264,8 @@ class ProgressTracker():
         projection = 1.0
         if self.progress_estimation > 0:
             projection = (1.0 - self.progress_estimation) / self.progress_estimation
-        if self.elapsed_sum.total_seconds() > 0: 
-           self.time_estimation = long(projection * float(self.elapsed_sum.total_seconds()))
-    
+        self.time_estimation = long(projection * float(self.elapsed_sum.total_seconds()))
+
         # Apply values only when monotonic, so the estimates look more consistent to the human eye
         if self.progress_estimation < last_progress_estimation:
             self.progress_estimation = last_progress_estimation
