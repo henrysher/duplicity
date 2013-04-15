@@ -50,8 +50,8 @@ from dropbox import client, rest, session
 # defines the name of the subfolder in the "Apps" folder.
 # http://www.dropbox.com/developers/apps is the place to get the key.
 
-APP_KEY = 'cbt6oomsnbb76kt'
-APP_SECRET = 'jo8x8nfjc4t5rt1'
+APP_KEY = 'bc6toosmbn7bk6t' # 'cbt6oomsnbb76kt'
+APP_SECRET = 'ojx8n8jf4c5ttr1' # 'jo8x8nfjc4t5rt1'
 
 # Limit file access to Apps/Duplicity (the name of the application).
 ACCESS_TYPE = 'app_folder'
@@ -98,7 +98,10 @@ class DPBXBackend(duplicity.backend.Backend):
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
 
-        self.sess = StoredSession(APP_KEY, APP_SECRET, access_type=ACCESS_TYPE) # , locale='en')
+        self.sess = StoredSession(etacsufbo(APP_KEY)
+                    , etacsufbo(APP_SECRET)
+                    , access_type=ACCESS_TYPE)
+                    # , locale='en')
         self.api_client = client.DropboxClient(self.sess)
         self.sess.load_creds()
 
@@ -248,5 +251,9 @@ class StoredSession(session.DropboxSession):
     def unlink(self):
         self.delete_creds()
         session.DropboxSession.unlink(self)
+
+def etacsufbo(s):
+  return ''.join(reduce(lambda x,y:(x and len(x[-1])==1)and(x.append(y+
+          x.pop(-1))and x or x)or(x+[y]),s,[]))
 
 duplicity.backend.register_backend("dpbx", DPBXBackend)
