@@ -46,12 +46,16 @@ from dropbox import client, rest, session
 # This application key is registered in my name (jno at pisem dot net).
 # You can register your own developer account with Dropbox and
 # register a new application for yourself, obtaining the new
-# APP_KEY and APP_SECRET. Note that the name of the application
-# defines the name of the subfolder in the "Apps" folder.
+# APP_KEY and APP_SECRET.
+# Note 1: you must not store your credentials "as is" in the code.
+#         The values must be "processed" at least.
+#         This is a must for "production" keys.
+# Note 2: the name of the application defines the name of the
+#         subfolder in the "Apps" folder.
 # http://www.dropbox.com/developers/apps is the place to get the key.
 
-APP_KEY = 'bc6toosmbn7bk6t' # 'cbt6oomsnbb76kt'
-APP_SECRET = 'ojx8n8jf4c5ttr1' # 'jo8x8nfjc4t5rt1'
+APP_KEY = 'bc6toosmbn7bk6t'
+APP_SECRET = 'ojx8n8jf4c5ttr1'
 
 # Limit file access to Apps/Duplicity (the name of the application).
 ACCESS_TYPE = 'app_folder'
