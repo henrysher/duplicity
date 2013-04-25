@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2013-02-18 00:38+0000\n"
+"POT-Creation-Date: 2013-04-24 18:09+0000\n"
 "PO-Revision-Date: 2010-03-11 14:36+0000\n"
 "Last-Translator: Kenneth Loafman <kenneth@loafman.com>\n"
 "Language-Team: Russian <ru@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2013-02-19 04:57+0000\n"
-"X-Generator: Launchpad (build 16491)\n"
+"X-Launchpad-Export-Date: 2013-04-25 05:27+0000\n"
+"X-Generator: Launchpad (build 16580)\n"
 
 #: ../bin/duplicity:99
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -486,12 +486,14 @@ msgstr ""
 
 #: ../duplicity/collections.py:310
 msgid "Preferring Backupset over previous one!"
-msgstr ""
+msgstr "Предпочтение набора резервного копирования вместо предыдущего!"
 
 #: ../duplicity/collections.py:313
 #, python-format
 msgid "Ignoring incremental Backupset (start_time: %s; needed: %s)"
 msgstr ""
+"Пропуск инкрементального  набора резервного копирования (время_запуска: %s; "
+"необходимо: %s)"
 
 #: ../duplicity/collections.py:318
 #, python-format
