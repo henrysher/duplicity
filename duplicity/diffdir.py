@@ -30,6 +30,7 @@ the second, the ROPath iterator is put into tar block form.
 import cStringIO, types, math
 from duplicity import statistics
 from duplicity import util
+from duplicity import globals
 from duplicity.path import * #@UnusedWildImport
 from duplicity.lazy import * #@UnusedWildImport
 from duplicity import progress
@@ -723,4 +724,4 @@ def get_block_size(file_len):
     else:
         # Split file into about 2000 pieces, rounding to 512
         file_blocksize = long((file_len / (2000 * 512)) * 512)
-        return min(file_blocksize, 2048L)
+        return min(file_blocksize, globals.max_blocksize)

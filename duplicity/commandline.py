@@ -402,6 +402,9 @@ def parse_cmdline_options(arglist):
                       dest="", action="callback",
                       callback=lambda o, s, v, p: log.add_file(v))
 
+    # Maximum block size for large files
+    parser.add_option("--max-blocksize", type="int", metavar=_("number"))
+
     # TRANSL: Used in usage help (noun)
     parser.add_option("--name", dest="backup_name", metavar=_("backup name"))
 

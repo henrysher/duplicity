@@ -30,6 +30,8 @@
     * Merged in lp:~jnoster/duplicity/dpbx-added
       - The application key was approved as "production" one after some changes to the code
         to suit the requirements of Dropbox team (the keys are now obfuscated, for instance).
+    * Applied blocksize.patch from https://bugs.launchpad.net/duplicity/+bug/897423
+      - New option --max-blocksize (default 2048) to allow increasing delta blocksize.
 
 2013-02-17  Kenneth Loafman  <kenneth@loafman.com>
 

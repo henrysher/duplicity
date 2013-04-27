@@ -75,6 +75,9 @@ gpg_profile = None
 # Options to pass to gpg
 gpg_options = ''
 
+# Maximum file blocksize
+max_blocksize = 2048L
+
 # If true, filelists and directory statistics will be split on
 # nulls instead of newlines.
 null_separator = None
