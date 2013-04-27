@@ -244,3 +244,11 @@ rename = {}
 
 # enable data comparison on verify runs
 compare_data = False
+
+# When selected, triggers a dry-run before a full or incremental to compute
+# changes, then runs the real operation and keeps track of the real progress
+progress = False
+
+# Controls the upload progress messages refresh rate. Default: update each 
+# 3 seconds
+progress_rate = 3 

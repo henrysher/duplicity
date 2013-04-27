@@ -29,6 +29,8 @@
 
 import getpass, gzip, os, sys, time, types
 import traceback, platform, statvfs, resource, re
+import threading
+from datetime import datetime
 
 pwd = os.path.abspath(os.path.dirname(sys.argv[0]))
 if os.path.exists(os.path.join(pwd, "../duplicity")):
@@ -57,10 +59,10 @@ from duplicity import robust
 from duplicity import tempdir
 from duplicity import asyncscheduler
 from duplicity import util
+from duplicity import progress
 
 # If exit_val is not None, exit with given value at end.
 exit_val = None
-
 
 def get_passphrase(n, action, for_signing = False):
     """
@@ -307,6 +309,7 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
             tdp.delete()
         return putsize
 
+
     def validate_encryption_settings(backup_set, manifest):
         """
         When restarting a backup, we have no way to verify that the current
@@ -355,6 +358,12 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
 
     at_end = 0
     bytes_written = 0
+
+    # If --progress option is given, initiate a background thread that will
+    # periodically report progress to the Log.
+    if globals.progress:
+        progress.tracker.set_start_volume(vol_num + 1)
+        progress.progress_thread.start()
 
     # This assertion must be kept until we have solved the problem
     # of concurrency at the backend level. Concurrency 1 is fine
@@ -408,6 +417,10 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
 
         # Log human-readable version as well as raw numbers for machine consumers
         log.Progress('Processed volume %d' % vol_num, diffdir.stats.SourceFileSize)
+        # Snapshot (serialize) progress now as a Volume has been completed. This is always the last restore point 
+        # when it comes to restart a failed backup
+        if globals.progress:
+            progress.tracker.snapshot_progress(vol_num)
 
         # for testing purposes only - assert on inc or full
         assert globals.fail_on_volume != vol_num, "Forced assertion for testing at volume %d" % vol_num
@@ -495,6 +508,18 @@ def full_backup(col_stats):
     @rtype: void
     @return: void
     """
+    if globals.progress:
+        progress.tracker = progress.ProgressTracker()
+        # Fake a backup to compute total of moving bytes
+        tarblock_iter = diffdir.DirFull(globals.select)
+        dummy_backup(tarblock_iter)
+        # Store computed stats to compute progress later
+        progress.tracker.set_evidence(diffdir.stats, True)
+        # Reinit the globals.select iterator, so
+        # the core of duplicity can rescan the paths
+        commandline.set_selection()
+        progress.progress_thread = progress.LogProgressThread()
+
     if globals.dry_run:
         tarblock_iter = diffdir.DirFull(globals.select)
         bytes_written = dummy_backup(tarblock_iter)
@@ -517,6 +542,14 @@ def full_backup(col_stats):
         man_outfp.close()
         man_outfp.to_remote()
         man_outfp.to_final()
+
+        if globals.progress:
+            # Terminate the background thread now, if any
+            progress.progress_thread.finished = True
+            progress.progress_thread.join()
+            log.TransferProgress(100.0, 0, progress.tracker.total_bytecount, 
+                                progress.tracker.total_elapsed_seconds(), 
+                                progress.tracker.speed, False)
 
         col_stats.set_values(sig_chain_warning=None)
 
@@ -566,6 +599,20 @@ def incremental_backup(sig_chain):
             time.sleep(2)
             dup_time.setcurtime()
             assert dup_time.curtime != dup_time.prevtime, "time not moving forward at appropriate pace - system clock issues?"
+
+    if globals.progress:
+        progress.tracker = progress.ProgressTracker()
+        # Fake a backup to compute total of moving bytes
+        tarblock_iter = diffdir.DirDelta(globals.select,
+                                         sig_chain.get_fileobjs())
+        dummy_backup(tarblock_iter)
+        # Store computed stats to compute progress later
+        progress.tracker.set_evidence(diffdir.stats, False)
+        # Reinit the globals.select iterator, so
+        # the core of duplicity can rescan the paths
+        commandline.set_selection()
+        progress.progress_thread = progress.LogProgressThread()
+
     if globals.dry_run:
         tarblock_iter = diffdir.DirDelta(globals.select,
                                          sig_chain.get_fileobjs())
@@ -589,6 +636,14 @@ def incremental_backup(sig_chain):
         new_man_outfp.close()
         new_man_outfp.to_remote()
         new_man_outfp.to_final()
+
+        if globals.progress:
+            # Terminate the background thread now, if any
+            progress.progress_thread.finished = True
+            progress.progress_thread.join()
+            log.TransferProgress(100.0, 0, progress.tracker.total_bytecount, 
+                                progress.tracker.total_elapsed_seconds(), 
+                                progress.tracker.speed, False)
 
     print_statistics(diffdir.stats, bytes_written)
 

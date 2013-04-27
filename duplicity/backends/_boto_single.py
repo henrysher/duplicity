@@ -27,6 +27,7 @@ from duplicity import log
 from duplicity.errors import * #@UnusedWildImport
 from duplicity.util import exception_traceback
 from duplicity.backend import retry
+from duplicity import progress
 
 BOTO_MIN_VERSION = "1.6a"
 
@@ -200,6 +201,7 @@ class BotoBackend(duplicity.backend.Backend):
             remote_filename = source_path.get_filename()
         key = self.key_class(self.bucket)
         key.key = self.key_prefix + remote_filename
+
         for n in range(1, globals.num_retries+1):
             if n > 1:
                 # sleep before retry (new connection to a **hopeful** new host, so no need to wait so long)
@@ -212,7 +214,11 @@ class BotoBackend(duplicity.backend.Backend):
             log.Info("Uploading %s/%s to %s Storage" % (self.straight_url, remote_filename, storage_class))
             try:
                 key.set_contents_from_filename(source_path.name, {'Content-Type': 'application/octet-stream',
-                                                                  'x-amz-storage-class': storage_class})
+                                                                  'x-amz-storage-class': storage_class},
+                                                cb=progress.report_transfer,
+                                                num_cb=(max(2, 8 * globals.volsize / (1024 * 1024)))
+                                              ) # Max num of callbacks = 8 times x megabyte
+
                 key.close()
                 self.resetConnection()
                 return

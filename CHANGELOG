@@ -30,6 +30,23 @@ Enhancements:
 * Merged in lp:~tblue/duplicity/paramiko-fix-delete-retry
   - This fixes bug #1115715, which is really annoying. Basically it makes
     using the Paramiko backend with the default settings impossible.
+* Merged in lp:~juan-f/duplicity/progress
+  - From time ago, there are people asking for a progress bar estimation in duplicity.
+    There is even a script that circumvents the issue, getting info from the log so as
+    to estimate the progress status ( https://github.com/quentin/Duplicity-progress )
+    but does not give enough feedback and the estimation is rather plain.
+  - I have developed a set of heuristics that gather information from the deltas and
+    the transfer ratios of the backend so as to forecast % of progress, estimation of
+    remaining time and average speed, for both full and incremental backup uploads.
+  - The current implementation works for boto backend, but to port the other backends
+    to use this feature would be quite easy (we can discuss the details if interested).
+  - The algorithm is activated by the --progress command line flag, and will perform a
+    first-pass dry-run to collect evidence for all the deltas. Next it will trigger the
+    real upload, while a thread statistically estimates the ratio of changes and
+    compression for the data in/out, and uses these ratios to forecast time remaining
+    and % of completion.
+  - The progress data will be logged each 3 seconds, or the --progress-rate flag.
+
 
 New in v0.6.21 (2013/01/23)
 ---------------------------

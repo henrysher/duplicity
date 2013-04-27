@@ -433,6 +433,12 @@ def parse_cmdline_options(arglist):
                       callback=lambda o, s, v, p: (setattr(p.values, o.dest, True),
                                                    old_fn_deprecation(s)))
 
+    # Used to display the progress for the full and incremental backup operations
+    parser.add_option("--progress", action="store_true")
+
+    # Used to control the progress option update rate in seconds. Default: prompts each 3 seconds
+    parser.add_option("--progress-rate", type="int", metavar=_("number"))
+
     # option to trigger Pydev debugger
     parser.add_option("--pydevd", action="store_true")
 

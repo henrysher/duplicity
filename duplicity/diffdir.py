@@ -27,15 +27,16 @@ first, the signature or delta is constructed of a ROPath iterator.  In
 the second, the ROPath iterator is put into tar block form.
 """
 
-import cStringIO, types
+import cStringIO, types, math
 from duplicity import statistics
 from duplicity import util
 from duplicity.path import * #@UnusedWildImport
 from duplicity.lazy import * #@UnusedWildImport
+from duplicity import progress
 
-# A StatsObj will be written to this from DirDelta_WriteSig only.
+# A StatsObj will be written to this from DirDelta and DirDelta_WriteSig.
 stats = None
-
+tracker = None
 
 class DiffDirException(Exception):
     pass
@@ -82,7 +83,7 @@ def DirDelta(path_iter, dirsig_fileobj_list):
     else:
         sig_iter = sigtar2path_iter(dirsig_fileobj_list)
     delta_iter = get_delta_iter(path_iter, sig_iter)
-    if globals.dry_run:
+    if globals.dry_run or (globals.progress and not progress.tracker.has_collected_evidence()):
         return DummyBlockIter(delta_iter)
     else:
         return DeltaTarBlockIter(delta_iter)
@@ -363,7 +364,7 @@ def DirDelta_WriteSig(path_iter, sig_infp_list, newsig_outfp):
     else:
         sig_path_iter = sigtar2path_iter(sig_infp_list)
     delta_iter = get_delta_iter(path_iter, sig_path_iter, newsig_outfp)
-    if globals.dry_run:
+    if globals.dry_run or (globals.progress and not progress.tracker.has_collected_evidence()):
         return DummyBlockIter(delta_iter)
     else:
         return DeltaTarBlockIter(delta_iter)
