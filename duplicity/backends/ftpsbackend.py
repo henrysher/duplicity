@@ -119,8 +119,9 @@ class FTPSBackend(duplicity.backend.Backend):
         filelist = ""
         for filename in filename_list:
             filelist += "\'%s\' " % filename
-        remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
-        commandline = "lftp -c 'source %s;cd \'%s\';rm %s'" % (self.tempname, remote_dir, filelist.rstrip())
-        self.popen_persist(commandline)
+        if filelist.rstrip():
+            remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
+            commandline = "lftp -c 'source %s;cd \'%s\';rm %s'" % (self.tempname, remote_dir, filelist.rstrip())
+            self.popen_persist(commandline)
 
 duplicity.backend.register_backend("ftps", FTPSBackend)
