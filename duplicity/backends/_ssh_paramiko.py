@@ -363,12 +363,10 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
     def delete(self, filename_list):
         """deletes all files in the list on the remote side. In scp mode unavoidable quoting issues
         will cause failures if filenames containing single quotes are encountered."""
-        for n in range(1, globals.num_retries+1):
-            if n > 1:
-                # sleep before retry
-                time.sleep(self.retry_delay)
-            try:
-                for fn in filename_list:
+        for fn in filename_list:
+            # Try to delete each file several times before giving up completely.
+            for n in range(1, globals.num_retries+1):
+                try:
                     if (globals.use_scp):
                         self.runremote("rm '%s/%s'" % (self.remote_dir,fn),False,"scp rm ")
                     else:
@@ -376,11 +374,15 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                             self.sftp.remove(fn)
                         except Exception, e:
                             raise BackendException("sftp rm %s failed: %s" % (fn,e))
-            except Exception, e:
-                if n == globals.num_retries:
-                    log.FatalError(str(e), log.ErrorCode.backend_error)
-                else:
-                    log.Warn("%s (Try %d of %d) Will retry in %d seconds." % (e,n,globals.num_retries,self.retry_delay))
+
+                    # If we get here, we deleted this file successfully. Move on to the next one.
+                    break
+                except Exception, e:
+                    if n == globals.num_retries:
+                        log.FatalError(str(e), log.ErrorCode.backend_error)
+                    else:
+                        log.Warn("%s (Try %d of %d) Will retry in %d seconds." % (e,n,globals.num_retries,self.retry_delay))
+                        time.sleep(self.retry_delay)
 
     def runremote(self,cmd,ignoreexitcode=False,errorprefix=""):
         """small convenience function that opens a shell channel, runs remote command and returns

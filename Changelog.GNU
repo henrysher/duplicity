@@ -8,6 +8,9 @@
         passed into request() is overloaded, so when it was NULL or of a type other
         than file, it would fail.  This checks if "body" is of type "file" before
         actually seek()'ing back to the beginning of the file.
+    * Merged in lp:~tblue/duplicity/paramiko-fix-delete-retry
+      - This fixes bug #1115715, which is really annoying. Basically it makes
+        using the Paramiko backend with the default settings impossible.
 
 2013-02-17  Kenneth Loafman  <kenneth@loafman.com>
 
