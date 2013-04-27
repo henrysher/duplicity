@@ -288,6 +288,10 @@ class ErrorCode:
     # Reserve 127 because it is used as an error code for pkexec
     # Reserve 255 because it is used as an error code for gksu
 
+def Error(s, code=ErrorCode.generic, extra=None):
+    """Write error message"""
+    Log(s, ERROR, code, extra)
+
 def FatalError(s, code=ErrorCode.generic, extra=None):
     """Write fatal error message and exit"""
     Log(s, ERROR, code, extra)

@@ -4,9 +4,9 @@
 #
 # Version: 0.3
 #
-# 0. You may make me happy with https://www.dropbox.com/referrals/NTE2ODA0Mzg5
-# 1. Made of ftpsbackend
-# 2. DPBX & dpbx are used because of actual name use is prohibited
+# 0. You can make me happy with https://www.dropbox.com/referrals/NTE2ODA0Mzg5
+# 1. Most of the code was taken from cli_client.py. The ftpsbackend.py was used as a template
+# 2. DPBX & dpbx are used because the use of the actual name is prohibited
 #
 # This file is part of duplicity.
 #
@@ -30,6 +30,7 @@ import urllib
 import re
 import locale, sys
 
+import traceback, StringIO
 from exceptions import Exception
 
 import duplicity.backend
@@ -37,25 +38,38 @@ from duplicity import globals
 from duplicity import log
 from duplicity.errors import *
 from duplicity import tempdir
+from duplicity.backend import retry_fatal
 
 
 from dropbox import client, rest, session
 
-# This KEY will write things under '/duplicity backend' folder.
-# If you need another one, you have to consider registering at
-# http://www.dropbox.com/developers/apps for your own app name.
-#
-# This KEY is a "development" one.
-# That means that there are only 5 test users allowed.
-# To put the "application" into production state the KEY must be
-# replaced with "production" version.
-# Let me know, if it's time to do so.
-APP_KEY = 'cbt6oomsnbb76kt'
-APP_SECRET = 'jo8x8nfjc4t5rt1'
-ACCESS_TYPE = 'app_folder'
+# This application key is registered in my name (jno at pisem dot net).
+# You can register your own developer account with Dropbox and
+# register a new application for yourself, obtaining the new
+# APP_KEY and APP_SECRET.
+# Note 1: you must not store your credentials "as is" in the code.
+#         The values must be "processed" at least.
+#         This is a must for "production" keys.
+# Note 2: the name of the application defines the name of the
+#         subfolder in the "Apps" folder.
+# http://www.dropbox.com/developers/apps is the place to get the key.
 
+APP_KEY = 'bc6toosmbn7bk6t'
+APP_SECRET = 'ojx8n8jf4c5ttr1'
+
+# Limit file access to Apps/Duplicity (the name of the application).
+ACCESS_TYPE = 'app_folder'
 # This file will store cached value of oAuth token
 _TOKEN_CACHE_FILE = os.path.expanduser("~/.dropbox.token_store.txt")
+
+def log_exception(e):
+  log.Error('Exception [%s]:'%(e,))
+  f = StringIO.StringIO()
+  traceback.print_exc(file=f)
+  f.seek(0)
+  for s in f.readlines():
+    log.Error('| '+s.rstrip())
+  f.close()
 
 def command(login_required=True):
     """a decorator for handling authentication and exceptions"""
@@ -68,12 +82,16 @@ def command(login_required=True):
             try:
                 return f(self, *args)
             except TypeError, e:
+                log_exception(e)
                 log.FatalError('dpbx type error "%s"' % (e,), log.ErrorCode.backend_code_error)
             except rest.ErrorResponse, e:
                 msg = e.user_error_msg or str(e)
-                log.FatalError('dpbx error: %s' % (msg,), log.ErrorCode.backend_command_error)
+                log.Error('dpbx error: %s' % (msg,), log.ErrorCode.backend_command_error)
+                raise e
             except Exception, e:
-                log.FatalError('dpbx code error "%s"' % (e,), log.ErrorCode.backend_code_error)
+                log_exception(e)
+                log.Error('dpbx code error "%s"' % (e,), log.ErrorCode.backend_code_error)
+                raise e
 
         wrapper.__doc__ = f.__doc__
         return wrapper
@@ -84,7 +102,10 @@ class DPBXBackend(duplicity.backend.Backend):
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
 
-        self.sess = StoredSession(APP_KEY, APP_SECRET, access_type=ACCESS_TYPE) # , locale='en')
+        self.sess = StoredSession(etacsufbo(APP_KEY)
+                    , etacsufbo(APP_SECRET)
+                    , access_type=ACCESS_TYPE)
+                    # , locale='en')
         self.api_client = client.DropboxClient(self.sess)
         self.sess.load_creds()
 
@@ -100,6 +121,7 @@ class DPBXBackend(duplicity.backend.Backend):
           if not self.sess.is_linked(): # stil not logged in
             log.FatalError("dpbx Cannot login: check your credentials",log.ErrorCode.dpbx_nologin)
 
+    @retry_fatal
     @command()
     def put(self, source_path, remote_filename = None):
         """Transfer source_path to remote_filename"""
@@ -107,10 +129,6 @@ class DPBXBackend(duplicity.backend.Backend):
             remote_filename = source_path.get_filename()
 
         remote_dir  = urllib.unquote(self.parsed_url.path.lstrip('/'))
-        try:
-          self._mkdir(remote_dir)
-        except Exception,e:
-          log.Info('dpbx.put mkdir(%s) failed: %s'%(remote_dir,e))
         remote_path = os.path.join(remote_dir, remote_filename).rstrip()
 
         from_file = open(source_path.name, "rb")
@@ -118,6 +136,7 @@ class DPBXBackend(duplicity.backend.Backend):
         resp = self.api_client.put_file(remote_path, from_file)
         log.Debug( 'dpbx,put(%s,%s): %s'%(source_path.name, remote_path, resp))
 
+    @retry_fatal
     @command()
     def get(self, remote_filename, local_path):
         """Get remote filename, saving it to local_path"""
@@ -133,6 +152,7 @@ class DPBXBackend(duplicity.backend.Backend):
 
         local_path.setdata()
 
+    @retry_fatal
     @command()
     def list(self,none=None):
         """List files in directory"""
@@ -143,11 +163,14 @@ class DPBXBackend(duplicity.backend.Backend):
         l = []
         if 'contents' in resp:
             encoding = locale.getdefaultlocale()[1]
+            if encoding is None:
+                encoding = 'LATIN1'
             for f in resp['contents']:
                 name = os.path.basename(f['path'])
                 l.append(name.encode(encoding))
         return l
 
+    @retry_fatal
     @command()
     def delete(self, filename_list):
         """Delete files in filename_list"""
@@ -173,8 +196,7 @@ class DPBXBackend(duplicity.backend.Backend):
       while more :
         info = self.api_client.delta(cursor)
         if info.get('reset',False) :
-          log.Warn("Shit happened and the doc says exactly:")
-          log.Warn("You should your local state to be an empty folder before processing the list of delta entries!")
+          log.Debug("delta returned True value for \"reset\", no matter")
         cursor = info.get('cursor',None)
         more   = info.get('more',False)
         entr   = info.get('entries',[])
@@ -233,5 +255,9 @@ class StoredSession(session.DropboxSession):
     def unlink(self):
         self.delete_creds()
         session.DropboxSession.unlink(self)
+
+def etacsufbo(s):
+  return ''.join(reduce(lambda x,y:(x and len(x[-1])==1)and(x.append(y+
+          x.pop(-1))and x or x)or(x+[y]),s,[]))
 
 duplicity.backend.register_backend("dpbx", DPBXBackend)

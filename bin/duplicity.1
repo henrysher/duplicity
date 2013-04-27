@@ -1004,16 +1004,23 @@ See also
 .PP
 webdav[s]://user[:password]@other.host/some_dir
 .PP
-.BI "Dropbox backend"
+.BI Dropbox
 .br
 dpbx:///some_dir
 .br
 .IP 1.
-The some_dir must already exist in your Dropbox Application folder.
+"some_dir" must already exist in the Dropbox Application folder for
+this application, like "Apps/Duplicity/some_dir".
 .IP 2.
 The first run of the backend must be ineractive!
-The code will print an URL that is to be followed in a browser
-in order to authorize the application to access your Dropbox account.
+It will print the URL that you need to open in the browser to obtain
+OAuth token for the application. The token will be saved in the file
+$HOME/.dropbox.token_store.txt and used in the future runs.
+.IP 3.
+When using Dropbox for storage, be aware that all files, including the
+ones in the Apps folder, will be synced to all connected computers.
+You may prefer to use a separate Dropbox account specially for the
+backups, and not connect any computers to that account.
 .RE
 
 .SH TIME FORMATS

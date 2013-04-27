@@ -355,11 +355,11 @@ def retry_fatal(fn):
             self.retry_count = n+1
             return fn(self, *args)
         except Exception, e:
+            log.Debug("Backtrace of previous error: %s"
+                        % exception_traceback())
             log.FatalError("Giving up after %s attempts. %s: %s"
                          % (self.retry_count, e.__class__.__name__, str(e)),
                           log.ErrorCode.backend_error)
-            log.Debug("Backtrace of previous error: %s"
-                        % exception_traceback())
         self.retry_count = 0
 
     return _retry_fatal

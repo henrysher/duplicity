@@ -27,6 +27,9 @@
         compression for the data in/out, and uses these ratios to forecast time remaining
         and % of completion.
       - The progress data will be logged each 3 seconds, or the --progress-rate flag.
+    * Merged in lp:~jnoster/duplicity/dpbx-added
+      - The application key was approved as "production" one after some changes to the code
+        to suit the requirements of Dropbox team (the keys are now obfuscated, for instance).
 
 2013-02-17  Kenneth Loafman  <kenneth@loafman.com>
 
