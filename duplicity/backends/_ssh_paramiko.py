@@ -155,8 +155,19 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
             self.config['identityfile'] = keyfilename
         ## ensure ~ is expanded and identity exists in dictionary
         if 'identityfile' in self.config:
-            self.config['identityfile'] = os.path.expanduser(
-                                            self.config['identityfile'])
+            if not isinstance(self.config['identityfile'], list):
+                # Paramiko 1.9.0 and earlier do not support multiple
+                # identity files when parsing config files and always
+                # return a string; later versions always return a list,
+                # even if there is only one file given.
+                #
+                # All recent versions seem to support *using* multiple
+                # identity files, though, so to make things easier, we
+                # simply always use a list.
+                self.config['identityfile'] = [self.config['identityfile']]
+
+            self.config['identityfile'] = [os.path.expanduser(i) for i in
+                    self.config['identityfile']]
         else:
             self.config['identityfile'] = None
 
