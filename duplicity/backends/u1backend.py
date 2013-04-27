@@ -84,6 +84,7 @@ class OAuthHttpClient(object):
                           % duplicity.util.exception_traceback())
                 if n == globals.num_retries:
                     log.FatalError("Giving up on request after %d attempts, last exception %s" % (n,e))
+                body.seek(0) # Go to the beginning of the file for the retry
                 time.sleep(30)
                 continue
 
@@ -105,6 +106,8 @@ class OAuthHttpClient(object):
                 ecode = log.ErrorCode.backend_no_space
             elif numcode == 404:
                 ecode = log.ErrorCode.backend_not_found
+ 
+            body.seek(0) # Go to the beginning of the file for the retry
 
             if n < globals.num_retries:
                 time.sleep(30)
@@ -207,10 +210,12 @@ class U1Backend(duplicity.backend.Backend):
         remote_full = self.content_base + self.quote(content['content_path'])
         log.Info("uploading file %s to location %s" % (remote_filename, remote_full))
 
+        size = os.path.getsize(source_path.name)
         fh=open(source_path.name,'rb')
 
         content_type = 'application/octet-stream'
-        headers = {"Content-Type": content_type}
+        headers = {"Content-Length": str(size),
+                   "Content-Type": content_type}
         resp, content = self.client.request(remote_full,
                                             method="PUT",
                                             body=fh,

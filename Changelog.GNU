@@ -1,3 +1,9 @@
+2013-04-27  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~tblue/duplicity/paramiko-1.10.0
+      - This fixes bug #1156746, making the Paramiko backend compatible with
+        Paramiko 1.10.0. It keeps compatibility with older Paramiko versions.
+
 2013-02-17  Kenneth Loafman  <kenneth@loafman.com>
 
     * Applied patches from Laszlo Ersek to rdiffdir to "consume a chain of sigtar

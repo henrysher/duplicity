@@ -19,6 +19,9 @@ Enhancements:
 * Merged in lp:~ed.so/duplicity/verify.data
   - add switch --compare-data, to selectively enable formerly always disabled
     data comparison on verify runs
+* Merged in lp:~tblue/duplicity/paramiko-1.10.0
+  - This fixes bug #1156746, making the Paramiko backend compatible with
+    Paramiko 1.10.0. It keeps compatibility with older Paramiko versions.
 
 
 New in v0.6.21 (2013/01/23)
