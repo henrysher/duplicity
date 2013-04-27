@@ -84,7 +84,10 @@ class OAuthHttpClient(object):
                           % duplicity.util.exception_traceback())
                 if n == globals.num_retries:
                     log.FatalError("Giving up on request after %d attempts, last exception %s" % (n,e))
-                body.seek(0) # Go to the beginning of the file for the retry
+
+                if isinstance(body, file):
+                    body.seek(0) # Go to the beginning of the file for the retry
+
                 time.sleep(30)
                 continue
 
@@ -106,8 +109,9 @@ class OAuthHttpClient(object):
                 ecode = log.ErrorCode.backend_no_space
             elif numcode == 404:
                 ecode = log.ErrorCode.backend_not_found
- 
-            body.seek(0) # Go to the beginning of the file for the retry
+
+            if isinstance(body, file):
+                body.seek(0) # Go to the beginning of the file for the retry
 
             if n < globals.num_retries:
                 time.sleep(30)

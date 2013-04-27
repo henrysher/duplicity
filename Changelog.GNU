@@ -3,6 +3,11 @@
     * Merged in lp:~tblue/duplicity/paramiko-1.10.0
       - This fixes bug #1156746, making the Paramiko backend compatible with
         Paramiko 1.10.0. It keeps compatibility with older Paramiko versions.
+    * Merged in lp:~townsend/duplicity/fix-1161599-2
+      - The fix in revno. 912 didn't take into account that the parameter "body"
+        passed into request() is overloaded, so when it was NULL or of a type other
+        than file, it would fail.  This checks if "body" is of type "file" before
+        actually seek()'ing back to the beginning of the file.
 
 2013-02-17  Kenneth Loafman  <kenneth@loafman.com>
 
