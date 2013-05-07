@@ -1,6 +1,9 @@
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
-# Copyright 2012 Christian Kornacker <christian.kornacker@gmail.com>
+# Copyright 2011 Carlos Abalde <carlos.abalde@gmail.com>
+# for gdocsbackend.py on which megabackend.py is based on
+#
+# Copyright 2013 Christian Kornacker <christian.kornacker@gmail.com>
 #
 # This file is part of duplicity.
 #
