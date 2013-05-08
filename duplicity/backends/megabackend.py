@@ -57,7 +57,7 @@ class MegaBackend(duplicity.backend.Backend):
             else:
                 # create subfolder if folder doesn't exist and use its handle as parent
                 folder_node = self.client.create_folder(folder_name, parent_folder)
-                parent_folder = self.client.get_id_from_node_data(folder_node)
+                parent_folder = self.client.get_id_from_obj(folder_node)
                 # update filelist after creating new folder
                 files = self.client.get_files()
 
@@ -78,7 +78,7 @@ class MegaBackend(duplicity.backend.Backend):
             for entry in entries:
                 self.client.delete(entry)
 
-            self.client.upload(source_path.get_canonical(), self.folder, remote=remote_filename)
+            self.client.upload(source_path.get_canonical(), self.folder, dest_filename=remote_filename)
 
         except Exception, e:
             self.__handle_error("Failed to upload file '%s' to remote folder '%s': %s"
@@ -94,7 +94,7 @@ class MegaBackend(duplicity.backend.Backend):
             if len(entries):
                 # get first matching remote file
                 entry = entries.keys()[0]
-                self.client.download((entry, entries[entry]), dest_file=local_path.name)
+                self.client.download((entry, entries[entry]), dest_filename=local_path.name)
                 local_path.setdata()
                 return
             else:
