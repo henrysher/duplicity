@@ -390,7 +390,9 @@ class BotoBackend(duplicity.backend.Backend):
             consumer = ConsumerThread(queue)
             consumer.start()
 
-        pool = multiprocessing.Pool(processes=chunks)
+        number_of_procs = min(chunks, globals.s3_multipart_max_procs)
+        log.Debug("Setting pool to %d processes" % number_of_procs)
+        pool = multiprocessing.Pool(processes=number_of_procs)
         for n in range(chunks):
              params = [self.scheme, self.parsed_url, self.bucket_name, 
                  mp.id, filename, n, chunk_size, globals.num_retries, 

@@ -186,6 +186,9 @@ s3_multipart_chunk_size = 25*1024*1024
 # Minimum chunk size accepted by S3
 s3_multipart_minimum_chunk_size = 5*1024*1024
 
+# Maximum number of processes to use while doing a multipart upload to S3
+s3_multipart_max_procs = 8
+
 # Whether to use the full email address as the user name when
 # logging into an imap server. If false just the user name
 # part of the email address is used.
