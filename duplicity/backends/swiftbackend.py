@@ -60,7 +60,7 @@ class SwiftBackend(duplicity.backend.Backend):
         conn_kwargs['authurl'] = os.environ['SWIFT_AUTHURL']
 
         if os.environ.has_key('SWIFT_AUTHVERSION'):
-            conn_kwargs['auth_version'] = os.environ['SWIFT_AUTHURL']
+            conn_kwargs['auth_version'] = os.environ['SWIFT_AUTHVERSION']
         else:
             conn_kwargs['auth_version'] = '1'
 
