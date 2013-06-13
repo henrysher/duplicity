@@ -81,7 +81,8 @@ class SwiftBackend(duplicity.backend.Backend):
         for n in range(1, globals.num_retries+1):
             log.Info("Uploading '%s/%s' " % (self.container, remote_filename))
             try:
-                self.conn.put_object(self.container, 
+                self.conn.put_object(self.container,
+                                     remote_filename, 
                                      file(source_path.name))
                 return
             except self.resp_exc, error:
