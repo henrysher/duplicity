@@ -43,36 +43,44 @@ class SwiftBackend(duplicity.backend.Backend):
         self.resp_exc = ClientException
         conn_kwargs = {}
 
-        if not os.environ.has_key('SWIFT_USERNAME'):
-            raise BackendException('SWIFT_USERNAME environment variable '
-                                   'not set.')
+        # if the user has already authenticated
+        if os.environ.has_key('SWIFT_PREAUTHURL') and os.environ.has_key('SWIFT_PREAUTHTOKEN'):
+            conn_kwargs['preauthurl'] = os.environ['SWIFT_PREAUTHURL']
+            conn_kwargs['preauthtoken'] = os.environ['SWIFT_PREAUTHTOKEN']           
+        
+        else:
+            if not os.environ.has_key('SWIFT_USERNAME'):
+                raise BackendException('SWIFT_USERNAME environment variable '
+                                       'not set.')
 
-        if not os.environ.has_key('SWIFT_PASSWORD'):
-            raise BackendException('SWIFT_PASSWORD environment variable '
-                                   'not set.')
+            if not os.environ.has_key('SWIFT_PASSWORD'):
+                raise BackendException('SWIFT_PASSWORD environment variable '
+                                       'not set.')
 
-        if not os.environ.has_key('SWIFT_AUTHURL'):
-            raise BackendException('SWIFT_AUTHURL environment variable '
-                                   'not set.')
+            if not os.environ.has_key('SWIFT_AUTHURL'):
+                raise BackendException('SWIFT_AUTHURL environment variable '
+                                       'not set.')
 
-        conn_kwargs['user'] = os.environ['SWIFT_USERNAME']
-        conn_kwargs['key'] = os.environ['SWIFT_PASSWORD']
-        conn_kwargs['authurl'] = os.environ['SWIFT_AUTHURL']
+            conn_kwargs['user'] = os.environ['SWIFT_USERNAME']
+            conn_kwargs['key'] = os.environ['SWIFT_PASSWORD']
+            conn_kwargs['authurl'] = os.environ['SWIFT_AUTHURL']
 
         if os.environ.has_key('SWIFT_AUTHVERSION'):
             conn_kwargs['auth_version'] = os.environ['SWIFT_AUTHVERSION']
         else:
             conn_kwargs['auth_version'] = '1'
-
+        if os.environ.has_key('SWIFT_TENANTNAME'):
+            conn_kwargs['tenant_name'] = os.environ['SWIFT_TENANTNAME']
+            
         self.container = parsed_url.path.lstrip('/')
 
         try:
             self.conn = Connection(**conn_kwargs)
+            self.conn.put_container(self.container)
         except Exception, e:
-            log.FatalError("Connection failed, please check your credentials: %s %s"
+            log.FatalError("Connection failed: %s %s"
                            % (e.__class__.__name__, str(e)),
                            log.ErrorCode.connection_failed)
-        self.conn.put_container(self.container)
 
     def put(self, source_path, remote_filename = None):
         if not remote_filename:
