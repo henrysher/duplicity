@@ -255,3 +255,6 @@ progress = False
 # Controls the upload progress messages refresh rate. Default: update each 
 # 3 seconds
 progress_rate = 3 
+
+# Level of Redundancy in % for Par2 files
+par2_redundancy = 10

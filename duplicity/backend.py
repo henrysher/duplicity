@@ -71,6 +71,7 @@ def import_backends():
     assert path.endswith("duplicity/backends"), duplicity.backends.__path__
 
     files = os.listdir(path)
+    files.sort()
     for fn in files:
         if fn.endswith("backend.py"):
             fn = fn[:-3]
