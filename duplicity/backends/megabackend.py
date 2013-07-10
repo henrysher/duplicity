@@ -136,7 +136,7 @@ class MegaBackend(duplicity.backend.Backend):
     def __get_node_name(self, handle):
         """get node name from public handle"""
         files = self.client.get_files()
-        return get_name_from_file({handle:files[handle]})
+        return self.client.get_name_from_file({handle:files[handle]})
         
     def __handle_error(self, message, raise_errors=True):
         if raise_errors:
