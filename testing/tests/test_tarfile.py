@@ -193,6 +193,7 @@ class Test_All(BaseTest):
         self.extract_and_compare_tarfile()
 
     def extract_and_compare_tarfile(self):
+        old_umask = os.umask(022)
         os.system("rm -r tempdir")
         assert not os.system("tar -xf temp2.tar")
 
@@ -224,6 +225,7 @@ class Test_All(BaseTest):
         s = os.lstat("tempdir/symlink")
         assert stat.S_ISLNK(s.st_mode)
 
+        os.umask(old_umask)
 
 class Test_FObj(BaseTest):
     """Test for read operations via file-object.
