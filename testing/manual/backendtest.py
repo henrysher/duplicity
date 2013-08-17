@@ -188,6 +188,19 @@ class ftpsTest(unittest.TestCase, UnivTest):
     password = config.ftp_password
 
 
+class gsModuleTest(unittest.TestCase, UnivTest):
+    """ Test the gs module backend """
+    def setUp(self):
+        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
+
+    def tearDown(self):
+        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+
+    my_test_id = "gs/boto"
+    url_string = config.gs_url
+    password = None
+
+
 class rsyncAbsPathTest(unittest.TestCase, UnivTest):
     """ Test the rsync abs path backend """
     def setUp(self):

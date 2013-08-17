@@ -5,6 +5,10 @@
     * Merged in lp:~mhu-s/duplicity/swiftbackend
       - This branch adds support for Swift, the OpenStack Object Storage service. See
         https://blueprints.launchpad.net/duplicity/+spec/swiftbackend
+    * Merged in lp:~verb/duplicity/boto-gcs
+      - These patches add support for Google Cloud Storage via the boto backend.
+      - boto has supported GCS in interoperability mode for a few years now. This change
+        adds support by taking advantage of boto's storage_uri abstraction layer.
 
 2013-04-27  Kenneth Loafman  <kenneth@loafman.com>
 

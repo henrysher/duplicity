@@ -16,7 +16,7 @@ It is best used under GNU/Linux.
 
 Some backends also require additional components (probably available as packages for your specific platform):
 .TP
-.BR "boto backend" " (S3 Amazon Web Services)"
+.BR "boto backend" " (S3 Amazon Web Services, Google Cloud Storage)"
 .B boto
 - http://github.com/boto/boto
 .TP
@@ -943,7 +943,7 @@ it could be revealed to anyone with permissions to do process listings,
 it is permitted however.
 Consider setting the environment variable 
 .B FTP_PASSWORD 
-instead, which is used by most, if not all backends, regardless of it's name.
+instead, which is used by most, if not all backends, regardless of its name.
 .PP
 In protocols that support it, the path may be preceded by a single
 slash, '/path', to represent a relative path to the target home directory,
@@ -963,6 +963,10 @@ file://[relative|/absolute]/local/path
 ftp[s]://user[:password]@other.host[:port]/some_dir
 .PP
 gdocs://user[:password]@other.host/some_dir
+.PP
+.BI "Google Cloud Storage"
+.br
+gs://bucket[/prefix]
 .PP
 hsi://user[:password]@other.host/some_dir
 .PP
@@ -1401,6 +1405,25 @@ writing it is unclear to what extent this is an expected feature of
 Amazon S3, but in practice you may experience timeouts, socket errors
 or HTTP errors when trying to upload files to your newly created
 bucket. Give it a few minutes and the bucket should function normally.
+
+.SH A NOTE ON GOOGLE CLOUD STORAGE
+Support for Google Cloud Storage relies on its Interoperable Access,
+which must be enabled for your account.  Once enabled, you can generate
+Interoperable Storage Access Keys and pass them to duplicity via the
+.B GS_ACCESS_KEY_ID
+and
+.B GS_SECRET_ACCESS_KEY
+environment variables. Alternatively, you can run
+.B "gsutil config -a"
+to have the Google Cloud Storage utility populate the
+.B ~/.boto
+configuration file.
+.PP
+Enable Interoperable Access: 
+https://code.google.com/apis/console#:storage
+.br
+Create Access Keys:
+https://code.google.com/apis/console#:storage:legacy
 
 .SH A NOTE ON IMAP
 An IMAP account can be used as a target for the upload.  The userid may

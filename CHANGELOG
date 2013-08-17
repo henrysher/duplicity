@@ -5,7 +5,7 @@ distribution and used to remove GnuPGInterface.py please note this:
 See README for details.
 
 
-New in v0.6.22 (2013/0?/??)
+New in v0.6.22 (2013/08/??)
 ---------------------------
 Enhancements:
 * Applied patches from Laszlo Ersek to rdiffdir to "consume a chain of sigtar
@@ -58,6 +58,11 @@ Enhancements:
 * Merged in lp:~mhu-s/duplicity/swiftbackend
   - This branch adds support for Swift, the OpenStack Object Storage service. See
     https://blueprints.launchpad.net/duplicity/+spec/swiftbackend
+* Merged in lp:~verb/duplicity/boto-gcs
+  - These patches add support for Google Cloud Storage via the boto backend.
+  - boto has supported GCS in interoperability mode for a few years now. This change
+    adds support by taking advantage of boto's storage_uri abstraction layer.
+
 
 New in v0.6.21 (2013/01/23)
 ---------------------------
