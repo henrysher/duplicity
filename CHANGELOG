@@ -62,6 +62,8 @@ Enhancements:
   - These patches add support for Google Cloud Storage via the boto backend.
   - boto has supported GCS in interoperability mode for a few years now. This change
     adds support by taking advantage of boto's storage_uri abstraction layer.
+* Merged in lp:~ckornacker/duplicity/megacloud
+  - Add support for Mega (mega.co.nz) backend.
 
 
 New in v0.6.21 (2013/01/23)
