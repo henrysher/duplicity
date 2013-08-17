@@ -53,6 +53,8 @@ Enhancements:
   - New option --max-blocksize (default 2048) to allow increasing delta blocksize.
 * Applied duplicity-ftps.patch from https://bugs.launchpad.net/duplicity/+bug/1104069
   - Don't try to delete an empty file list.
+* Merged in lp:~scowcron/duplicity/ftp_password_pexpect
+  - Use common backend.Backend get_password() rather than _ssh_pexpect.py specific code.
 
 
 New in v0.6.21 (2013/01/23)

@@ -1,3 +1,8 @@
+2013-08-17  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~scowcron/duplicity/ftp_password_pexpect
+      - Use common backend.Backend get_password() rather than _ssh_pexpect.py specific code.
+
 2013-04-27  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~tblue/duplicity/paramiko-1.10.0
