@@ -8,6 +8,43 @@
 .SH NAME
 duplicity \- Encrypted incremental backup to local or remote storage.
 
+.SH SYNOPSIS
+.B duplicity [full|incremental]
+.I [options]
+source_directory target_url
+
+.B duplicity verify
+.I [options] [--file-to-restore <relpath>]
+source_url target_directory
+
+.B duplicity collection-status
+.I [options]
+target_url
+
+.B duplicity list-current-files
+.I [options] [--time time]
+target_url
+
+.B duplicity [restore]
+.I [options] [--file-to-restore <relpath>] [--time time]
+source_url target_directory
+
+.B duplicity remove-older-than <time>
+.I [options] [--force]
+target_url
+
+.B duplicity remove-all-but-n-full  <count>
+.I [options] [--force]
+target_url
+
+.B duplicity remove-all-inc-of-but-n-full <count>
+.I [options] [--force]
+target_url
+
+.B duplicity cleanup
+.I [options] [--force] [--extra-clean]
+target_url
+
 .SH REQUIREMENTS
 Duplicity requires a POSIX-like operating system with a 
 .B python
@@ -93,43 +130,6 @@ for ssl certificate verification of HTTPS connections
 .B Dropbox Python SDK
 - https://www.dropbox.com/developers/reference/sdk
 .br
-
-.SH SYNOPSIS
-.B duplicity [full|incremental]
-.I [options]
-source_directory target_url
-
-.B duplicity verify
-.I [options] [--file-to-restore <relpath>]
-source_url target_directory
-
-.B duplicity collection-status
-.I [options]
-target_url
-
-.B duplicity list-current-files
-.I [options] [--time time]
-target_url
-
-.B duplicity [restore]
-.I [options] [--file-to-restore <relpath>] [--time time]
-source_url target_directory
-
-.B duplicity remove-older-than <time>
-.I [options] [--force]
-target_url
-
-.B duplicity remove-all-but-n-full  <count>
-.I [options] [--force]
-target_url
-
-.B duplicity remove-all-inc-of-but-n-full <count>
-.I [options] [--force]
-target_url
-
-.B duplicity cleanup
-.I [options] [--force] [--extra-clean]
-target_url
 
 .SH DESCRIPTION
 Duplicity incrementally backs up files and directory

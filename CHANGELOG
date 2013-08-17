@@ -64,6 +64,7 @@ Enhancements:
     adds support by taking advantage of boto's storage_uri abstraction layer.
 * Merged in lp:~ckornacker/duplicity/megacloud
   - Add support for Mega (mega.co.nz) backend.
+* Applied patch from Eric S Raymond to man page to fix markup problems.
 
 
 New in v0.6.21 (2013/01/23)
