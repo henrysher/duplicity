@@ -2,6 +2,9 @@
 
     * Merged in lp:~scowcron/duplicity/ftp_password_pexpect
       - Use common backend.Backend get_password() rather than _ssh_pexpect.py specific code.
+    * Merged in lp:~mhu-s/duplicity/swiftbackend
+      - This branch adds support for Swift, the OpenStack Object Storage service. See
+        https://blueprints.launchpad.net/duplicity/+spec/swiftbackend
 
 2013-04-27  Kenneth Loafman  <kenneth@loafman.com>
 

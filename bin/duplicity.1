@@ -24,6 +24,13 @@ Some backends also require additional components (probably available as packages
 .B Cloud Files Python API
 - http://www.rackspace.com/knowledge_center/article/python-api-installation-for-cloud-files
 .TP
+.BR "OpenStack Swift backend"
+.B Python swiftclient module
+- https://github.com/openstack/python-swiftclient/
+.br
+.B Python keystoneclient module
+- https://github.com/openstack/python-keystoneclient/
+.TP
 .B "ftp backend"
 .B NcFTP Client
 - http://www.ncftp.com/
@@ -991,6 +998,11 @@ See also
 and
 .BR "A NOTE ON SSH BACKENDS" .
 .PP
+swift://container_name
+.br
+See also
+.B "A NOTE ON OPENSTACK SWIFT ACCESS"
+.PP
 tahoe://alias/directory
 .PP
 .BI "Ubuntu One"
@@ -1326,6 +1338,33 @@ is unspecified it will default to the value
 provided by python-cloudfiles, which points to rackspace, hence this value 
 .I must 
 be set in order to use other cloud files providers.
+
+.SH A NOTE ON OPENSTACK SWIFT ACCESS
+
+Swift is the OpenStack Object Storage service.
+
+The backend requires python-switclient to be installed on the system.
+python-keystoneclient is also needed to use OpenStack's Keystone Identity service.
+See 
+.B REQUIREMENTS 
+above.
+
+It uses four environment variables for authentification:
+.BR SWIFT_USERNAME " (required),"
+.BR SWIFT_PASSWORD " (required),"
+.BR SWIFT_AUTHURL " (required),"
+.BR SWIFT_TENANTNAME " (optional, the tenant can be included in the username)"
+
+If the user was previously authenticated, the following environment
+variables can be used instead:
+.BR SWIFT_PREAUTHURL " (required),"
+.BR SWIFT_PREAUTHTOKEN " (required)"
+
+If
+.B SWIFT_AUTHVERSION
+is unspecified, it will default to version 1.
+
+
 
 .SH A NOTE ON EUROPEAN S3 BUCKETS
 Amazon S3 provides the ability to choose the location of a bucket upon
