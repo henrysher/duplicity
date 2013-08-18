@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2013-04-27 15:09+0000\n"
+"POT-Creation-Date: 2013-08-17 18:36+0000\n"
 "PO-Revision-Date: 2009-09-15 03:17+0000\n"
 "Last-Translator: Kenneth Loafman <kenneth@loafman.com>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2013-04-28 04:36+0000\n"
-"X-Generator: Launchpad (build 16580)\n"
+"X-Launchpad-Export-Date: 2013-08-18 04:39+0000\n"
+"X-Generator: Launchpad (build 16723)\n"
 
 #: ../bin/duplicity:101
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -408,26 +408,26 @@ msgstr "execução da tarefa terminada (sucesso: %s)"
 msgid "Could not initialize backend: %s"
 msgstr ""
 
-#: ../duplicity/backend.py:530 ../duplicity/backend.py:554
+#: ../duplicity/backend.py:531 ../duplicity/backend.py:555
 #, python-format
 msgid "Reading results of '%s'"
 msgstr "A ler os resultados de '%s'"
 
-#: ../duplicity/backend.py:569
+#: ../duplicity/backend.py:570
 #, python-format
 msgid "Running '%s' failed with code %d (attempt #%d)"
 msgid_plural "Running '%s' failed with code %d (attempt #%d)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../duplicity/backend.py:573
+#: ../duplicity/backend.py:574
 #, python-format
 msgid ""
 "Error is:\n"
 "%s"
 msgstr ""
 
-#: ../duplicity/backend.py:575
+#: ../duplicity/backend.py:576
 #, python-format
 msgid "Giving up trying to execute '%s' after %d attempt"
 msgid_plural "Giving up trying to execute '%s' after %d attempts"
@@ -942,53 +942,53 @@ msgid "Backends and their URL formats:"
 msgstr "Motores de processamento e os seus formatos de URL:"
 
 #. TRANSL: Header in usage help
-#: ../duplicity/commandline.py:838
+#: ../duplicity/commandline.py:840
 msgid "Commands:"
 msgstr ""
 
-#: ../duplicity/commandline.py:862
+#: ../duplicity/commandline.py:864
 #, python-format
 msgid ""
 "Specified archive directory '%s' does not exist, or is not a directory"
 msgstr ""
 "A pasta de arquivo especificada ( '%s' ) não existe ou não é uma pasta"
 
-#: ../duplicity/commandline.py:871
+#: ../duplicity/commandline.py:873
 #, python-format
 msgid ""
 "Sign key should be an 8 character hex string, like 'AA0E73D2'.\n"
 "Received '%s' instead."
 msgstr ""
 
-#: ../duplicity/commandline.py:931
+#: ../duplicity/commandline.py:933
 #, python-format
 msgid ""
 "Restore destination directory %s already exists.\n"
 "Will not overwrite."
 msgstr ""
 
-#: ../duplicity/commandline.py:936
+#: ../duplicity/commandline.py:938
 #, python-format
 msgid "Verify directory %s does not exist"
 msgstr "A pasta de verificação %s não existe"
 
-#: ../duplicity/commandline.py:942
+#: ../duplicity/commandline.py:944
 #, python-format
 msgid "Backup source directory %s does not exist."
 msgstr "A pasta de origem da cópia de segurança ( %s ) não existe."
 
-#: ../duplicity/commandline.py:971
+#: ../duplicity/commandline.py:973
 #, python-format
 msgid "Command line warning: %s"
 msgstr ""
 
-#: ../duplicity/commandline.py:971
+#: ../duplicity/commandline.py:973
 msgid ""
 "Selection options --exclude/--include\n"
 "currently work only when backing up,not restoring."
 msgstr ""
 
-#: ../duplicity/commandline.py:1019
+#: ../duplicity/commandline.py:1021
 #, python-format
 msgid ""
 "Bad URL '%s'.\n"
@@ -996,7 +996,7 @@ msgid ""
 "\"file:///usr/local\".  See the man page for more information."
 msgstr ""
 
-#: ../duplicity/commandline.py:1044
+#: ../duplicity/commandline.py:1046
 msgid "Main action: "
 msgstr "Acção principal: "
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2013-04-27 15:09+0000\n"
+"POT-Creation-Date: 2013-08-17 18:36+0000\n"
 "PO-Revision-Date: 2011-08-27 12:46+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Slovenian <sl@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || "
 "n%100==4 ? 3 : 0);\n"
-"X-Launchpad-Export-Date: 2013-04-28 04:37+0000\n"
-"X-Generator: Launchpad (build 16580)\n"
+"X-Launchpad-Export-Date: 2013-08-18 04:39+0000\n"
+"X-Generator: Launchpad (build 16723)\n"
 
 #: ../bin/duplicity:101
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -433,12 +433,12 @@ msgstr "izvajanje naloge je končano (uspeh: %s)"
 msgid "Could not initialize backend: %s"
 msgstr ""
 
-#: ../duplicity/backend.py:530 ../duplicity/backend.py:554
+#: ../duplicity/backend.py:531 ../duplicity/backend.py:555
 #, python-format
 msgid "Reading results of '%s'"
 msgstr "Branje rezultatov '%s'"
 
-#: ../duplicity/backend.py:569
+#: ../duplicity/backend.py:570
 #, python-format
 msgid "Running '%s' failed with code %d (attempt #%d)"
 msgid_plural "Running '%s' failed with code %d (attempt #%d)"
@@ -447,7 +447,7 @@ msgstr[1] "Izvajanje '%s' je spodletelo s kodo %d (poskus št. %d)"
 msgstr[2] "Izvajanje '%s' je spodletelo s kodo %d (poskus št. %d)"
 msgstr[3] "Izvajanje '%s' je spodletelo s kodo %d (poskus št. %d)"
 
-#: ../duplicity/backend.py:573
+#: ../duplicity/backend.py:574
 #, python-format
 msgid ""
 "Error is:\n"
@@ -456,7 +456,7 @@ msgstr ""
 "Napaka je:\n"
 "%s"
 
-#: ../duplicity/backend.py:575
+#: ../duplicity/backend.py:576
 #, python-format
 msgid "Giving up trying to execute '%s' after %d attempt"
 msgid_plural "Giving up trying to execute '%s' after %d attempts"
@@ -1022,17 +1022,17 @@ msgid "Backends and their URL formats:"
 msgstr "Zaledja in njihove oblike URL"
 
 #. TRANSL: Header in usage help
-#: ../duplicity/commandline.py:838
+#: ../duplicity/commandline.py:840
 msgid "Commands:"
 msgstr "Ukazi:"
 
-#: ../duplicity/commandline.py:862
+#: ../duplicity/commandline.py:864
 #, python-format
 msgid ""
 "Specified archive directory '%s' does not exist, or is not a directory"
 msgstr "Navedena mapa arhivov '%s' še ne obstaja ali pa ni mapa"
 
-#: ../duplicity/commandline.py:871
+#: ../duplicity/commandline.py:873
 #, python-format
 msgid ""
 "Sign key should be an 8 character hex string, like 'AA0E73D2'.\n"
@@ -1041,7 +1041,7 @@ msgstr ""
 "Ključ podpisa bi moral biti 8 znakovni šestnajstiški niz kot je 'AA0E73D2'.\n"
 "Namesto tega je bila prejet ključ '%s'."
 
-#: ../duplicity/commandline.py:931
+#: ../duplicity/commandline.py:933
 #, python-format
 msgid ""
 "Restore destination directory %s already exists.\n"
@@ -1050,22 +1050,22 @@ msgstr ""
 "Cilja mapa obnovitve %s že obstaja.\n"
 "Ne bo prepisana."
 
-#: ../duplicity/commandline.py:936
+#: ../duplicity/commandline.py:938
 #, python-format
 msgid "Verify directory %s does not exist"
 msgstr "Mapa potrjevanja veljavnosti %s ne obstaja"
 
-#: ../duplicity/commandline.py:942
+#: ../duplicity/commandline.py:944
 #, python-format
 msgid "Backup source directory %s does not exist."
 msgstr "Mapa vira varnostnih kopij %s ne obstaja."
 
-#: ../duplicity/commandline.py:971
+#: ../duplicity/commandline.py:973
 #, python-format
 msgid "Command line warning: %s"
 msgstr "Opozorilo ukazne vrstice: %s"
 
-#: ../duplicity/commandline.py:971
+#: ../duplicity/commandline.py:973
 msgid ""
 "Selection options --exclude/--include\n"
 "currently work only when backing up,not restoring."
@@ -1074,7 +1074,7 @@ msgstr ""
 "trenutno trenutno delujejo le pri ustvarjanju varnostne kopije, ne "
 "obnavljanju."
 
-#: ../duplicity/commandline.py:1019
+#: ../duplicity/commandline.py:1021
 #, python-format
 msgid ""
 "Bad URL '%s'.\n"
@@ -1085,7 +1085,7 @@ msgstr ""
 "Primera nizov URL sta  \"scp://uporabnik@gostitelj.net:1234/pot\" in\n"
 "\"file:///usr/local\". Za več podrobnosti si oglejte stran man."
 
-#: ../duplicity/commandline.py:1044
+#: ../duplicity/commandline.py:1046
 msgid "Main action: "
 msgstr "Glavno dejanje: "
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2013-04-27 15:09+0000\n"
+"POT-Creation-Date: 2013-08-17 18:36+0000\n"
 "PO-Revision-Date: 2010-12-07 21:11+0000\n"
 "Last-Translator: Hertatijanto Hartono <dvertx@gmail.com>\n"
 "Language-Team: Indonesian <id@li.org>\n"
@@ -15,45 +15,47 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2013-04-28 04:36+0000\n"
-"X-Generator: Launchpad (build 16580)\n"
+"X-Launchpad-Export-Date: 2013-08-18 04:39+0000\n"
+"X-Generator: Launchpad (build 16723)\n"
 
 #: ../bin/duplicity:101
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
-msgstr ""
+msgstr "Pakai lagi PASSPHRASE yang dikonfigurasi sebagai SIGN_PASSPHRASE"
 
 #: ../bin/duplicity:108
 msgid "Reuse configured SIGN_PASSPHRASE as PASSPHRASE"
-msgstr ""
+msgstr "Pakai lagi SIGN_PASSPHRASE yang dikonfigurasi sebagai PASSPHRASE"
 
 #: ../bin/duplicity:147
 msgid "PASSPHRASE variable not set, asking user."
-msgstr ""
+msgstr "Variabel PASSPHRASE tak diisi, menanyakan ke pengguna."
 
 #: ../bin/duplicity:162
 msgid "GnuPG passphrase for signing key:"
-msgstr ""
+msgstr "Frasa sandi GnuPG untuk kunci penandatanganan:"
 
 #: ../bin/duplicity:167
 msgid "GnuPG passphrase:"
-msgstr ""
+msgstr "Frasa sandi GnuPG:"
 
 #: ../bin/duplicity:172
 msgid "Retype passphrase for signing key to confirm: "
-msgstr ""
+msgstr "Ketikkan ulang frasa sandi bagi kunci penyandian untuk konfirmasi: "
 
 #: ../bin/duplicity:174
 msgid "Retype passphrase to confirm: "
-msgstr ""
+msgstr "Ketikkan ulang frasa sandi untuk konfirmasi: "
 
 #: ../bin/duplicity:177
 msgid "First and second passphrases do not match!  Please try again."
-msgstr ""
+msgstr "Frasa sandi pertama dan kedua tak cocok! Harap coba lagi."
 
 #: ../bin/duplicity:182
 msgid ""
 "Cannot use empty passphrase with symmetric encryption!  Please try again."
 msgstr ""
+"Tak bisa memakai frasa sandi kosong dengan enkripsi simetrik! Harap coba "
+"lagi."
 
 #: ../bin/duplicity:237
 #, python-format
@@ -61,6 +63,8 @@ msgid ""
 "File %s complete in backup set.\n"
 "Continuing restart on file %s."
 msgstr ""
+"Berkas %s lengkap dalam set cadangan.\n"
+"Melanjutkan memulai lagi pada berkas %s."
 
 #: ../bin/duplicity:243
 #, python-format
@@ -68,17 +72,21 @@ msgid ""
 "File %s missing in backup set.\n"
 "Continuing restart on file %s."
 msgstr ""
+"Berkas %s hilang dalam set cadangan.\n"
+"Melanjutkan mulai ulang pada berkas %s."
 
 #: ../bin/duplicity:295
 #, python-format
 msgid "File %s was corrupted during upload."
-msgstr ""
+msgstr "Berkas %s terkorupsi selama pengunggahan."
 
 #: ../bin/duplicity:329
 msgid ""
 "Restarting backup, but current encryption settings do not match original "
 "settings"
 msgstr ""
+"Memulai ulang membuat cadangan, tapi pengaturan enkripsi kini tak cocok "
+"dengan pengaturan asli."
 
 #: ../bin/duplicity:568
 msgid ""
@@ -113,7 +121,7 @@ msgstr "Volume %d dari %d telah diproses"
 #: ../bin/duplicity:751
 #, python-format
 msgid "Invalid data - %s hash mismatch for file:"
-msgstr ""
+msgstr "Data tak valid - hash %s tak cocok bagi berkas:"
 
 #: ../bin/duplicity:753
 #, python-format
@@ -233,7 +241,7 @@ msgstr "Menghapus lokal %s (bukan otorita pada latar belakang)."
 #: ../bin/duplicity:1032
 #, python-format
 msgid "Unable to delete %s: %s"
-msgstr ""
+msgstr "Tak bisa menghapus %s: %s"
 
 #: ../bin/duplicity:1060 ../duplicity/dup_temp.py:263
 #, python-format
@@ -349,7 +357,7 @@ msgstr "Backup penuh terakhir terlalu tua, melaksanakan backup penuh."
 
 #: ../bin/duplicity:1479
 msgid "INT intercepted...exiting."
-msgstr ""
+msgstr "INT tertangkap...keluar."
 
 #: ../bin/duplicity:1485
 #, python-format
@@ -407,18 +415,18 @@ msgstr "pelaksanaan tugas selesai (sukses: %s)"
 msgid "Could not initialize backend: %s"
 msgstr ""
 
-#: ../duplicity/backend.py:530 ../duplicity/backend.py:554
+#: ../duplicity/backend.py:531 ../duplicity/backend.py:555
 #, python-format
 msgid "Reading results of '%s'"
 msgstr "Membaca hasil '%s'"
 
-#: ../duplicity/backend.py:569
+#: ../duplicity/backend.py:570
 #, python-format
 msgid "Running '%s' failed with code %d (attempt #%d)"
 msgid_plural "Running '%s' failed with code %d (attempt #%d)"
 msgstr[0] "Eksekusi '%s' gagal dengan kode %d (usaha #%d)"
 
-#: ../duplicity/backend.py:573
+#: ../duplicity/backend.py:574
 #, python-format
 msgid ""
 "Error is:\n"
@@ -427,7 +435,7 @@ msgstr ""
 "Kesalahan:\n"
 "%s"
 
-#: ../duplicity/backend.py:575
+#: ../duplicity/backend.py:576
 #, python-format
 msgid "Giving up trying to execute '%s' after %d attempt"
 msgid_plural "Giving up trying to execute '%s' after %d attempts"
@@ -941,17 +949,17 @@ msgid "Backends and their URL formats:"
 msgstr "Format latar dan URL:"
 
 #. TRANSL: Header in usage help
-#: ../duplicity/commandline.py:838
+#: ../duplicity/commandline.py:840
 msgid "Commands:"
 msgstr "Perintah:"
 
-#: ../duplicity/commandline.py:862
+#: ../duplicity/commandline.py:864
 #, python-format
 msgid ""
 "Specified archive directory '%s' does not exist, or is not a directory"
 msgstr "Direktori arsip '%s' tidak ada, atau bukan merupakan suatu direktori"
 
-#: ../duplicity/commandline.py:871
+#: ../duplicity/commandline.py:873
 #, python-format
 msgid ""
 "Sign key should be an 8 character hex string, like 'AA0E73D2'.\n"
@@ -960,7 +968,7 @@ msgstr ""
 "Kunci penanda harus merupakan string heksa 8 karakter, seperti 'AA0E73D2'.\n"
 "Bukan seperti '%s'."
 
-#: ../duplicity/commandline.py:931
+#: ../duplicity/commandline.py:933
 #, python-format
 msgid ""
 "Restore destination directory %s already exists.\n"
@@ -969,28 +977,30 @@ msgstr ""
 "Direktori tujuan pulihan %s sudah ada.\n"
 "Tidak akan ditimpa."
 
-#: ../duplicity/commandline.py:936
+#: ../duplicity/commandline.py:938
 #, python-format
 msgid "Verify directory %s does not exist"
 msgstr "Verifikasi direktori %s belum ada"
 
-#: ../duplicity/commandline.py:942
+#: ../duplicity/commandline.py:944
 #, python-format
 msgid "Backup source directory %s does not exist."
 msgstr "Direktori sumber backup %s tidak ada."
 
-#: ../duplicity/commandline.py:971
+#: ../duplicity/commandline.py:973
 #, python-format
 msgid "Command line warning: %s"
-msgstr ""
+msgstr "Peringatan baris perintah: %s"
 
-#: ../duplicity/commandline.py:971
+#: ../duplicity/commandline.py:973
 msgid ""
 "Selection options --exclude/--include\n"
 "currently work only when backing up,not restoring."
 msgstr ""
+"Opsi seleksi --exclude/--include\n"
+"kini hanya bekerja ketika membuat cadangan, bukan ketika mengembalikan."
 
-#: ../duplicity/commandline.py:1019
+#: ../duplicity/commandline.py:1021
 #, python-format
 msgid ""
 "Bad URL '%s'.\n"
@@ -1003,7 +1013,7 @@ msgstr ""
 "atau \"file:///usr/local\". Lihat panduan halaman man untuk informasi lebih "
 "lanjut."
 
-#: ../duplicity/commandline.py:1044
+#: ../duplicity/commandline.py:1046
 msgid "Main action: "
 msgstr "Kegiatan utama: "
 
@@ -1211,7 +1221,7 @@ msgstr "Berkas %%s memiliki jenis %s, seharusnya %s"
 #: ../duplicity/path.py:364 ../duplicity/path.py:390
 #, python-format
 msgid "File %%s has permissions %s, expected %s"
-msgstr ""
+msgstr "Berkas %%s memiliki permission %s, diharapkan %s"
 
 #: ../duplicity/path.py:369
 #, python-format

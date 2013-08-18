@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2013-04-27 15:09+0000\n"
+"POT-Creation-Date: 2013-08-17 18:36+0000\n"
 "PO-Revision-Date: 2011-08-24 23:58+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Turkish <tr@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2013-04-28 04:37+0000\n"
-"X-Generator: Launchpad (build 16580)\n"
+"X-Launchpad-Export-Date: 2013-08-18 04:39+0000\n"
+"X-Generator: Launchpad (build 16723)\n"
 
 #: ../bin/duplicity:101
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -36,7 +36,7 @@ msgstr ""
 
 #: ../bin/duplicity:167
 msgid "GnuPG passphrase:"
-msgstr ""
+msgstr "GnuPG parola:"
 
 #: ../bin/duplicity:172
 msgid "Retype passphrase for signing key to confirm: "
@@ -48,7 +48,7 @@ msgstr ""
 
 #: ../bin/duplicity:177
 msgid "First and second passphrases do not match!  Please try again."
-msgstr ""
+msgstr "İlk ve ikinci parolalar eşleşmiyor! Lütfen tekrar deneyin."
 
 #: ../bin/duplicity:182
 msgid ""
@@ -92,7 +92,7 @@ msgstr ""
 
 #: ../bin/duplicity:586
 msgid "Backup Statistics"
-msgstr ""
+msgstr "Yedekleme İstatistikleri"
 
 #: ../bin/duplicity:689
 #, python-format
@@ -131,7 +131,7 @@ msgstr ""
 #: ../bin/duplicity:822
 #, python-format
 msgid "Verify complete: %s, %s."
-msgstr ""
+msgstr "Doğrulama tamamlandı: %s, %s."
 
 #: ../bin/duplicity:823
 #, python-format
@@ -229,17 +229,17 @@ msgstr ""
 #: ../bin/duplicity:1032
 #, python-format
 msgid "Unable to delete %s: %s"
-msgstr ""
+msgstr "%s silinemedi: %s"
 
 #: ../bin/duplicity:1060 ../duplicity/dup_temp.py:263
 #, python-format
 msgid "Failed to read %s: %s"
-msgstr ""
+msgstr "%s okuma hatası: %s"
 
 #: ../bin/duplicity:1074
 #, python-format
 msgid "Copying %s to local cache."
-msgstr ""
+msgstr "%s yerel önbelleğe kopyalanıyor."
 
 #: ../bin/duplicity:1122
 msgid "Local and Remote metadata are synchronized, no sync needed."
@@ -333,12 +333,12 @@ msgstr ""
 #: ../bin/duplicity:1485
 #, python-format
 msgid "GPG error detail: %s"
-msgstr ""
+msgstr "GPG hata ayrıntıları: %s"
 
 #: ../bin/duplicity:1494
 #, python-format
 msgid "User error detail: %s"
-msgstr ""
+msgstr "Kullanıcı hata ayrıntıları: %s"
 
 #: ../bin/duplicity:1503
 #, python-format
@@ -386,26 +386,28 @@ msgstr ""
 msgid "Could not initialize backend: %s"
 msgstr ""
 
-#: ../duplicity/backend.py:530 ../duplicity/backend.py:554
+#: ../duplicity/backend.py:531 ../duplicity/backend.py:555
 #, python-format
 msgid "Reading results of '%s'"
 msgstr ""
 
-#: ../duplicity/backend.py:569
+#: ../duplicity/backend.py:570
 #, python-format
 msgid "Running '%s' failed with code %d (attempt #%d)"
 msgid_plural "Running '%s' failed with code %d (attempt #%d)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../duplicity/backend.py:573
+#: ../duplicity/backend.py:574
 #, python-format
 msgid ""
 "Error is:\n"
 "%s"
 msgstr ""
+"Hata:\n"
+"%s"
 
-#: ../duplicity/backend.py:575
+#: ../duplicity/backend.py:576
 #, python-format
 msgid "Giving up trying to execute '%s' after %d attempt"
 msgid_plural "Giving up trying to execute '%s' after %d attempts"
@@ -472,7 +474,7 @@ msgstr ""
 
 #: ../duplicity/collections.py:398
 msgid "Full"
-msgstr ""
+msgstr "Tüm"
 
 #: ../duplicity/collections.py:401
 msgid "Incremental"
@@ -668,7 +670,7 @@ msgstr "yol"
 #: ../duplicity/commandline.py:357 ../duplicity/commandline.py:503
 #: ../duplicity/commandline.py:711
 msgid "gpg-key-id"
-msgstr ""
+msgstr "gpg-key-id"
 
 #. TRANSL: Used in usage help to represent a "glob" style pattern for
 #. matching one or more files, as described in the documentation.
@@ -737,7 +739,7 @@ msgstr ""
 #. TRANSL: Used in usage help (noun)
 #: ../duplicity/commandline.py:409
 msgid "backup name"
-msgstr ""
+msgstr "yedek adı"
 
 #. TRANSL: noun
 #: ../duplicity/commandline.py:490 ../duplicity/commandline.py:493
@@ -757,12 +759,12 @@ msgstr ""
 #. --timeout <seconds>
 #: ../duplicity/commandline.py:527 ../duplicity/commandline.py:755
 msgid "seconds"
-msgstr ""
+msgstr "saniyeler"
 
 #. TRANSL: abbreviation for "character" (noun)
 #: ../duplicity/commandline.py:533 ../duplicity/commandline.py:689
 msgid "char"
-msgstr ""
+msgstr "karakter"
 
 #: ../duplicity/commandline.py:655
 #, python-format
@@ -772,7 +774,7 @@ msgstr ""
 #: ../duplicity/commandline.py:656
 #, python-format
 msgid "Using backup name: %s"
-msgstr ""
+msgstr "Kullanılan yedek adı: %s"
 
 #: ../duplicity/commandline.py:663
 #, python-format
@@ -877,7 +879,7 @@ msgstr ""
 #. duplicity [restore] [options] source_url target_dir
 #: ../duplicity/commandline.py:777
 msgid "source_url"
-msgstr ""
+msgstr "kaynak_url"
 
 #. TRANSL: Used in usage help to represent the name of a single file
 #. directory or a Unix-style path to a directory. where files will be
@@ -885,14 +887,14 @@ msgstr ""
 #. duplicity [restore] [options] source_url target_dir
 #: ../duplicity/commandline.py:783
 msgid "target_dir"
-msgstr ""
+msgstr "hedef_dir"
 
 #. TRANSL: Used in usage help to represent a URL files will be going TO.
 #. Example:
 #. duplicity [full|incremental] [options] source_dir target_url
 #: ../duplicity/commandline.py:788
 msgid "target_url"
-msgstr ""
+msgstr "hedef_url"
 
 #. TRANSL: Used in usage help to represent a user name (i.e. login).
 #. Example:
@@ -907,52 +909,52 @@ msgid "Backends and their URL formats:"
 msgstr ""
 
 #. TRANSL: Header in usage help
-#: ../duplicity/commandline.py:838
+#: ../duplicity/commandline.py:840
 msgid "Commands:"
 msgstr "Komutlar:"
 
-#: ../duplicity/commandline.py:862
+#: ../duplicity/commandline.py:864
 #, python-format
 msgid ""
 "Specified archive directory '%s' does not exist, or is not a directory"
 msgstr ""
 
-#: ../duplicity/commandline.py:871
+#: ../duplicity/commandline.py:873
 #, python-format
 msgid ""
 "Sign key should be an 8 character hex string, like 'AA0E73D2'.\n"
 "Received '%s' instead."
 msgstr ""
 
-#: ../duplicity/commandline.py:931
+#: ../duplicity/commandline.py:933
 #, python-format
 msgid ""
 "Restore destination directory %s already exists.\n"
 "Will not overwrite."
 msgstr ""
 
-#: ../duplicity/commandline.py:936
+#: ../duplicity/commandline.py:938
 #, python-format
 msgid "Verify directory %s does not exist"
-msgstr ""
+msgstr "%s doğrulama dizini yok"
 
-#: ../duplicity/commandline.py:942
+#: ../duplicity/commandline.py:944
 #, python-format
 msgid "Backup source directory %s does not exist."
 msgstr ""
 
-#: ../duplicity/commandline.py:971
+#: ../duplicity/commandline.py:973
 #, python-format
 msgid "Command line warning: %s"
-msgstr ""
+msgstr "Komut satırı uyarısı: %s"
 
-#: ../duplicity/commandline.py:971
+#: ../duplicity/commandline.py:973
 msgid ""
 "Selection options --exclude/--include\n"
 "currently work only when backing up,not restoring."
 msgstr ""
 
-#: ../duplicity/commandline.py:1019
+#: ../duplicity/commandline.py:1021
 #, python-format
 msgid ""
 "Bad URL '%s'.\n"
@@ -960,7 +962,7 @@ msgid ""
 "\"file:///usr/local\".  See the man page for more information."
 msgstr ""
 
-#: ../duplicity/commandline.py:1044
+#: ../duplicity/commandline.py:1046
 msgid "Main action: "
 msgstr ""
 
@@ -977,12 +979,12 @@ msgstr ""
 #: ../duplicity/diffdir.py:162
 #, python-format
 msgid "A %s"
-msgstr ""
+msgstr "A %s"
 
 #: ../duplicity/diffdir.py:169
 #, python-format
 msgid "M %s"
-msgstr ""
+msgstr "M %s"
 
 #: ../duplicity/diffdir.py:191
 #, python-format
@@ -992,7 +994,7 @@ msgstr ""
 #: ../duplicity/diffdir.py:199
 #, python-format
 msgid "D %s"
-msgstr ""
+msgstr "D %s"
 
 #: ../duplicity/dup_time.py:47
 #, python-format
@@ -1095,7 +1097,7 @@ msgstr ""
 #: ../duplicity/misc.py:99
 #, python-format
 msgid "Starting to write %s"
-msgstr ""
+msgstr "%s ögesine yazmaya başlıyor"
 
 #: ../duplicity/misc.py:107
 #, python-format
@@ -1121,12 +1123,12 @@ msgstr ""
 
 #: ../duplicity/path.py:346
 msgid "Difference found:"
-msgstr ""
+msgstr "Farklılık bulundu:"
 
 #: ../duplicity/path.py:352
 #, python-format
 msgid "New file %s"
-msgstr ""
+msgstr "Yeni dosya %s"
 
 #: ../duplicity/path.py:355
 #, python-format
@@ -1166,7 +1168,7 @@ msgstr ""
 #: ../duplicity/path.py:554
 #, python-format
 msgid "Making directory %s"
-msgstr ""
+msgstr "%s dizini yapılıyor"
 
 #: ../duplicity/path.py:564
 #, python-format
@@ -1186,7 +1188,7 @@ msgstr ""
 #: ../duplicity/robust.py:59
 #, python-format
 msgid "Error listing directory %s"
-msgstr ""
+msgstr "%s dizini listeleme hatası"
 
 #: ../duplicity/selection.py:119
 #, python-format
@@ -1245,7 +1247,7 @@ msgstr ""
 #: ../duplicity/selection.py:311
 #, python-format
 msgid "Reading filelist %s"
-msgstr ""
+msgstr "%s dosya listesi okunuyor"
 
 #: ../duplicity/selection.py:314
 #, python-format
@@ -1266,7 +1268,7 @@ msgstr ""
 #: ../duplicity/selection.py:361
 #, python-format
 msgid "Error closing filelist %s"
-msgstr ""
+msgstr "%s dosya listesini kapatma hatası"
 
 #: ../duplicity/selection.py:428
 #, python-format
@@ -1352,3 +1354,6 @@ msgid ""
 "Warning: Selected ssh backend '%s' is neither 'paramiko nor 'pexpect'. Will "
 "use default paramiko instead."
 msgstr ""
+
+#~ msgid "Unable to load gio module"
+#~ msgstr "gio modülü yüklenemedi"

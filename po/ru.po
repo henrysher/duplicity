@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2013-04-27 15:09+0000\n"
+"POT-Creation-Date: 2013-08-17 18:36+0000\n"
 "PO-Revision-Date: 2010-03-11 14:36+0000\n"
 "Last-Translator: Kenneth Loafman <kenneth@loafman.com>\n"
 "Language-Team: Russian <ru@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2013-04-28 04:36+0000\n"
-"X-Generator: Launchpad (build 16580)\n"
+"X-Launchpad-Export-Date: 2013-08-18 04:39+0000\n"
+"X-Generator: Launchpad (build 16723)\n"
 
 #: ../bin/duplicity:101
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -435,12 +435,12 @@ msgstr "завершено выполнение задачи (успех: %s)"
 msgid "Could not initialize backend: %s"
 msgstr ""
 
-#: ../duplicity/backend.py:530 ../duplicity/backend.py:554
+#: ../duplicity/backend.py:531 ../duplicity/backend.py:555
 #, python-format
 msgid "Reading results of '%s'"
 msgstr "Чтение результата '%s'"
 
-#: ../duplicity/backend.py:569
+#: ../duplicity/backend.py:570
 #, python-format
 msgid "Running '%s' failed with code %d (attempt #%d)"
 msgid_plural "Running '%s' failed with code %d (attempt #%d)"
@@ -448,7 +448,7 @@ msgstr[0] "Ошибка выполнения '%s' с кодом %d (попытк
 msgstr[1] "Ошибка выполнения '%s' с кодом %d (попытка #%d)"
 msgstr[2] "Ошибка выполнения '%s' с кодом %d (попытка #%d)"
 
-#: ../duplicity/backend.py:573
+#: ../duplicity/backend.py:574
 #, python-format
 msgid ""
 "Error is:\n"
@@ -457,7 +457,7 @@ msgstr ""
 "Ошибка:\n"
 "%s"
 
-#: ../duplicity/backend.py:575
+#: ../duplicity/backend.py:576
 #, python-format
 msgid "Giving up trying to execute '%s' after %d attempt"
 msgid_plural "Giving up trying to execute '%s' after %d attempts"
@@ -541,11 +541,11 @@ msgstr "Пошаговая"
 
 #: ../duplicity/collections.py:461
 msgid "local"
-msgstr ""
+msgstr "Локальная"
 
 #: ../duplicity/collections.py:463
 msgid "remote"
-msgstr ""
+msgstr "удалённая"
 
 #: ../duplicity/collections.py:618
 msgid "Collection Status"
@@ -1007,17 +1007,17 @@ msgid "Backends and their URL formats:"
 msgstr "Заглушки и формат их URL:"
 
 #. TRANSL: Header in usage help
-#: ../duplicity/commandline.py:838
+#: ../duplicity/commandline.py:840
 msgid "Commands:"
 msgstr "Команды:"
 
-#: ../duplicity/commandline.py:862
+#: ../duplicity/commandline.py:864
 #, python-format
 msgid ""
 "Specified archive directory '%s' does not exist, or is not a directory"
 msgstr "Заданная папка архива '%s' не существует или не является папкой"
 
-#: ../duplicity/commandline.py:871
+#: ../duplicity/commandline.py:873
 #, python-format
 msgid ""
 "Sign key should be an 8 character hex string, like 'AA0E73D2'.\n"
@@ -1027,7 +1027,7 @@ msgstr ""
 "например 'AA0E73D2'.\n"
 "Получено '%s'."
 
-#: ../duplicity/commandline.py:931
+#: ../duplicity/commandline.py:933
 #, python-format
 msgid ""
 "Restore destination directory %s already exists.\n"
@@ -1036,22 +1036,22 @@ msgstr ""
 "Каталог в который предназначено восстановление %s уже существует.\n"
 "Замена не будет произведена."
 
-#: ../duplicity/commandline.py:936
+#: ../duplicity/commandline.py:938
 #, python-format
 msgid "Verify directory %s does not exist"
 msgstr "Убедитесь, что папка %s не существует"
 
-#: ../duplicity/commandline.py:942
+#: ../duplicity/commandline.py:944
 #, python-format
 msgid "Backup source directory %s does not exist."
 msgstr "Папка источника резервной копии %s не существует."
 
-#: ../duplicity/commandline.py:971
+#: ../duplicity/commandline.py:973
 #, python-format
 msgid "Command line warning: %s"
 msgstr "Предупреждение командной строки: %s"
 
-#: ../duplicity/commandline.py:971
+#: ../duplicity/commandline.py:973
 msgid ""
 "Selection options --exclude/--include\n"
 "currently work only when backing up,not restoring."
@@ -1060,7 +1060,7 @@ msgstr ""
 "в настоящее время работают только для резервного копирования, не для "
 "восстановления."
 
-#: ../duplicity/commandline.py:1019
+#: ../duplicity/commandline.py:1021
 #, python-format
 msgid ""
 "Bad URL '%s'.\n"
@@ -1072,7 +1072,7 @@ msgstr ""
 "\"file:///usr/local\".  Для получения дополнительных сведений обратитесь в "
 "руководству (man)."
 
-#: ../duplicity/commandline.py:1044
+#: ../duplicity/commandline.py:1046
 msgid "Main action: "
 msgstr "Главное действие: "
 

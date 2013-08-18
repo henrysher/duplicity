@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2013-04-27 15:09+0000\n"
+"POT-Creation-Date: 2013-08-17 18:36+0000\n"
 "PO-Revision-Date: 2011-11-29 08:34+0000\n"
 "Last-Translator: SanskritFritz <Unknown>\n"
 "Language-Team: Hungarian <hu@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2013-04-28 04:36+0000\n"
-"X-Generator: Launchpad (build 16580)\n"
+"X-Launchpad-Export-Date: 2013-08-18 04:39+0000\n"
+"X-Generator: Launchpad (build 16723)\n"
 
 #: ../bin/duplicity:101
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -424,19 +424,19 @@ msgstr "feladat végrehajtva (siker: %s)"
 msgid "Could not initialize backend: %s"
 msgstr ""
 
-#: ../duplicity/backend.py:530 ../duplicity/backend.py:554
+#: ../duplicity/backend.py:531 ../duplicity/backend.py:555
 #, python-format
 msgid "Reading results of '%s'"
 msgstr "'%s' eredményeinek beolvasása"
 
-#: ../duplicity/backend.py:569
+#: ../duplicity/backend.py:570
 #, python-format
 msgid "Running '%s' failed with code %d (attempt #%d)"
 msgid_plural "Running '%s' failed with code %d (attempt #%d)"
 msgstr[0] "'%s' futtatása sikertelen volt, kód: %d ( #%d. próbálkozás)"
 msgstr[1] "'%s' futtatása sikertelen volt, kód: %d ( #%d. próbálkozás)"
 
-#: ../duplicity/backend.py:573
+#: ../duplicity/backend.py:574
 #, python-format
 msgid ""
 "Error is:\n"
@@ -445,7 +445,7 @@ msgstr ""
 "A hiba:\n"
 "%s"
 
-#: ../duplicity/backend.py:575
+#: ../duplicity/backend.py:576
 #, python-format
 msgid "Giving up trying to execute '%s' after %d attempt"
 msgid_plural "Giving up trying to execute '%s' after %d attempts"
@@ -963,17 +963,17 @@ msgid "Backends and their URL formats:"
 msgstr "Tárhelyek és azok URL formátumai:"
 
 #. TRANSL: Header in usage help
-#: ../duplicity/commandline.py:838
+#: ../duplicity/commandline.py:840
 msgid "Commands:"
 msgstr "Parancsok:"
 
-#: ../duplicity/commandline.py:862
+#: ../duplicity/commandline.py:864
 #, python-format
 msgid ""
 "Specified archive directory '%s' does not exist, or is not a directory"
 msgstr "A megadott '%s' archív könyvtár nem létezik, vagy nem könyvtár"
 
-#: ../duplicity/commandline.py:871
+#: ../duplicity/commandline.py:873
 #, python-format
 msgid ""
 "Sign key should be an 8 character hex string, like 'AA0E73D2'.\n"
@@ -982,7 +982,7 @@ msgstr ""
 "Az aláíró kulcs egy 8 karakter hosszú hex szöveg, pl. 'AA0E73D2'.\n"
 "Ehelyett ezt kaptam: '%s'."
 
-#: ../duplicity/commandline.py:931
+#: ../duplicity/commandline.py:933
 #, python-format
 msgid ""
 "Restore destination directory %s already exists.\n"
@@ -991,22 +991,22 @@ msgstr ""
 "A visszaállításhoz kért %s könyvár már létezik.\n"
 "Nem írom felül."
 
-#: ../duplicity/commandline.py:936
+#: ../duplicity/commandline.py:938
 #, python-format
 msgid "Verify directory %s does not exist"
 msgstr "Az ellenőrzéshez kért %s könyvtár nem létezik"
 
-#: ../duplicity/commandline.py:942
+#: ../duplicity/commandline.py:944
 #, python-format
 msgid "Backup source directory %s does not exist."
 msgstr "Biztonsági mentés %s forráskönyvtár nem létezik."
 
-#: ../duplicity/commandline.py:971
+#: ../duplicity/commandline.py:973
 #, python-format
 msgid "Command line warning: %s"
 msgstr "Parancssori figyelmetetés: %s"
 
-#: ../duplicity/commandline.py:971
+#: ../duplicity/commandline.py:973
 msgid ""
 "Selection options --exclude/--include\n"
 "currently work only when backing up,not restoring."
@@ -1014,7 +1014,7 @@ msgstr ""
 "Az --exclude/--include állományválasztó opciók jelenleg csak \n"
 "biztonsági mentéshez használhatók, visszaállításhoz nem."
 
-#: ../duplicity/commandline.py:1019
+#: ../duplicity/commandline.py:1021
 #, python-format
 msgid ""
 "Bad URL '%s'.\n"
@@ -1025,7 +1025,7 @@ msgstr ""
 "Néhány példa-URL: \"scp://user@host.net:1234/path\" vagy\n"
 "\"file:///usr/local\". Olvass utána a \"man\" oldalon."
 
-#: ../duplicity/commandline.py:1044
+#: ../duplicity/commandline.py:1046
 msgid "Main action: "
 msgstr "Fő művelet: "
 
