@@ -5,7 +5,7 @@ distribution and used to remove GnuPGInterface.py please note this:
 See README for details.
 
 
-New in v0.6.22 (2013/08/??)
+New in v0.6.22 (2013/08/22)
 ---------------------------
 Enhancements:
 * Applied patches from Laszlo Ersek to rdiffdir to "consume a chain of sigtar
