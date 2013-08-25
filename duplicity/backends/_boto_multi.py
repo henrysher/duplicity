@@ -36,7 +36,7 @@ from duplicity.backend import retry
 from duplicity.filechunkio import FileChunkIO
 from duplicity import progress
 
-BOTO_MIN_VERSION = "1.6a"
+BOTO_MIN_VERSION = "2.1.1"
 
 # Multiprocessing is not supported on *BSD
 if sys.platform not in ('darwin', 'linux2'):
