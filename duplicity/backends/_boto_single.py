@@ -163,6 +163,8 @@ class BotoBackend(duplicity.backend.Backend):
 
     def resetConnection(self):
         self.bucket = None
+        self.conn = None
+        del self.conn
         self.conn = get_connection(self.scheme, self.parsed_url)
         self.bucket = self.conn.lookup(self.bucket_name)
 
