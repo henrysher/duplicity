@@ -239,15 +239,9 @@ class BotoBackend(duplicity.backend.Backend):
         raise BackendException("Error uploading %s/%s" % (self.straight_url, remote_filename))
 
     def get(self, remote_filename, local_path):
-<<<<<<< TREE
         key_name = self.key_prefix + remote_filename
         self.pre_process_download(remote_filename, wait=True)
         key = self._listed_keys[key_name]
-
-=======
-        key = self.storage_uri.new_key()
-        key.key = self.key_prefix + remote_filename
->>>>>>> MERGE-SOURCE
         for n in range(1, globals.num_retries+1):
             if n > 1:
                 # sleep before retry (new connection to a **hopeful** new host, so no need to wait so long)
@@ -338,7 +332,6 @@ class BotoBackend(duplicity.backend.Backend):
             else:
                 return {'size': None}
 
-<<<<<<< TREE
     def upload(self, source_path_name, key, headers):
             key.set_contents_from_filename(source_path_name, headers,
                                            cb=progress.report_transfer,
@@ -390,8 +383,6 @@ class BotoBackend(duplicity.backend.Backend):
                         (self.straight_url, remote_filename, globals.num_retries))
                 raise BackendException("Error restoring %s/%s from Glacier to S3" % (self.straight_url, remote_filename))
 
-=======
 duplicity.backend.register_backend("gs", BotoBackend)
->>>>>>> MERGE-SOURCE
 duplicity.backend.register_backend("s3", BotoBackend)
 duplicity.backend.register_backend("s3+http", BotoBackend)
