@@ -112,7 +112,7 @@ class BotoBackend(BotoSingleBackend):
         log.Debug("Setting pool to %d processes" % number_of_procs)
         pool = multiprocessing.Pool(processes=number_of_procs)
         for n in range(chunks):
-            params = [self.scheme, self.parsed_url, self.bucket_name,
+            params = [self.scheme, self.parsed_url,self.storage_uri, self.bucket_name,
                       mp.id, filename, n, chunk_size, globals.num_retries,
                       queue]
             pool.apply_async(multipart_upload_worker, params)
@@ -131,7 +131,7 @@ class BotoBackend(BotoSingleBackend):
         return mp.complete_upload()
 
 
-def multipart_upload_worker(scheme, parsed_url, bucket_name, multipart_id, filename,
+def multipart_upload_worker(scheme, parsed_url, bucket_name, storage_uri, multipart_id, filename,
                             offset, bytes, num_retries, queue):
     """
     Worker method for uploading a file chunk to S3 using multipart upload.
@@ -150,7 +150,7 @@ def multipart_upload_worker(scheme, parsed_url, bucket_name, multipart_id, filen
         worker_name = multiprocessing.current_process().name
         log.Debug("%s: Uploading chunk %d" % (worker_name, offset + 1))
         try:
-            conn = get_connection(scheme, parsed_url)
+            conn = get_connection(scheme, parsed_url, storage_uri)
             bucket = conn.lookup(bucket_name)
 
             for mp in bucket.get_all_multipart_uploads():

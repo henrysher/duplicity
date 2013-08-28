@@ -31,7 +31,8 @@ from duplicity import progress
 
 BOTO_MIN_VERSION = "1.6a"
 
-def get_connection(scheme, parsed_url):
+
+def get_connection(scheme, parsed_url, storage_uri):
     try:
         from boto.s3.connection import S3Connection
         assert hasattr(S3Connection, 'lookup')
@@ -90,14 +91,13 @@ def get_connection(scheme, parsed_url):
                        "(http://code.google.com/p/boto/)." % BOTO_MIN_VERSION,
                        log.ErrorCode.boto_lib_too_old)
 
-    if scheme == 's3+http':
-        # Use the default Amazon S3 host.
-        conn = S3Connection(is_secure=(not globals.s3_unencrypted_connection))
+    if not parsed_url.hostname:
+        # Use the default host.
+        conn = storage_uri.connect(is_secure=(not globals.s3_unencrypted_connection))
     else:
         assert scheme == 's3'
-        conn = S3Connection(
-            host = parsed_url.hostname,
-            is_secure=(not globals.s3_unencrypted_connection))
+        conn = storage_uri.connect(host=parsed_url.hostname,
+                                   is_secure=(not globals.s3_unencrypted_connection))
 
     if hasattr(conn, 'calling_format'):
         if calling_format is None:
@@ -167,7 +167,7 @@ class BotoBackend(duplicity.backend.Backend):
         self.bucket = None
         self.conn = None
         del self.conn
-        self.conn = get_connection(self.scheme, self.parsed_url)
+        self.conn = get_connection(self.scheme, self.parsed_url, self.storage_uri)
         self.bucket = self.conn.lookup(self.bucket_name)
 
     def put(self, source_path, remote_filename=None):
@@ -299,7 +299,7 @@ class BotoBackend(duplicity.backend.Backend):
         # Because of the need for this optimization, it should be left as is.
         #for k in self.bucket.list(prefix = self.key_prefix + 'd', delimiter = '/'):
         filename_list = []
-        for k in self.bucket.list(prefix = self.key_prefix, delimiter = '/'):
+        for k in self.bucket.list(prefix=self.key_prefix, delimiter='/'):
             try:
                 filename = k.key.replace(self.key_prefix, '', 1)
                 filename_list.append(filename)
