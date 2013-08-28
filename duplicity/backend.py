@@ -194,7 +194,8 @@ def _ensure_urlparser_initialized():
                                      'webdav', 'webdavs',
                                      'gdocs',
                                      'http', 'https',
-                                     'imap', 'imaps']
+                                     'imap', 'imaps',
+                                     'mega']
 
             # Do not transform or otherwise parse the URL path component.
             urlparser.uses_query = []

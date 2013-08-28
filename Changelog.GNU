@@ -1,3 +1,23 @@
+2013-08-17  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~scowcron/duplicity/ftp_password_pexpect
+      - Use common backend.Backend get_password() rather than _ssh_pexpect.py specific code.
+    * Merged in lp:~mhu-s/duplicity/swiftbackend
+      - This branch adds support for Swift, the OpenStack Object Storage service. See
+        https://blueprints.launchpad.net/duplicity/+spec/swiftbackend
+    * Merged in lp:~verb/duplicity/boto-gcs
+      - These patches add support for Google Cloud Storage via the boto backend.
+      - boto has supported GCS in interoperability mode for a few years now. This change
+        adds support by taking advantage of boto's storage_uri abstraction layer.
+    * Merged in lp:~ckornacker/duplicity/megacloud
+      - Add support for Mega (mega.co.nz) backend.
+    * Applied patch from Eric S Raymond to man page to fix markup problems.
+    * Merged in lp:~ed.so/duplicity/man.page
+      - update paramiko links
+      - add command parameters to synopsis
+      - add --compare-data
+      - some polishing and several improvements
+
 2013-04-27  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~tblue/duplicity/paramiko-1.10.0

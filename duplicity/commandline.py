@@ -830,10 +830,12 @@ def usage():
   s3+http://%(bucket_name)s[/%(prefix)s]
   scp://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]/%(some_dir)s
   ssh://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]/%(some_dir)s
+  swift://%(container_name)s
   tahoe://%(alias)s/%(directory)s
   webdav://%(user)s[:%(password)s]@%(other_host)s/%(some_dir)s
   webdavs://%(user)s[:%(password)s]@%(other_host)s/%(some_dir)s
   gdocs://%(user)s[:%(password)s]@%(other_host)s/%(some_dir)s
+  mega://%(user)s[:%(password)s]@%(other_host)s/%(some_dir)s
   dpbx:///%(some_dir)s
 
 """ % dict

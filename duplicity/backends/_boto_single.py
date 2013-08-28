@@ -133,8 +133,6 @@ class BotoBackend(duplicity.backend.Backend):
         import boto
         assert boto.Version >= BOTO_MIN_VERSION
 
-        from boto.s3.key import Key
-
         # This folds the null prefix and all null parts, which means that:
         #  //MyBucket/ and //MyBucket are equivalent.
         #  //MyBucket//My///My/Prefix/ and //MyBucket/My/Prefix are equivalent.
@@ -149,8 +147,6 @@ class BotoBackend(duplicity.backend.Backend):
 
         self.scheme = parsed_url.scheme
 
-        self.key_class = Key
-
         if self.url_parts:
             self.key_prefix = '%s/' % '/'.join(self.url_parts)
         else:
@@ -158,6 +154,12 @@ class BotoBackend(duplicity.backend.Backend):
 
         self.straight_url = duplicity.backend.strip_auth_from_url(parsed_url)
         self.parsed_url = parsed_url
+
+        # duplicity and boto.storage_uri() have different URI formats.
+        # boto uses scheme://bucket[/name] and specifies hostname on connect()
+        self.boto_uri_str = '://'.join((parsed_url.scheme[:2],
+                                        parsed_url.path.lstrip('/')))
+        self.storage_uri = boto.storage_uri(self.boto_uri_str)
         self.resetConnection()
         self._listed_keys = {}
 
@@ -202,7 +204,7 @@ class BotoBackend(duplicity.backend.Backend):
 
         if not remote_filename:
             remote_filename = source_path.get_filename()
-        key = self.key_class(self.bucket)
+        key = self.storage_uri.new_key()
         key.key = self.key_prefix + remote_filename
 
         for n in range(1, globals.num_retries+1):
@@ -237,10 +239,15 @@ class BotoBackend(duplicity.backend.Backend):
         raise BackendException("Error uploading %s/%s" % (self.straight_url, remote_filename))
 
     def get(self, remote_filename, local_path):
+<<<<<<< TREE
         key_name = self.key_prefix + remote_filename
         self.pre_process_download(remote_filename, wait=True)
         key = self._listed_keys[key_name]
 
+=======
+        key = self.storage_uri.new_key()
+        key.key = self.key_prefix + remote_filename
+>>>>>>> MERGE-SOURCE
         for n in range(1, globals.num_retries+1):
             if n > 1:
                 # sleep before retry (new connection to a **hopeful** new host, so no need to wait so long)
@@ -331,6 +338,7 @@ class BotoBackend(duplicity.backend.Backend):
             else:
                 return {'size': None}
 
+<<<<<<< TREE
     def upload(self, source_path_name, key, headers):
             key.set_contents_from_filename(source_path_name, headers,
                                            cb=progress.report_transfer,
@@ -382,5 +390,8 @@ class BotoBackend(duplicity.backend.Backend):
                         (self.straight_url, remote_filename, globals.num_retries))
                 raise BackendException("Error restoring %s/%s from Glacier to S3" % (self.straight_url, remote_filename))
 
+=======
+duplicity.backend.register_backend("gs", BotoBackend)
+>>>>>>> MERGE-SOURCE
 duplicity.backend.register_backend("s3", BotoBackend)
 duplicity.backend.register_backend("s3+http", BotoBackend)

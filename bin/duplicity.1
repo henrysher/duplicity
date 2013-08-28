@@ -8,6 +8,46 @@
 .SH NAME
 duplicity \- Encrypted incremental backup to local or remote storage.
 
+.SH SYNOPSIS
+For detailed descriptions for each command see chapter
+.BR ACTIONS .
+
+.B duplicity [full|incremental]
+.I [options]
+source_directory target_url
+
+.B duplicity verify
+.I [options] [--compare-data] [--file-to-restore <relpath>] [--time time]
+source_url target_directory
+
+.B duplicity collection-status
+.I [options]
+target_url
+
+.B duplicity list-current-files
+.I [options] [--time time]
+target_url
+
+.B duplicity [restore]
+.I [options] [--file-to-restore <relpath>] [--time time]
+source_url target_directory
+
+.B duplicity remove-older-than <time>
+.I [options] [--force]
+target_url
+
+.B duplicity remove-all-but-n-full  <count>
+.I [options] [--force]
+target_url
+
+.B duplicity remove-all-inc-of-but-n-full <count>
+.I [options] [--force]
+target_url
+
+.B duplicity cleanup
+.I [options] [--force] [--extra-clean]
+target_url
+
 .SH REQUIREMENTS
 Duplicity requires a POSIX-like operating system with a 
 .B python
@@ -16,13 +56,17 @@ It is best used under GNU/Linux.
 
 Some backends also require additional components (probably available as packages for your specific platform):
 .TP
-.BR "boto backend" " (S3 Amazon Web Services)"
-.B boto
+.BR "boto backend" " (S3 Amazon Web Services, Google Cloud Storage)"
+.B boto version 2.0+
 - http://github.com/boto/boto
 .TP
 .BR "cloudfiles backend" " (e.g. Rackspace Open Cloud)"
 .B Cloud Files Python API
 - http://www.rackspace.com/knowledge_center/article/python-api-installation-for-cloud-files
+.TP
+.B "dpbx backend" (Dropbox)
+.B Dropbox Python SDK
+- https://www.dropbox.com/developers/reference/sdk
 .TP
 .B "ftp backend"
 .B NcFTP Client
@@ -55,7 +99,7 @@ for scp/sftp/ssh access (also see
 .BR "ssh paramiko backend" " (enabled by default)"
 .B paramiko
 (SSH2 for python) 
-- http://www.lag.net/paramiko/
+- http://pypi.python.org/pypi/paramiko (downloads); http://github.com/paramiko/paramiko (project page)
 .br
 .B pycrypto
 (Python Cryptography Toolkit) 
@@ -64,6 +108,13 @@ for scp/sftp/ssh access (also see
 .B ssh pexpect backend
 .B sftp/scp client binaries
 OpenSSH - http://www.openssh.com/
+.TP
+.BR "swift backend (OpenStack Object Storage)"
+.B Python swiftclient module
+- https://github.com/openstack/python-swiftclient/
+.br
+.B Python keystoneclient module
+- https://github.com/openstack/python-keystoneclient/
 .TP
 .B "Ubuntu One"
 .B httplib2
@@ -81,60 +132,17 @@ for ssl certificate verification of HTTPS connections
 .br
 (also see 
 .BR "A NOTE ON SSL CERTIFICATE VERIFICATION" ).
-.TP
-.B "dpbx backend"
-.B Dropbox Python SDK
-- https://www.dropbox.com/developers/reference/sdk
-.br
-
-.SH SYNOPSIS
-.B duplicity [full|incremental]
-.I [options]
-source_directory target_url
-
-.B duplicity verify
-.I [options] [--file-to-restore <relpath>]
-source_url target_directory
-
-.B duplicity collection-status
-.I [options]
-target_url
-
-.B duplicity list-current-files
-.I [options] [--time time]
-target_url
-
-.B duplicity [restore]
-.I [options] [--file-to-restore <relpath>] [--time time]
-source_url target_directory
-
-.B duplicity remove-older-than <time>
-.I [options] [--force]
-target_url
-
-.B duplicity remove-all-but-n-full  <count>
-.I [options] [--force]
-target_url
-
-.B duplicity remove-all-inc-of-but-n-full <count>
-.I [options] [--force]
-target_url
-
-.B duplicity cleanup
-.I [options] [--force] [--extra-clean]
-target_url
 
 .SH DESCRIPTION
-Duplicity incrementally backs up files and directory
-by encrypting tar-format volumes with GnuPG and uploading them to a
-remote (or local) file server.  See
+Duplicity incrementally backs up files and folders into
+tar-format volumes encrypted with GnuPG and places them to a
+remote (or local) storage backend.  See chapter
 .B URL FORMAT
-for a list all supported backends and how to address them.
-Because duplicity uses
-librsync, the incremental archives are space efficient and only record
-the parts of files that have changed since the last backup.  Currently
-duplicity supports deleted files, full Unix permissions, uid/gid, directories,
-symbolic links, fifos, etc., but not hard links.
+for a list of all supported backends and how to address them.
+Because duplicity uses librsync, incremental backups are space efficient 
+and only record the parts of files that have changed since the last backup.
+Currently duplicity supports deleted files, full Unix permissions, uid/gid,
+directories, symbolic links, fifos, etc., but not hard links.
 
 If you are backing up the root directory /, remember to --exclude
 /proc, or else duplicity will probably crash on the weird stuff in
@@ -149,12 +157,20 @@ duplicity /home/me sftp://uid@other.host/some_dir
 .PP
 .RE
 If the above is run repeatedly, the first will be a full backup, and
-subsequent ones will be incremental.  To force a full backup, use the
+subsequent ones will be incremental. To force a full backup, use the
 .I full
 action:
 .PP
 .RS
 duplicity full /home/me sftp://uid@other.host/some_dir
+.PP
+.RE
+or enforcing a full every other time via 
+.I --full-if-older-than <time>
+, e.g. a full every month:
+.PP
+.RS
+duplicity --full-if-older-than 1M /home/me sftp://uid@other.host/some_dir
 .PP
 .RE
 Now suppose we accidentally delete /home/me and want to restore it
@@ -172,8 +188,7 @@ directory.  If we wanted to restore just the file "Mail/article" in
 duplicity -t 3D --file-to-restore Mail/article sftp://uid@other.host/some_dir /home/me/restored_file
 .PP
 .RE
-The following command compares the files we backed up, so see what has
-changed since then:
+The following command compares the latest backup with the current files:
 .PP
 .RS
 duplicity verify sftp://uid@other.host/some_dir /home/me
@@ -206,6 +221,7 @@ FTP_PASSWORD=mypassword duplicity /local/dir ftp://user@other.host/some_dir
 
 .SH ACTIONS
 Duplicity knows action commands, which can be finetuned with options.
+.br
 The actions for backup (full,incr) and restoration (restore) can as well be
 left out as duplicity detects in what mode it should switch to by the order
 of target URL and local folder. If the target URL comes before the local folder
@@ -214,24 +230,47 @@ is about to be backed up to the target URL.
 .br
 If a backup is in order and old signatures can be found duplicity automatically
 performs an incremental backup.
+.PP
+.B Note:
+The following explanations explain some but
+.B not
+all options that can be used in connection with that action command.
+Consult the OPTIONS section for more detailed informations.
 
 .TP
-.B full
+.BI "full " "<folder> <url>"
 Perform a full backup. A new backup chain is started even if
 signatures are available for an incremental backup.
 
 .TP
-.BR incr
+.BI "incr " "<folder> <url>"
 If this is requested an incremental backup will be performed.
 Duplicity will abort if no old signatures can be found.
 
 .TP
-.B collection-status
+.BI "verify " "[--compare-data] [--time <time>] [--file-to-restore <relpath>] <url> <folder>"
+Verify compares the backup contents with the source folder.
+duplicity will exit with a non-zero error level if any files are different.
+On verbosity level info (4) or higher, a message for each file that has
+changed will be logged.
+.br
+The 
+.I --file-to-restore
+option restricts verify to that file or folder.
+The 
+.I --time
+option allows to select a backup to verify against.
+The
+.I --compare-data
+option enables data comparison (see below).
+
+.TP
+.BI "collection-status " "<url>"
 Summarize the status of the backup repository by printing the chains
 and sets found, and the number of volumes in each.
 
 .TP
-.BI "list-current-files " "[--time <time>]"
+.BI "list-current-files " "[--time <time>] <url>"
 Lists the files contained in the most current backup or backup at time.
 The information will be extracted from the signature files, not the archive data
 itself. Thus the whole archive does not have to be downloaded, but on
@@ -239,15 +278,7 @@ the other hand if the archive has been deleted or corrupted, this
 command will not detect it.
 
 .TP
-.BI "verify " "[--file-to-restore <relpath>]"
-Enter verify mode instead of restore.  If the --file-to-restore option
-is given, restrict verify to that file or directory.  duplicity will
-exit with a non-zero error level if any files are different.  On
-verbosity level 4 or higher, log a message for each file that has
-changed.
-
-.TP
-.BI "restore " "[--file-to-restore <relpath>] [--time <time>]"
+.BI "restore " "[--file-to-restore <relpath>] [--time <time>] <url> <target_folder>"
 You can restore the full monty or selected folders/files from a specific time.
 Use the relative path as it is printed by
 .BR list-current-files .
@@ -255,7 +286,7 @@ Usually not needed as duplicity enters restore mode when it detects that the URL
 comes before the local folder.
 
 .TP
-.BI "remove-older-than " time
+.BI "remove-older-than " "<time> [--force] <url>"
 Delete all backup sets older than the given time.  Old backup sets
 will not be deleted if backup sets newer than
 .I time
@@ -264,10 +295,10 @@ depend on them.  See the
 section for more information.  Note, this action cannot be combined
 with backup or other actions, such as cleanup.  Note also that
 .I --force
-will be needed to delete the files rather than just list them.
+will be needed to delete the files instead of just listing them.
 
 .TP
-.BI "remove-all-but-n-full " count
+.BI "remove-all-but-n-full " "<count> [--force] <url>"
 Delete all backups sets that are older than the count:th last full
 backup (in other words, keep the last
 .I count
@@ -276,26 +307,26 @@ full backups and associated incremental sets).
 must be larger than zero. A value of 1 means that only the single most
 recent backup chain will be kept.  Note that
 .I --force
-will be needed to delete the files rather than just list them.
+will be needed to delete the files instead of just listing them.
 
 .TP
-.BI "remove-all-inc-of-but-n-full " count
+.BI "remove-all-inc-of-but-n-full " "<count> [--force] <url>"
 Delete incremental sets of all backups sets that are older than the count:th last full
 backup (in other words, keep only old full backups and not their increments).
 .I count
 must be larger than zero. A value of 1 means that only the single most
 recent backup chain will be kept intact.  Note that
 .I --force
-will be needed to delete the files rather than just list them.
+will be needed to delete the files instead of just listing them.
 
 .TP
-.B cleanup
+.BI "cleanup " "[--force] [--extra-clean] <url>"
 Delete the extraneous duplicity files on the given backend.
 Non-duplicity files, or files in complete data sets will not be
 deleted.  This should only be necessary after a duplicity session
 fails or is aborted prematurely.  Note that
 .I --force
-will be needed to delete the files rather than just list them.
+will be needed to delete the files instead of just listing them.
 
 .SH OPTIONS
 
@@ -365,6 +396,11 @@ CPU and your bandwidth can be more consistently utilized. Use of this
 option implies additional need for disk space in the temporary storage
 location; rather than needing to store only one volume at a time,
 enough storage space is required to store two volumes.
+
+.TP
+.B --compare-data
+Enable data comparison of regular files on action verify.
+This is disabled by default for performance reasons.
 
 .TP
 .BI "--dry-run "
@@ -663,7 +699,7 @@ messages (requires
 option). Default is to prompt the status each 3 seconds.
 
 .TP
-.BI "--rename " "orig new"
+.BI "--rename " "<original path> <new path>"
 Treats the path
 .I orig
 in the backup as if it were the path
@@ -951,11 +987,22 @@ cf+http://container_name
 See also
 .B "A NOTE ON CLOUD FILES ACCESS"
 .PP
+.BI Dropbox
+.br
+dpbx:///some_dir
+.br
+Make sure to read
+.BR "A NOTE ON DROPBOX ACCESS" " first!"
+.PP
 file://[relative|/absolute]/local/path
 .PP
 ftp[s]://user[:password]@other.host[:port]/some_dir
 .PP
 gdocs://user[:password]@other.host/some_dir
+.PP
+.BI "Google Cloud Storage"
+.br
+gs://bucket[/prefix]
 .PP
 hsi://user[:password]@other.host/some_dir
 .PP
@@ -991,6 +1038,11 @@ See also
 and
 .BR "A NOTE ON SSH BACKENDS" .
 .PP
+swift://container_name
+.br
+See also
+.B "A NOTE ON SWIFT (OPENSTACK OBJECT STORAGE) ACCESS"
+.PP
 tahoe://alias/directory
 .PP
 .BI "Ubuntu One"
@@ -1002,25 +1054,7 @@ u1+http://volume_path
 See also
 .BI "A NOTE ON UBUNTU ONE"
 .PP
-webdav[s]://user[:password]@other.host/some_dir
-.PP
-.BI Dropbox
-.br
-dpbx:///some_dir
-.br
-.IP 1.
-"some_dir" must already exist in the Dropbox Application folder for
-this application, like "Apps/Duplicity/some_dir".
-.IP 2.
-The first run of the backend must be ineractive!
-It will print the URL that you need to open in the browser to obtain
-OAuth token for the application. The token will be saved in the file
-$HOME/.dropbox.token_store.txt and used in the future runs.
-.IP 3.
-When using Dropbox for storage, be aware that all files, including the
-ones in the Apps folder, will be synced to all connected computers.
-You may prefer to use a separate Dropbox account specially for the
-backups, and not connect any computers to that account.
+webdav[s]://user[:password]@other.host[:port]/some_dir
 .RE
 
 .SH TIME FORMATS
@@ -1156,21 +1190,26 @@ before duplicity sees them.
 The
 .B --exclude
 pattern option matches a file if:
-.IP 1.
+.PP
+.B 1.
 .I pattern
 can be expanded into the file's filename, or
-.IP 2.
+.br
+.B 2.
 the file is inside a directory matched by the option.
 .PP
 Conversely, the 
 .B "--include " 
 pattern matches a file if:
-.IP 1.
+.PP
+.B 1.
 .I pattern
 can be expanded into the file's filename, or
-.IP 2.
+.br
+.B 2.
 the file is inside a directory matched by the option, or
-.IP 3.
+.br
+.B 3.
 the file is a directory which contains a file matched by the option.
 .PP
 For example,
@@ -1215,7 +1254,8 @@ are separated by newlines or nulls, depending on whether the
 interpreted similarly to the way
 .I extended shell patterns
 are, with a few exceptions:
-.IP 1.
+.PP
+.B 1.
 Globbing patterns like
 .BR * ,
 .BR ** ,
@@ -1223,10 +1263,12 @@ Globbing patterns like
 and
 .B [...]
 are not expanded.
-.IP 2.
+.br
+.B 2.
 Include patterns do not match files in a directory that is included.
 So /usr/local in an include file will not match /usr/local/doc.
-.IP 3.
+.br
+.B 3.
 Lines starting with "+ " are interpreted as include directives, even
 if found in a filelist referenced by
 .BR --exclude-filelist .
@@ -1327,6 +1369,21 @@ provided by python-cloudfiles, which points to rackspace, hence this value
 .I must 
 be set in order to use other cloud files providers.
 
+.SH A NOTE ON DROPBOX ACCESS
+.IP 1.
+"some_dir" must already exist in the Dropbox Application folder for
+this application, like "Apps/Duplicity/some_dir".
+.IP 2.
+The first run of the backend must be ineractive!
+It will print the URL that you need to open in the browser to obtain
+OAuth token for the application. The token will be saved in the file
+$HOME/.dropbox.token_store.txt and used in the future runs.
+.IP 3.
+When using Dropbox for storage, be aware that all files, including the
+ones in the Apps folder, will be synced to all connected computers.
+You may prefer to use a separate Dropbox account specially for the
+backups, and not connect any computers to that account.
+
 .SH A NOTE ON EUROPEAN S3 BUCKETS
 Amazon S3 provides the ability to choose the location of a bucket upon
 its creation. The purpose is to enable the user to choose a location
@@ -1362,6 +1419,25 @@ writing it is unclear to what extent this is an expected feature of
 Amazon S3, but in practice you may experience timeouts, socket errors
 or HTTP errors when trying to upload files to your newly created
 bucket. Give it a few minutes and the bucket should function normally.
+
+.SH A NOTE ON GOOGLE CLOUD STORAGE
+Support for Google Cloud Storage relies on its Interoperable Access,
+which must be enabled for your account.  Once enabled, you can generate
+Interoperable Storage Access Keys and pass them to duplicity via the
+.B GS_ACCESS_KEY_ID
+and
+.B GS_SECRET_ACCESS_KEY
+environment variables. Alternatively, you can run
+.B "gsutil config -a"
+to have the Google Cloud Storage utility populate the
+.B ~/.boto
+configuration file.
+.PP
+Enable Interoperable Access: 
+https://code.google.com/apis/console#:storage
+.br
+Create Access Keys:
+https://code.google.com/apis/console#:storage:legacy
 
 .SH A NOTE ON IMAP
 An IMAP account can be used as a target for the upload.  The userid may
@@ -1467,7 +1543,31 @@ Finally there is the
 .B --ssl-no-check-certificate
 option to disable certificate verification alltogether, in case some ssl library 
 is missing or verification is not wanted. Use it with care, as even with self signed 
-servers manually providing the private ca certificate is definitely the safer option. 
+servers manually providing the private ca certificate is definitely the safer option.
+
+.SH A NOTE ON SWIFT (OPENSTACK OBJECT STORAGE) ACCESS
+Swift is the OpenStack Object Storage service.
+.br
+The backend requires python-switclient to be installed on the system.
+python-keystoneclient is also needed to use OpenStack's Keystone Identity service.
+See 
+.B REQUIREMENTS 
+above.
+
+It uses four environment variables for authentification:
+.BR SWIFT_USERNAME " (required),"
+.BR SWIFT_PASSWORD " (required),"
+.BR SWIFT_AUTHURL " (required),"
+.BR SWIFT_TENANTNAME " (optional, the tenant can be included in the username)"
+
+If the user was previously authenticated, the following environment
+variables can be used instead:
+.BR SWIFT_PREAUTHURL " (required),"
+.BR SWIFT_PREAUTHTOKEN " (required)"
+
+If
+.B SWIFT_AUTHVERSION
+is unspecified, it will default to version 1.
 
 .SH A NOTE ON SYMMETRIC ENCRYPTION AND SIGNING
 Signing and symmetrically encrypt at the same time with the gpg binary on the
