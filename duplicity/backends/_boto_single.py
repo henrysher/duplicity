@@ -204,8 +204,8 @@ class BotoBackend(duplicity.backend.Backend):
 
         if not remote_filename:
             remote_filename = source_path.get_filename()
-        key = self.storage_uri.new_key()
-        key.key = self.key_prefix + remote_filename
+
+        key = self.bucket.new_key(self.key_prefix + remote_filename)
 
         for n in range(1, globals.num_retries+1):
             if n > 1:
