@@ -25,8 +25,6 @@ import sys
 import threading
 import Queue
 
-import duplicity.backend
-
 from duplicity import globals
 from duplicity import log
 from duplicity.errors import * #@UnusedWildImport
@@ -112,7 +110,7 @@ class BotoBackend(BotoSingleBackend):
         log.Debug("Setting pool to %d processes" % number_of_procs)
         pool = multiprocessing.Pool(processes=number_of_procs)
         for n in range(chunks):
-            params = [self.scheme, self.parsed_url,self.storage_uri, self.bucket_name,
+            params = [self.scheme, self.parsed_url, self.storage_uri, self.bucket_name,
                       mp.id, filename, n, chunk_size, globals.num_retries,
                       queue]
             pool.apply_async(multipart_upload_worker, params)
@@ -131,8 +129,8 @@ class BotoBackend(BotoSingleBackend):
         return mp.complete_upload()
 
 
-def multipart_upload_worker(scheme, parsed_url, bucket_name, storage_uri, multipart_id, filename,
-                            offset, bytes, num_retries, queue):
+def multipart_upload_worker(scheme, parsed_url, storage_uri, bucket_name, multipart_id,
+                            filename, offset, bytes, num_retries, queue):
     """
     Worker method for uploading a file chunk to S3 using multipart upload.
     Note that the file chunk is read into memory, so it's important to keep
@@ -153,7 +151,7 @@ def multipart_upload_worker(scheme, parsed_url, bucket_name, storage_uri, multip
             conn = get_connection(scheme, parsed_url, storage_uri)
             bucket = conn.lookup(bucket_name)
 
-            for mp in bucket.get_all_multipart_uploads():
+            for mp in bucket.list_multipart_uploads():
                 if mp.id == multipart_id:
                     with FileChunkIO(filename, 'r', offset=offset * bytes, bytes=bytes) as fd:
                         mp.upload_part_from_file(fd, offset + 1, cb=_upload_callback,
@@ -172,6 +170,3 @@ def multipart_upload_worker(scheme, parsed_url, bucket_name, storage_uri, multip
         log.Debug("%s: Upload of chunk %d complete" % (worker_name, offset + 1))
 
     return _upload(num_retries)
-
-duplicity.backend.register_backend("s3", BotoBackend)
-duplicity.backend.register_backend("s3+http", BotoBackend)

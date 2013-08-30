@@ -382,7 +382,3 @@ class BotoBackend(duplicity.backend.Backend):
                 log.Warn("Giving up trying to restore %s/%s after %d attempts" %
                         (self.straight_url, remote_filename, globals.num_retries))
                 raise BackendException("Error restoring %s/%s from Glacier to S3" % (self.straight_url, remote_filename))
-
-duplicity.backend.register_backend("gs", BotoBackend)
-duplicity.backend.register_backend("s3", BotoBackend)
-duplicity.backend.register_backend("s3+http", BotoBackend)
