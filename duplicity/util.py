@@ -119,5 +119,5 @@ def ignore_missing(fn, filename):
             pass
         else:
             raise
-    else:
+    except Exception:
         raise
