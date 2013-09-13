@@ -114,9 +114,10 @@ def ignore_missing(fn, filename):
     """
     try:
         fn(filename)
-    except Exception:
-        type, value, tb = sys.exc_info() #@UnusedVariable
-        if isinstance(type, OSError) and value[0] == errno.ENOENT:
+    except OSError, ex:
+        if ex.errno == errno.ENOENT:
             pass
+        else:
+            raise
+    else:
         raise
-

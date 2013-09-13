@@ -1,3 +1,7 @@
+2013-09-13  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Applied patch from bug 1216921 to fix ignore_missing().
+
 2013-08-17  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~scowcron/duplicity/ftp_password_pexpect
