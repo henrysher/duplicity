@@ -1,3 +1,7 @@
+2013-09-14  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged lp:~mterry/duplicity/ignore-missing to fix patch below.
+
 2013-09-13  Kenneth Loafman  <kenneth@loafman.com>
 
     * Applied patch from bug 1216921 to fix ignore_missing().
