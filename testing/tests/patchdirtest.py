@@ -299,6 +299,30 @@ class TestInnerFuncs(unittest.TestCase):
         testseq([self.snapshot(), self.delta1(), self.delta2()], ("%s 644" % ids),
                 "3499 34957839485792357 458348573")
 
+    def test_patch_seq2ropath_copy_failure(self):
+        # First, create a non-file basis file.  This will trigger the code
+        # path that copies the non-file into a real file.  Then, expect an
+        # empty path result, because the copy threw an error.  Notably, we
+        # don't want the error to bubble up -- seq2ropath should shield us from
+        # that).
+        class FakeFile:
+            raised = False
+            closed = False
+            def read(self, num_bytes):
+                self.raised = True
+                raise librsync.librsyncError("DUPTEST")
+            def close(self):
+                self.closed = True
+
+        ss = self.out.append("snapshot")
+        ss.setfileobj(FakeFile())
+        ss.difftype = "snapshot"
+        ss.type = "reg"
+
+        result = patchdir.patch_seq2ropath([ss, self.delta1()])
+        assert not result.exists()
+        assert ss.fileobj.raised
+        assert ss.fileobj.closed
 
 if __name__ == "__main__":
     unittest.main()
