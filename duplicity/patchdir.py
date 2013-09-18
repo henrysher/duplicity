@@ -29,7 +29,6 @@ from duplicity import librsync #@UnusedImport
 from duplicity import log #@UnusedImport
 from duplicity import diffdir
 from duplicity import misc
-from duplicity import robust
 from duplicity import selection
 from duplicity import tempdir
 from duplicity import util #@UnusedImport
@@ -458,22 +457,17 @@ def normalize_ps( patch_sequence ):
         i -= 1
     return result_list
 
-def patch_iter_error_handler(exc, *args):
-    # Just return, caller will handle appropriately (we'd handle it ourselves,
-    # but we don't have access to the path index, which we'd want for proper
-    # logging.
-    return exc
-
 def patch_seq2ropath( patch_seq ):
     """Apply the patches in patch_seq, return single ropath"""
     first = patch_seq[0]
-    assert first.difftype != "diff", patch_seq
+    assert first.difftype != "diff", "First patch in sequence " \
+                                     "%s was a diff" % patch_seq
     if not first.isreg():
         # No need to bother with data if not regular file
-        assert len( patch_seq ) == 1, len( patch_seq )
+        assert len(patch_seq) == 1, "Patch sequence isn't regular, but " \
+                                    "has %d entries" % len(patch_seq)
         return first.get_ropath()
 
-    result = patch_seq[-1].get_ropath()
     current_file = first.open( "rb" )
 
     for delta_ropath in patch_seq[1:]:
@@ -484,28 +478,13 @@ def patch_seq2ropath( patch_seq ):
             by using the duplicity.tempdir to tell us where.
             """
             tempfp = tempfile.TemporaryFile( dir=tempdir.default().dir() )
-            error = robust.check_common_error(patch_iter_error_handler,
-                                              misc.copyfileobj,
-                                              [current_file, tempfp])
-            if isinstance(error, Exception):
-                # Could not copy from current file, which generally means that
-                # we could not create the file from previous patches.  A
-                # librsync error perhaps.  We'll warn about it, but no reason
-                # to stop the entire restore.  Just don't write the file.
-                log.Warn(_("Error '%s' patching %s, ") % 
-                         (str(error), delta_ropath.get_relative_path()),
-                         log.WarningCode.cannot_process,
-                         util.escape(delta_ropath.get_relative_path()))
-                tempfp.close()
-                current_file.close()
-                result.blank() # pretend file doesn't exist
-                return result
+            misc.copyfileobj( current_file, tempfp )
             assert not current_file.close()
             tempfp.seek( 0 )
             current_file = tempfp
         current_file = librsync.PatchedFile( current_file,
                                             delta_ropath.open( "rb" ) )
-
+    result = patch_seq[-1].get_ropath()
     result.setfileobj( current_file )
     return result
 
@@ -519,10 +498,17 @@ def integrate_patch_iters( iter_list ):
     """
     collated = collate_iters( iter_list )
     for patch_seq in collated:
-        final_ropath = patch_seq2ropath( normalize_ps( patch_seq ) )
-        if final_ropath.exists():
-            # otherwise final patch was delete
-            yield final_ropath
+        try:
+            final_ropath = patch_seq2ropath( normalize_ps( patch_seq ) )
+            if final_ropath.exists():
+                # otherwise final patch was delete
+                yield final_ropath
+        except Exception, e:
+            filename = patch_seq[-1].get_ropath().get_relative_path()
+            log.Warn(_("Error '%s' patching %s, ") % 
+                     (str(e), filename),
+                     log.WarningCode.cannot_process,
+                     util.escape(filename))
 
 def tarfiles2rop_iter( tarfile_list, restrict_index=() ):
     """Integrate tarfiles of diffs into single ROPath iter
