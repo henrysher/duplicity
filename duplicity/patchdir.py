@@ -460,10 +460,12 @@ def normalize_ps( patch_sequence ):
 def patch_seq2ropath( patch_seq ):
     """Apply the patches in patch_seq, return single ropath"""
     first = patch_seq[0]
-    assert first.difftype != "diff", patch_seq
+    assert first.difftype != "diff", "First patch in sequence " \
+                                     "%s was a diff" % patch_seq
     if not first.isreg():
         # No need to bother with data if not regular file
-        assert len( patch_seq ) == 1, len( patch_seq )
+        assert len(patch_seq) == 1, "Patch sequence isn't regular, but " \
+                                    "has %d entries" % len(patch_seq)
         return first.get_ropath()
 
     current_file = first.open( "rb" )
@@ -496,10 +498,17 @@ def integrate_patch_iters( iter_list ):
     """
     collated = collate_iters( iter_list )
     for patch_seq in collated:
-        final_ropath = patch_seq2ropath( normalize_ps( patch_seq ) )
-        if final_ropath.exists():
-            # otherwise final patch was delete
-            yield final_ropath
+        try:
+            final_ropath = patch_seq2ropath(normalize_ps(patch_seq))
+            if final_ropath.exists():
+                # otherwise final patch was delete
+                yield final_ropath
+        except Exception, e:
+            filename = patch_seq[-1].get_ropath().get_relative_path()
+            log.Warn(_("Error '%s' patching %s") % 
+                     (str(e), filename),
+                     log.WarningCode.cannot_process,
+                     util.escape(filename))
 
 def tarfiles2rop_iter( tarfile_list, restrict_index=() ):
     """Integrate tarfiles of diffs into single ROPath iter
