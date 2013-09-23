@@ -5,6 +5,8 @@
         logged) and duplicity should move on. This covers the two asserts in that
         function (bug 1155345 and bug 720525) as well as errors that happen during
         file copying (bug 662442).
+    * Merged in lp:~mterry/duplicity/argv
+      - Fix use of argv when calling os.execve
 
 2013-09-14  Kenneth Loafman  <kenneth@loafman.com>
 
