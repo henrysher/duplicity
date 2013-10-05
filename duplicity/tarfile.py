@@ -2282,7 +2282,7 @@ class TarFile(object):
                     if sys.platform != "os2emx":
                         os.chown(targetpath, u, g)
             except EnvironmentError, e:
-                raise ExtractError("could not change owner")
+                raise ExtractError("could not change owner to %d:%d" % (u, g))
 
     def chmod(self, tarinfo, targetpath):
         """Set file permissions of targetpath according to tarinfo.
