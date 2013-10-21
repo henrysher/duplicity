@@ -1,3 +1,21 @@
+2013-09-23  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~mterry/duplicity/catch-seq-copy-error
+      - Any* exception when running patch_seq2ropath should be ignored (though
+        logged) and duplicity should move on. This covers the two asserts in that
+        function (bug 1155345 and bug 720525) as well as errors that happen during
+        file copying (bug 662442).
+    * Merged in lp:~mterry/duplicity/argv
+      - Fix use of argv when calling os.execve
+
+2013-09-14  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged lp:~mterry/duplicity/ignore-missing to fix patch below.
+
+2013-09-13  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Applied patch from bug 1216921 to fix ignore_missing().
+
 2013-08-17  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~scowcron/duplicity/ftp_password_pexpect
