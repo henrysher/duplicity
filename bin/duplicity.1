@@ -60,9 +60,13 @@ Some backends also require additional components (probably available as packages
 .B boto version 2.0+
 - http://github.com/boto/boto
 .TP
-.BR "cloudfiles backend" " (e.g. Rackspace Open Cloud)"
-.B Cloud Files Python API
+.BR "cloudfiles backend (deprecated)" " (e.g. Rackspace Open Cloud)"
+.B Cloud Files Python API (deprecated)
 - http://www.rackspace.com/knowledge_center/article/python-api-installation-for-cloud-files
+.TP
+.BR "cfpyrax backend" " (Rackspace Cloud)"
+.B Rackspace CloudFiles Pyrax API
+- http://docs.rackspace.com/sdks/guide/content/python.html
 .TP
 .B "dpbx backend" (Dropbox)
 .B Dropbox Python SDK
@@ -982,7 +986,10 @@ filesystem path.
 Formats of each of the URL schemes follow:
 .RS
 .PP
+.BI "Rackspace Cloud Files"
+.br
 cf+http://container_name
+cfpyrax+http://container_name
 .br
 See also
 .B "A NOTE ON CLOUD FILES ACCESS"
@@ -1349,8 +1356,16 @@ which aren't followed by 'foo'.  However, it wouldn't match /home even
 if /home/ben/1234567 existed.
 
 .SH A NOTE ON CLOUD FILES ACCESS
-Cloudfiles is Rackspace's implementation of OpenStack Object Storage
-protocol.
+Pyrax is Rackspace's next-generation Cloud management API, including
+Cloud Files access.  The cfpyrax backend requires the pyrax library to 
+be installed on the system.
+See
+.B REQUIREMENTS
+above.
+
+Cloudfiles is Rackspace's now deprecated implementation of OpenStack 
+Object Storage protocol.  Users wishing to use Duplicity with Rackspace
+Cloud Files should migrate to the new Pyrax plugin to ensure support.
 
 The backend requires python-cloudfiles to be installed on the system.
 See 
