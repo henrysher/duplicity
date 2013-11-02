@@ -665,8 +665,9 @@ def list_current(col_stats):
         if path.difftype != "deleted":
             user_info = "%s %s" % (dup_time.timetopretty(path.getmtime()),
                                    path.get_relative_path())
-            log_info = "%s %s" % (dup_time.timetostring(path.getmtime()),
-                                  util.escape(path.get_relative_path()))
+            log_info = "%s %s %s" % (dup_time.timetostring(path.getmtime()),
+                                     util.escape(path.get_relative_path()),
+                                     path.type)
             log.Log(user_info, log.INFO, log.InfoCode.file_list,
                     log_info, True)
 
