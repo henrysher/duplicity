@@ -446,6 +446,29 @@ class RestartTest(unittest.TestCase):
         assert not os.system("diff %s/file1 testfiles/restore_out/file1" % source)
         assert not os.system("diff %s/z testfiles/restore_out/z" % source)
 
+    def test_dangling_manifest_volume(self):
+        """
+        If we restart but find remote volumes missing, we can easily end up
+        with a manifest that lists "vol1, vol2, vol3, vol2", leaving a dangling
+        vol3.  Make sure we can gracefully handle that.
+        """
+        source = 'testfiles/largefiles'
+        self.make_largefiles(count=5, size=1)
+        # intentionally interrupt initial backup
+        try:
+            self.backup("full", source, options = ["--vol 1", "--fail 3"])
+            self.fail()
+        except CmdError, e:
+            self.assertEqual(30, e.exit_status)
+        # now delete the last volume on remote end and change source data
+        assert not os.system("rm testfiles/output/duplicity-full*vol3.difftar*")
+        assert not os.system("rm %s/file[2345]" % source)
+        assert not os.system("echo hello > %s/z" % source)
+        # finish backup
+        self.backup("full", source)
+        # and verify we can restore
+        self.restore()
+
 
 # Note that this class duplicates all the tests in RestartTest
 class RestartTestWithoutEncryption(RestartTest):
