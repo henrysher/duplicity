@@ -469,6 +469,7 @@ class TarBlockIter:
         self.remember_next = False          # see remember_next_index()
         self.remember_value = None          # holds index of next block
         self.remember_block = None          # holds block of next block
+        self.queued_data = None             # data to return in next next() call
 
     def tarinfo2tarblock(self, index, tarinfo, file_data = ""):
         """
@@ -504,6 +505,12 @@ class TarBlockIter:
         """
         Return next block and update offset
         """
+        if self.queued_data is not None:
+            result = self.queued_data
+            self.queued_data = None
+            # Keep rest of metadata as is (like previous_index)
+            return result
+
         if self.process_waiting:
             result = self.process_continued()
         else:
@@ -531,6 +538,12 @@ class TarBlockIter:
         Return index of last tarblock, or None if no previous index
         """
         return self.previous_index, self.previous_block
+
+    def queue_index_data(self, data):
+        """
+        Next time next() is called, we will return data instead of processing
+        """
+        self.queued_data = data
 
     def remember_next_index(self):
         """
