@@ -446,11 +446,13 @@ class RestartTest(unittest.TestCase):
         assert not os.system("diff %s/file1 testfiles/restore_out/file1" % source)
         assert not os.system("diff %s/z testfiles/restore_out/z" % source)
 
-    def test_dangling_manifest_volume(self):
+    def test_changed_source_dangling_manifest_volume(self):
         """
         If we restart but find remote volumes missing, we can easily end up
         with a manifest that lists "vol1, vol2, vol3, vol2", leaving a dangling
-        vol3.  Make sure we can gracefully handle that.
+        vol3.  Make sure we can gracefully handle that.  This will only happen
+        if the source data changes to be small enough to not create a vol3 on
+        restart.
         """
         source = 'testfiles/largefiles'
         self.make_largefiles(count=5, size=1)
@@ -460,7 +462,7 @@ class RestartTest(unittest.TestCase):
             self.fail()
         except CmdError, e:
             self.assertEqual(30, e.exit_status)
-        # now delete the last volume on remote end and change source data
+        # now delete the last volume on remote end and some source files
         assert not os.system("rm testfiles/output/duplicity-full*vol3.difftar*")
         assert not os.system("rm %s/file[2345]" % source)
         assert not os.system("echo hello > %s/z" % source)
