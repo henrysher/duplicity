@@ -2,6 +2,8 @@
 
     * Merged in lp:~verb/duplicity/bucket_root_fix
       - Fix bug that prevents backing up to the root of a bucket with boto backend.
+    * Merged in lp:~gliptak/duplicity/415619
+      - Better error message when chown fails
 
 2013-09-23  Kenneth Loafman  <kenneth@loafman.com>
 
