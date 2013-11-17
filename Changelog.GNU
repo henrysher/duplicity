@@ -30,6 +30,21 @@
         This branch fixes it by deleting any excess volume information encountered
         when loading in the manifest. We discard volume with higher numbers
         than the last one read.
+    * Merged in lp:~mterry/duplicity/disappearing-source
+      - When restarting a backup, we may accidentally skip the first chunk of one of the source files. To reproduce this,:
+        1) interrupt a backup
+        2) delete the source file it was in the middle of
+        3) restart the backup
+
+        When replaying the source iterator to find where to resume from, we can't
+        notice that the file is gone until we've already iterated past where it
+        would be!
+
+        The solution I came up with is to just let duplicity stuff the data we
+        accidentally read back into the source iterator.
+
+        This is actually a data loss bug, because it's possible to back up
+        corrupted files (that are missing their first chunk).
 
 2013-09-23  Kenneth Loafman  <kenneth@loafman.com>
 

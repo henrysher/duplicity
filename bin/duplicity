@@ -223,7 +223,8 @@ def restart_position_iterator(tarblock_iter):
     last_block = globals.restart.last_block
     try:
         # Just spin our wheels
-        while tarblock_iter.next():
+        iter_result = tarblock_iter.next()
+        while iter_result:
             if (tarblock_iter.previous_index == last_index):
                 # If both the previous index and this index are done, exit now
                 # before we hit the next index, to prevent skipping its first
@@ -238,13 +239,15 @@ def restart_position_iterator(tarblock_iter):
                            "Continuing restart on file %s.") %
                            ("/".join(last_index), "/".join(tarblock_iter.previous_index)),
                            log.ErrorCode.restart_file_not_found)
+                # We went too far! Stuff the data back into place before restarting
+                tarblock_iter.queue_index_data(iter_result)
                 break
+            iter_result = tarblock_iter.next()
     except StopIteration:
         log.Warn(_("File %s missing in backup set.\n"
                    "Continuing restart on file %s.") %
                    ("/".join(last_index), "/".join(tarblock_iter.previous_index)),
                    log.ErrorCode.restart_file_not_found)
-    return 0
 
 
 def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):

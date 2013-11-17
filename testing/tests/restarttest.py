@@ -471,6 +471,30 @@ class RestartTest(unittest.TestCase):
         # and verify we can restore
         self.restore()
 
+    def test_changed_source_file_disappears(self):
+        """
+        Make sure we correctly handle restarting a backup when a file
+        disappears when we had been in the middle of backing it up.  It's
+        possible that the first chunk of the next file will be skipped unless
+        we're careful.
+        """
+        source = 'testfiles/largefiles'
+        self.make_largefiles(count=1)
+        # intentionally interrupt initial backup
+        try:
+            self.backup("full", source, options = ["--vol 1", "--fail 2"])
+            self.fail()
+        except CmdError, e:
+            self.assertEqual(30, e.exit_status)
+        # now remove starting source data and make sure we add something after
+        assert not os.system("rm %s/*" % source)
+        assert not os.system("echo hello > %s/z" % source)
+        # finish backup
+        self.backup("full", source)
+        # and verify we can restore
+        self.restore()
+        assert not os.system("diff %s/z testfiles/restore_out/z" % source)
+
 
 # Note that this class duplicates all the tests in RestartTest
 class RestartTestWithoutEncryption(RestartTest):
