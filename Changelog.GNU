@@ -9,6 +9,27 @@
         files in the backup are folders and which are files. The current logging
         information doesn't provide this detail. So I've added a field to the
         log.InfoCode.file_list output that includes the path type.
+    * Merged in lp:~mterry/duplicity/manifest-oddities
+      - We may accidentally end up with an oddly inconsistent manifest like so:
+
+        Volume 1
+        Volume 2
+        Volume 3
+        Volume 2
+
+        As did get reported recently on the mailing list:
+        http://lists.nongnu.org/archive/html/duplicity-talk/2013-11/msg00009.html
+
+        One way this can happen (the only way?) is if you back up, then duplicity
+        gets interrupted between writing the manifest and uploading the volume.
+        Then, when restarted, there is no longer enough data to create as many
+        volumes as existed previously.
+
+        This situation can cause an exception when trying to restart the backup.
+
+        This branch fixes it by deleting any excess volume information encountered
+        when loading in the manifest. We discard volume with higher numbers
+        than the last one read.
 
 2013-09-23  Kenneth Loafman  <kenneth@loafman.com>
 
