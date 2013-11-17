@@ -498,13 +498,14 @@ def integrate_patch_iters( iter_list ):
     """
     collated = collate_iters( iter_list )
     for patch_seq in collated:
+        normalized = normalize_ps(patch_seq)
         try:
-            final_ropath = patch_seq2ropath(normalize_ps(patch_seq))
+            final_ropath = patch_seq2ropath(normalized)
             if final_ropath.exists():
                 # otherwise final patch was delete
                 yield final_ropath
         except Exception, e:
-            filename = patch_seq[-1].get_ropath().get_relative_path()
+            filename = normalized[-1].get_ropath().get_relative_path()
             log.Warn(_("Error '%s' patching %s") % 
                      (str(e), filename),
                      log.WarningCode.cannot_process,

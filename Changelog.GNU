@@ -45,6 +45,19 @@
 
         This is actually a data loss bug, because it's possible to back up
         corrupted files (that are missing their first chunk).
+    * Merged in lp:~mterry/duplicity/normalize-before-using
+      - Avoid throwing an exception due to a None element in a patch sequence.
+
+        None elements in a (non-normalized) patch sequence are perfectly normal.
+        With the current code in the patched function, it is certainly possible to
+        hit a crash due a None.
+        See http://lists.nongnu.org/archive/html/duplicity-talk/2013-11/msg00005.html
+
+        This branch fixes that by normalizing the sequence before using it in the
+        logging code. It's acceptable to bring the normalize_ps() call outside the
+        try/except block because normalize_ps is not expected to throw. It's
+        relatively simple and doesn't really use its objects besides checking if
+        they are None.
 
 2013-09-23  Kenneth Loafman  <kenneth@loafman.com>
 
