@@ -4,6 +4,11 @@
       - Fix bug that prevents backing up to the root of a bucket with boto backend.
     * Merged in lp:~gliptak/duplicity/415619
       - Better error message when chown fails
+    * Merged in lp:~mterry/duplicity/log-path-type
+      - Any backup browser built on top of duplicity will need to indicate which
+        files in the backup are folders and which are files. The current logging
+        information doesn't provide this detail. So I've added a field to the
+        log.InfoCode.file_list output that includes the path type.
 
 2013-09-23  Kenneth Loafman  <kenneth@loafman.com>
 
