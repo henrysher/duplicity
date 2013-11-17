@@ -1,3 +1,8 @@
+2013-11-17  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~verb/duplicity/bucket_root_fix
+      - Fix bug that prevents backing up to the root of a bucket with boto backend.
+
 2013-09-23  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~mterry/duplicity/catch-seq-copy-error

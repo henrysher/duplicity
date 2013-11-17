@@ -202,8 +202,7 @@ class BotoBackend(duplicity.backend.Backend):
 
         if not remote_filename:
             remote_filename = source_path.get_filename()
-        key = self.storage_uri.new_key()
-        key.key = self.key_prefix + remote_filename
+        key = self.bucket.new_key(self.key_prefix + remote_filename)
 
         for n in range(1, globals.num_retries+1):
             if n > 1:
@@ -239,14 +238,16 @@ class BotoBackend(duplicity.backend.Backend):
         raise BackendException("Error uploading %s/%s" % (self.straight_url, remote_filename))
 
     def get(self, remote_filename, local_path):
-        key = self.storage_uri.new_key()
-        key.key = self.key_prefix + remote_filename
         for n in range(1, globals.num_retries+1):
             if n > 1:
                 # sleep before retry (new connection to a **hopeful** new host, so no need to wait so long)
                 time.sleep(10)
             log.Info("Downloading %s/%s" % (self.straight_url, remote_filename))
             try:
+                key_name = self.key_prefix + remote_filename
+                key = self.bucket.get_key(key_name)
+                if key is None:
+                    raise BackendException("%s: key not found" % key_name)
                 key.get_contents_to_filename(local_path.name)
                 local_path.setdata()
                 self.resetConnection()
