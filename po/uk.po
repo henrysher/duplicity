@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2013-09-23 13:30+0000\n"
+"POT-Creation-Date: 2013-11-17 17:31+0000\n"
 "PO-Revision-Date: 2013-04-27 07:38+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2013-09-24 05:56+0000\n"
-"X-Generator: Launchpad (build 16771)\n"
+"X-Launchpad-Export-Date: 2013-11-18 05:23+0000\n"
+"X-Generator: Launchpad (build 16831)\n"
 
 #: ../bin/duplicity:101
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -59,7 +59,7 @@ msgstr ""
 "Неможливо використовувати порожню кодову фразу з симетричним шифруванням! "
 "Будь-ласка, повторіть знову."
 
-#: ../bin/duplicity:237
+#: ../bin/duplicity:238
 #, python-format
 msgid ""
 "File %s complete in backup set.\n"
@@ -68,7 +68,7 @@ msgstr ""
 "Файл %s вже є у наборі резервного копіювання.\n"
 "Продовження перезапуску на файлі %s."
 
-#: ../bin/duplicity:243
+#: ../bin/duplicity:247
 #, python-format
 msgid ""
 "File %s missing in backup set.\n"
@@ -77,12 +77,12 @@ msgstr ""
 "Файл %s відсутній у наборі резервного копіювання.\n"
 "Продовження перезапуску на файлі %s."
 
-#: ../bin/duplicity:295
+#: ../bin/duplicity:298
 #, python-format
 msgid "File %s was corrupted during upload."
 msgstr "Файл %s було пошкоджено під час вивантаження."
 
-#: ../bin/duplicity:329
+#: ../bin/duplicity:332
 msgid ""
 "Restarting backup, but current encryption settings do not match original "
 "settings"
@@ -90,7 +90,7 @@ msgstr ""
 "Перезапуск резервного копіювання, але налаштування поточного шифрування не "
 "відповідають вихідним налаштуванням"
 
-#: ../bin/duplicity:568
+#: ../bin/duplicity:571
 msgid ""
 "Fatal Error: Unable to start incremental backup.  Old signatures not found "
 "and incremental specified"
@@ -98,54 +98,54 @@ msgstr ""
 "Фатальна помилка: Не вдалося почати покрокове резервне копіювання. Старої "
 "сигнатури не знайдено та вказаний покроковий режим"
 
-#: ../bin/duplicity:572
+#: ../bin/duplicity:575
 msgid "No signatures found, switching to full backup."
 msgstr "Сигнатури не знайдено, перемикання на повну резервну копію."
 
-#: ../bin/duplicity:586
+#: ../bin/duplicity:589
 msgid "Backup Statistics"
 msgstr "Статистика резервного копіювання"
 
-#: ../bin/duplicity:689
+#: ../bin/duplicity:693
 #, python-format
 msgid "%s not found in archive, no files restored."
 msgstr "%s не знайдено у архіві, файли не відновлено."
 
-#: ../bin/duplicity:693
+#: ../bin/duplicity:697
 msgid "No files found in archive - nothing restored."
 msgstr "Нічого не знайдено у архіві - нічого не відновлено."
 
-#: ../bin/duplicity:726
+#: ../bin/duplicity:730
 #, python-format
 msgid "Processed volume %d of %d"
 msgstr "Оброблено том %d з %d"
 
-#: ../bin/duplicity:751
+#: ../bin/duplicity:755
 #, python-format
 msgid "Invalid data - %s hash mismatch for file:"
 msgstr "Неприпустимі дані - %s hash не відповідає файлу:"
 
-#: ../bin/duplicity:753
+#: ../bin/duplicity:757
 #, python-format
 msgid "Calculated hash: %s"
 msgstr "Вичислений хеш: %s"
 
-#: ../bin/duplicity:754
+#: ../bin/duplicity:758
 #, python-format
 msgid "Manifest hash: %s"
 msgstr "Хеш маніфесту: %s"
 
-#: ../bin/duplicity:792
+#: ../bin/duplicity:796
 #, python-format
 msgid "Volume was signed by key %s, not %s"
 msgstr "Том було підписано ключем %s, а не %s"
 
-#: ../bin/duplicity:822
+#: ../bin/duplicity:826
 #, python-format
 msgid "Verify complete: %s, %s."
 msgstr "Перевірку закінчено: %s, %s."
 
-#: ../bin/duplicity:823
+#: ../bin/duplicity:827
 #, python-format
 msgid "%d file compared"
 msgid_plural "%d files compared"
@@ -153,7 +153,7 @@ msgstr[0] "%d файл порівняно"
 msgstr[1] "%d файли порівняно"
 msgstr[2] "%d файлів порівняно"
 
-#: ../bin/duplicity:825
+#: ../bin/duplicity:829
 #, python-format
 msgid "%d difference found"
 msgid_plural "%d differences found"
@@ -161,37 +161,37 @@ msgstr[0] "%d відмінність знайдено"
 msgstr[1] "%d відмінності знайдено"
 msgstr[2] "%d відмінностей знайдено"
 
-#: ../bin/duplicity:844
+#: ../bin/duplicity:848
 msgid "No extraneous files found, nothing deleted in cleanup."
 msgstr "Сторонніх файлів не знайдено, при очистці нічого не вилучено."
 
-#: ../bin/duplicity:849
+#: ../bin/duplicity:853
 msgid "Deleting this file from backend:"
 msgid_plural "Deleting these files from backend:"
 msgstr[0] "Вилучається наступний файл з заглушки:"
 msgstr[1] "Вилучаються наступні файли з заглушки:"
 msgstr[2] "Вилучаються наступні файли з заглушки:"
 
-#: ../bin/duplicity:861
+#: ../bin/duplicity:865
 msgid "Found the following file to delete:"
 msgid_plural "Found the following files to delete:"
 msgstr[0] "Знайдено файл для вилучення:"
 msgstr[1] "Знайдено файли для вилучення:"
 msgstr[2] "Знайдено файли для вилучення:"
 
-#: ../bin/duplicity:865
+#: ../bin/duplicity:869
 msgid "Run duplicity again with the --force option to actually delete."
 msgstr "Запустіть duplicity ще раз з ключем --force щоб вилучити на справді."
 
-#: ../bin/duplicity:908
+#: ../bin/duplicity:912
 msgid "There are backup set(s) at time(s):"
 msgstr "Є резервні копії за наступні дати:"
 
-#: ../bin/duplicity:910
+#: ../bin/duplicity:914
 msgid "Which can't be deleted because newer sets depend on them."
 msgstr "Які не може бути вилучено з-за нових наборів що залежать від них."
 
-#: ../bin/duplicity:914
+#: ../bin/duplicity:918
 msgid ""
 "Current active backup chain is older than specified time.  However, it will "
 "not be deleted.  To remove all your backups, manually purge the repository."
@@ -200,109 +200,109 @@ msgstr ""
 "його не буде вилучено. Щоб вилучити усі резервні копії, вручну очистіть "
 "сховище."
 
-#: ../bin/duplicity:920
+#: ../bin/duplicity:924
 msgid "No old backup sets found, nothing deleted."
 msgstr "Старих резервних копій не знайдено, нічого не вилучено."
 
-#: ../bin/duplicity:923
+#: ../bin/duplicity:927
 msgid "Deleting backup chain at time:"
 msgid_plural "Deleting backup chains at times:"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../bin/duplicity:934
+#: ../bin/duplicity:938
 #, python-format
 msgid "Deleting incremental signature chain %s"
 msgstr ""
 
-#: ../bin/duplicity:936
+#: ../bin/duplicity:940
 #, python-format
 msgid "Deleting incremental backup chain %s"
 msgstr ""
 
-#: ../bin/duplicity:939
+#: ../bin/duplicity:943
 #, python-format
 msgid "Deleting complete signature chain %s"
 msgstr ""
 
-#: ../bin/duplicity:941
+#: ../bin/duplicity:945
 #, python-format
 msgid "Deleting complete backup chain %s"
 msgstr ""
 
-#: ../bin/duplicity:947
+#: ../bin/duplicity:951
 msgid "Found old backup chain at the following time:"
 msgid_plural "Found old backup chains at the following times:"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../bin/duplicity:951
+#: ../bin/duplicity:955
 msgid "Rerun command with --force option to actually delete."
 msgstr "Знову запустіть команду with --force варіант фактично вилучити."
 
-#: ../bin/duplicity:1028
+#: ../bin/duplicity:1032
 #, python-format
 msgid "Deleting local %s (not authoritative at backend)."
 msgstr ""
 "Вилучення локального %s (недостатньо надійний у внутрішньому інтерфейсі)."
 
-#: ../bin/duplicity:1032
+#: ../bin/duplicity:1036
 #, python-format
 msgid "Unable to delete %s: %s"
 msgstr "Неможливо вилучити %s: %s"
 
-#: ../bin/duplicity:1060 ../duplicity/dup_temp.py:263
+#: ../bin/duplicity:1064 ../duplicity/dup_temp.py:263
 #, python-format
 msgid "Failed to read %s: %s"
 msgstr "Не вдалося прочитати %s: %s"
 
-#: ../bin/duplicity:1074
+#: ../bin/duplicity:1078
 #, python-format
 msgid "Copying %s to local cache."
 msgstr "Копіюється %s у локальний кеш."
 
-#: ../bin/duplicity:1122
+#: ../bin/duplicity:1126
 msgid "Local and Remote metadata are synchronized, no sync needed."
 msgstr ""
 "Локальні та вилучені метадані синхронізовано, синхронізація не потрібна."
 
-#: ../bin/duplicity:1127
+#: ../bin/duplicity:1131
 msgid "Synchronizing remote metadata to local cache..."
 msgstr ""
 "Синхронізація вилучених метаданих з локальними тимчасовими файлами..."
 
-#: ../bin/duplicity:1140
+#: ../bin/duplicity:1144
 msgid "Sync would copy the following from remote to local:"
 msgstr "Синхронізація скопіює це з вилученого місця у локальне:"
 
-#: ../bin/duplicity:1143
+#: ../bin/duplicity:1147
 msgid "Sync would remove the following spurious local files:"
 msgstr "Синхронізація вилучить наступні невідомі файли:"
 
-#: ../bin/duplicity:1186
+#: ../bin/duplicity:1190
 msgid "Unable to get free space on temp."
 msgstr ""
 "Не вдалося визначити об’єм доступного простору у тимчасовому каталозі."
 
-#: ../bin/duplicity:1194
+#: ../bin/duplicity:1198
 #, python-format
 msgid "Temp space has %d available, backup needs approx %d."
 msgstr ""
 "У тимчасовому каталозі доступного %d, для резервного копіювання потрібно "
 "приблизно %d."
 
-#: ../bin/duplicity:1197
+#: ../bin/duplicity:1201
 #, python-format
 msgid "Temp has %d available, backup will use approx %d."
 msgstr ""
 "У тимчасовому каталозі доступно %d, для резервного копіювання буде "
 "використано приблизно %d."
 
-#: ../bin/duplicity:1205
+#: ../bin/duplicity:1209
 msgid "Unable to get max open files."
 msgstr "Не вдалося визначити максимальну кількість відкритих файлів."
 
-#: ../bin/duplicity:1209
+#: ../bin/duplicity:1213
 #, python-format
 msgid ""
 "Max open files of %s is too low, should be >= 1024.\n"
@@ -311,7 +311,7 @@ msgstr ""
 "Максимальна кількість відкритих файлів %s надто мала, Має бути >= 1024.\n"
 "Використайте 'ulimit -n 1024' або вище, щоб виправити.\n"
 
-#: ../bin/duplicity:1258
+#: ../bin/duplicity:1262
 msgid ""
 "RESTART: The first volume failed to upload before termination.\n"
 "         Restart is impossible...starting backup from beginning."
@@ -319,7 +319,7 @@ msgstr ""
 "ПЕРЕЗАПУСК: Помилка вивантаження першого тома перед закінченням роботи.\n"
 "         Перезапуск неможливий...виконання резервного копіювання з початку."
 
-#: ../bin/duplicity:1264
+#: ../bin/duplicity:1268
 #, python-format
 msgid ""
 "RESTART: Volumes %d to %d failed to upload before termination.\n"
@@ -328,7 +328,7 @@ msgstr ""
 "ПЕРЕЗАПУСК: Помилка вивантаження томів %d дo %d перед закінченням роботи.\n"
 "Перезапуск резервного копіювання у томі %d."
 
-#: ../bin/duplicity:1271
+#: ../bin/duplicity:1275
 #, python-format
 msgid ""
 "RESTART: Impossible backup state: manifest has %d vols, remote has %d vols.\n"
@@ -342,47 +342,47 @@ msgstr ""
 "частини\n"
 "         резервної копії, потім запустить резервне копіювання з початку."
 
-#: ../bin/duplicity:1364
+#: ../bin/duplicity:1368
 #, python-format
 msgid "Last %s backup left a partial set, restarting."
 msgstr ""
 "Остання %s резервна копія залишила частковий набір, виконується перезапуск."
 
-#: ../bin/duplicity:1368
+#: ../bin/duplicity:1372
 #, python-format
 msgid "Cleaning up previous partial %s backup set, restarting."
 msgstr ""
 "Очищення попереднього часткового %s набору резервного копіювання, "
 "виконується перезапуск."
 
-#: ../bin/duplicity:1379
+#: ../bin/duplicity:1383
 msgid "Last full backup date:"
 msgstr "Час останньої повної резервної копії:"
 
-#: ../bin/duplicity:1381
+#: ../bin/duplicity:1385
 msgid "Last full backup date: none"
 msgstr "Час останньої повної резервної копії: немає"
 
-#: ../bin/duplicity:1383
+#: ../bin/duplicity:1387
 msgid "Last full backup is too old, forcing full backup"
 msgstr ""
 "Остання повна резервна копія надто стара, буде зроблено повну резервну копію"
 
-#: ../bin/duplicity:1479
+#: ../bin/duplicity:1483
 msgid "INT intercepted...exiting."
 msgstr "Перехоплення INT...виконується вихід."
 
-#: ../bin/duplicity:1485
+#: ../bin/duplicity:1489
 #, python-format
 msgid "GPG error detail: %s"
 msgstr "Подробиці помилки GPG: %s"
 
-#: ../bin/duplicity:1494
+#: ../bin/duplicity:1498
 #, python-format
 msgid "User error detail: %s"
 msgstr "Відомості помилки користувача: %s"
 
-#: ../bin/duplicity:1503
+#: ../bin/duplicity:1507
 #, python-format
 msgid "Backend error detail: %s"
 msgstr "Подробиці про помилку у заглушці: %s"
@@ -1174,40 +1174,40 @@ msgstr ""
 "й те ж віддалене розміщення. Якщо це помилка, використайте параметр --allow-"
 "source-mismatch для приховування цього повідомлення"
 
-#: ../duplicity/manifest.py:198
+#: ../duplicity/manifest.py:209
 msgid "Manifests not equal because different volume numbers"
 msgstr "Маніфести не однакові у зв’язку з номерами томів що відрізняються"
 
-#: ../duplicity/manifest.py:203
+#: ../duplicity/manifest.py:214
 msgid "Manifests not equal because volume lists differ"
 msgstr "Маніфести не однакові у зв’язку зі списками томів що відрізняються"
 
-#: ../duplicity/manifest.py:208
+#: ../duplicity/manifest.py:219
 msgid "Manifests not equal because hosts or directories differ"
 msgstr ""
 "Маніфести не однакові у зв’язку з вузлами або каталогами що відрізняються"
 
-#: ../duplicity/manifest.py:355
+#: ../duplicity/manifest.py:366
 msgid "Warning, found extra Volume identifier"
 msgstr "Увага, знайдено додатковий ідентифікатор тому"
 
-#: ../duplicity/manifest.py:381
+#: ../duplicity/manifest.py:392
 msgid "Other is not VolumeInfo"
 msgstr "Інший не є VolumeInfo"
 
-#: ../duplicity/manifest.py:384
+#: ../duplicity/manifest.py:395
 msgid "Volume numbers don't match"
 msgstr "Номери томів не відповідають"
 
-#: ../duplicity/manifest.py:387
+#: ../duplicity/manifest.py:398
 msgid "start_indicies don't match"
 msgstr "start_indicies не відповідає"
 
-#: ../duplicity/manifest.py:390
+#: ../duplicity/manifest.py:401
 msgid "end_index don't match"
 msgstr "end_index не відповідає"
 
-#: ../duplicity/manifest.py:397
+#: ../duplicity/manifest.py:408
 msgid "Hashes don't match"
 msgstr "Хеші не співпадають"
 
@@ -1230,12 +1230,12 @@ msgstr ""
 msgid "Patching %s"
 msgstr "Внесення змін у %s"
 
-#: ../duplicity/patchdir.py:508
+#: ../duplicity/patchdir.py:509
 #, python-format
 msgid "Error '%s' patching %s"
 msgstr ""
 
-#: ../duplicity/patchdir.py:581
+#: ../duplicity/patchdir.py:582
 #, python-format
 msgid "Writing %s of type %s"
 msgstr "Запис %s типу %s"
