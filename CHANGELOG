@@ -75,6 +75,8 @@ Enhancements:
     try/except block because normalize_ps is not expected to throw. It's
     relatively simple and doesn't really use its objects besides checking if
     they are None.
+* Applied patch to fix "Access GDrive through gdocs backend failing"
+  - see https://lists.nongnu.org/archive/html/duplicity-talk/2013-07/msg00007.html
 
 
 New in v0.6.22 (2013/08/22)

@@ -220,7 +220,9 @@ class GDocsBackend(duplicity.backend.Backend):
             if title:
                 result = []
                 for entry in entries:
-                    if (not type) or (entry.get_resource_type() == type):
+                    entry_type = entry.get_resource_type().split('/')[0]
+
+                    if (not type) or (type.split('/')[0] == entry_type):
                         if folder_id != GDocsBackend.ROOT_FOLDER_ID:
                             for link in entry.in_collections():
                                 folder_entry = self.client.get_entry(link.href, None, None,

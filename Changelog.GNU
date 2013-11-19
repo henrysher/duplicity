@@ -1,3 +1,7 @@
+2013-11-19  Kenneth Loafman  <kenneth@loafman.com>
+    * Applied patch to fix "Access GDrive through gdocs backend failing"
+      - see https://lists.nongnu.org/archive/html/duplicity-talk/2013-07/msg00007.html
+
 2013-11-17  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~verb/duplicity/bucket_root_fix
