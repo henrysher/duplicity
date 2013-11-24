@@ -24,7 +24,7 @@ import time
 import duplicity.backend
 from duplicity import globals
 from duplicity import log
-from duplicity.errors import * #@UnusedWildImport
+from duplicity.errors import *  # @UnusedWildImport
 from duplicity.util import exception_traceback
 from duplicity.backend import retry
 
@@ -39,9 +39,9 @@ class PyraxBackend(duplicity.backend.Backend):
             raise BackendException("This backend requires the pyrax "
                                    "library available from Rackspace.")
 
-		# Inform Pyrax that we're talking to Rackspace
-		# per Jesus Monzon (gsusmonzon) 
-		pyrax.set_setting("identity_type", "rackspace")
+        # Inform Pyrax that we're talking to Rackspace
+        # per Jesus Monzon (gsusmonzon)
+        pyrax.set_setting("identity_type", "rackspace")
 
         conn_kwargs = {}
 
@@ -66,17 +66,17 @@ class PyraxBackend(duplicity.backend.Backend):
             log.FatalError("Connection failed, please check your credentials: %s %s"
                            % (e.__class__.__name__, str(e)),
                            log.ErrorCode.connection_failed)
-        
+
         self.client_exc = pyrax.exceptions.ClientException
         self.nso_exc = pyrax.exceptions.NoSuchObject
         self.cloudfiles = pyrax.cloudfiles
-        self.container = pyrax.cloudfiles.create_container(container) 
+        self.container = pyrax.cloudfiles.create_container(container)
 
     def put(self, source_path, remote_filename = None):
         if not remote_filename:
             remote_filename = source_path.get_filename()
 
-        for n in range(1, globals.num_retries+1):
+        for n in range(1, globals.num_retries + 1):
             log.Info("Uploading '%s/%s' " % (self.container, remote_filename))
             try:
                 self.container.upload_file(source_path.name, remote_filename)
@@ -95,7 +95,7 @@ class PyraxBackend(duplicity.backend.Backend):
         raise BackendException("Error uploading '%s'" % remote_filename)
 
     def get(self, remote_filename, local_path):
-        for n in range(1, globals.num_retries+1):
+        for n in range(1, globals.num_retries + 1):
             log.Info("Downloading '%s/%s'" % (self.container, remote_filename))
             try:
                 sobject = self.container.get_object(remote_filename)
@@ -120,7 +120,7 @@ class PyraxBackend(duplicity.backend.Backend):
                                % (self.container, remote_filename))
 
     def list(self):
-        for n in range(1, globals.num_retries+1):
+        for n in range(1, globals.num_retries + 1):
             log.Info("Listing '%s'" % (self.container))
             try:
                 # Cloud Files will return a max of 10,000 objects.  We have
@@ -128,7 +128,7 @@ class PyraxBackend(duplicity.backend.Backend):
                 objs = self.container.get_object_names()
                 keys = objs
                 while len(objs) == 10000:
-                    objs = self.container.get_object_names(marker=keys[-1])
+                    objs = self.container.get_object_names(marker = keys[-1])
                     keys += objs
                 return keys
             except self.client_exc, resperr:
@@ -146,7 +146,7 @@ class PyraxBackend(duplicity.backend.Backend):
                                % (self.container))
 
     def delete_one(self, remote_filename):
-        for n in range(1, globals.num_retries+1):
+        for n in range(1, globals.num_retries + 1):
             log.Info("Deleting '%s/%s'" % (self.container, remote_filename))
             try:
                 self.container.delete_object(remote_filename)
@@ -154,7 +154,7 @@ class PyraxBackend(duplicity.backend.Backend):
             except self.client_exc, resperr:
                 if n > 1 and resperr.status == 404:
                     # We failed on a timeout, but delete succeeded on the server
-                    log.Warn("Delete of '%s' missing after retry - must have succeded earler" % remote_filename )
+                    log.Warn("Delete of '%s' missing after retry - must have succeded earler" % remote_filename)
                     return
                 log.Warn("Delete of '%s' failed (attempt %s): pyrax returned: %s %s"
                          % (remote_filename, n, resperr.__class__.__name__, resperr.message))
@@ -175,7 +175,7 @@ class PyraxBackend(duplicity.backend.Backend):
             log.Debug("Deleted '%s/%s'" % (self.container, file_))
 
     @retry
-    def _query_file_info(self, filename, raise_errors=False):
+    def _query_file_info(self, filename, raise_errors = False):
         try:
             sobject = self.container.get_object(filename)
             return {'size': sobject.total_bytes}
@@ -191,4 +191,4 @@ class PyraxBackend(duplicity.backend.Backend):
             else:
                 return {'size': None}
 
-duplicity.backend.register_backend("cfpyrax+http", PyraxBackend)
+duplicity.backend.register_backend("cf+http", PyraxBackend)

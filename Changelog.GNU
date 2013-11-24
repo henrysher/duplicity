@@ -4,6 +4,8 @@
         library, which consolidates all Rackspace Cloud API functionality into
         a single library.  Tested it with Duplicity 0.6.21 on both Arch Linux
         and FreeBSD 8.3.0.
+    * Changed to default to pyrax backend rather than cloudfiles backend.
+      To revert to the cloudfiles backend use '--cf-backend=cloudfiles'
 
 2013-11-19  Kenneth Loafman  <kenneth@loafman.com>
     * Applied patch to fix "Access GDrive through gdocs backend failing"

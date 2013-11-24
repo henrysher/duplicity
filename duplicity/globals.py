@@ -21,7 +21,9 @@
 
 """Store global configuration information"""
 
-import socket, os
+import os
+import socket
+
 
 # The current version of duplicity
 version = "$version"
@@ -138,7 +140,7 @@ encryption = True
 compression = True
 
 # volume size. default 25M
-volsize = 25*1024*1024
+volsize = 25 * 1024 * 1024
 
 # Working directory for the tempfile module. Defaults to /tmp on most systems.
 temproot = None
@@ -181,10 +183,10 @@ s3_use_multiprocessing = False
 # Chunk size used for S3 multipart uploads.The number of parallel uploads to
 # S3 be given by chunk size / volume size. Use this to maximize the use of
 # your bandwidth. Defaults to 25MB
-s3_multipart_chunk_size = 25*1024*1024
+s3_multipart_chunk_size = 25 * 1024 * 1024
 
 # Minimum chunk size accepted by S3
-s3_multipart_minimum_chunk_size = 5*1024*1024
+s3_multipart_minimum_chunk_size = 5 * 1024 * 1024
 
 # Whether to use the full email address as the user name when
 # logging into an imap server. If false just the user name
@@ -216,6 +218,9 @@ ssh_options = ""
 
 # whether to use scp for put/get, sftp is default
 use_scp = False
+
+# default cf backend is pyrax
+cf_backend = "pyrax"
 
 # HTTPS ssl optons (currently only webdav)
 ssl_cacert_file = None
@@ -252,6 +257,6 @@ compare_data = False
 # changes, then runs the real operation and keeps track of the real progress
 progress = False
 
-# Controls the upload progress messages refresh rate. Default: update each 
+# Controls the upload progress messages refresh rate. Default: update each
 # 3 seconds
-progress_rate = 3 
+progress_rate = 3
