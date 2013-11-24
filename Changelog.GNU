@@ -1,3 +1,10 @@
+2013-11-24  Kenneth Loafman  <kenneth@loafman.com>
+    * Merged in lp:~jkrauss/duplicity/pyrax
+      - Rackspace has deprecated python-cloudfiles in favor of their pyrax
+        library, which consolidates all Rackspace Cloud API functionality into
+        a single library.  Tested it with Duplicity 0.6.21 on both Arch Linux
+        and FreeBSD 8.3.0.
+
 2013-11-19  Kenneth Loafman  <kenneth@loafman.com>
     * Applied patch to fix "Access GDrive through gdocs backend failing"
       - see https://lists.nongnu.org/archive/html/duplicity-talk/2013-07/msg00007.html
