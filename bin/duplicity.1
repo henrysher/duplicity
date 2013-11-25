@@ -1229,26 +1229,32 @@ the file is a directory which contains a file matched by the option.
 .PP
 For example,
 
+.RS
 .B --exclude
 /usr/local
+.RE
 
 matches e.g. /usr/local, /usr/local/lib, and /usr/local/lib/netscape.  It
 is the same as --exclude /usr/local --exclude '/usr/local/**'.
+.PP
+On the other hand
 
-Or
-.br
+.RS
 .B --include
 /usr/local
+.RE
 
 specifies that /usr, /usr/local, /usr/local/lib, and
 /usr/local/lib/netscape (but not /usr/doc) all be backed up. Thus you
 don't have to worry about including parent directories to make sure
 that included subdirectories have somewhere to go.
-
+.PP
 Finally,
-.br
+
+.RS
 .B --include
 ignorecase:'/usr/[a-z0-9]foo/*/**.py'
+.RE
 
 would match a file like /usR/5fOO/hello/there/world.py.  If it did
 match anything, it would also match /usr.  If there is no existing
