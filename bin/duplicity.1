@@ -94,6 +94,10 @@ Some backends also require additional components (probably available as packages
 .B "rsync backend"
 .B rsync client binary
 - http://rsync.samba.org/
+.TP
+.BR "mega backend" " (mega.co.nz)"
+.B Python library for mega API
+- https://github.com/ckornacker/mega.py, ubuntu ppa - ppa:ckornacker/backup
 .PP
 There are two
 .B ssh backends
@@ -1025,6 +1029,8 @@ imap[s]://user[:password]@host.com[/from_address_prefix]
 .br
 See also
 .B "A NOTE ON IMAP"
+.PP
+mega://user[:password]@mega.co.nz/some_dir
 .PP
 .B "using rsync daemon"
 .br
