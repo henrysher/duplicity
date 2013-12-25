@@ -1,3 +1,12 @@
+2013-12-25 ede
+    * fix "Import of duplicity.backends.dpbxbackend Failed: No module named dropbox"
+
+2013-11-28 ede
+    * manpage: add mega documentation
+
+2013-11-25 ede
+    * manpage: some formatting fixes to rman issues on website display
+
 2013-11-24  Kenneth Loafman  <kenneth@loafman.com>
     * Merged in lp:~jkrauss/duplicity/pyrax
       - Rackspace has deprecated python-cloudfiles in favor of their pyrax
