@@ -195,7 +195,11 @@ class OPHelpFix(optparse.OptionParser):
         if file is None:
             file = sys.stdout
         encoding = self._get_encoding(file)
-        file.write(self.format_help().decode('utf-8').encode(encoding, "replace"))
+        help = self.format_help()
+        # The help is in unicode or bytes depending on the user's locale
+        if not isinstance(help, unicode):
+            help = self.format_help().decode('utf-8')
+        file.write(help.encode(encoding, "replace"))
 
 
 def parse_cmdline_options(arglist):
