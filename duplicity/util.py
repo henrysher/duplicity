@@ -24,6 +24,7 @@ Miscellaneous utilities.
 """
 
 import errno
+import os
 import sys
 import string
 import traceback
@@ -50,7 +51,21 @@ def exception_traceback(limit = 50):
     return str
 
 def escape(string):
-    return "'%s'" % string.encode("string-escape")
+    "Convert a (bytes) filename to a format suitable for logging (quoted utf8)"
+    string = ufn(string).encode('unicode-escape', 'replace')
+    return u"'%s'" % string.decode('utf8', 'replace')
+
+def ufn(filename):
+    "Convert a (bytes) filename to unicode for printing"
+    assert not isinstance(filename, unicode)
+    return filename.decode(sys.getfilesystemencoding(), 'replace')
+
+def uindex(index):
+    "Convert an index (a tuple of path parts) to unicode for printing"
+    if index:
+        return os.path.join(*map(ufn, index))
+    else:
+        return u'.'
 
 def maybe_ignore_errors(fn):
     """

@@ -244,7 +244,7 @@ class U1Backend(duplicity.backend.Backend):
         f.close()
         local_path.setdata()
 
-    def list(self):
+    def _list(self):
         """List files in that directory"""
         remote_full = self.meta_base + "?include_children=true"
         resp, content = self.client.request(remote_full)

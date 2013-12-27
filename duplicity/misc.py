@@ -24,6 +24,7 @@
 import os
 
 from duplicity import log
+from duplicity import util
 
 
 class MiscError(Exception):
@@ -96,7 +97,7 @@ class FileVolumeWriter:
             raise StopIteration
 
         filename = "%s.%d" % (self.prefix, self.current_index)
-        log.Info(_("Starting to write %s") % filename)
+        log.Info(_("Starting to write %s") % util.ufn(filename))
         outfp = open(filename, "wb")
 
         if not self.write_volume(outfp):
@@ -105,7 +106,7 @@ class FileVolumeWriter:
             if self.current_index == 1:
                 # special case first index
                 log.Notice(_("One only volume required.\n"
-                             "Renaming %s to %s") % (filename, self.prefix))
+                             "Renaming %s to %s") % (util.ufn(filename), util.ufn(self.prefix)))
                 os.rename(filename, self.prefix)
                 return self.prefix
         else:

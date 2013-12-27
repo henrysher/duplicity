@@ -137,7 +137,7 @@ class GDocsBackend(duplicity.backend.Backend):
                                  % (remote_filename, self.folder.title.text, str(e)), raise_errors)
 
     @retry
-    def list(self, raise_errors=False):
+    def _list(self, raise_errors=False):
         """List files in folder"""
         try:
             entries = self.__fetch_entries(self.folder.resource_id.text,

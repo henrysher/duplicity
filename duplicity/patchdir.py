@@ -72,12 +72,12 @@ def patch_diff_tarfile( base_path, diff_tarfile, restrict_index=() ):
     ITR = IterTreeReducer( PathPatcher, [base_path] )
     for basis_path, diff_ropath in collated:
         if basis_path:
-            log.Info( _( "Patching %s" ) % ( basis_path.get_relative_path(), ),
+            log.Info(_("Patching %s") % (util.ufn(basis_path.get_relative_path())),
                      log.InfoCode.patch_file_patching,
                      util.escape( basis_path.get_relative_path() ) )
             ITR( basis_path.index, basis_path, diff_ropath )
         else:
-            log.Info( _( "Patching %s" ) % ( diff_ropath.get_relative_path(), ),
+            log.Info(_("Patching %s") % (util.ufn(diff_ropath.get_relative_path())),
                      log.InfoCode.patch_file_patching,
                      util.escape( diff_ropath.get_relative_path() ) )
             ITR( diff_ropath.index, basis_path, diff_ropath )
@@ -155,8 +155,8 @@ def get_index_from_tarinfo( tarinfo ):
                       re.subn( "(?s)^multivol_(diff|snapshot)/?(.*)/[0-9]+$",
                               "\\2", tiname )
                 if num_subs != 1:
-                    raise PatchDirException( "Unrecognized diff entry %s" %
-                                            ( tiname, ) )
+                    raise PatchDirException(u"Unrecognized diff entry %s" %
+                                            util.ufn(tiname))
             else:
                 difftype = prefix[:-1] # strip trailing /
                 name = tiname[len( prefix ):]
@@ -165,15 +165,15 @@ def get_index_from_tarinfo( tarinfo ):
                 multivol = 0
             break
     else:
-        raise PatchDirException( "Unrecognized diff entry %s" %
-                                 ( tiname, ) )
+        raise PatchDirException(u"Unrecognized diff entry %s" %
+                                util.ufn(tiname))
     if name == "." or name == "":
         index = ()
     else:
         index = tuple( name.split( "/" ) )
         if '..' in index:
-            raise PatchDirException( "Tar entry %s contains '..'.  Security "
-                                    "violation" % ( tiname, ) )
+            raise PatchDirException(u"Tar entry %s contains '..'.  Security "
+                                    "violation" % util.ufn(tiname))
     return ( index, difftype, multivol )
 
 
@@ -252,7 +252,7 @@ class PathPatcher( ITRBranch ):
     def start_process( self, index, basis_path, diff_ropath ):
         """Start processing when diff_ropath is a directory"""
         if not ( diff_ropath and diff_ropath.isdir() ):
-            assert index == (), str( index ) # should only happen for first elem
+            assert index == (), util.uindex(index) # should only happen for first elem
             self.fast_process( index, basis_path, diff_ropath )
             return
 
@@ -580,7 +580,7 @@ class ROPath_IterWriter( ITRBranch ):
     def can_fast_process( self, index, ropath ):
         """Can fast process (no recursion) if ropath isn't a directory"""
         log.Info( _( "Writing %s of type %s" ) %
-                 ( ropath.get_relative_path(), ropath.type ),
+                 (util.ufn(ropath.get_relative_path()), ropath.type),
                  log.InfoCode.patch_file_writing,
                  "%s %s" % ( util.escape( ropath.get_relative_path() ), ropath.type ) )
         return not ropath.isdir()

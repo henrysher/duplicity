@@ -234,7 +234,7 @@ try:
     import threading
 except ImportError:
     import dummy_threading #@UnusedImport
-    log.Warn("Threading not available -- zombie processes may appear")
+    log.Warn(_("Threading not available -- zombie processes may appear"))
 
 __author__   = "Frank J. Tobin, ftobin@neverending.org"
 __version__  = "0.3.2"
@@ -674,7 +674,7 @@ def threaded_waitpid(process):
     try:
         process.returned = os.waitpid(process.pid, 0)[1]
     except:
-        log.Debug("GPG process %d terminated before wait()" % process.pid)
+        log.Debug(_("GPG process %d terminated before wait()") % process.pid)
         process.returned = 0
 
 

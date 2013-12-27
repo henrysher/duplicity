@@ -152,7 +152,7 @@ class GIOBackend(duplicity.backend.Backend):
         local_path.setdata()
 
     @retry
-    def list(self, raise_errors=False):
+    def _list(self, raise_errors=False):
         """List files in that directory"""
         files = []
         try:

@@ -277,7 +277,7 @@ class SSHPExpectBackend(duplicity.backend.Backend):
             raise BackendException("File %s not found locally after get "
                                    "from backend" % local_path.name)
 
-    def list(self):
+    def _list(self):
         """
         List files available for scp
 
