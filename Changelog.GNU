@@ -2,6 +2,7 @@
     * Merged in lp:~verb/duplicity/boto-min-version
       - Update documentation and error messages to match the current actual version
         requirements of boto backend.
+    * Merged in changes from main trunk.
 
 2013-11-24  Kenneth Loafman  <kenneth@loafman.com>
     * Merged in lp:~jkrauss/duplicity/pyrax
