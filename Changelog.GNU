@@ -3,6 +3,9 @@
       - Update documentation and error messages to match the current actual version
         requirements of boto backend.
     * Merged in changes from main trunk.
+    * Merged in lp:~ed.so/duplicity/debian.paramiko.log
+      - upstream debian patch "paramiko logging"
+        http://patch-tracker.debian.org/package/duplicity/0.6.22-2
 
 2013-11-24  Kenneth Loafman  <kenneth@loafman.com>
     * Merged in lp:~jkrauss/duplicity/pyrax

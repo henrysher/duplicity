@@ -30,6 +30,7 @@ import errno
 import sys
 import time
 import getpass
+import logging
 from binascii import hexlify
 
 import duplicity.backend
@@ -104,6 +105,30 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
 
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(AgreedAddPolicy())
+        
+        # paramiko uses logging with the normal python severity levels,
+        # but duplicity uses both custom levels and inverted logic...*sigh*
+        self.client.set_log_channel("sshbackend")
+        ours=paramiko.util.get_logger("sshbackend")
+        dest=logging.StreamHandler(sys.stderr)
+        dest.setFormatter(logging.Formatter('ssh: %(message)s'))
+        ours.addHandler(dest)
+
+        # ..and the duplicity levels are neither linear, 
+        # nor are the names compatible with python logging, eg. 'NOTICE'...WAAAAAH!
+        plevel=logging.getLogger("duplicity").getEffectiveLevel()
+        if plevel <= 1:
+            wanted=logging.DEBUG
+        elif plevel <= 5:
+            wanted=logging.INFO
+        elif plevel <= 7:
+            wanted=logging.WARNING
+        elif plevel <= 9:
+            wanted=logging.ERROR
+        else:
+            wanted=logging.CRITICAL
+        ours.setLevel(wanted)
+        
         # load known_hosts files
         # paramiko is very picky wrt format and bails out on any problem...
         try:

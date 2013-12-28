@@ -87,6 +87,9 @@ Enhancements:
 * Merged in lp:~verb/duplicity/boto-min-version
   - Update documentation and error messages to match the current actual version
     requirements of boto backend.
+* Merged in lp:~ed.so/duplicity/debian.paramiko.log
+  - upstream debian patch "paramiko logging"
+    http://patch-tracker.debian.org/package/duplicity/0.6.22-2
 
 
 New in v0.6.22 (2013/08/22)
