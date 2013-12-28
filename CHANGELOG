@@ -90,6 +90,9 @@ Enhancements:
 * Merged in lp:~ed.so/duplicity/debian.paramiko.log
   - upstream debian patch "paramiko logging"
     http://patch-tracker.debian.org/package/duplicity/0.6.22-2
+* Merged in lp:~ed.so/duplicity/debian.dav.mkdir
+  - upstream debian patch "webdav create folder recursively"
+    http://patch-tracker.debian.org/package/duplicity/0.6.22-2
 
 
 New in v0.6.22 (2013/08/22)

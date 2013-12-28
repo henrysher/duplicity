@@ -6,6 +6,9 @@
     * Merged in lp:~ed.so/duplicity/debian.paramiko.log
       - upstream debian patch "paramiko logging"
         http://patch-tracker.debian.org/package/duplicity/0.6.22-2
+    * Merged in lp:~ed.so/duplicity/debian.dav.mkdir
+      - upstream debian patch "webdav create folder recursively"
+        http://patch-tracker.debian.org/package/duplicity/0.6.22-2
 
 2013-11-24  Kenneth Loafman  <kenneth@loafman.com>
     * Merged in lp:~jkrauss/duplicity/pyrax
