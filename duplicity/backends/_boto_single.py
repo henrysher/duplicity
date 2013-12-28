@@ -29,7 +29,7 @@ from duplicity.util import exception_traceback
 from duplicity.backend import retry
 from duplicity import progress
 
-BOTO_MIN_VERSION = "1.6a"
+BOTO_MIN_VERSION = "2.0"
 
 
 class BotoBackend(duplicity.backend.Backend):

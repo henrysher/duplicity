@@ -1,3 +1,8 @@
+2013-12-28  Kenneth Loafman  <kenneth@loafman.com>
+    * Merged in lp:~verb/duplicity/boto-min-version
+      - Update documentation and error messages to match the current actual version
+        requirements of boto backend.
+
 2013-11-24  Kenneth Loafman  <kenneth@loafman.com>
     * Merged in lp:~jkrauss/duplicity/pyrax
       - Rackspace has deprecated python-cloudfiles in favor of their pyrax
