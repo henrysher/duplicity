@@ -1,11 +1,11 @@
 #!/bin/bash
 
 help(){
-	echo "Usage: ${SCRIPT_NAME} [-n] [-s] [source_dir]"
-	echo "Options:" 
-	echo "  -n   Do not encrypt files (use --no-encryption duplicity option)."
-	echo "  -s   Use system duplicity rather than local one."
-	exit 1
+    echo "Usage: ${SCRIPT_NAME} [-n] [-s] [source_dir]"
+    echo "Options:"
+    echo "  -n   Do not encrypt files (use --no-encryption duplicity option)."
+    echo "  -s   Use system duplicity rather than local one."
+    exit 1
 }
 
 # Check permissions
