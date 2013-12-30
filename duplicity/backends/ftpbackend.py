@@ -105,7 +105,7 @@ class FTPBackend(duplicity.backend.Backend):
         self.run_command_persist(commandline)
         local_path.setdata()
 
-    def list(self):
+    def _list(self):
         """List files in directory"""
         # Do a long listing to avoid connection reset
         commandline = "ncftpls %s -l '%s'" % (self.flags, self.url_string)

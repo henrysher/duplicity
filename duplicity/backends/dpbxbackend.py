@@ -196,7 +196,7 @@ class DPBXBackend(duplicity.backend.Backend):
 
     @retry_fatal
     @command()
-    def list(self,none=None):
+    def _list(self,none=None):
         """List files in directory"""
         # Do a long listing to avoid connection reset
         remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()

@@ -104,7 +104,7 @@ class FTPSBackend(duplicity.backend.Backend):
         self.run_command_persist(commandline)
         local_path.setdata()
 
-    def list(self):
+    def _list(self):
         """List files in directory"""
         # Do a long listing to avoid connection reset
         remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()

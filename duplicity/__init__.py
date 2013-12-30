@@ -19,5 +19,12 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
+import __builtin__
 import gettext
-gettext.install('duplicity', codeset='utf8')
+
+t = gettext.translation('duplicity', fallback=True)
+t.install(unicode=True)
+
+# Once we can depend on python >=2.5, we can just use names='ngettext' above.
+# But for now, do the install manually.
+__builtin__.__dict__['ngettext'] = t.ungettext

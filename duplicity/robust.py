@@ -56,7 +56,7 @@ def check_common_error(error_handler, function, args = ()):
 def listpath(path):
     """Like path.listdir() but return [] if error, and sort results"""
     def error_handler(exc):
-        log.Warn(_("Error listing directory %s") % path.name)
+        log.Warn(_("Error listing directory %s") % util.ufn(path.name))
         return []
     dir_listing = check_common_error(error_handler, path.listdir)
     dir_listing.sort()
@@ -64,4 +64,4 @@ def listpath(path):
 
 from duplicity import librsync
 from duplicity import log
-
+from duplicity import util

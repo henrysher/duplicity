@@ -232,7 +232,7 @@ class Manifest:
         Write string version of manifest to given path
         """
         assert not path.exists()
-        fout = path.open("w")
+        fout = path.open("wb")
         fout.write(self.to_string())
         assert not fout.close()
         path.setdata()

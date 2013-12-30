@@ -72,7 +72,14 @@ def Log(s, verb_level, code=1, extra=None, force_print=False):
         initial_level = _logger.getEffectiveLevel()
         _logger.setLevel(DupToLoggerLevel(MAX))
 
-    _logger.log(DupToLoggerLevel(verb_level), s.decode("utf8", "ignore"))
+    # If all the backends kindly gave us unicode, we could enable this next
+    # assert line.  As it is, we'll attempt to convert s to unicode if we
+    # are handed bytes.  One day we should update the backends.
+    #assert isinstance(s, unicode)
+    if not isinstance(s, unicode):
+        s = s.decode("utf8", "replace")
+
+    _logger.log(DupToLoggerLevel(verb_level), s)
     _logger.controlLine = None
 
     if force_print:
@@ -194,7 +201,7 @@ def TransferProgress(progress, eta, changed_bytes, elapsed, speed, stalled):
 
 def PrintCollectionStatus(col_stats, force_print=False):
     """Prints a collection status to the log"""
-    Log(str(col_stats), 8, InfoCode.collection_status,
+    Log(unicode(col_stats), 8, InfoCode.collection_status,
         '\n' + '\n'.join(col_stats.to_log_info()), force_print)
 
 def Notice(s):

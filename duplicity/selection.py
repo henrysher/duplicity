@@ -116,15 +116,15 @@ class Select:
             try:
                 mode = os.stat(fullpath)[stat.ST_MODE]
                 if stat.S_ISSOCK(mode):
-                    log.Info(_("Skipping socket %s") % fullpath,
+                    log.Info(_("Skipping socket %s") % util.ufn(fullpath),
                              log.InfoCode.skipping_socket,
                              util.escape(fullpath))
                 else:
-                    log.Warn(_("Error initializing file %s") % fullpath,
+                    log.Warn(_("Error initializing file %s") % util.ufn(fullpath),
                              log.WarningCode.cannot_iterate,
                              util.escape(fullpath))
             except OSError:
-                log.Warn(_("Error accessing possibly locked file %s") % fullpath,
+                log.Warn(_("Error accessing possibly locked file %s") % util.ufn(fullpath),
                          log.WarningCode.cannot_stat,
                          util.escape(fullpath))
             return None
@@ -145,7 +145,7 @@ class Select:
                 # make sure file is read accessible
                 if (new_path and new_path.type in ["reg", "dir"]
                     and not os.access(new_path.name, os.R_OK)):
-                    log.Warn(_("Error accessing possibly locked file %s") % new_path.name,
+                    log.Warn(_("Error accessing possibly locked file %s") % util.ufn(new_path.name),
                              log.WarningCode.cannot_read,
                              util.escape(new_path.name))
                     if diffdir.stats:
@@ -161,9 +161,9 @@ class Select:
         if not path.type:
             # base doesn't exist
             log.Warn(_("Warning: base %s doesn't exist, continuing") %
-                     path.name)
+                     util.ufn(path.name))
             return
-        log.Debug(_("Selecting %s") % path.name)
+        log.Debug(_("Selecting %s") % util.ufn(path.name))
         yield path
         if not path.isdir():
             return
@@ -181,10 +181,10 @@ class Select:
             if val == 0:
                 if delayed_path_stack:
                     for delayed_path in delayed_path_stack:
-                        log.Log(_("Selecting %s") % delayed_path.name, 6)
+                        log.Log(_("Selecting %s") % util.ufn(delayed_path.name), 6)
                         yield delayed_path
                     del delayed_path_stack[:]
-                log.Debug(_("Selecting %s") % subpath.name)
+                log.Debug(_("Selecting %s") % util.ufn(subpath.name))
                 yield subpath
                 if subpath.isdir():
                     diryield_stack.append(diryield(subpath))
@@ -271,7 +271,7 @@ cannot match any files in the base directory
     %s
 Useful file specifications begin with the base directory or some
 pattern (such as '**') which matches the base directory.""") %
-            (exc, self.prefix), log.ErrorCode.file_prefix_error)
+            (exc, util.ufn(self.prefix)), log.ErrorCode.file_prefix_error)
         elif isinstance(exc, GlobbingError):
             log.FatalError(_("Fatal Error while processing expression\n"
                              "%s") % exc, log.ErrorCode.globbing_error)
@@ -340,7 +340,7 @@ probably isn't what you meant.""") %
             if prefix_warnings[0] < 6:
                 log.Warn(_("Warning: file specification '%s' in filelist %s\n"
                            "doesn't start with correct prefix %s.  Ignoring.") %
-                         (exc, filelist_name, self.prefix))
+                         (exc, filelist_name, util.ufn(self.prefix)))
                 if prefix_warnings[0] == 5:
                     log.Warn(_("Future prefix errors will not be logged."))
 
@@ -519,7 +519,7 @@ probably isn't what you meant.""") %
         if include == 0:
             sel_func = exclude_sel_func
         else:
-            log.FatalError("--include-if-present not implemented (would it make sense?).",
+            log.FatalError(u"--include-if-present not implemented (would it make sense?).",
                            log.ErrorCode.not_implemented)
 
         sel_func.exclude = not include

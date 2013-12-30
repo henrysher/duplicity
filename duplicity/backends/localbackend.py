@@ -96,7 +96,7 @@ class LocalBackend(duplicity.backend.Backend):
         except Exception, e:
             self.handle_error(e, 'get', source_path.name, local_path.name)
 
-    def list(self):
+    def _list(self):
         """List files in that directory"""
         try:
                 os.makedirs(self.remote_pathdir.base)

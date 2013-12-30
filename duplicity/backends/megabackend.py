@@ -105,7 +105,7 @@ class MegaBackend(duplicity.backend.Backend):
                                  % (remote_filename, self.__get_node_name(self.folder), str(e)), raise_errors)
 
     @retry
-    def list(self, raise_errors=False):
+    def _list(self, raise_errors=False):
         """List files in folder"""
         try:
             entries = self.client.get_files_in_node(self.folder)

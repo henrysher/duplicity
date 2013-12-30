@@ -40,6 +40,7 @@ from duplicity import gpg
 from duplicity import log
 from duplicity import path
 from duplicity import selection
+from duplicity import util
 
 
 select_opts = []  # Will hold all the selection options
@@ -194,7 +195,11 @@ class OPHelpFix(optparse.OptionParser):
         if file is None:
             file = sys.stdout
         encoding = self._get_encoding(file)
-        file.write(self.format_help().decode('utf-8').encode(encoding, "replace"))
+        help = self.format_help()
+        # The help is in unicode or bytes depending on the user's locale
+        if not isinstance(help, unicode):
+            help = self.format_help().decode('utf-8')
+        file.write(help.encode(encoding, "replace"))
 
 
 def parse_cmdline_options(arglist):
@@ -655,7 +660,7 @@ def parse_cmdline_options(arglist):
     set_archive_dir(expand_archive_dir(globals.archive_dir,
                                        globals.backup_name))
 
-    log.Info(_("Using archive dir: %s") % (globals.archive_dir.name,))
+    log.Info(_("Using archive dir: %s") % (util.ufn(globals.archive_dir.name),))
     log.Info(_("Using backup name: %s") % (globals.backup_name,))
 
     return args
@@ -865,7 +870,7 @@ def set_archive_dir(dirstring):
     archive_dir = path.Path(dirstring)
     if not archive_dir.isdir():
         log.FatalError(_("Specified archive directory '%s' does not exist, "
-                         "or is not a directory") % (archive_dir.name,),
+                         "or is not a directory") % (util.ufn(archive_dir.name),),
                        log.ErrorCode.bad_archive_dir)
     globals.archive_dir = archive_dir
 
@@ -934,18 +939,18 @@ def process_local_dir(action, local_pathname):
     if action == "restore":
         if (local_path.exists() and not local_path.isemptydir()) and not globals.force:
             log.FatalError(_("Restore destination directory %s already "
-                             "exists.\nWill not overwrite.") % (local_pathname,),
+                             "exists.\nWill not overwrite.") % (util.ufn(local_path.name),),
                            log.ErrorCode.restore_dir_exists)
     elif action == "verify":
         if not local_path.exists():
             log.FatalError(_("Verify directory %s does not exist") %
-                           (local_path.name,),
+                           (util.ufn(local_path.name),),
                            log.ErrorCode.verify_dir_doesnt_exist)
     else:
         assert action == "full" or action == "inc"
         if not local_path.exists():
             log.FatalError(_("Backup source directory %s does not exist.")
-                           % (local_path.name,),
+                           % (util.ufn(local_path.name),),
                            log.ErrorCode.backup_dir_doesnt_exist)
 
     globals.local_path = local_path

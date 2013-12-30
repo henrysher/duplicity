@@ -46,7 +46,7 @@ class FileNamingBase:
         dup_time.setcurtime(20)
 
         filename = file_naming.get("inc", volume_number = 23)
-        log.Info("Inc filename: " + filename)
+        log.Info(u"Inc filename: " + filename)
         pr = file_naming.parse(filename)
         assert pr and pr.type == "inc", pr
         assert pr.start_time == 10
@@ -55,7 +55,7 @@ class FileNamingBase:
         assert not pr.partial
 
         filename = file_naming.get("full-sig")
-        log.Info("Full sig filename: " + filename)
+        log.Info(u"Full sig filename: " + filename)
         pr = file_naming.parse(filename)
         assert pr.type == "full-sig"
         assert pr.time == 20

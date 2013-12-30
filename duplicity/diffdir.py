@@ -100,7 +100,7 @@ def delta_iter_error_handler(exc, new_path, sig_path, sig_tar = None):
         index_string = sig_path.get_relative_path()
     else:
         assert 0, "Both new and sig are None for some reason"
-    log.Warn(_("Error %s getting delta for %s") % (str(exc), index_string))
+    log.Warn(_("Error %s getting delta for %s") % (str(exc), util.ufn(index_string)))
     return None
 
 
@@ -160,14 +160,14 @@ def log_delta_path(delta_path, new_path = None, stats = None):
         if new_path and stats:
             stats.add_new_file(new_path)
         log.Info(_("A %s") %
-                 (delta_path.get_relative_path(),),
+                 (util.ufn(delta_path.get_relative_path())),
                  log.InfoCode.diff_file_new,
                  util.escape(delta_path.get_relative_path()))
     else:
         if new_path and stats:
             stats.add_changed_file(new_path)
         log.Info(_("M %s") %
-                 (delta_path.get_relative_path(),),
+                 (util.ufn(delta_path.get_relative_path())),
                  log.InfoCode.diff_file_changed,
                  util.escape(delta_path.get_relative_path()))
 
@@ -188,8 +188,8 @@ def get_delta_iter(new_iter, sig_iter, sig_fileobj=None):
     else:
         sigTarFile = None
     for new_path, sig_path in collated:
-        log.Debug(_("Comparing %s and %s") % (new_path and new_path.index,
-                                              sig_path and sig_path.index))
+        log.Debug(_("Comparing %s and %s") % (new_path and util.uindex(new_path.index),
+                                              sig_path and util.uindex(sig_path.index)))
         if not new_path or not new_path.type:
             # File doesn't exist (but ignore attempts to delete base dir;
             # old versions of duplicity could have written out the sigtar in
@@ -197,7 +197,7 @@ def get_delta_iter(new_iter, sig_iter, sig_fileobj=None):
             if sig_path and sig_path.exists() and sig_path.index != ():
                 # but signature says it did
                 log.Info(_("D %s") %
-                         (sig_path.get_relative_path(),),
+                         (util.ufn(sig_path.get_relative_path())),
                          log.InfoCode.diff_file_deleted,
                          util.escape(sig_path.get_relative_path()))
                 if sigTarFile:
@@ -391,7 +391,7 @@ class FileWithReadCounter:
             buf = self.infile.read(length)
         except IOError, ex:
             buf = ""
-            log.Warn(_("Error %s getting delta for %s") % (str(ex), self.infile.name))
+            log.Warn(_("Error %s getting delta for %s") % (str(ex), util.ufn(self.infile.name)))
         if stats:
             stats.SourceFileSize += len(buf)
         return buf
@@ -476,7 +476,7 @@ class TarBlockIter:
         Make tarblock out of tarinfo and file data
         """
         tarinfo.size = len(file_data)
-        headers = tarinfo.tobuf()
+        headers = tarinfo.tobuf(errors='replace')
         blocks, remainder = divmod(tarinfo.size, tarfile.BLOCKSIZE) #@UnusedVariable
         if remainder > 0:
             filler_data = "\0" * (tarfile.BLOCKSIZE - remainder)

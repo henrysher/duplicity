@@ -364,7 +364,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                 log.Warn("%s (Try %d of %d) Will retry in %d seconds." % (e,n,globals.num_retries,self.retry_delay))
         raise BackendException("Giving up trying to download '%s' after %d attempts" % (remote_filename,n))
 
-    def list(self):
+    def _list(self):
         """lists the contents of the one-and-only duplicity dir on the remote side.
         In scp mode unavoidable quoting issues will make this fail if the directory name
         contains single quotes."""

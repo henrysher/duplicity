@@ -131,7 +131,7 @@ class SwiftBackend(duplicity.backend.Backend):
         raise BackendException("Error downloading '%s/%s'"
                                % (self.container, remote_filename))
 
-    def list(self):
+    def _list(self):
         for n in range(1, globals.num_retries+1):
             log.Info("Listing '%s'" % (self.container))
             try:

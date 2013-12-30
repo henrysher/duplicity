@@ -94,6 +94,36 @@ Enhancements:
   - upstream debian patch "webdav create folder recursively"
     http://patch-tracker.debian.org/package/duplicity/0.6.22-2
 * Nuke tabs
+* Merged in lp:~mterry/duplicity/encoding
+  - This branch hopefully fixes two filename encoding issues:
+  - Users in bug 989496 were noticing a UnicodeEncodeError exception which
+    happens (as far as I can tell) because some backends (like webdav) are
+    returning unicode filenames from list(). When these filenames are combined
+    with the utf8 translations of log messages, either (A) the default ascii
+    encoding can't handle promoting the utf8 bytes or -- if there aren't any
+    utf8 bytes in the translation -- (B) the resulting unicode string raises
+    an error later when log.py tries to upgrade the string again to unicode
+    for printing.
+  - This fix is largely implemented by adding a wrapper for backend list()
+    implementations. This wrapper ensures that duplicity internals always see
+    a byte string. (I'd like to eventually use this same wrapping strategy to
+    implement generic retry support without backends having to add any logic,
+    but that's just a thought for the future.)
+  - That is, the fix for issue #1 is completely inside backend.py and the
+    changes to backends/*.py.
+  - The rest of the invasive changes deal with filenames that may not be valid
+    utf8. This is much rarer, but possible. For proper handling of this, we
+    need to print using unicode, and convert filenames from the system filename
+    encoding to unicode, gracefully handling conversion errors. Some of the
+    filenames we print are remote names. Who knows what encoding they are in;
+    it could be different than the system filename encoding. 99% of the time,
+    everything will be utf8 and we're fine. If we do get conversion errors,
+    the only effect should be some question mark characters in duplicity
+    logging output.
+  - I tried to convert as much of the actual codebase to use unicode for
+    printing. But I stopped short of adding an assert in log.py to enforce
+    unicode, because I didn't want to go through all the backend code and
+    manually adjust those bits without being able to test each one.
 
 
 New in v0.6.22 (2013/08/22)

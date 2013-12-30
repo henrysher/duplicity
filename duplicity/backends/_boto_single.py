@@ -265,7 +265,7 @@ class BotoBackend(duplicity.backend.Backend):
                 (self.straight_url, remote_filename, globals.num_retries))
         raise BackendException("Error downloading %s/%s" % (self.straight_url, remote_filename))
 
-    def list(self):
+    def _list(self):
         if not self.bucket:
             return []
 

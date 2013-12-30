@@ -262,7 +262,7 @@ class WebDAVBackend(duplicity.backend.Backend):
         return 'Digest %s' % auth_string
 
     @retry_fatal
-    def list(self):
+    def _list(self):
         """List files in directory"""
         log.Info("Listing directory %s on WebDAV server" % (self.directory,))
         response = None

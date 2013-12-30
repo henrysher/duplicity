@@ -84,7 +84,7 @@ def import_backends():
             except Exception:
                 res = "Failed: " + str(sys.exc_info()[1])
                 level = log.WARNING
-            log.Log("Import of %s %s" % (imp, res), level)
+            log.Log(_("Import of %s %s") % (imp, res), level)
         else:
             continue
 
@@ -317,9 +317,9 @@ def retry(fn):
                 kwargs = {"raise_errors" : True}
                 return fn(*args, **kwargs)
             except Exception, e:
-                log.Warn("Attempt %s failed: %s: %s"
+                log.Warn(_("Attempt %s failed: %s: %s")
                          % (n, e.__class__.__name__, str(e)))
-                log.Debug("Backtrace of previous error: %s"
+                log.Debug(_("Backtrace of previous error: %s")
                           % exception_traceback())
                 if isinstance(e, TemporaryLoadException):
                     time.sleep(30) # wait longer before trying again
@@ -347,18 +347,18 @@ def retry_fatal(fn):
                     raise e
                 except Exception, e:
                     # retry on anything else
-                    log.Warn("Attempt %s failed. %s: %s"
+                    log.Warn(_("Attempt %s failed. %s: %s")
                              % (n, e.__class__.__name__, str(e)))
-                    log.Debug("Backtrace of previous error: %s"
+                    log.Debug(_("Backtrace of previous error: %s")
                               % exception_traceback())
                     time.sleep(10) # wait a bit before trying again
         # final trial, die on exception
             self.retry_count = n+1
             return fn(self, *args)
         except Exception, e:
-            log.Debug("Backtrace of previous error: %s"
+            log.Debug(_("Backtrace of previous error: %s")
                         % exception_traceback())
-            log.FatalError("Giving up after %s attempts. %s: %s"
+            log.FatalError(_("Giving up after %s attempts. %s: %s")
                          % (self.retry_count, e.__class__.__name__, str(e)),
                           log.ErrorCode.backend_error)
         self.retry_count = 0
@@ -411,9 +411,24 @@ class Backend:
 
     def list(self):
         """
-        Return list of filenames (strings) present in backend
+        Return list of filenames (byte strings) present in backend
         """
-        raise NotImplementedError()
+        def tobytes(filename):
+            "Convert a (maybe unicode) filename to bytes"
+            if isinstance(filename, unicode):
+                # There shouldn't be any encoding errors for files we care
+                # about, since duplicity filenames are ascii.  But user files
+                # may be in the same directory.  So just replace characters.
+                return filename.encode(sys.getfilesystemencoding(), 'replace')
+            else:
+                return filename
+
+        if hasattr(self, '_list'):
+            # Make sure that duplicity internals only ever see byte strings
+            # for filenames, no matter what the backend thinks it is talking.
+            return map(tobytes, self._list())
+        else:
+            raise NotImplementedError()
 
     def delete(self, filename_list):
         """
@@ -567,15 +582,15 @@ class Backend:
             except (KeyError, ValueError):
                 pass
 
-            log.Warn(gettext.ngettext("Running '%s' failed with code %d (attempt #%d)",
-                                     "Running '%s' failed with code %d (attempt #%d)", n) %
-                                      (private, result, n))
+            log.Warn(ngettext("Running '%s' failed with code %d (attempt #%d)",
+                              "Running '%s' failed with code %d (attempt #%d)", n) %
+                               (private, result, n))
             if stdout or stderr:
                     log.Warn(_("Error is:\n%s") % stderr + (stderr and stdout and "\n") + stdout)
 
-        log.Warn(gettext.ngettext("Giving up trying to execute '%s' after %d attempt",
-                                  "Giving up trying to execute '%s' after %d attempts",
-                                  globals.num_retries) % (private, globals.num_retries))
+        log.Warn(ngettext("Giving up trying to execute '%s' after %d attempt",
+                          "Giving up trying to execute '%s' after %d attempts",
+                          globals.num_retries) % (private, globals.num_retries))
         raise BackendException("Error running '%s'" % private)
 
     def get_fileobj_read(self, filename, parseresults = None):
@@ -609,7 +624,7 @@ class Backend:
         """
         if not parseresults:
             parseresults = file_naming.parse(filename)
-            assert parseresults, "Filename %s not correctly parsed" % filename
+            assert parseresults, u"Filename %s not correctly parsed" % util.ufn(filename)
         tdp = dup_temp.new_tempduppath(parseresults)
 
         def close_file_hook():
