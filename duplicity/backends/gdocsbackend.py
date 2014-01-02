@@ -220,6 +220,7 @@ class GDocsBackend(duplicity.backend.Backend):
             if title:
                 result = []
                 for entry in entries:
+                    resource_type = entry.get_resource_type()
                     if (not type) \
                        or (type == 'folder' and resource_type == 'folder') \
                        or (type == GDocsBackend.BACKUP_DOCUMENT_TYPE and resource_type != 'folder'):
