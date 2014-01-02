@@ -118,6 +118,7 @@ Enhancements:
     unicode, because I didn't want to go through all the backend code and
     manually adjust those bits without being able to test each one.
 * Restored missing line from patch of gdocsbackend.py
+* Reverted changes to gdocsbackend.py
 
 
 New in v0.6.22 (2013/08/22)
