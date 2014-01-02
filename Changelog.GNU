@@ -1,3 +1,6 @@
+2014-01-02  Kenneth Loafman  <kenneth@loafman.com>
+    * Restored missing line from patch of gdocsbackend.py
+
 2013-12-30  Kenneth Loafman  <kenneth@loafman.com>
     * Merged in lp:~mterry/duplicity/encoding
       - This branch hopefully fixes two filename encoding issues:

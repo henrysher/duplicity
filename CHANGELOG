@@ -1,11 +1,4 @@
-[not to be removed until the end of 2013]
-DEAR PACKAGE MAINTAINER: If you are packaging duplicity for some
-distribution and used to remove GnuPGInterface.py please note this:
-*** Duplicity really does need its patched version of GnuPGInterface ***
-See README for details.
-
-
-New in v0.6.23 (2013/??/??)
+New in v0.6.23 (2014/??/??)
 ---------------------------
 Enhancements:
 * Applied patch from bug 1216921 to fix ignore_missing().
@@ -124,6 +117,7 @@ Enhancements:
     printing. But I stopped short of adding an assert in log.py to enforce
     unicode, because I didn't want to go through all the backend code and
     manually adjust those bits without being able to test each one.
+* Restored missing line from patch of gdocsbackend.py
 
 
 New in v0.6.22 (2013/08/22)

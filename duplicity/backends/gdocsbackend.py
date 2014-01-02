@@ -220,6 +220,7 @@ class GDocsBackend(duplicity.backend.Backend):
             if title:
                 result = []
                 for entry in entries:
+                    resource_type = entry.get_resource_type()
                     entry_type = entry.get_resource_type().split('/')[0]
 
                     if (not type) or (type.split('/')[0] == entry_type):
