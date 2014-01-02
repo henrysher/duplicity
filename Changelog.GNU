@@ -73,49 +73,40 @@
         log.InfoCode.file_list output that includes the path type.
     * Merged in lp:~mterry/duplicity/manifest-oddities
       - We may accidentally end up with an oddly inconsistent manifest like so:
-
         Volume 1
         Volume 2
         Volume 3
         Volume 2
-
         As did get reported recently on the mailing list:
         http://lists.nongnu.org/archive/html/duplicity-talk/2013-11/msg00009.html
-
-        One way this can happen (the only way?) is if you back up, then duplicity
+      - One way this can happen (the only way?) is if you back up, then duplicity
         gets interrupted between writing the manifest and uploading the volume.
         Then, when restarted, there is no longer enough data to create as many
         volumes as existed previously.
-
-        This situation can cause an exception when trying to restart the backup.
-
-        This branch fixes it by deleting any excess volume information encountered
+      - This situation can cause an exception when trying to restart the backup.
+      - This branch fixes it by deleting any excess volume information encountered
         when loading in the manifest. We discard volume with higher numbers
         than the last one read.
     * Merged in lp:~mterry/duplicity/disappearing-source
-      - When restarting a backup, we may accidentally skip the first chunk of one of the source files. To reproduce this,:
+      - When restarting a backup, we may accidentally skip the first chunk of one of
+        the source files. To reproduce this,:
         1) interrupt a backup
         2) delete the source file it was in the middle of
         3) restart the backup
-
-        When replaying the source iterator to find where to resume from, we can't
+      - When replaying the source iterator to find where to resume from, we can't
         notice that the file is gone until we've already iterated past where it
         would be!
-
-        The solution I came up with is to just let duplicity stuff the data we
+      - The solution I came up with is to just let duplicity stuff the data we
         accidentally read back into the source iterator.
-
-        This is actually a data loss bug, because it's possible to back up
+      - This is actually a data loss bug, because it's possible to back up
         corrupted files (that are missing their first chunk).
     * Merged in lp:~mterry/duplicity/normalize-before-using
       - Avoid throwing an exception due to a None element in a patch sequence.
-
-        None elements in a (non-normalized) patch sequence are perfectly normal.
+      - None elements in a (non-normalized) patch sequence are perfectly normal.
         With the current code in the patched function, it is certainly possible to
         hit a crash due a None.
         See http://lists.nongnu.org/archive/html/duplicity-talk/2013-11/msg00005.html
-
-        This branch fixes that by normalizing the sequence before using it in the
+      - This branch fixes that by normalizing the sequence before using it in the
         logging code. It's acceptable to bring the normalize_ps() call outside the
         try/except block because normalize_ps is not expected to throw. It's
         relatively simple and doesn't really use its objects besides checking if
