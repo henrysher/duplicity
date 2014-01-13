@@ -267,7 +267,7 @@ class BotoBackend(duplicity.backend.Backend):
 
     def _list(self):
         if not self.bucket:
-            return []
+            raise BackendException("No connection to backend")
 
         for n in range(1, globals.num_retries+1):
             if n > 1:
