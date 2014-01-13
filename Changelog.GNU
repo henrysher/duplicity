@@ -1,3 +1,8 @@
+2014-01-13  Kenneth Loafman  <kenneth@loafman.com>
+    * Restored patch of gdocsbackend.py from original author (thanks ede)
+    * Applied patch from bug 1266753: Boto backend removes local cache if
+      connection cannot be made
+
 2014-01-02  Kenneth Loafman  <kenneth@loafman.com>
     * Restored missing line from patch of gdocsbackend.py
     * Reverted changes to gdocsbackend.py

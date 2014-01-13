@@ -110,6 +110,9 @@ Enhancements:
     manually adjust those bits without being able to test each one.
 * Restored missing line from patch of gdocsbackend.py
 * Reverted changes to gdocsbackend.py
+* Restored patch of gdocsbackend.py from original author (thanks ede)
+* Applied patch from bug 1266753: Boto backend removes local cache if
+  connection cannot be made
 
 
 New in v0.6.22 (2013/08/22)
