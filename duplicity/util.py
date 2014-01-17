@@ -29,6 +29,8 @@ import sys
 import string
 import traceback
 
+from lockfile import FileLock, UnlockError
+
 from duplicity import tarfile
 
 import duplicity.globals as globals
@@ -134,3 +136,12 @@ def ignore_missing(fn, filename):
             pass
         else:
             raise
+
+def release_lockfile():
+    if globals.lockfile and globals.lockfile.is_locked():
+        log.Debug(_("Releasing lockfile %s") % globals.lockfile )
+        try:
+            globals.lockfile.release()
+        except UnlockError:
+            pass
+

@@ -1,3 +1,11 @@
+2014-01-17  Kenneth Loafman  <kenneth@loafman.com>
+    * Merged in lp:~louis-bouchard/duplicity/add-allow-concurrency
+      - Implement locking mechanism to avoid concurrent execution under the same
+        cache directory. This is the default behavior.
+      - Also implement --alllow-concurrency option to disable the locking
+        if required.
+      - This functionality adds a dependency to python-lockfile
+
 2014-01-13  Kenneth Loafman  <kenneth@loafman.com>
     * Restored patch of gdocsbackend.py from original author (thanks ede)
     * Applied patch from bug 1266753: Boto backend removes local cache if

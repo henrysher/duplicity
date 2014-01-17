@@ -246,6 +246,10 @@ def parse_cmdline_options(arglist):
 
     parser = OPHelpFix(option_class = DupOption, usage = usage())
 
+    # If set, more than one instance may run with the given cache dir at the same time
+    parser.add_option("--allow-concurrency", action="store_true")
+
+
     # If this is true, only warn and don't raise fatal error when backup
     # source directory doesn't match previous backup source directory.
     parser.add_option("--allow-source-mismatch", action = "store_true")

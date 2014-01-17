@@ -31,6 +31,7 @@ import getpass, gzip, os, sys, time, types
 import traceback, platform, statvfs, resource, re
 import threading
 from datetime import datetime
+from lockfile import FileLock
 
 pwd = os.path.abspath(os.path.dirname(sys.argv[0]))
 if os.path.exists(os.path.join(pwd, "../duplicity")):
@@ -1315,6 +1316,24 @@ See https://bugs.launchpad.net/duplicity/+bug/931175
     # determine what action we're performing and process command line
     action = commandline.ProcessCommandLine(sys.argv[1:])
 
+    globals.lockfile = None
+
+    if not globals.allow_concurrency:
+        globals.lockfile = FileLock(os.path.join(globals.archive_dir.name, "lockfile"))
+        if globals.lockfile.is_locked():
+            log.FatalError("Another instance is already running with this archive directory", log.ErrorCode.user_error)
+            log.shutdown()
+            sys.exit(2)
+            
+        globals.lockfile.acquire(timeout = 0)
+
+    try:
+        do_backup(action)
+
+    finally:
+         util.release_lockfile()
+
+def do_backup(action):
     # The following is for starting remote debugging in Eclipse with Pydev.
     # Adjust the path to your location and version of Eclipse and Pydev.
     if globals.pydevd:
@@ -1464,7 +1483,6 @@ def with_tempdir(fn):
     finally:
         tempdir.default().cleanup()
 
-
 if __name__ == "__main__":
     try:
         with_tempdir(main)
@@ -1476,16 +1494,19 @@ if __name__ == "__main__":
     # goes here, if needed.
     except SystemExit, e:
         # No traceback, just get out
+        util.release_lockfile()
         sys.exit(e)
 
     except KeyboardInterrupt, e:
         # No traceback, just get out
         log.Info(_("INT intercepted...exiting."))
+        util.release_lockfile()
         sys.exit(4)
 
     except gpg.GPGError, e:
         # For gpg errors, don't show an ugly stack trace by
         # default. But do with sufficient verbosity.
+        util.release_lockfile()
         log.Info(_("GPG error detail: %s")
                  % (u''.join(traceback.format_exception(*sys.exc_info()))))
         log.FatalError(u"%s: %s" % (e.__class__.__name__, e.args[0]),
@@ -1493,6 +1514,7 @@ if __name__ == "__main__":
                        e.__class__.__name__)
 
     except duplicity.errors.UserError, e:
+        util.release_lockfile()
         # For user errors, don't show an ugly stack trace by
         # default. But do with sufficient verbosity.
         log.Info(_("User error detail: %s")
@@ -1502,6 +1524,7 @@ if __name__ == "__main__":
                        e.__class__.__name__)
 
     except duplicity.errors.BackendException, e:
+        util.release_lockfile()
         # For backend errors, don't show an ugly stack trace by
         # default. But do with sufficient verbosity.
         log.Info(_("Backend error detail: %s")
@@ -1511,6 +1534,7 @@ if __name__ == "__main__":
                        e.__class__.__name__)
 
     except Exception, e:
+        util.release_lockfile()
         if "Forced assertion for testing" in str(e):
             log.FatalError(u"%s: %s" % (e.__class__.__name__, unicode(e)),
                            log.ErrorCode.exception,
