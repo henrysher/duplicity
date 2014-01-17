@@ -95,6 +95,12 @@ pydevd = False
 # windows machines.
 time_separator = ":"
 
+# Allow only one concurrent instance runnning with the same cache directory
+allow_concurrency = False
+
+# Global lockfile used to manage concurrency
+lockfile = None
+
 # If this is true, only warn and don't raise fatal error when backup
 # source directory doesn't match previous backup source directory.
 allow_source_mismatch = None
@@ -249,6 +255,9 @@ extra_clean = False
 
 # Renames (--rename)
 rename = {}
+
+# Allow only one concurrent instance runnning with the same cache directory
+allow_concurrency = False
 
 # enable data comparison on verify runs
 compare_data = False

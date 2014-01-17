@@ -24,9 +24,11 @@
 import types
 import gettext
 
+
 from duplicity import log
 from duplicity import file_naming
 from duplicity import path
+from duplicity import util
 from duplicity import dup_time
 from duplicity import globals
 from duplicity import manifest
@@ -158,6 +160,7 @@ class BackupSet:
                 except Exception:
                     log.Debug(_("BackupSet.delete: missing %s") % map(util.ufn, lfn))
                     pass
+        util.release_lockfile()
 
     def __unicode__(self):
         """
