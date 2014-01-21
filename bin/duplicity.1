@@ -339,15 +339,6 @@ will be needed to delete the files instead of just listing them.
 .SH OPTIONS
 
 .TP
-.BI --allow-concurrency
-Allow duplicity to run more than one instance in the same user context.
-Upon startup, duplicity puts a lock file into the cache directory which
-prevents a second instance of duplicity to run at the same time.
-Using this option will override the locking mechanism and allow for a 
-second duplicity instance to run. This may become useful when a stale
-lockfile has been left behind.
-
-.TP
 .BI --allow-source-mismatch
 Do not abort on attempts to use the same archive dir or remote backend
 to back up different directories. duplicity will tell you if you need
