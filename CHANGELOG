@@ -1,4 +1,4 @@
-New in v0.6.23 (2014/??/??)
+New in v0.6.23 (2014/01/24)
 ---------------------------
 Enhancements:
 * Applied patch from bug 1216921 to fix ignore_missing().

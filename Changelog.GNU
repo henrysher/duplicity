@@ -1,4 +1,7 @@
 2014-01-17  Kenneth Loafman  <kenneth@loafman.com>
+    * Prep for 0.6.23 release.
+
+2014-01-17  Kenneth Loafman  <kenneth@loafman.com>
     * Merged in lp:~louis-bouchard/duplicity/add-allow-concurrency
       - Implement locking mechanism to avoid concurrent execution under the same
         cache directory. This is the default behavior.
