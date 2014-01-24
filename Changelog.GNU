@@ -1,4 +1,4 @@
-2014-01-17  Kenneth Loafman  <kenneth@loafman.com>
+2014-01-24  Kenneth Loafman  <kenneth@loafman.com>
     * Prep for 0.6.23 release.
 
 2014-01-17  Kenneth Loafman  <kenneth@loafman.com>
