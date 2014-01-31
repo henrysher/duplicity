@@ -515,6 +515,18 @@ See the
 argument for more information.
 
 .TP
+.BI "--file-prefix, --file-prefix-manifest, --file-prefix-archive, --file-prefix-signature
+Adds a prefix to all files, manifest files, archive files, and/or signature files. 
+
+The same set of prefixes must be passed in on backup and restore.
+
+If both global and type-specific prefixes are set, global prefix will go before
+type-specific prefixes.
+
+See also
+.B "A NOTE ON FILENAME PREFIXES"
+
+.TP
 .BI "--file-to-restore " path
 This option may be given in restore mode, causing only
 .I path
@@ -1635,6 +1647,13 @@ and requests an access token from the Ubuntu SSO service. The newly
 acquired token is then printed to the console.
 .PP
 See https://one.ubuntu.com/ for more information about Ubuntu One.
+
+.SH A NOTE ON FILENAME PREFIXES
+
+Filename prefixes can be used in conjunction with S3 lifecycle rules to transition 
+archive files to Glacier, while keeping metadata (signature and manifest files) on S3.
+
+Duplicity does not require access to archive files except when restoring from backup.
 
 .SH KNOWN ISSUES / BUGS
 Hard links currently unsupported (they will be treated as non-linked

@@ -1,3 +1,10 @@
+2014-01-31  Kenneth Loafman  <kenneth@loafman.com>
+    * Applied two patches from mailing list message at:
+      https://lists.nongnu.org/archive/html/duplicity-talk/2014-01/msg00030.html
+      "Added command line options to use different prefixes for manifest/sig/archive files"
+      This resolves https://bugs.launchpad.net/duplicity/+bug/1170161 and provides
+      a workaround for https://bugs.launchpad.net/duplicity/+bug/1170113
+
 2014-01-24  Kenneth Loafman  <kenneth@loafman.com>
     * Prep for 0.6.23 release.
 

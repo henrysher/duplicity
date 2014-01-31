@@ -329,6 +329,15 @@ def parse_cmdline_options(arglist):
 
     # used to provide a prefix on top of the defaul tar file name
     parser.add_option("--file-prefix", type = "string", dest = "file_prefix", action = "store")
+    
+    # used to provide a suffix for manifest files only
+    parser.add_option("--file-prefix-manifest", type = "string", dest = "file_prefix_manifest", action = "store")
+
+    # used to provide a suffix for archive files only
+    parser.add_option("--file-prefix-archive", type = "string", dest = "file_prefix_archive", action = "store")
+
+    # used to provide a suffix for sigature files only
+    parser.add_option("--file-prefix-signature", type = "string", dest = "file_prefix_signature", action = "store")
 
     # used in testing only - skips upload for a given volume
     parser.add_option("--skip-volume", type = "int",

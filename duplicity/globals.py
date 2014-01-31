@@ -28,8 +28,17 @@ import socket
 # The current version of duplicity
 version = "$version"
 
-# Default file_prefix value
+# Prefix for all files (appended before type-specific prefixes)
 file_prefix = ""
+
+# Prefix for manifest files only
+file_prefix_manifest = ""
+
+# Prefix for archive files only
+file_prefix_archive = ""
+
+# Prefix for sig files only
+file_prefix_signature = ""
 
 # The name of the current host, or None if it cannot be set
 hostname = socket.getfqdn()

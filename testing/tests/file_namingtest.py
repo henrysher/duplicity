@@ -45,6 +45,7 @@ class FileNamingBase:
         dup_time.setprevtime(10)
         dup_time.setcurtime(20)
 
+        file_naming.prepare_regex(force = True)
         filename = file_naming.get("inc", volume_number = 23)
         log.Info(u"Inc filename: " + filename)
         pr = file_naming.parse(filename)
@@ -70,6 +71,7 @@ class FileNamingBase:
 
     def test_suffix(self):
         """Test suffix (encrypt/compressed) encoding and generation"""
+        file_naming.prepare_regex(force = True)
         filename = file_naming.get("inc", manifest = 1, gzipped = 1)
         pr = file_naming.parse(filename)
         assert pr and pr.compressed == 1
@@ -82,38 +84,40 @@ class FileNamingBase:
 
     def test_more(self):
         """More file_parsing tests"""
-        pr = file_naming.parse("dns.h112bi.h14rg0.st.g")
+        file_naming.prepare_regex(force = True)
+        pr = file_naming.parse(globals.file_prefix + globals.file_prefix_signature + "dns.h112bi.h14rg0.st.g")
         assert pr, pr
         assert pr.type == "new-sig"
         assert pr.end_time == 1029826800L
 
         if not globals.short_filenames:
-            pr = file_naming.parse("duplicity-new-signatures.2002-08-18T00:04:30-07:00.to.2002-08-20T00:00:00-07:00.sigtar.gpg")
+            pr = file_naming.parse(globals.file_prefix + globals.file_prefix_signature + "duplicity-new-signatures.2002-08-18T00:04:30-07:00.to.2002-08-20T00:00:00-07:00.sigtar.gpg")
             assert pr, pr
             assert pr.type == "new-sig"
             assert pr.end_time == 1029826800L
 
-        pr = file_naming.parse("dfs.h5dixs.st.g")
+        pr = file_naming.parse(globals.file_prefix + globals.file_prefix_signature + "dfs.h5dixs.st.g")
         assert pr, pr
         assert pr.type == "full-sig"
         assert pr.time == 1036954144, repr(pr.time)
 
     def test_partial(self):
         """Test addition of partial flag"""
-        pr = file_naming.parse("dns.h112bi.h14rg0.st.p.g")
+        file_naming.prepare_regex(force = True)
+        pr = file_naming.parse(globals.file_prefix + globals.file_prefix_signature + "dns.h112bi.h14rg0.st.p.g")
         assert pr, pr
         assert pr.partial
         assert pr.type == "new-sig"
         assert pr.end_time == 1029826800L
 
         if not globals.short_filenames:
-            pr = file_naming.parse("duplicity-new-signatures.2002-08-18T00:04:30-07:00.to.2002-08-20T00:00:00-07:00.sigtar.part.gpg")
+            pr = file_naming.parse(globals.file_prefix + globals.file_prefix_signature + "duplicity-new-signatures.2002-08-18T00:04:30-07:00.to.2002-08-20T00:00:00-07:00.sigtar.part.gpg")
             assert pr, pr
             assert pr.partial
             assert pr.type == "new-sig"
             assert pr.end_time == 1029826800L
 
-        pr = file_naming.parse("dfs.h5dixs.st.p.g")
+        pr = file_naming.parse(globals.file_prefix + globals.file_prefix_signature + "dfs.h5dixs.st.p.g")
         assert pr, pr
         assert pr.partial
         assert pr.type == "full-sig"
@@ -129,6 +133,14 @@ class FileNamingShort(unittest.TestCase, FileNamingBase):
     """Test short filename parsing and generation"""
     def setUp(self):
         globals.short_filenames = 1
+        
+class FileNamingPrefixes(unittest.TestCase, FileNamingBase):
+    """Test filename parsing and generation with prefixes"""
+    def setUp(self):
+        globals.file_prefix = "global-"
+        globals.file_prefix_manifest = "mani-"
+        globals.file_prefix_signature = "sign-"
+        globals.file_prefix_archive = "arch-"
 
 
 if __name__ == "__main__":
