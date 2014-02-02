@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2014-01-31 12:43+0000\n"
-"PO-Revision-Date: 2010-05-23 16:47+0000\n"
-"Last-Translator: Kenneth Loafman <kenneth@loafman.com>\n"
+"PO-Revision-Date: 2014-02-01 16:51+0000\n"
+"Last-Translator: Jean Marc <m.balthazar@orange.fr>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2014-02-01 06:10+0000\n"
+"X-Launchpad-Export-Date: 2014-02-02 05:32+0000\n"
 "X-Generator: Launchpad (build 16916)\n"
 
 #: ../bin/duplicity:102
@@ -440,7 +440,7 @@ msgstr ""
 #: ../duplicity/selection.py:163
 #, python-format
 msgid "Warning: base %s doesn't exist, continuing"
-msgstr ""
+msgstr "Attention : la base %s n'existe pas, continue"
 
 #: ../duplicity/selection.py:166 ../duplicity/selection.py:184
 #: ../duplicity/selection.py:187
@@ -465,6 +465,8 @@ msgid ""
 "Fatal Error while processing expression\n"
 "%s"
 msgstr ""
+"Erreur fatale pendant le traitement de l'expression\n"
+"%s"
 
 #: ../duplicity/selection.py:286
 #, python-format
