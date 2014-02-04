@@ -160,19 +160,19 @@ def get_passphrase(n, action, for_signing = False):
                     if use_cache and globals.gpg_profile.signing_passphrase:
                         pass1 = globals.gpg_profile.signing_passphrase
                     else:
-                        pass1 = getpass.getpass(_("GnuPG passphrase for signing key:")+" ")
+                        pass1 = getpass.getpass(_("GnuPG passphrase for signing key:").encode('utf8')+" ")
                 else:
                     if use_cache and globals.gpg_profile.passphrase:
                         pass1 = globals.gpg_profile.passphrase
                     else:
-                        pass1 = getpass.getpass(_("GnuPG passphrase:")+" ")
+                        pass1 = getpass.getpass(_("GnuPG passphrase:").encode('utf8')+" ")
 
             if n == 1:
                 pass2 = pass1
             elif for_signing:
-                pass2 = getpass.getpass(_("Retype passphrase for signing key to confirm: "))
+                pass2 = getpass.getpass(_("Retype passphrase for signing key to confirm: ").encode('utf8'))
             else:
-                pass2 = getpass.getpass(_("Retype passphrase to confirm: "))
+                pass2 = getpass.getpass(_("Retype passphrase to confirm: ").encode('utf8'))
 
             if not pass1 == pass2:
                 print _("First and second passphrases do not match!  Please try again.")
