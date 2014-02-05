@@ -20,6 +20,7 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import helper
+import pexpect
 import sys, os, unittest
 
 import duplicity.backend
@@ -50,7 +51,8 @@ class FinalTest:
     """
     Test backup/restore using duplicity binary
     """
-    def run_duplicity(self, arglist, options = [], current_time = None):
+    def run_duplicity(self, arglist, options = [], current_time = None,
+                      passphrase_input = None):
         """Run duplicity binary with given arguments and options"""
         options.append("--archive-dir testfiles/cache")
         cmd_list = ["duplicity"]
@@ -62,22 +64,23 @@ class FinalTest:
         cmd_list.extend(arglist)
         cmdline = " ".join(cmd_list)
         #print "Running '%s'." % cmdline
-        if not os.environ.has_key('PASSPHRASE'):
+        if passphrase_input is None and not os.environ.has_key('PASSPHRASE'):
             os.environ['PASSPHRASE'] = 'foobar'
-        return_val = os.system(cmdline)
+        (output, return_val) = pexpect.run(cmdline, withexitstatus=True,
+            events={'passphrase.*:': passphrase_input}) 
         if return_val:
             raise CmdError(return_val)
 
-    def backup(self, type, input_dir, options = [], current_time = None):
+    def backup(self, type, input_dir, options = [], **kwargs):
         """Run duplicity backup to default directory"""
         options = options[:]
         if type == "full":
             options.insert(0, 'full')
         args = [input_dir, "'%s'" % backend_url]
-        self.run_duplicity(args, options, current_time)
+        self.run_duplicity(args, options, **kwargs)
 
     def restore(self, file_to_restore = None, time = None, options = [],
-                current_time = None):
+                **kwargs):
         options = options[:] # just nip any mutability problems in bud
         assert not os.system("rm -rf testfiles/restore_out")
         args = ["'%s'" % backend_url, "testfiles/restore_out"]
@@ -85,17 +88,17 @@ class FinalTest:
             options.extend(['--file-to-restore', file_to_restore])
         if time:
             options.extend(['--restore-time', str(time)])
-        self.run_duplicity(args, options, current_time)
+        self.run_duplicity(args, options, **kwargs)
 
     def verify(self, dirname, file_to_verify = None, time = None, options = [],
-               current_time = None):
+               **kwargs):
         options = ["verify"] + options[:]
         args = ["'%s'" % backend_url, dirname]
         if file_to_verify:
             options.extend(['--file-to-restore', file_to_verify])
         if time:
             options.extend(['--restore-time', str(time)])
-        self.run_duplicity(args, options, current_time)
+        self.run_duplicity(args, options, **kwargs)
 
     def deltmp(self):
         """Delete temporary directories"""
@@ -254,6 +257,12 @@ class FinalTest:
         chain = cs3.all_backup_chains[0]
         assert chain.start_time == 30000, chain.start_time
         assert chain.end_time == 40000, chain.end_time
+
+    def test_piped_password(self):
+        """Make sure that prompting for a password works"""
+        self.backup("full", "testfiles/empty_dir",
+                    passphrase_input="foobar\nfoobar\n")
+        self.restore(passphrase_input="foobar\n")
 
 class FinalTest1(FinalTest, unittest.TestCase):
     def setUp(self):
