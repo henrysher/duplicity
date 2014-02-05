@@ -27,9 +27,6 @@
 
 import sys, getopt, gzip, os
 
-import gettext
-gettext.install('duplicity', codeset='utf8')
-
 from duplicity import diffdir
 from duplicity import patchdir
 from duplicity import log

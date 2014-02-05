@@ -1,3 +1,11 @@
+2014-02-05  Kenneth Loafman  <kenneth@loafman.com>
+    * Merged in lp:~mterry/duplicity/gpg-encode
+      - getpass.getpass(prompt) eventually calls str(prompt). Which is a no go,
+        if the prompt contains unicode. Here's a patch to always pass getpass() a
+        byte string.
+      - Our tests didn't catch this because they always set PASSPHRASE. I've added
+        a test that passes the passphrase via stdin.
+
 2014-01-31  Kenneth Loafman  <kenneth@loafman.com>
     * Applied two patches from mailing list message at:
       https://lists.nongnu.org/archive/html/duplicity-talk/2014-01/msg00030.html

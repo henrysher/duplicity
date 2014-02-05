@@ -27,7 +27,7 @@
 # Please send mail to me or the mailing list if you find bugs or have
 # any suggestions.
 
-import getpass, gzip, os, sys, time, types
+import gzip, os, sys, time, types
 import traceback, platform, statvfs, resource, re
 import threading
 from datetime import datetime
@@ -36,9 +36,6 @@ from lockfile import FileLock
 pwd = os.path.abspath(os.path.dirname(sys.argv[0]))
 if os.path.exists(os.path.join(pwd, "../duplicity")):
     sys.path.insert(0, os.path.abspath(os.path.join(pwd, "../.")))
-
-import gettext
-gettext.install('duplicity', codeset='utf8')
 
 from duplicity import log
 log.setup()
@@ -64,6 +61,13 @@ from duplicity import progress
 
 # If exit_val is not None, exit with given value at end.
 exit_val = None
+
+def getpass_safe(message):
+    # getpass() in Python 2.x will call str() on our prompt.  So we can't pass
+    # in non-ascii characters.
+    import getpass, locale
+    message = message.encode(locale.getpreferredencoding(), 'replace')
+    return getpass.getpass(message)
 
 def get_passphrase(n, action, for_signing = False):
     """
@@ -160,19 +164,19 @@ def get_passphrase(n, action, for_signing = False):
                     if use_cache and globals.gpg_profile.signing_passphrase:
                         pass1 = globals.gpg_profile.signing_passphrase
                     else:
-                        pass1 = getpass.getpass(_("GnuPG passphrase for signing key:")+" ")
+                        pass1 = getpass_safe(_("GnuPG passphrase for signing key:")+" ")
                 else:
                     if use_cache and globals.gpg_profile.passphrase:
                         pass1 = globals.gpg_profile.passphrase
                     else:
-                        pass1 = getpass.getpass(_("GnuPG passphrase:")+" ")
+                        pass1 = getpass_safe(_("GnuPG passphrase:")+" ")
 
             if n == 1:
                 pass2 = pass1
             elif for_signing:
-                pass2 = getpass.getpass(_("Retype passphrase for signing key to confirm: "))
+                pass2 = getpass_safe(_("Retype passphrase for signing key to confirm: "))
             else:
-                pass2 = getpass.getpass(_("Retype passphrase to confirm: "))
+                pass2 = getpass_safe(_("Retype passphrase to confirm: "))
 
             if not pass1 == pass2:
                 print _("First and second passphrases do not match!  Please try again.")

@@ -6,6 +6,12 @@ Enhancements:
   "Added command line options to use different prefixes for manifest/sig/archive files"
   This resolves https://bugs.launchpad.net/duplicity/+bug/1170161 and provides
   a workaround for https://bugs.launchpad.net/duplicity/+bug/1170113
+* Merged in lp:~mterry/duplicity/gpg-encode
+  - getpass.getpass(prompt) eventually calls str(prompt). Which is a no go,
+    if the prompt contains unicode. Here's a patch to always pass getpass() a
+    byte string.
+  - Our tests didn't catch this because they always set PASSPHRASE. I've added
+    a test that passes the passphrase via stdin.
 
 
 New in v0.6.23 (2014/01/24)
