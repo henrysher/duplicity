@@ -25,7 +25,7 @@ which is now patched with some code for iterative threaded execution
 see duplicity's README for details
 """
 
-import os, types, tempfile, re, gzip
+import os, types, tempfile, re, gzip, locale
 
 from duplicity import misc
 from duplicity import globals
@@ -207,14 +207,14 @@ class GPGFile:
             self.read(offset - self.byte_count)
 
     def gpg_failed(self):
-        msg = "GPG Failed, see log below:\n"
-        msg += "===== Begin GnuPG log =====\n"
+        msg = u"GPG Failed, see log below:\n"
+        msg += u"===== Begin GnuPG log =====\n"
         for fp in (self.logger_fp, self.stderr_fp):
             fp.seek(0)
             for line in fp:
-                msg += line.strip() + "\n"
-        msg += "===== End GnuPG log =====\n"
-        if not (msg.find("invalid packet (ctb=14)") > -1):
+                msg += unicode(line.strip(), locale.getpreferredencoding(), 'replace') + u"\n"
+        msg += u"===== End GnuPG log =====\n"
+        if not (msg.find(u"invalid packet (ctb=14)") > -1):
             raise GPGError, msg
         else:
             return ""

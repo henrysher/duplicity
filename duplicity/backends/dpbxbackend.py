@@ -41,8 +41,6 @@ from duplicity import tempdir
 from duplicity.backend import retry_fatal
 
 
-from dropbox import client, rest, session
-
 # This application key is registered in my name (jno at pisem dot net).
 # You can register your own developer account with Dropbox and
 # register a new application for yourself, obtaining the new
@@ -102,6 +100,51 @@ class DPBXBackend(duplicity.backend.Backend):
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
 
+        from dropbox import client, rest, session
+
+        class StoredSession(session.DropboxSession):
+            """a wrapper around DropboxSession that stores a token to a file on disk"""
+            TOKEN_FILE = _TOKEN_CACHE_FILE
+        
+            def load_creds(self):
+                try:
+                    f = open(self.TOKEN_FILE)
+                    stored_creds = f.read()
+                    f.close()
+                    self.set_token(*stored_creds.split('|'))
+                    log.Info( "[loaded access token]" )
+                except IOError:
+                    pass # don't worry if it's not there
+        
+            def write_creds(self, token):
+                open(self.TOKEN_FILE, 'w').close() # create/reset file
+                os.chmod(self.TOKEN_FILE,0600)     # set it -rw------ (NOOP in Windows?)
+                # now write the content
+                f = open(self.TOKEN_FILE, 'w')
+                f.write("|".join([token.key, token.secret]))
+                f.close()
+        
+            def delete_creds(self):
+                os.unlink(self.TOKEN_FILE)
+        
+            def link(self):
+                if not sys.stdout.isatty() or not sys.stdin.isatty() :
+                  log.FatalError('dpbx error: cannot interact, but need human attention', log.ErrorCode.backend_command_error)
+                request_token = self.obtain_request_token()
+                url = self.build_authorize_url(request_token)
+                print
+                print '-'*72
+                print "url:", url
+                print "Please authorize in the browser. After you're done, press enter."
+                raw_input()
+        
+                self.obtain_access_token(request_token)
+                self.write_creds(self.token)
+        
+            def unlink(self):
+                self.delete_creds()
+                session.DropboxSession.unlink(self)
+
         self.sess = StoredSession(etacsufbo(APP_KEY)
                     , etacsufbo(APP_SECRET)
                     , access_type=ACCESS_TYPE)
@@ -110,7 +153,6 @@ class DPBXBackend(duplicity.backend.Backend):
         self.sess.load_creds()
 
         self.login()
-
 
     def login(self):
         if not self.sess.is_linked():
@@ -154,7 +196,7 @@ class DPBXBackend(duplicity.backend.Backend):
 
     @retry_fatal
     @command()
-    def list(self,none=None):
+    def _list(self,none=None):
         """List files in directory"""
         # Do a long listing to avoid connection reset
         remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
@@ -212,49 +254,6 @@ class DPBXBackend(duplicity.backend.Backend):
         """create a new directory"""
         resp = self.api_client.file_create_folder(path)
         log.Debug('dpbx._mkdir(%s): %s'%(path,resp))
-
-class StoredSession(session.DropboxSession):
-    """a wrapper around DropboxSession that stores a token to a file on disk"""
-    TOKEN_FILE = _TOKEN_CACHE_FILE
-
-    def load_creds(self):
-        try:
-            f = open(self.TOKEN_FILE)
-            stored_creds = f.read()
-            f.close()
-            self.set_token(*stored_creds.split('|'))
-            log.Info( "[loaded access token]" )
-        except IOError:
-            pass # don't worry if it's not there
-
-    def write_creds(self, token):
-        open(self.TOKEN_FILE, 'w').close() # create/reset file
-        os.chmod(self.TOKEN_FILE,0600)     # set it -rw------ (NOOP in Windows?)
-        # now write the content
-        f = open(self.TOKEN_FILE, 'w')
-        f.write("|".join([token.key, token.secret]))
-        f.close()
-
-    def delete_creds(self):
-        os.unlink(self.TOKEN_FILE)
-
-    def link(self):
-        if not sys.stdout.isatty() or not sys.stdin.isatty() :
-          log.FatalError('dpbx error: cannot interact, but need human attantion', log.ErrorCode.backend_command_error)
-        request_token = self.obtain_request_token()
-        url = self.build_authorize_url(request_token)
-        print
-        print '-'*72
-        print "url:", url
-        print "Please authorize in the browser. After you're done, press enter."
-        raw_input()
-
-        self.obtain_access_token(request_token)
-        self.write_creds(self.token)
-
-    def unlink(self):
-        self.delete_creds()
-        session.DropboxSession.unlink(self)
 
 def etacsufbo(s):
   return ''.join(reduce(lambda x,y:(x and len(x[-1])==1)and(x.append(y+

@@ -81,8 +81,8 @@ class ROPath:
         elif stat.S_ISFIFO(st_mode):
             self.type = "fifo"
         elif stat.S_ISSOCK(st_mode):
-            raise PathException(self.get_relative_path() +
-                                "is a socket, unsupported by tar")
+            raise PathException(util.ufn(self.get_relative_path()) +
+                                u"is a socket, unsupported by tar")
             self.type = "sock"
         elif stat.S_ISCHR(st_mode):
             self.type = "chr"
@@ -220,7 +220,7 @@ class ROPath:
         self.stat.st_mtime = int(tarinfo.mtime)
         if self.stat.st_mtime < 0:
             log.Warn(_("Warning: %s has negative mtime, treating as 0.")
-                     % (tarinfo.name,))
+                     % (util.ufn(tarinfo.name)))
             self.stat.st_mtime = 0
         self.stat.st_size = tarinfo.size
 
@@ -279,7 +279,7 @@ class ROPath:
             ti.uid, ti.gid = self.stat.st_uid, self.stat.st_gid
             if self.stat.st_mtime < 0:
                 log.Warn(_("Warning: %s has negative mtime, treating as 0.")
-                         % (self.get_relative_path(),))
+                         % (util.ufn(self.get_relative_path())))
                 ti.mtime = 0
             else:
                 ti.mtime = int(self.stat.st_mtime)
@@ -343,8 +343,8 @@ class ROPath:
 
         """
         def log_diff(log_string):
-            log_str = _("Difference found:") + " " + log_string
-            log.Notice(log_str % (self.get_relative_path(),))
+            log_str = _("Difference found:") + u" " + log_string
+            log.Notice(log_str % (util.ufn(self.get_relative_path())))
 
         if not self.type and not other.type:
             return 1
@@ -459,9 +459,9 @@ class ROPath:
             other.stat = stat
             other.mode = self.mode
 
-    def __repr__(self):
+    def __unicode__(self):
         """Return string representation"""
-        return "(%s %s)" % (self.index, self.type)
+        return u"(%s %s)" % (util.uindex(self.index), self.type)
 
 
 class Path(ROPath):
@@ -551,17 +551,17 @@ class Path(ROPath):
 
     def mkdir(self):
         """Make directory(s) at specified path"""
-        log.Info(_("Making directory %s") % (self.name,))
+        log.Info(_("Making directory %s") % util.ufn(self.name))
         try:
             os.makedirs(self.name)
         except OSError:
             if (not globals.force):
-                raise PathException("Error creating directory %s" % (self.name,), 7)
+                raise PathException("Error creating directory %s" % util.ufn(self.name), 7)
         self.setdata()
 
     def delete(self):
         """Remove this file"""
-        log.Info(_("Deleting %s") % (self.name,))
+        log.Info(_("Deleting %s") % util.ufn(self.name))
         if self.isdir():
             util.ignore_missing(os.rmdir, self.name)
         else:
@@ -570,14 +570,14 @@ class Path(ROPath):
 
     def touch(self):
         """Open the file, write 0 bytes, close"""
-        log.Info(_("Touching %s") % (self.name,))
+        log.Info(_("Touching %s") % util.ufn(self.name))
         fp = self.open("wb")
         fp.close()
 
     def deltree(self):
         """Remove self by recursively deleting files under it"""
         from duplicity import selection # todo: avoid circ. dep. issue
-        log.Info(_("Deleting tree %s") % (self.name,))
+        log.Info(_("Deleting tree %s") % util.ufn(self.name))
         itr = IterTreeReducer(PathDeleter, [])
         for path in selection.Select(self).set_iter():
             itr(path.index, path)
@@ -644,7 +644,7 @@ class Path(ROPath):
                 return temp_path
             _tmp_path_counter += 1
             assert _tmp_path_counter < 10000, \
-                   "Warning too many temp files created for " + self.name
+                   u"Warning too many temp files created for " + util.ufn(self.name)
 
     def compare_recursive(self, other, verbose = None):
         """Compare self to other Path, descending down directories"""

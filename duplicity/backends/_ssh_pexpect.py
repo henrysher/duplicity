@@ -69,15 +69,10 @@ class SSHPExpectBackend(duplicity.backend.Backend):
             globals.ssh_options += " -oServerAliveInterval=%d" % ((int)(globals.timeout / 2))
         if "ServerAliveCountMax" not in globals.ssh_options:
             globals.ssh_options += " -oServerAliveCountMax=2"
+
         # set up password
-        if globals.ssh_askpass:
-            self.password = self.get_password()
-        else:
-            if parsed_url.password:
-                self.password = parsed_url.password
-                globals.ssh_askpass = True
-            else:
-                self.password = ''
+        self.use_getpass = globals.ssh_askpass
+        self.password = self.get_password()
 
     def run_scp_command(self, commandline):
         """ Run an scp command, responding to password prompts """
@@ -282,7 +277,7 @@ class SSHPExpectBackend(duplicity.backend.Backend):
             raise BackendException("File %s not found locally after get "
                                    "from backend" % local_path.name)
 
-    def list(self):
+    def _list(self):
         """
         List files available for scp
 

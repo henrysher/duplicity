@@ -36,7 +36,7 @@ from duplicity.backend import retry
 from duplicity.filechunkio import FileChunkIO
 from duplicity import progress
 
-BOTO_MIN_VERSION = "1.6a"
+BOTO_MIN_VERSION = "2.1.1"
 
 # Multiprocessing is not supported on *BSD
 if sys.platform not in ('darwin', 'linux2'):
@@ -294,9 +294,9 @@ class BotoBackend(duplicity.backend.Backend):
                 (self.straight_url, remote_filename, globals.num_retries))
         raise BackendException("Error downloading %s/%s" % (self.straight_url, remote_filename))
 
-    def list(self):
+    def _list(self):
         if not self.bucket:
-            return []
+            raise BackendException("No connection to backend")
 
         for n in range(1, globals.num_retries+1):
             if n > 1:

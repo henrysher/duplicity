@@ -29,7 +29,7 @@ from duplicity.util import exception_traceback
 from duplicity.backend import retry
 from duplicity import progress
 
-BOTO_MIN_VERSION = "1.6a"
+BOTO_MIN_VERSION = "2.0"
 
 
 class BotoBackend(duplicity.backend.Backend):
@@ -50,8 +50,6 @@ class BotoBackend(duplicity.backend.Backend):
         import boto
         assert boto.Version >= BOTO_MIN_VERSION
 
-        from boto.s3.key import Key
-
         # This folds the null prefix and all null parts, which means that:
         #  //MyBucket/ and //MyBucket are equivalent.
         #  //MyBucket//My///My/Prefix/ and //MyBucket/My/Prefix are equivalent.
@@ -66,8 +64,6 @@ class BotoBackend(duplicity.backend.Backend):
 
         self.scheme = parsed_url.scheme
 
-        self.key_class = Key
-
         if self.url_parts:
             self.key_prefix = '%s/' % '/'.join(self.url_parts)
         else:
@@ -75,6 +71,12 @@ class BotoBackend(duplicity.backend.Backend):
 
         self.straight_url = duplicity.backend.strip_auth_from_url(parsed_url)
         self.parsed_url = parsed_url
+
+        # duplicity and boto.storage_uri() have different URI formats.
+        # boto uses scheme://bucket[/name] and specifies hostname on connect()
+        self.boto_uri_str = '://'.join((parsed_url.scheme[:2],
+                                        parsed_url.path.lstrip('/')))
+        self.storage_uri = boto.storage_uri(self.boto_uri_str)
         self.resetConnection()
 
     def resetConnection(self):
@@ -140,12 +142,13 @@ class BotoBackend(duplicity.backend.Backend):
                            "(http://code.google.com/p/boto/)." % BOTO_MIN_VERSION,
                            log.ErrorCode.boto_lib_too_old)
 
-        if self.scheme == 's3+http':
-            # Use the default Amazon S3 host.
-            self.conn = S3Connection(is_secure=(not globals.s3_unencrypted_connection))
+        if not self.parsed_url.hostname:
+            # Use the default host.
+            self.conn = self.storage_uri.connect(
+                is_secure=(not globals.s3_unencrypted_connection))
         else:
             assert self.scheme == 's3'
-            self.conn = S3Connection(
+            self.conn = self.storage_uri.connect(
                 host=self.parsed_url.hostname,
                 is_secure=(not globals.s3_unencrypted_connection))
 
@@ -199,8 +202,7 @@ class BotoBackend(duplicity.backend.Backend):
 
         if not remote_filename:
             remote_filename = source_path.get_filename()
-        key = self.key_class(self.bucket)
-        key.key = self.key_prefix + remote_filename
+        key = self.bucket.new_key(self.key_prefix + remote_filename)
 
         for n in range(1, globals.num_retries+1):
             if n > 1:
@@ -236,14 +238,16 @@ class BotoBackend(duplicity.backend.Backend):
         raise BackendException("Error uploading %s/%s" % (self.straight_url, remote_filename))
 
     def get(self, remote_filename, local_path):
-        key = self.key_class(self.bucket)
-        key.key = self.key_prefix + remote_filename
         for n in range(1, globals.num_retries+1):
             if n > 1:
                 # sleep before retry (new connection to a **hopeful** new host, so no need to wait so long)
                 time.sleep(10)
             log.Info("Downloading %s/%s" % (self.straight_url, remote_filename))
             try:
+                key_name = self.key_prefix + remote_filename
+                key = self.bucket.get_key(key_name)
+                if key is None:
+                    raise BackendException("%s: key not found" % key_name)
                 key.get_contents_to_filename(local_path.name)
                 local_path.setdata()
                 self.resetConnection()
@@ -261,9 +265,9 @@ class BotoBackend(duplicity.backend.Backend):
                 (self.straight_url, remote_filename, globals.num_retries))
         raise BackendException("Error downloading %s/%s" % (self.straight_url, remote_filename))
 
-    def list(self):
+    def _list(self):
         if not self.bucket:
-            return []
+            raise BackendException("No connection to backend")
 
         for n in range(1, globals.num_retries+1):
             if n > 1:
@@ -326,5 +330,6 @@ class BotoBackend(duplicity.backend.Backend):
             else:
                 return {'size': None}
 
+duplicity.backend.register_backend("gs", BotoBackend)
 duplicity.backend.register_backend("s3", BotoBackend)
 duplicity.backend.register_backend("s3+http", BotoBackend)

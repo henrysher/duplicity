@@ -177,12 +177,23 @@ class Manifest:
         next_vi_string_regexp = re.compile("(^|\\n)(volume\\s.*?)"
                                            "(\\nvolume\\s|$)", re.I | re.S)
         starting_s_index = 0
+        highest_vol = 0
+        latest_vol = 0
         while 1:
             match = next_vi_string_regexp.search(s[starting_s_index:])
             if not match:
                 break
-            self.add_volume_info(VolumeInfo().from_string(match.group(2)))
+            vi = VolumeInfo().from_string(match.group(2))
+            self.add_volume_info(vi)
+            highest_vol = max(highest_vol, vi.volume_number)
+            latest_vol = vi.volume_number
             starting_s_index += match.end(2)
+        # If we restarted after losing some remote volumes, the highest volume
+        # seen may be higher than the last volume recorded.  That is, the
+        # manifest could contain "vol1, vol2, vol3, vol2."  If so, we don't
+        # want to keep vol3's info.
+        for i in range(latest_vol + 1, highest_vol + 1):
+            self.del_volume_info(i)
         return self
 
     def __eq__(self, other):
@@ -221,7 +232,7 @@ class Manifest:
         Write string version of manifest to given path
         """
         assert not path.exists()
-        fout = path.open("w")
+        fout = path.open("wb")
         fout.write(self.to_string())
         assert not fout.close()
         path.setdata()

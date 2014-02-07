@@ -446,6 +446,55 @@ class RestartTest(unittest.TestCase):
         assert not os.system("diff %s/file1 testfiles/restore_out/file1" % source)
         assert not os.system("diff %s/z testfiles/restore_out/z" % source)
 
+    def test_changed_source_dangling_manifest_volume(self):
+        """
+        If we restart but find remote volumes missing, we can easily end up
+        with a manifest that lists "vol1, vol2, vol3, vol2", leaving a dangling
+        vol3.  Make sure we can gracefully handle that.  This will only happen
+        if the source data changes to be small enough to not create a vol3 on
+        restart.
+        """
+        source = 'testfiles/largefiles'
+        self.make_largefiles(count=5, size=1)
+        # intentionally interrupt initial backup
+        try:
+            self.backup("full", source, options = ["--vol 1", "--fail 3"])
+            self.fail()
+        except CmdError, e:
+            self.assertEqual(30, e.exit_status)
+        # now delete the last volume on remote end and some source files
+        assert not os.system("rm testfiles/output/duplicity-full*vol3.difftar*")
+        assert not os.system("rm %s/file[2345]" % source)
+        assert not os.system("echo hello > %s/z" % source)
+        # finish backup
+        self.backup("full", source)
+        # and verify we can restore
+        self.restore()
+
+    def test_changed_source_file_disappears(self):
+        """
+        Make sure we correctly handle restarting a backup when a file
+        disappears when we had been in the middle of backing it up.  It's
+        possible that the first chunk of the next file will be skipped unless
+        we're careful.
+        """
+        source = 'testfiles/largefiles'
+        self.make_largefiles(count=1)
+        # intentionally interrupt initial backup
+        try:
+            self.backup("full", source, options = ["--vol 1", "--fail 2"])
+            self.fail()
+        except CmdError, e:
+            self.assertEqual(30, e.exit_status)
+        # now remove starting source data and make sure we add something after
+        assert not os.system("rm %s/*" % source)
+        assert not os.system("echo hello > %s/z" % source)
+        # finish backup
+        self.backup("full", source)
+        # and verify we can restore
+        self.restore()
+        assert not os.system("diff %s/z testfiles/restore_out/z" % source)
+
 
 # Note that this class duplicates all the tests in RestartTest
 class RestartTestWithoutEncryption(RestartTest):

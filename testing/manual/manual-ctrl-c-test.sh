@@ -1,10 +1,10 @@
 #!/bin/bash
 
 help(){
-	echo "Usage: ${SCRIPT_NAME} [-n] [source_dir]"
-	echo "Options:" 
-	echo "  -n   Do not encrypt files (use --no-encryption duplicity option)."
-	exit 1
+    echo "Usage: ${SCRIPT_NAME} [-n] [source_dir]"
+    echo "Options:"
+    echo "  -n   Do not encrypt files (use --no-encryption duplicity option)."
+    exit 1
 }
 
 # Check permissions

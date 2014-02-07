@@ -262,7 +262,7 @@ class WebDAVBackend(duplicity.backend.Backend):
         return 'Digest %s' % auth_string
 
     @retry_fatal
-    def list(self):
+    def _list(self):
         """List files in directory"""
         log.Info("Listing directory %s on WebDAV server" % (self.directory,))
         response = None
@@ -272,12 +272,9 @@ class WebDAVBackend(duplicity.backend.Backend):
             del self.headers['Depth']
             # if the target collection does not exist, create it.
             if response.status == 404:
-                response.close()
-                log.Info("Directory '%s' being created." % self.directory)
-                response = self.request("MKCOL", self.directory)
-                log.Info("WebDAV MKCOL status: %s %s" % (response.status, response.reason))
-                response.close()
-                # just created folder is so return empty
+                response.close() # otherwise next request fails with ResponseNotReady
+                self.makedir()
+                # just created an empty folder, so return empty
                 return []
             elif response.status in [200, 207]:
                 document = response.read()
@@ -300,6 +297,32 @@ class WebDAVBackend(duplicity.backend.Backend):
             raise e
         finally:
             if response: response.close()
+
+    def makedir(self):
+        """Make (nested) directories on the server."""
+        dirs = self.directory.split("/")
+        # url causes directory to start with /, but it might be given 
+        # with or without trailing / (which is required)
+        if dirs[-1] == '':
+            dirs=dirs[0:-1]
+        for i in range(1,len(dirs)):
+            d="/".join(dirs[0:i+1])+"/"
+       
+            self.close() # or we get previous request's data or exception       
+            self.headers['Depth'] = "1"
+            response = self.request("PROPFIND", d)
+            del self.headers['Depth']
+
+            log.Info("Checking existence dir %s: %d" % (d, response.status))
+
+            if response.status == 404:
+                log.Info("Creating missing directory %s" % d)
+                self.close() # or we get previous request's data or exception   
+
+                res = self.request("MKCOL", d)
+                if res.status != 201:
+                    raise BackendException("WebDAV MKCOL %s failed: %s %s" % (d,res.status,res.reason))
+                self.close()
 
     def __taste_href(self, href):
         """
