@@ -98,6 +98,10 @@ Some backends also require additional components (probably available as packages
 .BR "mega backend" " (mega.co.nz)"
 .B Python library for mega API
 - https://github.com/ckornacker/mega.py, ubuntu ppa - ppa:ckornacker/backup
+.TP
+.B "Par2 Wrapper Backend"
+.B par2cmdline
+- http://parchive.sourceforge.net/
 .PP
 There are two
 .B ssh backends
@@ -712,6 +716,12 @@ Use the old filename format (incompatible with Windows/Samba) rather than
 the new filename format.
 
 .TP
+.BI "--par2-redundancy " percent
+Adjust the level of redundancy in
+.I percent
+for Par2 recovery files (default 10%)
+
+.TP
 .B --progress
 When selected, duplicity will output the current upload progress and estimated
 upload time. To annotate changes, it will perform a first dry-run before a full
@@ -1041,6 +1051,13 @@ See also
 .B "A NOTE ON IMAP"
 .PP
 mega://user[:password]@mega.co.nz/some_dir
+.PP
+.BI "Par2 Wrapper Backend"
+.br
+par2+scheme://[user[:password]@]host[:port]/[/]path
+.br
+See also
+.B "A NOTE ON PAR2 WRAPPER BACKEND"
 .PP
 .B "using rsync daemon"
 .br
@@ -1495,6 +1512,24 @@ the "From" address in the IMAP server.  Then on a restore (or list) command
 the
 .B from_address_prefix
 will distinguish between different backups.
+
+.SH A NOTE ON PAR2 WRAPPER BACKEND
+Par2 Wrapper Backend can be used in combination with all other backends to
+create recovery files. Just add
+.BR par2+
+before a regular scheme (e.g.
+.IR par2+ftp://user@host/dir " or"
+.I par2+s3+http://bucket_name
+). This will create par2 recovery files for each archive and upload them all to
+the wrapped backend.
+.PP
+Before restoring, archives will be verified. Corrupt archives will be repaired
+on the fly if there are enough recovery blocks available.
+.PP
+Use
+.BI "--par2-redundancy " percent
+to adjust the size (and redundancy) of recovery files in
+.I percent.
 
 .SH A NOTE ON SSH BACKENDS
 The
