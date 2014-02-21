@@ -28,7 +28,7 @@ from _boto_single import BotoBackend as BotoSingleUploadBackend
 
 if globals.s3_use_multiprocessing:
     if sys.version_info[:2] < (2, 6):
-        print "Sorry, S3 multiprocessing requires version 2.5 or later of python"
+        print "Sorry, S3 multiprocessing requires version 2.6 or later of python"
         sys.exit(1)
     duplicity.backend.register_backend("gs", BotoMultiUploadBackend)
     duplicity.backend.register_backend("s3", BotoMultiUploadBackend)

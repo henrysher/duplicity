@@ -485,6 +485,10 @@ def parse_cmdline_options(arglist):
     # uploads to S3. Use this to control the maximum simultaneous uploads to S3.
     parser.add_option("--s3-multipart-max-procs", type="int", metavar=_("number"))
 
+    # Number of seconds to wait for each part of a multipart upload to S3. Use this
+    # to prevent hangups when doing a multipart upload to S3.
+    parser.add_option("--s3_multipart_max_timeout", type="int", metavar=_("number"))
+
     # Option to allow the s3/boto backend use the multiprocessing version.
     # By default it is off since it does not work for Python 2.4 or 2.5.
     if sys.version_info[:2] >= (2,6):

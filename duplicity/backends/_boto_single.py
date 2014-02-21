@@ -19,6 +19,7 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
+import os
 import time
 
 import duplicity.backend
@@ -163,7 +164,16 @@ class BotoBackend(duplicity.backend.Backend):
         self.resetConnection()
         self._listed_keys = {}
 
+    def close(self):
+        del self._listed_keys
+        self._listed_keys = {}
+        self.bucket = None
+        self.conn = None
+        del self.conn
+
     def resetConnection(self):
+        if getattr(self, 'conn', False):
+            self.conn.close()
         self.bucket = None
         self.conn = None
         del self.conn
@@ -222,8 +232,13 @@ class BotoBackend(duplicity.backend.Backend):
                     'Content-Type': 'application/octet-stream',
                     'x-amz-storage-class': storage_class
                 }
+                upload_start = time.time()
                 self.upload(source_path.name, key, headers)
+                upload_end = time.time()
+                total_s = abs(upload_end-upload_start) or 1  # prevent a zero value!
+                rough_upload_speed = os.path.getsize(source_path.name)/total_s
                 self.resetConnection()
+                log.Debug("Uploaded %s/%s to %s Storage at roughly %f bytes/second" % (self.straight_url, remote_filename, storage_class, rough_upload_speed))
                 return
             except Exception, e:
                 log.Warn("Upload '%s/%s' failed (attempt #%d, reason: %s: %s)"
@@ -332,8 +347,8 @@ class BotoBackend(duplicity.backend.Backend):
             else:
                 return {'size': None}
 
-    def upload(self, source_path_name, key, headers):
-            key.set_contents_from_filename(source_path_name, headers,
+    def upload(self, filename, key, headers):
+            key.set_contents_from_filename(filename, headers,
                                            cb=progress.report_transfer,
                                            num_cb=(max(2, 8 * globals.volsize / (1024 * 1024)))
                                            )  # Max num of callbacks = 8 times x megabyte

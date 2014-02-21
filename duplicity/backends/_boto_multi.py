@@ -24,6 +24,8 @@ import os
 import sys
 import threading
 import Queue
+import time
+import traceback
 
 from duplicity import globals
 from duplicity import log
@@ -75,6 +77,31 @@ class BotoBackend(BotoSingleBackend):
     AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY.
     """
 
+    def __init__(self, parsed_url):
+        BotoSingleBackend.__init__(self, parsed_url)
+        self._setup_pool()
+
+    def _setup_pool(self):
+        number_of_procs = globals.s3_multipart_max_procs
+        if not number_of_procs:
+            number_of_procs = multiprocessing.cpu_count()
+
+        if getattr(self, '_pool', False):
+            log.Debug("A process pool already exists. Destroying previous pool.")
+            self._pool.terminate()
+            self._pool.join()
+            self._pool = None
+
+        log.Debug("Setting multipart boto backend process pool to %d processes" % number_of_procs)
+
+        self._pool = multiprocessing.Pool(processes=number_of_procs)
+
+    def close(self):
+        BotoSingleBackend.close(self)
+        log.Debug("Closing pool")
+        self._pool.terminate()
+        self._pool.join()
+
     def upload(self, filename, key, headers=None):
         chunk_size = globals.s3_multipart_chunk_size
 
@@ -105,24 +132,39 @@ class BotoBackend(BotoSingleBackend):
             queue = manager.Queue()
             consumer = ConsumerThread(queue)
             consumer.start()
-
-        number_of_procs = min(chunks, globals.s3_multipart_max_procs)
-        log.Debug("Setting pool to %d processes" % number_of_procs)
-        pool = multiprocessing.Pool(processes=number_of_procs)
+        tasks = []
         for n in range(chunks):
             params = [self.scheme, self.parsed_url, self.storage_uri, self.bucket_name,
                       mp.id, filename, n, chunk_size, globals.num_retries,
                       queue]
-            pool.apply_async(multipart_upload_worker, params)
-        pool.close()
-        pool.join()
+            tasks.append(self._pool.apply_async(multipart_upload_worker, params))
+
+        log.Debug("Waiting for the pool to finish processing %s tasks" % len(tasks))
+        while tasks:
+            try:
+                tasks[0].wait(timeout=globals.s3_multipart_max_timeout)
+                if tasks[0].ready():
+                    if tasks[0].successful():
+                        del tasks[0]
+                    else:
+                        log.Debug("Part upload not successful, aborting multipart upload.")
+                        self._setup_pool()
+                        break
+                else:
+                    raise multiprocessing.TimeoutError
+            except multiprocessing.TimeoutError:
+                log.Debug("%s tasks did not finish by the specified timeout, aborting multipart upload and resetting pool." % len(tasks))
+                self._setup_pool()
+                break
+
+        log.Debug("Done waiting for the pool to finish processing")
 
         # Terminate the consumer thread, if any
         if globals.progress:
             consumer.finish = True
             consumer.join()
 
-        if len(mp.get_all_parts()) < chunks:
+        if len(tasks) > 0 or len(mp.get_all_parts()) < chunks:
             mp.cancel_upload()
             raise BackendException("Multipart upload failed. Aborted.")
 
@@ -136,7 +178,6 @@ def multipart_upload_worker(scheme, parsed_url, storage_uri, bucket_name, multip
     Note that the file chunk is read into memory, so it's important to keep
     this number reasonably small.
     """
-    import traceback
 
     def _upload_callback(uploaded, total):
         worker_name = multiprocessing.current_process().name
@@ -154,10 +195,17 @@ def multipart_upload_worker(scheme, parsed_url, storage_uri, bucket_name, multip
             for mp in bucket.list_multipart_uploads():
                 if mp.id == multipart_id:
                     with FileChunkIO(filename, 'r', offset=offset * bytes, bytes=bytes) as fd:
+                        start = time.time()
                         mp.upload_part_from_file(fd, offset + 1, cb=_upload_callback,
                                                  num_cb=max(2, 8 * bytes / (1024 * 1024))
                                                  )  # Max num of callbacks = 8 times x megabyte
+                        end = time.time()
+                        log.Debug("{name}: Uploaded chunk {chunk} at roughly {speed} bytes/second".format(name=worker_name, chunk=offset+1, speed=(bytes/max(1, abs(end-start)))))
                     break
+            conn.close()
+            conn = None
+            bucket = None
+            del conn
         except Exception, e:
             traceback.print_exc()
             if num_retries:
