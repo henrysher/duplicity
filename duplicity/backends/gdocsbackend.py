@@ -137,7 +137,7 @@ class GDocsBackend(duplicity.backend.Backend):
                                  % (remote_filename, self.folder.title.text, str(e)), raise_errors)
 
     @retry
-    def list(self, raise_errors=False):
+    def _list(self, raise_errors=False):
         """List files in folder"""
         try:
             entries = self.__fetch_entries(self.folder.resource_id.text,
@@ -220,7 +220,11 @@ class GDocsBackend(duplicity.backend.Backend):
             if title:
                 result = []
                 for entry in entries:
-                    if (not type) or (entry.get_resource_type() == type):
+                    resource_type = entry.get_resource_type()
+                    if (not type) \
+                       or (type == 'folder' and resource_type == 'folder') \
+                       or (type == GDocsBackend.BACKUP_DOCUMENT_TYPE and resource_type != 'folder'):
+
                         if folder_id != GDocsBackend.ROOT_FOLDER_ID:
                             for link in entry.in_collections():
                                 folder_entry = self.client.get_entry(link.href, None, None,

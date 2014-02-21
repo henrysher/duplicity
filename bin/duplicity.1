@@ -49,9 +49,9 @@ target_url
 target_url
 
 .SH REQUIREMENTS
-Duplicity requires a POSIX-like operating system with a 
+Duplicity requires a POSIX-like operating system with a
 .B python
-interpreter version 2.4+ installed. 
+interpreter version 2.4+ installed.
 It is best used under GNU/Linux.
 
 Some backends also require additional components (probably available as packages for your specific platform):
@@ -60,9 +60,13 @@ Some backends also require additional components (probably available as packages
 .B boto version 2.0+
 - http://github.com/boto/boto
 .TP
-.BR "cloudfiles backend" " (e.g. Rackspace Open Cloud)"
-.B Cloud Files Python API
+.BR "cloudfiles backend (deprecated)" " (e.g. Rackspace Open Cloud)"
+.B Cloud Files Python API (deprecated)
 - http://www.rackspace.com/knowledge_center/article/python-api-installation-for-cloud-files
+.TP
+.BR "cfpyrax backend" " (Rackspace Cloud)"
+.B Rackspace CloudFiles Pyrax API
+- http://docs.rackspace.com/sdks/guide/content/python.html
 .TP
 .B "dpbx backend" (Dropbox)
 .B Dropbox Python SDK
@@ -90,19 +94,23 @@ Some backends also require additional components (probably available as packages
 .B "rsync backend"
 .B rsync client binary
 - http://rsync.samba.org/
+.TP
+.BR "mega backend" " (mega.co.nz)"
+.B Python library for mega API
+- https://github.com/ckornacker/mega.py, ubuntu ppa - ppa:ckornacker/backup
 .PP
-There are two 
+There are two
 .B ssh backends
-for scp/sftp/ssh access (also see 
+for scp/sftp/ssh access (also see
 .BR "A NOTE ON SSH BACKENDS" ).
 .TP
 .BR "ssh paramiko backend" " (enabled by default)"
 .B paramiko
-(SSH2 for python) 
+(SSH2 for python)
 - http://pypi.python.org/pypi/paramiko (downloads); http://github.com/paramiko/paramiko (project page)
 .br
 .B pycrypto
-(Python Cryptography Toolkit) 
+(Python Cryptography Toolkit)
 - http://www.dlitz.net/software/pycrypto/
 .TP
 .B ssh pexpect backend
@@ -130,7 +138,7 @@ OpenSSH - http://www.openssh.com/
 for ssl certificate verification of HTTPS connections
 - http://curl.haxx.se/docs/caextract.html
 .br
-(also see 
+(also see
 .BR "A NOTE ON SSL CERTIFICATE VERIFICATION" ).
 
 .SH DESCRIPTION
@@ -139,7 +147,7 @@ tar-format volumes encrypted with GnuPG and places them to a
 remote (or local) storage backend.  See chapter
 .B URL FORMAT
 for a list of all supported backends and how to address them.
-Because duplicity uses librsync, incremental backups are space efficient 
+Because duplicity uses librsync, incremental backups are space efficient
 and only record the parts of files that have changed since the last backup.
 Currently duplicity supports deleted files, full Unix permissions, uid/gid,
 directories, symbolic links, fifos, etc., but not hard links.
@@ -165,7 +173,7 @@ action:
 duplicity full /home/me sftp://uid@other.host/some_dir
 .PP
 .RE
-or enforcing a full every other time via 
+or enforcing a full every other time via
 .I --full-if-older-than <time>
 , e.g. a full every month:
 .PP
@@ -254,10 +262,10 @@ duplicity will exit with a non-zero error level if any files are different.
 On verbosity level info (4) or higher, a message for each file that has
 changed will be logged.
 .br
-The 
+The
 .I --file-to-restore
 option restricts verify to that file or folder.
-The 
+The
 .I --time
 option allows to select a backup to verify against.
 The
@@ -398,6 +406,13 @@ location; rather than needing to store only one volume at a time,
 enough storage space is required to store two volumes.
 
 .TP
+.BI "--cf-backend " backend
+Allows the explicit selection of a cloudfiles backend. Defaults to
+.BR pyrax .
+Alternatively you might choose
+.BR cloudfiles .
+
+.TP
 .B --compare-data
 Enable data comparison of regular files on action verify.
 This is disabled by default for performance reasons.
@@ -410,7 +425,7 @@ Calculate what would be done, but do not perform any backend actions
 .BI "--encrypt-key " key-id
 When backing up, encrypt to the given public key, instead of using
 symmetric (traditional) encryption.  Can be specified multiple times.
-The key-id can be given in any of the formats supported by GnuPG; see 
+The key-id can be given in any of the formats supported by GnuPG; see
 .BR gpg (1),
 section "HOW TO SPECIFY A USER ID" for details.
 
@@ -427,9 +442,9 @@ default secret keyring is used which is usually located at .gnupg/secring.gpg
 .TP
 .BI "--encrypt-sign-key " key-id
 Convenience parameter. Same as
-.BR --encrypt-key 
+.BR --encrypt-key
 .IR key-id
-.BR --sign-key 
+.BR --sign-key
 .IR "key-id" .
 
 .TP
@@ -500,6 +515,18 @@ See the
 argument for more information.
 
 .TP
+.BI "--file-prefix, --file-prefix-manifest, --file-prefix-archive, --file-prefix-signature
+Adds a prefix to all files, manifest files, archive files, and/or signature files. 
+
+The same set of prefixes must be passed in on backup and restore.
+
+If both global and type-specific prefixes are set, global prefix will go before
+type-specific prefixes.
+
+See also
+.B "A NOTE ON FILENAME PREFIXES"
+
+.TP
 .BI "--file-to-restore " path
 This option may be given in restore mode, causing only
 .I path
@@ -541,8 +568,8 @@ Same as
 .BR --encrypt-key ,
 but it hides user's key id from encrypted file. It uses the gpg's
 .B --hidden-recipient
-command to obfuscate the owner of the backup. On restore, gpg will 
-automatically try all available secret keys in order to decrypt the 
+command to obfuscate the owner of the backup. On restore, gpg will
+automatically try all available secret keys in order to decrypt the
 backup. See gpg(1) for more details.
 
 
@@ -670,9 +697,9 @@ the directory statistics file.
 
 .TP
 .B --numeric-owner
-On restore always use the numeric uid/gid from the archive and not the 
+On restore always use the numeric uid/gid from the archive and not the
 archived user/group names, which is the default behaviour.
-Recommended for restoring from live cds which might have the users with 
+Recommended for restoring from live cds which might have the users with
 identical names but different uids/gids.
 
 .TP
@@ -768,7 +795,7 @@ section
 .B (only ssh pexpect backend)
 The
 .I command
-will be used instead of "sftp". 
+will be used instead of "sftp".
 .br
 See also
 .B "A NOTE ON SSH BACKENDS"
@@ -784,15 +811,15 @@ support long filenames.
 
 .TP
 .BI "--sign-key " key-id
-This option can be used when backing up, restoring or verifying. 
+This option can be used when backing up, restoring or verifying.
 When backing up, all backup files will be signed with keyid
 .IR key .
 When restoring, duplicity will signal an error if any remote file is
-not signed with the given key-id. The key-id can be givein in any of 
-the formats supported by GnuPG; see 
+not signed with the given key-id. The key-id can be givein in any of
+the formats supported by GnuPG; see
 .BR gpg (1),
 section "HOW TO SPECIFY A USER ID" for details.
-Should be specified only once because currently only 
+Should be specified only once because currently only
 .B one
 signing key is supported. Last entry overrides all other entries.
 .br
@@ -801,15 +828,15 @@ See also
 
 .TP
 .B --ssh-askpass
-Tells the ssh backend to prompt the user for the remote system password, 
+Tells the ssh backend to prompt the user for the remote system password,
 if it was not defined in target url and no FTP_PASSWORD env var is set.
 This password is also used for passphrase-protected ssh keys.
 
 .TP
 .BI "--ssh-backend " backend
-Allows the explicit selection of a ssh backend. Defaults to 
+Allows the explicit selection of a ssh backend. Defaults to
 .BR paramiko .
-Alternatively you might choose 
+Alternatively you might choose
 .BR pexpect .
 .br
 See also
@@ -950,12 +977,12 @@ This passphrase is passed to GnuPG. If this is not set, the user will be
 prompted for the passphrase.
 .TP
 .B SIGN_PASSPHRASE
-The passphrase to be used for 
+The passphrase to be used for
 .BR --sign-key .
-If ommitted 
+If ommitted
 .B and
-sign key is also one of the keys to encrypt against 
-.B PASSPHRASE 
+sign key is also one of the keys to encrypt against
+.B PASSPHRASE
 will be reused instead.
 Otherwise, if passphrase is needed but not set the user will be prompted for it.
 
@@ -970,8 +997,8 @@ scheme://[user[:password]@]host[:port]/[/]path
 It is not recommended to expose the password on the command line since
 it could be revealed to anyone with permissions to do process listings,
 it is permitted however.
-Consider setting the environment variable 
-.B FTP_PASSWORD 
+Consider setting the environment variable
+.B FTP_PASSWORD
 instead, which is used by most, if not all backends, regardless of it's name.
 .PP
 In protocols that support it, the path may be preceded by a single
@@ -982,6 +1009,8 @@ filesystem path.
 Formats of each of the URL schemes follow:
 .RS
 .PP
+.BI "Rackspace Cloud Files"
+.br
 cf+http://container_name
 .br
 See also
@@ -1010,6 +1039,8 @@ imap[s]://user[:password]@host.com[/from_address_prefix]
 .br
 See also
 .B "A NOTE ON IMAP"
+.PP
+mega://user[:password]@mega.co.nz/some_dir
 .PP
 .B "using rsync daemon"
 .br
@@ -1198,8 +1229,8 @@ can be expanded into the file's filename, or
 .B 2.
 the file is inside a directory matched by the option.
 .PP
-Conversely, the 
-.B "--include " 
+Conversely, the
+.B "--include "
 pattern matches a file if:
 .PP
 .B 1.
@@ -1214,26 +1245,32 @@ the file is a directory which contains a file matched by the option.
 .PP
 For example,
 
+.RS
 .B --exclude
 /usr/local
+.RE
 
 matches e.g. /usr/local, /usr/local/lib, and /usr/local/lib/netscape.  It
 is the same as --exclude /usr/local --exclude '/usr/local/**'.
+.PP
+On the other hand
 
-Or
-.br
+.RS
 .B --include
 /usr/local
+.RE
 
 specifies that /usr, /usr/local, /usr/local/lib, and
 /usr/local/lib/netscape (but not /usr/doc) all be backed up. Thus you
 don't have to worry about including parent directories to make sure
-that included subdirectories have somewhere to go. 
-
+that included subdirectories have somewhere to go.
+.PP
 Finally,
-.br
+
+.RS
 .B --include
 ignorecase:'/usr/[a-z0-9]foo/*/**.py'
+.RE
 
 would match a file like /usR/5fOO/hello/there/world.py.  If it did
 match anything, it would also match /usr.  If there is no existing
@@ -1289,7 +1326,7 @@ For example, if file "list.txt" contains the lines:
 - /var
 .RE
 
-then 
+then
 .B "--include-filelist list.txt"
 would include /usr, /usr/local, and
 /usr/local/bin.  It would exclude /usr/local/doc,
@@ -1320,9 +1357,9 @@ dir/foo
 - **
 .RE
 
-Then 
-.B "--include-globbing-filelist globbing-list.txt" 
-would be exactly the same as specifying 
+Then
+.B "--include-globbing-filelist globbing-list.txt"
+would be exactly the same as specifying
 .B "--include dir/foo --include dir/bar --exclude **"
 on the command line.
 
@@ -1349,12 +1386,20 @@ which aren't followed by 'foo'.  However, it wouldn't match /home even
 if /home/ben/1234567 existed.
 
 .SH A NOTE ON CLOUD FILES ACCESS
-Cloudfiles is Rackspace's implementation of OpenStack Object Storage
-protocol.
+Pyrax is Rackspace's next-generation Cloud management API, including
+Cloud Files access.  The cfpyrax backend requires the pyrax library to
+be installed on the system.
+See
+.B REQUIREMENTS
+above.
+
+Cloudfiles is Rackspace's now deprecated implementation of OpenStack
+Object Storage protocol.  Users wishing to use Duplicity with Rackspace
+Cloud Files should migrate to the new Pyrax plugin to ensure support.
 
 The backend requires python-cloudfiles to be installed on the system.
-See 
-.B REQUIREMENTS 
+See
+.B REQUIREMENTS
 above.
 
 It uses three environment variables for authentification:
@@ -1362,11 +1407,11 @@ It uses three environment variables for authentification:
 .BR CLOUDFILES_APIKEY " (required),"
 .BR CLOUDFILES_AUTHURL " (optional)"
 
-If 
-.B CLOUDFILES_AUTHURL 
+If
+.B CLOUDFILES_AUTHURL
 is unspecified it will default to the value
-provided by python-cloudfiles, which points to rackspace, hence this value 
-.I must 
+provided by python-cloudfiles, which points to rackspace, hence this value
+.I must
 be set in order to use other cloud files providers.
 
 .SH A NOTE ON DROPBOX ACCESS
@@ -1433,7 +1478,7 @@ to have the Google Cloud Storage utility populate the
 .B ~/.boto
 configuration file.
 .PP
-Enable Interoperable Access: 
+Enable Interoperable Access:
 https://code.google.com/apis/console#:storage
 .br
 Create Access Keys:
@@ -1452,7 +1497,7 @@ the
 will distinguish between different backups.
 
 .SH A NOTE ON SSH BACKENDS
-The 
+The
 .I ssh backends
 support
 .I sftp
@@ -1460,7 +1505,7 @@ and
 .I scp/ssh
 transport protocols.
 This is a known user-confusing issue as these are fundamentally different.
-If you plan to access your backend via one of those please inform yourself 
+If you plan to access your backend via one of those please inform yourself
 about the requirements for a server to support
 .IR sftp " or"
 .I scp/ssh
@@ -1472,15 +1517,15 @@ Both support
 .BR --use-scp ,
 .BR --ssh-askpass " and"
 .BR --ssh-options "."
-Only the 
+Only the
 .B pexpect
 backend allows to define
 .BR --scp-command " and"
 .BR --sftp-command .
 .PP
 .BR "SSH paramiko backend " "(selected by default)"
-is a complete reimplementation of ssh protocols natively in python. Advantages 
-are speed and maintainability. Minor disadvantage is that extra packages are 
+is a complete reimplementation of ssh protocols natively in python. Advantages
+are speed and maintainability. Minor disadvantage is that extra packages are
 needed as listed in
 .B REQUIREMENTS
 above. In
@@ -1503,12 +1548,12 @@ delete operations.  The current version uses
 for all four supported
 operations, unless the
 .I --use-scp
-option is used to revert to old behavior. 
+option is used to revert to old behavior.
 .PP
 .B Why use sftp instead of scp?
 The change to sftp was made in order to allow the remote system to chroot the backup,
-thus providing better security and because it does not suffer from shell quoting issues like scp. 
-Scp also does not support any kind of file listing, so sftp or ssh access will always be needed 
+thus providing better security and because it does not suffer from shell quoting issues like scp.
+Scp also does not support any kind of file listing, so sftp or ssh access will always be needed
 in addition for this backend mode to work properly. Sftp does not have these limitations but needs
 an sftp service running on the backend server, which is sometimes not an option.
 
@@ -1516,7 +1561,7 @@ an sftp service running on the backend server, which is sometimes not an option.
 Certificate verification as implemented right now [01.2013] only in the webdav backend needs a file
 based database of certification authority certificates (cacert file). It has to be a
 .B PEM
-formatted text file as currently provided by the 
+formatted text file as currently provided by the
 .B CURL
 project. See
 .PP
@@ -1541,8 +1586,8 @@ to point duplicity to a copy in a different location.
 .PP
 Finally there is the
 .B --ssl-no-check-certificate
-option to disable certificate verification alltogether, in case some ssl library 
-is missing or verification is not wanted. Use it with care, as even with self signed 
+option to disable certificate verification alltogether, in case some ssl library
+is missing or verification is not wanted. Use it with care, as even with self signed
 servers manually providing the private ca certificate is definitely the safer option.
 
 .SH A NOTE ON SWIFT (OPENSTACK OBJECT STORAGE) ACCESS
@@ -1550,8 +1595,8 @@ Swift is the OpenStack Object Storage service.
 .br
 The backend requires python-switclient to be installed on the system.
 python-keystoneclient is also needed to use OpenStack's Keystone Identity service.
-See 
-.B REQUIREMENTS 
+See
+.B REQUIREMENTS
 above.
 
 It uses four environment variables for authentification:
@@ -1580,7 +1625,7 @@ and enter both passphrases (symmetric and sign key) in the gpg-agent's dialog.
 .PP
 2. Use a
 .BI PASSPHRASE
-for symmetric encryption of your choice but the signing key has an 
+for symmetric encryption of your choice but the signing key has an
 .B empty
 passphrase.
 .PP
@@ -1590,18 +1635,25 @@ for symmetric encryption and the passphrase of the signing key are identical.
 
 .SH A NOTE ON UBUNTU ONE
 
-To use Ubuntu One you must have an Ubuntu One OAuth access token. Such 
-OAuth tokens have a practically unlimited lifetime; you can have multiple 
+To use Ubuntu One you must have an Ubuntu One OAuth access token. Such
+OAuth tokens have a practically unlimited lifetime; you can have multiple
 active tokens and you can revoke tokens using the Ubuntu One web interface.
 .PP
-Duplicity expects the token in the environment variable 
+Duplicity expects the token in the environment variable
 .B FTP_PASSWORD
 (in the format "consumer_key:consumer_secret:token:token_secret"). If no
 token is present, duplicity asks for your Ubuntu One email address and password
-and requests an access token from the Ubuntu SSO service. The newly 
+and requests an access token from the Ubuntu SSO service. The newly
 acquired token is then printed to the console.
 .PP
 See https://one.ubuntu.com/ for more information about Ubuntu One.
+
+.SH A NOTE ON FILENAME PREFIXES
+
+Filename prefixes can be used in conjunction with S3 lifecycle rules to transition 
+archive files to Glacier, while keeping metadata (signature and manifest files) on S3.
+
+Duplicity does not require access to archive files except when restoring from backup.
 
 .SH KNOWN ISSUES / BUGS
 Hard links currently unsupported (they will be treated as non-linked
@@ -1683,7 +1735,7 @@ Edgar Soldin, Mike Terry
 Most backends were contributed individually.
 Information about their authorship may be found in the according file's header.
 .br
-Also we'd like to thank everybody posting issue to the mailing list or on 
+Also we'd like to thank everybody posting issue to the mailing list or on
 launchpad, sending in patches or contributing otherwise. Duplicity wouldn't
 be as stable and useful if it weren't for you.
 

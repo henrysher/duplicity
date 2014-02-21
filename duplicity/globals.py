@@ -21,13 +21,24 @@
 
 """Store global configuration information"""
 
-import socket, os
+import os
+import socket
+
 
 # The current version of duplicity
 version = "$version"
 
-# Default file_prefix value
+# Prefix for all files (appended before type-specific prefixes)
 file_prefix = ""
+
+# Prefix for manifest files only
+file_prefix_manifest = ""
+
+# Prefix for archive files only
+file_prefix_archive = ""
+
+# Prefix for sig files only
+file_prefix_signature = ""
 
 # The name of the current host, or None if it cannot be set
 hostname = socket.getfqdn()
@@ -93,6 +104,9 @@ pydevd = False
 # windows machines.
 time_separator = ":"
 
+# Global lockfile used to manage concurrency
+lockfile = None
+
 # If this is true, only warn and don't raise fatal error when backup
 # source directory doesn't match previous backup source directory.
 allow_source_mismatch = None
@@ -138,7 +152,7 @@ encryption = True
 compression = True
 
 # volume size. default 25M
-volsize = 25*1024*1024
+volsize = 25 * 1024 * 1024
 
 # Working directory for the tempfile module. Defaults to /tmp on most systems.
 temproot = None
@@ -181,10 +195,10 @@ s3_use_multiprocessing = False
 # Chunk size used for S3 multipart uploads.The number of parallel uploads to
 # S3 be given by chunk size / volume size. Use this to maximize the use of
 # your bandwidth. Defaults to 25MB
-s3_multipart_chunk_size = 25*1024*1024
+s3_multipart_chunk_size = 25 * 1024 * 1024
 
 # Minimum chunk size accepted by S3
-s3_multipart_minimum_chunk_size = 5*1024*1024
+s3_multipart_minimum_chunk_size = 5 * 1024 * 1024
 
 # Maximum number of processes to use while doing a multipart upload to S3
 s3_multipart_max_procs = None
@@ -223,6 +237,9 @@ ssh_options = ""
 # whether to use scp for put/get, sftp is default
 use_scp = False
 
+# default cf backend is pyrax
+cf_backend = "pyrax"
+
 # HTTPS ssl optons (currently only webdav)
 ssl_cacert_file = None
 ssl_no_check_certificate = False
@@ -258,6 +275,6 @@ compare_data = False
 # changes, then runs the real operation and keeps track of the real progress
 progress = False
 
-# Controls the upload progress messages refresh rate. Default: update each 
+# Controls the upload progress messages refresh rate. Default: update each
 # 3 seconds
-progress_rate = 3 
+progress_rate = 3

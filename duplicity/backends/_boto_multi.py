@@ -36,6 +36,8 @@ from duplicity import progress
 from _boto_single import BotoBackend as BotoSingleBackend
 from _boto_single import get_connection
 
+BOTO_MIN_VERSION = "2.1.1"
+
 # Multiprocessing is not supported on *BSD
 if sys.platform not in ('darwin', 'linux2'):
     from multiprocessing import dummy as multiprocessing

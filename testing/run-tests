@@ -25,9 +25,9 @@ cd $(dirname $0)
 
 THISDIR=$(pwd)
 export TZ=US/Central
-export LANG=
+export LANG=en_US.UTF-8
 # up for 'duplicity' module and here for 'helper.py'
-export PYTHONPATH="$(dirname $THISDIR):$THISDIR/helpers"
+export PYTHONPATH="$THISDIR/overrides:$(dirname $THISDIR):$THISDIR/helpers"
 export GNUPGHOME="$THISDIR/gnupg"
 export PATH="$(dirname $THISDIR)/bin:$PATH"
 

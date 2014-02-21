@@ -30,7 +30,7 @@ from duplicity.util import exception_traceback
 from duplicity.backend import retry
 from duplicity import progress
 
-BOTO_MIN_VERSION = "1.6a"
+BOTO_MIN_VERSION = "2.1.1"
 
 
 def get_connection(scheme, parsed_url, storage_uri):
@@ -214,7 +214,6 @@ class BotoBackend(duplicity.backend.Backend):
 
         if not remote_filename:
             remote_filename = source_path.get_filename()
-
         key = self.bucket.new_key(self.key_prefix + remote_filename)
 
         for n in range(1, globals.num_retries+1):
@@ -264,6 +263,8 @@ class BotoBackend(duplicity.backend.Backend):
             log.Info("Downloading %s/%s" % (self.straight_url, remote_filename))
             try:
                 self.resetConnection()
+                if key is None:
+                    raise BackendException("%s: key not found" % key_name)
                 key.get_contents_to_filename(local_path.name)
                 local_path.setdata()
                 return
@@ -280,9 +281,9 @@ class BotoBackend(duplicity.backend.Backend):
                 (self.straight_url, remote_filename, globals.num_retries))
         raise BackendException("Error downloading %s/%s" % (self.straight_url, remote_filename))
 
-    def list(self):
+    def _list(self):
         if not self.bucket:
-            return []
+            raise BackendException("No connection to backend")
 
         for n in range(1, globals.num_retries+1):
             if n > 1:

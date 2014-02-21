@@ -24,12 +24,15 @@
 import types
 import gettext
 
+
 from duplicity import log
 from duplicity import file_naming
 from duplicity import path
+from duplicity import util
 from duplicity import dup_time
 from duplicity import globals
 from duplicity import manifest
+from duplicity import util
 from duplicity.gpg import GPGError
 
 class CollectionsError(Exception):
@@ -144,7 +147,7 @@ class BackupSet:
         try:
             self.backend.delete(rfn)
         except Exception:
-            log.Debug("BackupSet.delete: missing %s" % rfn)
+            log.Debug(_("BackupSet.delete: missing %s") % map(util.ufn, rfn))
             pass
         for lfn in globals.archive_dir.listdir():
             pr = file_naming.parse(lfn)
@@ -155,10 +158,11 @@ class BackupSet:
                 try:
                     globals.archive_dir.append(lfn).delete()
                 except Exception:
-                    log.Debug("BackupSet.delete: missing %s" % lfn)
+                    log.Debug(_("BackupSet.delete: missing %s") % map(util.ufn, lfn))
                     pass
+        util.release_lockfile()
 
-    def __str__(self):
+    def __unicode__(self):
         """
         For now just list files in set
         """
@@ -166,7 +170,7 @@ class BackupSet:
         if self.remote_manifest_name:
             filelist.append(self.remote_manifest_name)
         filelist.extend(self.volume_name_dict.values())
-        return "[%s]" % ", ".join(filelist)
+        return u"[%s]" % u", ".join(map(util.ufn, filelist))
 
     def get_timestr(self):
         """
@@ -611,42 +615,42 @@ class CollectionsStatus:
 
         return l
 
-    def __str__(self):
+    def __unicode__(self):
         """
         Return string summary of the collection
         """
         l = [_("Collection Status"),
-             "-----------------",
+             u"-----------------",
              _("Connecting with backend: %s") %
              (self.backend.__class__.__name__,),
-             _("Archive dir: %s") % (self.archive_dir.name,)]
+             _("Archive dir: %s") % (util.ufn(self.archive_dir.name),)]
 
         l.append("\n" +
-                 gettext.ngettext("Found %d secondary backup chain.",
-                                  "Found %d secondary backup chains.",
-                                  len(self.other_backup_chains))
+                 ngettext("Found %d secondary backup chain.",
+                          "Found %d secondary backup chains.",
+                          len(self.other_backup_chains))
                  % len(self.other_backup_chains))
         for i in range(len(self.other_backup_chains)):
             l.append(_("Secondary chain %d of %d:") %
                      (i+1, len(self.other_backup_chains)))
-            l.append(str(self.other_backup_chains[i]))
+            l.append(unicode(self.other_backup_chains[i]))
             l.append("")
 
         if self.matched_chain_pair:
             l.append("\n" + _("Found primary backup chain with matching "
                      "signature chain:"))
-            l.append(str(self.matched_chain_pair[1]))
+            l.append(unicode(self.matched_chain_pair[1]))
         else:
             l.append(_("No backup chains with active signatures found"))
 
         if self.orphaned_backup_sets or self.incomplete_backup_sets:
-            l.append(gettext.ngettext("Also found %d backup set not part of any chain,",
-                                      "Also found %d backup sets not part of any chain,",
-                                      len(self.orphaned_backup_sets))
+            l.append(ngettext("Also found %d backup set not part of any chain,",
+                              "Also found %d backup sets not part of any chain,",
+                              len(self.orphaned_backup_sets))
                      % (len(self.orphaned_backup_sets),))
-            l.append(gettext.ngettext("and %d incomplete backup set.",
-                                      "and %d incomplete backup sets.",
-                                      len(self.incomplete_backup_sets))
+            l.append(ngettext("and %d incomplete backup set.",
+                              "and %d incomplete backup sets.",
+                              len(self.incomplete_backup_sets))
                      % (len(self.incomplete_backup_sets),))
             # TRANSL: "cleanup" is a hard-coded command, so do not translate it
             l.append(_('These may be deleted by running duplicity with the '
@@ -654,7 +658,7 @@ class CollectionsStatus:
         else:
             l.append(_("No orphaned or incomplete backup sets found."))
 
-        return "\n".join(l)
+        return u"\n".join(l)
 
     def set_values(self, sig_chain_warning = 1):
         """
@@ -668,16 +672,16 @@ class CollectionsStatus:
 
         # get remote filename list
         backend_filename_list = self.backend.list()
-        log.Debug(gettext.ngettext("%d file exists on backend",
-                                   "%d files exist on backend",
-                                   len(backend_filename_list)) %
+        log.Debug(ngettext("%d file exists on backend",
+                           "%d files exist on backend",
+                           len(backend_filename_list)) %
                   len(backend_filename_list))
 
         # get local filename list
         local_filename_list = self.archive_dir.listdir()
-        log.Debug(gettext.ngettext("%d file exists in cache",
-                                   "%d files exist in cache",
-                                   len(local_filename_list)) %
+        log.Debug(ngettext("%d file exists in cache",
+                           "%d files exist in cache",
+                           len(local_filename_list)) %
                   len(local_filename_list))
 
         # check for partial backups
@@ -750,21 +754,21 @@ class CollectionsStatus:
         assert self.values_set
 
         if self.local_orphaned_sig_names:
-            log.Warn(gettext.ngettext("Warning, found the following local orphaned "
-                                      "signature file:",
-                                      "Warning, found the following local orphaned "
-                                      "signature files:",
-                                      len(self.local_orphaned_sig_names))
-                     + "\n" + "\n".join(self.local_orphaned_sig_names),
+            log.Warn(ngettext("Warning, found the following local orphaned "
+                              "signature file:",
+                              "Warning, found the following local orphaned "
+                              "signature files:",
+                              len(self.local_orphaned_sig_names))
+                     + u"\n" + u"\n".join(map(util.ufn, self.local_orphaned_sig_names)),
                      log.WarningCode.orphaned_sig)
 
         if self.remote_orphaned_sig_names:
-            log.Warn(gettext.ngettext("Warning, found the following remote orphaned "
-                                      "signature file:",
-                                      "Warning, found the following remote orphaned "
-                                      "signature files:",
-                                      len(self.remote_orphaned_sig_names))
-                     + "\n" + "\n".join(self.remote_orphaned_sig_names),
+            log.Warn(ngettext("Warning, found the following remote orphaned "
+                              "signature file:",
+                              "Warning, found the following remote orphaned "
+                              "signature files:",
+                              len(self.remote_orphaned_sig_names))
+                     + u"\n" + u"\n".join(map(util.ufn, self.remote_orphaned_sig_names)),
                      log.WarningCode.orphaned_sig)
 
         if self.all_sig_chains and sig_chain_warning and not self.matched_chain_pair:
@@ -776,13 +780,12 @@ class CollectionsStatus:
                        "from aborted session"), log.WarningCode.incomplete_backup)
 
         if self.orphaned_backup_sets:
-            log.Warn(gettext.ngettext("Warning, found the following orphaned "
-                                      "backup file:",
-                                      "Warning, found the following orphaned "
-                                      "backup files:",
-                                      len(self.orphaned_backup_sets))
-                     + "\n" + "\n".join(map(lambda x: str(x),
-                                            self.orphaned_backup_sets)),
+            log.Warn(ngettext("Warning, found the following orphaned "
+                              "backup file:",
+                              "Warning, found the following orphaned "
+                              "backup files:",
+                              len(self.orphaned_backup_sets))
+                     + u"\n" + u"\n".join(map(unicode, self.orphaned_backup_sets)),
                      log.WarningCode.orphaned_backup)
 
     def get_backup_chains(self, filename_list):
@@ -795,7 +798,7 @@ class CollectionsStatus:
         missing files.
         """
         log.Debug(_("Extracting backup chains from list of files: %s")
-                  % filename_list)
+                  % map(util.ufn, filename_list))
         # First put filenames in set form
         sets = []
         def add_to_sets(filename):
@@ -804,15 +807,15 @@ class CollectionsStatus:
             """
             for set in sets:
                 if set.add_filename(filename):
-                    log.Debug(_("File %s is part of known set") % (filename,))
+                    log.Debug(_("File %s is part of known set") % (util.ufn(filename),))
                     break
             else:
-                log.Debug(_("File %s is not part of a known set; creating new set") % (filename,))
+                log.Debug(_("File %s is not part of a known set; creating new set") % (util.ufn(filename),))
                 new_set = BackupSet(self.backend)
                 if new_set.add_filename(filename):
                     sets.append(new_set)
                 else:
-                    log.Debug(_("Ignoring file (rejected by backup set) '%s'") % filename)
+                    log.Debug(_("Ignoring file (rejected by backup set) '%s'") % util.ufn(filename))
         map(add_to_sets, filename_list)
         sets, incomplete_sets = self.get_sorted_sets(sets)
 

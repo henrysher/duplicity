@@ -27,17 +27,15 @@
 # Please send mail to me or the mailing list if you find bugs or have
 # any suggestions.
 
-import getpass, gzip, os, sys, time, types
+import gzip, os, sys, time, types
 import traceback, platform, statvfs, resource, re
 import threading
 from datetime import datetime
+from lockfile import FileLock
 
 pwd = os.path.abspath(os.path.dirname(sys.argv[0]))
 if os.path.exists(os.path.join(pwd, "../duplicity")):
     sys.path.insert(0, os.path.abspath(os.path.join(pwd, "../.")))
-
-import gettext
-gettext.install('duplicity', codeset='utf8')
 
 from duplicity import log
 log.setup()
@@ -63,6 +61,13 @@ from duplicity import progress
 
 # If exit_val is not None, exit with given value at end.
 exit_val = None
+
+def getpass_safe(message):
+    # getpass() in Python 2.x will call str() on our prompt.  So we can't pass
+    # in non-ascii characters.
+    import getpass, locale
+    message = message.encode(locale.getpreferredencoding(), 'replace')
+    return getpass.getpass(message)
 
 def get_passphrase(n, action, for_signing = False):
     """
@@ -159,19 +164,19 @@ def get_passphrase(n, action, for_signing = False):
                     if use_cache and globals.gpg_profile.signing_passphrase:
                         pass1 = globals.gpg_profile.signing_passphrase
                     else:
-                        pass1 = getpass.getpass(_("GnuPG passphrase for signing key:")+" ")
+                        pass1 = getpass_safe(_("GnuPG passphrase for signing key:")+" ")
                 else:
                     if use_cache and globals.gpg_profile.passphrase:
                         pass1 = globals.gpg_profile.passphrase
                     else:
-                        pass1 = getpass.getpass(_("GnuPG passphrase:")+" ")
+                        pass1 = getpass_safe(_("GnuPG passphrase:")+" ")
 
             if n == 1:
                 pass2 = pass1
             elif for_signing:
-                pass2 = getpass.getpass(_("Retype passphrase for signing key to confirm: "))
+                pass2 = getpass_safe(_("Retype passphrase for signing key to confirm: "))
             else:
-                pass2 = getpass.getpass(_("Retype passphrase to confirm: "))
+                pass2 = getpass_safe(_("Retype passphrase to confirm: "))
 
             if not pass1 == pass2:
                 print _("First and second passphrases do not match!  Please try again.")
@@ -223,7 +228,8 @@ def restart_position_iterator(tarblock_iter):
     last_block = globals.restart.last_block
     try:
         # Just spin our wheels
-        while tarblock_iter.next():
+        iter_result = tarblock_iter.next()
+        while iter_result:
             if (tarblock_iter.previous_index == last_index):
                 # If both the previous index and this index are done, exit now
                 # before we hit the next index, to prevent skipping its first
@@ -236,15 +242,17 @@ def restart_position_iterator(tarblock_iter):
             if tarblock_iter.previous_index > last_index:
                 log.Warn(_("File %s complete in backup set.\n"
                            "Continuing restart on file %s.") %
-                           ("/".join(last_index), "/".join(tarblock_iter.previous_index)),
+                           (util.uindex(last_index), util.uindex(tarblock_iter.previous_index)),
                            log.ErrorCode.restart_file_not_found)
+                # We went too far! Stuff the data back into place before restarting
+                tarblock_iter.queue_index_data(iter_result)
                 break
+            iter_result = tarblock_iter.next()
     except StopIteration:
         log.Warn(_("File %s missing in backup set.\n"
                    "Continuing restart on file %s.") %
-                   ("/".join(last_index), "/".join(tarblock_iter.previous_index)),
+                   (util.uindex(last_index), util.uindex(tarblock_iter.previous_index)),
                    log.ErrorCode.restart_file_not_found)
-    return 0
 
 
 def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
@@ -292,7 +300,7 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
             return # error querying file
         if size != orig_size:
             code_extra = "%s %d %d" % (util.escape(dest_filename), orig_size, size)
-            log.FatalError(_("File %s was corrupted during upload.") % dest_filename,
+            log.FatalError(_("File %s was corrupted during upload.") % util.ufn(dest_filename),
                            log.ErrorCode.volume_wrong_size, code_extra)
 
     def put(tdp, dest_filename, vol_num):
@@ -349,9 +357,9 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
         validate_encryption_settings(globals.restart.last_backup, mf)
         mf.fh = man_outfp
         last_block = globals.restart.last_block
-        log.Notice("Restarting after volume %s, file %s, block %s" %
+        log.Notice(_("Restarting after volume %s, file %s, block %s") %
                    (globals.restart.start_vol,
-                    "/".join(globals.restart.last_index),
+                    util.uindex(globals.restart.last_index),
                     globals.restart.last_block))
         vol_num = globals.restart.start_vol
         restart_position_iterator(tarblock_iter)
@@ -416,7 +424,7 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
                                                         (tdp, dest_filename, vol_num)))
 
         # Log human-readable version as well as raw numbers for machine consumers
-        log.Progress('Processed volume %d' % vol_num, diffdir.stats.SourceFileSize)
+        log.Progress(_('Processed volume %d') % vol_num, diffdir.stats.SourceFileSize)
         # Snapshot (serialize) progress now as a Volume has been completed. This is always the last restore point 
         # when it comes to restart a failed backup
         if globals.progress:
@@ -663,10 +671,11 @@ def list_current(col_stats):
     path_iter = diffdir.get_combined_path_iter(sig_chain.get_fileobjs(time))
     for path in path_iter:
         if path.difftype != "deleted":
-            user_info = "%s %s" % (dup_time.timetopretty(path.getmtime()),
-                                   path.get_relative_path())
-            log_info = "%s %s" % (dup_time.timetostring(path.getmtime()),
-                                  util.escape(path.get_relative_path()))
+            user_info = u"%s %s" % (dup_time.timetopretty(path.getmtime()),
+                                    util.ufn(path.get_relative_path()))
+            log_info = "%s %s %s" % (dup_time.timetostring(path.getmtime()),
+                                     util.escape(path.get_relative_path()),
+                                     path.type)
             log.Log(user_info, log.INFO, log.InfoCode.file_list,
                     log_info, True)
 
@@ -757,11 +766,11 @@ def restore_get_enc_fileobj(backend, filename, volume_info):
     verified, hash_pair, calculated_hash = restore_check_hash(volume_info, tdp)
     if not verified:
         log.FatalError("%s\n %s\n %s\n %s\n" %
-                           (_("Invalid data - %s hash mismatch for file:") % hash_pair[0],
-                            filename,
-                            _("Calculated hash: %s") % calculated_hash,
-                            _("Manifest hash: %s") % hash_pair[1]),
-                           log.ErrorCode.mismatched_hash)
+                       (_("Invalid data - %s hash mismatch for file:") % hash_pair[0],
+                        util.ufn(filename),
+                        _("Calculated hash: %s") % calculated_hash,
+                        _("Manifest hash: %s") % hash_pair[1]),
+                       log.ErrorCode.mismatched_hash)
 
     fileobj = tdp.filtered_open_with_delete("rb")
     if parseresults.encrypted and globals.gpg_profile.sign_key:
@@ -829,10 +838,10 @@ def verify(col_stats):
     # Unfortunately, ngettext doesn't handle multiple number variables, so we
     # split up the string.
     log.Notice(_("Verify complete: %s, %s.") %
-               (gettext.ngettext("%d file compared",
-                                 "%d files compared", total_count) % total_count,
-                gettext.ngettext("%d difference found",
-                                 "%d differences found", diff_count) % diff_count))
+               (ngettext("%d file compared",
+                         "%d files compared", total_count) % total_count,
+                ngettext("%d difference found",
+                         "%d differences found", diff_count) % diff_count))
     if diff_count >= 1:
         exit_val = 1
 
@@ -853,12 +862,12 @@ def cleanup(col_stats):
         log.Warn(_("No extraneous files found, nothing deleted in cleanup."))
         return
 
-    filestr = "\n".join(extraneous)
+    filestr = u"\n".join(map(util.ufn, extraneous))
     if globals.force:
-        log.Notice(gettext.ngettext("Deleting this file from backend:",
-                                    "Deleting these files from backend:",
-                                    len(extraneous))
-                   + "\n" + filestr)
+        log.Notice(ngettext("Deleting this file from backend:",
+                            "Deleting these files from backend:",
+                            len(extraneous))
+                   + u"\n" + filestr)
         if not globals.dry_run:
             col_stats.backend.delete(ext_remote)
             for fn in ext_local:
@@ -867,10 +876,10 @@ def cleanup(col_stats):
                 except Exception:
                     pass
     else:
-        log.Notice(gettext.ngettext("Found the following file to delete:",
-                                     "Found the following files to delete:",
-                                    len(extraneous))
-                   + "\n" + filestr + "\n"
+        log.Notice(ngettext("Found the following file to delete:",
+                            "Found the following files to delete:",
+                            len(extraneous))
+                   + u"\n" + filestr + u"\n"
                    + _("Run duplicity again with the --force option to actually delete."))
 
 
@@ -929,9 +938,9 @@ def remove_old(col_stats):
         log.Notice(_("No old backup sets found, nothing deleted."))
         return
     if globals.force:
-        log.Notice(gettext.ngettext("Deleting backup chain at time:",
-                                    "Deleting backup chains at times:",
-                                    len(chainlist)) +
+        log.Notice(ngettext("Deleting backup chain at time:",
+                            "Deleting backup chains at times:",
+                            len(chainlist)) +
                    "\n" + chain_times_str(chainlist))
         # Add signature files too, since they won't be needed anymore
         chainlist += col_stats.get_signature_chains_older_than(globals.remove_time)
@@ -953,9 +962,9 @@ def remove_old(col_stats):
                 chain.delete(keep_full=globals.remove_all_inc_of_but_n_full_mode)
         col_stats.set_values(sig_chain_warning=None)
     else:
-        log.Notice(gettext.ngettext("Found old backup chain at the following time:",
-                                    "Found old backup chains at the following times:",
-                                    len(chainlist)) +
+        log.Notice(ngettext("Found old backup chain at the following time:",
+                            "Found old backup chains at the following times:",
+                            len(chainlist)) +
                    "\n" + chain_times_str(chainlist) + "\n" +
                    _("Rerun command with --force option to actually delete."))
 
@@ -1034,11 +1043,11 @@ def sync_archive(decrypt):
     def remove_local(fn):
         del_name = globals.archive_dir.append(fn).name
 
-        log.Notice(_("Deleting local %s (not authoritative at backend).") % del_name)
+        log.Notice(_("Deleting local %s (not authoritative at backend).") % util.ufn(del_name))
         try:
             util.ignore_missing(os.unlink, del_name)
         except Exception, e:
-            log.Warn(_("Unable to delete %s: %s") % (del_name, str(e)))
+            log.Warn(_("Unable to delete %s: %s") % (util.ufn(del_name), str(e)))
 
     def copy_to_local(fn):
         """
@@ -1067,7 +1076,7 @@ def sync_archive(decrypt):
                     else:
                         name = None
                     log.FatalError(_("Failed to read %s: %s") %
-                                   (name, sys.exc_info()),
+                                   (util.ufn(name), sys.exc_info()),
                                    log.ErrorCode.generic)
                 if not res.data:
                     self.fileobj.close()
@@ -1080,7 +1089,7 @@ def sync_archive(decrypt):
             def get_footer(self):
                 return ""
 
-        log.Notice(_("Copying %s to local cache.") % fn)
+        log.Notice(_("Copying %s to local cache.") % util.ufn(fn))
 
         pr, loc_name, rem_name = resolve_basename(fn)
 
@@ -1149,10 +1158,10 @@ def sync_archive(decrypt):
         else:
             if local_missing:
                 log.Notice(_("Sync would copy the following from remote to local:")
-                           + "\n" + "\n".join(local_missing))
+                           + u"\n" + u"\n".join(map(util.ufn, local_missing)))
             if local_spurious:
                 log.Notice(_("Sync would remove the following spurious local files:")
-                           + "\n" + "\n".join(local_spurious))
+                           + u"\n" + u"\n".join(map(util.ufn, local_spurious)))
 
 
 def check_last_manifest(col_stats):
@@ -1225,12 +1234,12 @@ def log_startup_parms(verbosity=log.INFO):
     """
     log Python, duplicity, and system versions
     """
-    log.Log('=' * 80, verbosity)
-    log.Log("duplicity $version ($reldate)", verbosity)
-    log.Log("Args: %s" % (' '.join(sys.argv),), verbosity)
-    log.Log(' '.join(platform.uname()), verbosity)
-    log.Log("%s %s" % (sys.executable or sys.platform, sys.version), verbosity)
-    log.Log('=' * 80, verbosity)
+    log.Log(u'=' * 80, verbosity)
+    log.Log(u"duplicity $version ($reldate)", verbosity)
+    log.Log(u"Args: %s" % util.ufn(' '.join(sys.argv)), verbosity)
+    log.Log(u' '.join(platform.uname()), verbosity)
+    log.Log(u"%s %s" % (sys.executable or sys.platform, sys.version), verbosity)
+    log.Log(u'=' * 80, verbosity)
 
 
 class Restart:
@@ -1300,14 +1309,14 @@ def main():
     # duplicity crashes when PYTHONOPTIMIZE is set, so check
     # and refuse to run if it is set.
     if 'PYTHONOPTIMIZE' in os.environ:
-        log.FatalError(
+        log.FatalError(_(
 """
 PYTHONOPTIMIZE in the environment causes duplicity to fail to
 recognize its own backups.  Please remove PYTHONOPTIMIZE from
 the environment and rerun the backup.
 
 See https://bugs.launchpad.net/duplicity/+bug/931175
-""", log.ErrorCode.pythonoptimize_set)
+"""), log.ErrorCode.pythonoptimize_set)
 
     # if python is run setuid, it's only partway set,
     # so make sure to run with euid/egid of root
@@ -1322,6 +1331,25 @@ See https://bugs.launchpad.net/duplicity/+bug/931175
     # determine what action we're performing and process command line
     action = commandline.ProcessCommandLine(sys.argv[1:])
 
+    globals.lockfile = FileLock(os.path.join(globals.archive_dir.name, "lockfile"))
+    if globals.lockfile.is_locked():
+        log.FatalError("Another instance is already running with this archive directory\n"
+	               "If you are sure that this is the  only instance running you may delete\n"
+		       "the following lockfile and run the command again :\n"
+		       "\t%s" % os.path.join(globals.archive_dir.name, "lockfile.lock" )
+		       , log.ErrorCode.user_error)
+        log.shutdown()
+        sys.exit(2)
+            
+    globals.lockfile.acquire(timeout = 0)
+
+    try:
+        do_backup(action)
+
+    finally:
+         util.release_lockfile()
+
+def do_backup(action):
     # The following is for starting remote debugging in Eclipse with Pydev.
     # Adjust the path to your location and version of Eclipse and Pydev.
     if globals.pydevd:
@@ -1434,7 +1462,7 @@ See https://bugs.launchpad.net/duplicity/+bug/931175
             # symmetric key
             if (globals.gpg_profile.signing_passphrase and
                 globals.gpg_profile.passphrase != globals.gpg_profile.signing_passphrase):
-                log.FatalError("When using symmetric encryption, the signing passphrase must equal the encryption passphrase.", log.ErrorCode.user_error)
+                log.FatalError(_("When using symmetric encryption, the signing passphrase must equal the encryption passphrase."), log.ErrorCode.user_error)
 
         if action == "full":
             full_backup(col_stats)
@@ -1471,7 +1499,6 @@ def with_tempdir(fn):
     finally:
         tempdir.default().cleanup()
 
-
 if __name__ == "__main__":
     try:
         with_tempdir(main)
@@ -1483,47 +1510,53 @@ if __name__ == "__main__":
     # goes here, if needed.
     except SystemExit, e:
         # No traceback, just get out
+        util.release_lockfile()
         sys.exit(e)
 
     except KeyboardInterrupt, e:
         # No traceback, just get out
         log.Info(_("INT intercepted...exiting."))
+        util.release_lockfile()
         sys.exit(4)
 
     except gpg.GPGError, e:
         # For gpg errors, don't show an ugly stack trace by
         # default. But do with sufficient verbosity.
+        util.release_lockfile()
         log.Info(_("GPG error detail: %s")
-                 % (''.join(traceback.format_exception(*sys.exc_info()))))
-        log.FatalError("%s: %s" % (e.__class__.__name__, e.args[0]),
+                 % (u''.join(traceback.format_exception(*sys.exc_info()))))
+        log.FatalError(u"%s: %s" % (e.__class__.__name__, e.args[0]),
                        log.ErrorCode.gpg_failed,
                        e.__class__.__name__)
 
     except duplicity.errors.UserError, e:
+        util.release_lockfile()
         # For user errors, don't show an ugly stack trace by
         # default. But do with sufficient verbosity.
         log.Info(_("User error detail: %s")
-                 % (''.join(traceback.format_exception(*sys.exc_info()))))
-        log.FatalError("%s: %s" % (e.__class__.__name__, str(e)),
+                 % (u''.join(traceback.format_exception(*sys.exc_info()))))
+        log.FatalError(u"%s: %s" % (e.__class__.__name__, unicode(e)),
                        log.ErrorCode.user_error,
                        e.__class__.__name__)
 
     except duplicity.errors.BackendException, e:
+        util.release_lockfile()
         # For backend errors, don't show an ugly stack trace by
         # default. But do with sufficient verbosity.
         log.Info(_("Backend error detail: %s")
-                 % (''.join(traceback.format_exception(*sys.exc_info()))))
-        log.FatalError("%s: %s" % (e.__class__.__name__, str(e)),
+                 % (u''.join(traceback.format_exception(*sys.exc_info()))))
+        log.FatalError(u"%s: %s" % (e.__class__.__name__, unicode(e)),
                        log.ErrorCode.user_error,
                        e.__class__.__name__)
 
     except Exception, e:
+        util.release_lockfile()
         if "Forced assertion for testing" in str(e):
-            log.FatalError("%s: %s" % (e.__class__.__name__, str(e)),
+            log.FatalError(u"%s: %s" % (e.__class__.__name__, unicode(e)),
                            log.ErrorCode.exception,
                            e.__class__.__name__)
         else:
             # Traceback and that mess
-            log.FatalError("%s" % (''.join(traceback.format_exception(*sys.exc_info()))),
+            log.FatalError(u''.join(traceback.format_exception(*sys.exc_info())),
                            log.ErrorCode.exception,
                            e.__class__.__name__)

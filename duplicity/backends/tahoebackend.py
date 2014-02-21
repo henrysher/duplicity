@@ -74,7 +74,7 @@ class TAHOEBackend(duplicity.backend.Backend):
         self.run("tahoe", "cp", self.get_remote_path(remote_filename), local_path.name)
         local_path.setdata()
 
-    def list(self):
+    def _list(self):
         log.Debug("tahoe: List")
         return self.run("tahoe", "ls", self.get_remote_path()).split('\n')
 

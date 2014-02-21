@@ -197,7 +197,7 @@ class ImapBackend(duplicity.backend.Backend):
         local_path.setdata()
         log.Info("IMAP mail with '%s' subject fetched" % remote_filename)
 
-    def list(self):
+    def _list(self):
         ret = []
         (result,list) = self._conn.select(globals.imap_mailbox)
         if result != "OK":

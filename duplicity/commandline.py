@@ -40,16 +40,17 @@ from duplicity import gpg
 from duplicity import log
 from duplicity import path
 from duplicity import selection
+from duplicity import util
 
 
-select_opts = []            # Will hold all the selection options
-select_files = []           # Will hold file objects when filelist given
+select_opts = []  # Will hold all the selection options
+select_files = []  # Will hold file objects when filelist given
 
-full_backup = None          # Will be set to true if full command given
-list_current = None         # Will be set to true if list-current command given
-collection_status = None    # Will be set to true if collection-status command given
-cleanup = None              # Set to true if cleanup command given
-verify = None               # Set to true if verify command given
+full_backup = None  # Will be set to true if full command given
+list_current = None  # Will be set to true if list-current command given
+collection_status = None  # Will be set to true if collection-status command given
+cleanup = None  # Set to true if cleanup command given
+verify = None  # Set to true if verify command given
 
 commands = ["cleanup",
             "collection-status",
@@ -64,7 +65,7 @@ commands = ["cleanup",
             ]
 
 def old_fn_deprecation(opt):
-    print >>sys.stderr, _("Warning: Option %s is pending deprecation "
+    print >> sys.stderr, _("Warning: Option %s is pending deprecation "
                           "and will be removed in a future release.\n"
                           "Use of default filenames is strongly suggested.") % opt
 
@@ -187,14 +188,18 @@ class OPHelpFix(optparse.OptionParser):
         encoding = getattr(file, "encoding", None)
         return encoding or 'utf-8'
 
-    def print_help(self, file=None):
+    def print_help(self, file = None):
         """
         overwrite method with proper utf-8 decoding
         """
         if file is None:
             file = sys.stdout
         encoding = self._get_encoding(file)
-        file.write(self.format_help().decode('utf-8').encode(encoding, "replace"))
+        help = self.format_help()
+        # The help is in unicode or bytes depending on the user's locale
+        if not isinstance(help, unicode):
+            help = self.format_help().decode('utf-8')
+        file.write(help.encode(encoding, "replace"))
 
 
 def parse_cmdline_options(arglist):
@@ -239,132 +244,141 @@ def parse_cmdline_options(arglist):
     def add_rename(o, s, v, p):
         globals.rename[os.path.normcase(os.path.normpath(v[0]))] = v[1]
 
-    parser = OPHelpFix( option_class=DupOption, usage=usage() )
+    parser = OPHelpFix(option_class = DupOption, usage = usage())
 
     # If this is true, only warn and don't raise fatal error when backup
     # source directory doesn't match previous backup source directory.
-    parser.add_option("--allow-source-mismatch", action="store_true")
+    parser.add_option("--allow-source-mismatch", action = "store_true")
 
     # Set to the path of the archive directory (the directory which
     # contains the signatures and manifests of the relevent backup
     # collection), and for checkpoint state between volumes.
     # TRANSL: Used in usage help to represent a Unix-style path name. Example:
     # --archive-dir <path>
-    parser.add_option("--archive-dir", type="file", metavar=_("path"))
+    parser.add_option("--archive-dir", type = "file", metavar = _("path"))
 
     # Asynchronous put/get concurrency limit
     # (default of 0 disables asynchronicity).
-    parser.add_option("--asynchronous-upload", action="store_const", const=1,
-                      dest="async_concurrency")
+    parser.add_option("--asynchronous-upload", action = "store_const", const = 1,
+                      dest = "async_concurrency")
 
-    parser.add_option("--compare-data", action="store_true")
+    parser.add_option("--compare-data", action = "store_true")
 
     # config dir for future use
-    parser.add_option("--config-dir", type="file", metavar=_("path"),
-                      help=optparse.SUPPRESS_HELP)
+    parser.add_option("--config-dir", type = "file", metavar = _("path"),
+                      help = optparse.SUPPRESS_HELP)
 
     # for testing -- set current time
-    parser.add_option("--current-time", type="int",
-                      dest="current_time", help=optparse.SUPPRESS_HELP)
+    parser.add_option("--current-time", type = "int",
+                      dest = "current_time", help = optparse.SUPPRESS_HELP)
 
     # Don't actually do anything, but still report what would be done
-    parser.add_option("--dry-run", action="store_true")
+    parser.add_option("--dry-run", action = "store_true")
 
     # TRANSL: Used in usage help to represent an ID for a GnuPG key. Example:
     # --encrypt-key <gpg_key_id>
-    parser.add_option("--encrypt-key", type="string", metavar=_("gpg-key-id"),
-                      dest="", action="callback",
-                      callback=lambda o, s, v, p: globals.gpg_profile.recipients.append(v)) #@UndefinedVariable
+    parser.add_option("--encrypt-key", type = "string", metavar = _("gpg-key-id"),
+                      dest = "", action = "callback",
+                      callback = lambda o, s, v, p: globals.gpg_profile.recipients.append(v))  # @UndefinedVariable
 
     # secret keyring in which the private encrypt key can be found
-    parser.add_option("--encrypt-secret-keyring", type="string", metavar=_("path"))
+    parser.add_option("--encrypt-secret-keyring", type = "string", metavar = _("path"))
 
-    parser.add_option("--encrypt-sign-key", type="string", metavar=_("gpg-key-id"),
-                      dest="", action="callback",
-                      callback=lambda o, s, v, p: ( globals.gpg_profile.recipients.append(v), set_sign_key(v)) )
+    parser.add_option("--encrypt-sign-key", type = "string", metavar = _("gpg-key-id"),
+                      dest = "", action = "callback",
+                      callback = lambda o, s, v, p: (globals.gpg_profile.recipients.append(v), set_sign_key(v)))
 
     # TRANSL: Used in usage help to represent a "glob" style pattern for
     # matching one or more files, as described in the documentation.
     # Example:
     # --exclude <shell_pattern>
-    parser.add_option("--exclude", action="callback", metavar=_("shell_pattern"),
-                      dest="", type="string", callback=add_selection)
+    parser.add_option("--exclude", action = "callback", metavar = _("shell_pattern"),
+                      dest = "", type = "string", callback = add_selection)
 
-    parser.add_option("--exclude-device-files", action="callback",
-                      dest="", callback=add_selection)
+    parser.add_option("--exclude-device-files", action = "callback",
+                      dest = "", callback = add_selection)
 
-    parser.add_option("--exclude-filelist", type="file", metavar=_("filename"),
-                      dest="", action="callback", callback=add_filelist)
+    parser.add_option("--exclude-filelist", type = "file", metavar = _("filename"),
+                      dest = "", action = "callback", callback = add_filelist)
 
-    parser.add_option("--exclude-filelist-stdin", action="callback", dest="",
-                      callback=lambda o, s, v, p: (select_opts.append(("--exclude-filelist", "standard input")),
+    parser.add_option("--exclude-filelist-stdin", action = "callback", dest = "",
+                      callback = lambda o, s, v, p: (select_opts.append(("--exclude-filelist", "standard input")),
                                                    select_files.append(sys.stdin)))
 
-    parser.add_option("--exclude-globbing-filelist", type="file", metavar=_("filename"),
-                      dest="", action="callback", callback=add_filelist)
+    parser.add_option("--exclude-globbing-filelist", type = "file", metavar = _("filename"),
+                      dest = "", action = "callback", callback = add_filelist)
 
     # TRANSL: Used in usage help to represent the name of a file. Example:
     # --log-file <filename>
-    parser.add_option("--exclude-if-present", metavar=_("filename"), dest="",
-                      type="file", action="callback", callback=add_selection)
+    parser.add_option("--exclude-if-present", metavar = _("filename"), dest = "",
+                      type = "file", action = "callback", callback = add_selection)
 
-    parser.add_option("--exclude-other-filesystems", action="callback",
-                      dest="", callback=add_selection)
+    parser.add_option("--exclude-other-filesystems", action = "callback",
+                      dest = "", callback = add_selection)
 
     # TRANSL: Used in usage help to represent a regular expression (regexp).
-    parser.add_option("--exclude-regexp", metavar=_("regular_expression"),
-                      dest="", type="string", action="callback", callback=add_selection)
+    parser.add_option("--exclude-regexp", metavar = _("regular_expression"),
+                      dest = "", type = "string", action = "callback", callback = add_selection)
 
     # Whether we should be particularly aggressive when cleaning up
-    parser.add_option("--extra-clean", action="store_true")
+    parser.add_option("--extra-clean", action = "store_true")
 
     # used in testing only - raises exception after volume
-    parser.add_option("--fail-on-volume", type="int",
-                      help=optparse.SUPPRESS_HELP)
+    parser.add_option("--fail-on-volume", type = "int",
+                      help = optparse.SUPPRESS_HELP)
 
     # used to provide a prefix on top of the defaul tar file name
-    parser.add_option("--file-prefix", type="string", dest="file_prefix", action="store")
+    parser.add_option("--file-prefix", type = "string", dest = "file_prefix", action = "store")
+    
+    # used to provide a suffix for manifest files only
+    parser.add_option("--file-prefix-manifest", type = "string", dest = "file_prefix_manifest", action = "store")
+
+    # used to provide a suffix for archive files only
+    parser.add_option("--file-prefix-archive", type = "string", dest = "file_prefix_archive", action = "store")
+
+    # used to provide a suffix for sigature files only
+    parser.add_option("--file-prefix-signature", type = "string", dest = "file_prefix_signature", action = "store")
 
     # used in testing only - skips upload for a given volume
-    parser.add_option("--skip-volume", type="int",
-                      help=optparse.SUPPRESS_HELP)
+    parser.add_option("--skip-volume", type = "int",
+                      help = optparse.SUPPRESS_HELP)
 
     # If set, restore only the subdirectory or file specified, not the
     # whole root.
     # TRANSL: Used in usage help to represent a Unix-style path name. Example:
     # --archive-dir <path>
-    parser.add_option("--file-to-restore", "-r", action="callback", type="file",
-                      metavar=_("path"), dest="restore_dir",
-                      callback=lambda o, s, v, p: setattr(p.values, "restore_dir", v.rstrip('/')))
+    parser.add_option("--file-to-restore", "-r", action = "callback", type = "file",
+                      metavar = _("path"), dest = "restore_dir",
+                      callback = lambda o, s, v, p: setattr(p.values, "restore_dir", v.rstrip('/')))
 
     # Used to confirm certain destructive operations like deleting old files.
-    parser.add_option("--force", action="store_true")
+    parser.add_option("--force", action = "store_true")
 
     # FTP data connection type
-    parser.add_option("--ftp-passive", action="store_const", const="passive", dest="ftp_connection")
-    parser.add_option("--ftp-regular", action="store_const", const="regular", dest="ftp_connection")
+    parser.add_option("--ftp-passive", action = "store_const", const = "passive", dest = "ftp_connection")
+    parser.add_option("--ftp-regular", action = "store_const", const = "regular", dest = "ftp_connection")
 
     # If set, forces a full backup if the last full backup is older than
     # the time specified
-    parser.add_option("--full-if-older-than", type="time", dest="full_force_time", metavar=_("time"))
+    parser.add_option("--full-if-older-than", type = "time", dest = "full_force_time", metavar = _("time"))
 
-    parser.add_option("--gio", action="callback", callback=use_gio)
+    parser.add_option("--gio", action = "callback", callback = use_gio)
 
-    parser.add_option("--gpg-options", action="extend", metavar=_("options"))
+    parser.add_option("--gpg-options", action = "extend", metavar = _("options"))
 
     # TRANSL: Used in usage help to represent an ID for a hidden GnuPG key. Example:
     # --hidden-encrypt-key <gpg_key_id>
-    parser.add_option("--hidden-encrypt-key", type="string", metavar=_("gpg-key-id"),
-                      dest="", action="callback",
-                      callback=lambda o, s, v, p: globals.gpg_profile.hidden_recipients.append(v)) #@UndefinedVariable
+    parser.add_option("--hidden-encrypt-key", type = "string", metavar = _("gpg-key-id"),
+                      dest = "", action = "callback",
+                      callback = lambda o, s, v, p: globals.gpg_profile.hidden_recipients.append(v))  # @UndefinedVariable
 
     # ignore (some) errors during operations; supposed to make it more
     # likely that you are able to restore data under problematic
     # circumstances. the default should absolutely always be False unless
     # you know what you are doing.
-    parser.add_option("--ignore-errors", action="callback",
-                      dest="ignore_errors",
-                      callback=lambda o, s, v, p: (log.Warn(
+    parser.add_option("--ignore-errors", action = "callback",
+                      dest = "ignore_errors",
+                      callback = lambda o, s, v, p: (log.Warn(
                           _("Running in 'ignore errors' mode due to %s; please "
                             "re-consider if this was not intended") % s),
                           setattr(p.values, "ignore errors", True)))
@@ -372,114 +386,114 @@ def parse_cmdline_options(arglist):
     # Whether to use the full email address as the user name when
     # logging into an imap server. If false just the user name
     # part of the email address is used.
-    parser.add_option("--imap-full-address", action="store_true",
-                      help=optparse.SUPPRESS_HELP)
+    parser.add_option("--imap-full-address", action = "store_true",
+                      help = optparse.SUPPRESS_HELP)
 
     # Name of the imap folder where we want to store backups.
     # Can be changed with a command line argument.
     # TRANSL: Used in usage help to represent an imap mailbox
-    parser.add_option("--imap-mailbox", metavar=_("imap_mailbox"))
+    parser.add_option("--imap-mailbox", metavar = _("imap_mailbox"))
 
-    parser.add_option("--include", action="callback", metavar=_("shell_pattern"),
-                      dest="", type="string", callback=add_selection)
-    parser.add_option("--include-filelist", type="file", metavar=_("filename"),
-                      dest="", action="callback", callback=add_filelist)
-    parser.add_option("--include-filelist-stdin", action="callback", dest="",
-                      callback=lambda o, s, v, p: (select_opts.append(("--include-filelist", "standard input")),
+    parser.add_option("--include", action = "callback", metavar = _("shell_pattern"),
+                      dest = "", type = "string", callback = add_selection)
+    parser.add_option("--include-filelist", type = "file", metavar = _("filename"),
+                      dest = "", action = "callback", callback = add_filelist)
+    parser.add_option("--include-filelist-stdin", action = "callback", dest = "",
+                      callback = lambda o, s, v, p: (select_opts.append(("--include-filelist", "standard input")),
                                                    select_files.append(sys.stdin)))
-    parser.add_option("--include-globbing-filelist", type="file", metavar=_("filename"),
-                      dest="", action="callback", callback=add_filelist)
-    parser.add_option("--include-regexp", metavar=_("regular_expression"), dest="",
-                      type="string", action="callback", callback=add_selection)
+    parser.add_option("--include-globbing-filelist", type = "file", metavar = _("filename"),
+                      dest = "", action = "callback", callback = add_filelist)
+    parser.add_option("--include-regexp", metavar = _("regular_expression"), dest = "",
+                      type = "string", action = "callback", callback = add_selection)
 
-    parser.add_option("--log-fd", type="int", metavar=_("file_descriptor"),
-                      dest="", action="callback",
-                      callback=lambda o, s, v, p: set_log_fd(v))
+    parser.add_option("--log-fd", type = "int", metavar = _("file_descriptor"),
+                      dest = "", action = "callback",
+                      callback = lambda o, s, v, p: set_log_fd(v))
 
     # TRANSL: Used in usage help to represent the name of a file. Example:
     # --log-file <filename>
-    parser.add_option("--log-file", type="file", metavar=_("filename"),
-                      dest="", action="callback",
-                      callback=lambda o, s, v, p: log.add_file(v))
+    parser.add_option("--log-file", type = "file", metavar = _("filename"),
+                      dest = "", action = "callback",
+                      callback = lambda o, s, v, p: log.add_file(v))
 
     # Maximum block size for large files
-    parser.add_option("--max-blocksize", type="int", metavar=_("number"))
+    parser.add_option("--max-blocksize", type = "int", metavar = _("number"))
 
     # TRANSL: Used in usage help (noun)
-    parser.add_option("--name", dest="backup_name", metavar=_("backup name"))
+    parser.add_option("--name", dest = "backup_name", metavar = _("backup name"))
 
     # If set to false, then do not encrypt files on remote system
-    parser.add_option("--no-encryption", action="store_false", dest="encryption")
+    parser.add_option("--no-encryption", action = "store_false", dest = "encryption")
 
     # If set to false, then do not compress files on remote system
-    parser.add_option("--no-compression", action="store_false", dest="compression")
+    parser.add_option("--no-compression", action = "store_false", dest = "compression")
 
     # If set, print the statistics after every backup session
-    parser.add_option("--no-print-statistics", action="store_false", dest="print_statistics")
+    parser.add_option("--no-print-statistics", action = "store_false", dest = "print_statistics")
 
     # If true, filelists and directory statistics will be split on
     # nulls instead of newlines.
-    parser.add_option("--null-separator", action="store_true")
+    parser.add_option("--null-separator", action = "store_true")
 
     # number of retries on network operations
     # TRANSL: Used in usage help to represent a desired number of
     # something. Example:
     # --num-retries <number>
-    parser.add_option("--num-retries", type="int", metavar=_("number"))
+    parser.add_option("--num-retries", type = "int", metavar = _("number"))
 
     # File owner uid keeps number from tar file. Like same option in GNU tar.
-    parser.add_option("--numeric-owner", action="store_true")
+    parser.add_option("--numeric-owner", action = "store_true")
 
     # Whether the old filename format is in effect.
-    parser.add_option("--old-filenames", action="callback",
-                      dest="old_filenames",
-                      callback=lambda o, s, v, p: (setattr(p.values, o.dest, True),
+    parser.add_option("--old-filenames", action = "callback",
+                      dest = "old_filenames",
+                      callback = lambda o, s, v, p: (setattr(p.values, o.dest, True),
                                                    old_fn_deprecation(s)))
 
     # Used to display the progress for the full and incremental backup operations
-    parser.add_option("--progress", action="store_true")
+    parser.add_option("--progress", action = "store_true")
 
     # Used to control the progress option update rate in seconds. Default: prompts each 3 seconds
-    parser.add_option("--progress-rate", type="int", metavar=_("number"))
+    parser.add_option("--progress-rate", type = "int", metavar = _("number"))
 
     # option to trigger Pydev debugger
-    parser.add_option("--pydevd", action="store_true")
+    parser.add_option("--pydevd", action = "store_true")
 
     # option to rename files during restore
-    parser.add_option("--rename", type="file", action="callback", nargs=2,
-                      callback=add_rename)
+    parser.add_option("--rename", type = "file", action = "callback", nargs = 2,
+                      callback = add_rename)
 
     # Restores will try to bring back the state as of the following time.
     # If it is None, default to current time.
     # TRANSL: Used in usage help to represent a time spec for a previous
     # point in time, as described in the documentation. Example:
     # duplicity remove-older-than time [options] target_url
-    parser.add_option("--restore-time", "--time", "-t", type="time", metavar=_("time"))
+    parser.add_option("--restore-time", "--time", "-t", type = "time", metavar = _("time"))
 
     # user added rsync options
-    parser.add_option("--rsync-options", action="extend", metavar=_("options"))
+    parser.add_option("--rsync-options", action = "extend", metavar = _("options"))
 
     # Whether to create European buckets (sorry, hard-coded to only
     # support european for now).
-    parser.add_option("--s3-european-buckets", action="store_true")
+    parser.add_option("--s3-european-buckets", action = "store_true")
 
     # Whether to use S3 Reduced Redudancy Storage
-    parser.add_option("--s3-use-rrs", action="store_true")
+    parser.add_option("--s3-use-rrs", action = "store_true")
 
     # Whether to use "new-style" subdomain addressing for S3 buckets. Such
     # use is not backwards-compatible with upper-case buckets, or buckets
     # that are otherwise not expressable in a valid hostname.
-    parser.add_option("--s3-use-new-style", action="store_true")
+    parser.add_option("--s3-use-new-style", action = "store_true")
 
     # Whether to use plain HTTP (without SSL) to send data to S3
     # See <https://bugs.launchpad.net/duplicity/+bug/433970>.
-    parser.add_option("--s3-unencrypted-connection", action="store_true")
+    parser.add_option("--s3-unencrypted-connection", action = "store_true")
 
     # Chunk size used for S3 multipart uploads.The number of parallel uploads to
     # S3 be given by chunk size / volume size. Use this to maximize the use of
     # your bandwidth. Defaults to 25MB
-    parser.add_option("--s3-multipart-chunk-size", type="int", action="callback", metavar=_("number"),
-                      callback=lambda o, s, v, p: setattr(p.values, "s3_multipart_chunk_size", v*1024*1024))
+    parser.add_option("--s3-multipart-chunk-size", type = "int", action = "callback", metavar = _("number"),
+                      callback = lambda o, s, v, p: setattr(p.values, "s3_multipart_chunk_size", v * 1024 * 1024))
 
     # Number of processes to set the Processor Pool to when uploading multipart
     # uploads to S3. Use this to control the maximum simultaneous uploads to S3.
@@ -491,74 +505,77 @@ def parse_cmdline_options(arglist):
 
     # Option to allow the s3/boto backend use the multiprocessing version.
     # By default it is off since it does not work for Python 2.4 or 2.5.
-    if sys.version_info[:2] >= (2,6):
-        parser.add_option("--s3-use-multiprocessing", action="store_true")
+    if sys.version_info[:2] >= (2, 6):
+        parser.add_option("--s3-use-multiprocessing", action = "store_true")
 
     # scp command to use (ssh pexpect backend)
-    parser.add_option("--scp-command", metavar=_("command"))
+    parser.add_option("--scp-command", metavar = _("command"))
 
     # sftp command to use (ssh pexpect backend)
-    parser.add_option("--sftp-command", metavar=_("command"))
+    parser.add_option("--sftp-command", metavar = _("command"))
+
+    # sftp command to use (ssh pexpect backend)
+    parser.add_option("--cf-command", metavar = _("command"))
 
     # If set, use short (< 30 char) filenames for all the remote files.
-    parser.add_option("--short-filenames", action="callback",
-                      dest="short_filenames",
-                      callback=lambda o, s, v, p: (setattr(p.values, o.dest, True),
+    parser.add_option("--short-filenames", action = "callback",
+                      dest = "short_filenames",
+                      callback = lambda o, s, v, p: (setattr(p.values, o.dest, True),
                                                    old_fn_deprecation(s)))
 
     # TRANSL: Used in usage help to represent an ID for a GnuPG key. Example:
     # --encrypt-key <gpg_key_id>
-    parser.add_option("--sign-key", type="string", metavar=_("gpg-key-id"),
-                      dest="", action="callback",
-                      callback=lambda o, s, v, p: set_sign_key(v))
+    parser.add_option("--sign-key", type = "string", metavar = _("gpg-key-id"),
+                      dest = "", action = "callback",
+                      callback = lambda o, s, v, p: set_sign_key(v))
 
     # default to batch mode using public-key encryption
-    parser.add_option("--ssh-askpass", action="store_true")
+    parser.add_option("--ssh-askpass", action = "store_true")
 
     # allow the user to switch ssh backend
-    parser.add_option("--ssh-backend", metavar=_("paramiko|pexpect"))
+    parser.add_option("--ssh-backend", metavar = _("paramiko|pexpect"))
 
     # user added ssh options
-    parser.add_option("--ssh-options", action="extend", metavar=_("options"))
+    parser.add_option("--ssh-options", action = "extend", metavar = _("options"))
 
     # user added ssl options (webdav backend)
-    parser.add_option("--ssl-cacert-file", metavar=_("pem formatted bundle of certificate authorities"))
+    parser.add_option("--ssl-cacert-file", metavar = _("pem formatted bundle of certificate authorities"))
 
-    parser.add_option("--ssl-no-check-certificate", action="store_true")
+    parser.add_option("--ssl-no-check-certificate", action = "store_true")
 
     # Working directory for the tempfile module. Defaults to /tmp on most systems.
-    parser.add_option("--tempdir", dest="temproot", type="file", metavar=_("path"))
+    parser.add_option("--tempdir", dest = "temproot", type = "file", metavar = _("path"))
 
     # network timeout value
     # TRANSL: Used in usage help. Example:
     # --timeout <seconds>
-    parser.add_option("--timeout", type="int", metavar=_("seconds"))
+    parser.add_option("--timeout", type = "int", metavar = _("seconds"))
 
     # Character used like the ":" in time strings like
     # 2002-08-06T04:22:00-07:00.  The colon isn't good for filenames on
     # windows machines.
     # TRANSL: abbreviation for "character" (noun)
-    parser.add_option("--time-separator", type="string", metavar=_("char"),
-                      action="callback",
-                      callback=lambda o, s, v, p: set_time_sep(v, s))
+    parser.add_option("--time-separator", type = "string", metavar = _("char"),
+                      action = "callback",
+                      callback = lambda o, s, v, p: set_time_sep(v, s))
 
     # Whether to specify --use-agent in GnuPG options
-    parser.add_option("--use-agent", action="store_true")
+    parser.add_option("--use-agent", action = "store_true")
 
-    parser.add_option("--use-scp", action="store_true")
+    parser.add_option("--use-scp", action = "store_true")
 
-    parser.add_option("--verbosity", "-v", type="verbosity", metavar="[0-9]",
-                      dest="", action="callback",
-                      callback=lambda o, s, v, p: log.setverbosity(v))
+    parser.add_option("--verbosity", "-v", type = "verbosity", metavar = "[0-9]",
+                      dest = "", action = "callback",
+                      callback = lambda o, s, v, p: log.setverbosity(v))
 
-    parser.add_option("-V", "--version", action="callback", callback=print_ver)
+    parser.add_option("-V", "--version", action = "callback", callback = print_ver)
 
     # volume size
     # TRANSL: Used in usage help to represent a desired number of
     # something. Example:
     # --num-retries <number>
-    parser.add_option("--volsize", type="int", action="callback", metavar=_("number"),
-                      callback=lambda o, s, v, p: setattr(p.values, "volsize", v*1024*1024))
+    parser.add_option("--volsize", type = "int", action = "callback", metavar = _("number"),
+                      callback = lambda o, s, v, p: setattr(p.values, "volsize", v * 1024 * 1024))
 
     # parse the options
     (options, args) = parser.parse_args()
@@ -649,7 +666,7 @@ def parse_cmdline_options(arglist):
     elif len(args) == 1:
         backend_url = args[0]
     elif len(args) == 2:
-        lpath, backend_url = args_to_path_backend(args[0], args[1]) #@UnusedVariable
+        lpath, backend_url = args_to_path_backend(args[0], args[1])  # @UnusedVariable
     else:
         command_line_error("Too many arguments")
 
@@ -660,7 +677,7 @@ def parse_cmdline_options(arglist):
     set_archive_dir(expand_archive_dir(globals.archive_dir,
                                        globals.backup_name))
 
-    log.Info(_("Using archive dir: %s") % (globals.archive_dir.name,))
+    log.Info(_("Using archive dir: %s") % (util.ufn(globals.archive_dir.name),))
     log.Info(_("Using backup name: %s") % (globals.backup_name,))
 
     return args
@@ -870,7 +887,7 @@ def set_archive_dir(dirstring):
     archive_dir = path.Path(dirstring)
     if not archive_dir.isdir():
         log.FatalError(_("Specified archive directory '%s' does not exist, "
-                         "or is not a directory") % (archive_dir.name,),
+                         "or is not a directory") % (util.ufn(archive_dir.name),),
                        log.ErrorCode.bad_archive_dir)
     globals.archive_dir = archive_dir
 
@@ -928,9 +945,9 @@ def set_backend(arg1, arg2):
     globals.backend = backend.get_backend(bend)
 
     if path == arg2:
-        return (None, arg2) # False?
+        return (None, arg2)  # False?
     else:
-        return (1, arg1) # True?
+        return (1, arg1)  # True?
 
 
 def process_local_dir(action, local_pathname):
@@ -939,18 +956,18 @@ def process_local_dir(action, local_pathname):
     if action == "restore":
         if (local_path.exists() and not local_path.isemptydir()) and not globals.force:
             log.FatalError(_("Restore destination directory %s already "
-                             "exists.\nWill not overwrite.") % (local_pathname,),
+                             "exists.\nWill not overwrite.") % (util.ufn(local_path.name),),
                            log.ErrorCode.restore_dir_exists)
     elif action == "verify":
         if not local_path.exists():
             log.FatalError(_("Verify directory %s does not exist") %
-                           (local_path.name,),
+                           (util.ufn(local_path.name),),
                            log.ErrorCode.verify_dir_doesnt_exist)
     else:
         assert action == "full" or action == "inc"
         if not local_path.exists():
             log.FatalError(_("Backup source directory %s does not exist.")
-                           % (local_path.name,),
+                           % (util.ufn(local_path.name),),
                            log.ErrorCode.backup_dir_doesnt_exist)
 
     globals.local_path = local_path
@@ -964,7 +981,7 @@ def check_consistency(action):
         n = 0
         for m in arglist:
             if m:
-                n+=1
+                n += 1
         assert n <= 1, "Invalid syntax, two conflicting modes specified"
     if action in ["list-current", "collection-status",
                   "cleanup", "remove-old", "remove-all-but-n-full", "remove-all-inc-of-but-n-full"]:
@@ -978,9 +995,9 @@ def check_consistency(action):
             command_line_error("--incremental option cannot be used when "
                                "restoring or verifying")
         if select_opts and action == "restore":
-            log.Warn( _("Command line warning: %s") % _("Selection options --exclude/--include\n"
+            log.Warn(_("Command line warning: %s") % _("Selection options --exclude/--include\n"
                                                         "currently work only when backing up,"
-                                                        "not restoring.") )
+                                                        "not restoring."))
     else:
         assert action == "inc" or action == "full"
         if verify:

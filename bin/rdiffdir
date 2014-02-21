@@ -27,15 +27,13 @@
 
 import sys, getopt, gzip, os
 
-import gettext
-gettext.install('duplicity', codeset='utf8')
-
 from duplicity import diffdir
 from duplicity import patchdir
 from duplicity import log
 from duplicity import globals
 from duplicity import selection
 from duplicity import path
+from duplicity import util
 
 # If set, compress diff and delta files using gzip
 gzip_compress = None
@@ -55,7 +53,7 @@ def parse_cmdline_options(arglist):
         try:
             return open(filename, "r")
         except IOError:
-            log.FatalError("Error opening file %s" % filename)
+            log.FatalError(_("Error opening file %s") % util.ufn(filename))
 
     try:
         optlist, args = getopt.getopt(arglist, "v:Vz",
@@ -118,8 +116,8 @@ def check_does_not_exist(filename):
     except OSError:
         pass
     else:
-        log.FatalError("File %s already exists, will not "
-                       "overwrite." % filename)
+        log.FatalError(_("File %s already exists, will not "
+                         "overwrite.") % util.ufn(filename))
 
 def get_action(args):
     """Figure out the main action from the arguments"""

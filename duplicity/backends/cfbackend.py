@@ -1,6 +1,6 @@
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
-# Copyright 2012 Canonical Ltd
+# Copyright 2013 Kenneth Loafman
 #
 # This file is part of duplicity.
 #
@@ -18,24 +18,10 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import sys
-import unittest
-from mock import patch
+from duplicity import globals
 
-
-class UTF8Test(unittest.TestCase):
-
-    def setUp(self):
-        if 'duplicity' in sys.modules:
-            del(sys.modules["duplicity"])
-
-    @patch('gettext.translation')
-    def test_module_install(self, gettext_mock):
-        """Make sure we convert translations to unicode"""
-        import duplicity
-        gettext_mock.assert_called_once_with('duplicity', fallback=True)
-        gettext_mock.return_value.install.assert_called_once_with(unicode=True)
-        assert ngettext is gettext_mock.return_value.ungettext
-
-if __name__ == "__main__":
-    unittest.main()
+if (globals.cf_backend and
+    globals.cf_backend.lower().strip() == 'pyrax'):
+    import _cf_pyrax
+else:
+    import _cf_cloudfiles

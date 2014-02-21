@@ -1,11 +1,20 @@
-[not to be removed until the end of 2013]
-DEAR PACKAGE MAINTAINER: If you are packaging duplicity for some
-distribution and used to remove GnuPGInterface.py please note this:
-*** Duplicity really does need its patched version of GnuPGInterface ***
-See README for details.
+New in v0.6.24 (2014/02/??)
+---------------------------
+Enhancements:
+* Applied two patches from mailing list message at:
+  https://lists.nongnu.org/archive/html/duplicity-talk/2014-01/msg00030.html
+  "Added command line options to use different prefixes for manifest/sig/archive files"
+  This resolves https://bugs.launchpad.net/duplicity/+bug/1170161 and provides
+  a workaround for https://bugs.launchpad.net/duplicity/+bug/1170113
+* Merged in lp:~mterry/duplicity/gpg-encode
+  - getpass.getpass(prompt) eventually calls str(prompt). Which is a no go,
+    if the prompt contains unicode. Here's a patch to always pass getpass() a
+    byte string.
+  - Our tests didn't catch this because they always set PASSPHRASE. I've added
+    a test that passes the passphrase via stdin.
 
 
-New in v0.6.23 (2013/??/??)
+New in v0.6.23 (2014/01/24)
 ---------------------------
 Enhancements:
 * Applied patch from bug 1216921 to fix ignore_missing().
@@ -17,6 +26,115 @@ Enhancements:
     file copying (bug 662442).
 * Merged in lp:~mterry/duplicity/argv
   - Fix use of argv when calling os.execve
+* Merged in lp:~verb/duplicity/bucket_root_fix
+  - Fix bug that prevents backing up to the root of a bucket with boto backend.
+* Merged in lp:~gliptak/duplicity/415619
+  - Better error message when chown fails
+* Merged in lp:~mterry/duplicity/log-path-type
+  - Any backup browser built on top of duplicity will need to indicate which
+    files in the backup are folders and which are files. The current logging
+    information doesn't provide this detail. So I've added a field to the
+    log.InfoCode.file_list output that includes the path type.
+* Merged in lp:~mterry/duplicity/manifest-oddities
+  - We may accidentally end up with an oddly inconsistent manifest like so:
+    Volume 1
+    Volume 2
+    Volume 3
+    Volume 2
+    As did get reported recently on the mailing list:
+    http://lists.nongnu.org/archive/html/duplicity-talk/2013-11/msg00009.html
+  - One way this can happen (the only way?) is if you back up, then duplicity
+    gets interrupted between writing the manifest and uploading the volume.
+    Then, when restarted, there is no longer enough data to create as many
+    volumes as existed previously.
+  - This situation can cause an exception when trying to restart the backup.
+  - This branch fixes it by deleting any excess volume information encountered
+    when loading in the manifest. We discard volume with higher numbers
+    than the last one read.
+* Merged in lp:~mterry/duplicity/disappearing-source
+  - When restarting a backup, we may accidentally skip the first chunk of one of
+    the source files. To reproduce this,:
+    1) interrupt a backup
+    2) delete the source file it was in the middle of
+    3) restart the backup
+  - When replaying the source iterator to find where to resume from, we can't
+    notice that the file is gone until we've already iterated past where it
+    would be!
+  - The solution I came up with is to just let duplicity stuff the data we
+    accidentally read back into the source iterator.
+  - This is actually a data loss bug, because it's possible to back up
+    corrupted files (that are missing their first chunk).
+* Merged in lp:~mterry/duplicity/normalize-before-using
+  - Avoid throwing an exception due to a None element in a patch sequence.
+  - None elements in a (non-normalized) patch sequence are perfectly normal.
+    With the current code in the patched function, it is certainly possible to
+    hit a crash due a None.
+    See http://lists.nongnu.org/archive/html/duplicity-talk/2013-11/msg00005.html
+  - This branch fixes that by normalizing the sequence before using it in the
+    logging code. It's acceptable to bring the normalize_ps() call outside the
+    try/except block because normalize_ps is not expected to throw. It's
+    relatively simple and doesn't really use its objects besides checking if
+    they are None.
+* Applied patch to fix "Access GDrive through gdocs backend failing"
+  - see https://lists.nongnu.org/archive/html/duplicity-talk/2013-07/msg00007.html
+* Merged in lp:~jkrauss/duplicity/pyrax
+  - Rackspace has deprecated python-cloudfiles in favor of their pyrax
+    library, which consolidates all Rackspace Cloud API functionality into
+    a single library.  Tested it with Duplicity 0.6.21 on both Arch Linux
+    and FreeBSD 8.3.0.
+* Changed to default to pyrax backend rather than cloudfiles backend.
+  To revert to the cloudfiles backend use '--cf-backend=cloudfiles'
+* Merged in lp:~verb/duplicity/boto-min-version
+  - Update documentation and error messages to match the current actual version
+    requirements of boto backend.
+* Merged in lp:~ed.so/duplicity/debian.paramiko.log
+  - upstream debian patch "paramiko logging"
+    http://patch-tracker.debian.org/package/duplicity/0.6.22-2
+* Merged in lp:~ed.so/duplicity/debian.dav.mkdir
+  - upstream debian patch "webdav create folder recursively"
+    http://patch-tracker.debian.org/package/duplicity/0.6.22-2
+* Nuke tabs
+* Merged in lp:~mterry/duplicity/encoding
+  - This branch hopefully fixes two filename encoding issues:
+  - Users in bug 989496 were noticing a UnicodeEncodeError exception which
+    happens (as far as I can tell) because some backends (like webdav) are
+    returning unicode filenames from list(). When these filenames are combined
+    with the utf8 translations of log messages, either (A) the default ascii
+    encoding can't handle promoting the utf8 bytes or -- if there aren't any
+    utf8 bytes in the translation -- (B) the resulting unicode string raises
+    an error later when log.py tries to upgrade the string again to unicode
+    for printing.
+  - This fix is largely implemented by adding a wrapper for backend list()
+    implementations. This wrapper ensures that duplicity internals always see
+    a byte string. (I'd like to eventually use this same wrapping strategy to
+    implement generic retry support without backends having to add any logic,
+    but that's just a thought for the future.)
+  - That is, the fix for issue #1 is completely inside backend.py and the
+    changes to backends/*.py.
+  - The rest of the invasive changes deal with filenames that may not be valid
+    utf8. This is much rarer, but possible. For proper handling of this, we
+    need to print using unicode, and convert filenames from the system filename
+    encoding to unicode, gracefully handling conversion errors. Some of the
+    filenames we print are remote names. Who knows what encoding they are in;
+    it could be different than the system filename encoding. 99% of the time,
+    everything will be utf8 and we're fine. If we do get conversion errors,
+    the only effect should be some question mark characters in duplicity
+    logging output.
+  - I tried to convert as much of the actual codebase to use unicode for
+    printing. But I stopped short of adding an assert in log.py to enforce
+    unicode, because I didn't want to go through all the backend code and
+    manually adjust those bits without being able to test each one.
+* Restored missing line from patch of gdocsbackend.py
+* Reverted changes to gdocsbackend.py
+* Restored patch of gdocsbackend.py from original author (thanks ede)
+* Applied patch from bug 1266753: Boto backend removes local cache if
+  connection cannot be made
+* Merged in lp:~louis-bouchard/duplicity/add-allow-concurrency
+  - Implement locking mechanism to avoid concurrent execution under the same
+    cache directory. This is the default behavior.
+  - Also implement --alllow-concurrency option to disable the locking
+    if required.
+  - This functionality adds a dependency to python-lockfile
 
 
 New in v0.6.22 (2013/08/22)
