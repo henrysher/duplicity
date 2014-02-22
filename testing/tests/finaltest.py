@@ -20,7 +20,6 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import helper
-import pexpect
 import sys, os, unittest
 
 import duplicity.backend
@@ -28,6 +27,7 @@ from duplicity import path
 from duplicity import collections
 from duplicity import commandline
 from duplicity import globals
+from duplicity import pexpect
 
 helper.setup()
 
