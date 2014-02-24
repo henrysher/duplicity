@@ -1,3 +1,9 @@
+2014-02-24  Kenneth Loafman  <kenneth@loafman.com>
+    * Merged in lp:~mterry/duplicity/pexpect-fix
+      - duplicity has its own copy of pexpect. Use that instead of requiring one
+        from the system.
+
+
 2014-02-05  Kenneth Loafman  <kenneth@loafman.com>
     * Merged in lp:~mterry/duplicity/gpg-encode
       - getpass.getpass(prompt) eventually calls str(prompt). Which is a no go,
