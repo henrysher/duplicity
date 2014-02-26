@@ -20,13 +20,20 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
+import duplicity.backend
 from duplicity import globals
 import sys
+from _boto_multi import BotoBackend as BotoMultiUploadBackend
+from _boto_single import BotoBackend as BotoSingleUploadBackend
 
 if globals.s3_use_multiprocessing:
-    if sys.version_info[:2] < (2,6):
-        print "Sorry, S3 multiprocessing requires version 2.5 or later of python"
+    if sys.version_info[:2] < (2, 6):
+        print "Sorry, S3 multiprocessing requires version 2.6 or later of python"
         sys.exit(1)
-    import _boto_multi
+    duplicity.backend.register_backend("gs", BotoMultiUploadBackend)
+    duplicity.backend.register_backend("s3", BotoMultiUploadBackend)
+    duplicity.backend.register_backend("s3+http", BotoMultiUploadBackend)
 else:
-    import _boto_single
+    duplicity.backend.register_backend("gs", BotoSingleUploadBackend)
+    duplicity.backend.register_backend("s3", BotoSingleUploadBackend)
+    duplicity.backend.register_backend("s3+http", BotoSingleUploadBackend)

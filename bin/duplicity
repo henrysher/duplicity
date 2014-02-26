@@ -735,6 +735,15 @@ def restore_get_patched_rop_iter(col_stats):
             log.Progress(_('Processed volume %d of %d') % (cur_vol[0], num_vols),
                          cur_vol[0], num_vols)
 
+    if hasattr(globals.backend, 'pre_process_download'):
+        file_names = []
+        for backup_set in backup_setlist:
+            manifest = backup_set.get_manifest()
+            volumes = manifest.get_containing_volumes(index)
+            for vol_num in volumes:
+                file_names.append(backup_set.volume_name_dict[vol_num])
+        globals.backend.pre_process_download(file_names)
+
     fileobj_iters = map(get_fileobj_iter, backup_setlist)
     tarfiles = map(patchdir.TarFile_FromFileobjs, fileobj_iters)
     return patchdir.tarfiles2rop_iter(tarfiles, index)
@@ -1142,6 +1151,8 @@ def sync_archive(decrypt):
                     local_missing = [] # don't download if we can't decrypt
             for fn in local_spurious:
                 remove_local(fn)
+            if hasattr(globals.backend, 'pre_process_download'):
+                globals.backend.pre_process_download(local_missing)
             for fn in local_missing:
                 copy_to_local(fn)
         else:
