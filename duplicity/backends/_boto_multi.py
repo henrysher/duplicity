@@ -105,6 +105,7 @@ class BotoBackend(BotoSingleBackend):
         self._pool.join()
 
     def upload(self, filename, key, headers=None):
+        import boto
         chunk_size = globals.s3_multipart_chunk_size
 
         # Check minimum chunk size for S3
@@ -136,7 +137,8 @@ class BotoBackend(BotoSingleBackend):
             consumer.start()
         tasks = []
         for n in range(chunks):
-            params = [self.scheme, self.parsed_url, self.storage_uri, self.bucket_name,
+            storage_uri = boto.storage_uri(self.boto_uri_str)
+            params = [self.scheme, self.parsed_url, storage_uri, self.bucket_name,
                       mp.id, filename, n, chunk_size, globals.num_retries,
                       queue]
             tasks.append(self._pool.apply_async(multipart_upload_worker, params))
