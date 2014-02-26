@@ -778,6 +778,44 @@ is not backwards compatible if your bucket name contains upper-case
 characters or other characters that are not valid in a hostname.
 
 .TP
+.BI "--s3-use-rrs"
+Store volumes using Reduced Redundnacy Storage when uploading to Amazon S3.
+This will lower the cost of storage but also lower the durability of stored 
+volumnes to 99.99% instead the 99.999999999% durability offered by Standard
+Storage on S3.
+
+.TP
+.BI "--s3-use-multiprocessing"
+Allow multipart volumne uploads to S3 through multiprocessing. This option
+requires Python 2.6 and can be used to make uploads to S3 more efficient.
+If enabled, files duplicity uploads to S3 will be split into chunks and 
+uploaded in parallel. Useful if you want to saturate your bandwidth
+or if large files are failing during upload.
+
+.TP
+.BI "--s3-multipart-chunk-size"
+Chunk size (in MB) used for S3 multipart uploads. Make this smaller than 
+.B --volsize
+to maximize the use of your bandwidth. For example, a chunk size of 10MB
+with a volsize of 30MB will result in 3 chunks per volume upload.
+
+.TP
+.BI "--s3-multipart-max-procs"
+Specify the maximum number of processes to spawn when performing a multipart
+upload to S3. By default, this will choose the number of processors detected
+on your system (e.g. 4 for a 4-core system). You can adjust this number as
+required to ensure you don't overload your system while maximizing the use of
+your bandwidth.
+
+.TP
+.BI "--s3_multipart_max_timeout"
+You can control the maximum time (in seconds) a multipart upload can spend on
+uploading a single chunk to S3. This may be useful if you find your system
+hanging on multipart uploads or if you'd like to control the time variance
+when uploading to S3 to ensure you kill connections to slow S3 endpoints.
+
+
+.TP
 .BI "--scp-command " command
 .B (only ssh pexpect backend with --use-scp enabled)
 The

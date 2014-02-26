@@ -160,7 +160,6 @@ class BotoBackend(duplicity.backend.Backend):
         # boto uses scheme://bucket[/name] and specifies hostname on connect()
         self.boto_uri_str = '://'.join((parsed_url.scheme[:2],
                                         parsed_url.path.lstrip('/')))
-        self.storage_uri = boto.storage_uri(self.boto_uri_str)
         self.resetConnection()
         self._listed_keys = {}
 
@@ -169,14 +168,19 @@ class BotoBackend(duplicity.backend.Backend):
         self._listed_keys = {}
         self.bucket = None
         self.conn = None
+        self.storage_uri = None
         del self.conn
+        del self.storage_uri
 
     def resetConnection(self):
         if getattr(self, 'conn', False):
             self.conn.close()
         self.bucket = None
         self.conn = None
+        self.storage_uri = None
         del self.conn
+        del self.storage_uri
+        self.storage_uri = boto.storage_uri(self.boto_uri_str)
         self.conn = get_connection(self.scheme, self.parsed_url, self.storage_uri)
         self.bucket = self.conn.lookup(self.bucket_name)
 
@@ -263,8 +267,6 @@ class BotoBackend(duplicity.backend.Backend):
             log.Info("Downloading %s/%s" % (self.straight_url, remote_filename))
             try:
                 self.resetConnection()
-                if key is None:
-                    raise BackendException("%s: key not found" % key_name)
                 key.get_contents_to_filename(local_path.name)
                 local_path.setdata()
                 return
