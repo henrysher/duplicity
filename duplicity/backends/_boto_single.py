@@ -21,6 +21,7 @@
 
 import os
 import time
+import boto
 
 import duplicity.backend
 from duplicity import globals
@@ -131,7 +132,6 @@ class BotoBackend(duplicity.backend.Backend):
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
 
-        import boto
         assert boto.Version >= BOTO_MIN_VERSION
 
         # This folds the null prefix and all null parts, which means that:
