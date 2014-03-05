@@ -73,6 +73,7 @@ def command(login_required=True):
     """a decorator for handling authentication and exceptions"""
     def decorate(f):
         def wrapper(self, *args):
+            from dropbox import rest
             if login_required and not self.sess.is_linked():
               log.FatalError("dpbx Cannot login: check your credentials",log.ErrorCode.dpbx_nologin)
               return
