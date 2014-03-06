@@ -1,6 +1,9 @@
 2014-03-06  Kenneth Loafman  <kenneth@loafman.com>
     * Merged in lp:~ed.so/duplicity/fix.dpbx
-        - fix dpbx backend "NameError: global name 'rest' is not defined"
+      - Fix dpbx backend "NameError: global name 'rest' is not defined"
+    * Merged in lp:~prateek/duplicity/botoimportfix
+      - Switches the boto backend back to using lazy imports so there are no
+        complaints during the importing of backends.
 
 2014-02-26  Kenneth Loafman  <kenneth@loafman.com>
     * Merged in lp:~prateek/duplicity/s3-glacier

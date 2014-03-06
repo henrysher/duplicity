@@ -21,7 +21,6 @@
 
 import os
 import time
-import boto
 
 import duplicity.backend
 from duplicity import globals
@@ -130,6 +129,7 @@ class BotoBackend(duplicity.backend.Backend):
     """
 
     def __init__(self, parsed_url):
+        import boto
         duplicity.backend.Backend.__init__(self, parsed_url)
 
         assert boto.Version >= BOTO_MIN_VERSION
@@ -173,6 +173,7 @@ class BotoBackend(duplicity.backend.Backend):
         del self.storage_uri
 
     def resetConnection(self):
+        import boto
         if getattr(self, 'conn', False):
             self.conn.close()
         self.bucket = None

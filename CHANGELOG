@@ -24,7 +24,10 @@ Enhancements:
       time of a chunked upload to S3. Also adds debug message to calculate
       upload speed.
 * Merged in lp:~ed.so/duplicity/fix.dpbx
-    - fix dpbx backend "NameError: global name 'rest' is not defined"
+  - Fix dpbx backend "NameError: global name 'rest' is not defined"
+* Merged in lp:~prateek/duplicity/botoimportfix
+  - Switches the boto backend back to using lazy imports so there are no
+    complaints during the importing of backends.
 
 
 New in v0.6.23 (2014/01/24)
