@@ -1,4 +1,4 @@
-New in v0.6.24 (2014/02/??)
+New in v0.6.24 (2014/03/??)
 ---------------------------
 Enhancements:
 * Applied two patches from mailing list message at:
@@ -23,7 +23,8 @@ Enhancements:
     - Adds a --s3_multipart_max_timeout input option to limit the max execution
       time of a chunked upload to S3. Also adds debug message to calculate
       upload speed.
-
+* Merged in lp:~ed.so/duplicity/fix.dpbx
+    - fix dpbx backend "NameError: global name 'rest' is not defined"
 
 
 New in v0.6.23 (2014/01/24)

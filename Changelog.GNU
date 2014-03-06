@@ -1,3 +1,7 @@
+2014-03-06  Kenneth Loafman  <kenneth@loafman.com>
+    * Merged in lp:~ed.so/duplicity/fix.dpbx
+        - fix dpbx backend "NameError: global name 'rest' is not defined"
+
 2014-02-26  Kenneth Loafman  <kenneth@loafman.com>
     * Merged in lp:~prateek/duplicity/s3-glacier
       - Fixes https://bugs.launchpad.net/duplicity/+bug/1039511
