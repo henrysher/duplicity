@@ -1,3 +1,25 @@
+2014-03-06  Kenneth Loafman  <kenneth@loafman.com>
+    * Merged in lp:~ed.so/duplicity/fix.dpbx
+      - Fix dpbx backend "NameError: global name 'rest' is not defined"
+    * Merged in lp:~prateek/duplicity/botoimportfix
+      - Switches the boto backend back to using lazy imports so there are no
+        complaints during the importing of backends.
+
+2014-02-26  Kenneth Loafman  <kenneth@loafman.com>
+    * Merged in lp:~prateek/duplicity/s3-glacier
+      - Fixes https://bugs.launchpad.net/duplicity/+bug/1039511
+        - Adds support to detect when a file is on Glacier and initiates a restore
+          to S3. Also merges overlapping code in the boto backends
+      - Fixes https://bugs.launchpad.net/duplicity/+bug/1243246
+        - Adds a --s3_multipart_max_timeout input option to limit the max execution
+          time of a chunked upload to S3. Also adds debug message to calculate
+          upload speed.
+
+2014-02-24  Kenneth Loafman  <kenneth@loafman.com>
+    * Merged in lp:~mterry/duplicity/pexpect-fix
+      - duplicity has its own copy of pexpect. Use that instead of requiring one
+        from the system.
+
 2014-02-05  Kenneth Loafman  <kenneth@loafman.com>
     * Merged in lp:~mterry/duplicity/gpg-encode
       - getpass.getpass(prompt) eventually calls str(prompt). Which is a no go,
