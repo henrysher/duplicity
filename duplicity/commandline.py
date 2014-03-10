@@ -450,6 +450,9 @@ def parse_cmdline_options(arglist):
                       callback = lambda o, s, v, p: (setattr(p.values, o.dest, True),
                                                    old_fn_deprecation(s)))
 
+    # Level of Redundancy in % for Par2 files
+    parser.add_option("--par2-redundancy", type="int", metavar=_("number"))
+
     # Used to display the progress for the full and incremental backup operations
     parser.add_option("--progress", action = "store_true")
 

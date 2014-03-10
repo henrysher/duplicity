@@ -425,7 +425,7 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
 
         # Log human-readable version as well as raw numbers for machine consumers
         log.Progress(_('Processed volume %d') % vol_num, diffdir.stats.SourceFileSize)
-        # Snapshot (serialize) progress now as a Volume has been completed. This is always the last restore point 
+        # Snapshot (serialize) progress now as a Volume has been completed. This is always the last restore point
         # when it comes to restart a failed backup
         if globals.progress:
             progress.tracker.snapshot_progress(vol_num)
@@ -555,8 +555,8 @@ def full_backup(col_stats):
             # Terminate the background thread now, if any
             progress.progress_thread.finished = True
             progress.progress_thread.join()
-            log.TransferProgress(100.0, 0, progress.tracker.total_bytecount, 
-                                progress.tracker.total_elapsed_seconds(), 
+            log.TransferProgress(100.0, 0, progress.tracker.total_bytecount,
+                                progress.tracker.total_elapsed_seconds(),
                                 progress.tracker.speed, False)
 
         col_stats.set_values(sig_chain_warning=None)
@@ -649,8 +649,8 @@ def incremental_backup(sig_chain):
             # Terminate the background thread now, if any
             progress.progress_thread.finished = True
             progress.progress_thread.join()
-            log.TransferProgress(100.0, 0, progress.tracker.total_bytecount, 
-                                progress.tracker.total_elapsed_seconds(), 
+            log.TransferProgress(100.0, 0, progress.tracker.total_bytecount,
+                                progress.tracker.total_elapsed_seconds(),
                                 progress.tracker.speed, False)
 
     print_statistics(diffdir.stats, bytes_written)
@@ -1333,21 +1333,22 @@ See https://bugs.launchpad.net/duplicity/+bug/931175
 
     globals.lockfile = FileLock(os.path.join(globals.archive_dir.name, "lockfile"))
     if globals.lockfile.is_locked():
-        log.FatalError("Another instance is already running with this archive directory\n"
-	               "If you are sure that this is the  only instance running you may delete\n"
-		       "the following lockfile and run the command again :\n"
-		       "\t%s" % os.path.join(globals.archive_dir.name, "lockfile.lock" )
-		       , log.ErrorCode.user_error)
+        log.FatalError(
+            "Another instance is already running with this archive directory\n"
+            "If you are sure that this is the  only instance running you may delete\n"
+            "the following lockfile and run the command again :\n"
+            "\t%s" % os.path.join(globals.archive_dir.name, "lockfile.lock"),
+            log.ErrorCode.user_error)
         log.shutdown()
         sys.exit(2)
-            
+
     globals.lockfile.acquire(timeout = 0)
 
     try:
         do_backup(action)
 
     finally:
-         util.release_lockfile()
+        util.release_lockfile()
 
 def do_backup(action):
     # The following is for starting remote debugging in Eclipse with Pydev.

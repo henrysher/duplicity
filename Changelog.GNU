@@ -1,3 +1,12 @@
+2014-03-10  Kenneth Loafman  <kenneth@loafman.com>
+     * Merged in lp:~germer/duplicity/par2
+      - This branch adds Par2 recovery files to duplicity. It is a wrapper backend
+        which will create the recovery files and upload them all together with the
+        wrapped backend. Corrupt archives will be detected and repaired (if
+        possible) on the fly during restore.
+      - It can be used with url-string par2+webdavs://USER@HOST/PATH
+      - Fixes https://bugs.launchpad.net/duplicity/+bug/426282
+
 2014-03-06  Kenneth Loafman  <kenneth@loafman.com>
     * Merged in lp:~ed.so/duplicity/fix.dpbx
       - Fix dpbx backend "NameError: global name 'rest' is not defined"

@@ -28,6 +28,13 @@ Enhancements:
 * Merged in lp:~prateek/duplicity/botoimportfix
   - Switches the boto backend back to using lazy imports so there are no
     complaints during the importing of backends.
+* Merged in lp:~germer/duplicity/par2
+  - This branch adds Par2 recovery files to duplicity. It is a wrapper backend
+    which will create the recovery files and upload them all together with the
+    wrapped backend. Corrupt archives will be detected and repaired (if
+    possible) on the fly during restore.
+  - It can be used with url-string par2+webdavs://USER@HOST/PATH
+  - Fixes https://bugs.launchpad.net/duplicity/+bug/426282
 
 
 New in v0.6.23 (2014/01/24)
