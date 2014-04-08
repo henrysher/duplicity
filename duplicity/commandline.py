@@ -65,9 +65,10 @@ commands = ["cleanup",
             ]
 
 def old_fn_deprecation(opt):
-    print >> sys.stderr, _("Warning: Option %s is pending deprecation "
-                          "and will be removed in a future release.\n"
-                          "Use of default filenames is strongly suggested.") % opt
+    log.Log(_("Warning: Option %s is pending deprecation "
+              "and will be removed in a future release.\n"
+              "Use of default filenames is strongly suggested.") % opt,
+            log.ERROR, force_print=True)
 
 def expand_fn(filename):
     return os.path.expanduser(os.path.expandvars(filename))
