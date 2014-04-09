@@ -206,6 +206,9 @@ s3_multipart_max_procs = None
 # Maximum time to wait for a part to finish when doig a multipart upload to S3
 s3_multipart_max_timeout = None
 
+# Use server side encryption in s3
+s3_use_sse = False
+
 # Whether to use the full email address as the user name when
 # logging into an imap server. If false just the user name
 # part of the email address is used.
