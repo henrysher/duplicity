@@ -19,208 +19,48 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import helper
-import sys, os, unittest
 import glob
+import os
 import subprocess
+import unittest
 
-import duplicity.backend
-from duplicity import path
+from helper import DuplicityTestCase
 
-helper.setup()
 
-# This can be changed to select the URL to use
-backend_url = "file://testfiles/output"
-
-# Extra arguments to be passed to duplicity
-other_args = ["-v0", "--no-print-statistics"]
-#other_args = ["--short-filenames"]
-#other_args = ["--ssh-command 'ssh -v'", "--scp-command 'scp -C'"]
-
-# If this is set to true, after each backup, verify contents
-verify = 1
-
-class CmdError(Exception):
-    """Indicates an error running an external command"""
-    def __init__(self, code):
-        Exception.__init__(self, code)
-        self.exit_status = code
-
-class RestartTest(unittest.TestCase):
+class RestartTest(DuplicityTestCase):
     """
     Test checkpoint/restart using duplicity binary
     """
-    def setUp(self):
-        self.class_args = []
-        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
-        assert not os.system("rm -rf testfiles/output testfiles/largefiles "
-                             "testfiles/restore_out testfiles/cache")
-        assert not os.system("mkdir testfiles/output testfiles/cache")
-        backend = duplicity.backend.get_backend(backend_url)
-        bl = backend.list()
-        if bl:
-            backend.delete(backend.list())
-        backend.close()
-
-    def tearDown(self):
-        helper.set_environ("PASSPHRASE", None)
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
-
-    def run_duplicity(self, arglist, options = [], current_time = None):
-        """
-        Run duplicity binary with given arguments and options
-        """
-        options.append("--archive-dir testfiles/cache")
-        # We run under setsid and take input from /dev/null (below) because
-        # this way we force a failure if duplicity tries to read from the
-        # console (like for gpg password or such).
-        cmd_list = ["setsid", "duplicity"]
-        cmd_list.extend(options + ["--allow-source-mismatch"])
-        if current_time:
-            cmd_list.append("--current-time %s" % (current_time,))
-        if other_args:
-            cmd_list.extend(other_args)
-        cmd_list.extend(self.class_args)
-        cmd_list.extend(arglist)
-        cmd_list.extend(["<", "/dev/null"])
-        cmdline = " ".join(cmd_list)
-        #print "Running '%s'." % cmdline
-        helper.set_environ('PASSPHRASE', helper.sign_passphrase)
-#        print "CMD: %s" % cmdline
-        return_val = os.system(cmdline)
-        if return_val:
-            raise CmdError(os.WEXITSTATUS(return_val))
-
-    def backup(self, type, input_dir, options = [], current_time = None):
-        """Run duplicity backup to default directory"""
-        options = options[:]
-        if type == "full":
-            options.insert(0, 'full')
-        args = [input_dir, "'%s'" % backend_url]
-        self.run_duplicity(args, options, current_time)
-
-    def restore(self, file_to_restore = None, time = None, options = [],
-                current_time = None):
-        options = options[:] # just nip any mutability problems in bud
-        assert not os.system("rm -rf testfiles/restore_out")
-        args = ["'%s'" % backend_url, "testfiles/restore_out"]
-        if file_to_restore:
-            options.extend(['--file-to-restore', file_to_restore])
-        if time:
-            options.extend(['--restore-time', str(time)])
-        self.run_duplicity(args, options, current_time)
-
-    def verify(self, dirname, file_to_verify = None, time = None, options = [],
-               current_time = None):
-        options = ["verify"] + options[:]
-        args = ["'%s'" % backend_url, dirname]
-        if file_to_verify:
-            options.extend(['--file-to-restore', file_to_verify])
-        if time:
-            options.extend(['--restore-time', str(time)])
-        self.run_duplicity(args, options, current_time)
-
-    def runtest(self, dirlist, backup_options = [], restore_options = []):
-        """
-        Run backup/restore test on directories in dirlist
-        """
-        assert len(dirlist) >= 1
-
-        # Back up directories to local backend
-        current_time = 100000
-        self.backup("full", dirlist[0], current_time = current_time,
-                    options = backup_options)
-        for new_dir in dirlist[1:]:
-            current_time += 100000
-            self.backup("inc", new_dir, current_time = current_time,
-                        options = backup_options)
-
-        # Restore each and compare them
-        for i in range(len(dirlist)):
-            dirname = dirlist[i]
-            current_time = 100000*(i + 1)
-            self.restore(time = current_time, options = restore_options)
-            self.check_same(dirname, "testfiles/restore_out")
-            if verify:
-                self.verify(dirname,
-                            time = current_time, options = restore_options)
-
-    def make_largefiles(self, count=3, size=2):
-        """
-        Makes a number of large files in testfiles/largefiles that each are
-        the specified number of megabytes.
-        """
-        assert not os.system("mkdir testfiles/largefiles")
-        for n in range(count):
-            assert not os.system("dd if=/dev/urandom of=testfiles/largefiles/file%d bs=1024 count=%d > /dev/null 2>&1" % (n + 1, size * 1024))
-
-    def check_same(self, filename1, filename2):
-        """
-        Verify two filenames are the same
-        """
-        path1, path2 = path.Path(filename1), path.Path(filename2)
-        assert path1.compare_recursive(path2, verbose = 1)
-
     def test_basic_checkpoint_restart(self):
         """
         Test basic Checkpoint/Restart
         """
-        excludes = ["--exclude '**/output'",
-                    "--exclude '**/cache'",]
-        # we know we're going to fail this one, its forced
-        try:
-            self.backup("full", "testfiles", options = ["--vol 1", "--fail 1"] + excludes)
-            self.fail()
-        except CmdError, e:
-            self.assertEqual(30, e.exit_status)
-        # this one should pass OK
-        self.backup("full", "testfiles", options = excludes)
-        self.verify("testfiles", options = excludes)
+        self.make_largefiles()
+        self.backup("full", "testfiles/largefiles", fail=1)
+        self.backup("full", "testfiles/largefiles")
+        self.verify("testfiles/largefiles")
 
     def test_multiple_checkpoint_restart(self):
         """
         Test multiple Checkpoint/Restart
         """
-        excludes = ["--exclude '**/output'",
-                    "--exclude '**/cache'",]
         self.make_largefiles()
-        # we know we're going to fail these, they are forced
-        try:
-            self.backup("full", "testfiles/largefiles", options = ["--vol 1", "--fail 1"] + excludes)
-            self.fail()
-        except CmdError, e:
-            self.assertEqual(30, e.exit_status)
-        try:
-            self.backup("full", "testfiles/largefiles", options = ["--vol 1", "--fail 2"] + excludes)
-            self.fail()
-        except CmdError, e:
-            self.assertEqual(30, e.exit_status)
-        try:
-            self.backup("full", "testfiles/largefiles", options = ["--vol 1", "--fail 3"] + excludes)
-            self.fail()
-        except CmdError, e:
-            self.assertEqual(30, e.exit_status)
-        # this one should pass OK
-        self.backup("full", "testfiles/largefiles", options = excludes)
-        self.verify("testfiles/largefiles", options = excludes)
+        self.backup("full", "testfiles/largefiles", fail=1)
+        self.backup("full", "testfiles/largefiles", fail=2)
+        self.backup("full", "testfiles/largefiles", fail=3)
+        self.backup("full", "testfiles/largefiles")
+        self.verify("testfiles/largefiles")
 
     def test_first_volume_failure(self):
         """
         Test restart when no volumes are available on the remote.
         Caused when duplicity fails before the first transfer.
         """
-        excludes = ["--exclude '**/output'",
-                    "--exclude '**/cache'",]
-        # we know we're going to fail these, they are forced
-        try:
-            self.backup("full", "testfiles", options = ["--vol 1", "--fail 1"] + excludes)
-            self.fail()
-        except CmdError, e:
-            self.assertEqual(30, e.exit_status)
+        self.make_largefiles()
+        self.backup("full", "testfiles/largefiles", fail=1)
         assert not os.system("rm testfiles/output/duplicity-full*difftar*")
-        # this one should pass OK
-        self.backup("full", "testfiles", options = excludes)
-        self.verify("testfiles", options = excludes)
+        self.backup("full", "testfiles/largefiles")
+        self.verify("testfiles/largefiles")
 
     def test_multi_volume_failure(self):
         """
@@ -229,15 +69,9 @@ class RestartTest(unittest.TestCase):
         fails the last queued transfer(s).
         """
         self.make_largefiles()
-        # we know we're going to fail these, they are forced
-        try:
-            self.backup("full", "testfiles/largefiles", options = ["--vol 1", "--fail 3"])
-            self.fail()
-        except CmdError, e:
-            self.assertEqual(30, e.exit_status)
+        self.backup("full", "testfiles/largefiles", fail=3)
         assert not os.system("rm testfiles/output/duplicity-full*vol[23].difftar*")
-        # this one should pass OK
-        self.backup("full", "testfiles/largefiles", options = ["--vol 1"])
+        self.backup("full", "testfiles/largefiles")
         self.verify("testfiles/largefiles")
 
     def test_restart_sign_and_encrypt(self):
@@ -246,15 +80,9 @@ class RestartTest(unittest.TestCase):
         https://bugs.launchpad.net/duplicity/+bug/946988
         """
         self.make_largefiles()
-        enc_opts = ["--sign-key " + helper.sign_key, "--encrypt-key " + helper.sign_key]
-        # Force a failure partway through
-        try:
-            self.backup("full", "testfiles/largefiles", options = ["--vols 1", "--fail 2"] + enc_opts)
-            self.fail()
-        except CmdError, e:
-            self.assertEqual(30, e.exit_status)
-        # Now finish that backup
-        self.backup("full", "testfiles/largefiles", options = enc_opts)
+        enc_opts = ["--sign-key", self.sign_key, "--encrypt-key", self.sign_key]
+        self.backup("full", "testfiles/largefiles", options=enc_opts, fail=2)
+        self.backup("full", "testfiles/largefiles", options=enc_opts)
         self.verify("testfiles/largefiles")
 
     def test_restart_sign_and_hidden_encrypt(self):
@@ -263,15 +91,9 @@ class RestartTest(unittest.TestCase):
         https://bugs.launchpad.net/duplicity/+bug/946988
         """
         self.make_largefiles()
-        enc_opts = ["--sign-key " + helper.sign_key, "--hidden-encrypt-key " + helper.sign_key]
-        # Force a failure partway through
-        try:
-            self.backup("full", "testfiles/largefiles", options = ["--vols 1", "--fail 2"] + enc_opts)
-            self.fail()
-        except CmdError, e:
-            self.assertEqual(30, e.exit_status)
-        # Now finish that backup
-        self.backup("full", "testfiles/largefiles", options = enc_opts)
+        enc_opts = ["--sign-key", self.sign_key, "--hidden-encrypt-key", self.sign_key]
+        self.backup("full", "testfiles/largefiles", options=enc_opts, fail=2)
+        self.backup("full", "testfiles/largefiles", options=enc_opts)
         self.verify("testfiles/largefiles")
 
     def test_last_file_missing_in_middle(self):
@@ -281,15 +103,9 @@ class RestartTest(unittest.TestCase):
         the file in the middle of the backup, with files following.
         """
         self.make_largefiles()
-        # we know we're going to fail, it's forced
-        try:
-            self.backup("full", "testfiles/largefiles", options = ["--vol 1", "--fail 3"])
-            self.fail()
-        except CmdError, e:
-            self.assertEqual(30, e.exit_status)
+        self.backup("full", "testfiles/largefiles", fail=3)
         assert not os.system("rm testfiles/largefiles/file2")
-        # this one should pass OK
-        self.backup("full", "testfiles/largefiles", options = ["--vol 1"])
+        self.backup("full", "testfiles/largefiles")
         #TODO: we can't verify but we need to to check for other errors that might show up
         # there should be 2 differences found, one missing file, one mtime change
         #self.verify("testfiles/largefiles")
@@ -301,15 +117,9 @@ class RestartTest(unittest.TestCase):
         the file at the end of the backup, with no files following.
         """
         self.make_largefiles()
-        # we know we're going to fail, it's forced
-        try:
-            self.backup("full", "testfiles/largefiles", options = ["--vol 1", "--fail 6"])
-            self.fail()
-        except CmdError, e:
-            self.assertEqual(30, e.exit_status)
+        self.backup("full", "testfiles/largefiles", fail=6)
         assert not os.system("rm testfiles/largefiles/file3")
-        # this one should pass OK
-        self.backup("full", "testfiles/largefiles", options = ["--vol 1"])
+        self.backup("full", "testfiles/largefiles")
         #TODO: we can't verify but we need to to check for other errors that might show up
         # there should be 2 differences found, one missing file, one mtime change
         #self.verify("testfiles/largefiles")
@@ -318,16 +128,9 @@ class RestartTest(unittest.TestCase):
         """
         Test restarting an incremental backup
         """
-        # Make first normal full backup
-        self.backup("full", "testfiles/dir1")
         self.make_largefiles()
-        # Force a failure partway through
-        try:
-            self.backup("inc", "testfiles/largefiles", options = ["--vols 1", "--fail 2"])
-            self.fail()
-        except CmdError, e:
-            self.assertEqual(30, e.exit_status)
-        # Now finish that incremental
+        self.backup("full", "testfiles/dir1")
+        self.backup("inc", "testfiles/largefiles", fail=2)
         self.backup("inc", "testfiles/largefiles")
         self.verify("testfiles/largefiles")
 
@@ -394,14 +197,15 @@ class RestartTest(unittest.TestCase):
         """
         source = 'testfiles/largefiles'
         self.make_largefiles(count=1, size=1)
-        self.backup("full", source, options=["--name=backup1"])
+        self.backup("full", source, options=["--volsize=5", "--name=backup1"])
         # Fake an interruption
         self.make_fake_second_volume("backup1")
         # Add new file
         assert not os.system("cp %s/file1 %s/newfile" % (source, source))
         # 'restart' the backup
-        self.backup("full", source, options=["--name=backup1"])
+        self.backup("full", source, options=["--volsize=5", "--name=backup1"])
         # Confirm we actually resumed the previous backup
+        print os.listdir("testfiles/output")
         self.assertEqual(len(os.listdir("testfiles/output")), 4)
         # Now make sure everything is byte-for-byte the same once restored
         self.restore()
@@ -414,11 +218,11 @@ class RestartTest(unittest.TestCase):
         """
         source = 'testfiles/largefiles'
         self.make_largefiles(count=1, size=3)
-        self.backup("full", source, options=["--vols 1", "--name=backup1"])
+        self.backup("full", source, options=["--name=backup1"])
         # Fake an interruption
         self.make_fake_second_volume("backup1")
         # 'restart' the backup
-        self.backup("full", source, options=["--vols 1", "--name=backup1"])
+        self.backup("full", source, options=["--name=backup1"])
         # Now make sure everything is byte-for-byte the same once restored
         self.restore()
         assert not os.system("diff -r %s testfiles/restore_out" % source)
@@ -456,12 +260,7 @@ class RestartTest(unittest.TestCase):
         """
         source = 'testfiles/largefiles'
         self.make_largefiles(count=5, size=1)
-        # intentionally interrupt initial backup
-        try:
-            self.backup("full", source, options = ["--vol 1", "--fail 3"])
-            self.fail()
-        except CmdError, e:
-            self.assertEqual(30, e.exit_status)
+        self.backup("full", source, fail=3)
         # now delete the last volume on remote end and some source files
         assert not os.system("rm testfiles/output/duplicity-full*vol3.difftar*")
         assert not os.system("rm %s/file[2345]" % source)
@@ -480,12 +279,7 @@ class RestartTest(unittest.TestCase):
         """
         source = 'testfiles/largefiles'
         self.make_largefiles(count=1)
-        # intentionally interrupt initial backup
-        try:
-            self.backup("full", source, options = ["--vol 1", "--fail 2"])
-            self.fail()
-        except CmdError, e:
-            self.assertEqual(30, e.exit_status)
+        self.backup("full", source, fail=2)
         # now remove starting source data and make sure we add something after
         assert not os.system("rm %s/*" % source)
         assert not os.system("echo hello > %s/z" % source)
@@ -498,9 +292,10 @@ class RestartTest(unittest.TestCase):
 
 # Note that this class duplicates all the tests in RestartTest
 class RestartTestWithoutEncryption(RestartTest):
-    def setUp(self):
-        RestartTest.setUp(self)
-        self.class_args.extend(["--no-encryption"])
+    @classmethod
+    def setUpClass(cls):
+        super(RestartTestWithoutEncryption, cls).setUpClass()
+        cls.class_args.extend(["--no-encryption"])
 
     def test_no_write_double_snapshot(self):
         """
@@ -510,13 +305,7 @@ class RestartTestWithoutEncryption(RestartTest):
         https://launchpad.net/bugs/929067
         """
         self.make_largefiles()
-        # Start backup
-        try:
-            self.backup("full", "testfiles/largefiles", options = ["--fail 2", "--vols 1"])
-            self.fail()
-        except CmdError, e:
-            self.assertEqual(30, e.exit_status)
-        # Finish it
+        self.backup("full", "testfiles/largefiles", fail=2)
         self.backup("full", "testfiles/largefiles")
         # Now check sigtar
         sigtars = glob.glob("testfiles/output/duplicity-full*.sigtar.gz")
