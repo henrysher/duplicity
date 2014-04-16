@@ -7,7 +7,6 @@ duplicity/statistics.py
 duplicity/selection.py
 duplicity/globals.py
 duplicity/commandline.py
-duplicity/urlparse_2_5.py
 duplicity/dup_temp.py
 duplicity/backend.py
 duplicity/asyncscheduler.py

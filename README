@@ -19,7 +19,7 @@ The default prefix is /usr, so files are put in /usr/bin,
 
 REQUIREMENTS:
 
- * Python v2.4 or later
+ * Python v2.6 or later
  * librsync v0.9.6 or later
  * GnuPG v1.x for encryption
  * python-lockfile for concurrency locking
@@ -28,7 +28,6 @@ REQUIREMENTS:
  * for ftp over SSL -- lftp version 3.7.15 or later
  * Boto 2.0 or later for single-processing S3 or GCS access (default)
  * Boto 2.1.1 or later for multi-processing S3 access
- * Python v2.6 or later for multi-processing S3 access
  * Boto 2.7.0 or later for Glacier S3 access
 
 If you install from the source package, you will also need:

@@ -46,7 +46,7 @@ for t in $TOP_TESTS; do
 done
 
 # run against all supported python versions
-for v in 2.4 2.5 2.6 2.7; do
+for v in 2.6 2.7; do
     type python$v >& /dev/null
     if [ $? == 1 ]; then
         echo "python$v not found on system"

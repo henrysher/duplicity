@@ -26,13 +26,13 @@ import httplib, os
 import re
 import urllib
 import urllib2
+import urlparse
 import xml.dom.minidom
 
 import duplicity.backend
 from duplicity import globals
 from duplicity import log
 from duplicity.errors import * #@UnusedWildImport
-from duplicity import urlparse_2_5 as urlparser
 from duplicity.backend import retry_fatal
 
 class CustomMethodRequest(urllib2.Request):
@@ -332,7 +332,7 @@ class WebDAVBackend(duplicity.backend.Backend):
         @return: A matching filename, or None if the href did not match.
         """
         raw_filename = self._getText(href.childNodes).strip()
-        parsed_url = urlparser.urlparse(urllib.unquote(raw_filename))
+        parsed_url = urlparse.urlparse(urllib.unquote(raw_filename))
         filename = parsed_url.path
         log.Debug("webdav path decoding and translation: "
                   "%s -> %s" % (raw_filename, filename))

@@ -29,13 +29,11 @@ class UTF8Test(unittest.TestCase):
         if 'duplicity' in sys.modules:
             del(sys.modules["duplicity"])
 
-    @patch('gettext.translation')
+    @patch('gettext.install')
     def test_module_install(self, gettext_mock):
         """Make sure we convert translations to unicode"""
         import duplicity
-        gettext_mock.assert_called_once_with('duplicity', fallback=True)
-        gettext_mock.return_value.install.assert_called_once_with(unicode=True)
-        assert ngettext is gettext_mock.return_value.ungettext
+        gettext_mock.assert_called_once_with('duplicity', unicode=True, names=['ngettext'])
 
 if __name__ == "__main__":
     unittest.main()

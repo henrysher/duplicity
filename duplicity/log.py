@@ -49,7 +49,6 @@ def LoggerToDupLevel(verb):
     return DupToLoggerLevel(verb)
 
 def LevelName(level):
-    level = LoggerToDupLevel(level)
     if   level >= 9: return "DEBUG"
     elif level >= 5: return "INFO"
     elif level >= 3: return "NOTICE"
@@ -59,12 +58,10 @@ def LevelName(level):
 def Log(s, verb_level, code=1, extra=None, force_print=False):
     """Write s to stderr if verbosity level low enough"""
     global _logger
-    # controlLine is a terrible hack until duplicity depends on Python 2.5
-    # and its logging 'extra' keyword that allows a custom record dictionary.
     if extra:
-        _logger.controlLine = '%d %s' % (code, extra)
+        controlLine = '%d %s' % (code, extra)
     else:
-        _logger.controlLine = '%d' % (code)
+        controlLine = '%d' % (code)
     if not s:
         s = '' # If None is passed, standard logging would render it as 'None'
 
@@ -79,8 +76,9 @@ def Log(s, verb_level, code=1, extra=None, force_print=False):
     if not isinstance(s, unicode):
         s = s.decode("utf8", "replace")
 
-    _logger.log(DupToLoggerLevel(verb_level), s)
-    _logger.controlLine = None
+    _logger.log(DupToLoggerLevel(verb_level), s,
+                extra={'levelName': LevelName(verb_level),
+                       'controlLine': controlLine})
 
     if force_print:
         _logger.setLevel(initial_level)
@@ -305,22 +303,6 @@ def FatalError(s, code=ErrorCode.generic, extra=None):
     shutdown()
     sys.exit(code)
 
-class DupLogRecord(logging.LogRecord):
-    """Custom log record that holds a message code"""
-    def __init__(self, controlLine, *args, **kwargs):
-        global _logger
-        logging.LogRecord.__init__(self, *args, **kwargs)
-        self.controlLine = controlLine
-        self.levelName = LevelName(self.levelno)
-
-class DupLogger(logging.Logger):
-    """Custom logger that creates special code-bearing records"""
-    # controlLine is a terrible hack until duplicity depends on Python 2.5
-    # and its logging 'extra' keyword that allows a custom record dictionary.
-    controlLine = None
-    def makeRecord(self, name, lvl, fn, lno, msg, args, exc_info, *argv, **kwargs):
-        return DupLogRecord(self.controlLine, name, lvl, fn, lno, msg, args, exc_info)
-
 class OutFilter(logging.Filter):
     """Filter that only allows warning or less important messages"""
     def filter(self, record):
@@ -337,7 +319,6 @@ def setup():
     if _logger:
         return
 
-    logging.setLoggerClass(DupLogger)
     _logger = logging.getLogger("duplicity")
 
     # Default verbosity allows notices and above

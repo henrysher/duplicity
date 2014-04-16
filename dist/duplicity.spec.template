@@ -10,8 +10,8 @@ Source: http://savannah.nongnu.org/download/duplicity/%{name}-%{version}.tar.gz
 License: GPL
 Group: Applications/Archiving
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-requires: librsync >= 0.9.6, %{PYTHON_NAME} >= 2.4, gnupg >= 1.0.6
-BuildPrereq: %{PYTHON_NAME}-devel >= 2.4, librsync-devel >= 0.9.6
+requires: librsync >= 0.9.6, %{PYTHON_NAME} >= 2.6, gnupg >= 1.0.6
+BuildPrereq: %{PYTHON_NAME}-devel >= 2.6, librsync-devel >= 0.9.6
 
 %description
 Duplicity incrementally backs up files and directory by encrypting
