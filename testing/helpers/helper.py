@@ -33,13 +33,21 @@ sign_passphrase = 'test'
 encrypt_key1 = 'B5FA894F'
 encrypt_key2 = '9B736B2A'
 
-# TODO: remove this method
 def setup():
     """ setup for unit tests """
+    # TODO: remove these lines
     log.setup()
     log.setverbosity(log.WARNING)
     globals.print_statistics = 0
     backend.import_backends()
+
+    # Have all file references in tests relative to our testing dir
+    _testing_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    os.chdir(_testing_dir)
+    # Make sure that PYTHONPATH is set right for subprocesses (setuptools
+    # may futz with it)
+    _top_dir = os.path.dirname(_testing_dir)
+    os.environ['PYTHONPATH'] = _top_dir
 
 
 class CmdError(Exception):
@@ -57,7 +65,7 @@ class DuplicityTestCase(unittest.TestCase):
         cls.sign_key = sign_key
         cls.sign_passphrase = sign_passphrase
         cls.encrypt_key1 = encrypt_key1
-        cls.encrypt_key2 = encrypt_key2        
+        cls.encrypt_key2 = encrypt_key2
         setup()
 
     def setUp(self):
