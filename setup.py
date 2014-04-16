@@ -119,7 +119,8 @@ class SDistCommand(sdist):
         if version[0] == '$':
             version = "0"
         os.system(os.path.join(top_dir, "dist", "makedist") + " " + version)
-        os.system("rm duplicity.spec")
+        os.system("rm -f duplicity.spec")
+        os.system("mkdir -p " + self.dist_dir)
         os.system("mv duplicity-" + version + ".tar.gz " + self.dist_dir)
 
 
