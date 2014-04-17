@@ -1,6 +1,13 @@
 2014-04-17  Kenneth Loafman  <kenneth@loafman.com>
     * Merged in lp:~fredrik-loch/duplicity/duplicity-S3-SSE
       - Adds support for server side encryption as requested in Bug #996660
+    * Merged in lp:~mterry/duplicity/consolidate-tests
+      - Consolidate all the duplicity-running code in the test framework.
+      - This takes the four test files [1] that run duplicity itself (i.e. the
+        high-level functional test files) and consolidates their code. Before, it
+        was madness. Each one had its own run_duplicity method, with its own
+        slightly tweaked features. This should reduce a lot of duplication.
+      - [1] cleanuptest.py, finaltest.py, restarttest.py, and badupload.py
 
 2014-03-10  Kenneth Loafman  <kenneth@loafman.com>
      * Merged in lp:~germer/duplicity/par2

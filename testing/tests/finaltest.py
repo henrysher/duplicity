@@ -19,102 +19,20 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import helper
-import sys, os, unittest
+import os
+import unittest
 
-import duplicity.backend
 from duplicity import path
-from duplicity import collections
-from duplicity import commandline
-from duplicity import globals
-from duplicity import pexpect
+from helper import CmdError, DuplicityTestCase
 
-helper.setup()
 
-# This can be changed to select the URL to use
-backend_url = "file://testfiles/output"
-
-# Extra arguments to be passed to duplicity
-other_args = ["-v0", "--no-print-statistics"]
-#other_args = ["--short-filenames"]
-#other_args = ["--ssh-command 'ssh -v'", "--scp-command 'scp -C'"]
-#other_args = ['--no-encryption']
-
-# If this is set to true, after each backup, verify contents
-verify = 1
-
-class CmdError(Exception):
-    """Indicates an error running an external command"""
-    pass
-
-class FinalTest:
+class FinalTest(DuplicityTestCase):
     """
     Test backup/restore using duplicity binary
     """
-    def run_duplicity(self, arglist, options = [], current_time = None,
-                      passphrase_input = None):
-        """Run duplicity binary with given arguments and options"""
-        options.append("--archive-dir testfiles/cache")
-        cmd_list = ["duplicity"]
-        cmd_list.extend(options + ["--allow-source-mismatch"])
-        if current_time:
-            cmd_list.append("--current-time %s" % (current_time,))
-        if other_args:
-            cmd_list.extend(other_args)
-        cmd_list.extend(arglist)
-        cmdline = " ".join(cmd_list)
-        #print "Running '%s'." % cmdline
-        if passphrase_input is None and not os.environ.has_key('PASSPHRASE'):
-            os.environ['PASSPHRASE'] = 'foobar'
-        (output, return_val) = pexpect.run(cmdline, withexitstatus=True,
-            events={'passphrase.*:': passphrase_input}) 
-        if return_val:
-            raise CmdError(return_val)
-
-    def backup(self, type, input_dir, options = [], **kwargs):
-        """Run duplicity backup to default directory"""
-        options = options[:]
-        if type == "full":
-            options.insert(0, 'full')
-        args = [input_dir, "'%s'" % backend_url]
-        self.run_duplicity(args, options, **kwargs)
-
-    def restore(self, file_to_restore = None, time = None, options = [],
-                **kwargs):
-        options = options[:] # just nip any mutability problems in bud
-        assert not os.system("rm -rf testfiles/restore_out")
-        args = ["'%s'" % backend_url, "testfiles/restore_out"]
-        if file_to_restore:
-            options.extend(['--file-to-restore', file_to_restore])
-        if time:
-            options.extend(['--restore-time', str(time)])
-        self.run_duplicity(args, options, **kwargs)
-
-    def verify(self, dirname, file_to_verify = None, time = None, options = [],
-               **kwargs):
-        options = ["verify"] + options[:]
-        args = ["'%s'" % backend_url, dirname]
-        if file_to_verify:
-            options.extend(['--file-to-restore', file_to_verify])
-        if time:
-            options.extend(['--restore-time', str(time)])
-        self.run_duplicity(args, options, **kwargs)
-
-    def deltmp(self):
-        """Delete temporary directories"""
-        assert not os.system("rm -rf testfiles/output "
-                             "testfiles/restore_out testfiles/cache")
-        assert not os.system("mkdir testfiles/output testfiles/cache")
-        backend = duplicity.backend.get_backend(backend_url)
-        bl = backend.list()
-        if bl:
-            backend.delete(backend.list())
-        backend.close()
-
     def runtest(self, dirlist, backup_options = [], restore_options = []):
         """Run backup/restore test on directories in dirlist"""
         assert len(dirlist) >= 1
-        self.deltmp()
 
         # Back up directories to local backend
         current_time = 100000
@@ -131,9 +49,8 @@ class FinalTest:
             current_time = 100000*(i + 1)
             self.restore(time = current_time, options = restore_options)
             self.check_same(dirname, "testfiles/restore_out")
-            if verify:
-                self.verify(dirname,
-                            time = current_time, options = restore_options)
+            self.verify(dirname,
+                        time = current_time, options = restore_options)
 
     def check_same(self, filename1, filename2):
         """Verify two filenames are the same"""
@@ -156,28 +73,25 @@ class FinalTest:
             self.restore(filename, time, options = restore_options)
             self.check_same('testfiles/%s/%s' % (dir, filename),
                             'testfiles/restore_out')
-            if verify:
-                self.verify('testfiles/%s/%s' % (dir, filename),
-                            file_to_verify = filename, time = time,
-                            options = restore_options)
+            self.verify('testfiles/%s/%s' % (dir, filename),
+                        file_to_verify = filename, time = time,
+                        options = restore_options)
 
     def test_asym_cycle(self):
         """Like test_basic_cycle but use asymmetric encryption and signing"""
-        backup_options = ["--encrypt-key " + helper.encrypt_key1,
-                          "--sign-key " + helper.sign_key]
-        restore_options = ["--encrypt-key " + helper.encrypt_key1,
-                           "--sign-key " + helper.sign_key]
-        helper.set_environ("SIGN_PASSPHRASE", helper.sign_passphrase)
+        backup_options = ["--encrypt-key", self.encrypt_key1,
+                          "--sign-key", self.sign_key]
+        restore_options = ["--encrypt-key", self.encrypt_key1,
+                           "--sign-key", self.sign_key]
         self.test_basic_cycle(backup_options = backup_options,
                               restore_options = restore_options)
 
     def test_asym_with_hidden_recipient_cycle(self):
         """Like test_basic_cycle but use asymmetric encryption (hidding key id) and signing"""
-        backup_options = ["--hidden-encrypt-key " + helper.encrypt_key1,
-                          "--sign-key " + helper.sign_key]
-        restore_options = ["--hidden-encrypt-key " + helper.encrypt_key1,
-                           "--sign-key " + helper.sign_key]
-        helper.set_environ("SIGN_PASSPHRASE", helper.sign_passphrase)
+        backup_options = ["--hidden-encrypt-key", self.encrypt_key1,
+                          "--sign-key", self.sign_key]
+        restore_options = ["--hidden-encrypt-key", self.encrypt_key1,
+                           "--sign-key", self.sign_key]
         self.test_basic_cycle(backup_options = backup_options,
                               restore_options = restore_options)
 
@@ -221,7 +135,6 @@ class FinalTest:
 
     def test_empty_restore(self):
         """Make sure error raised when restore doesn't match anything"""
-        self.deltmp()
         self.backup("full", "testfiles/dir1")
         self.assertRaises(CmdError, self.restore, "this_file_does_not_exist")
         self.backup("inc", "testfiles/empty_dir")
@@ -229,58 +142,40 @@ class FinalTest:
 
     def test_remove_older_than(self):
         """Test removing old backup chains"""
-        self.deltmp()
-        self.backup("full", "testfiles/dir1", current_time = 10000)
-        self.backup("inc", "testfiles/dir2", current_time = 20000)
-        self.backup("full", "testfiles/dir1", current_time = 30000)
-        self.backup("inc", "testfiles/dir3", current_time = 40000)
+        first_chain = self.backup("full", "testfiles/dir1", current_time = 10000)
+        first_chain |= self.backup("inc", "testfiles/dir2", current_time = 20000)
+        second_chain = self.backup("full", "testfiles/dir1", current_time = 30000)
+        second_chain |= self.backup("inc", "testfiles/dir3", current_time = 40000)
 
-        b = duplicity.backend.get_backend(backend_url)
-        commandline.set_archive_dir("testfiles/cache")
-        cs = collections.CollectionsStatus(b, globals.archive_dir).set_values()
-        assert len(cs.all_backup_chains) == 2, cs.all_backup_chains
-        assert cs.matched_chain_pair
+        self.assertEqual(self.get_backend_files(), first_chain | second_chain)
 
-        self.run_duplicity(["--force", backend_url], options=["remove-older-than 35000"])
-        cs2 = collections.CollectionsStatus(b, globals.archive_dir).set_values()
-        assert len(cs2.all_backup_chains) == 1, cs.all_backup_chains
-        assert cs2.matched_chain_pair
-        chain = cs2.all_backup_chains[0]
-        assert chain.start_time == 30000, chain.start_time
-        assert chain.end_time == 40000, chain.end_time
+        self.run_duplicity(options=["remove-older-than", "35000", "--force", self.backend_url])
+        self.assertEqual(self.get_backend_files(), second_chain)
 
         # Now check to make sure we can't delete only chain
-        self.run_duplicity(["--force", backend_url], options=["remove-older-than 50000"])
-        cs3 = collections.CollectionsStatus(b, globals.archive_dir).set_values()
-        assert len(cs3.all_backup_chains) == 1
-        assert cs3.matched_chain_pair
-        chain = cs3.all_backup_chains[0]
-        assert chain.start_time == 30000, chain.start_time
-        assert chain.end_time == 40000, chain.end_time
+        self.run_duplicity(options=["remove-older-than", "50000", "--force", self.backend_url])
+        self.assertEqual(self.get_backend_files(), second_chain)
 
     def test_piped_password(self):
         """Make sure that prompting for a password works"""
+        self.set_environ("PASSPHRASE", None)
         self.backup("full", "testfiles/empty_dir",
-                    passphrase_input="foobar\nfoobar\n")
-        self.restore(passphrase_input="foobar\n")
+                    passphrase_input=[self.sign_passphrase, self.sign_passphrase])
+        self.restore(passphrase_input=[self.sign_passphrase])
 
-class FinalTest1(FinalTest, unittest.TestCase):
-    def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
 
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+class OldFilenamesFinalTest(FinalTest):
+    @classmethod
+    def setUpClass(cls):
+        super(OldFilenamesFinalTest, cls).setUpClass()
+        cls.class_args.extend(["--old-filenames"])
 
-    globals.old_filenames = False
 
-class FinalTest2(FinalTest, unittest.TestCase):
-    def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
-
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
-
-    globals.old_filenames = True
+class ShortFilenamesFinalTest(FinalTest):
+    @classmethod
+    def setUpClass(cls):
+        super(ShortFilenamesFinalTest, cls).setUpClass()
+        cls.class_args.extend(["--short-filenames"])
 
 if __name__ == "__main__":
     unittest.main()

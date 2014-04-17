@@ -20,63 +20,24 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import helper
-import os, unittest, sys
+import unittest
 
-helper.setup()
+from helper import CmdError, DuplicityTestCase
 
-# This can be changed to select the URL to use
-backend_url = 'file://testfiles/output'
 
-class CmdError(Exception):
-    """Indicates an error running an external command"""
-    return_val = -1
-    def __init__(self, return_val):
-        self.return_val = os.WEXITSTATUS(return_val)
-
-class BadUploadTest(unittest.TestCase):
+class BadUploadTest(DuplicityTestCase):
     """
     Test missing volume upload using duplicity binary
     """
-    def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
-
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
-
-    def run_duplicity(self, arglist, options = []):
-        """
-        Run duplicity binary with given arguments and options
-        """
-        options.append("--archive-dir testfiles/cache")
-        cmd_list = ["duplicity"]
-        cmd_list.extend(options + ["--allow-source-mismatch"])
-        cmd_list.extend(arglist)
-        cmdline = " ".join(cmd_list)
-        if not os.environ.has_key('PASSPHRASE'):
-            os.environ['PASSPHRASE'] = 'foobar'
-        return_val = os.system(cmdline)
-        if return_val:
-            raise CmdError(return_val)
-
-    def backup(self, type, input_dir, options = []):
-        """Run duplicity backup to default directory"""
-        options = options[:]
-        if type == "full":
-            options.insert(0, 'full')
-        args = [input_dir, "'%s'" % backend_url]
-        self.run_duplicity(args, options)
-
     def test_missing_file(self):
         """
         Test basic lost file
         """
-        # we know we're going to fail this one, its forced
         try:
-            self.backup("full", "testfiles/dir1", options = ["--skip-volume 1"])
-            assert False # shouldn't get this far
+            self.backup("full", "testfiles/dir1", options=["--skip-volume=1"])
+            self.fail()
         except CmdError, e:
-            assert e.return_val == 44, e.return_val
+            self.assertEqual(e.exit_status, 44)
 
 if __name__ == "__main__":
     unittest.main()
