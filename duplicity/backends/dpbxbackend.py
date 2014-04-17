@@ -80,14 +80,14 @@ def command(login_required=True):
 
             try:
                 return f(self, *args)
-            except TypeError, e:
+            except TypeError as e:
                 log_exception(e)
                 log.FatalError('dpbx type error "%s"' % (e,), log.ErrorCode.backend_code_error)
-            except rest.ErrorResponse, e:
+            except rest.ErrorResponse as e:
                 msg = e.user_error_msg or str(e)
                 log.Error('dpbx error: %s' % (msg,), log.ErrorCode.backend_command_error)
                 raise e
-            except Exception, e:
+            except Exception as e:
                 log_exception(e)
                 log.Error('dpbx code error "%s"' % (e,), log.ErrorCode.backend_code_error)
                 raise e
@@ -159,7 +159,7 @@ class DPBXBackend(duplicity.backend.Backend):
         if not self.sess.is_linked():
           try: # to login to the box
             self.sess.link()
-          except rest.ErrorResponse, e:
+          except rest.ErrorResponse as e:
             log.FatalError('dpbx Error: %s\n' % str(e), log.ErrorCode.dpbx_nologin)
           if not self.sess.is_linked(): # stil not logged in
             log.FatalError("dpbx Cannot login: check your credentials",log.ErrorCode.dpbx_nologin)

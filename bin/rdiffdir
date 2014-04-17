@@ -64,7 +64,7 @@ def parse_cmdline_options(arglist):
                                        "include-filelist-stdin", "include-globbing-filelist",
                                        "include-regexp=", "max-blocksize", "null-separator",
                                        "verbosity=", "write-sig-to="])
-    except getopt.error, e:
+    except getopt.error as e:
         command_line_error("Bad command line option: %s" % (str(e),))
 
     for opt, arg in optlist:

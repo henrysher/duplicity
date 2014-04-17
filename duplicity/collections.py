@@ -222,7 +222,7 @@ class BackupSet:
         # public key w/o secret key
         try:
             manifest_buffer = self.backend.get_data(self.remote_manifest_name)
-        except GPGError, message:
+        except GPGError as message:
             #TODO: We check for gpg v1 and v2 messages, should be an error code.
             if ("secret key not available" in message.args[0] or
                 "No secret key" in message.args[0]):

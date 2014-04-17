@@ -74,13 +74,13 @@ class LocalBackend(duplicity.backend.Backend):
                 source_path.rename(target_path)
             except OSError:
                 pass
-            except Exception, e:
+            except Exception as e:
                 self.handle_error(e, 'put', source_path.name, target_path.name)
             else:
                 return
         try:
             target_path.writefileobj(source_path.open("rb"))
-        except Exception, e:
+        except Exception as e:
             self.handle_error(e, 'put', source_path.name, target_path.name)
 
         """If we get here, renaming failed previously"""
@@ -93,7 +93,7 @@ class LocalBackend(duplicity.backend.Backend):
         source_path = self.remote_pathdir.append(filename)
         try:
             local_path.writefileobj(source_path.open("rb"))
-        except Exception, e:
+        except Exception as e:
             self.handle_error(e, 'get', source_path.name, local_path.name)
 
     def _list(self):
@@ -104,7 +104,7 @@ class LocalBackend(duplicity.backend.Backend):
                 pass
         try:
             return self.remote_pathdir.listdir()
-        except Exception, e:
+        except Exception as e:
             self.handle_error(e, 'list', self.remote_pathdir.name)
 
     def delete(self, filename_list):
@@ -113,7 +113,7 @@ class LocalBackend(duplicity.backend.Backend):
         for filename in filename_list:
             try:
                 self.remote_pathdir.append(filename).delete()
-            except Exception, e:
+            except Exception as e:
                 self.handle_error(e, 'delete', self.remote_pathdir.append(filename).name)
 
     def _query_file_info(self, filename):
@@ -125,7 +125,7 @@ class LocalBackend(duplicity.backend.Backend):
             target_file.setdata()
             size = target_file.getsize()
             return {'size': size}
-        except Exception, e:
+        except Exception as e:
             self.handle_error(e, 'query', target_file.name)
             return {'size': None}
 

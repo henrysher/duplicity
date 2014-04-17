@@ -93,14 +93,14 @@ class GIOBackend(duplicity.backend.Backend):
         # Now make the directory if it doesn't exist
         try:
             self.remote_file.make_directory_with_parents(None)
-        except GLib.GError, e:
+        except GLib.GError as e:
             if e.code != Gio.IOErrorEnum.EXISTS:
                 raise
 
     def done_with_mount(self, fileobj, result, loop):
         try:
             fileobj.mount_enclosing_volume_finish(result)
-        except GLib.GError, e:
+        except GLib.GError as e:
             # check for NOT_SUPPORTED because some schemas (e.g. file://) validly don't
             if e.code != Gio.IOErrorEnum.ALREADY_MOUNTED and e.code != Gio.IOErrorEnum.NOT_SUPPORTED:
                 log.FatalError(_("Connection failed, please check your password: %s")
@@ -132,7 +132,7 @@ class GIOBackend(duplicity.backend.Backend):
             source.copy(target,
                         Gio.FileCopyFlags.OVERWRITE | Gio.FileCopyFlags.NOFOLLOW_SYMLINKS,
                         None, self.copy_progress, None)
-        except Exception, e:
+        except Exception as e:
             self.handle_error(raise_errors, e, op, source.get_parse_name(),
                               target.get_parse_name())
 
@@ -163,7 +163,7 @@ class GIOBackend(duplicity.backend.Backend):
             while info:
                 files.append(info.get_name())
                 info = enum.next_file(None)
-        except Exception, e:
+        except Exception as e:
             self.handle_error(raise_errors, e, 'list',
                               self.remote_file.get_parse_name())
         return files
@@ -176,7 +176,7 @@ class GIOBackend(duplicity.backend.Backend):
             target_file = self.remote_file.get_child(filename)
             try:
                 target_file.delete(None)
-            except Exception, e:
+            except Exception as e:
                 if isinstance(e, GLib.GError):
                     if e.code == Gio.IOErrorEnum.NOT_FOUND:
                         continue
@@ -193,7 +193,7 @@ class GIOBackend(duplicity.backend.Backend):
             info = target_file.query_info(attrs, Gio.FileQueryInfoFlags.NONE,
                                           None)
             return {'size': info.get_size()}
-        except Exception, e:
+        except Exception as e:
             if isinstance(e, GLib.GError):
                 if e.code == Gio.IOErrorEnum.NOT_FOUND:
                     return {'size': -1} # early exit, no need to retry

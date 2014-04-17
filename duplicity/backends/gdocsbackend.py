@@ -113,7 +113,7 @@ class GDocsBackend(duplicity.backend.Backend):
                 self.__handle_error("Failed to initialize upload of file '%s' to remote folder '%s'"
                          % (source_path.get_filename(), self.folder.title.text), raise_errors)
             assert not file.close()
-        except Exception, e:
+        except Exception as e:
             self.__handle_error("Failed to upload file '%s' to remote folder '%s': %s"
                                 % (source_path.get_filename(), self.folder.title.text, str(e)), raise_errors)
 
@@ -132,7 +132,7 @@ class GDocsBackend(duplicity.backend.Backend):
             else:
                 self.__handle_error("Failed to find file '%s' in remote folder '%s'"
                                     % (remote_filename, self.folder.title.text), raise_errors)
-        except Exception, e:
+        except Exception as e:
             self.__handle_error("Failed to download file '%s' in remote folder '%s': %s"
                                  % (remote_filename, self.folder.title.text, str(e)), raise_errors)
 
@@ -143,7 +143,7 @@ class GDocsBackend(duplicity.backend.Backend):
             entries = self.__fetch_entries(self.folder.resource_id.text,
                                            GDocsBackend.BACKUP_DOCUMENT_TYPE)
             return [entry.title.text for entry in entries]
-        except Exception, e:
+        except Exception as e:
             self.__handle_error("Failed to fetch list of files in remote folder '%s': %s"
                                 % (self.folder.title.text, str(e)), raise_errors)
 
@@ -166,7 +166,7 @@ class GDocsBackend(duplicity.backend.Backend):
                 else:
                     log.Warn("Failed to fetch file '%s' in remote folder '%s'"
                              % (filename, self.folder.title.text))
-            except Exception, e:
+            except Exception as e:
                 self.__handle_error("Failed to remove file '%s' in remote folder '%s': %s"
                                     % (filename, self.folder.title.text, str(e)), raise_errors)
 
@@ -184,7 +184,7 @@ class GDocsBackend(duplicity.backend.Backend):
                                      service='writely',
                                      captcha_token=captcha_token,
                                      captcha_response=captcha_response)
-        except gdata.client.CaptchaChallenge, challenge:
+        except gdata.client.CaptchaChallenge as challenge:
             print('A captcha challenge in required. Please visit ' + challenge.captcha_url)
             answer = None
             while not answer:
@@ -196,7 +196,7 @@ class GDocsBackend(duplicity.backend.Backend):
                                 'access code for using this Duplicity backend. Follow the instrucction in '
                                 'http://www.google.com/support/accounts/bin/static.py?page=guide.cs&guide=1056283&topic=1056286 '
                                 'and create your application-specific password to run duplicity backups.')
-        except Exception, e:
+        except Exception as e:
             self.__handle_error('Error while authenticating client: %s.' % str(e))
 
     def __fetch_entries(self, folder_id, type, title=None):
@@ -238,7 +238,7 @@ class GDocsBackend(duplicity.backend.Backend):
 
             # Done!
             return result
-        except Exception, e:
+        except Exception as e:
             self.__handle_error('Error while fetching remote entries: %s.' % str(e))
 
 duplicity.backend.register_backend('gdocs', GDocsBackend)

@@ -37,7 +37,6 @@ class Python3ReadinessTest(unittest.TestCase):
                                           "--nofix=basestring",
                                           "--nofix=callable",
                                           "--nofix=dict",
-                                          "--nofix=except",
                                           "--nofix=filter",
                                           "--nofix=future",
                                           "--nofix=has_key",

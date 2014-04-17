@@ -36,7 +36,7 @@ class BadUploadTest(DuplicityTestCase):
         try:
             self.backup("full", "testfiles/dir1", options=["--skip-volume=1"])
             self.fail()
-        except CmdError, e:
+        except CmdError as e:
             self.assertEqual(e.exit_status, 44)
 
 if __name__ == "__main__":

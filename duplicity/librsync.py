@@ -90,7 +90,7 @@ class LikeFile:
             self._add_to_inbuf()
         try:
             self.eof, len_inbuf_read, cycle_out = self.maker.cycle(self.inbuf)
-        except _librsync.librsyncError, e:
+        except _librsync.librsyncError as e:
             raise librsyncError(str(e))
         self.inbuf = self.inbuf[len_inbuf_read:]
         self.outbuf.fromstring(cycle_out)
@@ -126,7 +126,7 @@ class SigFile(LikeFile):
         LikeFile.__init__(self, infile)
         try:
             self.maker = _librsync.new_sigmaker(blocksize)
-        except _librsync.librsyncError, e:
+        except _librsync.librsyncError as e:
             raise librsyncError(str(e))
 
 class DeltaFile(LikeFile):
@@ -148,7 +148,7 @@ class DeltaFile(LikeFile):
             assert not signature.close()
         try:
             self.maker = _librsync.new_deltamaker(sig_string)
-        except _librsync.librsyncError, e:
+        except _librsync.librsyncError as e:
             raise librsyncError(str(e))
 
 
@@ -167,7 +167,7 @@ class PatchedFile(LikeFile):
             raise TypeError("basis_file must be a (true) file")
         try:
             self.maker = _librsync.new_patchmaker(basis_file)
-        except _librsync.librsyncError, e:
+        except _librsync.librsyncError as e:
             raise librsyncError(str(e))
 
 
@@ -182,7 +182,7 @@ class SigGenerator:
         """Return new signature instance"""
         try:
             self.sig_maker = _librsync.new_sigmaker(blocksize)
-        except _librsync.librsyncError, e:
+        except _librsync.librsyncError as e:
             raise librsyncError(str(e))
         self.gotsig = None
         self.buffer = ""
@@ -201,7 +201,7 @@ class SigGenerator:
         """Run self.buffer through sig_maker, add to self.sig_string"""
         try:
             eof, len_buf_read, cycle_out = self.sig_maker.cycle(self.buffer)
-        except _librsync.librsyncError, e:
+        except _librsync.librsyncError as e:
             raise librsyncError(str(e))
         self.buffer = self.buffer[len_buf_read:]
         self.sigstring_list.append(cycle_out)

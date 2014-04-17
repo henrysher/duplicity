@@ -306,7 +306,7 @@ def retry(fn):
             try:
                 kwargs = {"raise_errors" : True}
                 return fn(*args, **kwargs)
-            except Exception, e:
+            except Exception as e:
                 log.Warn(_("Attempt %s failed: %s: %s")
                          % (n, e.__class__.__name__, str(e)))
                 log.Debug(_("Backtrace of previous error: %s")
@@ -332,10 +332,10 @@ def retry_fatal(fn):
                 try:
                     self.retry_count = n
                     return fn(self, *args)
-                except FatalBackendError, e:
+                except FatalBackendError as e:
                     # die on fatal errors
                     raise e
-                except Exception, e:
+                except Exception as e:
                     # retry on anything else
                     log.Warn(_("Attempt %s failed. %s: %s")
                              % (n, e.__class__.__name__, str(e)))
@@ -345,7 +345,7 @@ def retry_fatal(fn):
         # final trial, die on exception
             self.retry_count = n+1
             return fn(self, *args)
-        except Exception, e:
+        except Exception as e:
             log.Debug(_("Backtrace of previous error: %s")
                         % exception_traceback())
             log.FatalError(_("Giving up after %s attempts. %s: %s")

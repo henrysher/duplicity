@@ -256,7 +256,7 @@ class Select:
                     self.add_selection_func(self.regexp_get_sf(arg, 1))
                 else:
                     assert 0, "Bad selection option %s" % opt
-        except SelectError, e:
+        except SelectError as e:
             self.parse_catch_error(e)
         assert filelists_index == len(filelists)
         self.parse_last_excludes()
@@ -351,7 +351,7 @@ probably isn't what you meant.""") %
                 continue # skip blanks
             try:
                 tuple = self.filelist_parse_line(line, include)
-            except FilePrefixError, exc:
+            except FilePrefixError as exc:
                 incr_warnings(exc)
                 continue
             tuple_list.append(tuple)

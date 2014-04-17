@@ -202,7 +202,7 @@ class BotoBackend(duplicity.backend.Backend):
             try:
                 try:
                     self.bucket = self.conn.get_bucket(self.bucket_name, validate=True)
-                except Exception, e:
+                except Exception as e:
                     if "NoSuchBucket" in str(e):
                         if globals.s3_european_buckets:
                             self.bucket = self.conn.create_bucket(self.bucket_name,
@@ -211,7 +211,7 @@ class BotoBackend(duplicity.backend.Backend):
                             self.bucket = self.conn.create_bucket(self.bucket_name)
                     else:
                         raise e
-            except Exception, e:
+            except Exception as e:
                 log.Warn("Failed to create bucket (attempt #%d) '%s' failed (reason: %s: %s)"
                          "" % (n, self.bucket_name,
                                e.__class__.__name__,
@@ -252,7 +252,7 @@ class BotoBackend(duplicity.backend.Backend):
                 self.resetConnection()
                 log.Debug("Uploaded %s/%s to %s Storage at roughly %f bytes/second" % (self.straight_url, remote_filename, storage_class, rough_upload_speed))
                 return
-            except Exception, e:
+            except Exception as e:
                 log.Warn("Upload '%s/%s' failed (attempt #%d, reason: %s: %s)"
                          "" % (self.straight_url,
                                remote_filename,
@@ -279,7 +279,7 @@ class BotoBackend(duplicity.backend.Backend):
                 key.get_contents_to_filename(local_path.name)
                 local_path.setdata()
                 return
-            except Exception, e:
+            except Exception as e:
                 log.Warn("Download %s/%s failed (attempt #%d, reason: %s: %s)"
                          "" % (self.straight_url,
                                remote_filename,
@@ -304,7 +304,7 @@ class BotoBackend(duplicity.backend.Backend):
             log.Info("Listing %s" % self.straight_url)
             try:
                 return self._list_filenames_in_bucket()
-            except Exception, e:
+            except Exception as e:
                 log.Warn("List %s failed (attempt #%d, reason: %s: %s)"
                          "" % (self.straight_url,
                                n,
@@ -348,7 +348,7 @@ class BotoBackend(duplicity.backend.Backend):
             if key is None:
                 return {'size': -1}
             return {'size': key.size}
-        except Exception, e:
+        except Exception as e:
             log.Warn("Query %s/%s failed: %s"
                      "" % (self.straight_url,
                            filename,
@@ -397,7 +397,7 @@ class BotoBackend(duplicity.backend.Backend):
                             log.Info("File %s was successfully restored from Glacier" % remote_filename)
                     success = True
                     break
-                except Exception, e:
+                except Exception as e:
                     log.Warn("Restoration from Glacier for file %s/%s failed (attempt #%d, reason: %s: %s)"
                              "" % (self.straight_url,
                                    remote_filename,

@@ -77,7 +77,7 @@ class SwiftBackend(duplicity.backend.Backend):
         try:
             self.conn = Connection(**conn_kwargs)
             self.conn.put_container(self.container)
-        except Exception, e:
+        except Exception as e:
             log.FatalError("Connection failed: %s %s"
                            % (e.__class__.__name__, str(e)),
                            log.ErrorCode.connection_failed)
@@ -93,10 +93,10 @@ class SwiftBackend(duplicity.backend.Backend):
                                      remote_filename, 
                                      file(source_path.name))
                 return
-            except self.resp_exc, error:
+            except self.resp_exc as error:
                 log.Warn("Upload of '%s' failed (attempt %d): Swift server returned: %s %s"
                          % (remote_filename, n, error.http_status, error.message))
-            except Exception, e:
+            except Exception as e:
                 log.Warn("Upload of '%s' failed (attempt %s): %s: %s"
                         % (remote_filename, n, e.__class__.__name__, str(e)))
                 log.Debug("Backtrace of previous error: %s"
@@ -117,10 +117,10 @@ class SwiftBackend(duplicity.backend.Backend):
                     f.write(chunk)
                 local_path.setdata()
                 return
-            except self.resp_exc, resperr:
+            except self.resp_exc as resperr:
                 log.Warn("Download of '%s' failed (attempt %s): Swift server returned: %s %s"
                          % (remote_filename, n, resperr.http_status, resperr.message))
-            except Exception, e:
+            except Exception as e:
                 log.Warn("Download of '%s' failed (attempt %s): %s: %s"
                          % (remote_filename, n, e.__class__.__name__, str(e)))
                 log.Debug("Backtrace of previous error: %s"
@@ -139,10 +139,10 @@ class SwiftBackend(duplicity.backend.Backend):
                 # to make multiple requests to get them all.
                 headers, objs = self.conn.get_container(self.container)
                 return [ o['name'] for o in objs ]
-            except self.resp_exc, resperr:
+            except self.resp_exc as resperr:
                 log.Warn("Listing of '%s' failed (attempt %s): Swift server returned: %s %s"
                          % (self.container, n, resperr.http_status, resperr.message))
-            except Exception, e:
+            except Exception as e:
                 log.Warn("Listing of '%s' failed (attempt %s): %s: %s"
                          % (self.container, n, e.__class__.__name__, str(e)))
                 log.Debug("Backtrace of previous error: %s"
@@ -159,14 +159,14 @@ class SwiftBackend(duplicity.backend.Backend):
             try:
                 self.conn.delete_object(self.container, remote_filename)
                 return
-            except self.resp_exc, resperr:
+            except self.resp_exc as resperr:
                 if n > 1 and resperr.http_status == 404:
                     # We failed on a timeout, but delete succeeded on the server
                     log.Warn("Delete of '%s' missing after retry - must have succeded earlier" % remote_filename )
                     return
                 log.Warn("Delete of '%s' failed (attempt %s): Swift server returned: %s %s"
                          % (remote_filename, n, resperr.http_status, resperr.message))
-            except Exception, e:
+            except Exception as e:
                 log.Warn("Delete of '%s' failed (attempt %s): %s: %s"
                          % (remote_filename, n, e.__class__.__name__, str(e)))
                 log.Debug("Backtrace of previous error: %s"
@@ -189,7 +189,7 @@ class SwiftBackend(duplicity.backend.Backend):
             return {'size': long(sobject['content-length'])}
         except self.resp_exc:
             return {'size': -1}
-        except Exception, e:
+        except Exception as e:
             log.Warn("Error querying '%s/%s': %s"
                      "" % (self.container,
                            filename,

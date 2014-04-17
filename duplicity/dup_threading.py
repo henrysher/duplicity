@@ -207,7 +207,7 @@ def async_split(fn):
             cv.release()
 
             return (True, waiter)
-        except Exception, e:
+        except Exception as e:
             cv.acquire()
             state['done'] = True
             state['error'] = e
