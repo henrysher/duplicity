@@ -32,6 +32,13 @@
       - Looks like when the drop-u1 branch got merged, its conflict got resolved
         badly. Here is the right version of backend.py to use (and also drops
         u1backend.py from POTFILES).
+    * Merged in lp:~mterry/duplicity/drop-pexpect
+      - Drop our local copy of pexpect in favor of a system version.
+      - It's only used by the pexpect ssh backend (and if you're opting into that,
+        you probably can expect that you will need pexpect) and the tests.
+      - I've done a quick smoketest (backed up and restored using
+        --ssh-backend=pexpect) and it seemed to work fine with a modern version
+        of pexpect.
 
 2014-03-10  Kenneth Loafman  <kenneth@loafman.com>
      * Merged in lp:~germer/duplicity/par2

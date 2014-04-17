@@ -32,7 +32,6 @@ import os
 import duplicity.backend
 from duplicity import globals
 from duplicity import log
-from duplicity import pexpect
 from duplicity.errors import * #@UnusedWildImport
 
 class SSHPExpectBackend(duplicity.backend.Backend):
@@ -76,6 +75,7 @@ class SSHPExpectBackend(duplicity.backend.Backend):
 
     def run_scp_command(self, commandline):
         """ Run an scp command, responding to password prompts """
+        import pexpect
         for n in range(1, globals.num_retries+1):
             if n > 1:
                 # sleep before retry
@@ -147,6 +147,7 @@ class SSHPExpectBackend(duplicity.backend.Backend):
 
     def run_sftp_command(self, commandline, commands):
         """ Run an sftp command, responding to password prompts, passing commands from list """
+        import pexpect
         maxread = 2000 # expected read buffer size
         responses = [pexpect.EOF,
                      "(?i)timeout, server not responding",

@@ -20,7 +20,6 @@ import os
 import re
 from duplicity import backend
 from duplicity.errors import UnsupportedBackendScheme, BackendException
-from duplicity.pexpect import run
 from duplicity import log
 from duplicity import globals
 
@@ -52,6 +51,7 @@ class Par2WrapperBackend(backend.Backend):
         temp-filename later on. So first of all create a tempdir and symlink
         the soure_path with remote_filename into this. 
         """
+        import pexpect
         if remote_filename is None:
             remote_filename = source_path.get_filename()
 
@@ -63,7 +63,7 @@ class Par2WrapperBackend(backend.Backend):
 
         log.Info("Create Par2 recovery files")
         par2create = 'par2 c -r%d -n1 -q -q %s' % (self.redundancy, source_symlink.get_canonical())
-        out, returncode = run(par2create, -1, True)
+        out, returncode = pexpect.run(par2create, -1, True)
         source_symlink.delete()
         files_to_transfer = []
         if not returncode:
@@ -89,6 +89,7 @@ class Par2WrapperBackend(backend.Backend):
         If "par2 verify" detect an error transfer the Par2-volumes into the
         temp-dir and try to repair.
         """
+        import pexpect
         par2temp = local_path.get_temp_in_same_dir()
         par2temp.mkdir()
         local_path_temp = par2temp.append(remote_filename)
@@ -100,7 +101,7 @@ class Par2WrapperBackend(backend.Backend):
             self.wrapped_backend.get(par2file.get_filename(), par2file)
 
             par2verify = 'par2 v -q -q %s %s' % (par2file.get_canonical(), local_path_temp.get_canonical())
-            out, returncode = run(par2verify, -1, True)
+            out, returncode = pexpect.run(par2verify, -1, True)
 
             if returncode:
                 log.Warn("File is corrupt. Try to repair %s" % remote_filename)
@@ -111,7 +112,7 @@ class Par2WrapperBackend(backend.Backend):
                     self.wrapped_backend.get(filename, file)
 
                 par2repair = 'par2 r -q -q %s %s' % (par2file.get_canonical(), local_path_temp.get_canonical())
-                out, returncode = run(par2repair, -1, True)
+                out, returncode = pexpect.run(par2repair, -1, True)
 
                 if returncode:
                     log.Error("Failed to repair %s" % remote_filename)
