@@ -36,7 +36,6 @@ class Python3ReadinessTest(unittest.TestCase):
                                           "--nofix=dict",
                                           "--nofix=filter",
                                           "--nofix=has_key",
-                                          "--nofix=import",
                                           "--nofix=imports",
                                           "--nofix=map",
                                           "--nofix=next",

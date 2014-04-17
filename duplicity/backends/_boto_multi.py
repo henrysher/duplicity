@@ -33,8 +33,8 @@ from duplicity.errors import * #@UnusedWildImport
 from duplicity.filechunkio import FileChunkIO
 from duplicity import progress
 
-from _boto_single import BotoBackend as BotoSingleBackend
-from _boto_single import get_connection
+from ._boto_single import BotoBackend as BotoSingleBackend
+from ._boto_single import get_connection
 
 BOTO_MIN_VERSION = "2.1.1"
 

@@ -22,8 +22,8 @@
 
 import duplicity.backend
 from duplicity import globals
-from _boto_multi import BotoBackend as BotoMultiUploadBackend
-from _boto_single import BotoBackend as BotoSingleUploadBackend
+from ._boto_multi import BotoBackend as BotoMultiUploadBackend
+from ._boto_single import BotoBackend as BotoSingleUploadBackend
 
 if globals.s3_use_multiprocessing:
     duplicity.backend.register_backend("gs", BotoMultiUploadBackend)
