@@ -36,7 +36,6 @@ class Python3ReadinessTest(unittest.TestCase):
                                           "--nofix=dict",
                                           "--nofix=filter",
                                           "--nofix=has_key",
-                                          "--nofix=imports",
                                           "--nofix=map",
                                           "--nofix=next",
                                           "--nofix=print",
@@ -48,6 +47,7 @@ class Python3ReadinessTest(unittest.TestCase):
         # but which 2to3 can fix for us better automatically.
                                           "--nofix=callable",
                                           "--nofix=future",
+                                          "--nofix=imports",
                                           "--nofix=raw_input",
                                           "--nofix=urllib",
                                           _top_dir],
