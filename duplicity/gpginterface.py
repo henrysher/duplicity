@@ -385,17 +385,17 @@ class GnuPG:
 
         for fh_name in create_fhs + attach_fhs.keys():
             if not _fd_modes.has_key(fh_name):
-                raise KeyError, \
+                raise KeyError(
                       "unrecognized filehandle name '%s'; must be one of %s" \
-                      % (fh_name, _fd_modes.keys())
+                      % (fh_name, _fd_modes.keys()))
 
         for fh_name in create_fhs:
             # make sure the user doesn't specify a filehandle
             # to be created *and* attached
             if attach_fhs.has_key(fh_name):
-                raise ValueError, \
+                raise ValueError(
                       "cannot have filehandle '%s' in both create_fhs and attach_fhs" \
-                      % fh_name
+                      % fh_name)
 
             pipe = os.pipe()
             # fix by drt@un.bewaff.net noting
@@ -660,7 +660,7 @@ class Process:
         if self.returned == None:
             self.thread.join()
         if self.returned != 0:
-            raise IOError, "GnuPG exited non-zero, with code %d" % (self.returned >> 8)
+            raise IOError("GnuPG exited non-zero, with code %d" % (self.returned >> 8))
 
 
 def threaded_waitpid(process):

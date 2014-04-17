@@ -215,7 +215,7 @@ class GPGFile:
                 msg += unicode(line.strip(), locale.getpreferredencoding(), 'replace') + u"\n"
         msg += u"===== End GnuPG log =====\n"
         if not (msg.find(u"invalid packet (ctb=14)") > -1):
-            raise GPGError, msg
+            raise GPGError(msg)
         else:
             return ""
 

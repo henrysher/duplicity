@@ -44,7 +44,6 @@ class Python3ReadinessTest(unittest.TestCase):
                                           "--nofix=next",
                                           "--nofix=numliterals",
                                           "--nofix=print",
-                                          "--nofix=raise",
                                           "--nofix=raw_input",
                                           "--nofix=reduce",
                                           "--nofix=types",
