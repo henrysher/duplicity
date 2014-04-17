@@ -39,20 +39,21 @@ class Python3ReadinessTest(unittest.TestCase):
                                           "--nofix=has_key",
                                           "--nofix=import",
                                           "--nofix=imports",
-                                          "--nofix=long",
                                           "--nofix=map",
                                           "--nofix=next",
                                           "--nofix=numliterals",
                                           "--nofix=print",
-                                          "--nofix=raw_input",
                                           "--nofix=types",
                                           "--nofix=unicode",
                                           "--nofix=urllib",
                                           "--nofix=xrange",
         # The following fixes we don't want to remove, since they are false
-        # positives or things we don't care about.
+        # positives, things we don't care about, or real incompatibilities
+        # but which 2to3 can fix for us better automatically.
                                           "--nofix=callable",
                                           "--nofix=future",
+                                          "--nofix=long",
+                                          "--nofix=raw_input",
                                           _top_dir],
                                          stderr=subprocess.PIPE)
         self.assertEqual("", output, output)
