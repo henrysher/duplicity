@@ -32,12 +32,13 @@ import re
 import getpass
 import gettext
 import urllib
-import urlparse
 
 from duplicity import dup_temp
+from duplicity import dup_threading
 from duplicity import file_naming
 from duplicity import globals
 from duplicity import log
+from duplicity import urlparse_2_5 as urlparser
 from duplicity import progress
 
 from duplicity.util import exception_traceback
@@ -56,28 +57,6 @@ socket.setdefaulttimeout(globals.timeout)
 
 _forced_backend = None
 _backends = {}
-
-# These URL schemes have a backend with a notion of an RFC "network location".
-# The 'file' and 's3+http' schemes should not be in this list.
-# 'http' and 'https' are not actually used for duplicity backend urls, but are needed
-# in order to properly support urls returned from some webdav servers. adding them here
-# is a hack. we should instead not stomp on the url parsing module to begin with.
-#
-# This looks similar to urlparse's 'uses_netloc' list, but urlparse doesn't use
-# that list for parsing, only creating urls.  And doesn't include our custom
-# schemes anyway.  So we keep our own here for our own use.
-uses_netloc = ['ftp',
-               'ftps',
-               'hsi',
-               'rsync',
-               's3',
-               'u1',
-               'scp', 'ssh', 'sftp',
-               'webdav', 'webdavs',
-               'gdocs',
-               'http', 'https',
-               'imap', 'imaps',
-               'mega']
 
 
 def import_backends():
@@ -186,6 +165,46 @@ def get_backend(url_string):
             raise BackendException(_("Could not initialize backend: %s") % str(sys.exc_info()[1]))
 
 
+_urlparser_initialized = False
+_urlparser_initialized_lock = dup_threading.threading_module().Lock()
+
+def _ensure_urlparser_initialized():
+    """
+    Ensure that the appropriate clobbering of variables in the
+    urlparser module has been done. In the future, the need for this
+    clobbering to begin with should preferably be eliminated.
+    """
+    def init():
+        global _urlparser_initialized
+
+        if not _urlparser_initialized:
+            # These URL schemes have a backend with a notion of an RFC "network location".
+            # The 'file' and 's3+http' schemes should not be in this list.
+            # 'http' and 'https' are not actually used for duplicity backend urls, but are needed
+            # in order to properly support urls returned from some webdav servers. adding them here
+            # is a hack. we should instead not stomp on the url parsing module to begin with.
+            #
+            # todo: eliminate the need for backend specific hacking here completely.
+            urlparser.uses_netloc = ['ftp',
+                                     'ftps',
+                                     'hsi',
+                                     'rsync',
+                                     's3',
+                                     'scp', 'ssh', 'sftp',
+                                     'webdav', 'webdavs',
+                                     'gdocs',
+                                     'http', 'https',
+                                     'imap', 'imaps',
+                                     'mega']
+
+            # Do not transform or otherwise parse the URL path component.
+            urlparser.uses_query = []
+            urlparser.uses_fragm = []
+
+            _urlparser_initialized = True
+
+    dup_threading.with_lock(_urlparser_initialized_lock, init)
+
 class ParsedUrl:
     """
     Parse the given URL as a duplicity backend URL.
@@ -199,6 +218,7 @@ class ParsedUrl:
     """
     def __init__(self, url_string):
         self.url_string = url_string
+        _ensure_urlparser_initialized()
 
         # While useful in some cases, the fact is that the urlparser makes
         # all the properties in the URL deferred or lazy.  This means that
@@ -206,7 +226,7 @@ class ParsedUrl:
         # problems here, so they will be caught early.
 
         try:
-            pu = urlparse.urlparse(url_string)
+            pu = urlparser.urlparse(url_string)
         except Exception:
             raise InvalidBackendURL("Syntax error in: %s" % url_string)
 
@@ -252,37 +272,26 @@ class ParsedUrl:
         self.port = None
         try:
             self.port = pu.port
-        except Exception: # not raised in python2.7+, just returns None
+        except Exception:
             # old style rsync://host::[/]dest, are still valid, though they contain no port
             if not ( self.scheme in ['rsync'] and re.search('::[^:]*$', self.url_string)):
                 raise InvalidBackendURL("Syntax error (port) in: %s A%s B%s C%s" % (url_string, (self.scheme in ['rsync']), re.search('::[^:]+$', self.netloc), self.netloc ) )
 
-        # Our URL system uses two slashes more than urlparse's does when using
-        # non-netloc URLs.  And we want to make sure that if urlparse assuming
-        # a netloc where we don't want one, that we correct it.
-        if self.scheme not in uses_netloc:
-            if self.netloc:
-                self.path = '//' + self.netloc + self.path
-                self.netloc = ''
-                self.hostname = None
-            elif self.path.startswith('/'):
-                self.path = '//' + self.path
-
         # This happens for implicit local paths.
-        if not self.scheme:
+        if not pu.scheme:
             return
 
         # Our backends do not handle implicit hosts.
-        if self.scheme in uses_netloc and not self.hostname:
+        if pu.scheme in urlparser.uses_netloc and not pu.hostname:
             raise InvalidBackendURL("Missing hostname in a backend URL which "
                                     "requires an explicit hostname: %s"
                                     "" % (url_string))
 
         # Our backends do not handle implicit relative paths.
-        if self.scheme not in uses_netloc and not self.path.startswith('//'):
+        if pu.scheme not in urlparser.uses_netloc and not pu.path.startswith('//'):
             raise InvalidBackendURL("missing // - relative paths not supported "
                                     "for scheme %s: %s"
-                                    "" % (self.scheme, url_string))
+                                    "" % (pu.scheme, url_string))
 
     def geturl(self):
         return self.url_string

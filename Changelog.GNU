@@ -26,6 +26,8 @@
       - Our code base already requires 2.6, because 2.6-isms have crept in. Usually
         because we or a contributor didn't think to test with 2.4. And frankly,
         I'm not even sure how to test with 2.4 on a modern system.
+    * Merged in lp:~mterry/duplicity/drop-u1
+      - Ubuntu One is closing shop. So no need to support a u1 backend anymore.
 
 2014-03-10  Kenneth Loafman  <kenneth@loafman.com>
      * Merged in lp:~germer/duplicity/par2

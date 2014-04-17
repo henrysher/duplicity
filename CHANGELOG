@@ -37,11 +37,8 @@ Enhancements:
   - Fixes https://bugs.launchpad.net/duplicity/+bug/426282
 * Merged in lp:~fredrik-loch/duplicity/duplicity-S3-SSE
   - Adds support for server side encryption as requested in Bug #996660
-* Merged in lp:~mterry/duplicity/require-2.6
-  - Require at least Python 2.6.
-  - Our code base already requires 2.6, because 2.6-isms have crept in. Usually
-    because we or a contributor didn't think to test with 2.4. And frankly,
-    I'm not even sure how to test with 2.4 on a modern system.
+* Merged in lp:~mterry/duplicity/drop-u1
+  - Ubuntu One is closing shop. So no need to support a u1 backend anymore.
 
 New in v0.6.23 (2014/01/24)
 ---------------------------
