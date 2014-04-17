@@ -125,7 +125,7 @@ class BotoBackend(BotoSingleBackend):
 
         log.Debug("Uploading %d bytes in %d chunks" % (bytes, chunks))
 
-        mp = self.bucket.initiate_multipart_upload(key.key, headers)
+        mp = self.bucket.initiate_multipart_upload(key.key, headers,encrypt_key=globals.s3_use_sse)
 
         # Initiate a queue to share progress data between the pool
         # workers and a consumer thread, that will collect and report

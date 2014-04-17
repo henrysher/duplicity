@@ -1,3 +1,7 @@
+2014-04-17  Kenneth Loafman  <kenneth@loafman.com>
+    * Merged in lp:~fredrik-loch/duplicity/duplicity-S3-SSE
+      - Adds support for server side encryption as requested in Bug #996660
+
 2014-03-10  Kenneth Loafman  <kenneth@loafman.com>
      * Merged in lp:~germer/duplicity/par2
       - This branch adds Par2 recovery files to duplicity. It is a wrapper backend

@@ -35,6 +35,8 @@ Enhancements:
     possible) on the fly during restore.
   - It can be used with url-string par2+webdavs://USER@HOST/PATH
   - Fixes https://bugs.launchpad.net/duplicity/+bug/426282
+* Merged in lp:~fredrik-loch/duplicity/duplicity-S3-SSE
+  - Adds support for server side encryption as requested in Bug #996660
 
 
 New in v0.6.23 (2014/01/24)

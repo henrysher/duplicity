@@ -511,6 +511,9 @@ def parse_cmdline_options(arglist):
     if sys.version_info[:2] >= (2, 6):
         parser.add_option("--s3-use-multiprocessing", action = "store_true")
 
+    # Option to allow use of server side encryption in s3
+    parser.add_option("--s3-use-server-side-encryption", action="store_true", dest="s3_use_sse")
+
     # scp command to use (ssh pexpect backend)
     parser.add_option("--scp-command", metavar = _("command"))
 
