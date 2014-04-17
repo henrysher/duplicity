@@ -29,7 +29,6 @@ duplicity/backends/swiftbackend.py
 duplicity/backends/_boto_single.py
 duplicity/backends/_boto_multi.py
 duplicity/backends/__init__.py
-duplicity/backends/u1backend.py
 duplicity/backends/dpbxbackend.py
 duplicity/backends/ftpsbackend.py
 duplicity/backends/hsibackend.py
