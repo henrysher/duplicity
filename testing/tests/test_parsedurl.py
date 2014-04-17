@@ -55,6 +55,13 @@ class ParsedUrlTest(unittest.TestCase):
         assert pu.username is None, pu.username
         assert pu.port is None, pu.port
 
+        pu = duplicity.backend.ParsedUrl("file://home")
+        assert pu.scheme == "file", pu.scheme
+        assert pu.netloc == "", pu.netloc
+        assert pu.path == "//home", pu.path
+        assert pu.username is None, pu.username
+        assert pu.port is None, pu.port
+
         pu = duplicity.backend.ParsedUrl("ftp://foo@bar:pass@example.com:123/home")
         assert pu.scheme == "ftp", pu.scheme
         assert pu.netloc == "foo@bar:pass@example.com:123", pu.netloc
@@ -121,7 +128,9 @@ class ParsedUrlTest(unittest.TestCase):
     def test_errors(self):
         """Test various url errors"""
         self.assertRaises(InvalidBackendURL, duplicity.backend.ParsedUrl,
-                          "ssh://foo@bar:pass@example.com:/home")
+                          "ssh:///home")  # we require a hostname for ssh
+        self.assertRaises(InvalidBackendURL, duplicity.backend.ParsedUrl,
+                          "file:path")  # no relative paths for non-netloc schemes
         self.assertRaises(UnsupportedBackendScheme, duplicity.backend.get_backend,
                           "foo://foo@bar:pass@example.com/home")
 

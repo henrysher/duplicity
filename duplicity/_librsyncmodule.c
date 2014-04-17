@@ -26,15 +26,6 @@
 #include <librsync.h>
 #define RS_JOB_BLOCKSIZE 65536
 
-/* Support Python 2.4 and 2.5 */
-#ifndef PyVarObject_HEAD_INIT
-    #define PyVarObject_HEAD_INIT(type, size) \
-        PyObject_HEAD_INIT(type) size,
-#endif
-#ifndef Py_TYPE
-    #define Py_TYPE(ob) (((PyObject*)(ob))->ob_type)
-#endif
-
 static PyObject *librsyncError;
 
 /* Sets python error string from result */

@@ -507,9 +507,7 @@ def parse_cmdline_options(arglist):
     parser.add_option("--s3_multipart_max_timeout", type="int", metavar=_("number"))
 
     # Option to allow the s3/boto backend use the multiprocessing version.
-    # By default it is off since it does not work for Python 2.4 or 2.5.
-    if sys.version_info[:2] >= (2, 6):
-        parser.add_option("--s3-use-multiprocessing", action = "store_true")
+    parser.add_option("--s3-use-multiprocessing", action = "store_true")
 
     # Option to allow use of server side encryption in s3
     parser.add_option("--s3-use-server-side-encryption", action="store_true", dest="s3_use_sse")

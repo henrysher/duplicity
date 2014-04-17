@@ -28,8 +28,8 @@ from setuptools.command.sdist import sdist
 
 version_string = "$version"
 
-if sys.version_info[:2] < (2,4):
-    print "Sorry, duplicity requires version 2.4 or later of python"
+if sys.version_info[:2] < (2, 6):
+    print "Sorry, duplicity requires version 2.6 or later of python"
     sys.exit(1)
 
 incdir_list = libdir_list = None
@@ -53,8 +53,6 @@ data_files = [('share/man/man1',
                 'README',
                 'README-REPO',
                 'README-LOG',
-                'tarfile-LICENSE',
-                'tarfile-CHANGES',
                 'CHANGELOG']),
               ]
 

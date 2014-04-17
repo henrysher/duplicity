@@ -46,7 +46,7 @@ for t in $TOP_TESTS; do
 done
 
 # run against all supported python versions
-for v in 2.4 2.5 2.6 2.7; do
+for v in 2.6 2.7; do
     ve=~/virtual$v
     if [ $? == 1 ]; then
         echo "virtual$v not found on system"

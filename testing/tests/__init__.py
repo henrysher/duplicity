@@ -41,12 +41,3 @@ os.environ['GNUPGHOME'] = os.path.join(_testing_dir, 'gnupg')
 # Standardize time
 os.environ['TZ'] = 'US/Central'
 time.tzset()
-
-# Automatically add all submodules into this namespace.  Helps python2.4
-# unittest work.
-if sys.version_info < (2, 5,):
-    for module in os.listdir(_this_dir):
-        if module == '__init__.py' or module[-3:] != '.py':
-            continue
-        __import__(module[:-3], locals(), globals())
-    del module
