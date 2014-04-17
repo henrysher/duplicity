@@ -32,25 +32,28 @@ class Python3ReadinessTest(unittest.TestCase):
                                 "..", "..")
 
         # As we modernize the source code, we can remove more and more nofixes
-        output = subprocess.check_output(["2to3",
-                                          "--nofix=dict",
-                                          "--nofix=filter",
-                                          "--nofix=map",
-                                          "--nofix=next",
-                                          "--nofix=print",
-                                          "--nofix=types",
-                                          "--nofix=unicode",
-                                          "--nofix=xrange",
+        process = subprocess.Popen(["2to3",
+                                    "--nofix=dict",
+                                    "--nofix=filter",
+                                    "--nofix=map",
+                                    "--nofix=next",
+                                    "--nofix=print",
+                                    "--nofix=types",
+                                    "--nofix=unicode",
+                                    "--nofix=xrange",
         # The following fixes we don't want to remove, since they are false
         # positives, things we don't care about, or real incompatibilities
         # but which 2to3 can fix for us better automatically.
-                                          "--nofix=callable",
-                                          "--nofix=future",
-                                          "--nofix=imports",
-                                          "--nofix=raw_input",
-                                          "--nofix=urllib",
-                                          _top_dir],
-                                         stderr=subprocess.PIPE)
+                                    "--nofix=callable",
+                                    "--nofix=future",
+                                    "--nofix=imports",
+                                    "--nofix=raw_input",
+                                    "--nofix=urllib",
+                                    _top_dir],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        output = process.communicate()[0]
+        self.assertEqual(0, process.returncode)
         self.assertEqual("", output, output)
 
 

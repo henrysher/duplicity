@@ -368,7 +368,7 @@ class BotoBackend(duplicity.backend.Backend):
 
     def pre_process_download(self, files_to_download, wait=False):
         # Used primarily to move files in Glacier to S3
-        if isinstance(files_to_download, (bytes, str)):
+        if isinstance(files_to_download, (bytes, str, unicode)):
             files_to_download = [files_to_download]
 
         for remote_filename in files_to_download:
