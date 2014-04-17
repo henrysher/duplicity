@@ -28,6 +28,10 @@
         I'm not even sure how to test with 2.4 on a modern system.
     * Merged in lp:~mterry/duplicity/drop-u1
       - Ubuntu One is closing shop. So no need to support a u1 backend anymore.
+    * Merged in lp:~mterry/duplicity/fix-drop-u1
+      - Looks like when the drop-u1 branch got merged, its conflict got resolved
+        badly. Here is the right version of backend.py to use (and also drops
+        u1backend.py from POTFILES).
 
 2014-03-10  Kenneth Loafman  <kenneth@loafman.com>
      * Merged in lp:~germer/duplicity/par2

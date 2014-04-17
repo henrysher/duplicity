@@ -39,6 +39,10 @@ Enhancements:
   - Adds support for server side encryption as requested in Bug #996660
 * Merged in lp:~mterry/duplicity/drop-u1
   - Ubuntu One is closing shop. So no need to support a u1 backend anymore.
+* Merged in lp:~mterry/duplicity/fix-drop-u1
+  - Looks like when the drop-u1 branch got merged, its conflict got resolved
+    badly. Here is the right version of backend.py to use (and also drops
+    u1backend.py from POTFILES).
 
 New in v0.6.23 (2014/01/24)
 ---------------------------
