@@ -51,7 +51,6 @@ duplicity/file_naming.py
 duplicity/filechunkio.py
 duplicity/dup_threading.py
 duplicity/path.py
-duplicity/pexpect.py
 duplicity/gpginterface.py
 duplicity/dup_time.py
 duplicity/gpg.py

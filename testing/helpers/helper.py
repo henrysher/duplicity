@@ -20,13 +20,13 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import os
+import pexpect
 import time
 import unittest
 
 from duplicity import backend
 from duplicity import globals
 from duplicity import log
-from duplicity import pexpect
 
 sign_key = '56538CCF'
 sign_passphrase = 'test'
