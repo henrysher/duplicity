@@ -179,9 +179,9 @@ class FileobjHooked:
         tgt = self.dirpath.append(self.remname)
         src_iter = SrcIter(src)
         if pr.compressed:
-            gpg.GzipWriteFile(src_iter, tgt.name, size = sys.maxint)
+            gpg.GzipWriteFile(src_iter, tgt.name, size = sys.maxsize)
         elif pr.encrypted:
-            gpg.GPGWriteFile(src_iter, tgt.name, globals.gpg_profile, size = sys.maxint)
+            gpg.GPGWriteFile(src_iter, tgt.name, globals.gpg_profile, size = sys.maxsize)
         else:
             os.system("cp -p \"%s\" \"%s\"" % (src.name, tgt.name))
         globals.backend.move(tgt) #@UndefinedVariable
@@ -195,7 +195,7 @@ class FileobjHooked:
         src_iter = SrcIter(src)
         pr = file_naming.parse(self.permname)
         if pr.compressed:
-            gpg.GzipWriteFile(src_iter, tgt.name, size = sys.maxint)
+            gpg.GzipWriteFile(src_iter, tgt.name, size = sys.maxsize)
             os.unlink(src.name)
         else:
             os.rename(src.name, tgt.name)
