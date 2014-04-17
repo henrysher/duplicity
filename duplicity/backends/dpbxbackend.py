@@ -120,7 +120,7 @@ class DPBXBackend(duplicity.backend.Backend):
         
             def write_creds(self, token):
                 open(self.TOKEN_FILE, 'w').close() # create/reset file
-                os.chmod(self.TOKEN_FILE,0600)     # set it -rw------ (NOOP in Windows?)
+                os.chmod(self.TOKEN_FILE, 0o600)     # set it -rw------ (NOOP in Windows?)
                 # now write the content
                 f = open(self.TOKEN_FILE, 'w')
                 f.write("|".join([token.key, token.secret]))

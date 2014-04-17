@@ -209,12 +209,12 @@ class TestInnerFuncs(unittest.TestCase):
         self.out = out
 
     def snapshot(self):
-        """Make a snapshot ROPath, permissions 0600"""
+        """Make a snapshot ROPath, permissions 0o600"""
         ss = self.out.append("snapshot")
         fout = ss.open("wb")
         fout.write("hello, world!")
         assert not fout.close()
-        ss.chmod(0600)
+        ss.chmod(0o600)
         ss.difftype = "snapshot"
         return ss
 
@@ -230,24 +230,24 @@ class TestInnerFuncs(unittest.TestCase):
         return deltabuf
 
     def delta1(self):
-        """Make a delta ROPath, permissions 0640"""
+        """Make a delta ROPath, permissions 0o640"""
         delta1 = self.out.append("delta1")
         fout = delta1.open("wb")
         fout.write(self.get_delta("hello, world!",
                                   "aonseuth aosetnuhaonsuhtansoetuhaoe"))
         assert not fout.close()
-        delta1.chmod(0640)
+        delta1.chmod(0o640)
         delta1.difftype = "diff"
         return delta1
 
     def delta2(self):
-        """Make another delta ROPath, permissions 0644"""
+        """Make another delta ROPath, permissions 0o644"""
         delta2 = self.out.append("delta1")
         fout = delta2.open("wb")
         fout.write(self.get_delta("aonseuth aosetnuhaonsuhtansoetuhaoe",
                                   "3499 34957839485792357 458348573"))
         assert not fout.close()
-        delta2.chmod(0644)
+        delta2.chmod(0o644)
         delta2.difftype = "diff"
         return delta2
 

@@ -88,13 +88,13 @@ class FileNamingBase:
         pr = file_naming.parse(globals.file_prefix + globals.file_prefix_signature + "dns.h112bi.h14rg0.st.g")
         assert pr, pr
         assert pr.type == "new-sig"
-        assert pr.end_time == 1029826800L
+        assert pr.end_time == 1029826800
 
         if not globals.short_filenames:
             pr = file_naming.parse(globals.file_prefix + globals.file_prefix_signature + "duplicity-new-signatures.2002-08-18T00:04:30-07:00.to.2002-08-20T00:00:00-07:00.sigtar.gpg")
             assert pr, pr
             assert pr.type == "new-sig"
-            assert pr.end_time == 1029826800L
+            assert pr.end_time == 1029826800
 
         pr = file_naming.parse(globals.file_prefix + globals.file_prefix_signature + "dfs.h5dixs.st.g")
         assert pr, pr
@@ -108,14 +108,14 @@ class FileNamingBase:
         assert pr, pr
         assert pr.partial
         assert pr.type == "new-sig"
-        assert pr.end_time == 1029826800L
+        assert pr.end_time == 1029826800
 
         if not globals.short_filenames:
             pr = file_naming.parse(globals.file_prefix + globals.file_prefix_signature + "duplicity-new-signatures.2002-08-18T00:04:30-07:00.to.2002-08-20T00:00:00-07:00.sigtar.part.gpg")
             assert pr, pr
             assert pr.partial
             assert pr.type == "new-sig"
-            assert pr.end_time == 1029826800L
+            assert pr.end_time == 1029826800
 
         pr = file_naming.parse(globals.file_prefix + globals.file_prefix_signature + "dfs.h5dixs.st.p.g")
         assert pr, pr

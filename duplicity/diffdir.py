@@ -461,7 +461,7 @@ class TarBlockIter:
         TarBlockIter initializer
         """
         self.input_iter = input_iter
-        self.offset = 0l                    # total length of data read
+        self.offset = 0                     # total length of data read
         self.process_waiting = False        # process_continued has more blocks
         self.process_next_vol_number = None # next volume number to write in multivol
         self.previous_index = None          # holds index of last block returned
@@ -564,7 +564,7 @@ class TarBlockIter:
         Return closing string for tarfile, reset offset
         """
         blocks, remainder = divmod(self.offset, tarfile.RECORDSIZE) #@UnusedVariable
-        self.offset = 0l
+        self.offset = 0
         return '\0' * (tarfile.RECORDSIZE - remainder) # remainder can be 0
 
     def __iter__(self):

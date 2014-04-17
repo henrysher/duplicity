@@ -158,7 +158,7 @@ def from_base36(s):
     """
     Convert string s in base 36 to long int
     """
-    total = 0L
+    total = 0
     for i in range(len(s)):
         total *= 36
         digit_ord = ord(s[i])

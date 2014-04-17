@@ -40,7 +40,6 @@ class Python3ReadinessTest(unittest.TestCase):
                                           "--nofix=imports",
                                           "--nofix=map",
                                           "--nofix=next",
-                                          "--nofix=numliterals",
                                           "--nofix=print",
                                           "--nofix=types",
                                           "--nofix=unicode",
