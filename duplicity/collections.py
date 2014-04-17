@@ -96,7 +96,7 @@ class BackupSet:
             self.set_manifest(filename)
         else:
             assert pr.volume_number is not None
-            assert not self.volume_name_dict.has_key(pr.volume_number), \
+            assert pr.volume_number not in self.volume_name_dict, \
                    (self.volume_name_dict, filename)
             self.volume_name_dict[pr.volume_number] = filename
 
@@ -916,7 +916,7 @@ class CollectionsStatus:
         # Build dictionary from end_times to lists of corresponding chains
         endtime_chain_dict = {}
         for chain in chain_list:
-            if endtime_chain_dict.has_key(chain.end_time):
+            if chain.end_time in endtime_chain_dict:
                 endtime_chain_dict[chain.end_time].append(chain)
             else:
                 endtime_chain_dict[chain.end_time] = [chain]

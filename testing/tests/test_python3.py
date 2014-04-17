@@ -35,7 +35,6 @@ class Python3ReadinessTest(unittest.TestCase):
         output = subprocess.check_output(["2to3",
                                           "--nofix=dict",
                                           "--nofix=filter",
-                                          "--nofix=has_key",
                                           "--nofix=map",
                                           "--nofix=next",
                                           "--nofix=print",

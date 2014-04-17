@@ -44,20 +44,20 @@ class SwiftBackend(duplicity.backend.Backend):
         conn_kwargs = {}
 
         # if the user has already authenticated
-        if os.environ.has_key('SWIFT_PREAUTHURL') and os.environ.has_key('SWIFT_PREAUTHTOKEN'):
+        if 'SWIFT_PREAUTHURL' in os.environ and 'SWIFT_PREAUTHTOKEN' in os.environ:
             conn_kwargs['preauthurl'] = os.environ['SWIFT_PREAUTHURL']
             conn_kwargs['preauthtoken'] = os.environ['SWIFT_PREAUTHTOKEN']           
         
         else:
-            if not os.environ.has_key('SWIFT_USERNAME'):
+            if 'SWIFT_USERNAME' not in os.environ:
                 raise BackendException('SWIFT_USERNAME environment variable '
                                        'not set.')
 
-            if not os.environ.has_key('SWIFT_PASSWORD'):
+            if 'SWIFT_PASSWORD' not in os.environ:
                 raise BackendException('SWIFT_PASSWORD environment variable '
                                        'not set.')
 
-            if not os.environ.has_key('SWIFT_AUTHURL'):
+            if 'SWIFT_AUTHURL' not in os.environ:
                 raise BackendException('SWIFT_AUTHURL environment variable '
                                        'not set.')
 
@@ -65,11 +65,11 @@ class SwiftBackend(duplicity.backend.Backend):
             conn_kwargs['key'] = os.environ['SWIFT_PASSWORD']
             conn_kwargs['authurl'] = os.environ['SWIFT_AUTHURL']
 
-        if os.environ.has_key('SWIFT_AUTHVERSION'):
+        if 'SWIFT_AUTHVERSION' in os.environ:
             conn_kwargs['auth_version'] = os.environ['SWIFT_AUTHVERSION']
         else:
             conn_kwargs['auth_version'] = '1'
-        if os.environ.has_key('SWIFT_TENANTNAME'):
+        if 'SWIFT_TENANTNAME' in os.environ:
             conn_kwargs['tenant_name'] = os.environ['SWIFT_TENANTNAME']
             
         self.container = parsed_url.path.lstrip('/')

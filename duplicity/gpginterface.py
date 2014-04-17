@@ -353,14 +353,14 @@ class GnuPG:
         if attach_fhs == None: attach_fhs = {}
 
         for std in _stds:
-            if not attach_fhs.has_key(std) \
+            if std not in attach_fhs \
                and std not in create_fhs:
                 attach_fhs.setdefault(std, getattr(sys, std))
 
         handle_passphrase = 0
 
         if self.passphrase != None \
-           and not attach_fhs.has_key('passphrase') \
+           and 'passphrase' not in attach_fhs \
            and 'passphrase' not in create_fhs:
             handle_passphrase = 1
             create_fhs.append('passphrase')
@@ -384,7 +384,7 @@ class GnuPG:
         process = Process()
 
         for fh_name in create_fhs + attach_fhs.keys():
-            if not _fd_modes.has_key(fh_name):
+            if fh_name not in _fd_modes:
                 raise KeyError(
                       "unrecognized filehandle name '%s'; must be one of %s" \
                       % (fh_name, _fd_modes.keys()))
@@ -392,7 +392,7 @@ class GnuPG:
         for fh_name in create_fhs:
             # make sure the user doesn't specify a filehandle
             # to be created *and* attached
-            if attach_fhs.has_key(fh_name):
+            if fh_name in attach_fhs:
                 raise ValueError(
                       "cannot have filehandle '%s' in both create_fhs and attach_fhs" \
                       % fh_name)

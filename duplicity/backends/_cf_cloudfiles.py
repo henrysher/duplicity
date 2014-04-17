@@ -44,17 +44,17 @@ class CloudFilesBackend(duplicity.backend.Backend):
         self.resp_exc = ResponseError
         conn_kwargs = {}
 
-        if not os.environ.has_key('CLOUDFILES_USERNAME'):
+        if 'CLOUDFILES_USERNAME' not in os.environ:
             raise BackendException('CLOUDFILES_USERNAME environment variable'
                                    'not set.')
 
-        if not os.environ.has_key('CLOUDFILES_APIKEY'):
+        if 'CLOUDFILES_APIKEY' not in os.environ:
             raise BackendException('CLOUDFILES_APIKEY environment variable not set.')
 
         conn_kwargs['username'] = os.environ['CLOUDFILES_USERNAME']
         conn_kwargs['api_key'] = os.environ['CLOUDFILES_APIKEY']
 
-        if os.environ.has_key('CLOUDFILES_AUTHURL'):
+        if 'CLOUDFILES_AUTHURL' in os.environ:
             conn_kwargs['authurl'] = os.environ['CLOUDFILES_AUTHURL']
         else:
             conn_kwargs['authurl'] = consts.default_authurl
