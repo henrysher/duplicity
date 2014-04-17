@@ -186,7 +186,7 @@ class SwiftBackend(duplicity.backend.Backend):
     def _query_file_info(self, filename, raise_errors=False):
         try:
             sobject = self.conn.head_object(self.container, filename)
-            return {'size': long(sobject['content-length'])}
+            return {'size': int(sobject['content-length'])}
         except self.resp_exc:
             return {'size': -1}
         except Exception as e:

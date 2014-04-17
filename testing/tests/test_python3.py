@@ -50,7 +50,6 @@ class Python3ReadinessTest(unittest.TestCase):
         # but which 2to3 can fix for us better automatically.
                                           "--nofix=callable",
                                           "--nofix=future",
-                                          "--nofix=long",
                                           "--nofix=raw_input",
                                           "--nofix=urllib",
                                           _top_dir],
