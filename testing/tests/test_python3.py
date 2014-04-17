@@ -33,7 +33,6 @@ class Python3ReadinessTest(unittest.TestCase):
 
         # As we modernize the source code, we can remove more and more nofixes
         output = subprocess.check_output(["2to3",
-                                          "--nofix=apply",
                                           "--nofix=basestring",
                                           "--nofix=callable",
                                           "--nofix=dict",

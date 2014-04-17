@@ -104,7 +104,7 @@ class StatsObj:
         if not index:
             filename = "."
         else:
-            filename = apply(os.path.join, index)
+            filename = os.path.join(*index)
             if use_repr:
                 # use repr to quote newlines in relative filename, then
                 # take of leading and trailing quote and quote spaces.
