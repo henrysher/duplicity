@@ -190,7 +190,6 @@ def _ensure_urlparser_initialized():
                                      'hsi',
                                      'rsync',
                                      's3',
-                                     'u1',
                                      'scp', 'ssh', 'sftp',
                                      'webdav', 'webdavs',
                                      'gdocs',
