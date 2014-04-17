@@ -40,7 +40,6 @@ class Python3ReadinessTest(unittest.TestCase):
                                           "--nofix=filter",
                                           "--nofix=future",
                                           "--nofix=has_key",
-                                          "--nofix=idioms",
                                           "--nofix=import",
                                           "--nofix=imports",
                                           "--nofix=long",
