@@ -34,10 +34,8 @@ class Python3ReadinessTest(unittest.TestCase):
         # As we modernize the source code, we can remove more and more nofixes
         output = subprocess.check_output(["2to3",
                                           "--nofix=basestring",
-                                          "--nofix=callable",
                                           "--nofix=dict",
                                           "--nofix=filter",
-                                          "--nofix=future",
                                           "--nofix=has_key",
                                           "--nofix=import",
                                           "--nofix=imports",
@@ -53,6 +51,10 @@ class Python3ReadinessTest(unittest.TestCase):
                                           "--nofix=unicode",
                                           "--nofix=urllib",
                                           "--nofix=xrange",
+        # The following fixes we don't want to remove, since they are false
+        # positives or things we don't care about.
+                                          "--nofix=callable",
+                                          "--nofix=future",
                                           _top_dir],
                                          stderr=subprocess.PIPE)
         self.assertEqual("", output, output)
