@@ -51,7 +51,7 @@ class Par2WrapperBackend(backend.Backend):
         temp-filename later on. So first of all create a tempdir and symlink
         the soure_path with remote_filename into this. 
         """
-        from pexpect
+        import pexpect
         if remote_filename is None:
             remote_filename = source_path.get_filename()
 
@@ -89,7 +89,7 @@ class Par2WrapperBackend(backend.Backend):
         If "par2 verify" detect an error transfer the Par2-volumes into the
         temp-dir and try to repair.
         """
-        from pexpect
+        import pexpect
         par2temp = local_path.get_temp_in_same_dir()
         par2temp.mkdir()
         local_path_temp = par2temp.append(remote_filename)
