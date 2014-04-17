@@ -44,7 +44,6 @@ class Python3ReadinessTest(unittest.TestCase):
                                           "--nofix=print",
                                           "--nofix=types",
                                           "--nofix=unicode",
-                                          "--nofix=urllib",
                                           "--nofix=xrange",
         # The following fixes we don't want to remove, since they are false
         # positives, things we don't care about, or real incompatibilities
@@ -53,6 +52,7 @@ class Python3ReadinessTest(unittest.TestCase):
                                           "--nofix=future",
                                           "--nofix=long",
                                           "--nofix=raw_input",
+                                          "--nofix=urllib",
                                           _top_dir],
                                          stderr=subprocess.PIPE)
         self.assertEqual("", output, output)
