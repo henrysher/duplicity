@@ -54,7 +54,6 @@ class Python3ReadinessTest(unittest.TestCase):
                                           "--nofix=types",
                                           "--nofix=unicode",
                                           "--nofix=urllib",
-                                          "--nofix=ws_comma",
                                           "--nofix=xrange",
                                           _top_dir],
                                          stderr=subprocess.PIPE)
