@@ -29,6 +29,7 @@ import os.path
 import urllib
 import re
 import locale, sys
+from functools import reduce
 
 import traceback, StringIO
 from exceptions import Exception

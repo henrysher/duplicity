@@ -21,6 +21,7 @@
 
 import helper
 import unittest, pickle, sys
+from functools import reduce
 
 from duplicity.lazy import * #@UnusedWildImport
 
