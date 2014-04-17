@@ -37,14 +37,19 @@ Enhancements:
   - Fixes https://bugs.launchpad.net/duplicity/+bug/426282
 * Merged in lp:~fredrik-loch/duplicity/duplicity-S3-SSE
   - Adds support for server side encryption as requested in Bug #996660
-* Merged in lp:~mterry/duplicity/consolidate-tests
-  - Consolidate all the duplicity-running code in the test framework.
-  - This takes the four test files [1] that run duplicity itself (i.e. the
-    high-level functional test files) and consolidates their code. Before, it
-    was madness. Each one had its own run_duplicity method, with its own
-    slightly tweaked features. This should reduce a lot of duplication.
-  - [1] cleanuptest.py, finaltest.py, restarttest.py, and badupload.py
-
+* Merged in lp:~mterry/duplicity/modern-testing
+  - Enable/use more modern testing tools like nosetests and tox as well as more
+    common setup.py hooks like test and sdist.
+  - Specifically:
+    * move setup.py to toplevel where most tools and users expect it
+    * Move and adjust test files to work when running "nosetests" in toplevel
+      directory. Specifically, do a lot more of the test setup in
+      tests/__init__.py rather than the run-tests scripts
+    * Add small tox.ini file for using tox, which is a wrapper for using
+      virtualenv. Only enable for py26 and py27 right now, since modern
+      setuptools dropped support for <2.6 (and tox 1.7 recently dropped <2.6)
+    * Add setup.py hooks for test and sdist which are both standard targets
+      (sdist just outsources to dist/makedist right now)
 
 New in v0.6.23 (2014/01/24)
 ---------------------------

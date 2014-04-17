@@ -23,7 +23,6 @@
 import os, re, shutil, time, sys, subprocess
 
 SourceDir = "duplicity"
-DistDir = "dist"
 
 # Various details about the files must also be specified by the rpm
 # spec template.
@@ -89,7 +88,7 @@ def MakeTar():
                   os.path.join(tardir, "bin", "duplicity.1"))
     VersionedCopy(os.path.join("bin", "rdiffdir.1"),
                   os.path.join(tardir, "bin", "rdiffdir.1"))
-    VersionedCopy(os.path.join(DistDir, "setup.py"),
+    VersionedCopy("setup.py",
                   os.path.join(tardir, "setup.py"))
 
     # make sure executables are

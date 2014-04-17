@@ -33,10 +33,6 @@ import threading
 from datetime import datetime
 from lockfile import FileLock
 
-pwd = os.path.abspath(os.path.dirname(sys.argv[0]))
-if os.path.exists(os.path.join(pwd, "../duplicity")):
-    sys.path.insert(0, os.path.abspath(os.path.join(pwd, "../.")))
-
 from duplicity import log
 log.setup()
 

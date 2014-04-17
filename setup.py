@@ -21,7 +21,10 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import sys, os
-from distutils.core import setup, Extension
+from setuptools import setup, Extension
+from setuptools.command.test import test
+from setuptools.command.install import install
+from setuptools.command.sdist import sdist
 
 version_string = "$version"
 
@@ -55,8 +58,9 @@ data_files = [('share/man/man1',
                 'CHANGELOG']),
               ]
 
-assert os.path.exists("po"), "Missing 'po' directory."
-for root, dirs, files in os.walk("po"):
+top_dir = os.path.dirname(os.path.abspath(__file__))
+assert os.path.exists(os.path.join(top_dir, "po")), "Missing 'po' directory."
+for root, dirs, files in os.walk(os.path.join(top_dir, "po")):
     for file in files:
         path = os.path.join(root, file)
         if path.endswith("duplicity.mo"):
@@ -64,6 +68,61 @@ for root, dirs, files in os.walk("po"):
             data_files.append(
                 ('share/locale/%s/LC_MESSAGES' % lang,
                  ["po/%s/duplicity.mo" % lang]))
+
+
+class TestCommand(test):
+    def run(self):
+        # Make sure all modules are ready
+        build_cmd = self.get_finalized_command("build_py")
+        build_cmd.run()
+        # And make sure our scripts are ready
+        build_scripts_cmd = self.get_finalized_command("build_scripts")
+        build_scripts_cmd.run()
+
+        # make symlinks for test data
+        if build_cmd.build_lib != top_dir:
+            for path in ['testfiles.tar.gz', 'testtar.tar', 'gnupg']:
+                src = os.path.join(top_dir, 'testing', path)
+                target = os.path.join(build_cmd.build_lib, 'testing', path)
+                try:
+                    os.symlink(src, target)
+                except Exception:
+                    pass
+
+        os.environ['PATH'] = "%s:%s" % (
+            os.path.abspath(build_scripts_cmd.build_dir),
+            os.environ.get('PATH'))
+
+        test.run(self)
+
+
+class InstallCommand(install):
+    def run(self):
+        # Normally, install will call build().  But we want to delete the
+        # testing dir between building and installing.  So we manually build
+        # and mark ourselves to skip building when we run() for real.
+        self.run_command('build')
+        self.skip_build = True
+
+        # This should always be true, but just to make sure!
+        if self.build_lib != top_dir:
+            testing_dir = os.path.join(self.build_lib, 'testing')
+            os.system("rm -rf %s" % testing_dir)
+
+        install.run(self)
+
+
+# TODO: move logic from dist/makedist inline
+class SDistCommand(sdist):
+    def run(self):
+        version = version_string
+        if version[0] == '$':
+            version = "0"
+        os.system(os.path.join(top_dir, "dist", "makedist") + " " + version)
+        os.system("rm -f duplicity.spec")
+        os.system("mkdir -p " + self.dist_dir)
+        os.system("mv duplicity-" + version + ".tar.gz " + self.dist_dir)
+
 
 setup(name="duplicity",
       version=version_string,
@@ -74,7 +133,10 @@ setup(name="duplicity",
       maintainer_email="kenneth@loafman.com",
       url="http://duplicity.nongnu.org/index.html",
       packages = ['duplicity',
-                  'duplicity.backends',],
+                  'duplicity.backends',
+                  'testing',
+                  'testing.helpers',
+                  'testing.tests'],
       package_dir = {"duplicity" : "duplicity",
                      "duplicity.backends" : "duplicity/backends",},
       ext_modules = [Extension("duplicity._librsync",
@@ -84,4 +146,9 @@ setup(name="duplicity",
                                libraries=["rsync"])],
       scripts = ['bin/rdiffdir', 'bin/duplicity'],
       data_files = data_files,
+      tests_require = ['lockfile', 'mock', 'nose'],
+      test_suite = 'nose.collector',
+      cmdclass={'test': TestCommand,
+                'install': InstallCommand,
+                'sdist': SDistCommand},
       )

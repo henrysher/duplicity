@@ -27,12 +27,11 @@ from duplicity import path
 
 helper.setup()
 
-default_profile = gpg.GPGProfile(passphrase = "foobar")
-
 class GPGTest(unittest.TestCase):
     """Test GPGFile"""
     def setUp(self):
         assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
+        self.default_profile = gpg.GPGProfile(passphrase = "foobar")
 
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
@@ -47,7 +46,7 @@ class GPGTest(unittest.TestCase):
         self.deltmp()
         epath = path.Path("testfiles/output/encrypted_file")
         if not profile:
-            profile = default_profile
+            profile = self.default_profile
         encrypted_file = gpg.GPGFile(1, epath, profile)
         encrypted_file.write(s)
         encrypted_file.close()

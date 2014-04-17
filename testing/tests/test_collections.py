@@ -70,20 +70,6 @@ filename_list2 = ["duplicity-full.2001-01-01T16:17:01-07:00.manifest.gpg",
                   "duplicity-inc.2000-08-17T16:17:01-07:00.to.2000-08-18T00:04:30-07:00.vol1.difftar.gpg",
                   "Extra stuff to be ignored"]
 
-assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
-
-col_test_dir = path.Path("testfiles/collectionstest")
-archive_dir = col_test_dir.append("archive_dir")
-globals.archive_dir = archive_dir
-archive_dir_backend = backend.get_backend("file://testfiles/collectionstest"
-                                           "/archive_dir")
-
-dummy_backend = None
-real_backend = backend.get_backend("file://%s/%s" %
-                                   (col_test_dir.name, "remote_dir"))
-output_dir = path.Path("testfiles/output") # used as a temp directory
-output_dir_backend = backend.get_backend("file://testfiles/output")
-
 
 class CollectionTest(unittest.TestCase):
     """Test collections"""
@@ -91,13 +77,24 @@ class CollectionTest(unittest.TestCase):
         assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
         assert not os.system("mkdir testfiles/output")
 
+        col_test_dir = path.Path("testfiles/collectionstest")
+        archive_dir = col_test_dir.append("archive_dir")
+        globals.archive_dir = archive_dir
+        self.archive_dir_backend = backend.get_backend("file://testfiles/collectionstest"
+                                                       "/archive_dir")
+
+        self.real_backend = backend.get_backend("file://%s/%s" %
+                                                (col_test_dir.name, "remote_dir"))
+        self.output_dir = path.Path("testfiles/output") # used as a temp directory
+        self.output_dir_backend = backend.get_backend("file://testfiles/output")
+
     def tearDown(self):
         assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     def del_tmp(self):
         """Reset the testfiles/output directory"""
-        output_dir.deltree()
-        output_dir.mkdir()
+        self.output_dir.deltree()
+        self.output_dir.mkdir()
 
     def set_gpg_profile(self):
         """Set gpg profile to standard "foobar" sym"""
@@ -106,7 +103,7 @@ class CollectionTest(unittest.TestCase):
     def test_backup_chains(self):
         """Test basic backup chain construction"""
         random.shuffle(filename_list1)
-        cs = collections.CollectionsStatus(dummy_backend, archive_dir)
+        cs = collections.CollectionsStatus(None, globals.archive_dir)
         chains, orphaned, incomplete = cs.get_backup_chains(filename_list1) #@UnusedVariable
         if len(chains) != 1 or len(orphaned) != 0:
             print chains
@@ -127,26 +124,26 @@ class CollectionTest(unittest.TestCase):
             assert cs.matched_chain_pair[0].end_time == 1029826800L
             assert len(cs.all_backup_chains) == 1, cs.all_backup_chains
 
-        cs = collections.CollectionsStatus(real_backend, archive_dir).set_values()
+        cs = collections.CollectionsStatus(self.real_backend, globals.archive_dir).set_values()
         check_cs(cs)
         assert cs.matched_chain_pair[0].islocal()
 
     def test_sig_chain(self):
         """Test a single signature chain"""
-        chain = collections.SignatureChain(1, archive_dir)
+        chain = collections.SignatureChain(1, globals.archive_dir)
         for filename in local_sigchain_filename_list:
             assert chain.add_filename(filename)
         assert not chain.add_filename("duplicity-new-signatures.2002-08-18T00:04:30-07:00.to.2002-08-20T00:00:00-07:00.sigtar.gpg")
 
     def test_sig_chains(self):
         """Test making signature chains from filename list"""
-        cs = collections.CollectionsStatus(dummy_backend, archive_dir)
+        cs = collections.CollectionsStatus(None, globals.archive_dir)
         chains, orphaned_paths = cs.get_signature_chains(local = 1)
         self.sig_chains_helper(chains, orphaned_paths)
 
     def test_sig_chains2(self):
         """Test making signature chains from filename list on backend"""
-        cs = collections.CollectionsStatus(archive_dir_backend, archive_dir)
+        cs = collections.CollectionsStatus(self.archive_dir_backend, globals.archive_dir)
         chains, orphaned_paths = cs.get_signature_chains(local = None)
         self.sig_chains_helper(chains, orphaned_paths)
 
@@ -161,16 +158,16 @@ class CollectionTest(unittest.TestCase):
     def sigchain_fileobj_get(self, local):
         """Return chain, local if local is true with filenames added"""
         if local:
-            chain = collections.SignatureChain(1, archive_dir)
+            chain = collections.SignatureChain(1, globals.archive_dir)
             for filename in local_sigchain_filename_list:
                 assert chain.add_filename(filename)
         else:
-            chain = collections.SignatureChain(None, real_backend)
+            chain = collections.SignatureChain(None, self.real_backend)
             for filename in remote_sigchain_filename_list:
                 assert chain.add_filename(filename)
         return chain
 
-    def sigchain_fileobj_testlist(self, chain):
+    def sigchain_fileobj_check_list(self, chain):
         """Make sure the list of file objects in chain has right contents
 
         The contents of the testfiles/collectiontest/remote_dir have
@@ -190,18 +187,18 @@ class CollectionTest(unittest.TestCase):
     def test_sigchain_fileobj(self):
         """Test getting signature chain fileobjs from archive_dir"""
         self.set_gpg_profile()
-        self.sigchain_fileobj_testlist(self.sigchain_fileobj_get(1))
-        self.sigchain_fileobj_testlist(self.sigchain_fileobj_get(None))
+        self.sigchain_fileobj_check_list(self.sigchain_fileobj_get(1))
+        self.sigchain_fileobj_check_list(self.sigchain_fileobj_get(None))
 
     def get_filelist2_cs(self):
         """Return set CollectionsStatus object from filelist 2"""
         # Set up testfiles/output with files from filename_list2
         self.del_tmp()
         for filename in filename_list2:
-            p = output_dir.append(filename)
+            p = self.output_dir.append(filename)
             p.touch()
 
-        cs = collections.CollectionsStatus(output_dir_backend, archive_dir)
+        cs = collections.CollectionsStatus(self.output_dir_backend, globals.archive_dir)
         cs.set_values()
         return cs
 
