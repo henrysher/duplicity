@@ -80,7 +80,7 @@ def maybe_ignore_errors(fn):
     """
     try:
         return fn()
-    except Exception, e:
+    except Exception as e:
         if globals.ignore_errors:
             log.Warn(_("IGNORED_ERROR: Warning: ignoring error as requested: %s: %s")
                      % (e.__class__.__name__, str(e)))
@@ -131,7 +131,7 @@ def ignore_missing(fn, filename):
     """
     try:
         fn(filename)
-    except OSError, ex:
+    except OSError as ex:
         if ex.errno == errno.ENOENT:
             pass
         else:

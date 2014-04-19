@@ -111,8 +111,8 @@ class CollectionTest(unittest.TestCase):
             assert 0
 
         chain = chains[0]
-        assert chain.end_time == 1029654270L
-        assert chain.fullset.time == 1029626221L
+        assert chain.end_time == 1029654270
+        assert chain.fullset.time == 1029626221
 
     def test_collections_status(self):
         """Test CollectionStatus object's set_values()"""
@@ -121,7 +121,7 @@ class CollectionTest(unittest.TestCase):
             assert cs.values_set
 
             assert cs.matched_chain_pair
-            assert cs.matched_chain_pair[0].end_time == 1029826800L
+            assert cs.matched_chain_pair[0].end_time == 1029826800
             assert len(cs.all_backup_chains) == 1, cs.all_backup_chains
 
         cs = collections.CollectionsStatus(self.real_backend, globals.archive_dir).set_values()
@@ -153,7 +153,7 @@ class CollectionTest(unittest.TestCase):
             for op in orphaned_paths: print op
             assert 0
         assert len(chains) == 1, chains
-        assert chains[0].end_time == 1029826800L
+        assert chains[0].end_time == 1029826800
 
     def sigchain_fileobj_get(self, local):
         """Return chain, local if local is true with filenames added"""

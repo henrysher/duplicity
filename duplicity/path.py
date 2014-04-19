@@ -500,7 +500,7 @@ class Path(ROPath):
         """Refresh stat cache"""
         try:
             self.stat = os.lstat(self.name)
-        except OSError, e:
+        except OSError as e:
             err_string = errno.errorcode[e[0]]
             if err_string in ["ENOENT", "ENOTDIR", "ELOOP", "ENOTCONN"]:
                 self.stat, self.type = None, None # file doesn't exist

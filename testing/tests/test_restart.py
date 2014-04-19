@@ -326,7 +326,7 @@ class RestartTestWithoutEncryption(RestartTest):
         self.backup("full", "testfiles/blocktartest")
         # Create an exact clone of the snapshot folder in the sigtar already.
         # Permissions and mtime must match.
-        os.mkdir("testfiles/snapshot", 0755)
+        os.mkdir("testfiles/snapshot", 0o755)
         os.utime("testfiles/snapshot", (1030384548, 1030384548))
         # Adjust the sigtar.gz file to have a bogus second snapshot/ entry
         # at the beginning.

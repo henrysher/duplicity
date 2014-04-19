@@ -22,6 +22,6 @@ from duplicity import globals
 
 if (globals.cf_backend and
     globals.cf_backend.lower().strip() == 'pyrax'):
-    import _cf_pyrax
+    from . import _cf_pyrax
 else:
-    import _cf_cloudfiles
+    from . import _cf_cloudfiles

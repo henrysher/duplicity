@@ -44,20 +44,20 @@ class SwiftBackend(duplicity.backend.Backend):
         conn_kwargs = {}
 
         # if the user has already authenticated
-        if os.environ.has_key('SWIFT_PREAUTHURL') and os.environ.has_key('SWIFT_PREAUTHTOKEN'):
+        if 'SWIFT_PREAUTHURL' in os.environ and 'SWIFT_PREAUTHTOKEN' in os.environ:
             conn_kwargs['preauthurl'] = os.environ['SWIFT_PREAUTHURL']
             conn_kwargs['preauthtoken'] = os.environ['SWIFT_PREAUTHTOKEN']           
         
         else:
-            if not os.environ.has_key('SWIFT_USERNAME'):
+            if 'SWIFT_USERNAME' not in os.environ:
                 raise BackendException('SWIFT_USERNAME environment variable '
                                        'not set.')
 
-            if not os.environ.has_key('SWIFT_PASSWORD'):
+            if 'SWIFT_PASSWORD' not in os.environ:
                 raise BackendException('SWIFT_PASSWORD environment variable '
                                        'not set.')
 
-            if not os.environ.has_key('SWIFT_AUTHURL'):
+            if 'SWIFT_AUTHURL' not in os.environ:
                 raise BackendException('SWIFT_AUTHURL environment variable '
                                        'not set.')
 
@@ -65,11 +65,11 @@ class SwiftBackend(duplicity.backend.Backend):
             conn_kwargs['key'] = os.environ['SWIFT_PASSWORD']
             conn_kwargs['authurl'] = os.environ['SWIFT_AUTHURL']
 
-        if os.environ.has_key('SWIFT_AUTHVERSION'):
+        if 'SWIFT_AUTHVERSION' in os.environ:
             conn_kwargs['auth_version'] = os.environ['SWIFT_AUTHVERSION']
         else:
             conn_kwargs['auth_version'] = '1'
-        if os.environ.has_key('SWIFT_TENANTNAME'):
+        if 'SWIFT_TENANTNAME' in os.environ:
             conn_kwargs['tenant_name'] = os.environ['SWIFT_TENANTNAME']
             
         self.container = parsed_url.path.lstrip('/')
@@ -77,7 +77,7 @@ class SwiftBackend(duplicity.backend.Backend):
         try:
             self.conn = Connection(**conn_kwargs)
             self.conn.put_container(self.container)
-        except Exception, e:
+        except Exception as e:
             log.FatalError("Connection failed: %s %s"
                            % (e.__class__.__name__, str(e)),
                            log.ErrorCode.connection_failed)
@@ -93,10 +93,10 @@ class SwiftBackend(duplicity.backend.Backend):
                                      remote_filename, 
                                      file(source_path.name))
                 return
-            except self.resp_exc, error:
+            except self.resp_exc as error:
                 log.Warn("Upload of '%s' failed (attempt %d): Swift server returned: %s %s"
                          % (remote_filename, n, error.http_status, error.message))
-            except Exception, e:
+            except Exception as e:
                 log.Warn("Upload of '%s' failed (attempt %s): %s: %s"
                         % (remote_filename, n, e.__class__.__name__, str(e)))
                 log.Debug("Backtrace of previous error: %s"
@@ -117,10 +117,10 @@ class SwiftBackend(duplicity.backend.Backend):
                     f.write(chunk)
                 local_path.setdata()
                 return
-            except self.resp_exc, resperr:
+            except self.resp_exc as resperr:
                 log.Warn("Download of '%s' failed (attempt %s): Swift server returned: %s %s"
                          % (remote_filename, n, resperr.http_status, resperr.message))
-            except Exception, e:
+            except Exception as e:
                 log.Warn("Download of '%s' failed (attempt %s): %s: %s"
                          % (remote_filename, n, e.__class__.__name__, str(e)))
                 log.Debug("Backtrace of previous error: %s"
@@ -139,10 +139,10 @@ class SwiftBackend(duplicity.backend.Backend):
                 # to make multiple requests to get them all.
                 headers, objs = self.conn.get_container(self.container)
                 return [ o['name'] for o in objs ]
-            except self.resp_exc, resperr:
+            except self.resp_exc as resperr:
                 log.Warn("Listing of '%s' failed (attempt %s): Swift server returned: %s %s"
                          % (self.container, n, resperr.http_status, resperr.message))
-            except Exception, e:
+            except Exception as e:
                 log.Warn("Listing of '%s' failed (attempt %s): %s: %s"
                          % (self.container, n, e.__class__.__name__, str(e)))
                 log.Debug("Backtrace of previous error: %s"
@@ -159,14 +159,14 @@ class SwiftBackend(duplicity.backend.Backend):
             try:
                 self.conn.delete_object(self.container, remote_filename)
                 return
-            except self.resp_exc, resperr:
+            except self.resp_exc as resperr:
                 if n > 1 and resperr.http_status == 404:
                     # We failed on a timeout, but delete succeeded on the server
                     log.Warn("Delete of '%s' missing after retry - must have succeded earlier" % remote_filename )
                     return
                 log.Warn("Delete of '%s' failed (attempt %s): Swift server returned: %s %s"
                          % (remote_filename, n, resperr.http_status, resperr.message))
-            except Exception, e:
+            except Exception as e:
                 log.Warn("Delete of '%s' failed (attempt %s): %s: %s"
                          % (remote_filename, n, e.__class__.__name__, str(e)))
                 log.Debug("Backtrace of previous error: %s"
@@ -186,10 +186,10 @@ class SwiftBackend(duplicity.backend.Backend):
     def _query_file_info(self, filename, raise_errors=False):
         try:
             sobject = self.conn.head_object(self.container, filename)
-            return {'size': long(sobject['content-length'])}
+            return {'size': int(sobject['content-length'])}
         except self.resp_exc:
             return {'size': -1}
-        except Exception, e:
+        except Exception as e:
             log.Warn("Error querying '%s/%s': %s"
                      "" % (self.container,
                            filename,

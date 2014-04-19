@@ -80,7 +80,7 @@ class MegaBackend(duplicity.backend.Backend):
 
             self.client.upload(source_path.get_canonical(), self.folder, dest_filename=remote_filename)
 
-        except Exception, e:
+        except Exception as e:
             self.__handle_error("Failed to upload file '%s' to remote folder '%s': %s"
                                 % (source_path.get_canonical(), self.__get_node_name(self.folder), str(e)), raise_errors)
 
@@ -100,7 +100,7 @@ class MegaBackend(duplicity.backend.Backend):
             else:
                 self.__handle_error("Failed to find file '%s' in remote folder '%s'"
                                     % (remote_filename, self.__get_node_name(self.folder)), raise_errors)
-        except Exception, e:
+        except Exception as e:
             self.__handle_error("Failed to download file '%s' in remote folder '%s': %s"
                                  % (remote_filename, self.__get_node_name(self.folder), str(e)), raise_errors)
 
@@ -110,7 +110,7 @@ class MegaBackend(duplicity.backend.Backend):
         try:
             entries = self.client.get_files_in_node(self.folder)
             return [ self.client.get_name_from_file({entry:entries[entry]}) for entry in entries]
-        except Exception, e:
+        except Exception as e:
             self.__handle_error("Failed to fetch list of files in remote folder '%s': %s"
                                 % (self.__get_node_name(self.folder), str(e)), raise_errors)
 
@@ -129,7 +129,7 @@ class MegaBackend(duplicity.backend.Backend):
                 else:
                     log.Warn("Failed to fetch file '%s' in remote folder '%s'"
                              % (filename, self.__get_node_name(self.folder)))
-            except Exception, e:
+            except Exception as e:
                 self.__handle_error("Failed to remove file '%s' in remote folder '%s': %s"
                                     % (filename, self.__get_node_name(self.folder), str(e)), raise_errors)
 
@@ -147,7 +147,7 @@ class MegaBackend(duplicity.backend.Backend):
     def __authorize(self, email, password):
         try:
             self.client.login(email, password)
-        except Exception, e:
+        except Exception as e:
             self.__handle_error('Error while authenticating client: %s.' % str(e))
 
     def __filter_entries(self, entries, parent_id=None, title=None, type=None):
@@ -169,7 +169,7 @@ class MegaBackend(duplicity.backend.Backend):
                 result.update({k:v})
 
             return result
-        except Exception, e:
+        except Exception as e:
             self.__handle_error('Error while fetching remote entries: %s.' % str(e))
 
 duplicity.backend.register_backend('mega', MegaBackend)

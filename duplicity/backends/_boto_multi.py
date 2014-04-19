@@ -33,8 +33,8 @@ from duplicity.errors import * #@UnusedWildImport
 from duplicity.filechunkio import FileChunkIO
 from duplicity import progress
 
-from _boto_single import BotoBackend as BotoSingleBackend
-from _boto_single import get_connection
+from ._boto_single import BotoBackend as BotoSingleBackend
+from ._boto_single import get_connection
 
 BOTO_MIN_VERSION = "2.1.1"
 
@@ -63,7 +63,7 @@ class ConsumerThread(threading.Thread):
             try:
                 args = self.queue.get(True, 1)
                 progress.report_transfer(args[0], args[1])
-            except Queue.Empty, e:
+            except Queue.Empty as e:
                 pass
 
 
@@ -210,7 +210,7 @@ def multipart_upload_worker(scheme, parsed_url, storage_uri, bucket_name, multip
             conn = None
             bucket = None
             del conn
-        except Exception, e:
+        except Exception as e:
             traceback.print_exc()
             if num_retries:
                 log.Debug("%s: Upload of chunk %d failed. Retrying %d more times..." % (

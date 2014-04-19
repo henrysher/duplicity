@@ -504,7 +504,7 @@ def integrate_patch_iters( iter_list ):
             if final_ropath.exists():
                 # otherwise final patch was delete
                 yield final_ropath
-        except Exception, e:
+        except Exception as e:
             filename = normalized[-1].get_ropath().get_relative_path()
             log.Warn(_("Error '%s' patching %s") % 
                      (str(e), filename),

@@ -1,3 +1,18 @@
+2014-04-19  Kenneth Loafman  <kenneth@loafman.com>
+    * Merged in lp:~mterry/duplicity/2.6isms
+      - Here's a whole stack of minor syntax modernizations that will become
+        necessary in python3. They all work in python2.6.
+      - I've added a new test to keep us honest and prevent backsliding on these
+        modernizations. It runs 2to3 and will fail the test if 2to3 finds anything
+        that needs fixing (with a specific set of exceptions carved out).
+      - This branch has most of the easy 2to3 fixes, the ones with obvious and
+        safe syntax changes.
+      - We could just let 2to3 do them for us, but ideally we use 2to3 as little
+        as possible, since it doesn't always know how to solve a given problem.
+        I will propose a branch later that actually does use 2to3 to generate
+        python3 versions of duplicity if they are requested. But this is a first
+        step to clean up the code base.
+
 2014-04-17  Kenneth Loafman  <kenneth@loafman.com>
     * Merged in lp:~fredrik-loch/duplicity/duplicity-S3-SSE
       - Adds support for server side encryption as requested in Bug #996660
@@ -2123,11 +2138,11 @@
 
 2011-03-06  Kenneth Loafman  <kenneth@loafman.com>
 
-    700390 	Backup fails silently when target is full (sftp, verbosity=4)
+    700390     Backup fails silently when target is full (sftp, verbosity=4)
 
 2011-03-06  Kenneth Loafman  <kenneth@loafman.com>
 
-    581054 	Inverted "Current directory" "Previous directory" in error message
+    581054     Inverted "Current directory" "Previous directory" in error message
 
 2011-03-06  Kenneth Loafman  <kenneth@loafman.com>
 
@@ -2135,11 +2150,11 @@
 
 2011-03-06  Kenneth Loafman  <kenneth@loafman.com>
 
-    629984 	boto backend uses Python 2.5 conditional
+    629984     boto backend uses Python 2.5 conditional
 
 2011-03-06  Kenneth Loafman  <kenneth@loafman.com>
 
-    670891 	Cygwin: TypeError: basis_file must be a (true) file, while restoring inremental backup
+    670891     Cygwin: TypeError: basis_file must be a (true) file, while restoring inremental backup
 
 2011-03-06  Kenneth Loafman  <kenneth@loafman.com>
 
@@ -2598,7 +2613,7 @@
 
 2010-05-23  ken
 
-    550455  	 duplicity doesn't handle with large files well (change librsync.SigGenerator.sig_string to a list)
+    550455       duplicity doesn't handle with large files well (change librsync.SigGenerator.sig_string to a list)
 
 2010-03-11  Kenneth Loafman  <kenneth@loafman.com>
 

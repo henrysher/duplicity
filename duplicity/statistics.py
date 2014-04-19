@@ -104,7 +104,7 @@ class StatsObj:
         if not index:
             filename = "."
         else:
-            filename = apply(os.path.join, index)
+            filename = os.path.join(*index)
             if use_repr:
                 # use repr to quote newlines in relative filename, then
                 # take of leading and trailing quote and quote spaces.
@@ -123,7 +123,7 @@ class StatsObj:
         for attr, val_string in zip(self.stat_file_attrs,
                                     lineparts[-len(self.stat_file_attrs):]):
             try:
-                val = long(val_string)
+                val = int(val_string)
             except ValueError:
                 try:
                     val = float(val_string)
@@ -230,7 +230,7 @@ class StatsObj:
                 error(line)
             try:
                 try:
-                    val1 = long(value_string)
+                    val1 = int(value_string)
                 except ValueError:
                     val1 = None
                 val2 = float(value_string)

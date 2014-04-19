@@ -26,11 +26,11 @@ def warn_option(option, optionvar):
 
 if (globals.ssh_backend and
     globals.ssh_backend.lower().strip() == 'pexpect'):
-    import _ssh_pexpect
+    from . import _ssh_pexpect
 else:
     # take user by the hand to prevent typo driven bug reports
     if globals.ssh_backend.lower().strip() != 'paramiko':
         log.Warn(_("Warning: Selected ssh backend '%s' is neither 'paramiko nor 'pexpect'. Will use default paramiko instead.") % globals.ssh_backend)
     warn_option("--scp-command", globals.scp_command)
     warn_option("--sftp-command", globals.sftp_command)
-    import _ssh_paramiko
+    from . import _ssh_paramiko

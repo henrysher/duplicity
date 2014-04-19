@@ -264,7 +264,7 @@ class ProgressTracker():
         projection = 1.0
         if self.progress_estimation > 0:
             projection = (1.0 - self.progress_estimation) / self.progress_estimation
-        self.time_estimation = long(projection * float(self.elapsed_sum.total_seconds()))
+        self.time_estimation = int(projection * float(self.elapsed_sum.total_seconds()))
 
         # Apply values only when monotonic, so the estimates look more consistent to the human eye
         if self.progress_estimation < last_progress_estimation:
@@ -299,7 +299,7 @@ class ProgressTracker():
         volume and for the current volume
         """
         changing = max(bytecount - self.last_bytecount, 0)
-        self.total_bytecount += long(changing) # Annotate only changing bytes since last probe
+        self.total_bytecount += int(changing) # Annotate only changing bytes since last probe
         self.last_bytecount = bytecount
         if changing > 0:
             self.stall_last_time = datetime.now()

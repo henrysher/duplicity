@@ -109,7 +109,7 @@ def check_file(option, opt, value):
 def check_time(option, opt, value):
     try:
         return dup_time.genstrtotime(value)
-    except dup_time.TimeException, e:
+    except dup_time.TimeException as e:
         raise optparse.OptionValueError(str(e))
 
 def check_verbosity(option, opt, value):

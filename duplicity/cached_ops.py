@@ -34,7 +34,7 @@ class CachedCall(object):
     def __call__(self, *args):
         try:
             return self.cache[args]
-        except (KeyError, TypeError), e:
+        except (KeyError, TypeError) as e:
             result = self.f(*args)
             if not isinstance(e, TypeError):
                 # TypeError most likely means that args is not hashable

@@ -96,7 +96,7 @@ class BackupSet:
             self.set_manifest(filename)
         else:
             assert pr.volume_number is not None
-            assert not self.volume_name_dict.has_key(pr.volume_number), \
+            assert pr.volume_number not in self.volume_name_dict, \
                    (self.volume_name_dict, filename)
             self.volume_name_dict[pr.volume_number] = filename
 
@@ -222,7 +222,7 @@ class BackupSet:
         # public key w/o secret key
         try:
             manifest_buffer = self.backend.get_data(self.remote_manifest_name)
-        except GPGError, message:
+        except GPGError as message:
             #TODO: We check for gpg v1 and v2 messages, should be an error code.
             if ("secret key not available" in message.args[0] or
                 "No secret key" in message.args[0]):
@@ -916,7 +916,7 @@ class CollectionsStatus:
         # Build dictionary from end_times to lists of corresponding chains
         endtime_chain_dict = {}
         for chain in chain_list:
-            if endtime_chain_dict.has_key(chain.end_time):
+            if chain.end_time in endtime_chain_dict:
                 endtime_chain_dict[chain.end_time].append(chain)
             else:
                 endtime_chain_dict[chain.end_time] = [chain]

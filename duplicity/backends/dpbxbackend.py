@@ -29,6 +29,7 @@ import os.path
 import urllib
 import re
 import locale, sys
+from functools import reduce
 
 import traceback, StringIO
 from exceptions import Exception
@@ -80,14 +81,14 @@ def command(login_required=True):
 
             try:
                 return f(self, *args)
-            except TypeError, e:
+            except TypeError as e:
                 log_exception(e)
                 log.FatalError('dpbx type error "%s"' % (e,), log.ErrorCode.backend_code_error)
-            except rest.ErrorResponse, e:
+            except rest.ErrorResponse as e:
                 msg = e.user_error_msg or str(e)
                 log.Error('dpbx error: %s' % (msg,), log.ErrorCode.backend_command_error)
                 raise e
-            except Exception, e:
+            except Exception as e:
                 log_exception(e)
                 log.Error('dpbx code error "%s"' % (e,), log.ErrorCode.backend_code_error)
                 raise e
@@ -119,7 +120,7 @@ class DPBXBackend(duplicity.backend.Backend):
         
             def write_creds(self, token):
                 open(self.TOKEN_FILE, 'w').close() # create/reset file
-                os.chmod(self.TOKEN_FILE,0600)     # set it -rw------ (NOOP in Windows?)
+                os.chmod(self.TOKEN_FILE, 0o600)     # set it -rw------ (NOOP in Windows?)
                 # now write the content
                 f = open(self.TOKEN_FILE, 'w')
                 f.write("|".join([token.key, token.secret]))
@@ -159,7 +160,7 @@ class DPBXBackend(duplicity.backend.Backend):
         if not self.sess.is_linked():
           try: # to login to the box
             self.sess.link()
-          except rest.ErrorResponse, e:
+          except rest.ErrorResponse as e:
             log.FatalError('dpbx Error: %s\n' % str(e), log.ErrorCode.dpbx_nologin)
           if not self.sess.is_linked(): # stil not logged in
             log.FatalError("dpbx Cannot login: check your credentials",log.ErrorCode.dpbx_nologin)

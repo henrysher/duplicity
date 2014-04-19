@@ -21,6 +21,7 @@
 
 import helper
 import unittest, pickle, sys
+from functools import reduce
 
 from duplicity.lazy import * #@UnusedWildImport
 
@@ -33,7 +34,7 @@ class Iterators(unittest.TestCase):
     empty = lambda s: iter([])
 
     def __init__(self, *args):
-        apply (unittest.TestCase.__init__, (self,) + args)
+        unittest.TestCase.__init__(self, *args)
         self.falseerror = self.falseerror_maker()
         self.trueerror = self.trueerror_maker()
         self.emptygen = self.emptygen_maker()

@@ -54,7 +54,7 @@ class ImapBackend(duplicity.backend.Backend):
 
         #  Set the password
         if ( not parsed_url.password ):
-            if os.environ.has_key('IMAP_PASSWORD'):
+            if 'IMAP_PASSWORD' in os.environ:
                 password = os.environ.get('IMAP_PASSWORD')
             else:
                 password = getpass.getpass("Enter account password: ")

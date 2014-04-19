@@ -62,7 +62,7 @@ the day).""")
 def setcurtime(time_in_secs = None):
     """Sets the current time in curtime and curtimestr"""
     global curtime, curtimestr
-    t = time_in_secs or long(time.time())
+    t = time_in_secs or int(time.time())
     assert type(t) in (types.LongType, types.IntType)
     curtime, curtimestr = t, timetostring(t)
 
@@ -137,9 +137,9 @@ def stringtotime(timestring):
         # even when we're not in the same timezone that wrote the
         # string
         if len(timestring) == 16:
-            return long(utc_in_secs)
+            return int(utc_in_secs)
         else:
-            return long(utc_in_secs + tzdtoseconds(timestring[19:]))
+            return int(utc_in_secs + tzdtoseconds(timestring[19:]))
     except (TypeError, ValueError, AssertionError):
         return None
 
@@ -169,7 +169,7 @@ def inttopretty(seconds):
     if seconds == 1:
         partlist.append("1 second")
     elif not partlist or seconds > 1:
-        if isinstance(seconds, int) or isinstance(seconds, long):
+        if isinstance(seconds, (types.LongType, types.IntType)):
             partlist.append("%s seconds" % seconds)
         else:
             partlist.append("%.2f seconds" % seconds)

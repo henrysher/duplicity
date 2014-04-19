@@ -134,7 +134,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         try:
             if os.path.isfile("/etc/ssh/ssh_known_hosts"):
                 self.client.load_system_host_keys("/etc/ssh/ssh_known_hosts")
-        except Exception, e:
+        except Exception as e:
             raise BackendException("could not load /etc/ssh/ssh_known_hosts, maybe corrupt?")
         try:
             # use load_host_keys() to signal it's writable to paramiko
@@ -144,7 +144,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                 self.client.load_host_keys(file)
             else:
                 self.client._host_keys_filename = file
-        except Exception, e:
+        except Exception as e:
             raise BackendException("could not load ~/.ssh/known_hosts, maybe corrupt?")
 
         """ the next block reorganizes all host parameters into a
@@ -211,7 +211,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                                 allow_agent=True, 
                                 look_for_keys=True,
                                 key_filename=self.config['identityfile'])
-        except Exception, e:
+        except Exception as e:
             raise BackendException("ssh connection to %s@%s:%d failed: %s" % (
                                     self.config['user'],
                                     self.config['hostname'],
@@ -229,7 +229,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         else:
             try:
                 self.sftp=self.client.open_sftp()
-            except Exception, e:
+            except Exception as e:
                 raise BackendException("sftp negotiation failed: %s" % e)
 
 
@@ -244,17 +244,17 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                         continue
                     try:
                         attrs=self.sftp.stat(d)
-                    except IOError, e:
+                    except IOError as e:
                         if e.errno == errno.ENOENT:
                             try:
                                 self.sftp.mkdir(d)
-                            except Exception, e:
+                            except Exception as e:
                                 raise BackendException("sftp mkdir %s failed: %s" % (self.sftp.normalize(".")+"/"+d,e))
                         else:
                             raise BackendException("sftp stat %s failed: %s" % (self.sftp.normalize(".")+"/"+d,e))
                     try:
                         self.sftp.chdir(d)
-                    except Exception, e:
+                    except Exception as e:
                         raise BackendException("sftp chdir to %s failed: %s" % (self.sftp.normalize(".")+"/"+d,e))
 
     def put(self, source_path, remote_filename = None):
@@ -275,7 +275,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                         chan=self.client.get_transport().open_session()
                         chan.settimeout(globals.timeout)
                         chan.exec_command("scp -t '%s'" % self.remote_dir) # scp in sink mode uses the arg as base directory
-                    except Exception, e:
+                    except Exception as e:
                         raise BackendException("scp execution failed: %s" % e)
                     # scp protocol: one 0x0 after startup, one after the Create meta, one after saving
                     # if there's a problem: 0x1 or 0x02 and some error text
@@ -298,9 +298,9 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                     try:
                         self.sftp.put(source_path.name,remote_filename)
                         return
-                    except Exception, e:
+                    except Exception as e:
                         raise BackendException("sftp put of %s (as %s) failed: %s" % (source_path.name,remote_filename,e))
-            except Exception, e:
+            except Exception as e:
                 log.Warn("%s (Try %d of %d) Will retry in %d seconds." % (e,n,globals.num_retries,self.retry_delay))
         raise BackendException("Giving up trying to upload '%s' after %d attempts" % (remote_filename,n))
 
@@ -320,7 +320,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                         chan=self.client.get_transport().open_session()
                         chan.settimeout(globals.timeout)
                         chan.exec_command("scp -f '%s/%s'" % (self.remote_dir,remote_filename))
-                    except Exception, e:
+                    except Exception as e:
                         raise BackendException("scp execution failed: %s" % e)
 
                     chan.send('\0')     # overall ready indicator
@@ -343,7 +343,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                             buff=chan.recv(blocksize)
                             f.write(buff)
                             togo-=len(buff)
-                    except Exception, e:
+                    except Exception as e:
                         raise BackendException("scp get %s failed: %s" % (remote_filename,e))
 
                     msg=chan.recv(1)    # check the final status
@@ -357,10 +357,10 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                     try:
                         self.sftp.get(remote_filename,local_path.name)
                         return
-                    except Exception, e:
+                    except Exception as e:
                         raise BackendException("sftp get of %s (to %s) failed: %s" % (remote_filename,local_path.name,e))
                 local_path.setdata()
-            except Exception, e:
+            except Exception as e:
                 log.Warn("%s (Try %d of %d) Will retry in %d seconds." % (e,n,globals.num_retries,self.retry_delay))
         raise BackendException("Giving up trying to download '%s' after %d attempts" % (remote_filename,n))
 
@@ -379,9 +379,9 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                 else:
                     try:
                         return self.sftp.listdir()
-                    except Exception, e:
+                    except Exception as e:
                         raise BackendException("sftp listing of %s failed: %s" % (self.sftp.getcwd(),e))
-            except Exception, e:
+            except Exception as e:
                 log.Warn("%s (Try %d of %d) Will retry in %d seconds." % (e,n,globals.num_retries,self.retry_delay))
         raise BackendException("Giving up trying to list '%s' after %d attempts" % (self.remote_dir,n))
 
@@ -397,12 +397,12 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                     else:
                         try:
                             self.sftp.remove(fn)
-                        except Exception, e:
+                        except Exception as e:
                             raise BackendException("sftp rm %s failed: %s" % (fn,e))
 
                     # If we get here, we deleted this file successfully. Move on to the next one.
                     break
-                except Exception, e:
+                except Exception as e:
                     if n == globals.num_retries:
                         log.FatalError(str(e), log.ErrorCode.backend_error)
                     else:
@@ -416,7 +416,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
             chan=self.client.get_transport().open_session()
             chan.settimeout(globals.timeout)
             chan.exec_command(cmd)
-        except Exception, e:
+        except Exception as e:
             raise BackendException("%sexecution failed: %s" % (errorprefix,e))
         output=chan.recv(-1)
         res=chan.recv_exit_status()
@@ -434,7 +434,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         sshconfig = paramiko.SSHConfig()
         try:
             sshconfig.parse(open(file))
-        except Exception, e:
+        except Exception as e:
             raise BackendException("could not load '%s', maybe corrupt?" % (file))
         
         return sshconfig.lookup(host)

@@ -39,7 +39,7 @@ def check_common_error(error_handler, function, args = ()):
     #       RPathException, Rdiff.RdiffException,
     #       librsync.librsyncError, C.UnknownFileTypeError), exc:
     #   TracebackArchive.add()
-    except (IOError, EnvironmentError, librsync.librsyncError, path.PathException), exc:
+    except (IOError, EnvironmentError, librsync.librsyncError, path.PathException) as exc:
         if (not isinstance(exc, EnvironmentError) or
             ((exc[0] in errno.errorcode)
              and errno.errorcode[exc[0]] in

@@ -96,7 +96,7 @@ Hints:
         def request(self, *args, **kwargs):
             try:
                 return httplib.HTTPSConnection.request(self, *args, **kwargs)
-            except ssl.SSLError, e:
+            except ssl.SSLError as e:
                 # encapsulate ssl errors
                 raise BackendException("SSL failed: %s" % str(e),log.ErrorCode.backend_error)
 
@@ -293,7 +293,7 @@ class WebDAVBackend(duplicity.backend.Backend):
                 if filename:
                     result.append(filename)
             return result
-        except Exception, e:
+        except Exception as e:
             raise e
         finally:
             if response: response.close()
@@ -383,7 +383,7 @@ class WebDAVBackend(duplicity.backend.Backend):
                 reason = response.reason
                 response.close()
                 raise BackendException("Bad status code %s reason %s." % (status,reason))
-        except Exception, e:
+        except Exception as e:
             raise e
         finally:
             if response: response.close()
@@ -407,7 +407,7 @@ class WebDAVBackend(duplicity.backend.Backend):
                 reason = response.reason
                 response.close()
                 raise BackendException("Bad status code %s reason %s." % (status,reason))
-        except Exception, e:
+        except Exception as e:
             raise e
         finally:
             if response: response.close()
@@ -429,7 +429,7 @@ class WebDAVBackend(duplicity.backend.Backend):
                     reason = response.reason
                     response.close()
                     raise BackendException("Bad status code %s reason %s." % (status,reason))
-            except Exception, e:
+            except Exception as e:
                 raise e
             finally:
                 if response: response.close()

@@ -192,7 +192,7 @@ def async_split(fn):
             if state['error'] is None:
                 return state['value']
             else:
-                raise state['error'], None, state['trace']
+                raise state['error'].with_traceback(state['trace'])
         finally:
             cv.release()
 
@@ -207,7 +207,7 @@ def async_split(fn):
             cv.release()
 
             return (True, waiter)
-        except Exception, e:
+        except Exception as e:
             cv.acquire()
             state['done'] = True
             state['error'] = e

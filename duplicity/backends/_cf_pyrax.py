@@ -45,24 +45,24 @@ class PyraxBackend(duplicity.backend.Backend):
 
         conn_kwargs = {}
 
-        if not os.environ.has_key('CLOUDFILES_USERNAME'):
+        if 'CLOUDFILES_USERNAME' not in os.environ:
             raise BackendException('CLOUDFILES_USERNAME environment variable'
                                    'not set.')
 
-        if not os.environ.has_key('CLOUDFILES_APIKEY'):
+        if 'CLOUDFILES_APIKEY' not in os.environ:
             raise BackendException('CLOUDFILES_APIKEY environment variable not set.')
 
         conn_kwargs['username'] = os.environ['CLOUDFILES_USERNAME']
         conn_kwargs['api_key'] = os.environ['CLOUDFILES_APIKEY']
 
-        if os.environ.has_key('CLOUDFILES_REGION'):
+        if 'CLOUDFILES_REGION' in os.environ:
             conn_kwargs['region'] = os.environ['CLOUDFILES_REGION']
 
         container = parsed_url.path.lstrip('/')
 
         try:
             pyrax.set_credentials(**conn_kwargs)
-        except Exception, e:
+        except Exception as e:
             log.FatalError("Connection failed, please check your credentials: %s %s"
                            % (e.__class__.__name__, str(e)),
                            log.ErrorCode.connection_failed)
@@ -81,10 +81,10 @@ class PyraxBackend(duplicity.backend.Backend):
             try:
                 self.container.upload_file(source_path.name, remote_filename)
                 return
-            except self.client_exc, error:
+            except self.client_exc as error:
                 log.Warn("Upload of '%s' failed (attempt %d): pyrax returned: %s %s"
                          % (remote_filename, n, error.__class__.__name__, error.message))
-            except Exception, e:
+            except Exception as e:
                 log.Warn("Upload of '%s' failed (attempt %s): %s: %s"
                         % (remote_filename, n, e.__class__.__name__, str(e)))
                 log.Debug("Backtrace of previous error: %s"
@@ -105,10 +105,10 @@ class PyraxBackend(duplicity.backend.Backend):
                 return
             except self.nso_exc:
                 return
-            except self.client_exc, resperr:
+            except self.client_exc as resperr:
                 log.Warn("Download of '%s' failed (attempt %s): pyrax returned: %s %s"
                          % (remote_filename, n, resperr.__class__.__name__, resperr.message))
-            except Exception, e:
+            except Exception as e:
                 log.Warn("Download of '%s' failed (attempt %s): %s: %s"
                          % (remote_filename, n, e.__class__.__name__, str(e)))
                 log.Debug("Backtrace of previous error: %s"
@@ -131,10 +131,10 @@ class PyraxBackend(duplicity.backend.Backend):
                     objs = self.container.get_object_names(marker = keys[-1])
                     keys += objs
                 return keys
-            except self.client_exc, resperr:
+            except self.client_exc as resperr:
                 log.Warn("Listing of '%s' failed (attempt %s): pyrax returned: %s %s"
                          % (self.container, n, resperr.__class__.__name__, resperr.message))
-            except Exception, e:
+            except Exception as e:
                 log.Warn("Listing of '%s' failed (attempt %s): %s: %s"
                          % (self.container, n, e.__class__.__name__, str(e)))
                 log.Debug("Backtrace of previous error: %s"
@@ -151,14 +151,14 @@ class PyraxBackend(duplicity.backend.Backend):
             try:
                 self.container.delete_object(remote_filename)
                 return
-            except self.client_exc, resperr:
+            except self.client_exc as resperr:
                 if n > 1 and resperr.status == 404:
                     # We failed on a timeout, but delete succeeded on the server
                     log.Warn("Delete of '%s' missing after retry - must have succeded earler" % remote_filename)
                     return
                 log.Warn("Delete of '%s' failed (attempt %s): pyrax returned: %s %s"
                          % (remote_filename, n, resperr.__class__.__name__, resperr.message))
-            except Exception, e:
+            except Exception as e:
                 log.Warn("Delete of '%s' failed (attempt %s): %s: %s"
                          % (remote_filename, n, e.__class__.__name__, str(e)))
                 log.Debug("Backtrace of previous error: %s"
@@ -181,7 +181,7 @@ class PyraxBackend(duplicity.backend.Backend):
             return {'size': sobject.total_bytes}
         except self.nso_exc:
             return {'size': -1}
-        except Exception, e:
+        except Exception as e:
             log.Warn("Error querying '%s/%s': %s"
                      "" % (self.container,
                            filename,

@@ -50,6 +50,19 @@ Enhancements:
   - I've done a quick smoketest (backed up and restored using
     --ssh-backend=pexpect) and it seemed to work fine with a modern version
     of pexpect.
+* Merged in lp:~mterry/duplicity/2.6isms
+  - Here's a whole stack of minor syntax modernizations that will become
+    necessary in python3. They all work in python2.6.
+  - I've added a new test to keep us honest and prevent backsliding on these
+    modernizations. It runs 2to3 and will fail the test if 2to3 finds anything
+    that needs fixing (with a specific set of exceptions carved out).
+  - This branch has most of the easy 2to3 fixes, the ones with obvious and
+    safe syntax changes.
+  - We could just let 2to3 do them for us, but ideally we use 2to3 as little
+    as possible, since it doesn't always know how to solve a given problem.
+    I will propose a branch later that actually does use 2to3 to generate
+    python3 versions of duplicity if they are requested. But this is a first
+    step to clean up the code base.
 
 New in v0.6.23 (2014/01/24)
 ---------------------------
@@ -534,11 +547,11 @@ Enhancements:
 Bugs closed in this release:
 411145     Misleading error message: "Invalid SSH password"
 871875     File ... was corrupted during upload.
-878220	   UnsupportedBackendScheme: scheme not supported in url: s3+http
+878220       UnsupportedBackendScheme: scheme not supported in url: s3+http
 878964     Resuming a backup with a different password should throw an error
-881070	   Bugfix for S3 multipart upload on 0.6.16
-881727	   duplicity 0.6.16 lists all backup sets as incomplete
-885670	   Duplicity fails to add incremental backups to chain...
+881070       Bugfix for S3 multipart upload on 0.6.16
+881727       duplicity 0.6.16 lists all backup sets as incomplete
+885670       Duplicity fails to add incremental backups to chain...
 
 Merges:
 lp:~mterry/duplicity/check-passphrase-on-restart

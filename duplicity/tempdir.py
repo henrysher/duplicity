@@ -213,7 +213,7 @@ class TemporaryDirectory:
         """
         self.__lock.acquire()
         try:
-            if self.__pending.has_key(fname):
+            if fname in self.__pending:
                 log.Debug(_("Forgetting temporary file %s") % util.ufn(fname))
                 del(self.__pending[fname])
             else:

@@ -1042,7 +1042,7 @@ def sync_archive(decrypt):
         log.Notice(_("Deleting local %s (not authoritative at backend).") % util.ufn(del_name))
         try:
             util.ignore_missing(os.unlink, del_name)
-        except Exception, e:
+        except Exception as e:
             log.Warn(_("Unable to delete %s: %s") % (util.ufn(del_name), str(e)))
 
     def copy_to_local(fn):
@@ -1505,18 +1505,18 @@ if __name__ == "__main__":
     # sys.exit() function.  Python handles this by
     # raising the SystemExit exception.  Cleanup code
     # goes here, if needed.
-    except SystemExit, e:
+    except SystemExit as e:
         # No traceback, just get out
         util.release_lockfile()
         sys.exit(e)
 
-    except KeyboardInterrupt, e:
+    except KeyboardInterrupt as e:
         # No traceback, just get out
         log.Info(_("INT intercepted...exiting."))
         util.release_lockfile()
         sys.exit(4)
 
-    except gpg.GPGError, e:
+    except gpg.GPGError as e:
         # For gpg errors, don't show an ugly stack trace by
         # default. But do with sufficient verbosity.
         util.release_lockfile()
@@ -1526,7 +1526,7 @@ if __name__ == "__main__":
                        log.ErrorCode.gpg_failed,
                        e.__class__.__name__)
 
-    except duplicity.errors.UserError, e:
+    except duplicity.errors.UserError as e:
         util.release_lockfile()
         # For user errors, don't show an ugly stack trace by
         # default. But do with sufficient verbosity.
@@ -1536,7 +1536,7 @@ if __name__ == "__main__":
                        log.ErrorCode.user_error,
                        e.__class__.__name__)
 
-    except duplicity.errors.BackendException, e:
+    except duplicity.errors.BackendException as e:
         util.release_lockfile()
         # For backend errors, don't show an ugly stack trace by
         # default. But do with sufficient verbosity.
@@ -1546,7 +1546,7 @@ if __name__ == "__main__":
                        log.ErrorCode.user_error,
                        e.__class__.__name__)
 
-    except Exception, e:
+    except Exception as e:
         util.release_lockfile()
         if "Forced assertion for testing" in str(e):
             log.FatalError(u"%s: %s" % (e.__class__.__name__, unicode(e)),
