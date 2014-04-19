@@ -63,6 +63,13 @@ Enhancements:
     I will propose a branch later that actually does use 2to3 to generate
     python3 versions of duplicity if they are requested. But this is a first
     step to clean up the code base.
+* Merged in lp:~mterry/duplicity/drop-static
+  - Drop static.py.
+  - This is some of the oldest code in duplicity! A bzr blame says it is
+    unmodified (except for whitespace / comment changes) since revision 1.
+  - But it's not needed anymore. Not really even since we updated to python2.4,
+    which introduced the @staticmethod decorator. So this branch drops it and
+    its test file.
 
 New in v0.6.23 (2014/01/24)
 ---------------------------
