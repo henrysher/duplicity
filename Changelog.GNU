@@ -19,6 +19,14 @@
       - But it's not needed anymore. Not really even since we updated to python2.4,
         which introduced the @staticmethod decorator. So this branch drops it and
         its test file.
+    * Merged in lp:~mterry/duplicity/encode-for-print
+      - Encode translated strings before passing them to 'print'.
+      - The print command can only apparently handle bytes. So when we pass it
+        unicode, it freaks out. There were only four instances I saw where we used
+        print, so I figured it was easiest to just convert them to use the log
+        framework too.
+      - That way all user-visible strings go through that framework and are subject
+        to the same encoding rules.
 
 2014-04-17  Kenneth Loafman  <kenneth@loafman.com>
     * Merged in lp:~fredrik-loch/duplicity/duplicity-S3-SSE

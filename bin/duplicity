@@ -175,12 +175,12 @@ def get_passphrase(n, action, for_signing = False):
                 pass2 = getpass_safe(_("Retype passphrase to confirm: "))
 
             if not pass1 == pass2:
-                print _("First and second passphrases do not match!  Please try again.")
+                log.Log(_("First and second passphrases do not match!  Please try again."), log.WARNING, force_print=True)
                 use_cache = False
                 continue
 
             if not pass1 and not (globals.gpg_profile.recipients or globals.gpg_profile.hidden_recipients) and not for_signing:
-                print _("Cannot use empty passphrase with symmetric encryption!  Please try again.")
+                log.Log(_("Cannot use empty passphrase with symmetric encryption!  Please try again."), log.WARNING, force_print=True)
                 use_cache = False
                 continue
 
@@ -587,7 +587,8 @@ def print_statistics(stats, bytes_written):
     """
     if globals.print_statistics:
         diffdir.stats.TotalDestinationSizeChange = bytes_written
-        print diffdir.stats.get_stats_logstring(_("Backup Statistics"))
+        logstring = diffdir.stats.get_stats_logstring(_("Backup Statistics"))
+        log.Log(logstring, log.NOTICE, force_print=True)
 
 
 def incremental_backup(sig_chain):
