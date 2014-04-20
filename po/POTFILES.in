@@ -15,7 +15,6 @@ duplicity/tarfile.py
 duplicity/collections.py
 duplicity/log.py
 duplicity/robust.py
-duplicity/misc.py
 duplicity/diffdir.py
 duplicity/lazy.py
 duplicity/backends/_cf_pyrax.py
