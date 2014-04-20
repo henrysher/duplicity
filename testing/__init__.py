@@ -72,12 +72,11 @@ class DuplicityTestCase(unittest.TestCase):
             self._update_env(key, self.savedEnviron[key])
         for key in self.savedGlobals:
             setattr(globals, key, self.savedGlobals[key])
-        assert not os.system("rm -rf testfiles tempdir temp2.tar "
-                             "testfiles/output testfiles/largefiles "
-                             "testfiles/restore_out testfiles/cache")
+        assert not os.system("rm -rf testfiles")
         super(DuplicityTestCase, self).tearDown()
 
     def unpack_testfiles(self):
+        assert not os.system("rm -rf testfiles")
         assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
         assert not os.system("mkdir testfiles/output testfiles/cache")
 

@@ -79,7 +79,7 @@ class TestCommand(test):
 
         # make symlinks for test data
         if build_cmd.build_lib != top_dir:
-            for path in ['testfiles.tar.gz', 'testtar.tar', 'gnupg']:
+            for path in ['testfiles.tar.gz', 'gnupg']:
                 src = os.path.join(top_dir, 'testing', path)
                 target = os.path.join(build_cmd.build_lib, 'testing', path)
                 try:
@@ -131,7 +131,10 @@ setup(name="duplicity",
       maintainer_email="kenneth@loafman.com",
       url="http://duplicity.nongnu.org/index.html",
       packages = ['duplicity',
-                  'duplicity.backends'],
+                  'duplicity.backends',
+                  'testing',
+                  'testing.functional',
+                  'testing.unit'],
       package_dir = {"duplicity" : "duplicity",
                      "duplicity.backends" : "duplicity/backends",},
       ext_modules = [Extension("duplicity._librsync",
