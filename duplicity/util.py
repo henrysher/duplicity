@@ -145,3 +145,30 @@ def release_lockfile():
         except UnlockError:
             pass
 
+def copyfileobj(infp, outfp, byte_count = -1):
+    """Copy byte_count bytes from infp to outfp, or all if byte_count < 0
+
+    Returns the number of bytes actually written (may be less than
+    byte_count if find eof.  Does not close either fileobj.
+
+    """
+    blocksize = 64 * 1024
+    bytes_written = 0
+    if byte_count < 0:
+        while 1:
+            buf = infp.read(blocksize)
+            if not buf:
+                break
+            bytes_written += len(buf)
+            outfp.write(buf)
+    else:
+        while bytes_written + blocksize <= byte_count:
+            buf = infp.read(blocksize)
+            if not buf:
+                break
+            bytes_written += len(buf)
+            outfp.write(buf)
+        buf = infp.read(byte_count - bytes_written)
+        bytes_written += len(buf)
+        outfp.write(buf)
+    return bytes_written

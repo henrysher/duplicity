@@ -28,7 +28,6 @@ from duplicity import tarfile #@UnusedImport
 from duplicity import librsync #@UnusedImport
 from duplicity import log #@UnusedImport
 from duplicity import diffdir
-from duplicity import misc
 from duplicity import selection
 from duplicity import tempdir
 from duplicity import util #@UnusedImport
@@ -478,7 +477,7 @@ def patch_seq2ropath( patch_seq ):
             by using the duplicity.tempdir to tell us where.
             """
             tempfp = tempfile.TemporaryFile( dir=tempdir.default().dir() )
-            misc.copyfileobj( current_file, tempfp )
+            util.copyfileobj( current_file, tempfp )
             assert not current_file.close()
             tempfp.seek( 0 )
             current_file = tempfp
