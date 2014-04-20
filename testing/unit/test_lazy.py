@@ -19,22 +19,21 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import helper
 import unittest, pickle, sys
 from functools import reduce
 
 from duplicity.lazy import * #@UnusedWildImport
+from . import UnitTestCase
 
-helper.setup()
 
-class Iterators(unittest.TestCase):
+class Iterators(UnitTestCase):
     one_to_100 = lambda s: iter(range(1, 101))
     evens = lambda s: iter(range(2, 101, 2))
     odds = lambda s: iter(range(1, 100, 2))
     empty = lambda s: iter([])
 
     def __init__(self, *args):
-        unittest.TestCase.__init__(self, *args)
+        super(Iterators, self).__init__(*args)
         self.falseerror = self.falseerror_maker()
         self.trueerror = self.trueerror_maker()
         self.emptygen = self.emptygen_maker()
@@ -275,8 +274,10 @@ class ITRBadder2(ITRBranch):
         #print "Adding branch ", subinstance.total
         self.total += subinstance.total
 
-class TreeReducerTest(unittest.TestCase):
+class TreeReducerTest(UnitTestCase):
     def setUp(self):
+        super(TreeReducerTest, self).setUp()
+
         self.i1 = [(), (1,), (2,), (3,)]
         self.i2 = [(0,), (0,1), (0,1,0), (0,1,1), (0,2), (0,2,1), (0,3)]
 

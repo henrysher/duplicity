@@ -23,10 +23,10 @@ import os
 import unittest
 
 from duplicity import path
-from helper import CmdError, DuplicityTestCase
+from . import CmdError, FunctionalTestCase
 
 
-class FinalTest(DuplicityTestCase):
+class FinalTest(FunctionalTestCase):
     """
     Test backup/restore using duplicity binary
     """
@@ -165,17 +165,17 @@ class FinalTest(DuplicityTestCase):
 
 
 class OldFilenamesFinalTest(FinalTest):
-    @classmethod
-    def setUpClass(cls):
-        super(OldFilenamesFinalTest, cls).setUpClass()
-        cls.class_args.extend(["--old-filenames"])
+
+    def setUp(self):
+        super(OldFilenamesFinalTest, self).setUp()
+        self.class_args.extend(["--old-filenames"])
 
 
 class ShortFilenamesFinalTest(FinalTest):
-    @classmethod
-    def setUpClass(cls):
-        super(ShortFilenamesFinalTest, cls).setUpClass()
-        cls.class_args.extend(["--short-filenames"])
+
+    def setUp(self):
+        super(ShortFilenamesFinalTest, self).setUp()
+        self.class_args.extend(["--short-filenames"])
 
 if __name__ == "__main__":
     unittest.main()

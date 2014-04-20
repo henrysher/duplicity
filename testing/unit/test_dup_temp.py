@@ -19,28 +19,16 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import helper
-import sys, os, unittest, gzip
+import gzip
+import unittest
 
 from duplicity import dup_temp
 from duplicity import file_naming
+from . import UnitTestCase
 
-helper.setup()
 
-prefix = "testfiles/output"
-
-class TempTest(unittest.TestCase):
+class TempTest(UnitTestCase):
     """Test various temp files methods"""
-    def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
-
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
-
-    def del_tmp(self):
-        """Delete testfiles/output and recreate"""
-        assert not os.system("rm -rf " + prefix)
-        assert not os.system("mkdir " + prefix)
 
     def test_temppath(self):
         """Allocate new temppath, try open_with_delete"""

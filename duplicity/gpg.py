@@ -27,10 +27,10 @@ see duplicity's README for details
 
 import os, types, tempfile, re, gzip, locale
 
-from duplicity import misc
 from duplicity import globals
 from duplicity import gpginterface
 from duplicity import tempdir
+from duplicity import util
 
 try:
     from hashlib import sha1
@@ -313,7 +313,7 @@ def GPGWriteFile(block_iter, filename, profile,
         >> largest block size).
         """
         incompressible_fp = open(filename, "rb")
-        assert misc.copyfileobj(incompressible_fp, file.gpg_input, bytes) == bytes
+        assert util.copyfileobj(incompressible_fp, file.gpg_input, bytes) == bytes
         incompressible_fp.close()
 
     def get_current_size():

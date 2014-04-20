@@ -19,17 +19,16 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import helper
-import sys, unittest
+import unittest
 
 from duplicity import dup_time
 from duplicity import file_naming
 from duplicity import log
 from duplicity import globals
+from . import UnitTestCase
 
-helper.setup()
 
-class Test36(unittest.TestCase):
+class Test36(UnitTestCase):
     def test_base36(self):
         """Test conversion to/from base 36"""
         numlist = [0, 1, 10, 1313, 34233, 872338, 2342889,
@@ -124,23 +123,28 @@ class FileNamingBase:
         assert pr.time == 1036954144, repr(pr.time)
 
 
-class FileNamingLong(unittest.TestCase, FileNamingBase):
+class FileNamingLong(UnitTestCase, FileNamingBase):
     """Test long filename parsing and generation"""
     def setUp(self):
-        globals.short_filenames = 0
+        super(FileNamingLong, self).setUp()
+        self.set_global('short_filenames', 0)
 
-class FileNamingShort(unittest.TestCase, FileNamingBase):
+
+class FileNamingShort(UnitTestCase, FileNamingBase):
     """Test short filename parsing and generation"""
     def setUp(self):
-        globals.short_filenames = 1
+        super(FileNamingShort, self).setUp()
+        self.set_global('short_filenames', 1)
+
         
-class FileNamingPrefixes(unittest.TestCase, FileNamingBase):
+class FileNamingPrefixes(UnitTestCase, FileNamingBase):
     """Test filename parsing and generation with prefixes"""
     def setUp(self):
-        globals.file_prefix = "global-"
-        globals.file_prefix_manifest = "mani-"
-        globals.file_prefix_signature = "sign-"
-        globals.file_prefix_archive = "arch-"
+        super(FileNamingPrefixes, self).setUp()
+        self.set_global('file_prefix', "global-")
+        self.set_global('file_prefix_manifest', "mani-")
+        self.set_global('file_prefix_signature', "sign-")
+        self.set_global('file_prefix_archive', "arch-")
 
 
 if __name__ == "__main__":

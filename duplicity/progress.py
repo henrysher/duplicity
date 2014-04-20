@@ -32,7 +32,9 @@ and the time left to transfer all the (yet unknown) amount of data to send.
 This is a forecast based on gathered evidence.
 """
 
+from __future__ import absolute_import
 
+import collections as sys_collections
 import math
 import threading
 import time
@@ -41,30 +43,6 @@ from duplicity import globals
 from duplicity import log
 import pickle
 import os
-
-def import_non_local(name, custom_name=None):
-    """
-    This function is needed to play a trick... as there exists a local
-    "collections" module, that is named the same as a system module
-    """
-    import imp, sys
-
-    custom_name = custom_name or name
-
-    f, pathname, desc = imp.find_module(name, sys.path[1:])
-    module = imp.load_module(custom_name, f, pathname, desc)
-    f.close()
-
-    return module
-
-"""
-Import non-local module, use a custom name to differentiate it from local
-This name is only used internally for identifying the module. We decide
-the name in the local scope by assigning it to the variable sys_collections.
-"""
-sys_collections = import_non_local('collections','sys_collections')
-
-
 
 tracker = None
 progress_thread = None

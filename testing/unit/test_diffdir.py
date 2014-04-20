@@ -19,7 +19,6 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import helper
 import os, sys, unittest
 
 from duplicity.path import * #@UnusedWildImport
@@ -27,16 +26,14 @@ from duplicity import diffdir
 from duplicity import selection
 from duplicity import util
 from duplicity import tarfile #@Reimport
+from . import UnitTestCase
 
-helper.setup()
 
-class DDTest(unittest.TestCase):
+class DDTest(UnitTestCase):
     """Test functions in diffdir.py"""
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
-
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+        super(DDTest, self).setUp()
+        self.unpack_testfiles()
 
     def copyfileobj(self, infp, outfp):
         """Copy in fileobj to out, closing afterwards"""
@@ -48,14 +45,8 @@ class DDTest(unittest.TestCase):
         assert not infp.close()
         assert not outfp.close()
 
-    def deltmp(self):
-        """Delete temporary directories"""
-        assert not os.system("rm -rf testfiles/output")
-        os.mkdir("testfiles/output")
-
     def testsig(self):
         """Test producing tar signature of various file types"""
-        self.deltmp()
         select = selection.Select(Path("testfiles/various_file_types"))
         select.set_iter()
         sigtar = diffdir.SigTarBlockIter(select)
@@ -68,7 +59,6 @@ class DDTest(unittest.TestCase):
 
     def empty_diff_schema(self, dirname):
         """Given directory name, make sure can tell when nothing changes"""
-        self.deltmp()
         select = selection.Select(Path(dirname))
         select.set_iter()
         sigtar = diffdir.SigTarBlockIter(select)
@@ -91,9 +81,7 @@ class DDTest(unittest.TestCase):
     def test_empty_diff(self):
         """Test producing a diff against same sig; should be len 0"""
         self.empty_diff_schema("testfiles/various_file_types")
-        return
 
-        self.deltmp()
         select = selection.Select(Path("testfiles/various_file_types"))
         select.set_iter()
         sigtar = diffdir.SigTarBlockIter(select)
@@ -114,7 +102,6 @@ class DDTest(unittest.TestCase):
 
     def test_diff(self):
         """Test making a diff"""
-        self.deltmp()
         sel1 = selection.Select(Path("testfiles/dir1"))
         diffdir.write_block_iter(diffdir.SigTarBlockIter(sel1.set_iter()),
                                  "testfiles/output/dir1.sigtar")
@@ -141,7 +128,6 @@ class DDTest(unittest.TestCase):
 
     def test_diff2(self):
         """Another diff test - this one involves multivol support"""
-        self.deltmp()
         sel1 = selection.Select(Path("testfiles/dir2"))
         diffdir.write_block_iter(diffdir.SigTarBlockIter(sel1.set_iter()),
                                  "testfiles/output/dir2.sigtar")
@@ -175,7 +161,6 @@ class DDTest(unittest.TestCase):
         those produced by DirDelta_WriteSig and other methods.
 
         """
-        self.deltmp()
         deltadir1 = Path("testfiles/output/dir.deltatar1") #@UnusedVariable
         deltadir2 = Path("testfiles/output/dir.deltatar2") #@UnusedVariable
         cur_full_sigs = Path("testfiles/output/fullsig.dir1")

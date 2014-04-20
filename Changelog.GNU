@@ -1,3 +1,33 @@
+2014-04-20  Kenneth Loafman  <kenneth@loafman.com>
+    # Merged in lp:~mterry/duplicity/more-test-reorg
+      - Here's another test reorganization / modernization branch. It does the
+        following things:
+        - Drop duplicity/misc.py. It is confusing to have both misc.py and util.py,
+          and most of the code in misc.py was no longer used. I moved the one
+          function that was still used into util.py.
+        - Consolidated the various ways to run tests into just one. I made tox runs
+          go through ./setup.py test, rather than nosetests. And I made the
+          ./testing/run-tests scripts just call tox. Now we no longer need nosetests
+          as a test dependency (although you can still use it if you want).
+        - Added two more code quality automated tests: a pep8 one and a pylint one.
+          I disabled almost all checks in each program that gave a warning. These
+          tests just establish a baseline for future improvement.
+        - Moved the test helper code into TestCase subclasses that all tests can
+          use. And used more code sharing and setUp/tearDown cleverness to remove
+          duplicated code.
+        - Reorganized the tests in ./testing/tests into ./testing/functional and
+          ./testing/unit -- for whether they drive duplicity as a subprocess or
+          whether they import and test code directly. Each dir can have specialized
+          TestCase subclasses now.
+        - Renamed the files in ./testing/unit to more clearly indicate which file
+          in ./duplicity they are unit testing.
+        - Added some helper methods for tests to set environment and globals.*
+          parameters more safely (i.e. without affecting other tests) by
+          automatically cleaning up any such changes during test tearDown.
+        - Removed test_unicode.py, since it is kind of dumb. It used to be more
+          useful, but now with py2.6, we are just testing that one line of code
+          in it is actually there.
+
 2014-04-19  Kenneth Loafman  <kenneth@loafman.com>
     * Merged in lp:~mterry/duplicity/2.6isms
       - Here's a whole stack of minor syntax modernizations that will become

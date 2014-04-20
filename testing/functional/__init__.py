@@ -1,7 +1,6 @@
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
-# Copyright 2002 Ben Escoto <ben@emerose.org>
-# Copyright 2007 Kenneth Loafman <kenneth@loafman.com>
+# Copyright 2012 Canonical Ltd
 #
 # This file is part of duplicity.
 #
@@ -25,29 +24,7 @@ import time
 import unittest
 
 from duplicity import backend
-from duplicity import globals
-from duplicity import log
-
-sign_key = '56538CCF'
-sign_passphrase = 'test'
-encrypt_key1 = 'B5FA894F'
-encrypt_key2 = '9B736B2A'
-
-def setup():
-    """ setup for unit tests """
-    # TODO: remove these lines
-    log.setup()
-    log.setverbosity(log.WARNING)
-    globals.print_statistics = 0
-    backend.import_backends()
-
-    # Have all file references in tests relative to our testing dir
-    _testing_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    os.chdir(_testing_dir)
-    # Make sure that PYTHONPATH is set right for subprocesses (setuptools
-    # may futz with it)
-    _top_dir = os.path.dirname(_testing_dir)
-    os.environ['PYTHONPATH'] = _top_dir
+from .. import DuplicityTestCase
 
 
 class CmdError(Exception):
@@ -57,45 +34,24 @@ class CmdError(Exception):
         self.exit_status = code
 
 
-class DuplicityTestCase(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.class_args = []
-        cls.backend_url = "file://testfiles/output"
-        cls.sign_key = sign_key
-        cls.sign_passphrase = sign_passphrase
-        cls.encrypt_key1 = encrypt_key1
-        cls.encrypt_key2 = encrypt_key2
-        setup()
+class FunctionalTestCase(DuplicityTestCase):
 
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
-        assert not os.system("rm -rf testfiles/output testfiles/largefiles "
-                             "testfiles/restore_out testfiles/cache")
-        assert not os.system("mkdir testfiles/output testfiles/cache")
+        super(FunctionalTestCase, self).setUp()
+
+        self.unpack_testfiles()
+
+        self.class_args = []
+        self.backend_url = "file://testfiles/output"
+        self.last_backup = None
+        self.set_environ('PASSPHRASE', self.sign_passphrase)
+        self.set_environ("SIGN_PASSPHRASE", self.sign_passphrase)
 
         backend_inst = backend.get_backend(self.backend_url)
         bl = backend_inst.list()
         if bl:
             backend_inst.delete(backend_inst.list())
         backend_inst.close()
-
-        self.last_backup = None
-        self.set_environ('PASSPHRASE', self.sign_passphrase)
-        self.set_environ("SIGN_PASSPHRASE", self.sign_passphrase)
-
-    def tearDown(self):
-        self.set_environ("PASSPHRASE", None)
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
-
-    def set_environ(self, varname, value):
-        if value is not None:
-            os.environ[varname] = value
-        else:
-            try:
-                del os.environ[varname]
-            except Exception:
-                pass
 
     def run_duplicity(self, options=[], current_time=None, fail=None,
                       passphrase_input=[]):

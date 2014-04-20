@@ -19,28 +19,17 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import helper
-import sys, unittest, os
+import unittest, os
 
 from duplicity import path
+from . import FunctionalTestCase
 
-helper.setup()
 
-class RdiffdirTest(unittest.TestCase):
+class RdiffdirTest(FunctionalTestCase):
     """Test rdiffdir command line program"""
-    def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
-
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     def run_cmd(self, command):
         assert not os.system(command)
-
-    def del_tmp(self):
-        """Make new testfiles/output dir"""
-        self.run_cmd("rm -rf testfiles/output")
-        os.mkdir("testfiles/output")
 
     def run_rdiffdir(self, argstring):
         """Run rdiffdir with given arguments"""
@@ -49,7 +38,6 @@ class RdiffdirTest(unittest.TestCase):
     def run_cycle(self, dirname_list):
         """Run diff/patch cycle on directories in dirname_list"""
         assert len(dirname_list) >= 2
-        self.del_tmp()
 
         seq_path = path.Path("testfiles/output/sequence")
         new_path = path.Path(dirname_list[0])

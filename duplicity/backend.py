@@ -355,7 +355,7 @@ def retry_fatal(fn):
 
     return _retry_fatal
 
-class Backend:
+class Backend(object):
     """
     Represents a generic duplicity backend, capable of storing and
     retrieving files.

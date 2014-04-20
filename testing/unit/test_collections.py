@@ -19,17 +19,15 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import helper
 import os, sys, random, unittest
 
 from duplicity import collections
 from duplicity import backend
+from duplicity import globals
 from duplicity import path
 from duplicity import gpg
-from duplicity import globals
 from duplicity import dup_time
-
-helper.setup()
+from . import UnitTestCase
 
 filename_list1 = ["duplicity-full.2002-08-17T16:17:01-07:00.manifest.gpg",
                   "duplicity-full.2002-08-17T16:17:01-07:00.vol1.difftar.gpg",
@@ -71,15 +69,16 @@ filename_list2 = ["duplicity-full.2001-01-01T16:17:01-07:00.manifest.gpg",
                   "Extra stuff to be ignored"]
 
 
-class CollectionTest(unittest.TestCase):
+class CollectionTest(UnitTestCase):
     """Test collections"""
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
-        assert not os.system("mkdir testfiles/output")
+        super(CollectionTest, self).setUp()
+
+        self.unpack_testfiles()
 
         col_test_dir = path.Path("testfiles/collectionstest")
         archive_dir = col_test_dir.append("archive_dir")
-        globals.archive_dir = archive_dir
+        self.set_global('archive_dir', archive_dir)
         self.archive_dir_backend = backend.get_backend("file://testfiles/collectionstest"
                                                        "/archive_dir")
 
@@ -88,17 +87,9 @@ class CollectionTest(unittest.TestCase):
         self.output_dir = path.Path("testfiles/output") # used as a temp directory
         self.output_dir_backend = backend.get_backend("file://testfiles/output")
 
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
-
-    def del_tmp(self):
-        """Reset the testfiles/output directory"""
-        self.output_dir.deltree()
-        self.output_dir.mkdir()
-
     def set_gpg_profile(self):
         """Set gpg profile to standard "foobar" sym"""
-        globals.gpg_profile = gpg.GPGProfile(passphrase = "foobar")
+        self.set_global('gpg_profile', gpg.GPGProfile(passphrase = "foobar"))
 
     def test_backup_chains(self):
         """Test basic backup chain construction"""
@@ -193,7 +184,6 @@ class CollectionTest(unittest.TestCase):
     def get_filelist2_cs(self):
         """Return set CollectionsStatus object from filelist 2"""
         # Set up testfiles/output with files from filename_list2
-        self.del_tmp()
         for filename in filename_list2:
             p = self.output_dir.append(filename)
             p.touch()

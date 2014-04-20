@@ -19,21 +19,18 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import helper
 import sys, unittest
 
 from duplicity.statistics import * #@UnusedWildImport
 from duplicity import path
+from . import UnitTestCase
 
-helper.setup()
 
-class StatsObjTest(unittest.TestCase):
+class StatsObjTest(UnitTestCase):
     """Test StatsObj class"""
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
-
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+        super(StatsObjTest, self).setUp()
+        self.unpack_testfiles()
 
     def set_obj(self, s):
         """Set values of s's statistics"""

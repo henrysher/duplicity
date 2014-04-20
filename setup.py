@@ -79,7 +79,7 @@ class TestCommand(test):
 
         # make symlinks for test data
         if build_cmd.build_lib != top_dir:
-            for path in ['testfiles.tar.gz', 'testtar.tar', 'gnupg']:
+            for path in ['testfiles.tar.gz', 'gnupg']:
                 src = os.path.join(top_dir, 'testing', path)
                 target = os.path.join(build_cmd.build_lib, 'testing', path)
                 try:
@@ -133,8 +133,9 @@ setup(name="duplicity",
       packages = ['duplicity',
                   'duplicity.backends',
                   'testing',
-                  'testing.helpers',
-                  'testing.tests'],
+                  'testing.functional',
+                  'testing.overrides',
+                  'testing.unit'],
       package_dir = {"duplicity" : "duplicity",
                      "duplicity.backends" : "duplicity/backends",},
       ext_modules = [Extension("duplicity._librsync",
@@ -144,8 +145,8 @@ setup(name="duplicity",
                                libraries=["rsync"])],
       scripts = ['bin/rdiffdir', 'bin/duplicity'],
       data_files = data_files,
-      tests_require = ['lockfile', 'mock', 'nose', 'pexpect'],
-      test_suite = 'nose.collector',
+      tests_require = ['lockfile', 'mock', 'pexpect'],
+      test_suite = 'testing',
       cmdclass={'test': TestCommand,
                 'install': InstallCommand,
                 'sdist': SDistCommand},

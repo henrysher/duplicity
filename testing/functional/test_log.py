@@ -21,14 +21,19 @@
 import unittest
 import os
 
-class LogTest(unittest.TestCase):
+from . import FunctionalTestCase
+
+
+class LogTest(FunctionalTestCase):
     """Test machine-readable functions/classes in log.py"""
 
     def setUp(self):
+        super(LogTest, self).setUp()
         assert not os.system("rm -f /tmp/duplicity.log")
 
     def tearDown(self):
         assert not os.system("rm -f /tmp/duplicity.log")
+        super(LogTest, self).tearDown()
 
     def test_command_line_error(self):
         """Check notification of a simple error code"""

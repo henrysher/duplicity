@@ -19,16 +19,16 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import helper
-import sys, unittest, types
+import types
+import unittest
 
 from duplicity import manifest
-from duplicity import globals
 from duplicity import path
+from . import UnitTestCase
 
-helper.setup()
 
-class VolumeInfoTest(unittest.TestCase):
+
+class VolumeInfoTest(UnitTestCase):
     """Test VolumeInfo"""
     def test_basic(self):
         """Basic VolumeInfoTest"""
@@ -75,7 +75,7 @@ class VolumeInfoTest(unittest.TestCase):
         assert not vi3.contains(("3",), recursive = 0)
 
 
-class ManifestTest(unittest.TestCase):
+class ManifestTest(UnitTestCase):
     """Test Manifest class"""
     def test_basic(self):
         vi1 = manifest.VolumeInfo()
@@ -87,7 +87,7 @@ class ManifestTest(unittest.TestCase):
         m = manifest.Manifest()
         for vi in [vi1, vi2, vi3]: m.add_volume_info(vi)
 
-        globals.local_path = path.Path("Foobar")
+        self.set_global('local_path', path.Path("Foobar"))
         m.set_dirinfo()
 
         s = m.to_string()

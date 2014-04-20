@@ -24,10 +24,10 @@ import os
 import subprocess
 import unittest
 
-from helper import DuplicityTestCase
+from . import FunctionalTestCase
 
 
-class RestartTest(DuplicityTestCase):
+class RestartTest(FunctionalTestCase):
     """
     Test checkpoint/restart using duplicity binary
     """
@@ -205,7 +205,6 @@ class RestartTest(DuplicityTestCase):
         # 'restart' the backup
         self.backup("full", source, options=["--volsize=5", "--name=backup1"])
         # Confirm we actually resumed the previous backup
-        print os.listdir("testfiles/output")
         self.assertEqual(len(os.listdir("testfiles/output")), 4)
         # Now make sure everything is byte-for-byte the same once restored
         self.restore()
@@ -292,10 +291,10 @@ class RestartTest(DuplicityTestCase):
 
 # Note that this class duplicates all the tests in RestartTest
 class RestartTestWithoutEncryption(RestartTest):
-    @classmethod
-    def setUpClass(cls):
-        super(RestartTestWithoutEncryption, cls).setUpClass()
-        cls.class_args.extend(["--no-encryption"])
+
+    def setUp(self):
+        super(RestartTestWithoutEncryption, self).setUp()
+        self.class_args.extend(["--no-encryption"])
 
     def test_no_write_double_snapshot(self):
         """

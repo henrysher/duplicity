@@ -20,23 +20,21 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import types
-import helper
 import StringIO, unittest, sys
 
 from duplicity.selection import * #@UnusedWildImport
 from duplicity.lazy import * #@UnusedWildImport
+from . import UnitTestCase
 
-helper.setup()
 
-class MatchingTest(unittest.TestCase):
+
+class MatchingTest(UnitTestCase):
     """Test matching of file names against various selection functions"""
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
+        super(MatchingTest, self).setUp()
+        self.unpack_testfiles()
         self.root = Path("testfiles/select")
         self.Select = Select(self.root)
-
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     def makeext(self, path):
         return self.root.new_index(tuple(path.split("/")))
@@ -122,7 +120,7 @@ testfiles/select/3/3/2""")
     def testFilelistIncludeNullSep(self):
         """Test included filelist but with null_separator set"""
         fp = StringIO.StringIO("""\0testfiles/select/1/2\0testfiles/select/1\0testfiles/select/1/2/3\0testfiles/select/3/3/2\0testfiles/select/hello\nthere\0""")
-        globals.null_separator = 1
+        self.set_global('null_separator', 1)
         sf = self.Select.filelist_get_sf(fp, 1, "test")
         assert sf(self.root) == 1
         assert sf(self.makeext("1")) == 1
@@ -133,7 +131,6 @@ testfiles/select/3/3/2""")
         assert sf(self.makeext("3/3")) == 1
         assert sf(self.makeext("3/3/3")) == None
         assert sf(self.makeext("hello\nthere")) == 1
-        globals.null_separator = 0
 
     def testFilelistExclude(self):
         """Test included filelist"""
@@ -271,15 +268,13 @@ testfiles/select/1/1
         assert sf(Path("/proc")) == sfval, \
                "Assumption: /proc is on a different filesystem"
 
-class ParseArgsTest(unittest.TestCase):
+class ParseArgsTest(UnitTestCase):
     """Test argument parsing"""
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
+        super(ParseArgsTest, self).setUp()
+        self.unpack_testfiles()
+        self.root = None
 
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
-
-    root = None
     def ParseTest(self, tuplelist, indicies, filelists = []):
         """No error if running select on tuple goes over indicies"""
         if not self.root:

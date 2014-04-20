@@ -19,16 +19,15 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import helper
-import sys, unittest
+import unittest
 
 import duplicity.backend
 import duplicity.backends #@UnusedImport
 from duplicity.errors import * #@UnusedWildImport
+from . import UnitTestCase
 
-helper.setup()
 
-class ParsedUrlTest(unittest.TestCase):
+class ParsedUrlTest(UnitTestCase):
     """Test the ParsedUrl class"""
     def test_basic(self):
         """Test various url strings"""

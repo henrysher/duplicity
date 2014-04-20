@@ -1,6 +1,7 @@
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
-# Copyright 2012 Canonical Ltd
+# Copyright 2002 Ben Escoto <ben@emerose.org>
+# Copyright 2007 Kenneth Loafman <kenneth@loafman.com>
 #
 # This file is part of duplicity.
 #
@@ -18,22 +19,32 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import sys
+import os
 import unittest
-from mock import patch
+
+from duplicity import tempdir
+from . import UnitTestCase
 
 
-class UTF8Test(unittest.TestCase):
+class TempDirTest(UnitTestCase):
+    def test_all(self):
+        td = tempdir.default()
 
-    def setUp(self):
-        if 'duplicity' in sys.modules:
-            del(sys.modules["duplicity"])
+        self.assert_(td.mktemp() != td.mktemp())
 
-    @patch('gettext.install')
-    def test_module_install(self, gettext_mock):
-        """Make sure we convert translations to unicode"""
-        import duplicity
-        gettext_mock.assert_called_once_with('duplicity', unicode=True, names=['ngettext'])
+        dir = td.mktemp()
+        os.mkdir(dir)
+        os.rmdir(dir)
+
+        fd, fname = td.mkstemp()
+        os.close(fd)
+        os.unlink(fname)
+        td.forget(fname)
+
+        fo, fname = td.mkstemp_file()
+        fo.close() # don't forget, leave to cleanup()
+
+        td.cleanup()
 
 if __name__ == "__main__":
     unittest.main()
