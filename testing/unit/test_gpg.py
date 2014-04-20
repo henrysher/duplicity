@@ -19,31 +19,22 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import helper
 import sys, os, unittest, random
 
 from duplicity import gpg
 from duplicity import path
+from . import UnitTestCase
 
-helper.setup()
 
-class GPGTest(unittest.TestCase):
+class GPGTest(UnitTestCase):
     """Test GPGFile"""
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
+        super(GPGTest, self).setUp()
+        self.unpack_testfiles()
         self.default_profile = gpg.GPGProfile(passphrase = "foobar")
-
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
-
-    def deltmp(self):
-        """Delete testfiles/output and recreate"""
-        assert not os.system("rm -rf testfiles/output")
-        assert not os.system("mkdir testfiles/output")
 
     def gpg_cycle(self, s, profile = None):
         """Test encryption/decryption cycle on string s"""
-        self.deltmp()
         epath = path.Path("testfiles/output/encrypted_file")
         if not profile:
             profile = self.default_profile
@@ -77,34 +68,33 @@ class GPGTest(unittest.TestCase):
 
     def test_gpg_asym(self):
         """Test GPG asymmetric encryption"""
-        profile = gpg.GPGProfile(passphrase = helper.sign_passphrase,
-                                 recipients = [helper.encrypt_key1,
-                                               helper.encrypt_key2])
+        profile = gpg.GPGProfile(passphrase = self.sign_passphrase,
+                                 recipients = [self.encrypt_key1,
+                                               self.encrypt_key2])
         self.gpg_cycle("aoensutha aonetuh saoe", profile)
 
-        profile2 = gpg.GPGProfile(passphrase = helper.sign_passphrase,
-                                  recipients = [helper.encrypt_key1])
+        profile2 = gpg.GPGProfile(passphrase = self.sign_passphrase,
+                                  recipients = [self.encrypt_key1])
         self.gpg_cycle("aoeu" * 10000, profile2)
 
     def test_gpg_hidden_asym(self):
         """Test GPG asymmetric encryption with hidden key id"""
-        profile = gpg.GPGProfile(passphrase = helper.sign_passphrase,
-                                 hidden_recipients = [helper.encrypt_key1,
-                                               helper.encrypt_key2])
+        profile = gpg.GPGProfile(passphrase = self.sign_passphrase,
+                                 hidden_recipients = [self.encrypt_key1,
+                                                      self.encrypt_key2])
         self.gpg_cycle("aoensutha aonetuh saoe", profile)
 
-        profile2 = gpg.GPGProfile(passphrase = helper.sign_passphrase,
-                                  hidden_recipients = [helper.encrypt_key1])
+        profile2 = gpg.GPGProfile(passphrase = self.sign_passphrase,
+                                  hidden_recipients = [self.encrypt_key1])
         self.gpg_cycle("aoeu" * 10000, profile2)
 
     def test_gpg_signing(self):
         """Test to make sure GPG reports the proper signature key"""
-        self.deltmp()
         plaintext = "hello" * 50000
 
-        signing_profile = gpg.GPGProfile(passphrase = helper.sign_passphrase,
-                                         sign_key = helper.sign_key,
-                                         recipients = [helper.encrypt_key1])
+        signing_profile = gpg.GPGProfile(passphrase = self.sign_passphrase,
+                                         sign_key = self.sign_key,
+                                         recipients = [self.encrypt_key1])
 
         epath = path.Path("testfiles/output/encrypted_file")
         encrypted_signed_file = gpg.GPGFile(1, epath, signing_profile)
@@ -115,16 +105,15 @@ class GPGTest(unittest.TestCase):
         assert decrypted_file.read() == plaintext
         decrypted_file.close()
         sig = decrypted_file.get_signature()
-        assert sig == helper.sign_key, sig
+        assert sig == self.sign_key, sig
 
     def test_gpg_signing_and_hidden_encryption(self):
         """Test to make sure GPG reports the proper signature key even with hidden encryption key id"""
-        self.deltmp()
         plaintext = "hello" * 50000
 
-        signing_profile = gpg.GPGProfile(passphrase = helper.sign_passphrase,
-                                         sign_key = helper.sign_key,
-                                         hidden_recipients = [helper.encrypt_key1])
+        signing_profile = gpg.GPGProfile(passphrase = self.sign_passphrase,
+                                         sign_key = self.sign_key,
+                                         hidden_recipients = [self.encrypt_key1])
 
         epath = path.Path("testfiles/output/encrypted_file")
         encrypted_signed_file = gpg.GPGFile(1, epath, signing_profile)
@@ -135,11 +124,10 @@ class GPGTest(unittest.TestCase):
         assert decrypted_file.read() == plaintext
         decrypted_file.close()
         sig = decrypted_file.get_signature()
-        assert sig == helper.sign_key, sig
+        assert sig == self.sign_key, sig
 
     def test_GPGWriteFile(self):
         """Test GPGWriteFile"""
-        self.deltmp()
         size = 400 * 1000
         gwfh = GPGWriteFile_Helper()
         profile = gpg.GPGProfile(passphrase = "foobar")
@@ -155,7 +143,6 @@ class GPGTest(unittest.TestCase):
 
     def test_GzipWriteFile(self):
         """Test GzipWriteFile"""
-        self.deltmp()
         size = 400 * 1000
         gwfh = GPGWriteFile_Helper()
         for i in range(10): #@UnusedVariable
@@ -170,6 +157,7 @@ class GPGTest(unittest.TestCase):
 
 class GPGWriteHelper2:
     def __init__(self, data): self.data = data
+
 
 class GPGWriteFile_Helper:
     """Used in test_GPGWriteFile above"""
@@ -203,13 +191,11 @@ class GPGWriteFile_Helper:
         return "e" * random.randrange(0, 15000)
 
 
-class SHATest(unittest.TestCase):
+class SHATest(UnitTestCase):
     """Test making sha signatures"""
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
-
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+        super(SHATest, self).setUp()
+        self.unpack_testfiles()
 
     def test_sha(self):
         hash = gpg.get_hash("SHA1", path.Path("testfiles/various_file_types/regular_file"))

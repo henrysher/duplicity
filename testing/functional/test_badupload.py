@@ -22,10 +22,10 @@
 
 import unittest
 
-from helper import CmdError, DuplicityTestCase
+from . import CmdError, FunctionalTestCase
 
 
-class BadUploadTest(DuplicityTestCase):
+class BadUploadTest(FunctionalTestCase):
     """
     Test missing volume upload using duplicity binary
     """

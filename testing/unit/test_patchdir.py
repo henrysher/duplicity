@@ -19,7 +19,6 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import helper
 import sys, cStringIO, unittest
 
 from duplicity import diffdir
@@ -29,16 +28,14 @@ from duplicity import selection
 from duplicity import tarfile #@UnusedImport
 from duplicity import librsync #@UnusedImport
 from duplicity.path import * #@UnusedWildImport
+from . import UnitTestCase
 
-helper.setup()
 
-class PatchingTest(unittest.TestCase):
+class PatchingTest(UnitTestCase):
     """Test patching"""
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
-
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+        super(PatchingTest, self).setUp()
+        self.unpack_testfiles()
 
     def copyfileobj(self, infp, outfp):
         """Copy in fileobj to out, closing afterwards"""
@@ -49,11 +46,6 @@ class PatchingTest(unittest.TestCase):
             outfp.write(buf)
         assert not infp.close()
         assert not outfp.close()
-
-    def deltmp(self):
-        """Delete temporary directories"""
-        assert not os.system("rm -rf testfiles/output")
-        os.mkdir("testfiles/output")
 
     def test_total(self):
         """Test cycle on dirx"""
@@ -68,7 +60,6 @@ class PatchingTest(unittest.TestCase):
     def total_sequence(self, filelist):
         """Test signatures, diffing, and patching on directory list"""
         assert len(filelist) >= 2
-        self.deltmp()
         sig = Path("testfiles/output/sig.tar")
         diff = Path("testfiles/output/diff.tar")
         seq_path = Path("testfiles/output/sequence")
@@ -107,7 +98,6 @@ class PatchingTest(unittest.TestCase):
 
     def test_doubledot_hole(self):
         """Test for the .. bug that lets tar overwrite parent dir"""
-        self.deltmp()
 
         def make_bad_tar(filename):
             """Write attack tarfile to filename"""
@@ -124,7 +114,6 @@ class PatchingTest(unittest.TestCase):
 
             tf.close()
 
-        self.deltmp()
         make_bad_tar("testfiles/output/bad.tar")
         os.mkdir("testfiles/output/temp")
 
@@ -139,12 +128,10 @@ class index:
     def __init__(self, index):
         self.index = index
 
-class CollateItersTest(unittest.TestCase):
+class CollateItersTest(UnitTestCase):
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
-
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+        super(CollateItersTest, self).setUp()
+        self.unpack_testfiles()
 
     def test_collate(self):
         """Test collate_iters function"""
@@ -193,14 +180,12 @@ class CollateItersTest(unittest.TestCase):
         assert c == 3
 
 
-class TestInnerFuncs(unittest.TestCase):
+class TestInnerFuncs(UnitTestCase):
     """Test some other functions involved in patching"""
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
+        super(TestInnerFuncs, self).setUp()
+        self.unpack_testfiles()
         self.check_output()
-
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
 
     def check_output(self):
         """Make sure testfiles/output exists"""

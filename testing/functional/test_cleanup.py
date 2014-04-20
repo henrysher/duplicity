@@ -21,10 +21,10 @@
 
 import unittest
 
-from helper import DuplicityTestCase
+from . import FunctionalTestCase
 
 
-class CleanupTest(DuplicityTestCase):
+class CleanupTest(FunctionalTestCase):
     """
     Test cleanup using duplicity binary
     """

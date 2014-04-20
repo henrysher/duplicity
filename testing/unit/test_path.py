@@ -19,25 +19,21 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import helper
 import sys, unittest
 
 from duplicity import log #@UnusedImport
 from duplicity.path import * #@UnusedWildImport
+from . import UnitTestCase
 
-helper.setup()
 
-class PathTest(unittest.TestCase):
+class PathTest(UnitTestCase):
     """Test basic path functions"""
     def setUp(self):
-        assert not os.system("tar xzf testfiles.tar.gz > /dev/null 2>&1")
-
-    def tearDown(self):
-        assert not os.system("rm -rf testfiles tempdir temp2.tar")
+        super(PathTest, self).setUp()
+        self.unpack_testfiles()
 
     def test_deltree(self):
         """Test deleting a tree"""
-        assert not os.system("rm -rf testfiles/output")
         assert not os.system("cp -pR testfiles/deltree testfiles/output")
         p = Path("testfiles/output")
         assert p.isdir()
@@ -48,7 +44,6 @@ class PathTest(unittest.TestCase):
     # will never be equal (they don't implement __cmp__ or __eq__)
     #def test_compare(self):
     #    """Test directory comparisons"""
-    #    assert not os.system("rm -rf testfiles/output")
     #    assert not os.system("cp -pR testfiles/dir1 testfiles/output")
     #    assert Path("testfiles/dir1").compare_recursive(Path("testfiles/output"), 1)
     #    assert not Path("testfiles/dir1").compare_recursive(Path("testfiles/dir2"), 1)
@@ -94,4 +89,4 @@ class PathTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main()g

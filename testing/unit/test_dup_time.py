@@ -19,13 +19,10 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import helper
 import sys, unittest, time, types
-from copy import copy
-from duplicity import globals
 from duplicity import dup_time
+from . import UnitTestCase
 
-helper.setup()
 
 class TimeTest:
     def testConversion(self):
@@ -41,12 +38,8 @@ class TimeTest:
 
     def testConversion_separator(self):
         """Same as testConversion, but change time Separator"""
-        prev_sep = copy(globals.time_separator)
-        try:
-            globals.time_separator = "_"
-            self.testConversion()
-        finally:
-            globals.time_separator = prev_sep
+        self.set_global('time_separator', "_")
+        self.testConversion()
 
     def testCmp(self):
         """Test time comparisons"""
@@ -64,19 +57,15 @@ class TimeTest:
 
     def testCmp_separator(self):
         """Like testCmp but with new separator"""
-        prev_sep = copy(globals.time_separator)
-        try:
-            globals.time_separator = "_"
-            cmp = dup_time.cmp
-            assert cmp(1,2) == -1
-            assert cmp(2,2) == 0
-            assert cmp(5,1) == 1
-            assert cmp("2001-09-01T21_49_04Z", "2001-08-01T21_49_04Z") == 1
-            assert cmp("2001-09-01T04_49_04+03_23", "2001-09-01T21_49_04Z") == -1
-            assert cmp("2001-09-01T12_00_00Z", "2001-09-01T04_00_00-08_00") == 0
-            assert cmp("2001-09-01T12_00_00-08_00", "2001-09-01T12_00_00-07_00") == 1
-        finally:
-            globals.time_separator = prev_sep
+        self.set_global('time_separator', "_")
+        cmp = dup_time.cmp
+        assert cmp(1,2) == -1
+        assert cmp(2,2) == 0
+        assert cmp(5,1) == 1
+        assert cmp("2001-09-01T21_49_04Z", "2001-08-01T21_49_04Z") == 1
+        assert cmp("2001-09-01T04_49_04+03_23", "2001-09-01T21_49_04Z") == -1
+        assert cmp("2001-09-01T12_00_00Z", "2001-09-01T04_00_00-08_00") == 0
+        assert cmp("2001-09-01T12_00_00-08_00", "2001-09-01T12_00_00-07_00") == 1
 
     def testStringtotime(self):
         """Test converting string to time"""
@@ -144,15 +133,19 @@ class TimeTest:
         t = int(time.time())
         assert dup_time.stringtotime(dup_time.timetostring(t)) == t
 
-class TimeTest1(TimeTest, unittest.TestCase):
-    
-    def setUp(self):
-        globals.old_filenames = False
 
-class TimeTest2(TimeTest, unittest.TestCase):
+class TimeTest1(TimeTest, UnitTestCase):
     
     def setUp(self):
-        globals.old_filenames = True
+        super(TimeTest1, self).setUp()
+        self.set_global('old_filenames', False)
+
+
+class TimeTest2(TimeTest, UnitTestCase):
+    
+    def setUp(self):
+        super(TimeTest2, self).setUp()
+        self.set_global('old_filenames', True)
 
 if __name__ == '__main__':
     unittest.main()

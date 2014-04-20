@@ -54,7 +54,7 @@ def default():
 
     _defaultLock.acquire()
     try:
-        if _defaultInstance is None:
+        if _defaultInstance is None or _defaultInstance.dir() is None:
             _defaultInstance = TemporaryDirectory(temproot = globals.temproot)
         return _defaultInstance
     finally:

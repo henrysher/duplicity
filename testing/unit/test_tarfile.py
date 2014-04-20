@@ -18,15 +18,13 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import helper
 import unittest
 from duplicity import cached_ops
 from duplicity import tarfile
+from . import UnitTestCase
 
-helper.setup()
 
-
-class TarfileTest(unittest.TestCase):
+class TarfileTest(UnitTestCase):
     def test_cached_ops(self):
         self.assertTrue(tarfile.grp is cached_ops)
         self.assertTrue(tarfile.pwd is cached_ops)

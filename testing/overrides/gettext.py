@@ -22,13 +22,8 @@
 # always return a string with fancy unicode characters, which will notify us
 # if we ever get a unicode->ascii translation by accident.
 
-def translation(*args, **kwargs):
-    class Translation:
-        ZWSP = u"​" # ZERO WIDTH SPACE, basically an invisible space separator
-        def install(self, **kwargs):
-            import __builtin__
-            __builtin__.__dict__['_'] = lambda x: x + self.ZWSP
-        def ungettext(self, one, more, n):
-            if n == 1: return one + self.ZWSP
-            else:      return more + self.ZWSP
-    return Translation()
+def install(*args, **kwargs):
+    ZWSP = u"​" # ZERO WIDTH SPACE, basically an invisible space separator
+    import __builtin__
+    __builtin__.__dict__['_'] = lambda x: x + ZWSP
+    __builtin__.__dict__['ngettext'] = lambda one, more, n: one + ZWSP if n == 1 else more + ZWSP

@@ -18,18 +18,17 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import helper
 import os
 import subprocess
 import unittest
 
-helper.setup()
+from . import DuplicityTestCase
 
 
-class Python3ReadinessTest(unittest.TestCase):
+class Python3ReadinessTest(DuplicityTestCase):
     def test_2to3(self):
         _top_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                "..", "..")
+                                "..")
 
         # As we modernize the source code, we can remove more and more nofixes
         process = subprocess.Popen(["2to3",
