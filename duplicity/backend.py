@@ -31,6 +31,7 @@ import time
 import re
 import getpass
 import gettext
+import types
 import urllib
 import urlparse
 
@@ -38,11 +39,14 @@ from duplicity import dup_temp
 from duplicity import file_naming
 from duplicity import globals
 from duplicity import log
+from duplicity import path
 from duplicity import progress
+from duplicity import util
 
 from duplicity.util import exception_traceback
 
-from duplicity.errors import BackendException, FatalBackendError
+from duplicity.errors import BackendException
+from duplicity.errors import FatalBackendException
 from duplicity.errors import TemporaryLoadException
 from duplicity.errors import ConflictingScheme
 from duplicity.errors import InvalidBackendURL
@@ -296,109 +300,143 @@ def strip_auth_from_url(parsed_url):
     # Replace the full network location with the stripped copy.
     return parsed_url.geturl().replace(parsed_url.netloc, straight_netloc, 1)
 
+def get_code_from_exception(backend, e):
+    if isinstance(e, BackendException) and e.code != log.ErrorCode.backend_error:
+        return e.code
+    elif hasattr(backend, '_error_code'):
+        return backend._error_code(e) or log.ErrorCode.backend_error
+    else:
+        return log.ErrorCode.backend_error
 
-# Decorator for backend operation functions to simplify writing one that
-# retries.  Make sure to add a keyword argument 'raise_errors' to your function
-# and if it is true, raise an exception on an error.  If false, fatal-log it.
-def retry(fn):
-    def iterate(*args):
-        for n in range(1, globals.num_retries):
-            try:
-                kwargs = {"raise_errors" : True}
-                return fn(*args, **kwargs)
-            except Exception as e:
-                log.Warn(_("Attempt %s failed: %s: %s")
-                         % (n, e.__class__.__name__, str(e)))
-                log.Debug(_("Backtrace of previous error: %s")
-                          % exception_traceback())
-                if isinstance(e, TemporaryLoadException):
-                    time.sleep(30) # wait longer before trying again
-                else:
-                    time.sleep(10) # wait a bit before trying again
-        # Now try one last time, but fatal-log instead of raising errors
-        kwargs = {"raise_errors" : False}
-        return fn(*args, **kwargs)
-    return iterate
-
-# same as above, a bit dumber and always dies fatally if last trial fails
-# hence no need for the raise_errors var ;), we really catch everything here
-# as we don't know what the underlying code comes up with and we really *do*
-# want to retry globals.num_retries times under all circumstances
-def retry_fatal(fn):
-    def _retry_fatal(self, *args):
+def _retry(self, num_retries, fn, *args):
+    for n in range(1, num_retries):
         try:
-            n = 0
+            return fn(self, *args)
+        except FatalBackendException as e:
+            # die on fatal errors
+            raise e
+        except Exception as e:
+            # retry on anything else
+            log.Warn(_("Attempt %s failed. %s: %s")
+                     % (n, e.__class__.__name__, str(e)))
+            log.Debug(_("Backtrace of previous error: %s")
+                      % exception_traceback())
+            if get_code_from_exception(self, e) == log.ErrorCode.backend_not_found:
+                # If we tried to do something, but the file just isn't there,
+                # no need to retry.
+                return
+            if isinstance(e, TemporaryLoadException):
+                time.sleep(1)#90) # wait longer before trying again
+            else:
+                time.sleep(1)#30) # wait a bit before trying again
+            if hasattr(self, '_retry_cleanup'):
+                self._retry_cleanup()
+
+def retry(fatal=True):
+    # Decorators with arguments introduce a new level of indirection.  So we
+    # have to return a decorator function (which itself returns a function!)
+    def handle_fatal_error(backend, e, n):
+        code = get_code_from_exception(backend, e)
+        def make_filename(f):
+            if isinstance(f, path.ROPath):
+                return util.escape(f.name)
+            else:
+                return util.escape(f)
+        extra = ' '.join([fn.__name__] + [make_filename(x) for x in args if x])
+        log.FatalError(_("Giving up after %s attempts. %s: %s")
+                       % (n, e.__class__.__name__,
+                          str(e)), code=code, extra=extra)
+
+    def outer_retry(fn):
+        def inner_retry(self, *args):
             for n in range(1, globals.num_retries):
                 try:
-                    self.retry_count = n
                     return fn(self, *args)
-                except FatalBackendError as e:
+                except FatalBackendException as e:
                     # die on fatal errors
                     raise e
                 except Exception as e:
                     # retry on anything else
-                    log.Warn(_("Attempt %s failed. %s: %s")
-                             % (n, e.__class__.__name__, str(e)))
                     log.Debug(_("Backtrace of previous error: %s")
                               % exception_traceback())
-                    time.sleep(10) # wait a bit before trying again
-        # final trial, die on exception
-            self.retry_count = n+1
-            return fn(self, *args)
-        except Exception as e:
-            log.Debug(_("Backtrace of previous error: %s")
-                        % exception_traceback())
-            log.FatalError(_("Giving up after %s attempts. %s: %s")
-                         % (self.retry_count, e.__class__.__name__, str(e)),
-                          log.ErrorCode.backend_error)
-        self.retry_count = 0
+                    at_end = n == globals.num_retries
+                    if get_code_from_exception(self, e) == log.ErrorCode.backend_not_found:
+                        # If we tried to do something, but the file just isn't there,
+                        # no need to retry.
+                        at_end = True
+                    if at_end and fatal:
+                        handle_fatal_error(self, e, n)
+                    else:
+                        log.Warn(_("Attempt %s failed. %s: %s")
+                                 % (n, e.__class__.__name__, str(e)))
+                    if not at_end:
+                        if isinstance(e, TemporaryLoadException):
+                            time.sleep(1)#90) # wait longer before trying again
+                        else:
+                            time.sleep(1)#30) # wait a bit before trying again
+                        if hasattr(self, '_retry_cleanup'):
+                            self._retry_cleanup()
 
-    return _retry_fatal
+        return inner_retry
+    return outer_retry
 
 class Backend(object):
     """
     Represents a generic duplicity backend, capable of storing and
     retrieving files.
 
-    Concrete sub-classes are expected to implement:
-
-      - put
-      - get
-      - list
-      - delete
-      - close (if needed)
-
-    Optional:
-
-      - move
+    See README in backends directory for information on how to write a backend.
     """
     
     def __init__(self, parsed_url):
         self.parsed_url = parsed_url
 
-    def put(self, source_path, remote_filename = None):
+    def __do_put(self, source_path, remote_filename):
+        if hasattr(self, '_put'):
+            log.Info(_("Writing %s") % remote_filename)
+            self._put(source_path, remote_filename)
+        else:
+            raise NotImplementedError()
+
+    @retry(fatal=True)
+    def put(self, source_path, remote_filename=None):
         """
         Transfer source_path (Path object) to remote_filename (string)
 
         If remote_filename is None, get the filename from the last
         path component of pathname.
         """
-        raise NotImplementedError()
+        if not remote_filename:
+            remote_filename = source_path.get_filename()
+        self.__do_put(source_path, remote_filename)
 
-    def move(self, source_path, remote_filename = None):
+    @retry(fatal=True)
+    def move(self, source_path, remote_filename=None):
         """
         Move source_path (Path object) to remote_filename (string)
 
         Same as put(), but unlinks source_path in the process.  This allows the
         local backend to do this more efficiently using rename.
         """
-        self.put(source_path, remote_filename)
-        source_path.delete()
+        if not remote_filename:
+            remote_filename = source_path.get_filename()
+        if not hasattr(self, '_move') or not self._move(source_path, remote_filename):
+            self.__do_put(source_path, remote_filename)
+            source_path.delete()
 
+    @retry(fatal=True)
     def get(self, remote_filename, local_path):
         """Retrieve remote_filename and place in local_path"""
-        raise NotImplementedError()
+        if hasattr(self, '_get'):
+            self._get(remote_filename, local_path)
+            if not local_path.exists():
+                raise BackendException(_("File %s not found locally after get "
+                                         "from backend") % util.ufn(local_path.name))
+            local_path.setdata()
+        else:
+            raise NotImplementedError()
 
+    @retry(fatal=True)
     def list(self):
         """
         Return list of filenames (byte strings) present in backend
@@ -409,7 +447,9 @@ class Backend(object):
                 # There shouldn't be any encoding errors for files we care
                 # about, since duplicity filenames are ascii.  But user files
                 # may be in the same directory.  So just replace characters.
-                return filename.encode(sys.getfilesystemencoding(), 'replace')
+                # We don't know what encoding the remote backend may have given
+                # us, but utf8 is a pretty good guess.
+                return filename.encode('utf8', 'replace')
             else:
                 return filename
 
@@ -424,7 +464,22 @@ class Backend(object):
         """
         Delete each filename in filename_list, in order if possible.
         """
-        raise NotImplementedError()
+        assert type(filename_list) is not types.StringType
+        if hasattr(self, '_delete_list'):
+            self._do_delete_list(filename_list)
+        elif hasattr(self, '_delete'):
+            for filename in filename_list:
+                self._do_delete(filename)
+        else:
+            raise NotImplementedError()
+
+    @retry(fatal=False)
+    def _do_delete_list(self, filename_list):
+        self._delete_list(filename_list)
+
+    @retry(fatal=False)
+    def _do_delete(self, filename):
+        self._delete(filename)
 
     # Should never cause FatalError.
     # Returns a dictionary of dictionaries.  The outer dictionary maps
@@ -435,25 +490,46 @@ class Backend(object):
     #         if None, error querying file
     #
     # Returned dictionary is guaranteed to contain a metadata dictionary for
-    # each filename, but not all metadata are guaranteed to be present.
-    def query_info(self, filename_list, raise_errors=True):
+    # each filename, and all metadata are guaranteed to be present.
+    def query_info(self, filename_list):
         """
         Return metadata about each filename in filename_list
         """
         info = {}
-        if hasattr(self, '_query_list_info'):
-            info = self._query_list_info(filename_list)
-        elif hasattr(self, '_query_file_info'):
+        if hasattr(self, '_query_list'):
+            info = self._do_query_list(filename_list)
+        elif hasattr(self, '_query'):
             for filename in filename_list:
-                info[filename] = self._query_file_info(filename)
+                info[filename] = self._do_query(filename)
 
         # Fill out any missing entries (may happen if backend has no support
         # or its query_list support is lazy)
         for filename in filename_list:
-            if filename not in info:
+            if filename not in info or info[filename] is None:
                 info[filename] = {}
+            for metadata in ['size']:
+                info[filename].setdefault(metadata, None)
 
         return info
+
+    @retry(fatal=False)
+    def _do_query_list(self, filename_list):
+        info = self._query_list(filename_list)
+        if info is None:
+            info = {}
+        return info
+
+    @retry(fatal=False)
+    def _do_query(self, filename):
+        return self._query(filename)
+
+    def close(self):
+        """
+        Close the backend, releasing any resources held and
+        invalidating any file objects obtained from the backend.
+        """
+        if hasattr(self, '_close'):
+            self._close()
 
     """ use getpass by default, inherited backends may overwrite this behaviour """
     use_getpass = True
@@ -493,27 +569,7 @@ class Backend(object):
         else:
             return commandline
 
-    """
-    DEPRECATED:
-    run_command(_persist) - legacy wrappers for subprocess_popen(_persist)
-    """
-    def run_command(self, commandline):
-        return self.subprocess_popen(commandline)
-    def run_command_persist(self, commandline):
-        return self.subprocess_popen_persist(commandline)
-
-    """
-    DEPRECATED:
-    popen(_persist) - legacy wrappers for subprocess_popen(_persist)
-    """
-    def popen(self, commandline):
-        result, stdout, stderr = self.subprocess_popen(commandline)
-        return stdout
-    def popen_persist(self, commandline):
-        result, stdout, stderr = self.subprocess_popen_persist(commandline)
-        return stdout
-
-    def _subprocess_popen(self, commandline):
+    def __subprocess_popen(self, commandline):
         """
         For internal use.
         Execute the given command line, interpreted as a shell command.
@@ -534,7 +590,7 @@ class Backend(object):
         """
         private = self.munge_password(commandline)
         log.Info(_("Reading results of '%s'") % private)
-        result, stdout, stderr = self._subprocess_popen(commandline)
+        result, stdout, stderr = self.__subprocess_popen(commandline)
         if result != 0:
             raise BackendException("Error running '%s'" % private)
         return result, stdout, stderr
@@ -558,7 +614,7 @@ class Backend(object):
             if n > 1:
                 time.sleep(30)
             log.Info(_("Reading results of '%s'") % private)
-            result, stdout, stderr = self._subprocess_popen(commandline)
+            result, stdout, stderr = self.__subprocess_popen(commandline)
             if result == 0:
                 return result, stdout, stderr
 
@@ -645,10 +701,3 @@ class Backend(object):
         fout = self.get_fileobj_write(filename, parseresults)
         fout.write(buffer)
         assert not fout.close()
-
-    def close(self):
-        """
-        Close the backend, releasing any resources held and
-        invalidating any file objects obtained from the backend.
-        """
-        pass

@@ -117,9 +117,7 @@ class ImapBackend(duplicity.backend.Backend):
 
         return mp.as_string()
 
-    def put(self, source_path, remote_filename = None):
-        if not remote_filename:
-            remote_filename = source_path.get_filename()
+    def _put(self, source_path, remote_filename):
         f=source_path.open("rb")
         allowedTimeout = globals.timeout
         if (allowedTimeout == 0):
@@ -149,7 +147,7 @@ class ImapBackend(duplicity.backend.Backend):
 
         log.Info("IMAP mail with '%s' subject stored" % remote_filename)
 
-    def get(self, remote_filename, local_path):
+    def _get(self, remote_filename, local_path):
         allowedTimeout = globals.timeout
         if (allowedTimeout == 0):
             # Allow a total timeout of 1 day
@@ -244,8 +242,7 @@ class ImapBackend(duplicity.backend.Backend):
     def _expunge(self):
         list=self._imapf(self._conn.expunge)
 
-    def delete(self, filename_list):
-        assert len(filename_list) > 0
+    def _delete_list(self, filename_list):
         for filename in filename_list:
             list = self._imapf(self._conn.search,None,"(SUBJECT %s)"%filename)
             list = list[0].split()
@@ -255,7 +252,7 @@ class ImapBackend(duplicity.backend.Backend):
         self._expunge()
         log.Notice("IMAP expunged %s files" % len(list))
 
-    def close(self):
+    def _close(self):
         self._conn.select(globals.imap_mailbox)
         self._conn.close()
         self._conn.logout()

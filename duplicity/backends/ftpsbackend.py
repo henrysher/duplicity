@@ -28,7 +28,6 @@ import re
 import duplicity.backend
 from duplicity import globals
 from duplicity import log
-from duplicity.errors import *
 from duplicity import tempdir
 
 class FTPSBackend(duplicity.backend.Backend):
@@ -87,41 +86,34 @@ class FTPSBackend(duplicity.backend.Backend):
 
         self.flags = "-f %s" % self.tempname
 
-    def put(self, source_path, remote_filename = None):
-        """Transfer source_path to remote_filename"""
-        if not remote_filename:
-            remote_filename = source_path.get_filename()
+    def _put(self, source_path, remote_filename):
         remote_path = os.path.join(urllib.unquote(self.parsed_url.path.lstrip('/')), remote_filename).rstrip()
         commandline = "lftp -c 'source %s;put \'%s\' -o \'%s\''" % \
             (self.tempname, source_path.name, remote_path)
-        l = self.run_command_persist(commandline)
+        self.subprocess_popen_persist(commandline)
 
-    def get(self, remote_filename, local_path):
-        """Get remote filename, saving it to local_path"""
+    def _get(self, remote_filename, local_path):
         remote_path = os.path.join(urllib.unquote(self.parsed_url.path), remote_filename).rstrip()
         commandline = "lftp -c 'source %s;get %s -o %s'" % \
             (self.tempname, remote_path.lstrip('/'), local_path.name)
-        self.run_command_persist(commandline)
-        local_path.setdata()
+        self.subprocess_popen_persist(commandline)
 
     def _list(self):
-        """List files in directory"""
         # Do a long listing to avoid connection reset
         remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
         commandline = "lftp -c 'source %s;ls \'%s\''" % (self.tempname, remote_dir)
-        l = self.popen_persist(commandline).split('\n')
-        l = filter(lambda x: x, l)
+        _, l, _ = self.subprocess_popen_persist(commandline)
+        l = filter(lambda x: x, l.split('\n'))
         # Look for our files as the last element of a long list line
         return [x.split()[-1] for x in l]
 
-    def delete(self, filename_list):
-        """Delete files in filename_list"""
+    def _delete_list(self, filename_list):
         filelist = ""
         for filename in filename_list:
             filelist += "\'%s\' " % filename
         if filelist.rstrip():
             remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
             commandline = "lftp -c 'source %s;cd \'%s\';rm %s'" % (self.tempname, remote_dir, filelist.rstrip())
-            self.popen_persist(commandline)
+            self.subprocess_popen_persist(commandline)
 
 duplicity.backend.register_backend("ftps", FTPSBackend)

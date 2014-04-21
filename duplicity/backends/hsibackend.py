@@ -20,9 +20,7 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import os
-
 import duplicity.backend
-from duplicity.errors import * #@UnusedWildImport
 
 hsi_command = "hsi"
 class HSIBackend(duplicity.backend.Backend):
@@ -35,36 +33,23 @@ class HSIBackend(duplicity.backend.Backend):
         else:
             self.remote_prefix = ""
 
-    def put(self, source_path, remote_filename = None):
-        if not remote_filename:
-            remote_filename = source_path.get_filename()
+    def _put(self, source_path, remote_filename):
         commandline = '%s "put %s : %s%s"' % (hsi_command,source_path.name,self.remote_prefix,remote_filename)
-        try:
-            self.run_command(commandline)
-        except Exception:
-            print commandline
+        self.subprocess_popen(commandline)
 
-    def get(self, remote_filename, local_path):
+    def _get(self, remote_filename, local_path):
         commandline = '%s "get %s : %s%s"' % (hsi_command, local_path.name, self.remote_prefix, remote_filename)
-        self.run_command(commandline)
-        local_path.setdata()
-        if not local_path.exists():
-            raise BackendException("File %s not found" % local_path.name)
+        self.subprocess_popen(commandline)
 
-    def list(self):
+    def _list(self):
         commandline = '%s "ls -l %s"' % (hsi_command, self.remote_dir)
         l = os.popen3(commandline)[2].readlines()[3:]
         for i in range(0,len(l)):
             l[i] = l[i].split()[-1]
-        print filter(lambda x: x, l)
         return filter(lambda x: x, l)
 
-    def delete(self, filename_list):
-        assert len(filename_list) > 0
-        for fn in filename_list:
-            commandline = '%s "rm %s%s"' % (hsi_command, self.remote_prefix, fn)
-            self.run_command(commandline)
+    def _delete(self, filename):
+        commandline = '%s "rm %s%s"' % (hsi_command, self.remote_prefix, fn)
+        self.subprocess_popen(commandline)
 
 duplicity.backend.register_backend("hsi", HSIBackend)
-
-

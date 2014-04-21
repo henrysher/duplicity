@@ -1,0 +1,45 @@
+= How to write a backend, in five easy steps! =
+
+There are five main methods you want to implement:
+
+__init__  - Initial setup
+_get      - Get one file
+_put      - Upload one file
+_list     - List all files in the backend
+_delete   - Delete one file
+
+There are other methods you may optionally implement:
+
+_delete_list
+_query
+_query_list
+_retry_cleanup
+_error_code
+_move
+_close
+
+== Subclassing ==
+
+Always subclass from duplicity.backend.Backend
+
+== Registering ==
+
+You can register your class as a single backend like so:
+
+duplicity.backend.register_backend("foo", FooBackend)
+
+This will allow a URL like so: foo://hostname/path
+
+Or you can register your class as a meta backend like so:
+duplicity.backend.register_prefix_backend("bar", BarBackend)
+
+Which will allow a URL like so: bar+foo://hostname/path and your class will
+be passed the inner URL to either interpret how you like or create a new
+inner backend instance with duplicity.backend.get_backend(url).
+
+== Naming ==
+
+When writing helper methods for your class, please prefix them with two
+underscores.  While you can define other no- or single-underscore prefixed
+methods, we don't guarantee that that method name won't later be used
+by the main Backend class.

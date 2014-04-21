@@ -22,9 +22,7 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import duplicity.backend
-from duplicity.backend import retry
-from duplicity import log
-from duplicity.errors import * #@UnusedWildImport
+from duplicity.errors import BackendException
 
 
 class MegaBackend(duplicity.backend.Backend):
@@ -42,7 +40,7 @@ class MegaBackend(duplicity.backend.Backend):
         # Setup client instance.
         self.client = Mega()
         self.client.domain = parsed_url.hostname
-        self.__authorize(parsed_url.username, self.get_password())
+        self._authorize(parsed_url.username, self.get_password())
 
         # Fetch destination folder entry (and crete hierarchy if required).
         folder_names = parsed_url.path[1:].split('/')
@@ -50,7 +48,7 @@ class MegaBackend(duplicity.backend.Backend):
 
         parent_folder = self.client.root_id
         for folder_name in folder_names:
-            entries = self.__filter_entries(files, parent_folder, folder_name, 'folder')
+            entries = self._filter_entries(files, parent_folder, folder_name, 'folder')
             if len(entries):
                 # use first matching folder as new parent
                 parent_folder = entries.keys()[0]
@@ -63,113 +61,56 @@ class MegaBackend(duplicity.backend.Backend):
 
         self.folder = parent_folder
 
-    @retry
-    def put(self, source_path, remote_filename=None, raise_errors=False):
-        """Transfer source_path to remote_filename"""
-        # Default remote file name.
-        if not remote_filename:
-            remote_filename = source_path.get_filename()
+    def _put(self, source_path, remote_filename):
+        self._delete(remote_filename)
+        self.client.upload(source_path.get_canonical(), self.folder, dest_filename=remote_filename)
 
-        try:
-            # If remote file already exists in destination folder, remove it.
-            files = self.client.get_files()
-            entries = self.__filter_entries(files, self.folder, remote_filename, 'file')
-
-            for entry in entries:
-                self.client.delete(entry)
-
-            self.client.upload(source_path.get_canonical(), self.folder, dest_filename=remote_filename)
-
-        except Exception as e:
-            self.__handle_error("Failed to upload file '%s' to remote folder '%s': %s"
-                                % (source_path.get_canonical(), self.__get_node_name(self.folder), str(e)), raise_errors)
-
-    @retry
-    def get(self, remote_filename, local_path, raise_errors=False):
-        """Get remote filename, saving it to local_path"""
-        try:
-            files = self.client.get_files()
-            entries = self.__filter_entries(files, self.folder, remote_filename, 'file')
-
-            if len(entries):
-                # get first matching remote file
-                entry = entries.keys()[0]
-                self.client.download((entry, entries[entry]), dest_filename=local_path.name)
-                local_path.setdata()
-                return
-            else:
-                self.__handle_error("Failed to find file '%s' in remote folder '%s'"
-                                    % (remote_filename, self.__get_node_name(self.folder)), raise_errors)
-        except Exception as e:
-            self.__handle_error("Failed to download file '%s' in remote folder '%s': %s"
-                                 % (remote_filename, self.__get_node_name(self.folder), str(e)), raise_errors)
-
-    @retry
-    def _list(self, raise_errors=False):
-        """List files in folder"""
-        try:
-            entries = self.client.get_files_in_node(self.folder)
-            return [ self.client.get_name_from_file({entry:entries[entry]}) for entry in entries]
-        except Exception as e:
-            self.__handle_error("Failed to fetch list of files in remote folder '%s': %s"
-                                % (self.__get_node_name(self.folder), str(e)), raise_errors)
-
-    @retry
-    def delete(self, filename_list, raise_errors=False):
-        """Delete files in filename_list"""
+    def _get(self, remote_filename, local_path):
         files = self.client.get_files()
-        for filename in filename_list:
-            entries = self.__filter_entries(files, self.folder, filename)
-            try:
-                if len(entries) > 0:
-                    for entry in entries:
-                        if self.client.destroy(entry):
-                            self.__handle_error("Failed to remove file '%s' in remote folder '%s'"
-                                % (filename, self.__get_node_name(self.folder)), raise_errors)
-                else:
-                    log.Warn("Failed to fetch file '%s' in remote folder '%s'"
-                             % (filename, self.__get_node_name(self.folder)))
-            except Exception as e:
-                self.__handle_error("Failed to remove file '%s' in remote folder '%s': %s"
-                                    % (filename, self.__get_node_name(self.folder), str(e)), raise_errors)
+        entries = self._filter_entries(files, self.folder, remote_filename, 'file')
+        if len(entries):
+            # get first matching remote file
+            entry = entries.keys()[0]
+            self.client.download((entry, entries[entry]), dest_filename=local_path.name)
+        else:
+            raise BackendException("Failed to find file '%s' in remote folder '%s'"
+                                   % (remote_filename, self._get_node_name(self.folder)))
 
-    def __get_node_name(self, handle):
+    def _list(self):
+        entries = self.client.get_files_in_node(self.folder)
+        return [ self.client.get_name_from_file({entry:entries[entry]}) for entry in entries]
+
+    def _delete(self, filename):
+        files = self.client.get_files()
+        entries = self._filter_entries(files, self.folder, filename)
+        for entry in entries:
+            self.client.destroy(entry)
+
+    def _get_node_name(self, handle):
         """get node name from public handle"""
         files = self.client.get_files()
         return self.client.get_name_from_file({handle:files[handle]})
-        
-    def __handle_error(self, message, raise_errors=True):
-        if raise_errors:
-            raise BackendException(message)
-        else:
-            log.FatalError(message, log.ErrorCode.backend_error)
 
-    def __authorize(self, email, password):
-        try:
-            self.client.login(email, password)
-        except Exception as e:
-            self.__handle_error('Error while authenticating client: %s.' % str(e))
+    def _authorize(self, email, password):
+        self.client.login(email, password)
 
-    def __filter_entries(self, entries, parent_id=None, title=None, type=None):
+    def _filter_entries(self, entries, parent_id=None, title=None, type=None):
         result = {}
         type_map = { 'folder': 1, 'file': 0 }
 
-        try:
-            for k, v in entries.items():
-                try:
-                    if parent_id != None:
-                        assert(v['p'] == parent_id)
-                    if title != None:
-                        assert(v['a']['n'] == title)
-                    if type != None:
-                        assert(v['t'] == type_map[type])
-                except AssertionError:
-                    continue
+        for k, v in entries.items():
+            try:
+                if parent_id != None:
+                    assert(v['p'] == parent_id)
+                if title != None:
+                    assert(v['a']['n'] == title)
+                if type != None:
+                    assert(v['t'] == type_map[type])
+            except AssertionError:
+                continue
 
-                result.update({k:v})
+            result.update({k:v})
 
-            return result
-        except Exception as e:
-            self.__handle_error('Error while fetching remote entries: %s.' % str(e))
+        return result
 
 duplicity.backend.register_backend('mega', MegaBackend)

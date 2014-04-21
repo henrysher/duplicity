@@ -289,8 +289,6 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
 
     def validate_block(orig_size, dest_filename):
         info = backend.query_info([dest_filename])[dest_filename]
-        if 'size' not in info:
-            return # backend didn't know how to query size
         size = info['size']
         if size is None:
             return # error querying file
@@ -537,10 +535,14 @@ def full_backup(col_stats):
                                        man_outfp, sig_outfp,
                                        globals.backend)
 
+        print 'MIKE sig1'
         # close sig file, send to remote, and rename to final
         sig_outfp.close()
+        print 'MIKE sig2'
         sig_outfp.to_remote()
+        print 'MIKE sig3'
         sig_outfp.to_final()
+        print 'MIKE sig4'
 
         # close manifest, send to remote, and rename to final
         man_outfp.close()

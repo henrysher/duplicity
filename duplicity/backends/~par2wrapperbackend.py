@@ -43,6 +43,12 @@ class Par2WrapperBackend(backend.Backend):
         except:
             raise UnsupportedBackendScheme(self.parsed_url.url_string)
 
+        for attr in ['_get', '_put', '_list', '_delete', '_delete_list',
+                     '_query', '_query_list', '_retry_cleanup', '_error_code',
+                     '_move', '_close']:
+            if hasattr(self.wrapped_backend, attr):
+                setattr(self, attr, getattr(self, '_' + attr))
+
     def put(self, source_path, remote_filename = None):
         """create Par2 files and transfer the given file and the Par2 files
         with the wrapped backend.
@@ -155,36 +161,11 @@ class Par2WrapperBackend(backend.Backend):
     """just return the output of coresponding wrapped backend
     for all other functions
     """
-    def query_info(self, filename_list, raise_errors=True):
+    def query_list(self, filename_list, raise_errors=True):
         return self.wrapped_backend.query_info(filename_list, raise_errors)
 
-    def get_password(self):
-        return self.wrapped_backend.get_password()
-
-    def munge_password(self, commandline):
-        return self.wrapped_backend.munge_password(commandline)
-
-    def run_command(self, commandline):
-        return self.wrapped_backend.run_command(commandline)
-    def run_command_persist(self, commandline):
-        return self.wrapped_backend.run_command_persist(commandline)
-
-    def popen(self, commandline):
-        return self.wrapped_backend.popen(commandline)
-    def popen_persist(self, commandline):
-        return self.wrapped_backend.popen_persist(commandline)
-
-    def _subprocess_popen(self, commandline):
-        return self.wrapped_backend._subprocess_popen(commandline)
-
-    def subprocess_popen(self, commandline):
-        return self.wrapped_backend.subprocess_popen(commandline)
-
-    def subprocess_popen_persist(self, commandline):
-        return self.wrapped_backend.subprocess_popen_persist(commandline)
-
-    def close(self):
-        return self.wrapped_backend.close()
+    def _close(self):
+        return self.wrapped_backend._close()
 
 """register this backend with leading "par2+" for all already known backends
 

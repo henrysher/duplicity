@@ -98,7 +98,7 @@ class BotoBackend(BotoSingleBackend):
 
         self._pool = multiprocessing.Pool(processes=number_of_procs)
 
-    def close(self):
+    def _close(self):
         BotoSingleBackend.close(self)
         log.Debug("Closing pool")
         self._pool.terminate()

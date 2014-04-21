@@ -19,7 +19,6 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import os
-import types
 import subprocess
 import atexit
 import signal
@@ -27,10 +26,7 @@ from gi.repository import Gio #@UnresolvedImport
 from gi.repository import GLib #@UnresolvedImport
 
 import duplicity.backend
-from duplicity.backend import retry
 from duplicity import log
-from duplicity import util
-from duplicity.errors import * #@UnusedWildImport
 
 def ensure_dbus():
     # GIO requires a dbus session bus which can start the gvfs daemons
@@ -86,8 +82,8 @@ class GIOBackend(duplicity.backend.Backend):
         op = DupMountOperation(self)
         loop = GLib.MainLoop()
         self.remote_file.mount_enclosing_volume(Gio.MountMountFlags.NONE,
-                                                op, None, self.done_with_mount,
-                                                loop)
+                                                op, None,
+                                                self.__done_with_mount, loop)
         loop.run() # halt program until we're done mounting
 
         # Now make the directory if it doesn't exist
@@ -97,7 +93,7 @@ class GIOBackend(duplicity.backend.Backend):
             if e.code != Gio.IOErrorEnum.EXISTS:
                 raise
 
-    def done_with_mount(self, fileobj, result, loop):
+    def __done_with_mount(self, fileobj, result, loop):
         try:
             fileobj.mount_enclosing_volume_finish(result)
         except GLib.GError as e:
@@ -107,86 +103,49 @@ class GIOBackend(duplicity.backend.Backend):
                                % str(e), log.ErrorCode.connection_failed)
         loop.quit()
 
-    def handle_error(self, raise_error, e, op, file1=None, file2=None):
-        if raise_error:
-            raise e
-        code = log.ErrorCode.backend_error
-        if isinstance(e, GLib.GError):
-            if e.code == Gio.IOErrorEnum.PERMISSION_DENIED:
-                code = log.ErrorCode.backend_permission_denied
-            elif e.code == Gio.IOErrorEnum.NOT_FOUND:
-                code = log.ErrorCode.backend_not_found
-            elif e.code == Gio.IOErrorEnum.NO_SPACE:
-                code = log.ErrorCode.backend_no_space
-        extra = ' '.join([util.escape(x) for x in [file1, file2] if x])
-        extra = ' '.join([op, extra])
-        log.FatalError(str(e), code, extra)
-
-    def copy_progress(self, *args, **kwargs):
+    def __copy_progress(self, *args, **kwargs):
         pass
 
-    @retry
-    def copy_file(self, op, source, target, raise_errors=False):
-        log.Info(_("Writing %s") % target.get_parse_name())
-        try:
-            source.copy(target,
-                        Gio.FileCopyFlags.OVERWRITE | Gio.FileCopyFlags.NOFOLLOW_SYMLINKS,
-                        None, self.copy_progress, None)
-        except Exception as e:
-            self.handle_error(raise_errors, e, op, source.get_parse_name(),
-                              target.get_parse_name())
+    def __copy_file(self, source, target):
+        source.copy(target,
+                    Gio.FileCopyFlags.OVERWRITE | Gio.FileCopyFlags.NOFOLLOW_SYMLINKS,
+                    None, self.__copy_progress, None)
 
-    def put(self, source_path, remote_filename = None):
-        """Copy file to remote"""
-        if not remote_filename:
-            remote_filename = source_path.get_filename()
+    def _error_code(self, e):
+        if isinstance(e, GLib.GError):
+            if e.code == Gio.IOErrorEnum.PERMISSION_DENIED:
+                return log.ErrorCode.backend_permission_denied
+            elif e.code == Gio.IOErrorEnum.NOT_FOUND:
+                return log.ErrorCode.backend_not_found
+            elif e.code == Gio.IOErrorEnum.NO_SPACE:
+                return log.ErrorCode.backend_no_space
+
+    def _put(self, source_path, remote_filename):
         source_file = Gio.File.new_for_path(source_path.name)
         target_file = self.remote_file.get_child(remote_filename)
-        self.copy_file('put', source_file, target_file)
+        self.__copy_file(source_file, target_file)
 
-    def get(self, filename, local_path):
-        """Get file and put in local_path (Path object)"""
+    def _get(self, filename, local_path):
         source_file = self.remote_file.get_child(filename)
         target_file = Gio.File.new_for_path(local_path.name)
-        self.copy_file('get', source_file, target_file)
-        local_path.setdata()
+        self.__copy_file(source_file, target_file)
 
-    @retry
-    def _list(self, raise_errors=False):
-        """List files in that directory"""
+    def _list(self):
         files = []
-        try:
-            enum = self.remote_file.enumerate_children(Gio.FILE_ATTRIBUTE_STANDARD_NAME,
-                                                       Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS,
-                                                       None)
+        enum = self.remote_file.enumerate_children(Gio.FILE_ATTRIBUTE_STANDARD_NAME,
+                                                   Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS,
+                                                   None)
+        info = enum.next_file(None)
+        while info:
+            files.append(info.get_name())
             info = enum.next_file(None)
-            while info:
-                files.append(info.get_name())
-                info = enum.next_file(None)
-        except Exception as e:
-            self.handle_error(raise_errors, e, 'list',
-                              self.remote_file.get_parse_name())
         return files
 
-    @retry
-    def delete(self, filename_list, raise_errors=False):
-        """Delete all files in filename list"""
-        assert type(filename_list) is not types.StringType
-        for filename in filename_list:
-            target_file = self.remote_file.get_child(filename)
-            try:
-                target_file.delete(None)
-            except Exception as e:
-                if isinstance(e, GLib.GError):
-                    if e.code == Gio.IOErrorEnum.NOT_FOUND:
-                        continue
-                self.handle_error(raise_errors, e, 'delete',
-                                  target_file.get_parse_name())
-                return
+    def _delete(self, filename):
+        target_file = self.remote_file.get_child(filename)
+        target_file.delete(None)
 
-    @retry
-    def _query_file_info(self, filename, raise_errors=False):
-        """Query attributes on filename"""
+    def _query(self, filename):
         target_file = self.remote_file.get_child(filename)
         attrs = Gio.FILE_ATTRIBUTE_STANDARD_SIZE
         try:
@@ -197,7 +156,6 @@ class GIOBackend(duplicity.backend.Backend):
             if isinstance(e, GLib.GError):
                 if e.code == Gio.IOErrorEnum.NOT_FOUND:
                     return {'size': -1} # early exit, no need to retry
-            if raise_errors:
-                raise e
-            else:
-                return {'size': None}
+            raise
+
+# FIXME: add prefix code here
