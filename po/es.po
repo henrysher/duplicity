@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-04-19 19:55+0000\n"
+"POT-Creation-Date: 2014-04-20 15:34+0000\n"
 "PO-Revision-Date: 2014-04-10 00:12+0000\n"
 "Last-Translator: Adolfo Jayme <fitoschido@gmail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2014-04-20 05:37+0000\n"
+"X-Launchpad-Export-Date: 2014-04-21 04:40+0000\n"
 "X-Generator: Launchpad (build 16985)\n"
 
 #: ../bin/duplicity:102
@@ -976,17 +976,17 @@ msgstr "trabajadores activos = %d"
 msgid "task execution done (success: %s)"
 msgstr "ejecución de la tarea realizada (éxito: %s)"
 
-#: ../duplicity/patchdir.py:75 ../duplicity/patchdir.py:80
+#: ../duplicity/patchdir.py:74 ../duplicity/patchdir.py:79
 #, python-format
 msgid "Patching %s"
 msgstr "Parcheando %s"
 
-#: ../duplicity/patchdir.py:509
+#: ../duplicity/patchdir.py:508
 #, python-format
 msgid "Error '%s' patching %s"
 msgstr ""
 
-#: ../duplicity/patchdir.py:582
+#: ../duplicity/patchdir.py:581
 #, python-format
 msgid "Writing %s of type %s"
 msgstr "Escribiendo %s del tipo %s"
@@ -1246,20 +1246,6 @@ msgstr ""
 #, python-format
 msgid "Error listing directory %s"
 msgstr "Error al escuchar el directorio %s"
-
-#: ../duplicity/misc.py:100
-#, python-format
-msgid "Starting to write %s"
-msgstr "Empezando a escribir %s"
-
-#: ../duplicity/misc.py:108
-#, python-format
-msgid ""
-"One only volume required.\n"
-"Renaming %s to %s"
-msgstr ""
-"Solo se necesita un volumen.\n"
-"Renombrando %s a %s"
 
 #: ../duplicity/diffdir.py:103 ../duplicity/diffdir.py:394
 #, python-format
@@ -1582,6 +1568,18 @@ msgstr ""
 
 #~ msgid "Unable to load gio module"
 #~ msgstr "No se puede cargar el módulo gio"
+
+#, python-format
+#~ msgid "Starting to write %s"
+#~ msgstr "Empezando a escribir %s"
+
+#, python-format
+#~ msgid ""
+#~ "One only volume required.\n"
+#~ "Renaming %s to %s"
+#~ msgstr ""
+#~ "Solo se necesita un volumen.\n"
+#~ "Renombrando %s a %s"
 
 #~ msgid "Deleting backup set at time:"
 #~ msgid_plural "Deleting backup sets at times:"

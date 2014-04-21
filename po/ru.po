@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-04-19 19:55+0000\n"
+"POT-Creation-Date: 2014-04-20 15:34+0000\n"
 "PO-Revision-Date: 2010-03-11 14:36+0000\n"
 "Last-Translator: Kenneth Loafman <kenneth@loafman.com>\n"
 "Language-Team: Russian <ru@li.org>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2014-04-20 05:37+0000\n"
+"X-Launchpad-Export-Date: 2014-04-21 04:40+0000\n"
 "X-Generator: Launchpad (build 16985)\n"
 
 #: ../bin/duplicity:102
@@ -987,17 +987,17 @@ msgstr "активный обработчики = %d"
 msgid "task execution done (success: %s)"
 msgstr "завершено выполнение задачи (успех: %s)"
 
-#: ../duplicity/patchdir.py:75 ../duplicity/patchdir.py:80
+#: ../duplicity/patchdir.py:74 ../duplicity/patchdir.py:79
 #, python-format
 msgid "Patching %s"
 msgstr "Внесение изменений в %s"
 
-#: ../duplicity/patchdir.py:509
+#: ../duplicity/patchdir.py:508
 #, python-format
 msgid "Error '%s' patching %s"
 msgstr ""
 
-#: ../duplicity/patchdir.py:582
+#: ../duplicity/patchdir.py:581
 #, python-format
 msgid "Writing %s of type %s"
 msgstr "Запись %s типа %s"
@@ -1273,20 +1273,6 @@ msgstr ""
 #, python-format
 msgid "Error listing directory %s"
 msgstr "Ошибка перечня каталога %s"
-
-#: ../duplicity/misc.py:100
-#, python-format
-msgid "Starting to write %s"
-msgstr "Начинается запись %s"
-
-#: ../duplicity/misc.py:108
-#, python-format
-msgid ""
-"One only volume required.\n"
-"Renaming %s to %s"
-msgstr ""
-"Требуется только один том.\n"
-"Переименовывается %s в %s"
 
 #: ../duplicity/diffdir.py:103 ../duplicity/diffdir.py:394
 #, python-format
@@ -1639,6 +1625,18 @@ msgstr ""
 
 #~ msgid "Unable to load gio module"
 #~ msgstr "Не удалось загрузить модуль gio"
+
+#, python-format
+#~ msgid ""
+#~ "One only volume required.\n"
+#~ "Renaming %s to %s"
+#~ msgstr ""
+#~ "Требуется только один том.\n"
+#~ "Переименовывается %s в %s"
+
+#, python-format
+#~ msgid "Starting to write %s"
+#~ msgstr "Начинается запись %s"
 
 #, python-format
 #~ msgid "Could not copy %s to %s"

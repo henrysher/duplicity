@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-04-19 19:55+0000\n"
+"POT-Creation-Date: 2014-04-20 15:34+0000\n"
 "PO-Revision-Date: 2012-08-10 06:41+0000\n"
 "Last-Translator: Arve Eriksson <Unknown>\n"
 "Language-Team: Swedish <sv@li.org>\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2014-04-20 05:37+0000\n"
+"X-Launchpad-Export-Date: 2014-04-21 04:40+0000\n"
 "X-Generator: Launchpad (build 16985)\n"
 
 #: ../bin/duplicity:102
@@ -940,17 +940,17 @@ msgstr "aktiva arbetare = %d"
 msgid "task execution done (success: %s)"
 msgstr ""
 
-#: ../duplicity/patchdir.py:75 ../duplicity/patchdir.py:80
+#: ../duplicity/patchdir.py:74 ../duplicity/patchdir.py:79
 #, python-format
 msgid "Patching %s"
 msgstr "Patchar %s"
 
-#: ../duplicity/patchdir.py:509
+#: ../duplicity/patchdir.py:508
 #, python-format
 msgid "Error '%s' patching %s"
 msgstr ""
 
-#: ../duplicity/patchdir.py:582
+#: ../duplicity/patchdir.py:581
 #, python-format
 msgid "Writing %s of type %s"
 msgstr "Skriver %s av typen %s"
@@ -1187,20 +1187,6 @@ msgstr ""
 #, python-format
 msgid "Error listing directory %s"
 msgstr "Fel vid listning av katalogen %s"
-
-#: ../duplicity/misc.py:100
-#, python-format
-msgid "Starting to write %s"
-msgstr "Börjar att skriva %s"
-
-#: ../duplicity/misc.py:108
-#, python-format
-msgid ""
-"One only volume required.\n"
-"Renaming %s to %s"
-msgstr ""
-"Endast en volym krävs.\n"
-"Byter namn på %s till %s"
 
 #: ../duplicity/diffdir.py:103 ../duplicity/diffdir.py:394
 #, python-format
@@ -1483,6 +1469,18 @@ msgstr ""
 #, python-format
 msgid "Releasing lockfile %s"
 msgstr ""
+
+#, python-format
+#~ msgid ""
+#~ "One only volume required.\n"
+#~ "Renaming %s to %s"
+#~ msgstr ""
+#~ "Endast en volym krävs.\n"
+#~ "Byter namn på %s till %s"
+
+#, python-format
+#~ msgid "Starting to write %s"
+#~ msgstr "Börjar att skriva %s"
 
 #~ msgid "Deleting backup set at time:"
 #~ msgid_plural "Deleting backup sets at times:"

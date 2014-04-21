@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-04-19 19:55+0000\n"
+"POT-Creation-Date: 2014-04-20 15:34+0000\n"
 "PO-Revision-Date: 2011-06-06 19:20+0000\n"
 "Last-Translator: Patrick <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2014-04-20 05:36+0000\n"
+"X-Launchpad-Export-Date: 2014-04-21 04:40+0000\n"
 "X-Generator: Launchpad (build 16985)\n"
 
 #: ../bin/duplicity:102
@@ -981,17 +981,17 @@ msgstr "aktive Arbeiter = %d"
 msgid "task execution done (success: %s)"
 msgstr "Aufgabenausführung abgeschlossen (erfolgreich: %s)"
 
-#: ../duplicity/patchdir.py:75 ../duplicity/patchdir.py:80
+#: ../duplicity/patchdir.py:74 ../duplicity/patchdir.py:79
 #, python-format
 msgid "Patching %s"
 msgstr "Repariere %s"
 
-#: ../duplicity/patchdir.py:509
+#: ../duplicity/patchdir.py:508
 #, python-format
 msgid "Error '%s' patching %s"
 msgstr ""
 
-#: ../duplicity/patchdir.py:582
+#: ../duplicity/patchdir.py:581
 #, python-format
 msgid "Writing %s of type %s"
 msgstr "Schreibvorgang von %s des Typs %s"
@@ -1250,20 +1250,6 @@ msgstr ""
 #, python-format
 msgid "Error listing directory %s"
 msgstr "Fehler beim Auflisten des Verzeichnisses %s"
-
-#: ../duplicity/misc.py:100
-#, python-format
-msgid "Starting to write %s"
-msgstr "Beginne Schreibvorgang von %s"
-
-#: ../duplicity/misc.py:108
-#, python-format
-msgid ""
-"One only volume required.\n"
-"Renaming %s to %s"
-msgstr ""
-"Es wird nur ein Volumen benötigt.\n"
-"Benenne %s zu %s um."
 
 #: ../duplicity/diffdir.py:103 ../duplicity/diffdir.py:394
 #, python-format
@@ -1623,6 +1609,18 @@ msgstr ""
 #, python-format
 #~ msgid "Could not copy %s to %s"
 #~ msgstr "Konnte %s nicht nach %s kopieren"
+
+#, python-format
+#~ msgid "Starting to write %s"
+#~ msgstr "Beginne Schreibvorgang von %s"
+
+#, python-format
+#~ msgid ""
+#~ "One only volume required.\n"
+#~ "Renaming %s to %s"
+#~ msgstr ""
+#~ "Es wird nur ein Volumen benötigt.\n"
+#~ "Benenne %s zu %s um."
 
 #, python-format
 #~ msgid "File %%s has permissions %o, expected %o"
