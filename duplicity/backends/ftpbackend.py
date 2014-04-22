@@ -64,7 +64,7 @@ class FTPBackend(duplicity.backend.Backend):
         # This squelches the "file not found" result from ncftpls when
         # the ftp backend looks for a collection that does not exist.
         # version 3.2.2 has error code 5, 1280 is some legacy value
-        self.popen_persist_breaks[ 'ncftpls' ] = [ 5, 1280 ]
+        self.popen_breaks[ 'ncftpls' ] = [ 5, 1280 ]
 
         # Use an explicit directory name.
         if self.url_string[-1] != '/':
@@ -91,18 +91,18 @@ class FTPBackend(duplicity.backend.Backend):
         remote_path = os.path.join(urllib.unquote(self.parsed_url.path.lstrip('/')), remote_filename).rstrip()
         commandline = "ncftpput %s -m -V -C '%s' '%s'" % \
             (self.flags, source_path.name, remote_path)
-        self.subprocess_popen_persist(commandline)
+        self.subprocess_popen(commandline)
 
     def _get(self, remote_filename, local_path):
         remote_path = os.path.join(urllib.unquote(self.parsed_url.path), remote_filename).rstrip()
         commandline = "ncftpget %s -V -C '%s' '%s' '%s'" % \
             (self.flags, self.parsed_url.hostname, remote_path.lstrip('/'), local_path.name)
-        self.subprocess_popen_persist(commandline)
+        self.subprocess_popen(commandline)
 
     def _list(self):
         # Do a long listing to avoid connection reset
         commandline = "ncftpls %s -l '%s'" % (self.flags, self.url_string)
-        _, l, _ = self.subprocess_popen_persist(commandline)
+        _, l, _ = self.subprocess_popen(commandline)
         l = filter(lambda x: x, l.split('\n'))
         # Look for our files as the last element of a long list line
         return [x.split()[-1] for x in l if not x.startswith("total ")]
@@ -110,6 +110,6 @@ class FTPBackend(duplicity.backend.Backend):
     def _delete(self, filename):
         commandline = "ncftpls %s -l -X 'DELE %s' '%s'" % \
             (self.flags, filename, self.url_string)
-        self.subprocess_popen_persist(commandline)
+        self.subprocess_popen(commandline)
 
 duplicity.backend.register_backend("ftp", FTPBackend)

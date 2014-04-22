@@ -84,25 +84,23 @@ class FTPSBackend(duplicity.backend.Backend):
             os.write(self.tempfile, "user %s %s\n" % (self.parsed_url.username, self.password))
         os.close(self.tempfile)
 
-        self.flags = "-f %s" % self.tempname
-
     def _put(self, source_path, remote_filename):
         remote_path = os.path.join(urllib.unquote(self.parsed_url.path.lstrip('/')), remote_filename).rstrip()
         commandline = "lftp -c 'source %s;put \'%s\' -o \'%s\''" % \
             (self.tempname, source_path.name, remote_path)
-        self.subprocess_popen_persist(commandline)
+        self.subprocess_popen(commandline)
 
     def _get(self, remote_filename, local_path):
         remote_path = os.path.join(urllib.unquote(self.parsed_url.path), remote_filename).rstrip()
         commandline = "lftp -c 'source %s;get %s -o %s'" % \
             (self.tempname, remote_path.lstrip('/'), local_path.name)
-        self.subprocess_popen_persist(commandline)
+        self.subprocess_popen(commandline)
 
     def _list(self):
         # Do a long listing to avoid connection reset
         remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
         commandline = "lftp -c 'source %s;ls \'%s\''" % (self.tempname, remote_dir)
-        _, l, _ = self.subprocess_popen_persist(commandline)
+        _, l, _ = self.subprocess_popen(commandline)
         l = filter(lambda x: x, l.split('\n'))
         # Look for our files as the last element of a long list line
         return [x.split()[-1] for x in l]
@@ -113,7 +111,7 @@ class FTPSBackend(duplicity.backend.Backend):
             filelist += "\'%s\' " % filename
         if filelist.rstrip():
             remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
-            commandline = "lftp -c 'source %s;cd \'%s\';rm %s'" % (self.tempname, remote_dir, filelist.rstrip())
-            self.subprocess_popen_persist(commandline)
+            commandline = "lftp -c 'source %s;cd \'%s\';rm -f %s'" % (self.tempname, remote_dir, filelist.rstrip())
+            self.subprocess_popen(commandline)
 
 duplicity.backend.register_backend("ftps", FTPSBackend)

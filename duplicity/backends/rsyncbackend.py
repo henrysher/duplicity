@@ -109,12 +109,12 @@ class RsyncBackend(duplicity.backend.Backend):
     def _put(self, source_path, remote_filename):
         remote_path = os.path.join(self.url_string, remote_filename)
         commandline = "%s %s %s" % (self.cmd, source_path.name, remote_path)
-        self.subprocess_popen_persist(commandline)
+        self.subprocess_popen(commandline)
 
     def _get(self, remote_filename, local_path):
         remote_path = os.path.join (self.url_string, remote_filename)
         commandline = "%s %s %s" % (self.cmd, remote_path, local_path.name)
-        self.subprocess_popen_persist(commandline)
+        self.subprocess_popen(commandline)
 
     def _list(self):
         def split (str):
@@ -124,7 +124,7 @@ class RsyncBackend(duplicity.backend.Backend):
             else:
                 return None
         commandline = "%s %s" % (self.cmd, self.url_string)
-        result, stdout, stderr = self.subprocess_popen_persist(commandline)
+        result, stdout, stderr = self.subprocess_popen(commandline)
         return filter(lambda x: x, map (split, stdout.split('\n')))
 
     def _delete_list(self, filename_list):
@@ -148,7 +148,7 @@ class RsyncBackend(duplicity.backend.Backend):
         exclude.close()
         commandline = ("%s --recursive --delete --exclude-from=%s %s/ %s" %
                                    (self.cmd, exclude_name, dir, self.url_string))
-        self.subprocess_popen_persist(commandline)
+        self.subprocess_popen(commandline)
         for file in to_delete:
             util.ignore_missing(os.unlink, file)
         os.rmdir (dir)

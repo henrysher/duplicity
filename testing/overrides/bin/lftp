@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+
+import os
+import subprocess
+import sys
+
+if sys.argv[1] == '--version':
+    print 'blah | blah 1.0'
+    sys.exit(0)
+
+command = ""
+for cmd in [x.split() for x in sys.argv[2].split(';')]:
+    if cmd[0] == 'source':
+        continue
+
+    if cmd[0] == 'get':
+        cmd = ['cp', cmd[1], cmd[3]]
+    elif cmd[0] == 'put':
+        cmd = ['cp', cmd[1], cmd[3]]
+
+    command += ' '.join(cmd) + ';'
+
+sys.exit(subprocess.call('/bin/sh -c "%s"' % command, shell=True))

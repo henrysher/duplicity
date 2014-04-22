@@ -448,6 +448,10 @@ class Backend(object):
 
         return p.returncode, stdout, stderr
 
+    """ a dictionary for breaking exceptions, syntax is
+        { 'command' : [ code1, code2 ], ... } see ftpbackend for an example """
+    popen_breaks = {}
+
     def subprocess_popen(self, commandline):
         """
         Execute the given command line with error check.
@@ -459,52 +463,16 @@ class Backend(object):
         log.Info(_("Reading results of '%s'") % private)
         result, stdout, stderr = self.__subprocess_popen(commandline)
         if result != 0:
-            raise BackendException("Error running '%s'" % private)
-        return result, stdout, stderr
-
-    """ a dictionary for persist breaking exceptions, syntax is
-        { 'command' : [ code1, code2 ], ... } see ftpbackend for an example """
-    popen_persist_breaks = {}
-
-    def subprocess_popen_persist(self, commandline):
-        """
-        Execute the given command line with error check.
-        Retries globals.num_retries times with 30s delay.
-        Returns int Exitcode, string StdOut, string StdErr
-
-        Raise a BackendException on failure.
-        """
-        private = self.munge_password(commandline)
-
-        for n in range(1, globals.num_retries+1):
-            # sleep before retry
-            if n > 1:
-                time.sleep(30)
-            log.Info(_("Reading results of '%s'") % private)
-            result, stdout, stderr = self.__subprocess_popen(commandline)
-            if result == 0:
-                return result, stdout, stderr
-
             try:
                 m = re.search("^\s*([\S]+)", commandline)
                 cmd = m.group(1)
-                ignores = self.popen_persist_breaks[ cmd ]
+                ignores = self.popen_breaks[ cmd ]
                 ignores.index(result)
                 """ ignore a predefined set of error codes """
                 return 0, '', ''
             except (KeyError, ValueError):
-                pass
-
-            log.Warn(ngettext("Running '%s' failed with code %d (attempt #%d)",
-                              "Running '%s' failed with code %d (attempt #%d)", n) %
-                               (private, result, n))
-            if stdout or stderr:
-                    log.Warn(_("Error is:\n%s") % stderr + (stderr and stdout and "\n") + stdout)
-
-        log.Warn(ngettext("Giving up trying to execute '%s' after %d attempt",
-                          "Giving up trying to execute '%s' after %d attempts",
-                          globals.num_retries) % (private, globals.num_retries))
-        raise BackendException("Error running '%s'" % private)
+                raise BackendException("Error running '%s'" % private)
+        return result, stdout, stderr
 
 
 class BackendWrapper(object):
