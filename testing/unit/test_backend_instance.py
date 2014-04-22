@@ -204,6 +204,14 @@ class HSIBackendTest(BackendInstanceBase):
         self.backend = duplicity.backend.get_backend_object(url)
 
 
+class FTPBackendTest(BackendInstanceBase):
+    def setUp(self):
+        super(FTPBackendTest, self).setUp()
+        os.makedirs('testfiles/output')
+        url = 'ftp://user:pass@hostname/testfiles/output'
+        self.backend = duplicity.backend.get_backend_object(url)
+
+
 class FTPSBackendTest(BackendInstanceBase):
     def setUp(self):
         super(FTPSBackendTest, self).setUp()

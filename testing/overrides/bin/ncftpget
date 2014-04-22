@@ -1,0 +1,8 @@
+#!/usr/bin/env python
+
+import subprocess
+import sys
+
+import os
+os.system('echo get %s %s >> /tmp/mike' % (sys.argv[-2],sys.argv[-1]))
+sys.exit(subprocess.call(['cp', sys.argv[-2], sys.argv[-1]]))
