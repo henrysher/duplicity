@@ -25,6 +25,7 @@ import unittest
 import duplicity.backend
 from duplicity import log
 from duplicity import path
+from duplicity.errors import BackendException
 from . import UnitTestCase
 
 
@@ -81,6 +82,8 @@ class BackendInstanceBase(UnitTestCase):
         # that gives log.ErrorCode.backend_not_found.
         try:
             self.backend._delete('a')
+        except BackendException as e:
+            pass  # Something went wrong, but it was an 'expected' something
         except Exception as e:
             code = duplicity.backend._get_code_from_exception(self.backend, e)
             self.assertEqual(code, log.ErrorCode.backend_not_found)
@@ -126,6 +129,8 @@ class BackendInstanceBase(UnitTestCase):
         # that gives log.ErrorCode.backend_not_found.
         try:
             info = self.backend._query('a')
+        except BackendException as e:
+            pass  # Something went wrong, but it was an 'expected' something
         except Exception as e:
             code = duplicity.backend._get_code_from_exception(self.backend, e)
             self.assertEqual(code, log.ErrorCode.backend_not_found)
@@ -167,9 +172,9 @@ class Par2BackendTest(BackendInstanceBase):
     # a missing file
 
 
-class Par2GIOBackendTest(BackendInstanceBase):
+class NestedPrefixBackendTest(BackendInstanceBase):
     def setUp(self):
-        super(Par2GIOBackendTest, self).setUp()
+        super(NestedPrefixBackendTest, self).setUp()
         url = 'par2+gio+file://%s/testfiles/output' % os.getcwd()
         self.backend = duplicity.backend.get_backend_object(url)
 
@@ -179,6 +184,14 @@ class RsyncBackendTest(BackendInstanceBase):
         super(RsyncBackendTest, self).setUp()
         os.makedirs('testfiles/output')  # rsync needs it to exist first
         url = 'rsync://%s/testfiles/output' % os.getcwd()
+        self.backend = duplicity.backend.get_backend_object(url)
+
+
+class TahoeBackendTest(BackendInstanceBase):
+    def setUp(self):
+        super(TahoeBackendTest, self).setUp()
+        os.makedirs('testfiles/output')
+        url = 'tahoe://testfiles/output'
         self.backend = duplicity.backend.get_backend_object(url)
 
 
