@@ -23,7 +23,7 @@ from duplicity.errors import UnsupportedBackendScheme, BackendException
 from duplicity import log
 from duplicity import globals
 
-class Par2WrapperBackend(backend.Backend):
+class Par2Backend(backend.Backend):
     """This backend wrap around other backends and create Par2 recovery files
     before the file and the Par2 files are transfered with the wrapped backend.
     
@@ -39,7 +39,7 @@ class Par2WrapperBackend(backend.Backend):
 
         try:
             url_string = self.parsed_url.url_string.lstrip('par2+')
-            self.wrapped_backend = backend.get_backend(url_string)
+            self.wrapped_backend = backend.get_backend_object(url_string)
         except:
             raise UnsupportedBackendScheme(self.parsed_url.url_string)
 
@@ -47,9 +47,9 @@ class Par2WrapperBackend(backend.Backend):
                      '_query', '_query_list', '_retry_cleanup', '_error_code',
                      '_move', '_close']:
             if hasattr(self.wrapped_backend, attr):
-                setattr(self, attr, getattr(self, '_' + attr))
+                setattr(self, attr, getattr(self, attr[1:]))
 
-    def put(self, source_path, remote_filename = None):
+    def transfer(self, method, source_path, remote_filename):
         """create Par2 files and transfer the given file and the Par2 files
         with the wrapped backend.
         
@@ -58,13 +58,14 @@ class Par2WrapperBackend(backend.Backend):
         the soure_path with remote_filename into this. 
         """
         import pexpect
-        if remote_filename is None:
-            remote_filename = source_path.get_filename()
 
         par2temp = source_path.get_temp_in_same_dir()
         par2temp.mkdir()
         source_symlink = par2temp.append(remote_filename)
-        os.symlink(source_path.get_canonical(), source_symlink.get_canonical())
+        source_target = source_path.get_canonical()
+        if not os.path.isabs(source_target):
+            source_target = os.path.join(os.getcwd(), source_target)
+        os.symlink(source_target, source_symlink.get_canonical())
         source_symlink.setdata()
 
         log.Info("Create Par2 recovery files")
@@ -76,16 +77,17 @@ class Par2WrapperBackend(backend.Backend):
             for file in par2temp.listdir():
                 files_to_transfer.append(par2temp.append(file))
 
-        ret = self.wrapped_backend.put(source_path, remote_filename)
+        method(source_path, remote_filename)
         for file in files_to_transfer:
-            self.wrapped_backend.put(file, file.get_filename())
+            method(file, file.get_filename())
 
         par2temp.deltree()
-        return ret
 
-    def move(self, source_path, remote_filename = None):
-        self.put(source_path, remote_filename)
-        source_path.delete()
+    def put(self, local, remote):
+        self.transfer(self.wrapped_backend._put, local, remote)
+
+    def move(self, local, remote):
+        self.transfer(self.wrapped_backend._move, local, remote)
 
     def get(self, remote_filename, local_path):
         """transfer remote_filename and the related .par2 file into
@@ -100,22 +102,23 @@ class Par2WrapperBackend(backend.Backend):
         par2temp.mkdir()
         local_path_temp = par2temp.append(remote_filename)
 
-        ret = self.wrapped_backend.get(remote_filename, local_path_temp)
+        self.wrapped_backend._get(remote_filename, local_path_temp)
 
         try:
             par2file = par2temp.append(remote_filename + '.par2')
-            self.wrapped_backend.get(par2file.get_filename(), par2file)
+            self.wrapped_backend._get(par2file.get_filename(), par2file)
 
             par2verify = 'par2 v -q -q %s %s' % (par2file.get_canonical(), local_path_temp.get_canonical())
             out, returncode = pexpect.run(par2verify, -1, True)
 
             if returncode:
                 log.Warn("File is corrupt. Try to repair %s" % remote_filename)
-                par2volumes = self.list(re.compile(r'%s\.vol[\d+]*\.par2' % remote_filename))
+                par2volumes = filter(re.compile((r'%s\.vol[\d+]*\.par2' % remote_filename).match,
+                                     self.wrapped_backend._list()))
 
                 for filename in par2volumes:
                     file = par2temp.append(filename)
-                    self.wrapped_backend.get(filename, file)
+                    self.wrapped_backend._get(filename, file)
 
                 par2repair = 'par2 r -q -q %s %s' % (par2file.get_canonical(), local_path_temp.get_canonical())
                 out, returncode = pexpect.run(par2repair, -1, True)
@@ -130,25 +133,23 @@ class Par2WrapperBackend(backend.Backend):
         finally:
             local_path_temp.rename(local_path)
             par2temp.deltree()
-        return ret
 
-    def list(self, filter = re.compile(r'(?!.*\.par2$)')):
-        """default filter all files that ends with ".par"
-        filter can be a re.compile instance or False for all remote files
+    def delete(self, filename):
+        """delete given filename and its .par2 files
         """
-        list = self.wrapped_backend.list()
-        if not filter:
-            return list
-        filtered_list = []
-        for item in list:
-            if filter.match(item):
-                filtered_list.append(item)
-        return filtered_list
+        self.wrapped_backend._delete(filename)
 
-    def delete(self, filename_list):
+        remote_list = self.list()
+        filename_list = [filename]
+        c =  re.compile(r'%s(?:\.vol[\d+]*)?\.par2' % filename)
+        for remote_filename in remote_list:
+            if c.match(remote_filename):
+                self.wrapped_backend._delete(remote_filename)
+
+    def delete_list(self, filename_list):
         """delete given filename_list and all .par2 files that belong to them
         """
-        remote_list = self.list(False)
+        remote_list = self.list()
 
         for filename in filename_list[:]:
             c =  re.compile(r'%s(?:\.vol[\d+]*)?\.par2' % filename)
@@ -156,16 +157,26 @@ class Par2WrapperBackend(backend.Backend):
                 if c.match(remote_filename):
                     filename_list.append(remote_filename)
 
-        return self.wrapped_backend.delete(filename_list)
+        return self.wrapped_backend._delete_list(filename_list)
 
-    """just return the output of coresponding wrapped backend
-    for all other functions
-    """
-    def query_list(self, filename_list, raise_errors=True):
-        return self.wrapped_backend.query_info(filename_list, raise_errors)
 
-    def _close(self):
-        return self.wrapped_backend._close()
+    def list(self):
+        return self.wrapped_backend._list()
+
+    def retry_cleanup(self):
+        self.wrapped_backend._retry_cleanup()
+
+    def error_code(self, e):
+        return self.wrapped_backend._error_code(e)
+
+    def query(self, filename):
+        return self.wrapped_backend._query(filename)
+
+    def query_list(self, filename_list):
+        return self.wrapped_backend._query(filename_list)
+
+    def close(self):
+        self.wrapped_backend._close()
 
 """register this backend with leading "par2+" for all already known backends
 
@@ -173,4 +184,4 @@ files must be sorted in duplicity.backend.import_backends to catch
 all supported backends
 """
 for item in backend._backends.keys():
-    backend.register_backend('par2+' + item, Par2WrapperBackend)
+    backend.register_backend('par2+' + item, Par2Backend)

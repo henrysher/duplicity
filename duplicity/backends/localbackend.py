@@ -79,10 +79,8 @@ class LocalBackend(duplicity.backend.Backend):
 
     def _query(self, filename):
         target_file = self.remote_pathdir.append(filename)
-        if not os.path.exists(target_file.name):
-            return {'size': -1}
         target_file.setdata()
-        size = target_file.getsize()
+        size = target_file.getsize() if target_file.exists() else -1
         return {'size': size}
 
 duplicity.backend.register_backend("file", LocalBackend)

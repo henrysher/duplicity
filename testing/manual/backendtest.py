@@ -107,34 +107,6 @@ class UnivTest:
         backend.delete([colonfile, normal_file])
         cmp_list([])
 
-    def try_fileobj_filename(self, backend, filename):
-        """Use get_fileobj_write and get_fileobj_read on filename around"""
-        fout = backend.get_fileobj_write(filename)
-        fout.write("hello, world!")
-        fout.close()
-        assert filename in backend.list()
-
-        fin = backend.get_fileobj_read(filename)
-        buf = fin.read()
-        fin.close()
-        assert buf == "hello, world!", buf
-
-        backend.delete ([filename])
-
-    def try_fileobj_ops(self, backend):
-        """Test above try_fileobj_filename with a few filenames"""
-        # Must set dup_time strings because they are used by file_naming
-        dup_time.setcurtime(2000)
-        dup_time.setprevtime(1000)
-        # Also set profile for encryption
-        globals.gpg_profile = gpg.GPGProfile(passphrase = "foobar")
-
-        filename1 = file_naming.get('full', manifest = 1, gzipped = 1)
-        self.try_fileobj_filename(backend, filename1)
-
-        filename2 = file_naming.get('new-sig', encrypted = 1)
-        self.try_fileobj_filename(backend, filename2)
-
 
 class LocalTest(unittest.TestCase, UnivTest):
     """ Test the Local backend """

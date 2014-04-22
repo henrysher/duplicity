@@ -147,15 +147,8 @@ class GIOBackend(duplicity.backend.Backend):
 
     def _query(self, filename):
         target_file = self.remote_file.get_child(filename)
-        attrs = Gio.FILE_ATTRIBUTE_STANDARD_SIZE
-        try:
-            info = target_file.query_info(attrs, Gio.FileQueryInfoFlags.NONE,
-                                          None)
-            return {'size': info.get_size()}
-        except Exception as e:
-            if isinstance(e, GLib.GError):
-                if e.code == Gio.IOErrorEnum.NOT_FOUND:
-                    return {'size': -1} # early exit, no need to retry
-            raise
+        info = target_file.query_info(Gio.FILE_ATTRIBUTE_STANDARD_SIZE,
+                                      Gio.FileQueryInfoFlags.NONE, None)
+        return {'size': info.get_size()}
 
 # FIXME: add prefix code here
