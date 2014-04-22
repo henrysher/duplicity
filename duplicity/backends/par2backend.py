@@ -19,7 +19,7 @@
 import os
 import re
 from duplicity import backend
-from duplicity.errors import UnsupportedBackendScheme, BackendException
+from duplicity.errors import BackendException
 from duplicity import log
 from duplicity import globals
 
@@ -37,11 +37,7 @@ class Par2Backend(backend.Backend):
         except AttributeError:
             self.redundancy = 10
 
-        try:
-            url_string = self.parsed_url.url_string.lstrip('par2+')
-            self.wrapped_backend = backend.get_backend_object(url_string)
-        except:
-            raise UnsupportedBackendScheme(self.parsed_url.url_string)
+        self.wrapped_backend = backend.get_backend_object(parsed_url.url_string)
 
         for attr in ['_get', '_put', '_list', '_delete', '_delete_list',
                      '_query', '_query_list', '_retry_cleanup', '_error_code',
@@ -178,10 +174,4 @@ class Par2Backend(backend.Backend):
     def close(self):
         self.wrapped_backend._close()
 
-"""register this backend with leading "par2+" for all already known backends
-
-files must be sorted in duplicity.backend.import_backends to catch
-all supported backends
-"""
-for item in backend._backends.keys():
-    backend.register_backend('par2+' + item, Par2Backend)
+backend.register_backend_prefix('par2', Par2Backend)

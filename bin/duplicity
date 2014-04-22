@@ -535,14 +535,10 @@ def full_backup(col_stats):
                                        man_outfp, sig_outfp,
                                        globals.backend)
 
-        print 'MIKE sig1'
         # close sig file, send to remote, and rename to final
         sig_outfp.close()
-        print 'MIKE sig2'
         sig_outfp.to_remote()
-        print 'MIKE sig3'
         sig_outfp.to_final()
-        print 'MIKE sig4'
 
         # close manifest, send to remote, and rename to final
         man_outfp.close()

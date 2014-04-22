@@ -146,26 +146,40 @@ class BackendInstanceBase(UnitTestCase):
 class LocalBackendTest(BackendInstanceBase):
     def setUp(self):
         super(LocalBackendTest, self).setUp()
-        from duplicity.backends.localbackend import LocalBackend
-        pu = duplicity.backend.ParsedUrl('file://testfiles/output')
-        self.backend = LocalBackend(pu)
+        url = 'file://testfiles/output'
+        self.backend = duplicity.backend.get_backend_object(url)
 
 
 class GIOBackendTest(BackendInstanceBase):
     def setUp(self):
         super(GIOBackendTest, self).setUp()
-        from duplicity.backends.giobackend import GIOBackend
-        pu = duplicity.backend.ParsedUrl('file://%s/testfiles/output' %
-                                         os.getcwd())
-        self.backend = GIOBackend(pu)
+        url = 'gio+file://%s/testfiles/output' % os.getcwd()
+        self.backend = duplicity.backend.get_backend_object(url)
 
 
 class Par2BackendTest(BackendInstanceBase):
     def setUp(self):
         super(Par2BackendTest, self).setUp()
-        from duplicity.backends.par2backend import Par2Backend
-        pu = duplicity.backend.ParsedUrl('par2+file://testfiles/output')
-        self.backend = Par2Backend(pu)
+        url = 'par2+file://testfiles/output'
+        self.backend = duplicity.backend.get_backend_object(url)
+
+    # TODO: Add par2-specific tests here, to confirm that we can recover from
+    # a missing file
+
+
+class Par2GIOBackendTest(BackendInstanceBase):
+    def setUp(self):
+        super(Par2GIOBackendTest, self).setUp()
+        url = 'par2+gio+file://%s/testfiles/output' % os.getcwd()
+        self.backend = duplicity.backend.get_backend_object(url)
+
+
+class RsyncBackendTest(BackendInstanceBase):
+    def setUp(self):
+        super(RsyncBackendTest, self).setUp()
+        os.makedirs('testfiles/output')  # rsync needs it to exist first
+        url = 'rsync://%s/testfiles/output' % os.getcwd()
+        self.backend = duplicity.backend.get_backend_object(url)
 
 
 # So we don't run tests on the base class itself, remove it from the module

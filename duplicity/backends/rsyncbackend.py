@@ -58,12 +58,13 @@ class RsyncBackend(duplicity.backend.Backend):
             if port:
                 port = " --port=%s" % port
         else:
+            host_string = host + ":" if host else ""
             if parsed_url.path.startswith("//"):
                 # its an absolute path
-                self.url_string = "%s:/%s" % (host, parsed_url.path.lstrip('/'))
+                self.url_string = "%s/%s" % (host_string, parsed_url.path.lstrip('/'))
             else:
                 # its a relative path
-                self.url_string = "%s:%s" % (host, parsed_url.path.lstrip('/'))
+                self.url_string = "%s%s" % (host_string, parsed_url.path.lstrip('/'))
             if parsed_url.port:
                 port = " -p %s" % parsed_url.port
         # add trailing slash if missing
@@ -129,7 +130,7 @@ class RsyncBackend(duplicity.backend.Backend):
     def _delete_list(self, filename_list):
         delete_list = filename_list
         dont_delete_list = []
-        for file in self.list ():
+        for file in self._list ():
             if file in delete_list:
                 delete_list.remove (file)
             else:

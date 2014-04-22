@@ -58,8 +58,8 @@ import duplicity.backends
 # todo: this should really NOT be done here
 socket.setdefaulttimeout(globals.timeout)
 
-_forced_backend = None
 _backends = {}
+_backend_prefixes = {}
 
 # These URL schemes have a backend with a notion of an RFC "network location".
 # The 'file' and 's3+http' schemes should not be in this list.
@@ -73,7 +73,6 @@ _backends = {}
 uses_netloc = ['ftp',
                'ftps',
                'hsi',
-               'rsync',
                's3',
                'scp', 'ssh', 'sftp',
                'webdav', 'webdavs',
@@ -100,8 +99,6 @@ def import_backends():
         if fn.endswith("backend.py"):
             fn = fn[:-3]
             imp = "duplicity.backends.%s" % (fn,)
-            # ignore gio as it is explicitly loaded in commandline.parse_cmdline_options()
-            if fn == "giobackend": continue
             try:
                 __import__(imp)
                 res = "Succeeded"
@@ -112,14 +109,6 @@ def import_backends():
             log.Log(_("Import of %s %s") % (imp, res), level)
         else:
             continue
-
-
-def force_backend(backend):
-    """
-    Forces the use of a particular backend, regardless of schema
-    """
-    global _forced_backend
-    _forced_backend = backend
 
 
 def register_backend(scheme, backend_factory):
@@ -148,6 +137,32 @@ def register_backend(scheme, backend_factory):
     _backends[scheme] = backend_factory
 
 
+def register_backend_prefix(scheme, backend_factory):
+    """
+    Register a given backend factory responsible for URL:s with the
+    given scheme prefix.
+
+    The backend must be a callable which, when called with a URL as
+    the single parameter, returns an object implementing the backend
+    protocol (i.e., a subclass of Backend).
+
+    Typically the callable will be the Backend subclass itself.
+
+    This function is not thread-safe and is intended to be called
+    during module importation or start-up.
+    """
+    global _backend_prefixes
+
+    assert callable(backend_factory), "backend factory must be callable"
+
+    if scheme in _backend_prefixes:
+        raise ConflictingScheme("the prefix %s already has a backend "
+                                "associated with it"
+                                "" % (scheme,))
+
+    _backend_prefixes[scheme] = backend_factory
+
+
 def is_backend_url(url_string):
     """
     @return Whether the given string looks like a backend URL.
@@ -171,22 +186,29 @@ def get_backend_object(url_string):
     if not is_backend_url(url_string):
         return None
 
-    pu = ParsedUrl(url_string)
+    global _backends, _backend_prefixes
 
-    # Implicit local path
+    pu = ParsedUrl(url_string)
     assert pu.scheme, "should be a backend url according to is_backend_url"
 
-    global _backends, _forced_backend
+    factory = None
 
-    if _forced_backend:
-        return _forced_backend(pu)
-    elif not pu.scheme in _backends:
-        raise UnsupportedBackendScheme(url_string)
-    else:
-        try:
-            return _backends[pu.scheme](pu)
-        except ImportError:
-            raise BackendException(_("Could not initialize backend: %s") % str(sys.exc_info()[1]))
+    for prefix in _backend_prefixes:
+        if url_string.startswith(prefix + '+'):
+            factory = _backend_prefixes[prefix]
+            pu = ParsedUrl(url_string.lstrip(prefix + '+'))
+            break
+
+    if factory is None:
+        if not pu.scheme in _backends:
+            raise UnsupportedBackendScheme(url_string)
+        else:
+            factory = _backends[pu.scheme]
+
+    try:
+        return factory(pu)
+    except ImportError:
+        raise BackendException(_("Could not initialize backend: %s") % str(sys.exc_info()[1]))
 
 
 def get_backend(url_string):
@@ -196,7 +218,9 @@ def get_backend(url_string):
 
     Raise InvalidBackendURL if the URL is not a valid URL.
     """
-    obj = get_backend_object(url_string)    
+    if globals.use_gio:
+        url_string = 'gio+' + url_string
+    obj = get_backend_object(url_string)
     if obj:
         obj = BackendWrapper(obj)
     return obj
@@ -599,12 +623,12 @@ class BackendWrapper(object):
         """
         Return metadata about each filename in filename_list
         """
+        info = {}
         if hasattr(self.backend, '_query_list'):
             info = self._do_query_list(filename_list)
             if info is None:
                 info = {}
         elif hasattr(self.backend, '_query'):
-            info = {}
             for filename in filename_list:
                 info[filename] = self._do_query(filename)
 
