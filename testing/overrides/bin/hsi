@@ -1,0 +1,16 @@
+#!/usr/bin/env python
+
+import sys
+import subprocess
+
+cmd = sys.argv[1].split()
+if cmd[0] == 'get':
+    cmd = ['cp', cmd[3], cmd[1]]
+elif cmd[0] == 'put':
+    cmd = ['cp', cmd[1], cmd[3]]
+elif cmd[0] == 'ls':
+    # output some expected header lines
+    print >> sys.stderr, 'one'
+    print >> sys.stderr, 'two'
+
+sys.exit(subprocess.call(' '.join(cmd) + ' 1>&2', shell=True))

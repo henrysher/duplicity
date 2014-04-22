@@ -102,10 +102,7 @@ class SwiftBackend(duplicity.backend.Backend):
         self.conn.delete_object(self.container, filename)
 
     def _query(self, filename):
-        try:
-            sobject = self.conn.head_object(self.container, filename)
-            return {'size': int(sobject['content-length'])}
-        except self.resp_exc:
-            return {'size': -1}
+        sobject = self.conn.head_object(self.container, filename)
+        return {'size': int(sobject['content-length'])}
 
 duplicity.backend.register_backend("swift", SwiftBackend)

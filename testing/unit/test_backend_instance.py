@@ -53,8 +53,8 @@ class BackendInstanceBase(UnitTestCase):
         self.backend._put(self.local, 'b')
         # It's OK for backends to create files as a side effect of put (e.g.
         # the par2 backend does), so only check that at least a and b exist.
-        self.assertTrue('a' in set(self.backend._list()))
-        self.assertTrue('b' in set(self.backend._list()))
+        self.assertTrue('a' in self.backend._list())
+        self.assertTrue('b' in self.backend._list())
 
     def test_delete(self):
         if not hasattr(self.backend, '_delete'):
@@ -192,6 +192,15 @@ class TahoeBackendTest(BackendInstanceBase):
         super(TahoeBackendTest, self).setUp()
         os.makedirs('testfiles/output')
         url = 'tahoe://testfiles/output'
+        self.backend = duplicity.backend.get_backend_object(url)
+
+
+class HSIBackendTest(BackendInstanceBase):
+    def setUp(self):
+        super(HSIBackendTest, self).setUp()
+        os.makedirs('testfiles/output')
+        # hostname is ignored...  Seemingly on purpose
+        url = 'hsi://hostname%s/testfiles/output' % os.getcwd()
         self.backend = duplicity.backend.get_backend_object(url)
 
 

@@ -49,7 +49,7 @@ class HSIBackend(duplicity.backend.Backend):
         return filter(lambda x: x, l)
 
     def _delete(self, filename):
-        commandline = '%s "rm %s%s"' % (hsi_command, self.remote_prefix, fn)
+        commandline = '%s "rm %s%s"' % (hsi_command, self.remote_prefix, filename)
         self.subprocess_popen(commandline)
 
 duplicity.backend.register_backend("hsi", HSIBackend)
