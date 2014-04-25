@@ -1,3 +1,7 @@
+2014-04-25  Kenneth Loafman  <kenneth@loafman.com>
+    * Fixed bug #1312328 WebDAV backend can't understand 200 OK response to DELETE
+      - Allow both 200 and 204 as valid response to delete
+
 2014-04-20  Kenneth Loafman  <kenneth@loafman.com>
     # Merged in lp:~mterry/duplicity/more-test-reorg
       - Here's another test reorganization / modernization branch. It does the

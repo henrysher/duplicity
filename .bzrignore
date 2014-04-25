@@ -5,3 +5,6 @@
 config.py
 testfiles
 random_seed
+build
+duplicity.egg-info
+.tox
