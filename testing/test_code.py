@@ -38,22 +38,21 @@ class CodeTest(DuplicityTestCase):
     def test_2to3(self):
         # As we modernize the source code, we can remove more and more nofixes
         self.run_checker(["2to3",
-                          "--nofix=dict",
-                          "--nofix=filter",
                           "--nofix=map",
                           "--nofix=next",
-                          "--nofix=print",
                           "--nofix=types",
                           "--nofix=unicode",
-                          "--nofix=xrange",
         # The following fixes we don't want to remove, since they are false
         # positives, things we don't care about, or real incompatibilities
         # but which 2to3 can fix for us better automatically.
                           "--nofix=callable",
+                          "--nofix=dict",
                           "--nofix=future",
                           "--nofix=imports",
+                          "--nofix=print",
                           "--nofix=raw_input",
                           "--nofix=urllib",
+                          "--nofix=xrange",
                           _top_dir])
 
     def test_pylint(self):

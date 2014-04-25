@@ -19,6 +19,8 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
+from future_builtins import filter
+
 import re #@UnusedImport
 import types
 import os

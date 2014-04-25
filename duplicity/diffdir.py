@@ -342,8 +342,7 @@ def combine_path_iters(path_iter_list):
             else:
                 break # assumed triple_list sorted, so can exit now
 
-    triple_list = filter(lambda x: x, map(get_triple,
-                                          range(len(path_iter_list))))
+    triple_list = [x for x in map(get_triple, range(len(path_iter_list))) if x]
     while triple_list:
         triple_list.sort()
         yield triple_list[0][2]

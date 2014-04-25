@@ -21,6 +21,8 @@
 
 """Create and edit manifest for session contents"""
 
+from future_builtins import filter
+
 import re
 
 from duplicity import log

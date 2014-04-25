@@ -21,6 +21,8 @@
 
 """Classes and functions on collections of backup volumes"""
 
+from future_builtins import filter
+
 import types
 import gettext
 
@@ -338,7 +340,7 @@ class BackupChain:
         """
         Return a list of sets in chain earlier or equal to time
         """
-        older_incsets = filter(lambda s: s.end_time <= time, self.incset_list)
+        older_incsets = [s for s in self.incset_list if s.end_time <= time]
         return [self.fullset] + older_incsets
 
     def get_last(self):
@@ -951,15 +953,14 @@ class CollectionsStatus:
         if not self.all_backup_chains:
             raise CollectionsError("No backup chains found")
 
-        covering_chains = filter(lambda c: c.start_time <= time <= c.end_time,
-                                 self.all_backup_chains)
+        covering_chains = [c for c in self.all_backup_chains
+                           if c.start_time <= time <= c.end_time]
         if len(covering_chains) > 1:
             raise CollectionsError("Two chains cover the given time")
         elif len(covering_chains) == 1:
             return covering_chains[0]
 
-        old_chains = filter(lambda c: c.end_time < time,
-                            self.all_backup_chains)
+        old_chains = [c for c in self.all_backup_chains if c.end_time < time]
         if old_chains:
             return old_chains[-1]
         else:
@@ -976,13 +977,12 @@ class CollectionsStatus:
         if not self.all_sig_chains:
             raise CollectionsError("No signature chains found")
 
-        covering_chains = filter(lambda c: c.start_time <= time <= c.end_time,
-                                 self.all_sig_chains)
+        covering_chains = [c for c in self.all_sig_chains
+                           if c.start_time <= time <= c.end_time]
         if covering_chains:
             return covering_chains[-1] # prefer local if multiple sig chains
 
-        old_chains = filter(lambda c: c.end_time < time,
-                            self.all_sig_chains)
+        old_chains = [c for c in self.all_sig_chains if c.end_time < time]
         if old_chains:
             return old_chains[-1]
         else:

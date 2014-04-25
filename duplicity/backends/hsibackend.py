@@ -56,8 +56,7 @@ class HSIBackend(duplicity.backend.Backend):
         l = os.popen3(commandline)[2].readlines()[3:]
         for i in range(0,len(l)):
             l[i] = l[i].split()[-1]
-        print filter(lambda x: x, l)
-        return filter(lambda x: x, l)
+        return [x for x in l if x]
 
     def delete(self, filename_list):
         assert len(filename_list) > 0
