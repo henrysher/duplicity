@@ -23,6 +23,8 @@
 Miscellaneous utilities.
 """
 
+from future_builtins import map
+
 import errno
 import os
 import sys

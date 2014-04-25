@@ -19,7 +19,7 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-from future_builtins import filter
+from future_builtins import filter, map
 
 import re #@UnusedImport
 import types
@@ -519,11 +519,10 @@ def tarfiles2rop_iter( tarfile_list, restrict_index=() ):
     the restrict_index.
 
     """
-    diff_iters = map( difftar2path_iter, tarfile_list )
+    diff_iters = [difftar2path_iter(x) for x in tarfile_list]
     if restrict_index:
         # Apply filter before integration
-        diff_iters = map( lambda i: filter_path_iter( i, restrict_index ),
-                         diff_iters )
+        diff_iters = [filter_path_iter(x, restrict_index) for x in diff_iters]
     return integrate_patch_iters( diff_iters )
 
 def Write_ROPaths( base_path, rop_iter ):

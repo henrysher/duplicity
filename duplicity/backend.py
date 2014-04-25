@@ -416,7 +416,7 @@ class Backend(object):
         if hasattr(self, '_list'):
             # Make sure that duplicity internals only ever see byte strings
             # for filenames, no matter what the backend thinks it is talking.
-            return map(tobytes, self._list())
+            return [tobytes(x) for x in self._list()]
         else:
             raise NotImplementedError()
 

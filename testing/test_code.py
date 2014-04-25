@@ -38,7 +38,6 @@ class CodeTest(DuplicityTestCase):
     def test_2to3(self):
         # As we modernize the source code, we can remove more and more nofixes
         self.run_checker(["2to3",
-                          "--nofix=map",
                           "--nofix=next",
                           "--nofix=types",
                           "--nofix=unicode",

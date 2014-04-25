@@ -21,7 +21,7 @@
 
 """Classes and functions on collections of backup volumes"""
 
-from future_builtins import filter
+from future_builtins import filter, map
 
 import types
 import gettext
@@ -149,7 +149,7 @@ class BackupSet:
         try:
             self.backend.delete(rfn)
         except Exception:
-            log.Debug(_("BackupSet.delete: missing %s") % map(util.ufn, rfn))
+            log.Debug(_("BackupSet.delete: missing %s") % [util.ufn(f) for f in rfn])
             pass
         for lfn in globals.archive_dir.listdir():
             pr = file_naming.parse(lfn)
@@ -160,7 +160,7 @@ class BackupSet:
                 try:
                     globals.archive_dir.append(lfn).delete()
                 except Exception:
-                    log.Debug(_("BackupSet.delete: missing %s") % map(util.ufn, lfn))
+                    log.Debug(_("BackupSet.delete: missing %s") % [util.ufn(f) for f in lfn])
                     pass
         util.release_lockfile()
 
@@ -249,8 +249,7 @@ class BackupSet:
         assert self.info_set
         volume_num_list = self.volume_name_dict.keys()
         volume_num_list.sort()
-        volume_filenames = map(lambda x: self.volume_name_dict[x],
-                               volume_num_list)
+        volume_filenames = [self.volume_name_dict[x] for x in volume_num_list]
         if self.remote_manifest_name:
             # For convenience of implementation for restart support, we treat
             # local partial manifests as this set's remote manifest.  But
@@ -529,7 +528,7 @@ class SignatureChain:
                 return sig_dp.filtered_open("rb")
         else:
             filename_to_fileobj = self.backend.get_fileobj_read
-        return map(filename_to_fileobj, self.get_filenames(time))
+        return [filename_to_fileobj(f) for f in self.get_filenames(time)]
 
     def delete(self, keep_full=False):
         """
@@ -800,7 +799,7 @@ class CollectionsStatus:
         missing files.
         """
         log.Debug(_("Extracting backup chains from list of files: %s")
-                  % map(util.ufn, filename_list))
+                  % [util.ufn(f) for f in filename_list])
         # First put filenames in set form
         sets = []
         def add_to_sets(filename):
@@ -818,7 +817,8 @@ class CollectionsStatus:
                     sets.append(new_set)
                 else:
                     log.Debug(_("Ignoring file (rejected by backup set) '%s'") % util.ufn(filename))
-        map(add_to_sets, filename_list)
+        for f in filename_list:
+            add_to_sets(f)
         sets, incomplete_sets = self.get_sorted_sets(sets)
 
         chains, orphaned_sets = [], []
@@ -841,7 +841,8 @@ class CollectionsStatus:
                 else:
                     log.Debug(_("Found orphaned set %s") % (set.get_timestr(),))
                     orphaned_sets.append(set)
-        map(add_to_chains, sets)
+        for s in sets:
+            add_to_chains(s)
         return (chains, orphaned_sets, incomplete_sets)
 
     def get_sorted_sets(self, set_list):
@@ -857,7 +858,7 @@ class CollectionsStatus:
             else:
                 time_set_pairs.append((set.end_time, set))
         time_set_pairs.sort()
-        return (map(lambda p: p[1], time_set_pairs), incomplete_sets)
+        return ([p[1] for p in time_set_pairs], incomplete_sets)
 
     def get_signature_chains(self, local, filelist = None):
         """
@@ -1024,9 +1025,9 @@ class CollectionsStatus:
 
     def sort_sets(self, setlist):
         """Return new list containing same elems of setlist, sorted by time"""
-        pairs = map(lambda s: (s.get_time(), s), setlist)
+        pairs = [(s.get_time(), s) for s in setlist]
         pairs.sort()
-        return map(lambda p: p[1], pairs)
+        return [p[1] for p in pairs]
 
     def get_chains_older_than(self, t):
         """
