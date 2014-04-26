@@ -26,6 +26,8 @@ associates stat information with filenames
 
 """
 
+from future_builtins import filter
+
 import stat, errno, socket, time, re, gzip
 
 from duplicity import tarfile

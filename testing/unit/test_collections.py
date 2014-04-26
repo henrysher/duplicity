@@ -219,16 +219,16 @@ class CollectionTest(UnitTestCase):
         cs = self.get_filelist2_cs()
         oldsets = cs.get_older_than(
             dup_time.genstrtotime("2002-05-01T16:17:01-07:00"))
-        oldset_times = map(lambda s: s.get_time(), oldsets)
-        right_times = map(dup_time.genstrtotime, ['2001-01-01T16:17:01-07:00'])
+        oldset_times = [s.get_time() for s in oldsets]
+        right_times = [dup_time.genstrtotime('2001-01-01T16:17:01-07:00')]
         assert oldset_times == right_times, \
                [oldset_times, right_times]
 
         oldsets_required = cs.get_older_than_required(
             dup_time.genstrtotime("2002-08-17T20:00:00-07:00"))
-        oldset_times = map(lambda s: s.get_time(), oldsets_required)
-        right_times_required = map(dup_time.genstrtotime,
-                                   ['2002-08-17T16:17:01-07:00'])
+        oldset_times = [s.get_time() for s in oldsets_required]
+        right_times_required = [dup_time.genstrtotime(
+                                   '2002-08-17T16:17:01-07:00')]
         assert oldset_times == right_times_required, \
                [oldset_times, right_times_required]
 

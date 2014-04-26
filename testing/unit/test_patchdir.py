@@ -19,6 +19,8 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
+from future_builtins import map
+
 import sys, cStringIO, unittest
 
 from duplicity import diffdir
@@ -135,12 +137,12 @@ class CollateItersTest(UnitTestCase):
 
     def test_collate(self):
         """Test collate_iters function"""
-        indicies = map(index, [0,1,2,3])
+        indicies = [index(i) for i in [0,1,2,3]]
         helper = lambda i: indicies[i]
 
         makeiter1 = lambda: iter(indicies)
-        makeiter2 = lambda: iter(map(helper, [0,1,3]))
-        makeiter3 = lambda: iter(map(helper, [1,2]))
+        makeiter2 = lambda: map(helper, [0,1,3])
+        makeiter3 = lambda: map(helper, [1,2])
 
         outiter = patchdir.collate_iters([makeiter1(), makeiter2()])
         assert Iter.equal(outiter,
@@ -158,8 +160,8 @@ class CollateItersTest(UnitTestCase):
                                 (indicies[3], indicies[3], None)]), 1)
 
         assert Iter.equal(patchdir.collate_iters([makeiter1(), iter([])]),
-                          iter(map(lambda i: (i, None), indicies)))
-        assert Iter.equal(iter(map(lambda i: (i, None), indicies)),
+                          map(lambda i: (i, None), indicies))
+        assert Iter.equal(map(lambda i: (i, None), indicies),
                           patchdir.collate_iters([makeiter1(), iter([])]))
 
     def test_tuple(self):

@@ -125,7 +125,7 @@ class RsyncBackend(duplicity.backend.Backend):
                 return None
         commandline = "%s %s" % (self.cmd, self.url_string)
         result, stdout, stderr = self.subprocess_popen(commandline)
-        return filter(lambda x: x, map (split, stdout.split('\n')))
+        return [x for x in map (split, stdout.split('\n')) if x]
 
     def _delete_list(self, filename_list):
         delete_list = filename_list

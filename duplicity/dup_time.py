@@ -21,6 +21,8 @@
 
 """Provide time related exceptions and functions"""
 
+from future_builtins import map
+
 import time, types, re, calendar
 from duplicity import globals
 

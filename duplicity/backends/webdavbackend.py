@@ -54,14 +54,14 @@ class VerifiedHTTPSConnection(httplib.HTTPSConnection):
                 import socket, ssl
             except ImportError:
                 raise FatalBackendException("Missing socket or ssl libraries.")
-            
+
             httplib.HTTPSConnection.__init__(self, *args, **kwargs)
-            
+
             self.cacert_file = globals.ssl_cacert_file
             cacert_candidates = [ "~/.duplicity/cacert.pem", \
                              "~/duplicity_cacert.pem", \
                              "/etc/duplicity/cacert.pem" ]
-            # 
+            #
             if not self.cacert_file:
                 for path in cacert_candidates :
                     path = os.path.expanduser(path)
@@ -71,8 +71,8 @@ class VerifiedHTTPSConnection(httplib.HTTPSConnection):
             # still no cacert file, inform user
             if not self.cacert_file:
                 raise FatalBackendException("""For certificate verification a cacert database file is needed in one of these locations: %s
-Hints: 
-  Consult the man page, chapter 'SSL Certificate Verification'. 
+Hints:
+  Consult the man page, chapter 'SSL Certificate Verification'.
   Consider using the options --ssl-cacert-file, --ssl-no-check-certificate .""" % ", ".join(cacert_candidates) )
             # check if file is accessible (libssl errors are not very detailed)
             if not os.access(self.cacert_file, os.R_OK):
@@ -91,7 +91,7 @@ Hints:
                                         cert_reqs=ssl.CERT_REQUIRED,
                                         ca_certs=self.cacert_file,
                                         )
-        
+
         def request(self, *args, **kwargs):
             try:
                 return httplib.HTTPSConnection.request(self, *args, **kwargs)
@@ -146,16 +146,16 @@ class WebDAVBackend(duplicity.backend.Backend):
             if node.nodeType == node.TEXT_NODE:
                 rc = rc + node.data
         return rc
-    
+
     def _connect(self, forced=False):
         """
         Connect or re-connect to the server, updates self.conn
-        # reconnect on errors as a precaution, there are errors e.g. 
+        # reconnect on errors as a precaution, there are errors e.g.
         # "[Errno 32] Broken pipe" or SSl errors that render the connection unusable
         """
         if self.retry_count<=1 and self.conn \
             and self.conn.host == self.parsed_url.hostname: return
-        
+
         log.Info("WebDAV create connection on '%s' (retry %s) " % (self.parsed_url.hostname,self.retry_count) )
         if self.conn: self.conn.close()
         # http schemes needed for redirect urls from servers
@@ -211,7 +211,7 @@ class WebDAVBackend(duplicity.backend.Backend):
             self.conn.request(method, quoted_path, data, self.headers)
             response = self.conn.getresponse()
             log.Info("WebDAV response2 status %s with reason '%s'." % (response.status,response.reason))
-        
+
         return response
 
 
@@ -297,14 +297,14 @@ class WebDAVBackend(duplicity.backend.Backend):
     def makedir(self):
         """Make (nested) directories on the server."""
         dirs = self.directory.split("/")
-        # url causes directory to start with /, but it might be given 
+        # url causes directory to start with /, but it might be given
         # with or without trailing / (which is required)
         if dirs[-1] == '':
             dirs=dirs[0:-1]
         for i in range(1,len(dirs)):
             d="/".join(dirs[0:i+1])+"/"
-       
-            self.close() # or we get previous request's data or exception       
+
+            self.close() # or we get previous request's data or exception
             self.headers['Depth'] = "1"
             response = self.request("PROPFIND", d)
             del self.headers['Depth']
@@ -313,7 +313,7 @@ class WebDAVBackend(duplicity.backend.Backend):
 
             if response.status == 404:
                 log.Info("Creating missing directory %s" % d)
-                self.close() # or we get previous request's data or exception   
+                self.close() # or we get previous request's data or exception
 
                 res = self.request("MKCOL", d)
                 if res.status != 201:
@@ -404,7 +404,7 @@ class WebDAVBackend(duplicity.backend.Backend):
         response = None
         try:
             response = self.request("DELETE", url)
-            if response.status == 204:
+            if response.status in [200, 204]:
                 response.read()
                 response.close()
             else:

@@ -27,6 +27,8 @@ first, the signature or delta is constructed of a ROPath iterator.  In
 the second, the ROPath iterator is put into tar block form.
 """
 
+from future_builtins import map
+
 import cStringIO, types, math
 from duplicity import statistics
 from duplicity import util
@@ -79,8 +81,8 @@ def DirDelta(path_iter, dirsig_fileobj_list):
     global stats
     stats = statistics.StatsDeltaProcess()
     if type(dirsig_fileobj_list) is types.ListType:
-        sig_iter = combine_path_iters(map(sigtar2path_iter,
-                                          dirsig_fileobj_list))
+        sig_iter = combine_path_iters([sigtar2path_iter(x) for x
+                                       in dirsig_fileobj_list])
     else:
         sig_iter = sigtar2path_iter(dirsig_fileobj_list)
     delta_iter = get_delta_iter(path_iter, sig_iter)
@@ -342,8 +344,7 @@ def combine_path_iters(path_iter_list):
             else:
                 break # assumed triple_list sorted, so can exit now
 
-    triple_list = filter(lambda x: x, map(get_triple,
-                                          range(len(path_iter_list))))
+    triple_list = [x for x in map(get_triple, range(len(path_iter_list))) if x]
     while triple_list:
         triple_list.sort()
         yield triple_list[0][2]
@@ -375,7 +376,7 @@ def get_combined_path_iter(sig_infp_list):
     """
     Return path iter combining signatures in list of open sig files
     """
-    return combine_path_iters(map(sigtar2path_iter, sig_infp_list))
+    return combine_path_iters([sigtar2path_iter(x) for x in sig_infp_list])
 
 
 class FileWithReadCounter:

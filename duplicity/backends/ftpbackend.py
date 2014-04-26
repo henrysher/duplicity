@@ -103,9 +103,8 @@ class FTPBackend(duplicity.backend.Backend):
         # Do a long listing to avoid connection reset
         commandline = "ncftpls %s -l '%s'" % (self.flags, self.url_string)
         _, l, _ = self.subprocess_popen(commandline)
-        l = filter(lambda x: x, l.split('\n'))
         # Look for our files as the last element of a long list line
-        return [x.split()[-1] for x in l if not x.startswith("total ")]
+        return [x.split()[-1] for x in l.split('\n') if x and not x.startswith("total ")]
 
     def _delete(self, filename):
         commandline = "ncftpls %s -l -X 'DELE %s' '%s'" % \

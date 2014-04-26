@@ -101,9 +101,8 @@ class FTPSBackend(duplicity.backend.Backend):
         remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
         commandline = "lftp -c 'source %s;ls \'%s\''" % (self.tempname, remote_dir)
         _, l, _ = self.subprocess_popen(commandline)
-        l = filter(lambda x: x, l.split('\n'))
         # Look for our files as the last element of a long list line
-        return [x.split()[-1] for x in l]
+        return [x.split()[-1] for x in l.split('\n') if x]
 
     def _delete_list(self, filename_list):
         filelist = ""

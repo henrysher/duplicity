@@ -514,7 +514,7 @@ class BackendWrapper(object):
         if not remote_filename:
             remote_filename = source_path.get_filename()
         if hasattr(self.backend, '_move'):
-            if self.backend._move(source_path, remote_filename) != False:
+            if self.backend._move(source_path, remote_filename) is not False:
                 source_path.setdata()
                 return
         self.__do_put(source_path, remote_filename)
@@ -543,16 +543,14 @@ class BackendWrapper(object):
                 # There shouldn't be any encoding errors for files we care
                 # about, since duplicity filenames are ascii.  But user files
                 # may be in the same directory.  So just replace characters.
-                # We don't know what encoding the remote backend may have given
-                # us, but utf8 is a pretty good guess.
-                return filename.encode('utf8', 'replace')
+                return filename.encode(sys.getfilesystemencoding(), 'replace')
             else:
                 return filename
 
         if hasattr(self.backend, '_list'):
             # Make sure that duplicity internals only ever see byte strings
             # for filenames, no matter what the backend thinks it is talking.
-            return map(tobytes, self.backend._list())
+            return [tobytes(x) for x in self.backend._list()]
         else:
             raise NotImplementedError()
 
