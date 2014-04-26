@@ -108,6 +108,10 @@ Enhancements:
       in it is actually there.
 * Fixed bug #1312328 WebDAV backend can't understand 200 OK response to DELETE
   - Allow both 200 and 204 as valid response to delete
+* Merged in lp:~mterry/duplicity/py3-map-filter
+  - In py3, map and filter return iterable objects, not lists. So in each case
+    we use them, I've either imported the future version or switched to a list
+    comprehension if we really wanted a list.
 
 New in v0.6.23 (2014/01/24)
 ---------------------------

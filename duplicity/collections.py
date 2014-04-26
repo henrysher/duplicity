@@ -21,6 +21,8 @@
 
 """Classes and functions on collections of backup volumes"""
 
+from future_builtins import filter, map
+
 import types
 import gettext
 
@@ -147,7 +149,7 @@ class BackupSet:
         try:
             self.backend.delete(rfn)
         except Exception:
-            log.Debug(_("BackupSet.delete: missing %s") % map(util.ufn, rfn))
+            log.Debug(_("BackupSet.delete: missing %s") % [util.ufn(f) for f in rfn])
             pass
         for lfn in globals.archive_dir.listdir():
             pr = file_naming.parse(lfn)
@@ -158,7 +160,7 @@ class BackupSet:
                 try:
                     globals.archive_dir.append(lfn).delete()
                 except Exception:
-                    log.Debug(_("BackupSet.delete: missing %s") % map(util.ufn, lfn))
+                    log.Debug(_("BackupSet.delete: missing %s") % [util.ufn(f) for f in lfn])
                     pass
         util.release_lockfile()
 
@@ -247,8 +249,7 @@ class BackupSet:
         assert self.info_set
         volume_num_list = self.volume_name_dict.keys()
         volume_num_list.sort()
-        volume_filenames = map(lambda x: self.volume_name_dict[x],
-                               volume_num_list)
+        volume_filenames = [self.volume_name_dict[x] for x in volume_num_list]
         if self.remote_manifest_name:
             # For convenience of implementation for restart support, we treat
             # local partial manifests as this set's remote manifest.  But
@@ -338,7 +339,7 @@ class BackupChain:
         """
         Return a list of sets in chain earlier or equal to time
         """
-        older_incsets = filter(lambda s: s.end_time <= time, self.incset_list)
+        older_incsets = [s for s in self.incset_list if s.end_time <= time]
         return [self.fullset] + older_incsets
 
     def get_last(self):
@@ -527,7 +528,7 @@ class SignatureChain:
                 return sig_dp.filtered_open("rb")
         else:
             filename_to_fileobj = self.backend.get_fileobj_read
-        return map(filename_to_fileobj, self.get_filenames(time))
+        return [filename_to_fileobj(f) for f in self.get_filenames(time)]
 
     def delete(self, keep_full=False):
         """
@@ -798,7 +799,7 @@ class CollectionsStatus:
         missing files.
         """
         log.Debug(_("Extracting backup chains from list of files: %s")
-                  % map(util.ufn, filename_list))
+                  % [util.ufn(f) for f in filename_list])
         # First put filenames in set form
         sets = []
         def add_to_sets(filename):
@@ -816,7 +817,8 @@ class CollectionsStatus:
                     sets.append(new_set)
                 else:
                     log.Debug(_("Ignoring file (rejected by backup set) '%s'") % util.ufn(filename))
-        map(add_to_sets, filename_list)
+        for f in filename_list:
+            add_to_sets(f)
         sets, incomplete_sets = self.get_sorted_sets(sets)
 
         chains, orphaned_sets = [], []
@@ -839,7 +841,8 @@ class CollectionsStatus:
                 else:
                     log.Debug(_("Found orphaned set %s") % (set.get_timestr(),))
                     orphaned_sets.append(set)
-        map(add_to_chains, sets)
+        for s in sets:
+            add_to_chains(s)
         return (chains, orphaned_sets, incomplete_sets)
 
     def get_sorted_sets(self, set_list):
@@ -855,7 +858,7 @@ class CollectionsStatus:
             else:
                 time_set_pairs.append((set.end_time, set))
         time_set_pairs.sort()
-        return (map(lambda p: p[1], time_set_pairs), incomplete_sets)
+        return ([p[1] for p in time_set_pairs], incomplete_sets)
 
     def get_signature_chains(self, local, filelist = None):
         """
@@ -951,15 +954,14 @@ class CollectionsStatus:
         if not self.all_backup_chains:
             raise CollectionsError("No backup chains found")
 
-        covering_chains = filter(lambda c: c.start_time <= time <= c.end_time,
-                                 self.all_backup_chains)
+        covering_chains = [c for c in self.all_backup_chains
+                           if c.start_time <= time <= c.end_time]
         if len(covering_chains) > 1:
             raise CollectionsError("Two chains cover the given time")
         elif len(covering_chains) == 1:
             return covering_chains[0]
 
-        old_chains = filter(lambda c: c.end_time < time,
-                            self.all_backup_chains)
+        old_chains = [c for c in self.all_backup_chains if c.end_time < time]
         if old_chains:
             return old_chains[-1]
         else:
@@ -976,13 +978,12 @@ class CollectionsStatus:
         if not self.all_sig_chains:
             raise CollectionsError("No signature chains found")
 
-        covering_chains = filter(lambda c: c.start_time <= time <= c.end_time,
-                                 self.all_sig_chains)
+        covering_chains = [c for c in self.all_sig_chains
+                           if c.start_time <= time <= c.end_time]
         if covering_chains:
             return covering_chains[-1] # prefer local if multiple sig chains
 
-        old_chains = filter(lambda c: c.end_time < time,
-                            self.all_sig_chains)
+        old_chains = [c for c in self.all_sig_chains if c.end_time < time]
         if old_chains:
             return old_chains[-1]
         else:
@@ -1024,9 +1025,9 @@ class CollectionsStatus:
 
     def sort_sets(self, setlist):
         """Return new list containing same elems of setlist, sorted by time"""
-        pairs = map(lambda s: (s.get_time(), s), setlist)
+        pairs = [(s.get_time(), s) for s in setlist]
         pairs.sort()
-        return map(lambda p: p[1], pairs)
+        return [p[1] for p in pairs]
 
     def get_chains_older_than(self, t):
         """

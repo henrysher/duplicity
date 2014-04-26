@@ -21,6 +21,8 @@
 
 """Parse command line, check for consistency, and set globals"""
 
+from future_builtins import filter
+
 from copy import copy
 import optparse
 import os

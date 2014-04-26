@@ -19,6 +19,8 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
+from future_builtins import filter, map
+
 import os #@UnusedImport
 import re #@UnusedImport
 import stat #@UnusedImport
@@ -235,8 +237,8 @@ class Select:
                         filelists[filelists_index], 0, arg))
                     filelists_index += 1
                 elif opt == "--exclude-globbing-filelist":
-                    map(self.add_selection_func,
-                        self.filelist_globbing_get_sfs(filelists[filelists_index], 0, arg))
+                    for sf in self.filelist_globbing_get_sfs(filelists[filelists_index], 0, arg):
+                        self.add_selection_func(sf)
                     filelists_index += 1
                 elif opt == "--exclude-other-filesystems":
                     self.add_selection_func(self.other_filesystems_get_sf(0))
@@ -249,8 +251,8 @@ class Select:
                         filelists[filelists_index], 1, arg))
                     filelists_index += 1
                 elif opt == "--include-globbing-filelist":
-                    map(self.add_selection_func,
-                        self.filelist_globbing_get_sfs(filelists[filelists_index], 1, arg))
+                    for sf in self.filelist_globbing_get_sfs(filelists[filelists_index], 1, arg):
+                        self.add_selection_func(sf)
                     filelists_index += 1
                 elif opt == "--include-regexp":
                     self.add_selection_func(self.regexp_get_sf(arg, 1))
@@ -626,8 +628,7 @@ probably isn't what you meant.""") %
             raise GlobbingError("Consecutive '/'s found in globbing string "
                                 + glob_str)
 
-        prefixes = map(lambda i: "/".join(glob_parts[:i+1]),
-                       range(len(glob_parts)))
+        prefixes = ["/".join(glob_parts[:i+1]) for i in range(len(glob_parts))]
         # we must make exception for root "/", only dir to end in slash
         if prefixes[0] == "":
             prefixes[0] = "/"

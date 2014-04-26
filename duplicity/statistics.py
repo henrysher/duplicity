@@ -21,6 +21,8 @@
 
 """Generate and process backup statistics"""
 
+from future_builtins import map
+
 import re, time, os
 
 from duplicity import dup_time
@@ -99,8 +101,7 @@ class StatsObj:
 
     def get_stats_line(self, index, use_repr = 1):
         """Return one line abbreviated version of full stats string"""
-        file_attrs = map(lambda attr: str(self.get_stat(attr)),
-                         self.stat_file_attrs)
+        file_attrs = [str(self.get_stat(a)) for a in self.stat_file_attrs]
         if not index:
             filename = "."
         else:

@@ -137,7 +137,7 @@ class BotoBackend(duplicity.backend.Backend):
         # This folds the null prefix and all null parts, which means that:
         #  //MyBucket/ and //MyBucket are equivalent.
         #  //MyBucket//My///My/Prefix/ and //MyBucket/My/Prefix are equivalent.
-        self.url_parts = filter(lambda x: x != '', parsed_url.path.split('/'))
+        self.url_parts = [x for x in parsed_url.path.split('/') if x != '']
 
         if self.url_parts:
             self.bucket_name = self.url_parts.pop(0)
