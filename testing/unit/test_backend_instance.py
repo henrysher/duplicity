@@ -153,6 +153,7 @@ class LocalBackendTest(BackendInstanceBase):
         super(LocalBackendTest, self).setUp()
         url = 'file://testfiles/output'
         self.backend = duplicity.backend.get_backend_object(url)
+        self.assertEqual(self.backend.__class__.__name__, 'LocalBackend')
 
 
 class GIOBackendTest(BackendInstanceBase):
@@ -160,6 +161,7 @@ class GIOBackendTest(BackendInstanceBase):
         super(GIOBackendTest, self).setUp()
         url = 'gio+file://%s/testfiles/output' % os.getcwd()
         self.backend = duplicity.backend.get_backend_object(url)
+        self.assertEqual(self.backend.__class__.__name__, 'GIOBackend')
 
 
 class Par2BackendTest(BackendInstanceBase):
@@ -167,6 +169,7 @@ class Par2BackendTest(BackendInstanceBase):
         super(Par2BackendTest, self).setUp()
         url = 'par2+file://testfiles/output'
         self.backend = duplicity.backend.get_backend_object(url)
+        self.assertEqual(self.backend.__class__.__name__, 'Par2Backend')
 
     # TODO: Add par2-specific tests here, to confirm that we can recover from
     # a missing file
@@ -177,6 +180,7 @@ class NestedPrefixBackendTest(BackendInstanceBase):
         super(NestedPrefixBackendTest, self).setUp()
         url = 'par2+gio+file://%s/testfiles/output' % os.getcwd()
         self.backend = duplicity.backend.get_backend_object(url)
+        self.assertEqual(self.backend.__class__.__name__, 'Par2Backend')
 
 
 class RsyncBackendTest(BackendInstanceBase):
@@ -185,6 +189,7 @@ class RsyncBackendTest(BackendInstanceBase):
         os.makedirs('testfiles/output')  # rsync needs it to exist first
         url = 'rsync://%s/testfiles/output' % os.getcwd()
         self.backend = duplicity.backend.get_backend_object(url)
+        self.assertEqual(self.backend.__class__.__name__, 'RsyncBackend')
 
 
 class TahoeBackendTest(BackendInstanceBase):
@@ -193,6 +198,7 @@ class TahoeBackendTest(BackendInstanceBase):
         os.makedirs('testfiles/output')
         url = 'tahoe://testfiles/output'
         self.backend = duplicity.backend.get_backend_object(url)
+        self.assertEqual(self.backend.__class__.__name__, 'TAHOEBackend')
 
 
 class HSIBackendTest(BackendInstanceBase):
@@ -202,6 +208,7 @@ class HSIBackendTest(BackendInstanceBase):
         # hostname is ignored...  Seemingly on purpose
         url = 'hsi://hostname%s/testfiles/output' % os.getcwd()
         self.backend = duplicity.backend.get_backend_object(url)
+        self.assertEqual(self.backend.__class__.__name__, 'HSIBackend')
 
 
 class FTPBackendTest(BackendInstanceBase):
@@ -210,6 +217,7 @@ class FTPBackendTest(BackendInstanceBase):
         os.makedirs('testfiles/output')
         url = 'ftp://user:pass@hostname/testfiles/output'
         self.backend = duplicity.backend.get_backend_object(url)
+        self.assertEqual(self.backend.__class__.__name__, 'FTPBackend')
 
 
 class FTPSBackendTest(BackendInstanceBase):
@@ -218,6 +226,7 @@ class FTPSBackendTest(BackendInstanceBase):
         os.makedirs('testfiles/output')
         url = 'ftps://user:pass@hostname/testfiles/output'
         self.backend = duplicity.backend.get_backend_object(url)
+        self.assertEqual(self.backend.__class__.__name__, 'FTPSBackend')
 
 
 # So we don't run tests on the base class itself, remove it from the module

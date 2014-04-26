@@ -285,7 +285,7 @@ class WebDAVBackend(duplicity.backend.Backend):
             dom = xml.dom.minidom.parseString(document)
             result = []
             for href in dom.getElementsByTagName('d:href') + dom.getElementsByTagName('D:href'):
-                filename = self._taste_href(href)
+                filename = self.__taste_href(href)
                 if filename:
                     result.append(filename)
             return result
@@ -320,7 +320,7 @@ class WebDAVBackend(duplicity.backend.Backend):
                     raise BackendException("WebDAV MKCOL %s failed: %s %s" % (d,res.status,res.reason))
                 self.close()
 
-    def _taste_href(self, href):
+    def __taste_href(self, href):
         """
         Internal helper to taste the given href node and, if
         it is a duplicity file, collect it as a result file.

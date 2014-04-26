@@ -22,6 +22,7 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import duplicity.backend
+from duplicity import log
 from duplicity.errors import BackendException
 
 
@@ -40,7 +41,7 @@ class MegaBackend(duplicity.backend.Backend):
         # Setup client instance.
         self.client = Mega()
         self.client.domain = parsed_url.hostname
-        self._authorize(parsed_url.username, self.get_password())
+        self.__authorize(parsed_url.username, self.get_password())
 
         # Fetch destination folder entry (and crete hierarchy if required).
         folder_names = parsed_url.path[1:].split('/')
@@ -48,7 +49,7 @@ class MegaBackend(duplicity.backend.Backend):
 
         parent_folder = self.client.root_id
         for folder_name in folder_names:
-            entries = self._filter_entries(files, parent_folder, folder_name, 'folder')
+            entries = self.__filter_entries(files, parent_folder, folder_name, 'folder')
             if len(entries):
                 # use first matching folder as new parent
                 parent_folder = entries.keys()[0]
@@ -62,39 +63,47 @@ class MegaBackend(duplicity.backend.Backend):
         self.folder = parent_folder
 
     def _put(self, source_path, remote_filename):
-        self._delete(remote_filename)
+        try:
+            self._delete(remote_filename)
+        except Exception:
+            pass
         self.client.upload(source_path.get_canonical(), self.folder, dest_filename=remote_filename)
 
     def _get(self, remote_filename, local_path):
         files = self.client.get_files()
-        entries = self._filter_entries(files, self.folder, remote_filename, 'file')
+        entries = self.__filter_entries(files, self.folder, remote_filename, 'file')
         if len(entries):
             # get first matching remote file
             entry = entries.keys()[0]
             self.client.download((entry, entries[entry]), dest_filename=local_path.name)
         else:
             raise BackendException("Failed to find file '%s' in remote folder '%s'"
-                                   % (remote_filename, self._get_node_name(self.folder)))
+                                   % (remote_filename, self.__get_node_name(self.folder)),
+                                   code=log.ErrorCode.backend_not_found)
 
     def _list(self):
         entries = self.client.get_files_in_node(self.folder)
-        return [ self.client.get_name_from_file({entry:entries[entry]}) for entry in entries]
+        return [self.client.get_name_from_file({entry:entries[entry]}) for entry in entries]
 
     def _delete(self, filename):
         files = self.client.get_files()
-        entries = self._filter_entries(files, self.folder, filename)
-        for entry in entries:
-            self.client.destroy(entry)
+        entries = self.__filter_entries(files, self.folder, filename, 'file')
+        if len(entries):
+            self.client.destroy(entries.keys()[0])
+        else:
+            raise BackendException("Failed to find file '%s' in remote folder '%s'"
+                                   % (filename, self.__get_node_name(self.folder)),
+                                   code=log.ErrorCode.backend_not_found)
 
-    def _get_node_name(self, handle):
+    def __get_node_name(self, handle):
         """get node name from public handle"""
         files = self.client.get_files()
         return self.client.get_name_from_file({handle:files[handle]})
 
-    def _authorize(self, email, password):
+    def __authorize(self, email, password):
         self.client.login(email, password)
 
-    def _filter_entries(self, entries, parent_id=None, title=None, type=None):
+    def __filter_entries(self, entries, parent_id=None, title=None, type=None):
         result = {}
         type_map = { 'folder': 1, 'file': 0 }
 

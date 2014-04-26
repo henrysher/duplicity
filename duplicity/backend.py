@@ -178,7 +178,7 @@ def is_backend_url(url_string):
 
 def get_backend_object(url_string):
     """
-    Find the right backend classs instance for the given URL, or return None
+    Find the right backend class instance for the given URL, or return None
     if the given string looks like a local path rather than a URL.
 
     Raise InvalidBackendURL if the URL is not a valid URL.
