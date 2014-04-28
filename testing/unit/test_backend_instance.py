@@ -35,20 +35,27 @@ class BackendInstanceBase(UnitTestCase):
         UnitTestCase.setUp(self)
         assert not os.system("rm -rf testfiles")
         os.makedirs('testfiles')
+        self.backend = None
         self.local = path.Path('testfiles/local')
         self.local.writefileobj(StringIO.StringIO("hello"))
 
     def tearDown(self):
+        if self.backend is None:
+            return
         if hasattr(self.backend, '_close'):
             self.backend._close()
 
     def test_get(self):
+        if self.backend is None:
+            return
         self.backend._put(self.local, 'a')
         getfile = path.Path('testfiles/getfile')
         self.backend._get('a', getfile)
         self.assertTrue(self.local.compare_data(getfile))
 
     def test_list(self):
+        if self.backend is None:
+            return
         self.backend._put(self.local, 'a')
         self.backend._put(self.local, 'b')
         # It's OK for backends to create files as a side effect of put (e.g.
@@ -57,6 +64,8 @@ class BackendInstanceBase(UnitTestCase):
         self.assertTrue('b' in self.backend._list())
 
     def test_delete(self):
+        if self.backend is None:
+            return
         if not hasattr(self.backend, '_delete'):
             self.assertTrue(hasattr(self.backend, '_delete_list'))
             return
@@ -67,6 +76,8 @@ class BackendInstanceBase(UnitTestCase):
         self.assertTrue('b' in self.backend._list())
 
     def test_delete_clean(self):
+        if self.backend is None:
+            return
         if not hasattr(self.backend, '_delete'):
             self.assertTrue(hasattr(self.backend, '_delete_list'))
             return
@@ -75,6 +86,8 @@ class BackendInstanceBase(UnitTestCase):
         self.assertEqual(self.backend._list(), [])
 
     def test_delete_missing(self):
+        if self.backend is None:
+            return
         if not hasattr(self.backend, '_delete'):
             self.assertTrue(hasattr(self.backend, '_delete_list'))
             return
@@ -85,10 +98,12 @@ class BackendInstanceBase(UnitTestCase):
         except BackendException as e:
             pass  # Something went wrong, but it was an 'expected' something
         except Exception as e:
-            code = duplicity.backend._get_code_from_exception(self.backend, e)
+            code = duplicity.backend._get_code_from_exception(self.backend, 'delete', e)
             self.assertEqual(code, log.ErrorCode.backend_not_found)
 
     def test_delete_list(self):
+        if self.backend is None:
+            return
         if not hasattr(self.backend, '_delete_list'):
             self.assertTrue(hasattr(self.backend, '_delete'))
             return
@@ -96,11 +111,14 @@ class BackendInstanceBase(UnitTestCase):
         self.backend._put(self.local, 'b')
         self.backend._put(self.local, 'c')
         self.backend._delete_list(['a', 'd', 'c'])
-        self.assertFalse('a' in self.backend._list())
-        self.assertTrue('b' in self.backend._list())
-        self.assertFalse('c' in self.backend._list())
+        files = self.backend._list()
+        self.assertFalse('a' in files, files)
+        self.assertTrue('b' in files, files)
+        self.assertFalse('c' in files, files)
 
     def test_move(self):
+        if self.backend is None:
+            return
         if not hasattr(self.backend, '_move'):
             return
 
@@ -116,6 +134,8 @@ class BackendInstanceBase(UnitTestCase):
         self.assertTrue(copy.compare_data(getfile))
 
     def test_query_exists(self):
+        if self.backend is None:
+            return
         if not hasattr(self.backend, '_query'):
             return
         self.backend._put(self.local, 'a')
@@ -123,6 +143,8 @@ class BackendInstanceBase(UnitTestCase):
         self.assertEqual(info['size'], self.local.getsize())
 
     def test_query_missing(self):
+        if self.backend is None:
+            return
         if not hasattr(self.backend, '_query'):
             return
         # Backends can either return -1 themselves, or throw an error
@@ -132,12 +154,14 @@ class BackendInstanceBase(UnitTestCase):
         except BackendException as e:
             pass  # Something went wrong, but it was an 'expected' something
         except Exception as e:
-            code = duplicity.backend._get_code_from_exception(self.backend, e)
+            code = duplicity.backend._get_code_from_exception(self.backend, 'query', e)
             self.assertEqual(code, log.ErrorCode.backend_not_found)
         else:
             self.assertEqual(info['size'], -1)
 
     def test_query_list(self):
+        if self.backend is None:
+            return
         if not hasattr(self.backend, '_query_list'):
             return
         self.backend._put(self.local, 'a')
@@ -156,14 +180,6 @@ class LocalBackendTest(BackendInstanceBase):
         self.assertEqual(self.backend.__class__.__name__, 'LocalBackend')
 
 
-class GIOBackendTest(BackendInstanceBase):
-    def setUp(self):
-        super(GIOBackendTest, self).setUp()
-        url = 'gio+file://%s/testfiles/output' % os.getcwd()
-        self.backend = duplicity.backend.get_backend_object(url)
-        self.assertEqual(self.backend.__class__.__name__, 'GIOBackend')
-
-
 class Par2BackendTest(BackendInstanceBase):
     def setUp(self):
         super(Par2BackendTest, self).setUp()
@@ -173,14 +189,6 @@ class Par2BackendTest(BackendInstanceBase):
 
     # TODO: Add par2-specific tests here, to confirm that we can recover from
     # a missing file
-
-
-class NestedPrefixBackendTest(BackendInstanceBase):
-    def setUp(self):
-        super(NestedPrefixBackendTest, self).setUp()
-        url = 'par2+gio+file://%s/testfiles/output' % os.getcwd()
-        self.backend = duplicity.backend.get_backend_object(url)
-        self.assertEqual(self.backend.__class__.__name__, 'Par2Backend')
 
 
 class RsyncBackendTest(BackendInstanceBase):
@@ -227,10 +235,6 @@ class FTPSBackendTest(BackendInstanceBase):
         url = 'ftps://user:pass@hostname/testfiles/output'
         self.backend = duplicity.backend.get_backend_object(url)
         self.assertEqual(self.backend.__class__.__name__, 'FTPSBackend')
-
-
-# So we don't run tests on the base class itself, remove it from the module
-del BackendInstanceBase
 
 
 if __name__ == "__main__":

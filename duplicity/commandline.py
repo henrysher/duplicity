@@ -516,8 +516,8 @@ def parse_cmdline_options(arglist):
     # sftp command to use (ssh pexpect backend)
     parser.add_option("--sftp-command", metavar = _("command"))
 
-    # sftp command to use (ssh pexpect backend)
-    parser.add_option("--cf-command", metavar = _("command"))
+    # allow the user to switch cloudfiles backend
+    parser.add_option("--cf-backend", metavar = _("pyrax|cloudfiles"))
 
     # If set, use short (< 30 char) filenames for all the remote files.
     parser.add_option("--short-filenames", action = "callback",

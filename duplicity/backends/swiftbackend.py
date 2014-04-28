@@ -79,7 +79,7 @@ class SwiftBackend(duplicity.backend.Backend):
                            % (e.__class__.__name__, str(e)),
                            log.ErrorCode.connection_failed)
 
-    def _error_code(self, e):
+    def _error_code(self, operation, e):
         if isinstance(e, self.resp_exc):
             if e.http_status == 404:
                 return log.ErrorCode.backend_not_found

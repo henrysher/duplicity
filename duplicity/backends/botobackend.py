@@ -22,14 +22,12 @@
 
 import duplicity.backend
 from duplicity import globals
-from ._boto_multi import BotoBackend as BotoMultiUploadBackend
-from ._boto_single import BotoBackend as BotoSingleUploadBackend
 
 if globals.s3_use_multiprocessing:
-    duplicity.backend.register_backend("gs", BotoMultiUploadBackend)
-    duplicity.backend.register_backend("s3", BotoMultiUploadBackend)
-    duplicity.backend.register_backend("s3+http", BotoMultiUploadBackend)
+    from ._boto_multi import BotoBackend
 else:
-    duplicity.backend.register_backend("gs", BotoSingleUploadBackend)
-    duplicity.backend.register_backend("s3", BotoSingleUploadBackend)
-    duplicity.backend.register_backend("s3+http", BotoSingleUploadBackend)
+    from ._boto_single import BotoBackend
+
+duplicity.backend.register_backend("gs", BotoBackend)
+duplicity.backend.register_backend("s3", BotoBackend)
+duplicity.backend.register_backend("s3+http", BotoBackend)

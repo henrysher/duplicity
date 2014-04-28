@@ -24,6 +24,7 @@ Provides a common interface to all backends and certain sevices
 intended to be used by the backends themselves.
 """
 
+import errno
 import os
 import sys
 import socket
@@ -337,15 +338,22 @@ def strip_auth_from_url(parsed_url):
     # Replace the full network location with the stripped copy.
     return parsed_url.geturl().replace(parsed_url.netloc, straight_netloc, 1)
 
-def _get_code_from_exception(backend, e):
+def _get_code_from_exception(backend, operation, e):
     if isinstance(e, BackendException) and e.code != log.ErrorCode.backend_error:
         return e.code
     elif hasattr(backend, '_error_code'):
-        return backend._error_code(e) or log.ErrorCode.backend_error
-    else:
-        return log.ErrorCode.backend_error
+        return backend._error_code(operation, e) or log.ErrorCode.backend_error
+    elif hasattr(e, 'errno'):
+        # A few backends return such errors (local, paramiko, etc)
+        if e.errno == errno.EACCES:
+            return log.ErrorCode.backend_permission_denied
+        elif e.errno == errno.ENOENT:
+            return log.ErrorCode.backend_not_found
+        elif e.errno == errno.ENOSPC:
+            return log.ErrorCode.backend_no_space
+    return log.ErrorCode.backend_error
 
-def retry(fatal=True):
+def retry(operation, fatal=True):
     # Decorators with arguments introduce a new level of indirection.  So we
     # have to return a decorator function (which itself returns a function!)
     def outer_retry(fn):
@@ -361,18 +369,18 @@ def retry(fatal=True):
                     log.Debug(_("Backtrace of previous error: %s")
                               % exception_traceback())
                     at_end = n == globals.num_retries
-                    if _get_code_from_exception(self.backend, e) == log.ErrorCode.backend_not_found:
+                    code = _get_code_from_exception(self.backend, operation, e)
+                    if code == log.ErrorCode.backend_not_found:
                         # If we tried to do something, but the file just isn't there,
                         # no need to retry.
                         at_end = True
                     if at_end and fatal:
-                        code = _get_code_from_exception(self.backend, e)
                         def make_filename(f):
                             if isinstance(f, path.ROPath):
                                 return util.escape(f.name)
                             else:
                                 return util.escape(f)
-                        extra = ' '.join([fn.__name__] + [make_filename(x) for x in args if x])
+                        extra = ' '.join([operation] + [make_filename(x) for x in args if x])
                         log.FatalError(_("Giving up after %s attempts. %s: %s")
                                        % (n, e.__class__.__name__,
                                           str(e)), code=code, extra=extra)
@@ -471,7 +479,8 @@ class Backend(object):
                 """ ignore a predefined set of error codes """
                 return 0, '', ''
             except (KeyError, ValueError):
-                raise BackendException("Error running '%s'" % private)
+                raise BackendException("Error running '%s': returned %d, with output:\n%s" %
+                                       (private, result, stdout + '\n' + stderr))
         return result, stdout, stderr
 
 
@@ -491,7 +500,7 @@ class BackendWrapper(object):
         else:
             raise NotImplementedError()
 
-    @retry(fatal=True)
+    @retry('put', fatal=True)
     def put(self, source_path, remote_filename=None):
         """
         Transfer source_path (Path object) to remote_filename (string)
@@ -503,7 +512,7 @@ class BackendWrapper(object):
             remote_filename = source_path.get_filename()
         self.__do_put(source_path, remote_filename)
 
-    @retry(fatal=True)
+    @retry('move', fatal=True)
     def move(self, source_path, remote_filename=None):
         """
         Move source_path (Path object) to remote_filename (string)
@@ -520,7 +529,7 @@ class BackendWrapper(object):
         self.__do_put(source_path, remote_filename)
         source_path.delete()
 
-    @retry(fatal=True)
+    @retry('get', fatal=True)
     def get(self, remote_filename, local_path):
         """Retrieve remote_filename and place in local_path"""
         if hasattr(self.backend, '_get'):
@@ -532,7 +541,7 @@ class BackendWrapper(object):
         else:
             raise NotImplementedError()
 
-    @retry(fatal=True)
+    @retry('list', fatal=True)
     def list(self):
         """
         Return list of filenames (byte strings) present in backend
@@ -567,11 +576,11 @@ class BackendWrapper(object):
         else:
             raise NotImplementedError()
 
-    @retry(fatal=False)
+    @retry('delete', fatal=False)
     def _do_delete_list(self, filename_list):
         self.backend._delete_list(filename_list)
 
-    @retry(fatal=False)
+    @retry('delete', fatal=False)
     def _do_delete(self, filename):
         self.backend._delete(filename)
 
@@ -608,19 +617,19 @@ class BackendWrapper(object):
 
         return info
 
-    @retry(fatal=False)
+    @retry('query', fatal=False)
     def _do_query_list(self, filename_list):
         info = self.backend._query_list(filename_list)
         if info is None:
             info = {}
         return info
 
-    @retry(fatal=False)
+    @retry('query', fatal=False)
     def _do_query(self, filename):
         try:
             return self.backend._query(filename)
         except Exception as e:
-            code = _get_code_from_exception(self.backend, e)
+            code = _get_code_from_exception(self.backend, 'query', e)
             if code == log.ErrorCode.backend_not_found:
                 return {'size': -1}
             else:

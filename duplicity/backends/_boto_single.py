@@ -243,9 +243,9 @@ class BotoBackend(duplicity.backend.Backend):
     def _list(self):
         if not self.bucket:
             raise BackendException("No connection to backend")
-        return self._list_filenames_in_bucket()
+        return self.list_filenames_in_bucket()
 
-    def _list_filenames_in_bucket(self):
+    def list_filenames_in_bucket(self):
         # We add a 'd' to the prefix to make sure it is not null (for boto) and
         # to optimize the listing of our filenames, which always begin with 'd'.
         # This will cause a failure in the regression tests as below:

@@ -72,3 +72,8 @@ inner backend instance with duplicity.backend.get_backend_object(url).
 
 Any method that duplicity calls will start with one underscore.  Please use
 zero or two underscores in your method names to avoid conflicts.
+
+== Testing ==
+
+Use "./testing/manual/backendtest.py foo://hostname/path" to test your new
+backend.  It will load your backend from your current branch.

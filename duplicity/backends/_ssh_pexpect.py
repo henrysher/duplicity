@@ -24,6 +24,8 @@
 # have the same syntax.  Also these strings will be executed by the
 # shell, so shouldn't have strange characters in them.
 
+from future_builtins import map
+
 import re
 import string
 import os
@@ -204,8 +206,10 @@ class SSHPExpectBackend(duplicity.backend.Backend):
                 msg = "Could not open file in command='%s'" % (commandline,)
                 break
         child.close(force = True)
-        if child.exitstatus != 0:
-            raise BackendException("Error running '%s'" % commandline)
+        if child.exitstatus == 0:
+            return res
+        else:
+            raise BackendException("Error running '%s': %s" % (commandline, msg))
 
     def _put(self, source_path, remote_filename):
         if globals.use_scp:
@@ -271,13 +275,8 @@ class SSHPExpectBackend(duplicity.backend.Backend):
 
         return [x for x in map(string.strip, l) if x]
 
-    def _delete_list(self, filename_list):
+    def _delete(self, filename):
         commands = ["cd \"%s\"" % (self.remote_dir,)]
-        for fn in filename_list:
-            commands.append("rm \"%s\"" % fn)
+        commands.append("rm \"%s\"" % filename)
         commandline = ("%s %s %s" % (self.sftp_command, globals.ssh_options, self.host_string))
         self.run_sftp_command(commandline, commands)
-
-duplicity.backend.register_backend("ssh", SSHPExpectBackend)
-duplicity.backend.register_backend("scp", SSHPExpectBackend)
-duplicity.backend.register_backend("sftp", SSHPExpectBackend)

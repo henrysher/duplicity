@@ -22,8 +22,6 @@ import os
 import subprocess
 import atexit
 import signal
-from gi.repository import Gio #@UnresolvedImport
-from gi.repository import GLib #@UnresolvedImport
 
 import duplicity.backend
 from duplicity import log
@@ -42,36 +40,39 @@ def ensure_dbus():
                     atexit.register(os.kill, int(parts[1]), signal.SIGTERM)
                 os.environ[parts[0]] = parts[1]
 
-class DupMountOperation(Gio.MountOperation):
-    """A simple MountOperation that grabs the password from the environment
-       or the user.
-    """
-    def __init__(self, backend):
-        Gio.MountOperation.__init__(self)
-        self.backend = backend
-        self.connect('ask-password', self.ask_password_cb)
-        self.connect('ask-question', self.ask_question_cb)
-
-    def ask_password_cb(self, *args, **kwargs):
-        self.set_password(self.backend.get_password())
-        self.reply(Gio.MountOperationResult.HANDLED)
-
-    def ask_question_cb(self, *args, **kwargs):
-        # Obviously just always answering with the first choice is a naive
-        # approach.  But there's no easy way to allow for answering questions
-        # in duplicity's typical run-from-cron mode with environment variables.
-        # And only a couple gvfs backends ask questions: 'sftp' does about
-        # new hosts and 'afc' does if the device is locked.  0 should be a
-        # safe choice.
-        self.set_choice(0)
-        self.reply(Gio.MountOperationResult.HANDLED)
-
 class GIOBackend(duplicity.backend.Backend):
     """Use this backend when saving to a GIO URL.
        This is a bit of a meta-backend, in that it can handle multiple schemas.
        URLs look like schema://user@server/path.
     """
     def __init__(self, parsed_url):
+        from gi.repository import Gio #@UnresolvedImport
+        from gi.repository import GLib #@UnresolvedImport
+
+        class DupMountOperation(Gio.MountOperation):
+            """A simple MountOperation that grabs the password from the environment
+               or the user.
+            """
+            def __init__(self, backend):
+                Gio.MountOperation.__init__(self)
+                self.backend = backend
+                self.connect('ask-password', self.ask_password_cb)
+                self.connect('ask-question', self.ask_question_cb)
+
+            def ask_password_cb(self, *args, **kwargs):
+                self.set_password(self.backend.get_password())
+                self.reply(Gio.MountOperationResult.HANDLED)
+
+            def ask_question_cb(self, *args, **kwargs):
+                # Obviously just always answering with the first choice is a naive
+                # approach.  But there's no easy way to allow for answering questions
+                # in duplicity's typical run-from-cron mode with environment variables.
+                # And only a couple gvfs backends ask questions: 'sftp' does about
+                # new hosts and 'afc' does if the device is locked.  0 should be a
+                # safe choice.
+                self.set_choice(0)
+                self.reply(Gio.MountOperationResult.HANDLED)
+
         duplicity.backend.Backend.__init__(self, parsed_url)
 
         ensure_dbus()
@@ -94,6 +95,8 @@ class GIOBackend(duplicity.backend.Backend):
                 raise
 
     def __done_with_mount(self, fileobj, result, loop):
+        from gi.repository import Gio #@UnresolvedImport
+        from gi.repository import GLib #@UnresolvedImport
         try:
             fileobj.mount_enclosing_volume_finish(result)
         except GLib.GError as e:
@@ -107,13 +110,20 @@ class GIOBackend(duplicity.backend.Backend):
         pass
 
     def __copy_file(self, source, target):
+        from gi.repository import Gio #@UnresolvedImport
         source.copy(target,
                     Gio.FileCopyFlags.OVERWRITE | Gio.FileCopyFlags.NOFOLLOW_SYMLINKS,
                     None, self.__copy_progress, None)
 
-    def _error_code(self, e):
+    def _error_code(self, operation, e):
+        from gi.repository import Gio #@UnresolvedImport
+        from gi.repository import GLib #@UnresolvedImport
         if isinstance(e, GLib.GError):
-            if e.code == Gio.IOErrorEnum.PERMISSION_DENIED:
+            if e.code == Gio.IOErrorEnum.FAILED and operation == 'delete':
+                # Sometimes delete will return a generic failure on a file not
+                # found (notably the FTP does that)
+                return log.ErrorCode.backend_not_found
+            elif e.code == Gio.IOErrorEnum.PERMISSION_DENIED:
                 return log.ErrorCode.backend_permission_denied
             elif e.code == Gio.IOErrorEnum.NOT_FOUND:
                 return log.ErrorCode.backend_not_found
@@ -121,16 +131,19 @@ class GIOBackend(duplicity.backend.Backend):
                 return log.ErrorCode.backend_no_space
 
     def _put(self, source_path, remote_filename):
+        from gi.repository import Gio #@UnresolvedImport
         source_file = Gio.File.new_for_path(source_path.name)
         target_file = self.remote_file.get_child(remote_filename)
         self.__copy_file(source_file, target_file)
 
     def _get(self, filename, local_path):
+        from gi.repository import Gio #@UnresolvedImport
         source_file = self.remote_file.get_child(filename)
         target_file = Gio.File.new_for_path(local_path.name)
         self.__copy_file(source_file, target_file)
 
     def _list(self):
+        from gi.repository import Gio #@UnresolvedImport
         files = []
         enum = self.remote_file.enumerate_children(Gio.FILE_ATTRIBUTE_STANDARD_NAME,
                                                    Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS,
@@ -146,6 +159,7 @@ class GIOBackend(duplicity.backend.Backend):
         target_file.delete(None)
 
     def _query(self, filename):
+        from gi.repository import Gio #@UnresolvedImport
         target_file = self.remote_file.get_child(filename)
         info = target_file.query_info(Gio.FILE_ATTRIBUTE_STANDARD_SIZE,
                                       Gio.FileQueryInfoFlags.NONE, None)

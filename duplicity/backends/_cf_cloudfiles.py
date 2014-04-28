@@ -65,8 +65,11 @@ class CloudFilesBackend(duplicity.backend.Backend):
                            log.ErrorCode.connection_failed)
         self.container = conn.create_container(container)
 
-    def _error_code(self, e):
-        if isinstance(e, self.resp_exc):
+    def _error_code(self, operation, e):
+        from cloudfiles.errors import NoSuchObject
+        if isinstance(e, NoSuchObject):
+            return log.ErrorCode.backend_not_found
+        elif isinstance(e, self.resp_exc):
             if e.status == 404:
                 return log.ErrorCode.backend_not_found
 
@@ -94,11 +97,5 @@ class CloudFilesBackend(duplicity.backend.Backend):
         self.container.delete_object(filename)
 
     def _query(self, filename):
-        from cloudfiles.errors import NoSuchObject
-        try:
-            sobject = self.container.get_object(filename)
-            return {'size': sobject.size}
-        except NoSuchObject:
-            return {'size': -1}
-
-duplicity.backend.register_backend("cf+http", CloudFilesBackend)
+        sobject = self.container.get_object(filename)
+        return {'size': sobject.size}

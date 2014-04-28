@@ -161,6 +161,12 @@ class DPBXBackend(duplicity.backend.Backend):
           if not self.sess.is_linked(): # stil not logged in
             log.FatalError("dpbx Cannot login: check your credentials",log.ErrorCode.dpbx_nologin)
 
+    def _error_code(self, operation, e):
+        from dropbox import rest
+        if isinstance(e, rest.ErrorResponse):
+            if e.status == 404:
+                return log.ErrorCode.backend_not_found
+
     @command()
     def _put(self, source_path, remote_filename):
         remote_dir  = urllib.unquote(self.parsed_url.path.lstrip('/'))

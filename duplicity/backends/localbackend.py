@@ -20,7 +20,6 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import os
-import errno
 
 import duplicity.backend
 from duplicity import log
@@ -45,15 +44,6 @@ class LocalBackend(duplicity.backend.Backend):
             os.makedirs(self.remote_pathdir.base)
         except Exception:
             pass
-
-    def _error_code(self, e):
-        if hasattr(e, 'errno'):
-            if e.errno == errno.EACCES:
-                return log.ErrorCode.backend_permission_denied
-            elif e.errno == errno.ENOENT:
-                return log.ErrorCode.backend_not_found
-            elif e.errno == errno.ENOSPC:
-                return log.ErrorCode.backend_no_space
 
     def _move(self, source_path, remote_filename):
         target_path = self.remote_pathdir.append(remote_filename)

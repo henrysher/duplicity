@@ -18,10 +18,13 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
+import duplicity.backend
 from duplicity import globals
 
 if (globals.cf_backend and
     globals.cf_backend.lower().strip() == 'pyrax'):
-    from . import _cf_pyrax
+    from ._cf_pyrax import PyraxBackend as CFBackend
 else:
-    from . import _cf_cloudfiles
+    from ._cf_cloudfiles import CloudFilesBackend as CFBackend
+
+duplicity.backend.register_backend("cf+http", CFBackend)

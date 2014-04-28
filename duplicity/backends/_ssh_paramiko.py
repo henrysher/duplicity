@@ -333,13 +333,13 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         else:
             return self.sftp.listdir()
 
-    def _delete(self, filename_list):
+    def _delete(self, filename):
         # In scp mode unavoidable quoting issues will cause failures if
         # filenames containing single quotes are encountered.
         if globals.use_scp:
-            self.runremote("rm '%s/%s'" % (self.remote_dir, fn), False, "scp rm ")
+            self.runremote("rm '%s/%s'" % (self.remote_dir, filename), False, "scp rm ")
         else:
-            self.sftp.remove(fn)
+            self.sftp.remove(filename)
 
     def runremote(self,cmd,ignoreexitcode=False,errorprefix=""):
         """small convenience function that opens a shell channel, runs remote command and returns
@@ -370,7 +370,3 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
             raise BackendException("could not load '%s', maybe corrupt?" % (file))
         
         return sshconfig.lookup(host)
-
-duplicity.backend.register_backend("sftp", SSHParamikoBackend)
-duplicity.backend.register_backend("scp", SSHParamikoBackend)
-duplicity.backend.register_backend("ssh", SSHParamikoBackend)

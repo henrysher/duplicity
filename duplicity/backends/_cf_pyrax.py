@@ -66,24 +66,25 @@ class PyraxBackend(duplicity.backend.Backend):
 
         self.client_exc = pyrax.exceptions.ClientException
         self.nso_exc = pyrax.exceptions.NoSuchObject
-        self.cloudfiles = pyrax.cloudfiles
         self.container = pyrax.cloudfiles.create_container(container)
 
-    def _error_code(self, e):
-        if isinstance(e, self.client_exc):
+    def _error_code(self, operation, e):
+        if isinstance(e, self.nso_exc):
+            return log.ErrorCode.backend_not_found
+        elif isinstance(e, self.client_exc):
             if e.status == 404:
+                return log.ErrorCode.backend_not_found
+        elif hasattr(e, 'http_status'):
+            if e.http_status == 404:
                 return log.ErrorCode.backend_not_found
 
     def _put(self, source_path, remote_filename):
         self.container.upload_file(source_path.name, remote_filename)
 
     def _get(self, remote_filename, local_path):
-        try:
-            sobject = self.container.get_object(remote_filename)
-            with open(local_path.name, 'wb') as f:
-                f.write(sobject.get())
-        except self.nso_exc:
-            pass
+        sobject = self.container.get_object(remote_filename)
+        with open(local_path.name, 'wb') as f:
+            f.write(sobject.get())
 
     def _list(self):
         # Cloud Files will return a max of 10,000 objects.  We have
@@ -99,10 +100,5 @@ class PyraxBackend(duplicity.backend.Backend):
         self.container.delete_object(filename)
 
     def _query(self, filename):
-        try:
-            sobject = self.container.get_object(filename)
-            return {'size': sobject.total_bytes}
-        except self.nso_exc:
-            return {'size': -1}
-
-duplicity.backend.register_backend("cf+http", PyraxBackend)
+        sobject = self.container.get_object(filename)
+        return {'size': sobject.total_bytes}

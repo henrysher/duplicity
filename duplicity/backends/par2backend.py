@@ -164,8 +164,8 @@ class Par2Backend(backend.Backend):
     def retry_cleanup(self):
         self.wrapped_backend._retry_cleanup()
 
-    def error_code(self, e):
-        return self.wrapped_backend._error_code(e)
+    def error_code(self, operation, e):
+        return self.wrapped_backend._error_code(operation, e)
 
     def query(self, filename):
         return self.wrapped_backend._query(filename)
