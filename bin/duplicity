@@ -1042,7 +1042,7 @@ def sync_archive(decrypt):
         try:
             util.ignore_missing(os.unlink, del_name)
         except Exception as e:
-            log.Warn(_("Unable to delete %s: %s") % (util.ufn(del_name), str(e)))
+            log.Warn(_("Unable to delete %s: %s") % (util.ufn(del_name), util.uexc(e)))
 
     def copy_to_local(fn):
         """
@@ -1531,7 +1531,7 @@ if __name__ == "__main__":
         # default. But do with sufficient verbosity.
         log.Info(_("User error detail: %s")
                  % (u''.join(traceback.format_exception(*sys.exc_info()))))
-        log.FatalError(u"%s: %s" % (e.__class__.__name__, unicode(e)),
+        log.FatalError(u"%s: %s" % (e.__class__.__name__, util.uexc(e)),
                        log.ErrorCode.user_error,
                        e.__class__.__name__)
 
@@ -1541,14 +1541,14 @@ if __name__ == "__main__":
         # default. But do with sufficient verbosity.
         log.Info(_("Backend error detail: %s")
                  % (u''.join(traceback.format_exception(*sys.exc_info()))))
-        log.FatalError(u"%s: %s" % (e.__class__.__name__, unicode(e)),
+        log.FatalError(u"%s: %s" % (e.__class__.__name__, util.uexc(e)),
                        log.ErrorCode.user_error,
                        e.__class__.__name__)
 
     except Exception as e:
         util.release_lockfile()
         if "Forced assertion for testing" in str(e):
-            log.FatalError(u"%s: %s" % (e.__class__.__name__, unicode(e)),
+            log.FatalError(u"%s: %s" % (e.__class__.__name__, util.uexc(e)),
                            log.ErrorCode.exception,
                            e.__class__.__name__)
         else:

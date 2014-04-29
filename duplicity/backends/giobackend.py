@@ -25,6 +25,7 @@ import signal
 
 import duplicity.backend
 from duplicity import log
+from duplicity import util
 
 def ensure_dbus():
     # GIO requires a dbus session bus which can start the gvfs daemons
@@ -103,7 +104,7 @@ class GIOBackend(duplicity.backend.Backend):
             # check for NOT_SUPPORTED because some schemas (e.g. file://) validly don't
             if e.code != Gio.IOErrorEnum.ALREADY_MOUNTED and e.code != Gio.IOErrorEnum.NOT_SUPPORTED:
                 log.FatalError(_("Connection failed, please check your password: %s")
-                               % str(e), log.ErrorCode.connection_failed)
+                               % util.uexc(e), log.ErrorCode.connection_failed)
         loop.quit()
 
     def __copy_progress(self, *args, **kwargs):

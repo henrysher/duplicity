@@ -35,6 +35,7 @@ import traceback, StringIO
 
 import duplicity.backend
 from duplicity import log
+from duplicity import util
 from duplicity.errors import BackendException
 
 
@@ -81,7 +82,7 @@ def command(login_required=True):
                 log_exception(e)
                 raise BackendException('dpbx type error "%s"' % (e,))
             except rest.ErrorResponse as e:
-                msg = e.user_error_msg or str(e)
+                msg = e.user_error_msg or util.uexc(e)
                 log.Error('dpbx error: %s' % (msg,), log.ErrorCode.backend_command_error)
                 raise e
             except Exception as e:
@@ -157,7 +158,7 @@ class DPBXBackend(duplicity.backend.Backend):
           try: # to login to the box
             self.sess.link()
           except rest.ErrorResponse as e:
-            log.FatalError('dpbx Error: %s\n' % str(e), log.ErrorCode.dpbx_nologin)
+            log.FatalError('dpbx Error: %s\n' % util.uexc(e), log.ErrorCode.dpbx_nologin)
           if not self.sess.is_linked(): # stil not logged in
             log.FatalError("dpbx Cannot login: check your credentials",log.ErrorCode.dpbx_nologin)
 

@@ -22,6 +22,7 @@ import os
 
 import duplicity.backend
 from duplicity import log
+from duplicity import util
 from duplicity.errors import BackendException
 
 
@@ -76,7 +77,7 @@ class SwiftBackend(duplicity.backend.Backend):
             self.conn.put_container(self.container)
         except Exception as e:
             log.FatalError("Connection failed: %s %s"
-                           % (e.__class__.__name__, str(e)),
+                           % (e.__class__.__name__, util.uexc(e)),
                            log.ErrorCode.connection_failed)
 
     def _error_code(self, operation, e):

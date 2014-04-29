@@ -22,6 +22,7 @@ import os
 
 import duplicity.backend
 from duplicity import log
+from duplicity import util
 from duplicity.errors import BackendException
 
 class CloudFilesBackend(duplicity.backend.Backend):
@@ -61,7 +62,7 @@ class CloudFilesBackend(duplicity.backend.Backend):
             conn = Connection(**conn_kwargs)
         except Exception as e:
             log.FatalError("Connection failed, please check your credentials: %s %s"
-                           % (e.__class__.__name__, str(e)),
+                           % (e.__class__.__name__, util.uexc(e)),
                            log.ErrorCode.connection_failed)
         self.container = conn.create_container(container)
 
