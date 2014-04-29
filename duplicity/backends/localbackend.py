@@ -20,14 +20,11 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import os
-import types
-import errno
 
 import duplicity.backend
 from duplicity import log
 from duplicity import path
-from duplicity import util
-from duplicity.errors import * #@UnusedWildImport
+from duplicity.errors import BackendException
 
 
 class LocalBackend(duplicity.backend.Backend):
@@ -43,90 +40,37 @@ class LocalBackend(duplicity.backend.Backend):
         if not parsed_url.path.startswith('//'):
             raise BackendException("Bad file:// path syntax.")
         self.remote_pathdir = path.Path(parsed_url.path[2:])
+        try:
+            os.makedirs(self.remote_pathdir.base)
+        except Exception:
+            pass
 
-    def handle_error(self, e, op, file1 = None, file2 = None):
-        code = log.ErrorCode.backend_error
-        if hasattr(e, 'errno'):
-            if e.errno == errno.EACCES:
-                code = log.ErrorCode.backend_permission_denied
-            elif e.errno == errno.ENOENT:
-                code = log.ErrorCode.backend_not_found
-            elif e.errno == errno.ENOSPC:
-                code = log.ErrorCode.backend_no_space
-        extra = ' '.join([util.escape(x) for x in [file1, file2] if x])
-        extra = ' '.join([op, extra])
-        if op != 'delete' and op != 'query':
-            log.FatalError(str(e), code, extra)
-        else:
-            log.Warn(str(e), code, extra)
-
-    def move(self, source_path, remote_filename = None):
-        self.put(source_path, remote_filename, rename_instead = True)
-
-    def put(self, source_path, remote_filename = None, rename_instead = False):
-        if not remote_filename:
-            remote_filename = source_path.get_filename()
+    def _move(self, source_path, remote_filename):
         target_path = self.remote_pathdir.append(remote_filename)
-        log.Info("Writing %s" % target_path.name)
-        """Try renaming first (if allowed to), copying if doesn't work"""
-        if rename_instead:
-            try:
-                source_path.rename(target_path)
-            except OSError:
-                pass
-            except Exception as e:
-                self.handle_error(e, 'put', source_path.name, target_path.name)
-            else:
-                return
         try:
-            target_path.writefileobj(source_path.open("rb"))
-        except Exception as e:
-            self.handle_error(e, 'put', source_path.name, target_path.name)
+            source_path.rename(target_path)
+            return True
+        except OSError:
+            return False
 
-        """If we get here, renaming failed previously"""
-        if rename_instead:
-            """We need to simulate its behaviour"""
-            source_path.delete()
+    def _put(self, source_path, remote_filename):
+        target_path = self.remote_pathdir.append(remote_filename)
+        target_path.writefileobj(source_path.open("rb"))
 
-    def get(self, filename, local_path):
-        """Get file and put in local_path (Path object)"""
+    def _get(self, filename, local_path):
         source_path = self.remote_pathdir.append(filename)
-        try:
-            local_path.writefileobj(source_path.open("rb"))
-        except Exception as e:
-            self.handle_error(e, 'get', source_path.name, local_path.name)
+        local_path.writefileobj(source_path.open("rb"))
 
     def _list(self):
-        """List files in that directory"""
-        try:
-                os.makedirs(self.remote_pathdir.base)
-        except Exception:
-                pass
-        try:
-            return self.remote_pathdir.listdir()
-        except Exception as e:
-            self.handle_error(e, 'list', self.remote_pathdir.name)
+        return self.remote_pathdir.listdir()
 
-    def delete(self, filename_list):
-        """Delete all files in filename list"""
-        assert type(filename_list) is not types.StringType
-        for filename in filename_list:
-            try:
-                self.remote_pathdir.append(filename).delete()
-            except Exception as e:
-                self.handle_error(e, 'delete', self.remote_pathdir.append(filename).name)
+    def _delete(self, filename):
+        self.remote_pathdir.append(filename).delete()
 
-    def _query_file_info(self, filename):
-        """Query attributes on filename"""
-        try:
-            target_file = self.remote_pathdir.append(filename)
-            if not os.path.exists(target_file.name):
-                return {'size': -1}
-            target_file.setdata()
-            size = target_file.getsize()
-            return {'size': size}
-        except Exception as e:
-            self.handle_error(e, 'query', target_file.name)
-            return {'size': None}
+    def _query(self, filename):
+        target_file = self.remote_pathdir.append(filename)
+        target_file.setdata()
+        size = target_file.getsize() if target_file.exists() else -1
+        return {'size': size}
 
 duplicity.backend.register_backend("file", LocalBackend)

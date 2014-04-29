@@ -83,13 +83,15 @@ class FunctionalTestCase(DuplicityTestCase):
             child.expect('passphrase.*:')
             child.sendline(passphrase)
         child.wait()
-        return_val = child.exitstatus
 
-        #print "Ran duplicity command: ", cmdline, "\n with return_val: ", child.exitstatus
+        return_val = child.exitstatus
+        #output = child.read()
+        #print "Ran duplicity command: ", cmdline, "\n with return_val: ", return_val, "\n and output:\n", output
+
         if fail:
-            self.assertEqual(30, child.exitstatus)
+            self.assertEqual(30, return_val)
         elif return_val:
-            raise CmdError(child.exitstatus)
+            raise CmdError(return_val)
 
     def backup(self, type, input_dir, options=[], **kwargs):
         """Run duplicity backup to default directory"""

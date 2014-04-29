@@ -25,7 +25,6 @@ import urllib
 import duplicity.backend
 from duplicity import globals
 from duplicity import log
-from duplicity.errors import * #@UnusedWildImport
 from duplicity import tempdir
 
 class FTPBackend(duplicity.backend.Backend):
@@ -65,7 +64,7 @@ class FTPBackend(duplicity.backend.Backend):
         # This squelches the "file not found" result from ncftpls when
         # the ftp backend looks for a collection that does not exist.
         # version 3.2.2 has error code 5, 1280 is some legacy value
-        self.popen_persist_breaks[ 'ncftpls' ] = [ 5, 1280 ]
+        self.popen_breaks[ 'ncftpls' ] = [ 5, 1280 ]
 
         # Use an explicit directory name.
         if self.url_string[-1] != '/':
@@ -88,36 +87,28 @@ class FTPBackend(duplicity.backend.Backend):
         if parsed_url.port != None and parsed_url.port != 21:
             self.flags += " -P '%s'" % (parsed_url.port)
 
-    def put(self, source_path, remote_filename = None):
-        """Transfer source_path to remote_filename"""
-        if not remote_filename:
-            remote_filename = source_path.get_filename()
+    def _put(self, source_path, remote_filename):
         remote_path = os.path.join(urllib.unquote(self.parsed_url.path.lstrip('/')), remote_filename).rstrip()
         commandline = "ncftpput %s -m -V -C '%s' '%s'" % \
             (self.flags, source_path.name, remote_path)
-        self.run_command_persist(commandline)
+        self.subprocess_popen(commandline)
 
-    def get(self, remote_filename, local_path):
-        """Get remote filename, saving it to local_path"""
+    def _get(self, remote_filename, local_path):
         remote_path = os.path.join(urllib.unquote(self.parsed_url.path), remote_filename).rstrip()
         commandline = "ncftpget %s -V -C '%s' '%s' '%s'" % \
             (self.flags, self.parsed_url.hostname, remote_path.lstrip('/'), local_path.name)
-        self.run_command_persist(commandline)
-        local_path.setdata()
+        self.subprocess_popen(commandline)
 
     def _list(self):
-        """List files in directory"""
         # Do a long listing to avoid connection reset
         commandline = "ncftpls %s -l '%s'" % (self.flags, self.url_string)
-        l = self.popen_persist(commandline).split('\n')
+        _, l, _ = self.subprocess_popen(commandline)
         # Look for our files as the last element of a long list line
-        return [x.split()[-1] for x in l if x and not x.startswith("total ")]
+        return [x.split()[-1] for x in l.split('\n') if x and not x.startswith("total ")]
 
-    def delete(self, filename_list):
-        """Delete files in filename_list"""
-        for filename in filename_list:
-            commandline = "ncftpls %s -l -X 'DELE %s' '%s'" % \
-                (self.flags, filename, self.url_string)
-            self.popen_persist(commandline)
+    def _delete(self, filename):
+        commandline = "ncftpls %s -l -X 'DELE %s' '%s'" % \
+            (self.flags, filename, self.url_string)
+        self.subprocess_popen(commandline)
 
 duplicity.backend.register_backend("ftp", FTPBackend)

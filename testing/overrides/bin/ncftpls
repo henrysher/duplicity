@@ -1,0 +1,19 @@
+#!/usr/bin/env python
+
+from duplicity.backend import ParsedUrl
+import os
+import subprocess
+import sys
+
+if sys.argv[1] == '-v':
+    print 'blah 3.2.1'
+    sys.exit(8)  # really, the backend expects 8 as the return
+
+for arg in sys.argv:
+    if arg.startswith('DELE '):
+        pu = ParsedUrl(sys.argv[-1])
+        filename = os.path.join(pu.path.lstrip('/'), arg.split()[1])
+        sys.exit(subprocess.call(['rm', filename]))
+
+pu = ParsedUrl(sys.argv[-1])
+sys.exit(subprocess.call(['ls', '-l', pu.path.lstrip('/')]))

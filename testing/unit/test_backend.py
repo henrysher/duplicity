@@ -19,11 +19,14 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
+import mock
 import unittest
 
 import duplicity.backend
 import duplicity.backends #@UnusedImport
 from duplicity.errors import * #@UnusedWildImport
+from duplicity import globals
+from duplicity import path
 from . import UnitTestCase
 
 
@@ -132,6 +135,131 @@ class ParsedUrlTest(UnitTestCase):
                           "file:path")  # no relative paths for non-netloc schemes
         self.assertRaises(UnsupportedBackendScheme, duplicity.backend.get_backend,
                           "foo://foo@bar:pass@example.com/home")
+
+
+class BackendWrapperTest(UnitTestCase):
+
+    def setUp(self):
+        super(BackendWrapperTest, self).setUp()
+        self.mock = mock.MagicMock()
+        self.backend = duplicity.backend.BackendWrapper(self.mock)
+        self.local = mock.MagicMock()
+        self.remote = 'remote'
+
+    @mock.patch('sys.exit')
+    def test_default_error_exit(self, exit_mock):
+        self.set_global('num_retries', 1)
+        del self.mock._error_code
+        self.mock._put.side_effect = Exception
+        self.backend.put(self.local, self.remote)
+        exit_mock.assert_called_once_with(50)
+
+    @mock.patch('sys.exit')
+    def test_translates_code(self, exit_mock):
+        self.set_global('num_retries', 1)
+        self.mock._error_code.return_value = 12345
+        self.mock._put.side_effect = Exception
+        self.backend.put(self.local, self.remote)
+        exit_mock.assert_called_once_with(12345)
+
+    @mock.patch('sys.exit')
+    def test_uses_exception_code(self, exit_mock):
+        self.set_global('num_retries', 1)
+        self.mock._error_code.return_value = 12345
+        self.mock._put.side_effect = BackendException('error', code=54321)
+        self.backend.put(self.local, self.remote)
+        exit_mock.assert_called_once_with(54321)
+
+    @mock.patch('sys.exit')
+    @mock.patch('time.sleep')  # so no waiting
+    def test_cleans_up(self, exit_mock, time_mock):
+        self.set_global('num_retries', 2)
+        self.mock._retry_cleanup.return_value = None
+        self.mock._put.side_effect = Exception
+        self.backend.put(self.local, self.remote)
+        self.mock._retry_cleanup.assert_called_once_with()
+
+    def test_prefer_lists(self):
+        self.mock._delete.return_value = None
+        self.mock._delete_list.return_value = None
+        self.backend.delete([self.remote])
+        self.assertEqual(self.mock._delete.call_count, 0)
+        self.assertEqual(self.mock._delete_list.call_count, 1)
+        del self.mock._delete_list
+        self.backend.delete([self.remote])
+        self.assertEqual(self.mock._delete.call_count, 1)
+
+        self.mock._query.return_value = None
+        self.mock._query_list.return_value = None
+        self.backend.query_info([self.remote])
+        self.assertEqual(self.mock._query.call_count, 0)
+        self.assertEqual(self.mock._query_list.call_count, 1)
+        del self.mock._query_list
+        self.backend.query_info([self.remote])
+        self.assertEqual(self.mock._query.call_count, 1)
+
+    @mock.patch('sys.exit')
+    @mock.patch('time.sleep')  # so no waiting
+    def test_retries(self, exit_mock, time_mock):
+        self.set_global('num_retries', 2)
+
+        self.mock._get.side_effect = Exception
+        self.backend.get(self.remote, self.local)
+        self.assertEqual(self.mock._get.call_count, globals.num_retries)
+
+        self.mock._put.side_effect = Exception
+        self.backend.put(self.local, self.remote)
+        self.assertEqual(self.mock._put.call_count, globals.num_retries)
+
+        self.mock._list.side_effect = Exception
+        self.backend.list()
+        self.assertEqual(self.mock._list.call_count, globals.num_retries)
+
+        self.mock._delete_list.side_effect = Exception
+        self.backend.delete([self.remote])
+        self.assertEqual(self.mock._delete_list.call_count, globals.num_retries)
+
+        self.mock._query_list.side_effect = Exception
+        self.backend.query_info([self.remote])
+        self.assertEqual(self.mock._query_list.call_count, globals.num_retries)
+
+        del self.mock._delete_list
+        self.mock._delete.side_effect = Exception
+        self.backend.delete([self.remote])
+        self.assertEqual(self.mock._delete.call_count, globals.num_retries)
+
+        del self.mock._query_list
+        self.mock._query.side_effect = Exception
+        self.backend.query_info([self.remote])
+        self.assertEqual(self.mock._query.call_count, globals.num_retries)
+
+        self.mock._move.side_effect = Exception
+        self.backend.move(self.local, self.remote)
+        self.assertEqual(self.mock._move.call_count, globals.num_retries)
+
+    def test_move(self):
+        self.mock._move.return_value = True
+        self.backend.move(self.local, self.remote)
+        self.mock._move.assert_called_once_with(self.local, self.remote)
+        self.assertEquals(self.mock._put.call_count, 0)
+
+    def test_move_fallback_false(self):
+        self.mock._move.return_value = False
+        self.backend.move(self.local, self.remote)
+        self.mock._move.assert_called_once_with(self.local, self.remote)
+        self.mock._put.assert_called_once_with(self.local, self.remote) 
+        self.local.delete.assert_called_once_with()
+
+    def test_move_fallback_undefined(self):
+        del self.mock._move
+        self.backend.move(self.local, self.remote)
+        self.mock._put.assert_called_once_with(self.local, self.remote)
+        self.local.delete.assert_called_once_with()
+
+    def test_close(self):
+        self.mock._close.return_value = None
+        self.backend.close()
+        self.mock._close.assert_called_once_with()
 
 
 if __name__ == "__main__":

@@ -210,13 +210,6 @@ def parse_cmdline_options(arglist):
     global select_opts, select_files, full_backup
     global list_current, collection_status, cleanup, remove_time, verify
 
-    def use_gio(*args):
-        try:
-            import duplicity.backends.giobackend
-            backend.force_backend(duplicity.backends.giobackend.GIOBackend)
-        except ImportError:
-            log.FatalError(_("Unable to load gio backend: %s") % str(sys.exc_info()[1]), log.ErrorCode.gio_not_available)
-
     def set_log_fd(fd):
         if fd < 1:
             raise optparse.OptionValueError("log-fd must be greater than zero.")
@@ -365,7 +358,9 @@ def parse_cmdline_options(arglist):
     # the time specified
     parser.add_option("--full-if-older-than", type = "time", dest = "full_force_time", metavar = _("time"))
 
-    parser.add_option("--gio", action = "callback", callback = use_gio)
+    parser.add_option("--gio",action = "callback", dest = "use_gio",
+                      callback = lambda o, s, v, p: (setattr(p.values, o.dest, True),
+                                                     old_fn_deprecation(s)))
 
     parser.add_option("--gpg-options", action = "extend", metavar = _("options"))
 
@@ -521,8 +516,8 @@ def parse_cmdline_options(arglist):
     # sftp command to use (ssh pexpect backend)
     parser.add_option("--sftp-command", metavar = _("command"))
 
-    # sftp command to use (ssh pexpect backend)
-    parser.add_option("--cf-command", metavar = _("command"))
+    # allow the user to switch cloudfiles backend
+    parser.add_option("--cf-backend", metavar = _("pyrax|cloudfiles"))
 
     # If set, use short (< 30 char) filenames for all the remote files.
     parser.add_option("--short-filenames", action = "callback",

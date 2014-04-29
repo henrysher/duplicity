@@ -32,14 +32,10 @@ import locale, sys
 from functools import reduce
 
 import traceback, StringIO
-from exceptions import Exception
 
 import duplicity.backend
-from duplicity import globals
 from duplicity import log
-from duplicity.errors import *
-from duplicity import tempdir
-from duplicity.backend import retry_fatal
+from duplicity.errors import BackendException
 
 
 # This application key is registered in my name (jno at pisem dot net).
@@ -76,14 +72,14 @@ def command(login_required=True):
         def wrapper(self, *args):
             from dropbox import rest
             if login_required and not self.sess.is_linked():
-              log.FatalError("dpbx Cannot login: check your credentials",log.ErrorCode.dpbx_nologin)
+              raise BackendException("dpbx Cannot login: check your credentials", log.ErrorCode.dpbx_nologin)
               return
 
             try:
                 return f(self, *args)
             except TypeError as e:
                 log_exception(e)
-                log.FatalError('dpbx type error "%s"' % (e,), log.ErrorCode.backend_code_error)
+                raise BackendException('dpbx type error "%s"' % (e,))
             except rest.ErrorResponse as e:
                 msg = e.user_error_msg or str(e)
                 log.Error('dpbx error: %s' % (msg,), log.ErrorCode.backend_command_error)
@@ -165,25 +161,22 @@ class DPBXBackend(duplicity.backend.Backend):
           if not self.sess.is_linked(): # stil not logged in
             log.FatalError("dpbx Cannot login: check your credentials",log.ErrorCode.dpbx_nologin)
 
-    @retry_fatal
-    @command()
-    def put(self, source_path, remote_filename = None):
-        """Transfer source_path to remote_filename"""
-        if not remote_filename:
-            remote_filename = source_path.get_filename()
+    def _error_code(self, operation, e):
+        from dropbox import rest
+        if isinstance(e, rest.ErrorResponse):
+            if e.status == 404:
+                return log.ErrorCode.backend_not_found
 
+    @command()
+    def _put(self, source_path, remote_filename):
         remote_dir  = urllib.unquote(self.parsed_url.path.lstrip('/'))
         remote_path = os.path.join(remote_dir, remote_filename).rstrip()
-
         from_file = open(source_path.name, "rb")
-
         resp = self.api_client.put_file(remote_path, from_file)
         log.Debug( 'dpbx,put(%s,%s): %s'%(source_path.name, remote_path, resp))
 
-    @retry_fatal
     @command()
-    def get(self, remote_filename, local_path):
-        """Get remote filename, saving it to local_path"""
+    def _get(self, remote_filename, local_path):
         remote_path = os.path.join(urllib.unquote(self.parsed_url.path), remote_filename).rstrip()
 
         to_file = open( local_path.name, 'wb' )
@@ -196,10 +189,8 @@ class DPBXBackend(duplicity.backend.Backend):
 
         local_path.setdata()
 
-    @retry_fatal
     @command()
-    def _list(self,none=None):
-        """List files in directory"""
+    def _list(self):
         # Do a long listing to avoid connection reset
         remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
         resp = self.api_client.metadata(remote_dir)
@@ -214,21 +205,15 @@ class DPBXBackend(duplicity.backend.Backend):
                 l.append(name.encode(encoding))
         return l
 
-    @retry_fatal
     @command()
-    def delete(self, filename_list):
-        """Delete files in filename_list"""
-        if not filename_list :
-          log.Debug('dpbx.delete(): no op')
-          return
+    def _delete(self, filename):
         remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
-        for filename in filename_list:
-          remote_name = os.path.join( remote_dir, filename )
-          resp = self.api_client.file_delete( remote_name )
-          log.Debug('dpbx.delete(%s): %s'%(remote_name,resp))
+        remote_name = os.path.join( remote_dir, filename )
+        resp = self.api_client.file_delete( remote_name )
+        log.Debug('dpbx.delete(%s): %s'%(remote_name,resp))
 
     @command()
-    def close(self):
+    def _close(self):
       """close backend session? no! just "flush" the data"""
       info = self.api_client.account_info()
       log.Debug('dpbx.close():')

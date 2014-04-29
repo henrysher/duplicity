@@ -18,6 +18,7 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
+import duplicity.backend
 from duplicity import globals, log
 
 def warn_option(option, optionvar):
@@ -26,11 +27,15 @@ def warn_option(option, optionvar):
 
 if (globals.ssh_backend and
     globals.ssh_backend.lower().strip() == 'pexpect'):
-    from . import _ssh_pexpect
+    from ._ssh_pexpect import SSHPExpectBackend as SSHBackend
 else:
     # take user by the hand to prevent typo driven bug reports
     if globals.ssh_backend.lower().strip() != 'paramiko':
         log.Warn(_("Warning: Selected ssh backend '%s' is neither 'paramiko nor 'pexpect'. Will use default paramiko instead.") % globals.ssh_backend)
     warn_option("--scp-command", globals.scp_command)
     warn_option("--sftp-command", globals.sftp_command)
-    from . import _ssh_paramiko
+    from ._ssh_paramiko import SSHParamikoBackend as SSHBackend
+
+duplicity.backend.register_backend("sftp", SSHBackend)
+duplicity.backend.register_backend("scp", SSHBackend)
+duplicity.backend.register_backend("ssh", SSHBackend)

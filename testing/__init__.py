@@ -30,12 +30,16 @@ from duplicity import log
 _testing_dir = os.path.dirname(os.path.abspath(__file__))
 _top_dir = os.path.dirname(_testing_dir)
 _overrides_dir = os.path.join(_testing_dir, 'overrides')
+_bin_dir = os.path.join(_testing_dir, 'overrides', 'bin')
 
 # Adjust python path for duplicity and override modules
-sys.path = [_overrides_dir, _top_dir] + sys.path
+sys.path = [_overrides_dir, _top_dir, _bin_dir] + sys.path
 
 # Also set PYTHONPATH for any subprocesses
 os.environ['PYTHONPATH'] = _overrides_dir + ":" + _top_dir + ":" + os.environ.get('PYTHONPATH', '')
+
+# And PATH for any subprocesses
+os.environ['PATH'] = _bin_dir + ":" + os.environ.get('PATH', '')
 
 # Now set some variables that help standardize test behavior
 os.environ['LANG'] = ''

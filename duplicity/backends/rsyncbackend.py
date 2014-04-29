@@ -23,7 +23,7 @@ import os, re
 import tempfile
 
 import duplicity.backend
-from duplicity.errors import * #@UnusedWildImport
+from duplicity.errors import InvalidBackendURL
 from duplicity import globals, tempdir, util
 
 class RsyncBackend(duplicity.backend.Backend):
@@ -58,12 +58,13 @@ class RsyncBackend(duplicity.backend.Backend):
             if port:
                 port = " --port=%s" % port
         else:
+            host_string = host + ":" if host else ""
             if parsed_url.path.startswith("//"):
                 # its an absolute path
-                self.url_string = "%s:/%s" % (host, parsed_url.path.lstrip('/'))
+                self.url_string = "%s/%s" % (host_string, parsed_url.path.lstrip('/'))
             else:
                 # its a relative path
-                self.url_string = "%s:%s" % (host, parsed_url.path.lstrip('/'))
+                self.url_string = "%s%s" % (host_string, parsed_url.path.lstrip('/'))
             if parsed_url.port:
                 port = " -p %s" % parsed_url.port
         # add trailing slash if missing
@@ -105,29 +106,17 @@ class RsyncBackend(duplicity.backend.Backend):
         raise InvalidBackendURL("Could not determine rsync path: %s"
                                     "" % self.munge_password( url ) )
 
-    def run_command(self, commandline):
-        result, stdout, stderr = self.subprocess_popen_persist(commandline)
-        return result, stdout
-
-    def put(self, source_path, remote_filename = None):
-        """Use rsync to copy source_dir/filename to remote computer"""
-        if not remote_filename:
-            remote_filename = source_path.get_filename()
+    def _put(self, source_path, remote_filename):
         remote_path = os.path.join(self.url_string, remote_filename)
         commandline = "%s %s %s" % (self.cmd, source_path.name, remote_path)
-        self.run_command(commandline)
+        self.subprocess_popen(commandline)
 
-    def get(self, remote_filename, local_path):
-        """Use rsync to get a remote file"""
+    def _get(self, remote_filename, local_path):
         remote_path = os.path.join (self.url_string, remote_filename)
         commandline = "%s %s %s" % (self.cmd, remote_path, local_path.name)
-        self.run_command(commandline)
-        local_path.setdata()
-        if not local_path.exists():
-            raise BackendException("File %s not found" % local_path.name)
+        self.subprocess_popen(commandline)
 
-    def list(self):
-        """List files"""
+    def _list(self):
         def split (str):
             line = str.split ()
             if len (line) > 4 and line[4] != '.':
@@ -135,20 +124,17 @@ class RsyncBackend(duplicity.backend.Backend):
             else:
                 return None
         commandline = "%s %s" % (self.cmd, self.url_string)
-        result, stdout = self.run_command(commandline)
+        result, stdout, stderr = self.subprocess_popen(commandline)
         return [x for x in map (split, stdout.split('\n')) if x]
 
-    def delete(self, filename_list):
-        """Delete files."""
+    def _delete_list(self, filename_list):
         delete_list = filename_list
         dont_delete_list = []
-        for file in self.list ():
+        for file in self._list ():
             if file in delete_list:
                 delete_list.remove (file)
             else:
                 dont_delete_list.append (file)
-        if len (delete_list) > 0:
-            raise BackendException("Files %s not found" % str (delete_list))
 
         dir = tempfile.mkdtemp()
         exclude, exclude_name = tempdir.default().mkstemp_file()
@@ -162,7 +148,7 @@ class RsyncBackend(duplicity.backend.Backend):
         exclude.close()
         commandline = ("%s --recursive --delete --exclude-from=%s %s/ %s" %
                                    (self.cmd, exclude_name, dir, self.url_string))
-        self.run_command(commandline)
+        self.subprocess_popen(commandline)
         for file in to_delete:
             util.ignore_missing(os.unlink, file)
         os.rmdir (dir)

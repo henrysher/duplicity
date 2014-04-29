@@ -1,3 +1,40 @@
+2014-04-29  Kenneth Loafman  <kenneth@loafman.com>
+    * Merged in lp:~mterry/duplicity/backend-unification
+      - Reorganize and simplify backend code.  Specifically:
+        - Formalize the expected API between backends and duplicity.  See the new
+          file duplicity/backends/README for the instructions I've given authors.
+        - Add some tests for our backend wrapper class as well as some tests for
+          individual backends.  For several backends that have some commands do all
+          the heavy lifting (hsi, tahoe, ftp), I've added fake little mock commands
+          so that we can test them locally.  This doesn't truly test our integration
+          with those commands, but at least lets us test the backend glue code.
+        - Removed a lot of duplicate and unused code which backends were using (or
+          not using).  This branch drops 700 lines of code (~20%)
+          in duplicity/backends!
+        - Simplified expectations of backends.  Our wrapper code now does all the
+          retrying, and all the exception handling.  Backends can 'fire and forget'
+          trusting our wrappers to give the user a reasonable error message.
+          Obviously, backends can also add more details and make nicer error
+          messages.  But they don't *have* to.
+        - Separate out the backend classes from our wrapper class.  Now there is no
+          possibility of namespace collision.  All our API methods use one
+          underscore.  Anything else (zero or two underscores) are for the backend
+          class's use.
+        - Added the concept of a 'backend prefix' which is used by par2 and gio
+          backends to provide generic support for "schema+" in urls -- like par2+
+          or gio+.  I've since marked the '--gio' flag as deprecated, in favor of
+          'gio+'.  Now you can even nest such backends like
+          par2+gio+file://blah/blah.
+        - The switch to control which cloudfiles backend had a typo.  I fixed this,
+          but I'm not sure I should have?  If we haven't had complaints, maybe we
+          can just drop the old backend.
+        - I manually tested all the backends we have (except hsi and tahoe -- but
+          those are simple wrappers around commands and I did test those via mocks
+          per above).  I also added a bunch more manual backend tests to
+          ./testing/manual/backendtest.py, which can now be run like the above to
+          test all the files you have configured in config.py or you can pass it a
+          URL which it will use for testing (useful for backend authors).
+
 2014-04-26  Kenneth Loafman  <kenneth@loafman.com>
     * Merged in lp:~mterry/duplicity/py3-map-filter
       - In py3, map and filter return iterable objects, not lists. So in each case

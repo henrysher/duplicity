@@ -23,6 +23,8 @@
 Error/exception classes that do not fit naturally anywhere else.
 """
 
+from duplicity import log
+
 class DuplicityError(Exception):
     pass
 
@@ -68,9 +70,11 @@ class BackendException(DuplicityError):
     """
     Raised to indicate a backend specific problem.
     """
-    pass
+    def __init__(self, msg, code=log.ErrorCode.backend_error):
+        super(BackendException, self).__init__(msg)
+        self.code = code
 
-class FatalBackendError(DuplicityError):
+class FatalBackendException(BackendException):
     """
     Raised to indicate a backend failed fatally.
     """

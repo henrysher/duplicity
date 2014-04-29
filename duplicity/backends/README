@@ -1,0 +1,79 @@
+= How to write a backend, in five easy steps! =
+
+There are five main methods you want to implement:
+
+__init__  - Initial setup
+_get
+ - Get one file
+ - Retried if an exception is thrown
+_put
+ - Upload one file
+ - Retried if an exception is thrown
+_list
+ - List all files in the backend
+ - Return a list of filenames
+ - Retried if an exception is thrown
+_delete
+ - Delete one file
+ - Retried if an exception is thrown
+
+There are other methods you may optionally implement:
+
+_delete_list
+ - Delete list of files
+ - This is used in preference of _delete if defined
+ - Must gracefully handle individual file errors itself
+ - Retried if an exception is thrown
+_query
+ - Query metadata of one file
+ - Return a dict with a 'size' key, and a file size value (-1 for not found)
+ - Retried if an exception is thrown
+_query_list
+ - Query metadata of a list of files
+ - Return a dict of filenames mapping to a dict with a 'size' key,
+   and a file size value (-1 for not found)
+ - This is used in preference of _query if defined
+ - Must gracefully handle individual file errors itself
+ - Retried if an exception is thrown
+_retry_cleanup
+ - If the backend wants to do any bookkeeping or connection resetting inbetween
+   retries, do it here.
+_error_code
+ - Passed an exception thrown by your backend, return a log.ErrorCode that
+   corresponds to that exception
+_move
+ - If your backend can more optimally move a local file into its backend,
+   implement this.  If it's not implemented or returns False, _put will be
+   called instead (and duplicity will delete the source file after).
+ - Retried if an exception is thrown
+_close
+ - If your backend needs to clean up after itself, do that here.
+
+== Subclassing ==
+
+Always subclass from duplicity.backend.Backend
+
+== Registering ==
+
+You can register your class as a single backend like so:
+
+duplicity.backend.register_backend("foo", FooBackend)
+
+This will allow a URL like so: foo://hostname/path
+
+Or you can register your class as a meta backend like so:
+duplicity.backend.register_backend_prefix("bar", BarBackend)
+
+Which will allow a URL like so: bar+foo://hostname/path and your class will
+be passed the inner URL to either interpret how you like or create a new
+inner backend instance with duplicity.backend.get_backend_object(url).
+
+== Naming ==
+
+Any method that duplicity calls will start with one underscore.  Please use
+zero or two underscores in your method names to avoid conflicts.
+
+== Testing ==
+
+Use "./testing/manual/backendtest.py foo://hostname/path" to test your new
+backend.  It will load your backend from your current branch.

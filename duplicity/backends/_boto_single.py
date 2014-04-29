@@ -25,9 +25,7 @@ import time
 import duplicity.backend
 from duplicity import globals
 from duplicity import log
-from duplicity.errors import * #@UnusedWildImport
-from duplicity.util import exception_traceback
-from duplicity.backend import retry
+from duplicity.errors import FatalBackendException, BackendException
 from duplicity import progress
 
 BOTO_MIN_VERSION = "2.1.1"
@@ -163,7 +161,7 @@ class BotoBackend(duplicity.backend.Backend):
         self.resetConnection()
         self._listed_keys = {}
 
-    def close(self):
+    def _close(self):
         del self._listed_keys
         self._listed_keys = {}
         self.bucket = None
@@ -185,137 +183,69 @@ class BotoBackend(duplicity.backend.Backend):
         self.conn = get_connection(self.scheme, self.parsed_url, self.storage_uri)
         self.bucket = self.conn.lookup(self.bucket_name)
 
-    def put(self, source_path, remote_filename=None):
+    def _retry_cleanup(self):
+        self.resetConnection()
+
+    def _put(self, source_path, remote_filename):
         from boto.s3.connection import Location
         if globals.s3_european_buckets:
             if not globals.s3_use_new_style:
-                log.FatalError("European bucket creation was requested, but not new-style "
-                               "bucket addressing (--s3-use-new-style)",
-                               log.ErrorCode.s3_bucket_not_style)
-        #Network glitch may prevent first few attempts of creating/looking up a bucket
-        for n in range(1, globals.num_retries+1):
-            if self.bucket:
-                break
-            if n > 1:
-                time.sleep(30)
-                self.resetConnection()
-            try:
-                try:
-                    self.bucket = self.conn.get_bucket(self.bucket_name, validate=True)
-                except Exception as e:
-                    if "NoSuchBucket" in str(e):
-                        if globals.s3_european_buckets:
-                            self.bucket = self.conn.create_bucket(self.bucket_name,
-                                                                  location=Location.EU)
-                        else:
-                            self.bucket = self.conn.create_bucket(self.bucket_name)
-                    else:
-                        raise e
-            except Exception as e:
-                log.Warn("Failed to create bucket (attempt #%d) '%s' failed (reason: %s: %s)"
-                         "" % (n, self.bucket_name,
-                               e.__class__.__name__,
-                               str(e)))
+                raise FatalBackendException("European bucket creation was requested, but not new-style "
+                                            "bucket addressing (--s3-use-new-style)",
+                                            code=log.ErrorCode.s3_bucket_not_style)
 
-        if not remote_filename:
-            remote_filename = source_path.get_filename()
+        if self.bucket is None:
+            try:
+                self.bucket = self.conn.get_bucket(self.bucket_name, validate=True)
+            except Exception as e:
+                if "NoSuchBucket" in str(e):
+                    if globals.s3_european_buckets:
+                        self.bucket = self.conn.create_bucket(self.bucket_name,
+                                                              location=Location.EU)
+                    else:
+                        self.bucket = self.conn.create_bucket(self.bucket_name)
+                else:
+                    raise
+
         key = self.bucket.new_key(self.key_prefix + remote_filename)
 
-        for n in range(1, globals.num_retries+1):
-            if n > 1:
-                # sleep before retry (new connection to a **hopeful** new host, so no need to wait so long)
-                time.sleep(10)
+        if globals.s3_use_rrs:
+            storage_class = 'REDUCED_REDUNDANCY'
+        else:
+            storage_class = 'STANDARD'
+        log.Info("Uploading %s/%s to %s Storage" % (self.straight_url, remote_filename, storage_class))
+        if globals.s3_use_sse:
+            headers = {
+            'Content-Type': 'application/octet-stream',
+            'x-amz-storage-class': storage_class,
+            'x-amz-server-side-encryption': 'AES256'
+        }
+        else:
+            headers = {
+            'Content-Type': 'application/octet-stream',
+            'x-amz-storage-class': storage_class
+        }
+        
+        upload_start = time.time()
+        self.upload(source_path.name, key, headers)
+        upload_end = time.time()
+        total_s = abs(upload_end-upload_start) or 1  # prevent a zero value!
+        rough_upload_speed = os.path.getsize(source_path.name)/total_s
+        log.Debug("Uploaded %s/%s to %s Storage at roughly %f bytes/second" % (self.straight_url, remote_filename, storage_class, rough_upload_speed))
 
-            if globals.s3_use_rrs:
-                storage_class = 'REDUCED_REDUNDANCY'
-            else:
-                storage_class = 'STANDARD'
-            log.Info("Uploading %s/%s to %s Storage" % (self.straight_url, remote_filename, storage_class))
-            try:
-                if globals.s3_use_sse:
-                    headers = {
-                    'Content-Type': 'application/octet-stream',
-                    'x-amz-storage-class': storage_class,
-                    'x-amz-server-side-encryption': 'AES256'
-                }
-                else:
-                    headers = {
-                    'Content-Type': 'application/octet-stream',
-                    'x-amz-storage-class': storage_class
-                }
-                
-                upload_start = time.time()
-                self.upload(source_path.name, key, headers)
-                upload_end = time.time()
-                total_s = abs(upload_end-upload_start) or 1  # prevent a zero value!
-                rough_upload_speed = os.path.getsize(source_path.name)/total_s
-                self.resetConnection()
-                log.Debug("Uploaded %s/%s to %s Storage at roughly %f bytes/second" % (self.straight_url, remote_filename, storage_class, rough_upload_speed))
-                return
-            except Exception as e:
-                log.Warn("Upload '%s/%s' failed (attempt #%d, reason: %s: %s)"
-                         "" % (self.straight_url,
-                               remote_filename,
-                               n,
-                               e.__class__.__name__,
-                               str(e)))
-                log.Debug("Backtrace of previous error: %s" % (exception_traceback(),))
-                self.resetConnection()
-        log.Warn("Giving up trying to upload %s/%s after %d attempts" %
-                 (self.straight_url, remote_filename, globals.num_retries))
-        raise BackendException("Error uploading %s/%s" % (self.straight_url, remote_filename))
-
-    def get(self, remote_filename, local_path):
+    def _get(self, remote_filename, local_path):
         key_name = self.key_prefix + remote_filename
         self.pre_process_download(remote_filename, wait=True)
         key = self._listed_keys[key_name]
-        for n in range(1, globals.num_retries+1):
-            if n > 1:
-                # sleep before retry (new connection to a **hopeful** new host, so no need to wait so long)
-                time.sleep(10)
-            log.Info("Downloading %s/%s" % (self.straight_url, remote_filename))
-            try:
-                self.resetConnection()
-                key.get_contents_to_filename(local_path.name)
-                local_path.setdata()
-                return
-            except Exception as e:
-                log.Warn("Download %s/%s failed (attempt #%d, reason: %s: %s)"
-                         "" % (self.straight_url,
-                               remote_filename,
-                               n,
-                               e.__class__.__name__,
-                               str(e)), 1)
-                log.Debug("Backtrace of previous error: %s" % (exception_traceback(),))
-
-        log.Warn("Giving up trying to download %s/%s after %d attempts" %
-                (self.straight_url, remote_filename, globals.num_retries))
-        raise BackendException("Error downloading %s/%s" % (self.straight_url, remote_filename))
+        self.resetConnection()
+        key.get_contents_to_filename(local_path.name)
 
     def _list(self):
         if not self.bucket:
             raise BackendException("No connection to backend")
+        return self.list_filenames_in_bucket()
 
-        for n in range(1, globals.num_retries+1):
-            if n > 1:
-                # sleep before retry
-                time.sleep(30)
-                self.resetConnection()
-            log.Info("Listing %s" % self.straight_url)
-            try:
-                return self._list_filenames_in_bucket()
-            except Exception as e:
-                log.Warn("List %s failed (attempt #%d, reason: %s: %s)"
-                         "" % (self.straight_url,
-                               n,
-                               e.__class__.__name__,
-                               str(e)), 1)
-                log.Debug("Backtrace of previous error: %s" % (exception_traceback(),))
-        log.Warn("Giving up trying to list %s after %d attempts" %
-                (self.straight_url, globals.num_retries))
-        raise BackendException("Error listng %s" % self.straight_url)
-
-    def _list_filenames_in_bucket(self):
+    def list_filenames_in_bucket(self):
         # We add a 'd' to the prefix to make sure it is not null (for boto) and
         # to optimize the listing of our filenames, which always begin with 'd'.
         # This will cause a failure in the regression tests as below:
@@ -336,76 +266,37 @@ class BotoBackend(duplicity.backend.Backend):
                 pass
         return filename_list
 
-    def delete(self, filename_list):
-        for filename in filename_list:
-            self.bucket.delete_key(self.key_prefix + filename)
-            log.Debug("Deleted %s/%s" % (self.straight_url, filename))
+    def _delete(self, filename):
+        self.bucket.delete_key(self.key_prefix + filename)
 
-    @retry
-    def _query_file_info(self, filename, raise_errors=False):
-        try:
-            key = self.bucket.lookup(self.key_prefix + filename)
-            if key is None:
-                return {'size': -1}
-            return {'size': key.size}
-        except Exception as e:
-            log.Warn("Query %s/%s failed: %s"
-                     "" % (self.straight_url,
-                           filename,
-                           str(e)))
-            self.resetConnection()
-            if raise_errors:
-                raise e
-            else:
-                return {'size': None}
+    def _query(self, filename):
+        key = self.bucket.lookup(self.key_prefix + filename)
+        if key is None:
+            return {'size': -1}
+        return {'size': key.size}
 
     def upload(self, filename, key, headers):
-            key.set_contents_from_filename(filename, headers,
-                                           cb=progress.report_transfer,
-                                           num_cb=(max(2, 8 * globals.volsize / (1024 * 1024)))
-                                           )  # Max num of callbacks = 8 times x megabyte
-            key.close()
+        key.set_contents_from_filename(filename, headers,
+                                       cb=progress.report_transfer,
+                                       num_cb=(max(2, 8 * globals.volsize / (1024 * 1024)))
+                                       )  # Max num of callbacks = 8 times x megabyte
+        key.close()
 
-    def pre_process_download(self, files_to_download, wait=False):
+    def pre_process_download(self, remote_filename, wait=False):
         # Used primarily to move files in Glacier to S3
-        if isinstance(files_to_download, (bytes, str, unicode)):
-            files_to_download = [files_to_download]
+        key_name = self.key_prefix + remote_filename
+        if not self._listed_keys.get(key_name, False):
+            self._listed_keys[key_name] = list(self.bucket.list(key_name))[0]
+        key = self._listed_keys[key_name]
 
-        for remote_filename in files_to_download:
-            success = False
-            for n in range(1, globals.num_retries+1):
-                if n > 1:
-                    # sleep before retry (new connection to a **hopeful** new host, so no need to wait so long)
-                    time.sleep(10)
+        if key.storage_class == "GLACIER":
+            # We need to move the file out of glacier
+            if not self.bucket.get_key(key.key).ongoing_restore:
+                log.Info("File %s is in Glacier storage, restoring to S3" % remote_filename)
+                key.restore(days=1)  # Shouldn't need this again after 1 day
+            if wait:
+                log.Info("Waiting for file %s to restore from Glacier" % remote_filename)
+                while self.bucket.get_key(key.key).ongoing_restore:
+                    time.sleep(60)
                     self.resetConnection()
-                try:
-                    key_name = self.key_prefix + remote_filename
-                    if not self._listed_keys.get(key_name, False):
-                        self._listed_keys[key_name] = list(self.bucket.list(key_name))[0]
-                    key = self._listed_keys[key_name]
-
-                    if key.storage_class == "GLACIER":
-                        # We need to move the file out of glacier
-                        if not self.bucket.get_key(key.key).ongoing_restore:
-                            log.Info("File %s is in Glacier storage, restoring to S3" % remote_filename)
-                            key.restore(days=1)  # Shouldn't need this again after 1 day
-                        if wait:
-                            log.Info("Waiting for file %s to restore from Glacier" % remote_filename)
-                            while self.bucket.get_key(key.key).ongoing_restore:
-                                time.sleep(60)
-                                self.resetConnection()
-                            log.Info("File %s was successfully restored from Glacier" % remote_filename)
-                    success = True
-                    break
-                except Exception as e:
-                    log.Warn("Restoration from Glacier for file %s/%s failed (attempt #%d, reason: %s: %s)"
-                             "" % (self.straight_url,
-                                   remote_filename,
-                                   n,
-                                   e.__class__.__name__,
-                                   str(e)), 1)
-                    log.Debug("Backtrace of previous error: %s" % (exception_traceback(),))
-            if not success:
-                log.Warn("Giving up trying to restore %s/%s after %d attempts" %
-                        (self.straight_url, remote_filename, globals.num_retries))
-                raise BackendException("Error restoring %s/%s from Glacier to S3" % (self.straight_url, remote_filename))
+                log.Info("File %s was successfully restored from Glacier" % remote_filename)
