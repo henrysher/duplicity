@@ -32,6 +32,7 @@ import xml.dom.minidom
 import duplicity.backend
 from duplicity import globals
 from duplicity import log
+from duplicity import util
 from duplicity.errors import BackendException, FatalBackendException
 
 class CustomMethodRequest(urllib2.Request):
@@ -97,7 +98,7 @@ Hints:
                 return httplib.HTTPSConnection.request(self, *args, **kwargs)
             except ssl.SSLError as e:
                 # encapsulate ssl errors
-                raise BackendException("SSL failed: %s" % str(e),log.ErrorCode.backend_error)
+                raise BackendException("SSL failed: %s" % util.uexc(e),log.ErrorCode.backend_error)
 
 
 class WebDAVBackend(duplicity.backend.Backend):

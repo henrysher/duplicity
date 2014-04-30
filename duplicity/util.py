@@ -48,11 +48,10 @@ def exception_traceback(limit = 50):
     lines = traceback.format_tb(tb, limit)
     lines.extend(traceback.format_exception_only(type, value))
 
-    str = "Traceback (innermost last):\n"
-    str = str + "%-20s %s" % (string.join(lines[:-1], ""),
-                                lines[-1])
+    msg = "Traceback (innermost last):\n"
+    msg = msg + "%-20s %s" % (string.join(lines[:-1], ""), lines[-1])
 
-    return str
+    return uexc(msg)
 
 def escape(string):
     "Convert a (bytes) filename to a format suitable for logging (quoted utf8)"
@@ -71,6 +70,13 @@ def uindex(index):
     else:
         return u'.'
 
+def uexc(e):
+    # Exceptions in duplicity often have path names in them, which if they are
+    # non-ascii will cause a UnicodeDecodeError when implicitly decoding to
+    # unicode.  So we decode manually, using the filesystem encoding.
+    # 99.99% of the time, this will be a fine encoding to use.
+    return ufn(str(e))
+
 def maybe_ignore_errors(fn):
     """
     Execute fn. If the global configuration setting ignore_errors is
@@ -85,7 +91,7 @@ def maybe_ignore_errors(fn):
     except Exception as e:
         if globals.ignore_errors:
             log.Warn(_("IGNORED_ERROR: Warning: ignoring error as requested: %s: %s")
-                     % (e.__class__.__name__, str(e)))
+                     % (e.__class__.__name__, uexc(e)))
             return None
         else:
             raise

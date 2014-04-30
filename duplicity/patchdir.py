@@ -508,7 +508,7 @@ def integrate_patch_iters( iter_list ):
         except Exception as e:
             filename = normalized[-1].get_ropath().get_relative_path()
             log.Warn(_("Error '%s' patching %s") % 
-                     (str(e), filename),
+                     (util.uexc(e), util.ufn(filename)),
                      log.WarningCode.cannot_process,
                      util.escape(filename))
 

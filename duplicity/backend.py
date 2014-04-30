@@ -383,10 +383,10 @@ def retry(operation, fatal=True):
                         extra = ' '.join([operation] + [make_filename(x) for x in args if x])
                         log.FatalError(_("Giving up after %s attempts. %s: %s")
                                        % (n, e.__class__.__name__,
-                                          str(e)), code=code, extra=extra)
+                                          util.uexc(e)), code=code, extra=extra)
                     else:
                         log.Warn(_("Attempt %s failed. %s: %s")
-                                 % (n, e.__class__.__name__, str(e)))
+                                 % (n, e.__class__.__name__, util.uexc(e)))
                     if not at_end:
                         if isinstance(e, TemporaryLoadException):
                             time.sleep(90) # wait longer before trying again
@@ -495,7 +495,7 @@ class BackendWrapper(object):
 
     def __do_put(self, source_path, remote_filename):
         if hasattr(self.backend, '_put'):
-            log.Info(_("Writing %s") % remote_filename)
+            log.Info(_("Writing %s") % util.ufn(remote_filename))
             self.backend._put(source_path, remote_filename)
         else:
             raise NotImplementedError()

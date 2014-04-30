@@ -1,3 +1,12 @@
+2014-04-30  Kenneth Loafman  <kenneth@loafman.com>
+    * Merged in lp:~mterry/duplicity/encode-exceptions
+      - Because exceptions often contain file paths, they have the same problem
+        with Python 2.x's implicit decoding using the 'ascii' encoding that we've
+        experienced before.  So I added a new util.uexc() method that uses the
+        util.ufn() method to convert an exception to a unicode string and used it
+        around the place.
+      - Bugs fixed: 1289288, 1311176, 1313966
+
 2014-04-29  Kenneth Loafman  <kenneth@loafman.com>
     * Merged in lp:~mterry/duplicity/backend-unification
       - Reorganize and simplify backend code.  Specifically:

@@ -147,6 +147,13 @@ Enhancements:
       ./testing/manual/backendtest.py, which can now be run like the above to
       test all the files you have configured in config.py or you can pass it a
       URL which it will use for testing (useful for backend authors).
+* Merged in lp:~mterry/duplicity/encode-exceptions
+  - Because exceptions often contain file paths, they have the same problem
+    with Python 2.x's implicit decoding using the 'ascii' encoding that we've
+    experienced before.  So I added a new util.uexc() method that uses the
+    util.ufn() method to convert an exception to a unicode string and used it
+    around the place.
+  - Bugs fixed: 1289288, 1311176, 1313966
 
 
 New in v0.6.23 (2014/01/24)
