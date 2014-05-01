@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-04-27 22:39-0400\n"
+"POT-Creation-Date: 2014-04-30 06:25-0500\n"
 "PO-Revision-Date: 2010-12-07 21:11+0000\n"
 "Last-Translator: Hertatijanto Hartono <dvertx@gmail.com>\n"
 "Language-Team: Indonesian <id@li.org>\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2014-04-30 05:40+0000\n"
+"X-Launchpad-Export-Date: 2014-05-01 05:43+0000\n"
 "X-Generator: Launchpad (build 16985)\n"
 
 #: ../bin/duplicity:102
@@ -1257,7 +1257,7 @@ msgstr ""
 "Peringatan: Backend ssh '%s' yang dipilih bukan paramiko maupun pexpect. "
 "Akan memakai paramiko baku saja."
 
-#: ../duplicity/backends/giobackend.py:105
+#: ../duplicity/backends/giobackend.py:106
 #, python-format
 msgid "Connection failed, please check your password: %s"
 msgstr "Hubungan gagal, periksa kata sandi anda: %s"
@@ -1492,14 +1492,14 @@ msgstr ""
 "Gagal membenahi direktori temporer %s - kemungkinan merupakan kesalahan "
 "pemrograman."
 
-#: ../duplicity/util.py:87
+#: ../duplicity/util.py:93
 #, python-format
 msgid "IGNORED_ERROR: Warning: ignoring error as requested: %s: %s"
 msgstr ""
 "KESALAHAN_TERABAIKAN: Perhatian: mengabaikan kesalahan sesuai permintaan: "
 "%s: %s"
 
-#: ../duplicity/util.py:144
+#: ../duplicity/util.py:150
 #, python-format
 msgid "Releasing lockfile %s"
 msgstr ""

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-04-27 22:39-0400\n"
+"POT-Creation-Date: 2014-04-30 06:25-0500\n"
 "PO-Revision-Date: 2013-04-27 07:38+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2014-04-30 05:41+0000\n"
+"X-Launchpad-Export-Date: 2014-05-01 05:43+0000\n"
 "X-Generator: Launchpad (build 16985)\n"
 
 #: ../bin/duplicity:102
@@ -1298,7 +1298,7 @@ msgstr ""
 "Увага: Вибраний ssh бекенд '%s' - не 'paramiko', і не 'pexpect'. Буде "
 "використаний paramiko типово."
 
-#: ../duplicity/backends/giobackend.py:105
+#: ../duplicity/backends/giobackend.py:106
 #, python-format
 msgid "Connection failed, please check your password: %s"
 msgstr "Не вдалося під’єднатися, перевірте пароль: %s"
@@ -1532,13 +1532,13 @@ msgid "Cleanup of temporary directory %s failed - this is probably a bug."
 msgstr ""
 "Не вдалося очистити тимчасовий каталог %s - схоже, що це помилка у програмі."
 
-#: ../duplicity/util.py:87
+#: ../duplicity/util.py:93
 #, python-format
 msgid "IGNORED_ERROR: Warning: ignoring error as requested: %s: %s"
 msgstr ""
 "GNORED_ERROR: Увага: пропуск помилки, як було позначено у запиті: %s: %s"
 
-#: ../duplicity/util.py:144
+#: ../duplicity/util.py:150
 #, python-format
 msgid "Releasing lockfile %s"
 msgstr ""
