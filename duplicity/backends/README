@@ -75,5 +75,5 @@ zero or two underscores in your method names to avoid conflicts.
 
 == Testing ==
 
-Use "./testing/manual/backendtest.py foo://hostname/path" to test your new
+Use "./testing/manual/backendtest foo://hostname/path" to test your new
 backend.  It will load your backend from your current branch.
