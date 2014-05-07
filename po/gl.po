@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-04-30 06:25-0500\n"
+"POT-Creation-Date: 2014-05-06 16:07+0000\n"
 "PO-Revision-Date: 2013-04-22 13:34+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Galician <gl@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2014-05-01 05:42+0000\n"
-"X-Generator: Launchpad (build 16985)\n"
+"X-Launchpad-Export-Date: 2014-05-07 06:27+0000\n"
+"X-Generator: Launchpad (build 16996)\n"
 
 #: ../bin/duplicity:102
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -519,7 +519,12 @@ msgid ""
 "Use of default filenames is strongly suggested."
 msgstr ""
 
-#. Used in usage help to represent a Unix-style path name. Example:
+#: ../duplicity/commandline.py:216
+#, python-format
+msgid "Unable to load gio backend: %s"
+msgstr ""
+
+#. TRANSL: Used in usage help to represent a Unix-style path name. Example:
 #. --archive-dir <path>
 #: ../duplicity/commandline.py:254 ../duplicity/commandline.py:264
 #: ../duplicity/commandline.py:281 ../duplicity/commandline.py:347
@@ -527,11 +532,11 @@ msgstr ""
 msgid "path"
 msgstr "ruta"
 
-#. Used in usage help to represent an ID for a GnuPG key. Example:
+#. TRANSL: Used in usage help to represent an ID for a GnuPG key. Example:
 #. --encrypt-key <gpg_key_id>
-#. Used in usage help to represent an ID for a hidden GnuPG key. Example:
+#. TRANSL: Used in usage help to represent an ID for a hidden GnuPG key. Example:
 #. --hidden-encrypt-key <gpg_key_id>
-#. Used in usage help to represent an ID for a GnuPG key. Example:
+#. TRANSL: Used in usage help to represent an ID for a GnuPG key. Example:
 #. --encrypt-key <gpg_key_id>
 #: ../duplicity/commandline.py:276 ../duplicity/commandline.py:283
 #: ../duplicity/commandline.py:369 ../duplicity/commandline.py:530
@@ -539,7 +544,7 @@ msgstr "ruta"
 msgid "gpg-key-id"
 msgstr ""
 
-#. Used in usage help to represent a "glob" style pattern for
+#. TRANSL: Used in usage help to represent a "glob" style pattern for
 #. matching one or more files, as described in the documentation.
 #. Example:
 #. --exclude <shell_pattern>
@@ -548,7 +553,7 @@ msgstr ""
 msgid "shell_pattern"
 msgstr ""
 
-#. Used in usage help to represent the name of a file. Example:
+#. TRANSL: Used in usage help to represent the name of a file. Example:
 #. --log-file <filename>
 #: ../duplicity/commandline.py:297 ../duplicity/commandline.py:304
 #: ../duplicity/commandline.py:309 ../duplicity/commandline.py:397
@@ -557,12 +562,12 @@ msgstr ""
 msgid "filename"
 msgstr "nome de ficheiro"
 
-#. Used in usage help to represent a regular expression (regexp).
+#. TRANSL: Used in usage help to represent a regular expression (regexp).
 #: ../duplicity/commandline.py:316 ../duplicity/commandline.py:404
 msgid "regular_expression"
 msgstr ""
 
-#. Used in usage help to represent a time spec for a previous
+#. TRANSL: Used in usage help to represent a time spec for a previous
 #. point in time, as described in the documentation. Example:
 #. duplicity remove-older-than time [options] target_url
 #: ../duplicity/commandline.py:359 ../duplicity/commandline.py:472
@@ -570,7 +575,7 @@ msgstr ""
 msgid "time"
 msgstr "hora"
 
-#. Used in usage help. (Should be consistent with the "Options:"
+#. TRANSL: Used in usage help. (Should be consistent with the "Options:"
 #. header.) Example:
 #. duplicity [full|incremental] [options] source_dir target_url
 #: ../duplicity/commandline.py:365 ../duplicity/commandline.py:475
@@ -585,7 +590,7 @@ msgid ""
 "not intended"
 msgstr ""
 
-#. Used in usage help to represent an imap mailbox
+#. TRANSL: Used in usage help to represent an imap mailbox
 #: ../duplicity/commandline.py:393
 msgid "imap_mailbox"
 msgstr ""
@@ -594,7 +599,7 @@ msgstr ""
 msgid "file_descriptor"
 msgstr ""
 
-#. Used in usage help to represent a desired number of
+#. TRANSL: Used in usage help to represent a desired number of
 #. something. Example:
 #. --num-retries <number>
 #: ../duplicity/commandline.py:418 ../duplicity/commandline.py:440
@@ -605,12 +610,12 @@ msgstr ""
 msgid "number"
 msgstr "número"
 
-#. Used in usage help (noun)
+#. TRANSL: Used in usage help (noun)
 #: ../duplicity/commandline.py:421
 msgid "backup name"
 msgstr ""
 
-#. noun
+#. TRANSL: noun
 #: ../duplicity/commandline.py:514 ../duplicity/commandline.py:517
 #: ../duplicity/commandline.py:719
 msgid "command"
@@ -628,13 +633,13 @@ msgstr ""
 msgid "pem formatted bundle of certificate authorities"
 msgstr ""
 
-#. Used in usage help. Example:
+#. TRANSL: Used in usage help. Example:
 #. --timeout <seconds>
 #: ../duplicity/commandline.py:554 ../duplicity/commandline.py:782
 msgid "seconds"
 msgstr "segundos"
 
-#. abbreviation for "character" (noun)
+#. TRANSL: abbreviation for "character" (noun)
 #: ../duplicity/commandline.py:560 ../duplicity/commandline.py:716
 msgid "char"
 msgstr "carácter"
@@ -658,88 +663,88 @@ msgstr ""
 msgid "Enter 'duplicity --help' for help screen."
 msgstr ""
 
-#. Used in usage help to represent a Unix-style path name. Example:
+#. TRANSL: Used in usage help to represent a Unix-style path name. Example:
 #. rsync://user[:password]@other_host[:port]//absolute_path
 #: ../duplicity/commandline.py:704
 msgid "absolute_path"
 msgstr ""
 
-#. Used in usage help. Example:
+#. TRANSL: Used in usage help. Example:
 #. tahoe://alias/some_dir
 #: ../duplicity/commandline.py:708
 msgid "alias"
 msgstr "alcume"
 
-#. Used in help to represent a "bucket name" for Amazon Web
+#. TRANSL: Used in help to represent a "bucket name" for Amazon Web
 #. Services' Simple Storage Service (S3). Example:
 #. s3://other.host/bucket_name[/prefix]
 #: ../duplicity/commandline.py:713
 msgid "bucket_name"
 msgstr ""
 
-#. Used in usage help to represent the name of a container in
+#. TRANSL: Used in usage help to represent the name of a container in
 #. Amazon Web Services' Cloudfront. Example:
 #. cf+http://container_name
 #: ../duplicity/commandline.py:724
 msgid "container_name"
 msgstr ""
 
-#. noun
+#. TRANSL: noun
 #: ../duplicity/commandline.py:727
 msgid "count"
 msgstr "número"
 
-#. Used in usage help to represent the name of a file directory
+#. TRANSL: Used in usage help to represent the name of a file directory
 #: ../duplicity/commandline.py:730
 msgid "directory"
 msgstr "directorio"
 
-#. Used in usage help, e.g. to represent the name of a code
+#. TRANSL: Used in usage help, e.g. to represent the name of a code
 #. module. Example:
 #. rsync://user[:password]@other.host[:port]::/module/some_dir
 #: ../duplicity/commandline.py:743
 msgid "module"
 msgstr "módulo"
 
-#. Used in usage help to represent an internet hostname. Example:
+#. TRANSL: Used in usage help to represent an internet hostname. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:757
 msgid "other.host"
 msgstr ""
 
-#. Used in usage help. Example:
+#. TRANSL: Used in usage help. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:761
 msgid "password"
 msgstr "contrasinal"
 
-#. Used in usage help to represent a TCP port number. Example:
+#. TRANSL: Used in usage help to represent a TCP port number. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:769
 msgid "port"
 msgstr "porto"
 
-#. Used in usage help. This represents a string to be used as a
+#. TRANSL: Used in usage help. This represents a string to be used as a
 #. prefix to names for backup files created by Duplicity. Example:
 #. s3://other.host/bucket_name[/prefix]
 #: ../duplicity/commandline.py:774
 msgid "prefix"
 msgstr "prefixo"
 
-#. Used in usage help to represent a Unix-style path name. Example:
+#. TRANSL: Used in usage help to represent a Unix-style path name. Example:
 #. rsync://user[:password]@other.host[:port]/relative_path
 #: ../duplicity/commandline.py:778
 msgid "relative_path"
 msgstr "ruta_relativa"
 
-#. Used in usage help to represent the name of a single file
+#. TRANSL: Used in usage help to represent the name of a single file
 #. directory or a Unix-style path to a directory. Example:
 #. file:///some_dir
 #: ../duplicity/commandline.py:793
 msgid "some_dir"
 msgstr "un_directorio"
 
-#. Used in usage help to represent the name of a single file
+#. TRANSL: Used in usage help to represent the name of a single file
 #. directory or a Unix-style path to a directory where files will be
 #. coming FROM. Example:
 #. duplicity [full|incremental] [options] source_dir target_url
@@ -747,14 +752,14 @@ msgstr "un_directorio"
 msgid "source_dir"
 msgstr "directorio_orixe"
 
-#. Used in usage help to represent a URL files will be coming
+#. TRANSL: Used in usage help to represent a URL files will be coming
 #. FROM. Example:
 #. duplicity [restore] [options] source_url target_dir
 #: ../duplicity/commandline.py:804
 msgid "source_url"
 msgstr "url_destino"
 
-#. Used in usage help to represent the name of a single file
+#. TRANSL: Used in usage help to represent the name of a single file
 #. directory or a Unix-style path to a directory. where files will be
 #. going TO. Example:
 #. duplicity [restore] [options] source_url target_dir
@@ -762,26 +767,26 @@ msgstr "url_destino"
 msgid "target_dir"
 msgstr "directorio_destino"
 
-#. Used in usage help to represent a URL files will be going TO.
+#. TRANSL: Used in usage help to represent a URL files will be going TO.
 #. Example:
 #. duplicity [full|incremental] [options] source_dir target_url
 #: ../duplicity/commandline.py:815
 msgid "target_url"
 msgstr "url_destino"
 
-#. Used in usage help to represent a user name (i.e. login).
+#. TRANSL: Used in usage help to represent a user name (i.e. login).
 #. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:825
 msgid "user"
 msgstr "usuario"
 
-#. Header in usage help
+#. TRANSL: Header in usage help
 #: ../duplicity/commandline.py:842
 msgid "Backends and their URL formats:"
 msgstr "Infraestruturas e os seus formatos URL:"
 
-#. Header in usage help
+#. TRANSL: Header in usage help
 #: ../duplicity/commandline.py:867
 msgid "Commands:"
 msgstr "Ordes:"
@@ -849,14 +854,14 @@ msgstr ""
 msgid "Could not initialize backend: %s"
 msgstr "Non foi posíbel inicializar a infraestrutura: %s"
 
+#: ../duplicity/backend.py:319
+#, python-format
+msgid "Attempt %s failed: %s: %s"
+msgstr ""
+
 #: ../duplicity/backend.py:369
 #, python-format
 msgid "Backtrace of previous error: %s"
-msgstr ""
-
-#: ../duplicity/backend.py:384
-#, python-format
-msgid "Giving up after %s attempts. %s: %s"
 msgstr ""
 
 #: ../duplicity/backend.py:388
@@ -864,20 +869,38 @@ msgstr ""
 msgid "Attempt %s failed. %s: %s"
 msgstr ""
 
+#: ../duplicity/backend.py:384
+#, python-format
+msgid "Giving up after %s attempts. %s: %s"
+msgstr ""
+
 #: ../duplicity/backend.py:471
 #, python-format
 msgid "Reading results of '%s'"
 msgstr "Lendo resultados de «%s»"
 
-#: ../duplicity/backend.py:498
+#: ../duplicity/backend.py:584
 #, python-format
-msgid "Writing %s"
-msgstr ""
+msgid "Running '%s' failed with code %d (attempt #%d)"
+msgid_plural "Running '%s' failed with code %d (attempt #%d)"
+msgstr[0] "A execución de «%s» fallou co código %d (intento #%d)"
+msgstr[1] "A execución de «%s» fallou co código %d (intentos #%d)"
 
-#: ../duplicity/backend.py:538
+#: ../duplicity/backend.py:588
 #, python-format
-msgid "File %s not found locally after get from backend"
+msgid ""
+"Error is:\n"
+"%s"
 msgstr ""
+"O erro é:\n"
+"%s"
+
+#: ../duplicity/backend.py:590
+#, python-format
+msgid "Giving up trying to execute '%s' after %d attempt"
+msgid_plural "Giving up trying to execute '%s' after %d attempts"
+msgstr[0] "Renunciar a tratar de executar «%s» despois de %d intento"
+msgstr[1] "Renunciar a tratar de executar «%s» despois de %d intentos"
 
 #: ../duplicity/asyncscheduler.py:66
 #, python-format
@@ -1065,7 +1088,7 @@ msgid_plural "and %d incomplete backup sets."
 msgstr[0] ""
 msgstr[1] ""
 
-#. "cleanup" is a hard-coded command, so do not translate it
+#. TRANSL: "cleanup" is a hard-coded command, so do not translate it
 #: ../duplicity/collections.py:657
 msgid ""
 "These may be deleted by running duplicity with the \"cleanup\" command."
@@ -1230,6 +1253,11 @@ msgstr ""
 #: ../duplicity/backends/giobackend.py:106
 #, python-format
 msgid "Connection failed, please check your password: %s"
+msgstr ""
+
+#: ../duplicity/backend.py:498
+#, python-format
+msgid "Writing %s"
 msgstr ""
 
 #: ../duplicity/manifest.py:89
@@ -1450,23 +1478,3 @@ msgstr ""
 #~ msgid "Found old backup set at the following time:"
 #~ msgid_plural "Found old backup sets at the following times:"
 #~ msgstr[0] "Buscar conxuntos de respaldo antigos na seguinte hora:"
-
-#, python-format
-#~ msgid "Running '%s' failed with code %d (attempt #%d)"
-#~ msgid_plural "Running '%s' failed with code %d (attempt #%d)"
-#~ msgstr[0] "A execución de «%s» fallou co código %d (intento #%d)"
-#~ msgstr[1] "A execución de «%s» fallou co código %d (intentos #%d)"
-
-#, python-format
-#~ msgid "Giving up trying to execute '%s' after %d attempt"
-#~ msgid_plural "Giving up trying to execute '%s' after %d attempts"
-#~ msgstr[0] "Renunciar a tratar de executar «%s» despois de %d intento"
-#~ msgstr[1] "Renunciar a tratar de executar «%s» despois de %d intentos"
-
-#, python-format
-#~ msgid ""
-#~ "Error is:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "O erro é:\n"
-#~ "%s"
