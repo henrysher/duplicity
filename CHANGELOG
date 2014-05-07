@@ -229,6 +229,9 @@ Enhancements:
     util.ufn() method to convert an exception to a unicode string and used it
     around the place.
   - Bugs fixed: 1289288, 1311176, 1313966
+* Applied expat fix from edso.  See answer #12 in
+  https://answers.launchpad.net/duplicity/+question/248020
+
 
 
 New in v0.6.23 (2014/01/24)

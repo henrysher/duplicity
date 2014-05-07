@@ -1,3 +1,7 @@
+2014-05-07  Kenneth Loafman  <kenneth@loafman.com>
+    * Applied expat fix from edso.  See answer #12 in
+      https://answers.launchpad.net/duplicity/+question/248020
+
 2014-04-30  Kenneth Loafman  <kenneth@loafman.com>
     * Merged in lp:~mterry/duplicity/encode-exceptions
       - Because exceptions often contain file paths, they have the same problem

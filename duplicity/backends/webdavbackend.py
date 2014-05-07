@@ -207,6 +207,7 @@ class WebDAVBackend(duplicity.backend.Backend):
             else:
                 raise FatalBackendException("WebDAV missing location header in redirect response.")
         elif response.status == 401:
+            response.read()
             response.close()
             self.headers['Authorization'] = self.get_authorization(response, quoted_path)
             log.Info("WebDAV retry request with authentification headers.")
