@@ -1,9 +1,84 @@
+New in v0.7.00 (2014/05/??)
+---------------------------
+* Merged in lp:~mterry/duplicity/require-2.6
+  - Require at least Python 2.6.
+  - Our code base already requires 2.6, because 2.6-isms have crept in. Usually
+    because we or a contributor didn't think to test with 2.4. And frankly,
+    I'm not even sure how to test with 2.4 on a modern system.
+* Merged in lp:~mterry/duplicity/drop-pexpect
+  - Drop our local copy of pexpect in favor of a system version.
+  - It's only used by the pexpect ssh backend (and if you're opting into that,
+    you probably can expect that you will need pexpect) and the tests.
+  - I've done a quick smoketest (backed up and restored using
+    --ssh-backend=pexpect) and it seemed to work fine with a modern version
+    of pexpect.
+* Merged in lp:~mterry/duplicity/2.6isms
+  - Here's a whole stack of minor syntax modernizations that will become
+    necessary in python3. They all work in python2.6.
+  - I've added a new test to keep us honest and prevent backsliding on these
+    modernizations. It runs 2to3 and will fail the test if 2to3 finds anything
+    that needs fixing (with a specific set of exceptions carved out).
+  - This branch has most of the easy 2to3 fixes, the ones with obvious and
+    safe syntax changes.
+  - We could just let 2to3 do them for us, but ideally we use 2to3 as little
+    as possible, since it doesn't always know how to solve a given problem.
+    I will propose a branch later that actually does use 2to3 to generate
+    python3 versions of duplicity if they are requested. But this is a first
+    step to clean up the code base.
+* Merged in lp:~mterry/duplicity/drop-static
+  - Drop static.py.
+  - This is some of the oldest code in duplicity! A bzr blame says it is
+    unmodified (except for whitespace / comment changes) since revision 1.
+  - But it's not needed anymore. Not really even since we updated to python2.4,
+    which introduced the @staticmethod decorator. So this branch drops it and
+    its test file.
+* Merged in lp:~mterry/duplicity/py3-map-filter
+  - In py3, map and filter return iterable objects, not lists. So in each case
+    we use them, I've either imported the future version or switched to a list
+    comprehension if we really wanted a list.
+* Merged in lp:~mterry/duplicity/backend-unification
+  - Reorganize and simplify backend code.  Specifically:
+    - Formalize the expected API between backends and duplicity.  See the new
+      file duplicity/backends/README for the instructions I've given authors.
+    - Add some tests for our backend wrapper class as well as some tests for
+      individual backends.  For several backends that have some commands do all
+      the heavy lifting (hsi, tahoe, ftp), I've added fake little mock commands
+      so that we can test them locally.  This doesn't truly test our integration
+      with those commands, but at least lets us test the backend glue code.
+    - Removed a lot of duplicate and unused code which backends were using (or
+      not using).  This branch drops 700 lines of code (~20%)
+      in duplicity/backends!
+    - Simplified expectations of backends.  Our wrapper code now does all the
+      retrying, and all the exception handling.  Backends can 'fire and forget'
+      trusting our wrappers to give the user a reasonable error message.
+      Obviously, backends can also add more details and make nicer error
+      messages.  But they don't *have* to.
+    - Separate out the backend classes from our wrapper class.  Now there is no
+      possibility of namespace collision.  All our API methods use one
+      underscore.  Anything else (zero or two underscores) are for the backend
+      class's use.
+    - Added the concept of a 'backend prefix' which is used by par2 and gio
+      backends to provide generic support for "schema+" in urls -- like par2+
+      or gio+.  I've since marked the '--gio' flag as deprecated, in favor of
+      'gio+'.  Now you can even nest such backends like
+      par2+gio+file://blah/blah.
+    - The switch to control which cloudfiles backend had a typo.  I fixed this,
+      but I'm not sure I should have?  If we haven't had complaints, maybe we
+      can just drop the old backend.
+    - I manually tested all the backends we have (except hsi and tahoe -- but
+      those are simple wrappers around commands and I did test those via mocks
+      per above).  I also added a bunch more manual backend tests to
+      ./testing/manual/backendtest.py, which can now be run like the above to
+      test all the files you have configured in config.py or you can pass it a
+      URL which it will use for testing (useful for backend authors).
+
+
 New in v0.6.24 (2014/05/??)
 ---------------------------
 Enhancements:
 * Applied two patches from mailing list message at:
   https://lists.nongnu.org/archive/html/duplicity-talk/2014-01/msg00030.html
-  "Added command line options to use different prefixes for manifest/sig/archive files"
+  "Added command line options to use different prefixes for duplicity files"
   This resolves https://bugs.launchpad.net/duplicity/+bug/1170161 and provides
   a workaround for https://bugs.launchpad.net/duplicity/+bug/1170113
 * Merged in lp:~mterry/duplicity/gpg-encode
