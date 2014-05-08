@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-05-06 16:07+0000\n"
+"POT-Creation-Date: 2014-05-07 21:41+0000\n"
 "PO-Revision-Date: 2011-08-27 12:46+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Slovenian <sl@li.org>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || "
 "n%100==4 ? 3 : 0);\n"
-"X-Launchpad-Export-Date: 2014-05-07 06:28+0000\n"
+"X-Launchpad-Export-Date: 2014-05-08 05:39+0000\n"
 "X-Generator: Launchpad (build 16996)\n"
 
 #: ../bin/duplicity:102
@@ -902,7 +902,7 @@ msgstr ""
 msgid "Could not initialize backend: %s"
 msgstr "Ni bilo možno začeti zaledja: %s"
 
-#: ../duplicity/backend.py:319
+#: ../duplicity/backend.py:320
 #, python-format
 msgid "Attempt %s failed: %s: %s"
 msgstr ""
@@ -927,7 +927,7 @@ msgstr ""
 msgid "Reading results of '%s'"
 msgstr "Branje rezultatov '%s'"
 
-#: ../duplicity/backend.py:584
+#: ../duplicity/backend.py:585
 #, python-format
 msgid "Running '%s' failed with code %d (attempt #%d)"
 msgid_plural "Running '%s' failed with code %d (attempt #%d)"
@@ -936,7 +936,7 @@ msgstr[1] "Izvajanje '%s' je spodletelo s kodo %d (poskus št. %d)"
 msgstr[2] "Izvajanje '%s' je spodletelo s kodo %d (poskus št. %d)"
 msgstr[3] "Izvajanje '%s' je spodletelo s kodo %d (poskus št. %d)"
 
-#: ../duplicity/backend.py:588
+#: ../duplicity/backend.py:589
 #, python-format
 msgid ""
 "Error is:\n"
@@ -945,7 +945,7 @@ msgstr ""
 "Napaka je:\n"
 "%s"
 
-#: ../duplicity/backend.py:590
+#: ../duplicity/backend.py:591
 #, python-format
 msgid "Giving up trying to execute '%s' after %d attempt"
 msgid_plural "Giving up trying to execute '%s' after %d attempts"
