@@ -2,9 +2,10 @@
 .project
 .pydevproject
 .settings
-config.py
-testfiles
-random_seed
-build
-duplicity.egg-info
 .tox
+build
+config.py
+duplicity.egg-info
+duplicity.spec
+random_seed
+testfiles

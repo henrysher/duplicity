@@ -1,8 +1,10 @@
 2014-05-07  Kenneth Loafman  <kenneth@loafman.com>
+
     * Applied expat fix from edso.  See answer #12 in
       https://answers.launchpad.net/duplicity/+question/248020
 
 2014-04-30  Kenneth Loafman  <kenneth@loafman.com>
+
     * Merged in lp:~mterry/duplicity/encode-exceptions
       - Because exceptions often contain file paths, they have the same problem
         with Python 2.x's implicit decoding using the 'ascii' encoding that we've
@@ -12,6 +14,7 @@
       - Bugs fixed: 1289288, 1311176, 1313966
 
 2014-04-29  Kenneth Loafman  <kenneth@loafman.com>
+
     * Merged in lp:~mterry/duplicity/backend-unification
       - Reorganize and simplify backend code.  Specifically:
         - Formalize the expected API between backends and duplicity.  See the new
@@ -49,17 +52,20 @@
           URL which it will use for testing (useful for backend authors).
 
 2014-04-26  Kenneth Loafman  <kenneth@loafman.com>
+
     * Merged in lp:~mterry/duplicity/py3-map-filter
       - In py3, map and filter return iterable objects, not lists. So in each case
         we use them, I've either imported the future version or switched to a list
         comprehension if we really wanted a list.
 
 2014-04-25  Kenneth Loafman  <kenneth@loafman.com>
+
     * Fixed bug #1312328 WebDAV backend can't understand 200 OK response to DELETE
       - Allow both 200 and 204 as valid response to delete
 
 2014-04-20  Kenneth Loafman  <kenneth@loafman.com>
-    # Merged in lp:~mterry/duplicity/more-test-reorg
+
+    * Merged in lp:~mterry/duplicity/more-test-reorg
       - Here's another test reorganization / modernization branch. It does the
         following things:
         - Drop duplicity/misc.py. It is confusing to have both misc.py and util.py,
@@ -89,6 +95,7 @@
           in it is actually there.
 
 2014-04-19  Kenneth Loafman  <kenneth@loafman.com>
+
     * Merged in lp:~mterry/duplicity/2.6isms
       - Here's a whole stack of minor syntax modernizations that will become
         necessary in python3. They all work in python2.6.
@@ -119,6 +126,7 @@
         to the same encoding rules.
 
 2014-04-17  Kenneth Loafman  <kenneth@loafman.com>
+
     * Merged in lp:~fredrik-loch/duplicity/duplicity-S3-SSE
       - Adds support for server side encryption as requested in Bug #996660
     * Merged in lp:~mterry/duplicity/consolidate-tests
@@ -161,6 +169,7 @@
         of pexpect.
 
 2014-03-10  Kenneth Loafman  <kenneth@loafman.com>
+
      * Merged in lp:~germer/duplicity/par2
       - This branch adds Par2 recovery files to duplicity. It is a wrapper backend
         which will create the recovery files and upload them all together with the
@@ -170,6 +179,7 @@
       - Fixes https://bugs.launchpad.net/duplicity/+bug/426282
 
 2014-03-06  Kenneth Loafman  <kenneth@loafman.com>
+
     * Merged in lp:~ed.so/duplicity/fix.dpbx
       - Fix dpbx backend "NameError: global name 'rest' is not defined"
     * Merged in lp:~prateek/duplicity/botoimportfix
@@ -177,6 +187,7 @@
         complaints during the importing of backends.
 
 2014-02-26  Kenneth Loafman  <kenneth@loafman.com>
+
     * Merged in lp:~prateek/duplicity/s3-glacier
       - Fixes https://bugs.launchpad.net/duplicity/+bug/1039511
         - Adds support to detect when a file is on Glacier and initiates a restore
@@ -187,11 +198,13 @@
           upload speed.
 
 2014-02-24  Kenneth Loafman  <kenneth@loafman.com>
+
     * Merged in lp:~mterry/duplicity/pexpect-fix
       - duplicity has its own copy of pexpect. Use that instead of requiring one
         from the system.
 
 2014-02-05  Kenneth Loafman  <kenneth@loafman.com>
+
     * Merged in lp:~mterry/duplicity/gpg-encode
       - getpass.getpass(prompt) eventually calls str(prompt). Which is a no go,
         if the prompt contains unicode. Here's a patch to always pass getpass() a
@@ -200,6 +213,7 @@
         a test that passes the passphrase via stdin.
 
 2014-01-31  Kenneth Loafman  <kenneth@loafman.com>
+
     * Applied two patches from mailing list message at:
       https://lists.nongnu.org/archive/html/duplicity-talk/2014-01/msg00030.html
       "Added command line options to use different prefixes for manifest/sig/archive files"
@@ -207,9 +221,11 @@
       a workaround for https://bugs.launchpad.net/duplicity/+bug/1170113
 
 2014-01-24  Kenneth Loafman  <kenneth@loafman.com>
+
     * Prep for 0.6.23 release.
 
 2014-01-17  Kenneth Loafman  <kenneth@loafman.com>
+
     * Merged in lp:~louis-bouchard/duplicity/add-allow-concurrency
       - Implement locking mechanism to avoid concurrent execution under the same
         cache directory. This is the default behavior.
@@ -218,15 +234,18 @@
       - This functionality adds a dependency to python-lockfile
 
 2014-01-13  Kenneth Loafman  <kenneth@loafman.com>
+
     * Restored patch of gdocsbackend.py from original author (thanks ede)
     * Applied patch from bug 1266753: Boto backend removes local cache if
       connection cannot be made
 
 2014-01-02  Kenneth Loafman  <kenneth@loafman.com>
+
     * Restored missing line from patch of gdocsbackend.py
     * Reverted changes to gdocsbackend.py
 
 2013-12-30  Kenneth Loafman  <kenneth@loafman.com>
+
     * Merged in lp:~mterry/duplicity/encoding
       - This branch hopefully fixes two filename encoding issues:
       - Users in bug 989496 were noticing a UnicodeEncodeError exception which
@@ -259,6 +278,7 @@
         manually adjust those bits without being able to test each one.
 
 2013-12-28  Kenneth Loafman  <kenneth@loafman.com>
+
     * Merged in lp:~verb/duplicity/boto-min-version
       - Update documentation and error messages to match the current actual version
         requirements of boto backend.
@@ -272,6 +292,7 @@
     * Nuke tabs
 
 2013-11-24  Kenneth Loafman  <kenneth@loafman.com>
+
     * Merged in lp:~jkrauss/duplicity/pyrax
       - Rackspace has deprecated python-cloudfiles in favor of their pyrax
         library, which consolidates all Rackspace Cloud API functionality into
@@ -281,6 +302,7 @@
       To revert to the cloudfiles backend use '--cf-backend=cloudfiles'
 
 2013-11-19  Kenneth Loafman  <kenneth@loafman.com>
+
     * Applied patch to fix "Access GDrive through gdocs backend failing"
       - see https://lists.nongnu.org/archive/html/duplicity-talk/2013-07/msg00007.html
 

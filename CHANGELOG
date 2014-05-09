@@ -153,7 +153,7 @@ Enhancements:
     framework too.
   - That way all user-visible strings go through that framework and are subject
     to the same encoding rules.
-# Merged in lp:~mterry/duplicity/more-test-reorg
+* Merged in lp:~mterry/duplicity/more-test-reorg
   - Here's another test reorganization / modernization branch. It does the
     following things:
     - Drop duplicity/misc.py. It is confusing to have both misc.py and util.py,
