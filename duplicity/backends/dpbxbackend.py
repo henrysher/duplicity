@@ -59,13 +59,13 @@ ACCESS_TYPE = 'app_folder'
 _TOKEN_CACHE_FILE = os.path.expanduser("~/.dropbox.token_store.txt")
 
 def log_exception(e):
-  log.Error('Exception [%s]:'%(e,))
-  f = StringIO.StringIO()
-  traceback.print_exc(file=f)
-  f.seek(0)
-  for s in f.readlines():
-    log.Error('| '+s.rstrip())
-  f.close()
+    log.Error('Exception [%s]:'%(e,))
+    f = StringIO.StringIO()
+    traceback.print_exc(file=f)
+    f.seek(0)
+    for s in f.readlines():
+        log.Error('| '+s.rstrip())
+    f.close()
 
 def command(login_required=True):
     """a decorator for handling authentication and exceptions"""
@@ -73,8 +73,8 @@ def command(login_required=True):
         def wrapper(self, *args):
             from dropbox import rest
             if login_required and not self.sess.is_linked():
-              raise BackendException("dpbx Cannot login: check your credentials", log.ErrorCode.dpbx_nologin)
-              return
+                raise BackendException("dpbx Cannot login: check your credentials", log.ErrorCode.dpbx_nologin)
+                return
 
             try:
                 return f(self, *args)
@@ -104,7 +104,7 @@ class DPBXBackend(duplicity.backend.Backend):
         class StoredSession(session.DropboxSession):
             """a wrapper around DropboxSession that stores a token to a file on disk"""
             TOKEN_FILE = _TOKEN_CACHE_FILE
-        
+
             def load_creds(self):
                 try:
                     f = open(self.TOKEN_FILE)
@@ -114,7 +114,7 @@ class DPBXBackend(duplicity.backend.Backend):
                     log.Info( "[loaded access token]" )
                 except IOError:
                     pass # don't worry if it's not there
-        
+
             def write_creds(self, token):
                 open(self.TOKEN_FILE, 'w').close() # create/reset file
                 os.chmod(self.TOKEN_FILE, 0o600)     # set it -rw------ (NOOP in Windows?)
@@ -122,13 +122,13 @@ class DPBXBackend(duplicity.backend.Backend):
                 f = open(self.TOKEN_FILE, 'w')
                 f.write("|".join([token.key, token.secret]))
                 f.close()
-        
+
             def delete_creds(self):
                 os.unlink(self.TOKEN_FILE)
-        
+
             def link(self):
                 if not sys.stdout.isatty() or not sys.stdin.isatty() :
-                  log.FatalError('dpbx error: cannot interact, but need human attention', log.ErrorCode.backend_command_error)
+                    log.FatalError('dpbx error: cannot interact, but need human attention', log.ErrorCode.backend_command_error)
                 request_token = self.obtain_request_token()
                 url = self.build_authorize_url(request_token)
                 print
@@ -136,10 +136,10 @@ class DPBXBackend(duplicity.backend.Backend):
                 print "url:", url
                 print "Please authorize in the browser. After you're done, press enter."
                 raw_input()
-        
+
                 self.obtain_access_token(request_token)
                 self.write_creds(self.token)
-        
+
             def unlink(self):
                 self.delete_creds()
                 session.DropboxSession.unlink(self)
@@ -155,12 +155,12 @@ class DPBXBackend(duplicity.backend.Backend):
 
     def login(self):
         if not self.sess.is_linked():
-          try: # to login to the box
-            self.sess.link()
-          except rest.ErrorResponse as e:
-            log.FatalError('dpbx Error: %s\n' % util.uexc(e), log.ErrorCode.dpbx_nologin)
-          if not self.sess.is_linked(): # stil not logged in
-            log.FatalError("dpbx Cannot login: check your credentials",log.ErrorCode.dpbx_nologin)
+            try: # to login to the box
+                self.sess.link()
+            except rest.ErrorResponse as e:
+                log.FatalError('dpbx Error: %s\n' % util.uexc(e), log.ErrorCode.dpbx_nologin)
+            if not self.sess.is_linked(): # stil not logged in
+                log.FatalError("dpbx Cannot login: check your credentials",log.ErrorCode.dpbx_nologin)
 
     def _error_code(self, operation, e):
         from dropbox import rest
@@ -215,28 +215,28 @@ class DPBXBackend(duplicity.backend.Backend):
 
     @command()
     def _close(self):
-      """close backend session? no! just "flush" the data"""
-      info = self.api_client.account_info()
-      log.Debug('dpbx.close():')
-      for k in info :
-        log.Debug(':: %s=[%s]'%(k,info[k]))
-      entries = []
-      more = True
-      cursor = None
-      while more :
-        info = self.api_client.delta(cursor)
-        if info.get('reset',False) :
-          log.Debug("delta returned True value for \"reset\", no matter")
-        cursor = info.get('cursor',None)
-        more   = info.get('more',False)
-        entr   = info.get('entries',[])
-        entries += entr
-      for path,meta in entries:
-        mm = meta and 'ok' or 'DELETE'
-        log.Info(':: :: [%s] %s'%(path,mm))
-        if meta :
-          for k in meta :
-            log.Debug(':: :: :: %s=[%s]'%(k,meta[k]))
+        """close backend session? no! just "flush" the data"""
+        info = self.api_client.account_info()
+        log.Debug('dpbx.close():')
+        for k in info :
+            log.Debug(':: %s=[%s]' % (k, info[k]))
+        entries = []
+        more = True
+        cursor = None
+        while more :
+            info = self.api_client.delta(cursor)
+            if info.get('reset', False) :
+                log.Debug("delta returned True value for \"reset\", no matter")
+            cursor = info.get('cursor', None)
+            more = info.get('more', False)
+            entr = info.get('entries', [])
+            entries += entr
+        for path, meta in entries:
+            mm = meta and 'ok' or 'DELETE'
+            log.Info(':: :: [%s] %s' % (path, mm))
+            if meta :
+                for k in meta :
+                    log.Debug(':: :: :: %s=[%s]' % (k, meta[k]))
 
     def _mkdir(self, path):
         """create a new directory"""
@@ -244,7 +244,7 @@ class DPBXBackend(duplicity.backend.Backend):
         log.Debug('dpbx._mkdir(%s): %s'%(path,resp))
 
 def etacsufbo(s):
-  return ''.join(reduce(lambda x,y:(x and len(x[-1])==1)and(x.append(y+
-          x.pop(-1))and x or x)or(x+[y]),s,[]))
+    return ''.join(reduce(lambda x,y:(x and len(x[-1])==1)and(x.append(y+
+        x.pop(-1))and x or x)or(x+[y]),s,[]))
 
 duplicity.backend.register_backend("dpbx", DPBXBackend)
