@@ -13,6 +13,7 @@
         identifier to the lock filename (we don't need a separate lock per thread,
         since our locking is per process).
       - I've tested with 2.6.0 and 2.7.6 (both extremes of our current support).
+    * Update shebang line to python2 instead of python to avoid confusion.
 
 2014-05-07  Kenneth Loafman  <kenneth@loafman.com>
 

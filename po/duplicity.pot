@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2014-04-30 06:25-0500\n"
+"POT-Creation-Date: 2014-05-11 06:34-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -814,32 +814,32 @@ msgstr ""
 msgid "Could not initialize backend: %s"
 msgstr ""
 
-#: ../duplicity/backend.py:369
+#: ../duplicity/backend.py:373
 #, python-format
 msgid "Backtrace of previous error: %s"
 msgstr ""
 
-#: ../duplicity/backend.py:384
+#: ../duplicity/backend.py:388
 #, python-format
 msgid "Giving up after %s attempts. %s: %s"
 msgstr ""
 
-#: ../duplicity/backend.py:388
+#: ../duplicity/backend.py:392
 #, python-format
 msgid "Attempt %s failed. %s: %s"
 msgstr ""
 
-#: ../duplicity/backend.py:471
+#: ../duplicity/backend.py:475
 #, python-format
 msgid "Reading results of '%s'"
 msgstr ""
 
-#: ../duplicity/backend.py:498
+#: ../duplicity/backend.py:502
 #, python-format
 msgid "Writing %s"
 msgstr ""
 
-#: ../duplicity/backend.py:538
+#: ../duplicity/backend.py:542
 #, python-format
 msgid "File %s not found locally after get from backend"
 msgstr ""
