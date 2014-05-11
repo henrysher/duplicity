@@ -241,6 +241,10 @@ class ParsedUrl:
     def __init__(self, url_string):
         self.url_string = url_string
 
+        # Python < 2.6.5 still examine urlparse.uses_netlock when parsing urls,
+        # so stuff our custom list in there before we parse.
+        urlparse.uses_netloc = uses_netloc
+
         # While useful in some cases, the fact is that the urlparser makes
         # all the properties in the URL deferred or lazy.  This means that
         # problems don't get detected till called.  We'll try to trap those
@@ -306,7 +310,7 @@ class ParsedUrl:
                 self.path = '//' + self.netloc + self.path
                 self.netloc = ''
                 self.hostname = None
-            elif self.path.startswith('/'):
+            elif not self.path.startswith('//') and self.path.startswith('/'):
                 self.path = '//' + self.path
 
         # This happens for implicit local paths.
