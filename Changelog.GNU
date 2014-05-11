@@ -1,3 +1,19 @@
+2014-05-11  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~mterry/duplicity/py2.6.0
+      - Support python 2.6.0.
+      - Without this branch, we only support python >= 2.6.5 because that's when
+        python's urlparse.py module became its more modern incarnation. (I won't
+        get into the wisdom of them making such a change in the middle of the
+        2.6 lifecycle.)
+      - Also, the version of lockfile that I have (0.8) doesn't work with python
+        2.6.0 or 2.6.1 due to their implementation of
+        threading.current_thread().ident returning None unexpectedly. So this
+        branch tells lockfile not to worry about adding the current thread's
+        identifier to the lock filename (we don't need a separate lock per thread,
+        since our locking is per process).
+      - I've tested with 2.6.0 and 2.7.6 (both extremes of our current support).
+
 2014-05-07  Kenneth Loafman  <kenneth@loafman.com>
 
     * Applied expat fix from edso.  See answer #12 in
