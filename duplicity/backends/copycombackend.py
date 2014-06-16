@@ -166,7 +166,7 @@ class CoPyCloud:
         return invalid_parts
 
     def __update_objects(self, parameters):
-        p = [parameters] if isinstance(parameters, dict) else p
+        p = [parameters] if isinstance(parameters, dict) else parameters
         self.__post_req('update_objects', {'meta': p})
 
     def __sanitize_path(self, path):
@@ -207,11 +207,15 @@ class CoPyCloud:
 
         return res['children']
 
-    def remove(self, path):
-        if not path or not len(path):
-            raise CoPyCloud.Error("Impossible to remove a file with an empty path")
+    def remove(self, paths):
+        if isinstance(paths, basestring):
+            if not len(paths):
+                raise CoPyCloud.Error("Impossible to remove a file with an empty path")
+            paths = [paths]
+        if paths is None:
+            raise CoPyCloud.Error("Impossible to remove files with invalid path")
 
-        self.__update_objects({'action': 'remove', 'path': self.__sanitize_path(path)})
+        self.__update_objects([{'action': 'remove', 'path': self.__sanitize_path(p)} for p in paths])
 
     def download(self, path):
         if not path or not len(path):
@@ -295,5 +299,13 @@ class CopyComBackend(duplicity.backend.Backend):
             self.copy.remove(os.path.join(self.folder, filename))
         except CoPyCloud.Error as e:
             raise BackendException(e)
+
+    def _delete_list(self, filenames):
+        """Delete list of files"""
+        try:
+            self.copy.remove([os.path.join(self.folder, f) for f in filenames])
+        except CoPyCloud.Error as e:
+            if 'Error 1024' in e:
+                pass # "Ignore file can't be located error, in this case"
 
 duplicity.backend.register_backend('copy', CopyComBackend)
