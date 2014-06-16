@@ -275,6 +275,13 @@ class CopyComBackend(duplicity.backend.Backend):
         except CoPyCloud.Error as e:
             raise BackendException(e)
 
+    def _query(self, filename):
+        try:
+            file_info = self.copy.list_files(os.path.join(self.folder, filename))
+            return {'size': int(file_info['size']) if 'size' in file_info else -1}
+        except CoPyCloud.Error as e:
+            raise BackendException(e)
+
     def _put(self, source_path, remote_filename):
         """Upload local file to cloud"""
         try:
