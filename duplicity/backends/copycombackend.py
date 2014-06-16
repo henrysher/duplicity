@@ -227,13 +227,10 @@ class CoPyCloud:
         return self.__post_req('download_object', {'path': path})
 
     def upload(self, source, dest, parallel=5, share_id=0):
-        if isinstance(source, file):
-            pass
-        else:
-            try:
-                f = open(source, 'rb')
-            except Exception as e:
-                raise CoPyCloud.Error("Impossible to open source file "+ str(e))
+        try:
+            f = open(source, 'rb')
+        except Exception as e:
+            raise CoPyCloud.Error("Impossible to open source file "+ str(e))
 
         parts = self.__get_file_parts(f)
         parts_chunks = [parts[i:i+parallel] for i in range(0, len(parts), parallel)]
