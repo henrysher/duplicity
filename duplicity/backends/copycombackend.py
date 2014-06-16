@@ -300,6 +300,9 @@ class CopyComBackend(duplicity.backend.Backend):
         except CoPyCloud.Error as e:
             raise BackendException(e)
 
+''' This must be disabled here, because if a file in list does not exist, the
+    Copy server will stop deleting the subsequent stuff, raising an error,
+    making test_delete_list to fail.
     def _delete_list(self, filenames):
         """Delete list of files"""
         try:
@@ -307,5 +310,6 @@ class CopyComBackend(duplicity.backend.Backend):
         except CoPyCloud.Error as e:
             if 'Error 1024' in e:
                 pass # "Ignore file can't be located error, in this case"
+'''
 
 duplicity.backend.register_backend('copy', CopyComBackend)
