@@ -80,7 +80,8 @@ uses_netloc = ['ftp',
                'gdocs',
                'http', 'https',
                'imap', 'imaps',
-               'mega']
+               'mega',
+               'copy']
 
 
 def import_backends():
