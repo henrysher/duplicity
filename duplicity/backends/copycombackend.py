@@ -18,12 +18,8 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import hashlib
-import json
 import os.path
-import struct
 import sys
-import urllib3
 
 import duplicity.backend
 from duplicity import log
@@ -48,6 +44,7 @@ class CoPyCloud:
             Exception.__init__(self, message)
 
     def __init__(self, username, password):
+        import urllib3
         self.http = urllib3.connection_from_url(self.API_URI, block=True, maxsize=1)
         res = self.__post_req('auth_user', {'username': username, 'password' : password})
 
@@ -58,6 +55,7 @@ class CoPyCloud:
 
 
     def __req(self, req_type, method, params={}, headers={}):
+        import json
         headers.update(self.DEFAULT_HEADERS)
         method = '/'+method if method[0] != '/' else method
 
@@ -93,6 +91,7 @@ class CoPyCloud:
         if not len(parts):
             return
 
+        import struct
         invalid_parts = []
         header_size = struct.calcsize(self.PARTS_HEADER_FMT)
         item_base_size = struct.calcsize(self.PART_ITEM_FMT)
@@ -174,6 +173,7 @@ class CoPyCloud:
         return '/'+path if path[0] != '/' else path
 
     def __get_file_parts(self, f):
+        import hashlib
         parts = []
         size = os.path.getsize(f.name)
 
