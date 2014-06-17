@@ -365,12 +365,15 @@ class WebDAVBackend(duplicity.backend.Backend):
         url = self.directory + remote_filename
         response = None
         try:
+            target_file = local_path.open("wb")
             response = self.request("GET", url)
             if response.status == 200:
                 #data=response.read()
-                local_path.writefileobj(response)
+                target_file.write(response.read())
                 #import hashlib
                 #log.Info("WebDAV GOT %s bytes with md5=%s" % (len(data),hashlib.md5(data).hexdigest()) )
+                assert not target_file.close()
+                response.close()
             else:
                 status = response.status
                 reason = response.reason
