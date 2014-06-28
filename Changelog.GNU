@@ -10,6 +10,9 @@
         delete a not-existing files, and it requires the backend not to raise an
         exception in that case (is this somewhat wanted or could we do the same as
         for _delete or _query?)
+    * Merged in lp:~ed.so/duplicity/webdav200fix-0.7
+      - webdav backend fix "BackendException: Bad status code 200 reason OK. " when
+        restarting an interrupted backup and overwriting partially uploaded volumes.
 
 2014-05-11  Kenneth Loafman  <kenneth@loafman.com>
 
