@@ -223,6 +223,12 @@ class gioFTPTest(ManualBackendBase):
         self.password = config.ftp_password
 
 
+class copyTest(ManualBackendBase):
+    def setBackendInfo(self):
+        self.url_string = config.copy_url
+        self.password = config.copy_password
+
+
 if __name__ == "__main__":
     defaultTest = None
     if len(sys. argv) > 1:

@@ -72,6 +72,10 @@ Some backends also require additional components (probably available as packages
 .B Dropbox Python SDK
 - https://www.dropbox.com/developers/reference/sdk
 .TP
+.B "copy backend" (Copy.com)
+.B python-urllib3
+- https://github.com/shazow/urllib3
+.TP
 .B "ftp backend"
 .B NcFTP Client
 - http://www.ncftp.com/
@@ -1064,6 +1068,9 @@ dpbx:///some_dir
 .br
 Make sure to read
 .BR "A NOTE ON DROPBOX ACCESS" " first!"
+.PP
+copy://user[:password]@copy.com/some_dir
+.PP
 .PP
 file://[relative|/absolute]/local/path
 .PP

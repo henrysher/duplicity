@@ -1,3 +1,16 @@
+2014-06-28  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~3v1n0/duplicity/copy.com-backend
+      - I've added a backend for Copy.com cloud storage, this supports all the
+        required operations and works as it should from my tests.
+      - You can use it by calling duplicity with something like:
+        copy://account@email.com:your-password@copy.com/duplicity
+      - The only thing I've concerns with is the optimized support for _delete_list
+        which can't be enabled here because the test_delete_list tries also to
+        delete a not-existing files, and it requires the backend not to raise an
+        exception in that case (is this somewhat wanted or could we do the same as
+        for _delete or _query?)
+
 2014-05-11  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~mterry/duplicity/py2.6.0
