@@ -161,7 +161,7 @@ class WebDAVBackend(duplicity.backend.Backend):
             and self.conn.host == self.parsed_url.hostname: return
 
         log.Info("WebDAV create connection on '%s'" % (self.parsed_url.hostname))
-        if self.conn: self.conn.close()
+        self._close()
         # http schemes needed for redirect urls from servers
         if self.parsed_url.scheme in ['webdav','http']:
             self.conn = httplib.HTTPConnection(self.parsed_url.hostname, self.parsed_url.port)
@@ -174,13 +174,15 @@ class WebDAVBackend(duplicity.backend.Backend):
             raise FatalBackendException("WebDAV Unknown URI scheme: %s" % (self.parsed_url.scheme))
 
     def _close(self):
-        self.conn.close()
+        if self.conn:
+            self.conn.close()
 
     def request(self, method, path, data=None, redirected=0):
         """
         Wraps the connection.request method to retry once if authentication is
         required
         """
+        self._close() # or we get previous request's data or exception
         self.connect()
 
         quoted_path = urllib.quote(path,"/:~")
@@ -309,7 +311,6 @@ class WebDAVBackend(duplicity.backend.Backend):
         for i in range(1,len(dirs)):
             d="/".join(dirs[0:i+1])+"/"
 
-            self._close() # or we get previous request's data or exception
             self.headers['Depth'] = "1"
             response = self.request("PROPFIND", d)
             del self.headers['Depth']
@@ -318,12 +319,10 @@ class WebDAVBackend(duplicity.backend.Backend):
 
             if response.status == 404:
                 log.Info("Creating missing directory %s" % d)
-                self._close() # or we get previous request's data or exception
 
                 res = self.request("MKCOL", d)
                 if res.status != 201:
                     raise BackendException("WebDAV MKCOL %s failed: %s %s" % (d,res.status,res.reason))
-                self._close()
 
     def taste_href(self, href):
         """

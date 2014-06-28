@@ -52,6 +52,7 @@ class ManualBackendBase(BackendInstanceBase):
     def setUp(self):
         super(ManualBackendBase, self).setUp()
         self.set_global('num_retries', 1)
+        self.set_global('ssl_no_check_certificate', True)
         self.setBackendInfo()
         if self.password is not None:
             self.set_environ("FTP_PASSWORD", self.password)

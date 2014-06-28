@@ -10,9 +10,17 @@
         delete a not-existing files, and it requires the backend not to raise an
         exception in that case (is this somewhat wanted or could we do the same as
         for _delete or _query?)
-    * Merged in lp:~ed.so/duplicity/webdav200fix-0.7
-      - webdav backend fix "BackendException: Bad status code 200 reason OK. " when
-        restarting an interrupted backup and overwriting partially uploaded volumes.
+    * Merged in lp:~mterry/duplicity/webdav-fixes
+      - This branch fixes two issues I saw when testing the webdav backend:
+      - 1) Errors like the following: "Attempt 1 failed. BackendException: File
+        /tmp/duplicity-LQ1a0i-tempdir/mktemp-u2aiyX-2 not found locally after get
+        from backend".  These were caused by the _get() method not calling setdata()
+        on the local path object, so the rest of the code thought it didn't exist.
+      - 2) Some odd issues from stale responses/data. We have a couple places in
+        webdavbackend.py where we close the connection before making a request
+        because of this problem. But I've changed it to do it every time, more
+        reliably, by putting a _close() call inside the request() method.
+      - With this, the webdav backend seems fine to me.
 
 2014-05-11  Kenneth Loafman  <kenneth@loafman.com>
 
