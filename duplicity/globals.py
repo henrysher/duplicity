@@ -285,5 +285,8 @@ progress_rate = 3
 # Level of Redundancy in % for Par2 files
 par2_redundancy = 10
 
+# Verbatim par2 other options
+par2_options = ""
+
 # Whether to enable gio backend
 use_gio = False

@@ -39,6 +39,11 @@ class Par2Backend(backend.Backend):
         except AttributeError:
             self.redundancy = 10
 
+        try:
+            self.common_options = globals.par2_options + "-q -q"
+        except AttributeError:
+            self.common_options = "-q -q"
+
         self.wrapped_backend = backend.get_backend_object(parsed_url.url_string)
 
         for attr in ['_get', '_put', '_list', '_delete', '_delete_list',
@@ -67,7 +72,7 @@ class Par2Backend(backend.Backend):
         source_symlink.setdata()
 
         log.Info("Create Par2 recovery files")
-        par2create = 'par2 c -r%d -n1 -q -q %s' % (self.redundancy, source_symlink.get_canonical())
+        par2create = 'par2 c -r%d -n1 %s %s' % (self.redundancy, self.common_options, source_symlink.get_canonical())
         out, returncode = pexpect.run(par2create, -1, True)
         source_symlink.delete()
         files_to_transfer = []
@@ -106,7 +111,7 @@ class Par2Backend(backend.Backend):
             par2file = par2temp.append(remote_filename + '.par2')
             self.wrapped_backend._get(par2file.get_filename(), par2file)
 
-            par2verify = 'par2 v -q -q %s %s' % (par2file.get_canonical(), local_path_temp.get_canonical())
+            par2verify = 'par2 v %s %s %s' % (self.common_options, par2file.get_canonical(), local_path_temp.get_canonical())
             out, returncode = pexpect.run(par2verify, -1, True)
 
             if returncode:
@@ -118,7 +123,7 @@ class Par2Backend(backend.Backend):
                     file = par2temp.append(filename)
                     self.wrapped_backend._get(filename, file)
 
-                par2repair = 'par2 r -q -q %s %s' % (par2file.get_canonical(), local_path_temp.get_canonical())
+                par2repair = 'par2 r %s %s %s' % (self.common_options, par2file.get_canonical(), local_path_temp.get_canonical())
                 out, returncode = pexpect.run(par2repair, -1, True)
 
                 if returncode:

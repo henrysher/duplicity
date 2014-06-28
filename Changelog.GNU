@@ -24,6 +24,8 @@
         because of this problem. But I've changed it to do it every time, more
         reliably, by putting a _close() call inside the request() method.
       - With this, the webdav backend seems fine to me.
+    * Merged in lp:~antmak/duplicity/0.7-par2-fix
+      - Useful fix for verbatim par2cmdline options (like "-t" in par2-tbb version)
 
 2014-05-11  Kenneth Loafman  <kenneth@loafman.com>
 

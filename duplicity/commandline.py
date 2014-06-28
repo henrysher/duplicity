@@ -449,7 +449,10 @@ def parse_cmdline_options(arglist):
                                                    old_fn_deprecation(s)))
 
     # Level of Redundancy in % for Par2 files
-    parser.add_option("--par2-redundancy", type="int", metavar=_("number"))
+    parser.add_option("--par2-redundancy", type = "int", metavar = _("number"))
+
+    # Verbatim par2 options
+    parser.add_option("--par2-options", action = "extend", metavar = _("options"))
 
     # Used to display the progress for the full and incremental backup operations
     parser.add_option("--progress", action = "store_true")
