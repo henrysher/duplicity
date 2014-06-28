@@ -26,6 +26,10 @@
       - With this, the webdav backend seems fine to me.
     * Merged in lp:~antmak/duplicity/0.7-par2-fix
       - Useful fix for verbatim par2cmdline options (like "-t" in par2-tbb version)
+    * Fixed bug 1327550: OverflowError: signed integer is greater than maximum
+      - Major and minor device numbers are supposed to be one byte each.  Someone
+        has crafted a special system image using OpenVZ where the major and minor
+        device numbers are much larger (ploop devices).  We treat them as (0,0).
 
 2014-05-11  Kenneth Loafman  <kenneth@loafman.com>
 

@@ -95,8 +95,13 @@ class ROPath:
 
         self.mode = stat.S_IMODE(st_mode)
         if self.type in ("chr", "blk"):
-            self.devnums = (os.major(self.stat.st_rdev),
-                            os.minor(self.stat.st_rdev))
+            try:
+                self.devnums = (os.major(self.stat.st_rdev),
+                                os.minor(self.stat.st_rdev))
+            except:
+                log.Warn(_("Warning: %s invalid devnums (0x%X), treating as (0, 0).")
+                         % (util.ufn(self.get_relative_path()), self.stat.st_rdev))
+                self.devnums = (0, 0)
 
     def blank(self):
         """Black out self - set type and stat to None"""
