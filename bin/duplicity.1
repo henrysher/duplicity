@@ -518,7 +518,7 @@ argument for more information.
 
 .TP
 .BI "--file-prefix, --file-prefix-manifest, --file-prefix-archive, --file-prefix-signature
-Adds a prefix to all files, manifest files, archive files, and/or signature files. 
+Adds a prefix to all files, manifest files, archive files, and/or signature files.
 
 The same set of prefixes must be passed in on backup and restore.
 
@@ -787,22 +787,22 @@ characters or other characters that are not valid in a hostname.
 
 .TP
 .BI "--s3-use-rrs"
-Store volumes using Reduced Redundnacy Storage when uploading to Amazon S3.
-This will lower the cost of storage but also lower the durability of stored 
-volumnes to 99.99% instead the 99.999999999% durability offered by Standard
+Store volumes using Reduced Redundancy Storage when uploading to Amazon S3.
+This will lower the cost of storage but also lower the durability of stored
+volumes to 99.99% instead the 99.999999999% durability offered by Standard
 Storage on S3.
 
 .TP
 .BI "--s3-use-multiprocessing"
 Allow multipart volumne uploads to S3 through multiprocessing. This option
 requires Python 2.6 and can be used to make uploads to S3 more efficient.
-If enabled, files duplicity uploads to S3 will be split into chunks and 
+If enabled, files duplicity uploads to S3 will be split into chunks and
 uploaded in parallel. Useful if you want to saturate your bandwidth
 or if large files are failing during upload.
 
 .TP
 .BI "--s3-multipart-chunk-size"
-Chunk size (in MB) used for S3 multipart uploads. Make this smaller than 
+Chunk size (in MB) used for S3 multipart uploads. Make this smaller than
 .B --volsize
 to maximize the use of your bandwidth. For example, a chunk size of 10MB
 with a volsize of 30MB will result in 3 chunks per volume upload.
@@ -1700,7 +1700,7 @@ for symmetric encryption and the passphrase of the signing key are identical.
 
 .SH A NOTE ON FILENAME PREFIXES
 
-Filename prefixes can be used in conjunction with S3 lifecycle rules to transition 
+Filename prefixes can be used in conjunction with S3 lifecycle rules to transition
 archive files to Glacier, while keeping metadata (signature and manifest files) on S3.
 
 Duplicity does not require access to archive files except when restoring from backup.
