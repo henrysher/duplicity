@@ -1,6 +1,9 @@
 2014-08-17  Kenneth Loafman  <kenneth@loafman.com>
 
     * Added sxbacked.py, Skylable backend.  Waiting on man page updates.
+    * Merged in lp:~ed.so/duplicity/manpage.verify
+      - clarify verify's functionality as wished for by a user surprised with a big
+        bandwidth bill from rackspace.
 
 2014-06-28  Kenneth Loafman  <kenneth@loafman.com>
 

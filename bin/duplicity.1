@@ -258,8 +258,8 @@ If this is requested an incremental backup will be performed.
 Duplicity will abort if no old signatures can be found.
 
 .TP
-.BI "verify " "[--compare-data] [--time <time>] [--file-to-restore <relpath>] <url> <folder>"
-Verify compares the backup contents with the source folder.
+.BI "verify " "[--compare-data] [--time <time>] [--file-to-restore <rel_path>] <url> <local_path>"
+Restore backup contents temporarily file by file and compare against the local path's contents.
 duplicity will exit with a non-zero error level if any files are different.
 On verbosity level info (4) or higher, a message for each file that has
 changed will be logged.

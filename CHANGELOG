@@ -116,6 +116,9 @@ New in v0.7.00 (2014/05/??)
     has crafted a special system image using OpenVZ where the major and minor
     device numbers are much larger (ploop devices).  We treat them as (0,0).
 * Added sxbacked.py, Skylable backend.  Waiting on man page updates.
+* Merged in lp:~ed.so/duplicity/manpage.verify
+  - clarify verify's functionality as wished for by a user surprised with a big
+    bandwidth bill from rackspace.
 
 
 New in v0.6.24 (2014/05/09)
