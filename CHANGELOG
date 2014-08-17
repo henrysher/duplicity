@@ -115,6 +115,7 @@ New in v0.7.00 (2014/05/??)
   - Major and minor device numbers are supposed to be one byte each.  Someone
     has crafted a special system image using OpenVZ where the major and minor
     device numbers are much larger (ploop devices).  We treat them as (0,0).
+* Added sxbacked.py, Skylable backend.  Waiting on man page updates.
 
 
 New in v0.6.24 (2014/05/09)

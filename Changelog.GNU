@@ -1,3 +1,7 @@
+2014-08-17  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Added sxbacked.py, Skylable backend.  Waiting on man page updates.
+
 2014-06-28  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~3v1n0/duplicity/copy.com-backend
