@@ -5,23 +5,19 @@ Getting duplicity to run:
 -------------------------
 
 By the numbers:
-1) Do the checkout while in a location called $DUP_ROOT:
-        bzr lp:duplicity .          [for the dev branch]
-   -OR- bzr lp:duplicity/stable .   [for the stable branch]
+1) Do the checkout to a location called $DUP_ROOT:
+        bzr branch lp:duplicity $DUP_ROOT          [for the dev branch]
+   -OR- bzr branch lp:duplicity/stable . $DUP_ROOT [for the stable branch]
 2) cd $DUP_ROOT/duplicity
 3) run "python compilec.py" to create _librsync.so
 4) cd ..
-5) run "./bin/duplicity -V". You will see "duplicity $version" instead
-of the normal version number. Versioning comes during the release.
-
-To run outside this directory, use PYTHONPATH to set the path. 
-
-PYTHONPATH=$DUP_ROOT bin/duplicity
-
-or
-
-PYTHONPATH=$DUP_ROOT bin/rdiffdir
-
+5) To run the duplicity binaries, use PYTHONPATH to set the path. 
+   PYTHONPATH=$DUP_ROOT bin/duplicity
+   or
+   PYTHONPATH=$DUP_ROOT bin/rdiffdir
+6) run "PYTHONPATH=$DUP_ROOT bin/duplicity -V". You will see 
+   "duplicity $version" instead of the normal version number. 
+   Versioning comes during the release.
 
 Running the unit tests:
 -----------------------
