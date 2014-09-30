@@ -1,3 +1,7 @@
+2014-09-30  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug 1375304 with patch supplied by Aleksandar Ivanovic
+
 2014-08-17  Kenneth Loafman  <kenneth@loafman.com>
 
     * Added sxbacked.py, Skylable backend.  Waiting on man page updates.

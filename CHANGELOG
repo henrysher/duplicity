@@ -1,5 +1,6 @@
-New in v0.7.00 (2014/05/??)
+New in v0.7.00 (2014/??/??)
 ---------------------------
+* Fixed bug 1375304 with patch supplied by Aleksandar Ivanovic
 * Merged in lp:~mterry/duplicity/require-2.6
   - Require at least Python 2.6.
   - Our code base already requires 2.6, because 2.6-isms have crept in. Usually

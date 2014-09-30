@@ -325,7 +325,7 @@ def parse_cmdline_options(arglist):
 
     # used to provide a prefix on top of the defaul tar file name
     parser.add_option("--file-prefix", type = "string", dest = "file_prefix", action = "store")
-    
+
     # used to provide a suffix for manifest files only
     parser.add_option("--file-prefix-manifest", type = "string", dest = "file_prefix_manifest", action = "store")
 
@@ -379,7 +379,7 @@ def parse_cmdline_options(arglist):
                       callback = lambda o, s, v, p: (log.Warn(
                           _("Running in 'ignore errors' mode due to %s; please "
                             "re-consider if this was not intended") % s),
-                          setattr(p.values, "ignore errors", True)))
+                          setattr(p.values, "ignore_errors", True)))
 
     # Whether to use the full email address as the user name when
     # logging into an imap server. If false just the user name
