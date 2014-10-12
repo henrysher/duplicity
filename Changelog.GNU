@@ -1,3 +1,8 @@
+2014-10-12  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~hooloovoo/duplicity/updated-README-REPO
+      - Changes to README-REPO to reflect the restructuring of the directories.
+
 2014-09-30  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug 1375304 with patch supplied by Aleksandar Ivanovic
