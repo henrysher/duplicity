@@ -2,6 +2,9 @@
 
     * Merged in lp:~hooloovoo/duplicity/updated-README-REPO
       - Changes to README-REPO to reflect the restructuring of the directories.
+    * Merged in lp:~jflaker/duplicity/BugFix1325215
+      - The reference to "--progress_rate" in the man page as a parameter is
+        incorrect. Should be "--progress-rate".
 
 2014-09-30  Kenneth Loafman  <kenneth@loafman.com>
 
