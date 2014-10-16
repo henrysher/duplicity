@@ -1,3 +1,9 @@
+2014-10-16  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~ed.so/duplicity/0.7-dpbx.importfix
+      - fix this showstopper with the dropbox backend
+        "NameError: global name 'rest' is not defined"
+
 2014-10-12  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~hooloovoo/duplicity/updated-README-REPO

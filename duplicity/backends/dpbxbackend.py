@@ -99,6 +99,7 @@ class DPBXBackend(duplicity.backend.Backend):
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
 
+        global client, rest, session
         from dropbox import client, rest, session
 
         class StoredSession(session.DropboxSession):

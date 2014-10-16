@@ -1,5 +1,9 @@
 New in v0.7.00 (2014/??/??)
 ---------------------------
+Enhancements:
+* Merged in lp:~ed.so/duplicity/0.7-dpbx.importfix
+  - fix this showstopper with the dropbox backend
+    "NameError: global name 'rest' is not defined"
 * Merged in lp:~jflaker/duplicity/BugFix1325215
   - The reference to "--progress_rate" in the man page as a parameter is
     incorrect. Should be "--progress-rate".
