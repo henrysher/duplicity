@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-10-12 17:16+0000\n"
+"POT-Creation-Date: 2014-10-16 21:30+0000\n"
 "PO-Revision-Date: 2011-06-06 19:20+0000\n"
 "Last-Translator: Patrick <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2014-10-13 05:47+0000\n"
+"X-Launchpad-Export-Date: 2014-10-17 05:42+0000\n"
 "X-Generator: Launchpad (build 17196)\n"
 
 #: ../bin/duplicity:102
@@ -93,12 +93,12 @@ msgstr ""
 #: ../bin/duplicity:356
 #, python-format
 msgid "Restarting after volume %s, file %s, block %s"
-msgstr ""
+msgstr "Neustart nach Volumen %s, Datei %s, Block %s"
 
 #: ../bin/duplicity:423
 #, python-format
 msgid "Processed volume %d"
-msgstr ""
+msgstr "Volumen %d verarbeitet"
 
 #: ../bin/duplicity:572
 msgid ""
@@ -216,34 +216,34 @@ msgstr "Keine alten Backups gefunden, nichts gelöscht."
 #: ../bin/duplicity:938
 msgid "Deleting backup chain at time:"
 msgid_plural "Deleting backup chains at times:"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Sicherungskette dieses Zeitpunkts wird gelöscht:"
+msgstr[1] "Sicherungskette dieser Zeitpunkte wird gelöscht:"
 
 #: ../bin/duplicity:949
 #, python-format
 msgid "Deleting incremental signature chain %s"
-msgstr ""
+msgstr "Inkrementelle Signaturkette wird gelöscht: %s"
 
 #: ../bin/duplicity:951
 #, python-format
 msgid "Deleting incremental backup chain %s"
-msgstr ""
+msgstr "Inkrementelle Sicherungskette wird gelöscht: %s"
 
 #: ../bin/duplicity:954
 #, python-format
 msgid "Deleting complete signature chain %s"
-msgstr ""
+msgstr "Vollständige Signaturkette wird gelöscht: %s"
 
 #: ../bin/duplicity:956
 #, python-format
 msgid "Deleting complete backup chain %s"
-msgstr ""
+msgstr "Vollständige Sicherungskette wird gelöscht: %s"
 
 #: ../bin/duplicity:962
 msgid "Found old backup chain at the following time:"
 msgid_plural "Found old backup chains at the following times:"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Alte Sicherungskette zu folgendem Zeitpunkt gefunden:"
+msgstr[1] "Alte Sicherungeketten zu folgenden Zeitpunkten gefunden:"
 
 #: ../bin/duplicity:966
 msgid "Rerun command with --force option to actually delete."
@@ -361,6 +361,12 @@ msgid ""
 "\n"
 "See https://bugs.launchpad.net/duplicity/+bug/931175\n"
 msgstr ""
+"\n"
+"Die Umgebungsvariable PYTHONOPTIMIZE bewirkt dass duplicity seine\n"
+"eigenen Sicherungen nicht wiedererkennt. Bitte entfernen Sie PYTHONOPTIMIZE\n"
+"aus Ihrer Umgebung und starten Sie die Sicherung neu.\n"
+"\n"
+"Siehe https://bugs.launchpad.net/duplicity/+bug/931175\n"
 
 #: ../bin/duplicity:1401
 #, python-format
@@ -390,6 +396,8 @@ msgid ""
 "When using symmetric encryption, the signing passphrase must equal the "
 "encryption passphrase."
 msgstr ""
+"Bei symmetrischer Verschlüsselung müssen die Passphrases für Signatur und "
+"Verschlüsselung übereinstimmen."
 
 #: ../bin/duplicity:1516
 msgid "INT intercepted...exiting."
@@ -418,7 +426,7 @@ msgstr "Fehler beim Öffnen der Datei »%s«"
 #: ../bin/rdiffdir:119
 #, python-format
 msgid "File %s already exists, will not overwrite."
-msgstr ""
+msgstr "Datei '%s' existiert bereits; wird nicht überschrieben."
 
 #: ../duplicity/selection.py:119
 #, python-format
@@ -892,7 +900,7 @@ msgstr "Hauptaufgabe: "
 #: ../duplicity/backend.py:88
 #, python-format
 msgid "Import of %s %s"
-msgstr ""
+msgstr "Importieren von %s %s"
 
 #: ../duplicity/backend.py:165
 #, python-format
@@ -908,17 +916,17 @@ msgstr ""
 #: ../duplicity/backend.py:359
 #, python-format
 msgid "Backtrace of previous error: %s"
-msgstr ""
+msgstr "Backtrace des vorangegangenen Fehlers: %s"
 
 #: ../duplicity/backend.py:350
 #, python-format
 msgid "Attempt %s failed. %s: %s"
-msgstr ""
+msgstr "Versuch %s fehlgeschlagen. %s: %s"
 
 #: ../duplicity/backend.py:361
 #, python-format
 msgid "Giving up after %s attempts. %s: %s"
-msgstr ""
+msgstr "Nach %s Versuchen wird aufgegeben. %s: %s"
 
 #: ../duplicity/backend.py:546 ../duplicity/backend.py:570
 #, python-format
@@ -1113,7 +1121,7 @@ msgstr "Zusätzliche Kette %d von %d:"
 
 #: ../duplicity/collections.py:640
 msgid "Found primary backup chain with matching signature chain:"
-msgstr "Primäre Sucherungskette mit pasender Signatur-Kette gefunden:"
+msgstr "Primäre Sicherungskette mit passender Signaturkette gefunden:"
 
 #: ../duplicity/collections.py:644
 msgid "No backup chains with active signatures found"
@@ -1316,6 +1324,8 @@ msgid ""
 "Warning: Selected ssh backend '%s' is neither 'paramiko nor 'pexpect'. Will "
 "use default paramiko instead."
 msgstr ""
+"Warnung: Ausgewähltes ssh Backend '%s' ist weder 'paramiko' noch 'pexpect'. "
+"Stattdessen wird der Standard 'paramiko' verwendet."
 
 #: ../duplicity/backends/giobackend.py:106
 #, python-format
@@ -1570,7 +1580,7 @@ msgstr "IGNORIERTER_FEHLER: Warnung: ignoriere Fehler wie verlangt: %s: %s"
 #: ../duplicity/util.py:148
 #, python-format
 msgid "Releasing lockfile %s"
-msgstr ""
+msgstr "Lockdatei '%s' wird freigegeben"
 
 #~ msgid "Found old backup set at the following time:"
 #~ msgid_plural "Found old backup sets at the following times:"
