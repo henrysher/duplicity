@@ -25,9 +25,7 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import os
-import os.path
 import urllib
-import re
 import locale, sys
 from functools import reduce
 
@@ -38,8 +36,9 @@ from duplicity import log
 from duplicity import util
 from duplicity.errors import BackendException
 
+from dropbox import client, rest, session
 
-# This application key is registered in my name (jno at pisem dot net).
+
 # You can register your own developer account with Dropbox and
 # register a new application for yourself, obtaining the new
 # APP_KEY and APP_SECRET.
@@ -50,8 +49,8 @@ from duplicity.errors import BackendException
 #         subfolder in the "Apps" folder.
 # http://www.dropbox.com/developers/apps is the place to get the key.
 
-APP_KEY = 'bc6toosmbn7bk6t'
-APP_SECRET = 'ojx8n8jf4c5ttr1'
+APP_KEY = 'YOUR_APP_KEY'
+APP_SECRET = 'YOUR_APP_SECRET'
 
 # Limit file access to Apps/Duplicity (the name of the application).
 ACCESS_TYPE = 'app_folder'
@@ -71,7 +70,6 @@ def command(login_required=True):
     """a decorator for handling authentication and exceptions"""
     def decorate(f):
         def wrapper(self, *args):
-            from dropbox import rest
             if login_required and not self.sess.is_linked():
                 raise BackendException("dpbx Cannot login: check your credentials", log.ErrorCode.dpbx_nologin)
                 return
@@ -98,9 +96,6 @@ class DPBXBackend(duplicity.backend.Backend):
     """Connect to remote store using Dr*pB*x service"""
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
-
-        global client, rest, session
-        from dropbox import client, rest, session
 
         class StoredSession(session.DropboxSession):
             """a wrapper around DropboxSession that stores a token to a file on disk"""
@@ -164,7 +159,6 @@ class DPBXBackend(duplicity.backend.Backend):
                 log.FatalError("dpbx Cannot login: check your credentials",log.ErrorCode.dpbx_nologin)
 
     def _error_code(self, operation, e):
-        from dropbox import rest
         if isinstance(e, rest.ErrorResponse):
             if e.status == 404:
                 return log.ErrorCode.backend_not_found
