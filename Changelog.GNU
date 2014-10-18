@@ -3,6 +3,8 @@
     * Merged in lp:~johnleach/duplicity/1315437-swift-container-create
       - Check to see if the swift container exists before trying to create it,
         in case we don't have permissions to create containers. Fixes #1315437
+    * Merged in lp:~moritzm/duplicity/duplicity
+      - Use lftp for both FTP and FTPS
 
 2014-10-16  Kenneth Loafman  <kenneth@loafman.com>
 

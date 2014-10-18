@@ -1,6 +1,8 @@
 New in v0.7.00 (2014/??/??)
 ---------------------------
 Enhancements:
+* Merged in lp:~moritzm/duplicity/duplicity
+  - Use lftp for both FTP and FTPS
 * Merged in lp:~ed.so/duplicity/0.7-dpbx.importfix
   - fix this showstopper with the dropbox backend
     "NameError: global name 'rest' is not defined"

@@ -24,8 +24,7 @@ REQUIREMENTS:
  * GnuPG v1.x for encryption
  * python-lockfile for concurrency locking
  * for scp/sftp -- python-paramiko and python-pycryptopp
- * for normal ftp -- NcFTP version 3.1.9 or later, but not 3.2.0
- * for ftp over SSL -- lftp version 3.7.15 or later
+ * for ftp -- lftp version 3.7.15 or later
  * Boto 2.0 or later for single-processing S3 or GCS access (default)
  * Boto 2.1.1 or later for multi-processing S3 access
  * Boto 2.7.0 or later for Glacier S3 access
