@@ -5,6 +5,7 @@
         in case we don't have permissions to create containers. Fixes #1315437
     * Merged in lp:~moritzm/duplicity/duplicity
       - Use lftp for both FTP and FTPS
+    * Adjust unit tests to expect single FTP backend
 
 2014-10-16  Kenneth Loafman  <kenneth@loafman.com>
 
