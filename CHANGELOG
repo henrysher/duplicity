@@ -10,6 +10,9 @@ Enhancements:
 * Merged in lp:~hooloovoo/duplicity/updated-README-REPO
   - Changes to README-REPO to reflect the restructuring of the directories.
 * Fixed bug 1375304 with patch supplied by Aleksandar Ivanovic
+* Merged in lp:~ed.so/duplicity/webdav200fix-0.7
+  - webdav backend fix "BackendException: Bad status code 200 reason OK. " when
+    restarting an interrupted backup and overwriting partially uploaded volumes.
 * Merged in lp:~mterry/duplicity/require-2.6
   - Require at least Python 2.6.
   - Our code base already requires 2.6, because 2.6-isms have crept in. Usually
