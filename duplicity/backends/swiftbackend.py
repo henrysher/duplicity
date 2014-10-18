@@ -44,8 +44,8 @@ class SwiftBackend(duplicity.backend.Backend):
         # if the user has already authenticated
         if 'SWIFT_PREAUTHURL' in os.environ and 'SWIFT_PREAUTHTOKEN' in os.environ:
             conn_kwargs['preauthurl'] = os.environ['SWIFT_PREAUTHURL']
-            conn_kwargs['preauthtoken'] = os.environ['SWIFT_PREAUTHTOKEN']           
-        
+            conn_kwargs['preauthtoken'] = os.environ['SWIFT_PREAUTHTOKEN']
+
         else:
             if 'SWIFT_USERNAME' not in os.environ:
                 raise BackendException('SWIFT_USERNAME environment variable '
@@ -69,16 +69,28 @@ class SwiftBackend(duplicity.backend.Backend):
             conn_kwargs['auth_version'] = '1'
         if 'SWIFT_TENANTNAME' in os.environ:
             conn_kwargs['tenant_name'] = os.environ['SWIFT_TENANTNAME']
-            
+
         self.container = parsed_url.path.lstrip('/')
 
+        container_metadata = None
         try:
             self.conn = Connection(**conn_kwargs)
-            self.conn.put_container(self.container)
-        except Exception as e:
+            container_metadata = self.conn.head_container(self.container)
+        except ClientException:
+            pass
+        except Exception, e:
             log.FatalError("Connection failed: %s %s"
-                           % (e.__class__.__name__, util.uexc(e)),
+                           % (e.__class__.__name__, str(e)),
                            log.ErrorCode.connection_failed)
+
+        if container_metadata is None:
+            log.Info("Creating container %s" % self.container)
+            try:
+                self.conn.put_container(self.container)
+            except Exception, e:
+                log.FatalError("Container creation failed: %s %s"
+                               % (e.__class__.__name__, str(e)),
+                               log.ErrorCode.connection_failed)
 
     def _error_code(self, operation, e):
         if isinstance(e, self.resp_exc):

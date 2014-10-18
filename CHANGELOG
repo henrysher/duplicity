@@ -131,6 +131,10 @@ Enhancements:
     bandwidth bill from rackspace.
 * Merged in lp:~jeffreydavidrogers/duplicity/duplicity
   - This change fixes two small typos in the duplicity man page.
+* Merged in lp:~johnleach/duplicity/1315437-swift-container-create
+  - Check to see if the swift container exists before trying to create it,
+    in case we don't have permissions to create containers. Fixes #1315437
+
 
 New in v0.6.24 (2014/05/09)
 ---------------------------
@@ -290,7 +294,6 @@ Enhancements:
   - Bugs fixed: 1289288, 1311176, 1313966
 * Applied expat fix from edso.  See answer #12 in
   https://answers.launchpad.net/duplicity/+question/248020
-
 
 
 New in v0.6.23 (2014/01/24)
