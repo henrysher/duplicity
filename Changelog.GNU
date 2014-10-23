@@ -1,3 +1,10 @@
+2014-10-23  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Prep for 0.7.0
+    * Merged in lp:~ed.so/duplicity/manpage.blocksize
+      - add --max_blocksize doc
+      - reorder 'a note on filename prefixes' into alphabetical order
+
 2014-10-18  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~johnleach/duplicity/1315437-swift-container-create

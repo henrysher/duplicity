@@ -666,6 +666,21 @@ Write specially-formatted versions of output messages to the specified file.
 The format used is designed to be easily consumable by other programs.
 
 .TP
+.BI "--max_blocksize " number
+determines the number of the blocks examined for changes during the diff process.
+For files < 1MB the blocksize is a constant of 512.
+For files over 1MB the size is given by:
+
+file_blocksize = int((file_len / (2000 * 512)) * 512)
+.br
+return min(file_blocksize, globals.max_blocksize)
+
+where globals.max_blocksize defaults to 2048.
+If you specify a larger max_blocksize, your difftar files will be larger, but your sigtar files will be smaller.
+If you specify a smaller max_blocksize, the reverse occurs.
+The --max-blocksize option should be in multiples of 512.
+
+.TP
 .BI "--name " symbolicname
 Set the symbolic name of the backup being operated on. The intent is
 to use a separate name for each logically distinct backup. For
@@ -1512,6 +1527,13 @@ Amazon S3, but in practice you may experience timeouts, socket errors
 or HTTP errors when trying to upload files to your newly created
 bucket. Give it a few minutes and the bucket should function normally.
 
+.SH A NOTE ON FILENAME PREFIXES
+
+Filename prefixes can be used in conjunction with S3 lifecycle rules to transition
+archive files to Glacier, while keeping metadata (signature and manifest files) on S3.
+
+Duplicity does not require access to archive files except when restoring from backup.
+
 .SH A NOTE ON GOOGLE CLOUD STORAGE
 Support for Google Cloud Storage relies on its Interoperable Access,
 which must be enabled for your account.  Once enabled, you can generate
@@ -1697,13 +1719,6 @@ passphrase.
 3. The used
 .BI PASSPHRASE
 for symmetric encryption and the passphrase of the signing key are identical.
-
-.SH A NOTE ON FILENAME PREFIXES
-
-Filename prefixes can be used in conjunction with S3 lifecycle rules to transition
-archive files to Glacier, while keeping metadata (signature and manifest files) on S3.
-
-Duplicity does not require access to archive files except when restoring from backup.
 
 .SH KNOWN ISSUES / BUGS
 Hard links currently unsupported (they will be treated as non-linked
