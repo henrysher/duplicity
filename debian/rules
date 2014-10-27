@@ -1,0 +1,24 @@
+#!/usr/bin/make -f
+# -*- Mode:Makefile; indent-tabs-mode:t; tab-width:4 -*-
+
+UPSTREAM_VERSION=$(shell dpkg-parsechangelog -SVersion | cut -d- -f1)
+
+%:
+	dh $@ --with python2
+
+override_dh_auto_test:
+	./setup.py test
+
+override_dh_auto_install:
+	dh_auto_install
+	
+	# Debian installs docs itself in /usr/share/doc/duplicity/
+	rm -r debian/duplicity/usr/share/doc/duplicity-*
+	
+	# Modify upstream's version string into the right version
+	find debian/duplicity -name "*\$$version*" | xargs rename "s/\\\$$version/$(UPSTREAM_VERSION)/g"
+	find debian/duplicity -name "*_version*" | xargs rename "s/_version/$(UPSTREAM_VERSION)/g"
+	grep -Rl "\$$version" debian/duplicity | xargs sed -i "s/\$$version/$(UPSTREAM_VERSION)/g"
+
+override_dh_installdocs:
+	dh_installdocs README README-LOG
