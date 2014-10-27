@@ -1,0 +1,40 @@
+Source: duplicity
+Section: utils
+Priority: optional
+Maintainer: Duplicity Team <duplicity-team@lists.launchpad.net>
+Build-Depends: debhelper (>= 7),
+               dh-python,
+               gnupg,
+               librsync-dev (>= 0.9.6),
+               par2,
+               pep8,
+               pylint,
+               python-dev (>= 2.6.6-3~),
+               python-lockfile,
+               python-mock,
+               python-pexpect,
+               rename,
+               rdiff,
+               rsync,
+Homepage: https://launchpad.net/duplicity
+Standards-Version: 3.9.5
+X-Python-Version: >= 2.6
+
+Package: duplicity
+Architecture: any
+Depends: ${misc:Depends},
+         ${python:Depends},
+         ${shlibs:Depends},
+         gnupg,
+         python-lockfile,
+         python-pexpect,
+Suggests: ncftp,
+          python-boto,
+          python-paramiko,
+Description: encrypted bandwidth-efficient backup
+ Duplicity backs directories by producing encrypted tar-format volumes
+ and uploading them to a remote or local file server. Because duplicity
+ uses librsync, the incremental archives are space efficient and only
+ record the parts of files that have changed since the last backup.
+ Because duplicity uses GnuPG to encrypt and/or sign these archives, they
+ will be safe from spying and/or modification by the server.

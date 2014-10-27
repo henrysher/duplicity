@@ -1,0 +1,5 @@
+duplicity (0) UNRELEASED; urgency=low
+
+  * Testing (just a dummy changelog, will be replaced by daily build scripts)
+
+ -- Michael Terry <mterry@ubuntu.com>  Fri, 15 Nov 2013 21:55:21 -0500

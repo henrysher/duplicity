@@ -1,0 +1,33 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Duplicity
+Upstream-Contact: Duplicity Team <duplicity-team@lists.launchpad.net>
+Source: https://launchpad.net/duplicity/+download
+
+Files: *
+Copyright: 2002–2006 Ben Escoto <bescoto@stanford.edu>
+           2005–2006 Jiri Tyr <jiri.tyr@e-learning.vslib.cz>
+           2006 intrigeri <intrigeri@boum.org>
+           2006 Mathias Wagner <mathias.wagner@physik.tu-darmstadt.de>
+           2006 Joey Hess <joeyh@debian.org>
+           2007–2014 Kenneth Loafman <kenneth@loafman.com>
+           2009–2014 Michael Terry <mike@mterry.name>
+           2010–2014 Edgar Soldin <edgar.soldin@web.de>
+Comment: For specific author information, see the bzr logs
+License: GPL-2+
+
+License: GPL-2+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 2 of the License, or
+ (at your option) any later version.
+ .
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ .
+ On Debian systems, the full text of the GNU General Public License
+ version 2 can be found in the file /usr/share/common-licenses/GPL-2.

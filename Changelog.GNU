@@ -2,6 +2,8 @@
 
     * Merged in lp:~mterry/duplicity/code-nits
       - Fix some pylint/pep8 nits that prevented the test_code.py test from passing.
+    * Merged in lp:~mterry/duplicity/debian-dir
+      - Add a debian/ directory to make it easier to manage the PPAs for duplicity.
 
 2014-10-23  Kenneth Loafman  <kenneth@loafman.com>
 
