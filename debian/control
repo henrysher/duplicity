@@ -3,17 +3,16 @@ Section: utils
 Priority: optional
 Maintainer: Duplicity Team <duplicity-team@lists.launchpad.net>
 Build-Depends: debhelper (>= 7),
-               dh-python,
+               dh-python | python (>= 2.6.6-3~),
                gnupg,
                librsync-dev (>= 0.9.6),
                par2,
                pep8,
                pylint,
-               python-dev (>= 2.6.6-3~),
+               python-dev,
                python-lockfile,
                python-mock,
                python-pexpect,
-               rename,
                rdiff,
                rsync,
 Homepage: https://launchpad.net/duplicity
