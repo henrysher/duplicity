@@ -202,7 +202,7 @@ def get_backend_object(url_string):
             break
 
     if factory is None:
-        if not pu.scheme in _backends:
+        if pu.scheme not in _backends:
             raise UnsupportedBackendScheme(url_string)
         else:
             factory = _backends[pu.scheme]

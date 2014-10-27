@@ -88,7 +88,7 @@ class BackupSet:
             if pr.time != self.time:
                 return False
             if (pr.start_time != self.start_time or
-                pr.end_time != self.end_time):
+                    pr.end_time != self.end_time):
                 return False
             if bool(pr.encrypted) != bool(self.encrypted):
                 if self.partial and pr.encrypted:
@@ -132,10 +132,10 @@ class BackupSet:
         for local_filename in globals.archive_dir.listdir():
             pr = file_naming.parse(local_filename)
             if (pr and pr.manifest
-                and pr.type == self.type
-                and pr.time == self.time
-                and pr.start_time == self.start_time
-                and pr.end_time == self.end_time):
+                    and pr.type == self.type
+                    and pr.time == self.time
+                    and pr.start_time == self.start_time
+                    and pr.end_time == self.end_time):
                 self.local_manifest_path = \
                               globals.archive_dir.append(local_filename)
                 break
@@ -154,9 +154,9 @@ class BackupSet:
         for lfn in globals.archive_dir.listdir():
             pr = file_naming.parse(lfn)
             if (pr
-                and pr.time == self.time
-                and pr.start_time == self.start_time
-                and pr.end_time == self.end_time):
+                    and pr.time == self.time
+                    and pr.start_time == self.start_time
+                    and pr.end_time == self.end_time):
                 try:
                     globals.archive_dir.append(lfn).delete()
                 except Exception:
@@ -225,9 +225,9 @@ class BackupSet:
         try:
             manifest_buffer = self.backend.get_data(self.remote_manifest_name)
         except GPGError as message:
-            #TODO: We check for gpg v1 and v2 messages, should be an error code.
+            # TODO: We check for gpg v1 and v2 messages, should be an error code
             if ("secret key not available" in message.args[0] or
-                "No secret key" in message.args[0]):
+                    "No secret key" in message.args[0]):
                 return None
             else:
                 raise
@@ -310,8 +310,8 @@ class BackupChain:
             self.incset_list.append(incset)
         else:
             if (self.incset_list
-                and incset.start_time == self.incset_list[-1].start_time
-                and incset.end_time > self.incset_list[-1]):
+                    and incset.start_time == self.incset_list[-1].start_time
+                    and incset.end_time > self.incset_list[-1]):
                 log.Info(_("Preferring Backupset over previous one!"))
                 self.incset_list[-1] = incset
             else:
@@ -1011,7 +1011,7 @@ class CollectionsStatus:
                 matched_sig_chain = self.matched_chain_pair[0]
                 for sig_chain in self.all_sig_chains:
                     if (sig_chain.start_time == matched_sig_chain.start_time and
-                        sig_chain.end_time == matched_sig_chain.end_time):
+                            sig_chain.end_time == matched_sig_chain.end_time):
                         old_sig_chains.remove(sig_chain)
             ext_containers += old_sig_chains
         for set_or_chain in ext_containers:

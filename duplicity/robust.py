@@ -35,10 +35,10 @@ def check_common_error(error_handler, function, args = ()):
 
     try:
         return function(*args)
-    #except (EnvironmentError, SkipFileException, DSRPPermError,
-    #       RPathException, Rdiff.RdiffException,
-    #       librsync.librsyncError, C.UnknownFileTypeError), exc:
-    #   TracebackArchive.add()
+    # except (EnvironmentError, SkipFileException, DSRPPermError,
+    #        RPathException, Rdiff.RdiffException,
+    #        librsync.librsyncError, C.UnknownFileTypeError), exc:
+    #    TracebackArchive.add()
     except (IOError, EnvironmentError, librsync.librsyncError, path.PathException) as exc:
         if (not isinstance(exc, EnvironmentError) or
             ((exc[0] in errno.errorcode)
@@ -46,11 +46,11 @@ def check_common_error(error_handler, function, args = ()):
              ['EPERM', 'ENOENT', 'EACCES', 'EBUSY', 'EEXIST',
               'ENOTDIR', 'ENAMETOOLONG', 'EINTR', 'ENOTEMPTY',
               'EIO', 'ETXTBSY', 'ESRCH', 'EINVAL'])):
-            #Log.exception()
+            # Log.exception()
             if error_handler:
                 return error_handler(exc, *args)
         else:
-            #Log.exception(1, 2)
+            # Log.exception(1, 2)
             raise
 
 def listpath(path):

@@ -78,7 +78,7 @@ class SwiftBackend(duplicity.backend.Backend):
             container_metadata = self.conn.head_container(self.container)
         except ClientException:
             pass
-        except Exception, e:
+        except Exception as e:
             log.FatalError("Connection failed: %s %s"
                            % (e.__class__.__name__, str(e)),
                            log.ErrorCode.connection_failed)
@@ -87,7 +87,7 @@ class SwiftBackend(duplicity.backend.Backend):
             log.Info("Creating container %s" % self.container)
             try:
                 self.conn.put_container(self.container)
-            except Exception, e:
+            except Exception as e:
                 log.FatalError("Container creation failed: %s %s"
                                % (e.__class__.__name__, str(e)),
                                log.ErrorCode.connection_failed)

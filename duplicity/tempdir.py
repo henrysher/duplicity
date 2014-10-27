@@ -233,7 +233,7 @@ class TemporaryDirectory:
         """
         self.__lock.acquire()
         try:
-            if not self.__dir is None:
+            if self.__dir is not None:
                 for file in self.__pending.keys():
                     try:
                         log.Debug(_("Removing still remembered temporary file %s") % util.ufn(file))

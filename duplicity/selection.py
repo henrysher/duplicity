@@ -146,7 +146,7 @@ class Select:
                     error_handler, Path.append, (path, filename))
                 # make sure file is read accessible
                 if (new_path and new_path.type in ["reg", "dir"]
-                    and not os.access(new_path.name, os.R_OK)):
+                        and not os.access(new_path.name, os.R_OK)):
                     log.Warn(_("Error accessing possibly locked file %s") % util.ufn(new_path.name),
                              log.WarningCode.cannot_read,
                              util.escape(new_path.name))
@@ -283,7 +283,7 @@ pattern (such as '**') which matches the base directory.""") %
     def parse_last_excludes(self):
         """Exit with error if last selection function isn't an exclude"""
         if (self.selection_functions and
-            not self.selection_functions[-1].exclude):
+                not self.selection_functions[-1].exclude):
             log.FatalError(_(
 """Last selection expression:
     %s
@@ -548,7 +548,7 @@ probably isn't what you meant.""") %
         """Return selection function based on tuple"""
         def include_sel_func(path):
             if (path.index == tuple[:len(path.index)] or
-                path.index[:len(tuple)] == tuple):
+                    path.index[:len(tuple)] == tuple):
                 return 1 # /foo/bar implicitly matches /foo, vice-versa
             else:
                 return None

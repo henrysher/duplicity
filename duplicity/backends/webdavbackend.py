@@ -343,7 +343,7 @@ class WebDAVBackend(duplicity.backend.Backend):
         # feel we want to bail out if the hostname
         # does not match until someone has looked into
         # what the WebDAV protocol mandages.
-        if not parsed_url.hostname is None \
+        if parsed_url.hostname is not None \
            and not (parsed_url.hostname == self.parsed_url.hostname):
             m = "Received filename was in the form of a "\
                 "full url, but the hostname (%s) did "\
@@ -368,10 +368,10 @@ class WebDAVBackend(duplicity.backend.Backend):
             target_file = local_path.open("wb")
             response = self.request("GET", url)
             if response.status == 200:
-                #data=response.read()
+                # data=response.read()
                 target_file.write(response.read())
-                #import hashlib
-                #log.Info("WebDAV GOT %s bytes with md5=%s" % (len(data),hashlib.md5(data).hexdigest()) )
+                # import hashlib
+                # log.Info("WebDAV GOT %s bytes with md5=%s" % (len(data),hashlib.md5(data).hexdigest()) )
                 assert not target_file.close()
                 response.close()
             else:

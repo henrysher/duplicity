@@ -254,7 +254,7 @@ class BotoBackend(duplicity.backend.Backend):
         #   AssertionError: Got list: []
         #   Wanted: ['testfile']
         # Because of the need for this optimization, it should be left as is.
-        #for k in self.bucket.list(prefix = self.key_prefix + 'd', delimiter = '/'):
+        # for k in self.bucket.list(prefix = self.key_prefix + 'd', delimiter = '/'):
         filename_list = []
         for k in self.bucket.list(prefix=self.key_prefix, delimiter='/'):
             try:

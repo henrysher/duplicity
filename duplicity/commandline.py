@@ -659,7 +659,7 @@ def parse_cmdline_options(arglist):
 
     # expand pathname args, but not URL
     for loc in range(len(args)):
-        if not '://' in args[loc]:
+        if '://' not in args[loc]:
             args[loc] = expand_fn(args[loc])
 
     # Note that ProcessCommandLine depends on us verifying the arg

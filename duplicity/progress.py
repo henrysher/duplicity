@@ -60,7 +60,7 @@ class Snapshot(sys_collections.deque):
         """
         snapshot = Snapshot()
         # If restarting Full, discard marshalled data and start over
-        if not globals.restart is None and globals.restart.start_vol >= 1:
+        if globals.restart is not None and globals.restart.start_vol >= 1:
             try:
                 progressfd = open('%s/progress' % globals.archive_dir.name, 'r')
                 snapshot = pickle.load(progressfd)
@@ -132,7 +132,7 @@ class ProgressTracker():
         If backup is interrupted, next restart will deserialize the data and try start
         progress from the snapshot
         """
-        if not self.prev_data is None:
+        if self.prev_data is not None:
             self.prev_data.push_snapshot(volume, self.progress_estimation)
             self.prev_data.marshall() 
 
@@ -141,7 +141,7 @@ class ProgressTracker():
         Returns true if the progress computation is on and duplicity has not
         yet started the first dry-run pass to collect some information
         """
-        return (not self.total_stats is None)
+        return (self.total_stats is not None)
     
     def log_upload_progress(self):
         """
@@ -153,7 +153,7 @@ class ProgressTracker():
         current_time = datetime.now()
         if self.start_time is None:
             self.start_time = current_time
-        if not self.last_time is None:
+        if self.last_time is not None:
             elapsed = (current_time - self.last_time)
         else:
             elapsed = timedelta()
@@ -310,7 +310,7 @@ def report_transfer(bytecount, totalbytes):
     """
     global tracker
     global progress_thread
-    if not progress_thread is None and not tracker is None:
+    if progress_thread is not None and tracker is not None:
         tracker.annotate_written_bytes(bytecount)
 
 

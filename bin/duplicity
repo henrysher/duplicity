@@ -94,14 +94,14 @@ def get_passphrase(n, action, for_signing = False):
         pass
 
     # check if we can reuse an already set (signing_)passphrase
-    ## if signing key is also an encryption key assume that the passphrase is identical
+    # if signing key is also an encryption key assume that the passphrase is identical
     if ( for_signing
          and (globals.gpg_profile.sign_key in globals.gpg_profile.recipients
          or globals.gpg_profile.sign_key in globals.gpg_profile.hidden_recipients)
          and 'PASSPHRASE' in os.environ ):
         log.Notice(_("Reuse configured PASSPHRASE as SIGN_PASSPHRASE"))
         return os.environ['PASSPHRASE']
-    ## if one encryption key is also the signing key assume that the passphrase is identical
+    # if one encryption key is also the signing key assume that the passphrase is identical
     if ( not for_signing
          and (globals.gpg_profile.sign_key in globals.gpg_profile.recipients
          or globals.gpg_profile.sign_key in globals.gpg_profile.hidden_recipients)
@@ -433,7 +433,7 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
         bytes_written += waiter()
 
     # Upload the collection summary.
-    #bytes_written += write_manifest(mf, backup_type, backend)
+    # bytes_written += write_manifest(mf, backup_type, backend)
 
     return bytes_written
 
@@ -923,7 +923,7 @@ def remove_old(col_stats):
                   _("Which can't be deleted because newer sets depend on them.")))
 
     if (col_stats.matched_chain_pair and
-        col_stats.matched_chain_pair[1].end_time < globals.remove_time):
+            col_stats.matched_chain_pair[1].end_time < globals.remove_time):
         log.Warn(_("Current active backup chain is older than specified time.  "
                    "However, it will not be deleted.  To remove all your backups, "
                    "manually purge the repository."))
@@ -1457,7 +1457,7 @@ def do_backup(action):
             # Allow an empty passphrase for the key though to allow a non-empty
             # symmetric key
             if (globals.gpg_profile.signing_passphrase and
-                globals.gpg_profile.passphrase != globals.gpg_profile.signing_passphrase):
+                    globals.gpg_profile.passphrase != globals.gpg_profile.signing_passphrase):
                 log.FatalError(_("When using symmetric encryption, the signing passphrase must equal the encryption passphrase."), log.ErrorCode.user_error)
 
         if action == "full":

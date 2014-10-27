@@ -72,7 +72,7 @@ def Log(s, verb_level, code=1, extra=None, force_print=False):
     # If all the backends kindly gave us unicode, we could enable this next
     # assert line.  As it is, we'll attempt to convert s to unicode if we
     # are handed bytes.  One day we should update the backends.
-    #assert isinstance(s, unicode)
+    # assert isinstance(s, unicode)
     if not isinstance(s, unicode):
         s = s.decode("utf8", "replace")
 
@@ -99,7 +99,7 @@ class InfoCode:
     diff_file_deleted = 6
     patch_file_writing = 7
     patch_file_patching = 8
-    #file_list = 9 # 9 isn't used anymore.  It corresponds to an older syntax for listing files
+    # file_list = 9 # 9 isn't used anymore.  It corresponds to an older syntax for listing files
     file_list = 10
     synchronous_upload_begin = 11
     asynchronous_upload_begin = 12
@@ -261,7 +261,7 @@ class ErrorCode:
     boto_calling_format = 26
     ftp_ncftp_missing = 27
     ftp_ncftp_too_old = 28
-    #ftp_ncftp_v320 = 29 # moved to warning
+    # ftp_ncftp_v320 = 29 # moved to warning
     exception = 30
     gpg_failed = 31
     s3_bucket_not_style = 32

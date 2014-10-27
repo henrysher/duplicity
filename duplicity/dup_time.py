@@ -191,7 +191,7 @@ def intstringtoseconds(interval_string):
         if not match:
             error()
         num, ext = int(match.group(1)), match.group(2)
-        if not ext in _interval_conv_dict or num < 0:
+        if ext not in _interval_conv_dict or num < 0:
             error()
         total += num*_interval_conv_dict[ext]
         interval_string = interval_string[match.end(0):]
