@@ -1,3 +1,8 @@
+2014-10-27  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~mterry/duplicity/code-nits
+      - Fix some pylint/pep8 nits that prevented the test_code.py test from passing.
+
 2014-10-23  Kenneth Loafman  <kenneth@loafman.com>
 
     * Prep for 0.7.0

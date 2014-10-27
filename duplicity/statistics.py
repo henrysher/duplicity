@@ -227,7 +227,7 @@ class StatsObj:
             if len(line_parts) < 2:
                 error(line)
             attr, value_string = line_parts[:2]
-            if not attr in self.stat_attrs:
+            if attr not in self.stat_attrs:
                 error(line)
             try:
                 try:

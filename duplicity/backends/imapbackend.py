@@ -159,7 +159,7 @@ class ImapBackend(duplicity.backend.Backend):
                 if result != "OK":
                     raise Exception(list[0])
 
-                #check if there is any result
+                # check if there is any result
                 if list[0] == '':
                     raise Exception("no mail with subject %s")
 

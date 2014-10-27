@@ -382,13 +382,13 @@ def parse(filename):
         Set encryption and compression flags in ParseResults pr
         """
         if (filename.endswith('.z') or
-            not globals.short_filenames and filename.endswith('gz')):
+                not globals.short_filenames and filename.endswith('gz')):
             pr.compressed = 1
         else:
             pr.compressed = None
 
         if (filename.endswith('.g') or
-            not globals.short_filenames and filename.endswith('.gpg')):
+                not globals.short_filenames and filename.endswith('.gpg')):
             pr.encrypted = 1
         else:
             pr.encrypted = None

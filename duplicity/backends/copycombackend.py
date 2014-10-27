@@ -208,7 +208,7 @@ class CoPyCloud:
         return res['children']
 
     def remove(self, paths):
-        if isinstance(paths, basestring):
+        if isinstance(paths, str):
             if not len(paths):
                 raise CoPyCloud.Error("Impossible to remove a file with an empty path")
             paths = [paths]

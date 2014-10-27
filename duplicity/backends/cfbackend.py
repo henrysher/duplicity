@@ -22,7 +22,7 @@ import duplicity.backend
 from duplicity import globals
 
 if (globals.cf_backend and
-    globals.cf_backend.lower().strip() == 'pyrax'):
+        globals.cf_backend.lower().strip() == 'pyrax'):
     from ._cf_pyrax import PyraxBackend as CFBackend
 else:
     from ._cf_cloudfiles import CloudFilesBackend as CFBackend

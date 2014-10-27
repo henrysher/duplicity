@@ -131,7 +131,7 @@ class Par2Backend(backend.Backend):
                 else:
                     log.Warn("Repair successful %s" % remote_filename)
         except BackendException:
-            #par2 file not available
+            # par2 file not available
             pass
         finally:
             local_path_temp.rename(local_path)

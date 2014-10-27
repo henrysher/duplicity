@@ -26,7 +26,7 @@ def warn_option(option, optionvar):
         log.Warn(_("Warning: Option %s is supported by ssh pexpect backend only and will be ignored.") % option)
 
 if (globals.ssh_backend and
-    globals.ssh_backend.lower().strip() == 'pexpect'):
+        globals.ssh_backend.lower().strip() == 'pexpect'):
     from ._ssh_pexpect import SSHPExpectBackend as SSHBackend
 else:
     # take user by the hand to prevent typo driven bug reports

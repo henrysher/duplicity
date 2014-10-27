@@ -143,7 +143,7 @@ class DPBXBackend(duplicity.backend.Backend):
         self.sess = StoredSession(etacsufbo(APP_KEY)
                     , etacsufbo(APP_SECRET)
                     , access_type=ACCESS_TYPE)
-                    # , locale='en')
+        #            , locale='en')
         self.api_client = client.DropboxClient(self.sess)
         self.sess.load_creds()
 

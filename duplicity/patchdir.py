@@ -379,7 +379,7 @@ def collate_iters( iter_list ):
     def yield_tuples( iter_num, overflow, elems ):
         while 1:
             setrorps( overflow, elems )
-            if not None in overflow:
+            if None not in overflow:
                 break
 
             index = getleastindex( elems )

@@ -217,7 +217,7 @@ class Manifest:
                 return False
 
         if (self.hostname != other.hostname or
-            self.local_dirname != other.local_dirname):
+                self.local_dirname != other.local_dirname):
             log.Notice(_("Manifests not equal because hosts or directories differ"))
             return False
 

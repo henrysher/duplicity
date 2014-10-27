@@ -29,7 +29,7 @@ from setuptools.command.sdist import sdist
 version_string = "$version"
 
 if sys.version_info[:2] < (2, 6):
-    print "Sorry, duplicity requires version 2.6 or later of python"
+    print("Sorry, duplicity requires version 2.6 or later of python")
     sys.exit(1)
 
 incdir_list = libdir_list = None

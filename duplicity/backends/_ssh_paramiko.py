@@ -91,7 +91,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                     sys.stdout.write(question)
                     choice = raw_input().lower()
                     if choice in ['yes','y']:
-                        super(AgreedAddPolicy, self).missing_host_key(client, hostname, key)
+                        paramiko.AutoAddPolicy.missing_host_key(self, client, hostname, key)
                         return
                     elif choice in ['no','n']:
                         raise AuthenticityException( hostname )
@@ -158,26 +158,26 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         # update with user's config file
         self.config.update(self.gethostconfig('~/.ssh/config',parsed_url.hostname))
         # update with url values
-        ## username from url
+        # username from url
         if parsed_url.username:
             self.config.update({'user':parsed_url.username})
-        ## username from input
-        if not 'user' in self.config:
+        # username from input
+        if 'user' not in self.config:
             self.config.update({'user':getpass.getuser()})
-        ## port from url
+        # port from url
         if parsed_url.port:
             self.config.update({'port':parsed_url.port})
-        ## ensure there is deafult 22 or an int value
+        # ensure there is deafult 22 or an int value
         if 'port' in self.config:
             self.config.update({'port':int(self.config['port'])})
         else:
             self.config.update({'port':22})
-        ## alternative ssh private key, identity file
+        # alternative ssh private key, identity file
         m=re.search("-oidentityfile=(\S+)",globals.ssh_options,re.I)
         if (m!=None):
             keyfilename=m.group(1)
             self.config['identityfile'] = keyfilename
-        ## ensure ~ is expanded and identity exists in dictionary
+        # ensure ~ is expanded and identity exists in dictionary
         if 'identityfile' in self.config:
             if not isinstance(self.config['identityfile'], list):
                 # Paramiko 1.9.0 and earlier do not support multiple
@@ -197,7 +197,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
 
         # get password, enable prompt if askpass is set
         self.use_getpass = globals.ssh_askpass
-        ## set url values for beautiful login prompt
+        # set url values for beautiful login prompt
         parsed_url.username = self.config['user']
         parsed_url.hostname = self.config['hostname']
         password = self.get_password()

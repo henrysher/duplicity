@@ -186,7 +186,7 @@ def multipart_upload_worker(scheme, parsed_url, storage_uri, bucket_name, multip
     def _upload_callback(uploaded, total):
         worker_name = multiprocessing.current_process().name
         log.Debug("%s: Uploaded %s/%s bytes" % (worker_name, uploaded, total))
-        if not queue is None:
+        if queue is not None:
             queue.put([uploaded, total])  # Push data to the consumer thread
 
     def _upload(num_retries):

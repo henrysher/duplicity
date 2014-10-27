@@ -178,7 +178,7 @@ class Iter:
                 except StopIteration:
                     # call closing_func if necessary
                     if (forkposition == starting_forkposition and
-                        not called_closing_func[0]):
+                            not called_closing_func[0]):
                         closing_func()
                         called_closing_func[0] = None
                     raise StopIteration

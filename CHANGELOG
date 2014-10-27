@@ -1,3 +1,10 @@
+New in v0.7.01 (2014/11/??)
+---------------------------
+Enhancements:
+* Merged in lp:~mterry/duplicity/code-nits
+  - Fix some pylint/pep8 nits that prevented the test_code.py test from passing.
+
+
 New in v0.7.00 (2014/10/23)
 ---------------------------
 Enhancements:
