@@ -91,7 +91,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                     sys.stdout.write(question)
                     choice = raw_input().lower()
                     if choice in ['yes','y']:
-                        super(AgreedAddPolicy, self).missing_host_key(client, hostname, key)
+                        paramiko.AutoAddPolicy.missing_host_key(self, client, hostname, key)
                         return
                     elif choice in ['no','n']:
                         raise AuthenticityException( hostname )
