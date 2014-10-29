@@ -2,8 +2,6 @@
 #
 # Copyright 2002 Ben Escoto <ben@emerose.org>
 # Copyright 2007 Kenneth Loafman <kenneth@loafman.com>
-# Copyright 2010 Marcel Pennewiss <opensource@pennewiss.de>
-# Copyright 2014 Moritz Maisel <moritz@maisel.name>
 #
 # This file is part of duplicity.
 #
@@ -21,10 +19,8 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import os
 import os.path
 import urllib
-import re
 
 import duplicity.backend
 from duplicity import globals
@@ -36,25 +32,39 @@ class FTPBackend(duplicity.backend.Backend):
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
 
-        # we expect an output
+        # we expect an error return, so go low-level and ignore it
         try:
-            p = os.popen("lftp --version")
+            p = os.popen("ncftpls -v")
             fout = p.read()
             ret = p.close()
         except Exception:
             pass
-        # there is no output if lftp not found
-        if not fout:
-            log.FatalError("LFTP not found:  Please install LFTP.",
-                           log.ErrorCode.ftps_lftp_missing)
+        # the expected error is 8 in the high-byte and some output
+        if ret != 0x0800 or not fout:
+            log.FatalError("NcFTP not found:  Please install NcFTP version 3.1.9 or later",
+                           log.ErrorCode.ftp_ncftp_missing)
 
-        # version is the second word of the second part of the first line
-        version = fout.split('\n')[0].split(' | ')[1].split()[1]
-        log.Notice("LFTP version is %s" % version)
+        # version is the second word of the first line
+        version = fout.split('\n')[0].split()[1]
+        if version < "3.1.9":
+            log.FatalError("NcFTP too old:  Duplicity requires NcFTP version 3.1.9,"
+                           "3.2.1 or later.  Version 3.2.0 will not work properly.",
+                           log.ErrorCode.ftp_ncftp_too_old)
+        elif version == "3.2.0":
+            log.Warn("NcFTP (ncftpput) version 3.2.0 may fail with duplicity.\n"
+                     "see: http://www.ncftpd.com/ncftp/doc/changelog.html\n"
+                     "If you have trouble, please upgrade to 3.2.1 or later",
+                     log.WarningCode.ftp_ncftp_v320)
+        log.Notice("NcFTP version is %s" % version)
 
         self.parsed_url = parsed_url
 
         self.url_string = duplicity.backend.strip_auth_from_url(self.parsed_url)
+
+        # This squelches the "file not found" result from ncftpls when
+        # the ftp backend looks for a collection that does not exist.
+        # version 3.2.2 has error code 5, 1280 is some legacy value
+        self.popen_breaks[ 'ncftpls' ] = [ 5, 1280 ]
 
         # Use an explicit directory name.
         if self.url_string[-1] != '/':
@@ -63,52 +73,42 @@ class FTPBackend(duplicity.backend.Backend):
         self.password = self.get_password()
 
         if globals.ftp_connection == 'regular':
-            self.conn_opt = 'off'
+            self.conn_opt = '-E'
         else:
-            self.conn_opt = 'on'
-
-        if parsed_url.port != None and parsed_url.port != 21:
-            self.portflag = " -p '%s'" % (parsed_url.port)
-        else:
-            self.portflag = ""
+            self.conn_opt = '-F'
 
         self.tempfile, self.tempname = tempdir.default().mkstemp()
-        os.write(self.tempfile, "set ftp:ssl-allow true\n")
-        os.write(self.tempfile, "set ftp:ssl-protect-data true\n")
-        os.write(self.tempfile, "set ftp:ssl-protect-list true\n")
-        os.write(self.tempfile, "set net:timeout %s\n" % globals.timeout)
-        os.write(self.tempfile, "set net:max-retries %s\n" % globals.num_retries)
-        os.write(self.tempfile, "set ftp:passive-mode %s\n" % self.conn_opt)
-        os.write(self.tempfile, "open %s %s\n" % (self.portflag, self.parsed_url.hostname))
-        # allow .netrc auth by only setting user/pass when user was actually given
-        if self.parsed_url.username:
-            os.write(self.tempfile, "user %s %s\n" % (self.parsed_url.username, self.password))
+        os.write(self.tempfile, "host %s\n" % self.parsed_url.hostname)
+        os.write(self.tempfile, "user %s\n" % self.parsed_url.username)
+        os.write(self.tempfile, "pass %s\n" % self.password)
         os.close(self.tempfile)
+        self.flags = "-f %s %s -t %s -o useCLNT=0,useHELP_SITE=0 " % \
+            (self.tempname, self.conn_opt, globals.timeout)
+        if parsed_url.port != None and parsed_url.port != 21:
+            self.flags += " -P '%s'" % (parsed_url.port)
 
     def _put(self, source_path, remote_filename):
         remote_path = os.path.join(urllib.unquote(self.parsed_url.path.lstrip('/')), remote_filename).rstrip()
-        commandline = "lftp -c 'source %s;put \'%s\' -o \'%s\''" % \
-            (self.tempname, source_path.name, remote_path)
+        commandline = "ncftpput %s -m -V -C '%s' '%s'" % \
+            (self.flags, source_path.name, remote_path)
         self.subprocess_popen(commandline)
 
     def _get(self, remote_filename, local_path):
         remote_path = os.path.join(urllib.unquote(self.parsed_url.path), remote_filename).rstrip()
-        commandline = "lftp -c 'source %s;get %s -o %s'" % \
-            (self.tempname, remote_path.lstrip('/'), local_path.name)
+        commandline = "ncftpget %s -V -C '%s' '%s' '%s'" % \
+            (self.flags, self.parsed_url.hostname, remote_path.lstrip('/'), local_path.name)
         self.subprocess_popen(commandline)
 
     def _list(self):
         # Do a long listing to avoid connection reset
-        remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
-        commandline = "lftp -c 'source %s;ls \'%s\''" % (self.tempname, remote_dir)
+        commandline = "ncftpls %s -l '%s'" % (self.flags, self.url_string)
         _, l, _ = self.subprocess_popen(commandline)
         # Look for our files as the last element of a long list line
-        return [x.split()[-1] for x in l.split('\n') if x]
+        return [x.split()[-1] for x in l.split('\n') if x and not x.startswith("total ")]
 
     def _delete(self, filename):
-        remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
-        commandline = "lftp -c 'source %s;cd \'%s\';rm \'%s\''" % (self.tempname, remote_dir, filename)
+        commandline = "ncftpls %s -l -X 'DELE %s' '%s'" % \
+            (self.flags, filename, self.url_string)
         self.subprocess_popen(commandline)
 
 duplicity.backend.register_backend("ftp", FTPBackend)
-duplicity.backend.register_backend("ftps", FTPBackend)
