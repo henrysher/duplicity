@@ -77,12 +77,15 @@ Some backends also require additional components (probably available as packages
 - https://github.com/shazow/urllib3
 .TP
 .B "ftp backend"
-.B NcFTP Client
-- http://www.ncftp.com/
-.TP
-.B "ftps backend"
 .B LFTP Client
+(default - supports ftp, ftps)
 - http://lftp.yar.ru/
+.br
+or
+.br
+.B NcFTP Client
+(supports ftp, select via ncftp+ftp://)
+- http://www.ncftp.com/
 .TP
 .BR "gdocs backend" " (Google Docs)"
 .B Google Data APIs Python Client Library
@@ -1084,43 +1087,59 @@ dpbx:///some_dir
 Make sure to read
 .BR "A NOTE ON DROPBOX ACCESS" " first!"
 .PP
+.B "Copy cloud storage"
+.br
 copy://user[:password]@copy.com/some_dir
 .PP
-.PP
+.B "Local file path"
+.br
 file://[relative|/absolute]/local/path
 .PP
+.B "FTP"
+.br
 ftp[s]://user[:password]@other.host[:port]/some_dir
+.br
+.B NOTE:
+use lftp+, ncftp+ prefixes to enforce a specific backend, e.g. ncftp+ftp://...
 .PP
+.B "Google Docs"
+.br
 gdocs://user[:password]@other.host/some_dir
 .PP
-.BI "Google Cloud Storage"
+.B "Google Cloud Storage"
 .br
 gs://bucket[/prefix]
 .PP
 hsi://user[:password]@other.host/some_dir
 .PP
+.B "IMAP email storage"
+.br
 imap[s]://user[:password]@host.com[/from_address_prefix]
 .br
 See also
 .B "A NOTE ON IMAP"
 .PP
+.B "Mega cloud storage"
+.br
 mega://user[:password]@mega.co.nz/some_dir
 .PP
-.BI "Par2 Wrapper Backend"
+.B "Par2 Wrapper Backend"
 .br
 par2+scheme://[user[:password]@]host[:port]/[/]path
 .br
 See also
 .B "A NOTE ON PAR2 WRAPPER BACKEND"
 .PP
-.B "using rsync daemon"
+.B "Rsync via daemon"
 .br
 rsync://user[:password]@host.com[:port]::[/]module/some_dir
 .br
-.B "using rsync over ssh (only key auth)"
+.B "Rsync over ssh (only key auth)"
 .br
 rsync://user@host.com[:port]/[relative|/absolute]_path
 .PP
+.B "Amazon S3 storage"
+.br
 s3://host/bucket_name[/prefix]
 .br
 s3+http://bucket_name[/prefix]
@@ -1128,6 +1147,8 @@ s3+http://bucket_name[/prefix]
 See also
 .B "A NOTE ON EUROPEAN S3 BUCKETS"
 .PP
+.B "SCP/SFTP access"
+.br
 scp://.. or ssh://.. are synonymous with
 .br
 sftp://user[:password]@other.host[:port]/[/]some_dir
@@ -1140,13 +1161,19 @@ See also
 and
 .BR "A NOTE ON SSH BACKENDS" .
 .PP
+.B "Openstack Swift"
+.br
 swift://container_name
 .br
 See also
 .B "A NOTE ON SWIFT (OPENSTACK OBJECT STORAGE) ACCESS"
 .PP
+.B "Tahoe-LAFS"
+.br
 tahoe://alias/directory
 .PP
+.B "WebDAV"
+.br
 webdav[s]://user[:password]@other.host[:port]/some_dir
 .RE
 
