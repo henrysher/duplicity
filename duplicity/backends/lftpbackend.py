@@ -30,7 +30,7 @@ from duplicity import globals
 from duplicity import log
 from duplicity import tempdir
 
-class FTPSBackend(duplicity.backend.Backend):
+class LFTPBackend(duplicity.backend.Backend):
     """Connect to remote store using File Transfer Protocol"""
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
@@ -54,6 +54,9 @@ class FTPSBackend(duplicity.backend.Backend):
         self.parsed_url = parsed_url
 
         self.url_string = duplicity.backend.strip_auth_from_url(self.parsed_url)
+
+        # strip lftp+ prefix
+        self.url_string = duplicity.backend.strip_prefix(self.url_string, 'lftp')
 
         # Use an explicit directory name.
         if self.url_string[-1] != '/':
@@ -109,4 +112,8 @@ class FTPSBackend(duplicity.backend.Backend):
         commandline = "lftp -c 'source %s;cd \'%s\';rm \'%s\''" % (self.tempname, remote_dir, filename)
         self.subprocess_popen(commandline)
 
-duplicity.backend.register_backend("ftps", FTPSBackend)
+duplicity.backend.register_backend("ftp", LFTPBackend)
+duplicity.backend.register_backend("ftps", LFTPBackend)
+duplicity.backend.register_backend("lftp+ftp", LFTPBackend)
+duplicity.backend.register_backend("lftp+ftps", LFTPBackend)
+duplicity.backend.uses_netloc.extend([ 'ftp', 'ftps', 'lftp+ftp', 'lftp+ftps' ])

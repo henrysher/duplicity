@@ -27,7 +27,7 @@ from duplicity import globals
 from duplicity import log
 from duplicity import tempdir
 
-class FTPBackend(duplicity.backend.Backend):
+class NCFTPBackend(duplicity.backend.Backend):
     """Connect to remote store using File Transfer Protocol"""
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
@@ -60,6 +60,9 @@ class FTPBackend(duplicity.backend.Backend):
         self.parsed_url = parsed_url
 
         self.url_string = duplicity.backend.strip_auth_from_url(self.parsed_url)
+
+        # strip ncftp+ prefix
+        self.url_string = duplicity.backend.strip_prefix(self.url_string, 'ncftp')
 
         # This squelches the "file not found" result from ncftpls when
         # the ftp backend looks for a collection that does not exist.
@@ -111,4 +114,5 @@ class FTPBackend(duplicity.backend.Backend):
             (self.flags, filename, self.url_string)
         self.subprocess_popen(commandline)
 
-duplicity.backend.register_backend("ftp", FTPBackend)
+duplicity.backend.register_backend("ncftp+ftp", NCFTPBackend)
+duplicity.backend.uses_netloc.extend([ 'ncftp+ftp' ])
