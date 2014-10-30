@@ -3,6 +3,10 @@
 # Copyright 2002 Ben Escoto <ben@emerose.org>
 # Copyright 2007 Kenneth Loafman <kenneth@loafman.com>
 # Copyright 2010 Marcel Pennewiss <opensource@pennewiss.de>
+# Copyright 2014 Edgar Soldin
+#                 - webdav, fish, sftp support
+#                 - https cert verification switches
+#                 - debug output
 #
 # This file is part of duplicity.
 #
@@ -80,8 +84,30 @@ class LFTPBackend(duplicity.backend.Backend):
         else:
             self.conn_opt = 'on'
 
+        # check for cacert file if https
+        self.cacert_file = globals.ssl_cacert_file
+        if self.scheme == 'https' and not globals.ssl_no_check_certificate:
+            cacert_candidates = [ "~/.duplicity/cacert.pem", \
+                             "~/duplicity_cacert.pem", \
+                             "/etc/duplicity/cacert.pem" ]
+            #
+            if not self.cacert_file:
+                for path in cacert_candidates :
+                    path = os.path.expanduser(path)
+                    if (os.path.isfile(path)):
+                        self.cacert_file = path
+                        break
+            # still no cacert file, inform user
+            if not self.cacert_file:
+                raise duplicity.errors.FatalBackendException("""For certificate verification a cacert database file is needed in one of these locations: %s
+Hints:
+  Consult the man page, chapter 'SSL Certificate Verification'.
+  Consider using the options --ssl-cacert-file, --ssl-no-check-certificate .""" % ", ".join(cacert_candidates) )
+
         self.tempfile, self.tempname = tempdir.default().mkstemp()
-        os.write(self.tempfile, "set ssl:verify-certificate false\n")
+        os.write(self.tempfile, "set ssl:verify-certificate " + ( "false" if globals.ssl_no_check_certificate else "true" ) + "\n")
+        if globals.ssl_cacert_file :
+            os.write(self.tempfile, "set ssl:ca-file '" + globals.ssl_cacert_file + "'\n")
         os.write(self.tempfile, "set ftp:ssl-allow true\n")
         os.write(self.tempfile, "set ftp:ssl-protect-data true\n")
         os.write(self.tempfile, "set ftp:ssl-protect-list true\n")
