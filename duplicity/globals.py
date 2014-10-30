@@ -231,14 +231,8 @@ sftp_command = None
 # default to batch mode using public-key encryption
 ssh_askpass = False
 
-# default ssh backend is paramiko
-ssh_backend = "paramiko"
-
 # user added ssh options
 ssh_options = ""
-
-# whether to use scp for put/get, sftp is default
-use_scp = False
 
 # default cf backend is pyrax
 cf_backend = "pyrax"

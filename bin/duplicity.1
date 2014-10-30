@@ -68,24 +68,13 @@ Some backends also require additional components (probably available as packages
 .B Rackspace CloudFiles Pyrax API
 - http://docs.rackspace.com/sdks/guide/content/python.html
 .TP
-.B "dpbx backend" (Dropbox)
+.BR "dpbx backend" " (Dropbox)"
 .B Dropbox Python SDK
 - https://www.dropbox.com/developers/reference/sdk
 .TP
-.B "copy backend" (Copy.com)
+.BR "copy backend" " (Copy.com)"
 .B python-urllib3
 - https://github.com/shazow/urllib3
-.TP
-.B "ftp backend"
-.B LFTP Client
-(default - supports ftp, ftps)
-- http://lftp.yar.ru/
-.br
-or
-.br
-.B NcFTP Client
-(supports ftp, select via ncftp+ftp://)
-- http://www.ncftp.com/
 .TP
 .BR "gdocs backend" " (Google Docs)"
 .B Google Data APIs Python Client Library
@@ -98,17 +87,25 @@ or
 .B D-Bus
 (dbus)- http://www.freedesktop.org/wiki/Software/dbus
 .TP
-.B "rsync backend"
-.B rsync client binary
-- http://rsync.samba.org/
+.BR "lftp backend" " (needed for ftp, ftps, fish [over ssh] - also supports sftp, webdav[s])"
+.B LFTP Client
+- http://lftp.yar.ru/
 .TP
 .BR "mega backend" " (mega.co.nz)"
 .B Python library for mega API
 - https://github.com/ckornacker/mega.py, ubuntu ppa - ppa:ckornacker/backup
 .TP
+.BR "ncftp backend" " (ftp, select via ncftp+ftp://)"
+.B NcFTP
+- http://www.ncftp.com/
+.TP
 .B "Par2 Wrapper Backend"
 .B par2cmdline
 - http://parchive.sourceforge.net/
+.TP
+.B "rsync backend"
+.B rsync client binary
+- http://rsync.samba.org/
 .PP
 There are two
 .B ssh backends
@@ -1070,111 +1067,169 @@ slash, '/path', to represent a relative path to the target home directory,
 or preceded by a double slash, '//path', to represent an absolute
 filesystem path.
 .PP
-Formats of each of the URL schemes follow:
+.B Note:
 .RS
+Scheme (protocol) access may be provided by more than one backend.
+In case the default backend is buggy or simply not working in a specific case it might be worth trying an alternative implementation.
+Alternative backends can be selected by prefixing the scheme with the name of the alternative backend e.g.
+.B ncftp+ftp://
+and are mentioned below the scheme's syntax summary.
+.RE
+
 .PP
-.BI "Rackspace Cloud Files"
-.br
+Formats of each of the URL schemes follow:
+
+.PP
+.BR "Cloud Files" " (Rackspace)"
+.PP
+.RS
 cf+http://container_name
-.br
+.PP
 See also
 .B "A NOTE ON CLOUD FILES ACCESS"
-.PP
-.BI Dropbox
-.br
-dpbx:///some_dir
-.br
-Make sure to read
-.BR "A NOTE ON DROPBOX ACCESS" " first!"
+.RE
 .PP
 .B "Copy cloud storage"
-.br
+.PP
+.RS
 copy://user[:password]@copy.com/some_dir
+.RE
+.PP
+.B Dropbox
+.PP
+.RS
+dpbx:///some_dir
+.PP
+Make sure to read
+.BR "A NOTE ON DROPBOX ACCESS" " first!"
+.RE
 .PP
 .B "Local file path"
-.br
+.PP
+.RS
 file://[relative|/absolute]/local/path
+.RE
+.PP
+.BR "FISH" " (Files transferred over Shell protocol) over ssh"
+.PP
+.RS
+fish://user[:password]@other.host[:port]/[relative|/absolute]_path
+.RE
 .PP
 .B "FTP"
-.br
+.PP
+.RS
 ftp[s]://user[:password]@other.host[:port]/some_dir
-.br
+.PP
 .B NOTE:
 use lftp+, ncftp+ prefixes to enforce a specific backend, e.g. ncftp+ftp://...
+.RE
 .PP
 .B "Google Docs"
-.br
+.PP
+.RS
 gdocs://user[:password]@other.host/some_dir
+.RE
 .PP
 .B "Google Cloud Storage"
-.br
-gs://bucket[/prefix]
 .PP
+.RS
+gs://bucket[/prefix]
+.RE
+.PP
+.B "HSI"
+.PP
+.RS
 hsi://user[:password]@other.host/some_dir
+.RE
 .PP
 .B "IMAP email storage"
-.br
+.PP
+.RS
 imap[s]://user[:password]@host.com[/from_address_prefix]
-.br
+.PP
 See also
 .B "A NOTE ON IMAP"
+.RE
 .PP
 .B "Mega cloud storage"
-.br
+.PP
+.RS
 mega://user[:password]@mega.co.nz/some_dir
+.RE
 .PP
 .B "Par2 Wrapper Backend"
-.br
+.PP
+.RS
 par2+scheme://[user[:password]@]host[:port]/[/]path
-.br
+.PP
 See also
 .B "A NOTE ON PAR2 WRAPPER BACKEND"
+.RE
 .PP
 .B "Rsync via daemon"
-.br
-rsync://user[:password]@host.com[:port]::[/]module/some_dir
-.br
-.B "Rsync over ssh (only key auth)"
-.br
-rsync://user@host.com[:port]/[relative|/absolute]_path
 .PP
-.B "Amazon S3 storage"
-.br
+.RS
+rsync://user[:password]@host.com[:port]::[/]module/some_dir
+.PP
+.RE
+.B "Rsync over ssh (only key auth)"
+.PP
+.RS
+rsync://user@host.com[:port]/[relative|/absolute]_path
+.RE
+.PP
+.BR "S3 storage" " (Amazon)"
+.PP
+.RS
 s3://host/bucket_name[/prefix]
 .br
 s3+http://bucket_name[/prefix]
-.br
+.PP
 See also
 .B "A NOTE ON EUROPEAN S3 BUCKETS"
+.RE
 .PP
 .B "SCP/SFTP access"
+.PP
+.RS
+scp://.. or
 .br
-scp://.. or ssh://.. are synonymous with
+sftp://user[:password]@other.host[:port]/[relative|/absolute]_path
+.PP
+.BR "defaults" " are paramiko+scp:// and paramiko+sftp://"
 .br
-sftp://user[:password]@other.host[:port]/[/]some_dir
+.BR "alternatively" " try pexpect+scp://, pexpect+sftp://, lftp+sftp://"
 .br
 See also
-.BR --ssh-backend ,
 .BR --ssh-askpass ,
-.BR --use-scp ,
 .B  --ssh-options
 and
 .BR "A NOTE ON SSH BACKENDS" .
+.RE
 .PP
-.B "Openstack Swift"
-.br
+.BR "Swift" " (Openstack)"
+.PP
+.RS
 swift://container_name
-.br
+.PP
 See also
 .B "A NOTE ON SWIFT (OPENSTACK OBJECT STORAGE) ACCESS"
+.RE
 .PP
 .B "Tahoe-LAFS"
-.br
+.PP
+.RS
 tahoe://alias/directory
+.RE
 .PP
 .B "WebDAV"
-.br
+.PP
+.RS
 webdav[s]://user[:password]@other.host[:port]/some_dir
+.PP
+.B alternatively
+try lftp+webdav[s]://
 .RE
 
 .SH TIME FORMATS

@@ -22,8 +22,8 @@
 
 import os
 import os.path
-import urllib
 import re
+import urllib
 
 import duplicity.backend
 from duplicity import globals
@@ -53,67 +53,119 @@ class LFTPBackend(duplicity.backend.Backend):
 
         self.parsed_url = parsed_url
 
-        self.url_string = duplicity.backend.strip_auth_from_url(self.parsed_url)
+#        self.url_string = duplicity.backend.strip_auth_from_url(self.parsed_url)
+#        # strip lftp+ prefix
+#        self.url_string = duplicity.backend.strip_prefix(self.url_string, 'lftp')
 
-        # strip lftp+ prefix
-        self.url_string = duplicity.backend.strip_prefix(self.url_string, 'lftp')
+        self.scheme = duplicity.backend.strip_prefix( parsed_url.scheme, 'lftp' ).lower()
+        self.scheme = re.sub('^webdav','http',self.scheme)
+        self.url_string = self.scheme + '://' + parsed_url.hostname
+        if parsed_url.port :
+            self.url_string += ":%s" % parsed_url.port
+
+        self.remote_path = re.sub('^/','',parsed_url.path)
 
         # Use an explicit directory name.
-        if self.url_string[-1] != '/':
-            self.url_string += '/'
+        if self.remote_path[-1] != '/':
+            self.remote_path += '/'
 
-        self.password = self.get_password()
+        self.authflag = ''
+        if self.parsed_url.username:
+            self.username = self.parsed_url.username
+            self.password = self.get_password()
+            self.authflag = "-u '%s,%s'" % (self.username,self.password)
 
         if globals.ftp_connection == 'regular':
             self.conn_opt = 'off'
         else:
             self.conn_opt = 'on'
 
-        if parsed_url.port != None and parsed_url.port != 21:
-            self.portflag = " -p '%s'" % (parsed_url.port)
-        else:
-            self.portflag = ""
-
         self.tempfile, self.tempname = tempdir.default().mkstemp()
+        os.write(self.tempfile, "set ssl:verify-certificate false\n")
         os.write(self.tempfile, "set ftp:ssl-allow true\n")
         os.write(self.tempfile, "set ftp:ssl-protect-data true\n")
         os.write(self.tempfile, "set ftp:ssl-protect-list true\n")
+        os.write(self.tempfile, "set http:use-propfind true\n")
         os.write(self.tempfile, "set net:timeout %s\n" % globals.timeout)
         os.write(self.tempfile, "set net:max-retries %s\n" % globals.num_retries)
         os.write(self.tempfile, "set ftp:passive-mode %s\n" % self.conn_opt)
-        os.write(self.tempfile, "open %s %s\n" % (self.portflag, self.parsed_url.hostname))
+        if log.getverbosity() >= log.DEBUG :
+            os.write(self.tempfile, "debug\n")
+        os.write(self.tempfile, "open %s %s\n" % (self.authflag, self.url_string) )
+#        os.write(self.tempfile, "open %s %s\n" % (self.portflag, self.parsed_url.hostname))
         # allow .netrc auth by only setting user/pass when user was actually given
-        if self.parsed_url.username:
-            os.write(self.tempfile, "user %s %s\n" % (self.parsed_url.username, self.password))
+#        if self.parsed_url.username:
+#            os.write(self.tempfile, "user %s %s\n" % (self.parsed_url.username, self.password))
         os.close(self.tempfile)
+        if log.getverbosity() >= log.DEBUG :
+            f = open(self.tempname, 'r')
+            log.Debug("SETTINGS: \n"
+                  "%s" % f.readlines() )
 
     def _put(self, source_path, remote_filename):
-        remote_path = os.path.join(urllib.unquote(self.parsed_url.path.lstrip('/')), remote_filename).rstrip()
-        commandline = "lftp -c 'source %s;put \'%s\' -o \'%s\''" % \
-            (self.tempname, source_path.name, remote_path)
-        self.subprocess_popen(commandline)
+        #remote_path = os.path.join(urllib.unquote(self.parsed_url.path.lstrip('/')), remote_filename).rstrip()
+        commandline = "lftp -c 'source \'%s\'; mkdir -p %s; put \'%s\' -o \'%s\''" % \
+            (self.tempname, self.remote_path, source_path.name, self.remote_path + remote_filename)
+        log.Debug("CMD: %s" % commandline)
+        s, l, e = self.subprocess_popen(commandline)
+        log.Debug("STATUS: %s" % s)
+        log.Debug("STDERR:\n"
+                  "%s" % (e))
+        log.Debug("STDOUT:\n"
+                  "%s" % (l))
 
     def _get(self, remote_filename, local_path):
-        remote_path = os.path.join(urllib.unquote(self.parsed_url.path), remote_filename).rstrip()
-        commandline = "lftp -c 'source %s;get %s -o %s'" % \
-            (self.tempname, remote_path.lstrip('/'), local_path.name)
-        self.subprocess_popen(commandline)
+        #remote_path = os.path.join(urllib.unquote(self.parsed_url.path), remote_filename).rstrip()
+        commandline = "lftp -c 'source \'%s\'; get \'%s\' -o \'%s\''" % \
+            (self.tempname, self.remote_path+remote_filename, local_path.name)
+        log.Debug("CMD: %s" % commandline)
+        _, l, e = self.subprocess_popen(commandline)
+        log.Debug("STDERR:\n"
+                  "%s" % (e))
+        log.Debug("STDOUT:\n"
+                  "%s" % (l))
 
     def _list(self):
         # Do a long listing to avoid connection reset
-        remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
-        commandline = "lftp -c 'source %s;ls \'%s\''" % (self.tempname, remote_dir)
-        _, l, _ = self.subprocess_popen(commandline)
+        #remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
+        remote_dir = urllib.unquote(self.parsed_url.path)
+        #print remote_dir
+        commandline = "lftp -c 'source \'%s\'; cd \'%s\' || exit 0; ls'" % (self.tempname, self.remote_path)
+        log.Debug("CMD: %s" % commandline)
+        _, l, e = self.subprocess_popen(commandline)
+        log.Debug("STDERR:\n"
+                  "%s" % (e))
+        log.Debug("STDOUT:\n"
+                  "%s" % (l))
+
         # Look for our files as the last element of a long list line
         return [x.split()[-1] for x in l.split('\n') if x]
 
     def _delete(self, filename):
-        remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
-        commandline = "lftp -c 'source %s;cd \'%s\';rm \'%s\''" % (self.tempname, remote_dir, filename)
-        self.subprocess_popen(commandline)
+        #remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
+        commandline = "lftp -c 'source \'%s\'; cd \'%s\'; rm \'%s\''" % (self.tempname, self.remote_path, filename)
+        log.Debug("CMD: %s" % commandline)
+        _, l, e = self.subprocess_popen(commandline)
+        log.Debug("STDERR:\n"
+                  "%s" % (e))
+        log.Debug("STDOUT:\n"
+                  "%s" % (l))
 
 duplicity.backend.register_backend("ftp", LFTPBackend)
 duplicity.backend.register_backend("ftps", LFTPBackend)
+duplicity.backend.register_backend("fish", LFTPBackend)
+
 duplicity.backend.register_backend("lftp+ftp", LFTPBackend)
 duplicity.backend.register_backend("lftp+ftps", LFTPBackend)
-duplicity.backend.uses_netloc.extend([ 'ftp', 'ftps', 'lftp+ftp', 'lftp+ftps' ])
+duplicity.backend.register_backend("lftp+fish", LFTPBackend)
+duplicity.backend.register_backend("lftp+sftp", LFTPBackend)
+duplicity.backend.register_backend("lftp+webdav", LFTPBackend)
+duplicity.backend.register_backend("lftp+webdavs", LFTPBackend)
+duplicity.backend.register_backend("lftp+http", LFTPBackend)
+duplicity.backend.register_backend("lftp+https", LFTPBackend)
+
+duplicity.backend.uses_netloc.extend([ 'ftp', 'ftps', 'fish',\
+                                       'lftp+ftp', 'lftp+ftps',\
+                                       'lftp+fish', 'lftp+sftp',\
+                                       'lftp+webdav', 'lftp+webdavs',\
+                                       'lftp+http', 'lftp+https' ])

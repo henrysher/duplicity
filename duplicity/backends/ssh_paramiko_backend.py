@@ -217,8 +217,11 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                                     self.config['port'],e))
         self.client.get_transport().set_keepalive((int)(globals.timeout / 2))
 
+        self.scheme = duplicity.backend.strip_prefix(parsed_url.scheme, 'paramiko')
+        self.use_scp = ( self.scheme == 'scp' )
+
         # scp or sftp?
-        if (globals.use_scp):
+        if (self.use_scp):
             # sanity-check the directory name
             if (re.search("'",self.remote_dir)):
                 raise BackendException("cannot handle directory names with single quotes with --use-scp!")
@@ -256,7 +259,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                         raise BackendException("sftp chdir to %s failed: %s" % (self.sftp.normalize(".")+"/"+d,e))
 
     def _put(self, source_path, remote_filename):
-        if globals.use_scp:
+        if self.use_scp:
             f=file(source_path.name,'rb')
             try:
                 chan=self.client.get_transport().open_session()
@@ -284,7 +287,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
             self.sftp.put(source_path.name,remote_filename)
 
     def _get(self, remote_filename, local_path):
-        if globals.use_scp:
+        if self.use_scp:
             try:
                 chan=self.client.get_transport().open_session()
                 chan.settimeout(globals.timeout)
@@ -327,7 +330,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
     def _list(self):
         # In scp mode unavoidable quoting issues will make this fail if the
         # directory name contains single quotes.
-        if globals.use_scp:
+        if self.use_scp:
             output = self.runremote("ls -1 '%s'" % self.remote_dir, False, "scp dir listing ")
             return output.splitlines()
         else:
@@ -336,7 +339,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
     def _delete(self, filename):
         # In scp mode unavoidable quoting issues will cause failures if
         # filenames containing single quotes are encountered.
-        if globals.use_scp:
+        if self.use_scp:
             self.runremote("rm '%s/%s'" % (self.remote_dir, filename), False, "scp rm ")
         else:
             self.sftp.remove(filename)
@@ -370,3 +373,9 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
             raise BackendException("could not load '%s', maybe corrupt?" % (file))
         
         return sshconfig.lookup(host)
+
+duplicity.backend.register_backend("sftp", SSHParamikoBackend)
+duplicity.backend.register_backend("scp", SSHParamikoBackend)
+duplicity.backend.register_backend("paramiko+sftp", SSHParamikoBackend)
+duplicity.backend.register_backend("paramiko+scp", SSHParamikoBackend)
+duplicity.backend.uses_netloc.extend([ 'sftp', 'scp', 'paramiko+sftp', 'paramiko+scp' ])
