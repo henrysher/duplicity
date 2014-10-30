@@ -27,12 +27,12 @@ from . import _top_dir, DuplicityTestCase
 
 class CodeTest(DuplicityTestCase):
 
-    def run_checker(self, cmd):
+    def run_checker(self, cmd, returncodes=[0]):
         process = subprocess.Popen(cmd,
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
         output = process.communicate()[0]
-        self.assertEqual(0, process.returncode, output)
+        self.assertTrue(process.returncode in returncodes, output)
         self.assertEqual("", output, output)
 
     def test_2to3(self):
@@ -66,7 +66,10 @@ class CodeTest(DuplicityTestCase):
                           "--ignore=_librsync.so",
                           os.path.join(_top_dir, 'duplicity'),
                           os.path.join(_top_dir, 'bin/duplicity'),
-                          os.path.join(_top_dir, 'bin/rdiffdir')])
+                          os.path.join(_top_dir, 'bin/rdiffdir')],
+                         # Allow usage errors, older versions don't have
+                         # --msg-template
+                         [0, 32])
 
     def test_pep8(self):
         # All these ignores are just because when this test was added, I didn't
