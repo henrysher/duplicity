@@ -1,7 +1,8 @@
 #!/usr/bin/make -f
 # -*- Mode:Makefile; indent-tabs-mode:t; tab-width:4 -*-
 
-UPSTREAM_VERSION=$(shell dpkg-parsechangelog -SVersion | cut -d- -f1)
+# Old versions of dpkg-parsechangelog don't support -SVersion
+UPSTREAM_VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d' ' -f2 | cut -d- -f1)
 
 %:
 	dh $@ --with python2
