@@ -8,6 +8,8 @@
       - added lftp fish, webdav(s), sftp support
     * Merged in lp:~mterry/duplicity/missing-unicode-escape
       - Convert restore_dir to unicode before printing.
+    * Merged in lp:~hooloovoo/duplicity/fix-typo-in-test-description
+      - Fixed spelling mistake/typo in a description of a test.
 
 2014-10-27  Kenneth Loafman  <kenneth@loafman.com>
 
