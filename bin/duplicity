@@ -691,7 +691,7 @@ def restore(col_stats):
                                   restore_get_patched_rop_iter(col_stats)):
         if globals.restore_dir:
             log.FatalError(_("%s not found in archive, no files restored.")
-                           % (globals.restore_dir,),
+                           % (util.ufn(globals.restore_dir)),
                            log.ErrorCode.restore_dir_not_found)
         else:
             log.FatalError(_("No files found in archive - nothing restored."),

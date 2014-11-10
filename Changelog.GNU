@@ -6,6 +6,8 @@
         e.g. ncftp+ftp://, see manpage
       - scp is now selected via scheme e.g. scp://
       - added lftp fish, webdav(s), sftp support
+    * Merged in lp:~mterry/duplicity/missing-unicode-escape
+      - Convert restore_dir to unicode before printing.
 
 2014-10-27  Kenneth Loafman  <kenneth@loafman.com>
 
