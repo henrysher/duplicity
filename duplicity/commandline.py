@@ -537,9 +537,6 @@ def parse_cmdline_options(arglist):
     # default to batch mode using public-key encryption
     parser.add_option("--ssh-askpass", action = "store_true")
 
-    # allow the user to switch ssh backend
-    parser.add_option("--ssh-backend", metavar = _("paramiko|pexpect"))
-
     # user added ssh options
     parser.add_option("--ssh-options", action = "extend", metavar = _("options"))
 
@@ -566,8 +563,6 @@ def parse_cmdline_options(arglist):
 
     # Whether to specify --use-agent in GnuPG options
     parser.add_option("--use-agent", action = "store_true")
-
-    parser.add_option("--use-scp", action = "store_true")
 
     parser.add_option("--verbosity", "-v", type = "verbosity", metavar = "[0-9]",
                       dest = "", action = "callback",

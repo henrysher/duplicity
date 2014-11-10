@@ -1,6 +1,12 @@
 New in v0.7.01 (2014/11/??)
 ---------------------------
 Enhancements:
+* Merged in lp:~ed.so/duplicity/lftp.ncftp.and.prefixes
+  - retire --ssh-backend, --use-scp parameters
+  - introduce scheme prefixes for alternative backend selection
+    e.g. ncftp+ftp://, see manpage
+  - scp is now selected via scheme e.g. scp://
+  - added lftp fish, webdav(s), sftp support
 * Merged in lp:~mterry/duplicity/code-nits
   - Fix some pylint/pep8 nits that prevented the test_code.py test from passing.
 * Merged in lp:~mterry/duplicity/debian-dir

@@ -1,3 +1,12 @@
+2014-11-10  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~ed.so/duplicity/lftp.ncftp.and.prefixes
+      - retire --ssh-backend, --use-scp parameters
+      - introduce scheme prefixes for alternative backend selection
+        e.g. ncftp+ftp://, see manpage
+      - scp is now selected via scheme e.g. scp://
+      - added lftp fish, webdav(s), sftp support
+
 2014-10-27  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~mterry/duplicity/code-nits

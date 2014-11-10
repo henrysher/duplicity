@@ -32,6 +32,7 @@ import time
 import re
 import getpass
 import gettext
+import re
 import types
 import urllib
 import urlparse
@@ -164,6 +165,11 @@ def register_backend_prefix(scheme, backend_factory):
 
     _backend_prefixes[scheme] = backend_factory
 
+def strip_prefix(url_string, prefix_scheme):
+    """
+    strip the prefix from a string e.g. par2+ftp://... -> ftp://...
+    """
+    return re.sub('(?i)^'+re.escape(prefix_scheme)+'\+','',url_string)
 
 def is_backend_url(url_string):
     """
@@ -198,7 +204,7 @@ def get_backend_object(url_string):
     for prefix in _backend_prefixes:
         if url_string.startswith(prefix + '+'):
             factory = _backend_prefixes[prefix]
-            pu = ParsedUrl(url_string.lstrip(prefix + '+'))
+            pu = ParsedUrl(strip_prefix(url_string,prefix))
             break
 
     if factory is None:
@@ -337,11 +343,8 @@ class ParsedUrl:
 def strip_auth_from_url(parsed_url):
     """Return a URL from a urlparse object without a username or password."""
 
-    # Get a copy of the network location without the username or password.
-    straight_netloc = parsed_url.netloc.split('@')[-1]
-
-    # Replace the full network location with the stripped copy.
-    return parsed_url.geturl().replace(parsed_url.netloc, straight_netloc, 1)
+    clean_url = re.sub('^([^:/]+://)(.*@)?(.*)',r'\1\3',parsed_url.geturl())
+    return clean_url
 
 def _get_code_from_exception(backend, operation, e):
     if isinstance(e, BackendException) and e.code != log.ErrorCode.backend_error:
