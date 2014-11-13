@@ -1,6 +1,8 @@
 New in v0.7.01 (2014/11/??)
 ---------------------------
 Enhancements:
+* Merged in lp:~ed.so/duplicity/fix.dpbx.import
+  - fix dpbx import error import lazily
 * Merged in lp:~hooloovoo/duplicity/fix-typo-in-test-description
   - Fixed spelling mistake/typo in a description of a test.
 * Merged in lp:~mterry/duplicity/missing-unicode-escape

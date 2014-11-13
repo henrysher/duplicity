@@ -1,3 +1,8 @@
+2014-11-13  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~ed.so/duplicity/fix.dpbx.import
+      - fix dpbx import error import lazily
+
 2014-11-10  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~ed.so/duplicity/lftp.ncftp.and.prefixes
