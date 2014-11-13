@@ -2,6 +2,7 @@
 
     * Merged in lp:~ed.so/duplicity/fix.dpbx.import
       - fix dpbx import error import lazily
+    * Partial fix for PPA build failures, new backend name.
 
 2014-11-10  Kenneth Loafman  <kenneth@loafman.com>
 
