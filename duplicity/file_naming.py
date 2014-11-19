@@ -393,20 +393,6 @@ def parse(filename):
         else:
             pr.encrypted = None
 
-    def valid_extension():
-        """
-        plausibility check for duplicity file extension
-        before starting to extensively parse the filenames
-        """
-        res = re.match(r'.*\.(g|z|gpg|gz|tar|p|part|manifest|sigtar)$', filename )
-        #print filename, res
-        if res is None :
-            return False
-        return True
-
-    if not valid_extension() :
-        return None
-
     pr = check_full()
     if not pr:
         pr = check_inc()

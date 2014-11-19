@@ -1,3 +1,8 @@
+2014-11-19  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Remove valid_extension() check from file_naming.py.  It was
+      causing failed tests for short filenames.  Thanks edso.
+
 2014-11-13  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~ed.so/duplicity/fix.dpbx.import
