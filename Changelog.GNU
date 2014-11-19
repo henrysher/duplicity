@@ -2,6 +2,8 @@
 
     * Remove valid_extension() check from file_naming.py.  It was
       causing failed tests for short filenames.  Thanks edso.
+    * Moved testing/test_code.py to testing/manual/code_test.py
+      so PPA builds would succeed.  Should be moved back later.
 
 2014-11-13  Kenneth Loafman  <kenneth@loafman.com>
 

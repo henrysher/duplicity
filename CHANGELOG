@@ -1,6 +1,8 @@
 New in v0.7.01 (2014/11/??)
 ---------------------------
 Enhancements:
+* Moved testing/test_code.py to testing/manual/code_test.py
+  so PPA builds would succeed.  Should be moved back later.
 * Remove valid_extension() check from file_naming.py.  It was
   causing failed tests for short filenames.  Thanks edso.
 * Partial fix for PPA build failures, new backend name.
