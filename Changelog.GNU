@@ -1,3 +1,10 @@
+2014-11-20  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Undid move of testing/test_code.py.  Instead I fixed it
+      so that it would not run during PPA build.  It now needs
+      the setting RUN_CODE_TESTS=1 in the environment which is
+      supplied in the tox.ini file.
+
 2014-11-19  Kenneth Loafman  <kenneth@loafman.com>
 
     * Remove valid_extension() check from file_naming.py.  It was
