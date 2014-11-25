@@ -95,6 +95,10 @@ Some backends also require additional components (probably available as packages
 .B D-Bus
 (dbus)- http://www.freedesktop.org/wiki/Software/dbus
 .TP
+.BR "hubic backend"
+.B Rackspace CloudFiles Pyrax API
+- http://docs.rackspace.com/sdks/guide/content/python.html
+.TP
 .B "rsync backend"
 .B rsync client binary
 - http://rsync.samba.org/
@@ -1099,6 +1103,13 @@ gs://bucket[/prefix]
 .PP
 hsi://user[:password]@other.host/some_dir
 .PP
+.BI "hubiC"
+.br
+cf+hubic://container_name
+.br
+See also
+.B "A NOTE ON HUBIC"
+.PP
 imap[s]://user[:password]@host.com[/from_address_prefix]
 .br
 See also
@@ -1552,6 +1563,25 @@ https://code.google.com/apis/console#:storage
 .br
 Create Access Keys:
 https://code.google.com/apis/console#:storage:legacy
+
+.SH A NOTE ON HUBIC
+The hubic backend requires the pyrax library to be installed on the system. See REQUIREMENTS above. 
+You will need to set your credentials for hubiC in a file called ~/.hubic_credentials, following this
+pattern:
+.PP
+.RS
+[hubic]
+.br
+email = your_email
+.br
+password = your_password
+.br
+client_id = api_client_id
+.br
+client_secret = api_secret_key
+.br
+redirect_uri = http://localhost/
+.RE
 
 .SH A NOTE ON IMAP
 An IMAP account can be used as a target for the upload.  The userid may

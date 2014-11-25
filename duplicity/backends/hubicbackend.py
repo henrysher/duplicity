@@ -41,7 +41,7 @@ class HubicBackend(PyraxBackend):
         # Inform Pyrax that we're talking to Hubic
         pyrax.set_setting("identity_type", "duplicity.backends.pyrax_identity.hubic.HubicIdentity")
 
-        CREDENTIALS_FILE = os.path.expanduser("~/.pyrax_cloud_credentials")
+        CREDENTIALS_FILE = os.path.expanduser("~/.hubic_credentials")
         if os.path.exists(CREDENTIALS_FILE):
             try:
                 pyrax.set_credential_file(CREDENTIALS_FILE)
@@ -51,27 +51,7 @@ class HubicBackend(PyraxBackend):
                                log.ErrorCode.connection_failed)
 
         else:
-            conn_kwargs = {}
-
-            if 'CLOUDFILES_USERNAME' not in os.environ:
-                raise BackendException('CLOUDFILES_USERNAME environment variable'
-                                       'not set.')
-
-            if 'CLOUDFILES_APIKEY' not in os.environ:
-                raise BackendException('CLOUDFILES_APIKEY environment variable not set.')
-
-            conn_kwargs['username'] = os.environ['CLOUDFILES_USERNAME']
-            conn_kwargs['api_key'] = os.environ['CLOUDFILES_APIKEY']
-
-            if 'CLOUDFILES_REGION' in os.environ:
-                conn_kwargs['region'] = os.environ['CLOUDFILES_REGION']
-
-            try:
-                pyrax.set_credentials(**conn_kwargs)
-            except Exception as e:
-                log.FatalError("Connection failed, please check your credentials: %s %s"
-                               % (e.__class__.__name__, util.uexc(e)),
-                               log.ErrorCode.connection_failed)
+            raise BackendException("No ~/.hubic_credentials file found.")
 
         container = parsed_url.path.lstrip('/')
 
@@ -79,4 +59,4 @@ class HubicBackend(PyraxBackend):
         self.nso_exc = pyrax.exceptions.NoSuchObject
         self.container = pyrax.cloudfiles.create_container(container)
 
-duplicity.backend.register_backend("hubic", HubicBackend)
+duplicity.backend.register_backend("cf+hubic", HubicBackend)
