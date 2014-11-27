@@ -1,3 +1,36 @@
+2014-11-20  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Undid move of testing/test_code.py.  Instead I fixed it
+      so that it would not run during PPA build.  It now needs
+      the setting RUN_CODE_TESTS=1 in the environment which is
+      supplied in the tox.ini file.
+
+2014-11-19  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Remove valid_extension() check from file_naming.py.  It was
+      causing failed tests for short filenames.  Thanks edso.
+    * Moved testing/test_code.py to testing/manual/code_test.py
+      so PPA builds would succeed.  Should be moved back later.
+
+2014-11-13  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~ed.so/duplicity/fix.dpbx.import
+      - fix dpbx import error import lazily
+    * Partial fix for PPA build failures, new backend name.
+
+2014-11-10  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~ed.so/duplicity/lftp.ncftp.and.prefixes
+      - retire --ssh-backend, --use-scp parameters
+      - introduce scheme prefixes for alternative backend selection
+        e.g. ncftp+ftp://, see manpage
+      - scp is now selected via scheme e.g. scp://
+      - added lftp fish, webdav(s), sftp support
+    * Merged in lp:~mterry/duplicity/missing-unicode-escape
+      - Convert restore_dir to unicode before printing.
+    * Merged in lp:~hooloovoo/duplicity/fix-typo-in-test-description
+      - Fixed spelling mistake/typo in a description of a test.
+
 2014-10-27  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~mterry/duplicity/code-nits

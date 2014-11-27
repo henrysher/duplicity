@@ -76,9 +76,9 @@ class SSHParamikoBackend(duplicity.backend.Backend):
 
         class AgreedAddPolicy (paramiko.AutoAddPolicy):
             """
-            Policy for showing a yes/no prompt and adding the hostname and new 
+            Policy for showing a yes/no prompt and adding the hostname and new
             host key to the known host file accordingly.
-            
+
             This class simply extends the AutoAddPolicy class with a yes/no prompt.
             """
             def missing_host_key(self, client, hostname, key):
@@ -97,14 +97,14 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                         raise AuthenticityException( hostname )
                     else:
                         question = "Please type 'yes' or 'no': "
-        
+
         class AuthenticityException (paramiko.SSHException):
             def __init__(self, hostname):
                 paramiko.SSHException.__init__(self, 'Host key verification for server %s failed.' % hostname)
 
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(AgreedAddPolicy())
-        
+
         # paramiko uses logging with the normal python severity levels,
         # but duplicity uses both custom levels and inverted logic...*sigh*
         self.client.set_log_channel("sshbackend")
@@ -113,7 +113,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         dest.setFormatter(logging.Formatter('ssh: %(message)s'))
         ours.addHandler(dest)
 
-        # ..and the duplicity levels are neither linear, 
+        # ..and the duplicity levels are neither linear,
         # nor are the names compatible with python logging, eg. 'NOTICE'...WAAAAAH!
         plevel=logging.getLogger("duplicity").getEffectiveLevel()
         if plevel <= 1:
@@ -127,7 +127,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         else:
             wanted=logging.CRITICAL
         ours.setLevel(wanted)
-        
+
         # load known_hosts files
         # paramiko is very picky wrt format and bails out on any problem...
         try:
@@ -147,9 +147,9 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
             raise BackendException("could not load ~/.ssh/known_hosts, maybe corrupt?")
 
         """ the next block reorganizes all host parameters into a
-        dictionary like SSHConfig does. this dictionary 'self.config' 
+        dictionary like SSHConfig does. this dictionary 'self.config'
         becomes the authorative source for these values from here on.
-        rationale is that it is easiest to deal wrt overwriting multiple 
+        rationale is that it is easiest to deal wrt overwriting multiple
         values from ssh_config file. (ede 03/2012)
         """
         self.config={'hostname':parsed_url.hostname}
@@ -203,11 +203,11 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         password = self.get_password()
 
         try:
-            self.client.connect(hostname=self.config['hostname'], 
-                                port=self.config['port'], 
-                                username=self.config['user'], 
+            self.client.connect(hostname=self.config['hostname'],
+                                port=self.config['port'],
+                                username=self.config['user'],
                                 password=password,
-                                allow_agent=True, 
+                                allow_agent=True,
                                 look_for_keys=True,
                                 key_filename=self.config['identityfile'])
         except Exception as e:
@@ -217,8 +217,11 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                                     self.config['port'],e))
         self.client.get_transport().set_keepalive((int)(globals.timeout / 2))
 
+        self.scheme = duplicity.backend.strip_prefix(parsed_url.scheme, 'paramiko')
+        self.use_scp = ( self.scheme == 'scp' )
+
         # scp or sftp?
-        if (globals.use_scp):
+        if (self.use_scp):
             # sanity-check the directory name
             if (re.search("'",self.remote_dir)):
                 raise BackendException("cannot handle directory names with single quotes with --use-scp!")
@@ -256,7 +259,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                         raise BackendException("sftp chdir to %s failed: %s" % (self.sftp.normalize(".")+"/"+d,e))
 
     def _put(self, source_path, remote_filename):
-        if globals.use_scp:
+        if self.use_scp:
             f=file(source_path.name,'rb')
             try:
                 chan=self.client.get_transport().open_session()
@@ -284,7 +287,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
             self.sftp.put(source_path.name,remote_filename)
 
     def _get(self, remote_filename, local_path):
-        if globals.use_scp:
+        if self.use_scp:
             try:
                 chan=self.client.get_transport().open_session()
                 chan.settimeout(globals.timeout)
@@ -327,7 +330,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
     def _list(self):
         # In scp mode unavoidable quoting issues will make this fail if the
         # directory name contains single quotes.
-        if globals.use_scp:
+        if self.use_scp:
             output = self.runremote("ls -1 '%s'" % self.remote_dir, False, "scp dir listing ")
             return output.splitlines()
         else:
@@ -336,7 +339,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
     def _delete(self, filename):
         # In scp mode unavoidable quoting issues will cause failures if
         # filenames containing single quotes are encountered.
-        if globals.use_scp:
+        if self.use_scp:
             self.runremote("rm '%s/%s'" % (self.remote_dir, filename), False, "scp rm ")
         else:
             self.sftp.remove(filename)
@@ -358,15 +361,21 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
 
     def gethostconfig(self, file, host):
         import paramiko
-        
+
         file = os.path.expanduser(file)
         if not os.path.isfile(file):
             return {}
-        
+
         sshconfig = paramiko.SSHConfig()
         try:
             sshconfig.parse(open(file))
         except Exception as e:
             raise BackendException("could not load '%s', maybe corrupt?" % (file))
-        
+
         return sshconfig.lookup(host)
+
+duplicity.backend.register_backend("sftp", SSHParamikoBackend)
+duplicity.backend.register_backend("scp", SSHParamikoBackend)
+duplicity.backend.register_backend("paramiko+sftp", SSHParamikoBackend)
+duplicity.backend.register_backend("paramiko+scp", SSHParamikoBackend)
+duplicity.backend.uses_netloc.extend([ 'sftp', 'scp', 'paramiko+sftp', 'paramiko+scp' ])

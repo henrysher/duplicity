@@ -36,8 +36,6 @@ from duplicity import log
 from duplicity import util
 from duplicity.errors import BackendException
 
-from dropbox import client, rest, session
-
 
 # You can register your own developer account with Dropbox and
 # register a new application for yourself, obtaining the new
@@ -96,6 +94,9 @@ class DPBXBackend(duplicity.backend.Backend):
     """Connect to remote store using Dr*pB*x service"""
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
+        
+        global client, rest, session
+        from dropbox import client, rest, session
 
         class StoredSession(session.DropboxSession):
             """a wrapper around DropboxSession that stores a token to a file on disk"""

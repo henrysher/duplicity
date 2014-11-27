@@ -87,7 +87,7 @@ class FinalTest(FunctionalTestCase):
                               restore_options = restore_options)
 
     def test_asym_with_hidden_recipient_cycle(self):
-        """Like test_basic_cycle but use asymmetric encryption (hidding key id) and signing"""
+        """Like test_basic_cycle but use asymmetric encryption (hiding key id) and signing"""
         backup_options = ["--hidden-encrypt-key", self.encrypt_key1,
                           "--sign-key", self.sign_key]
         restore_options = ["--hidden-encrypt-key", self.encrypt_key1,

@@ -19,6 +19,7 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import os
+import sys
 import subprocess
 import unittest
 
@@ -35,6 +36,8 @@ class CodeTest(DuplicityTestCase):
         self.assertTrue(process.returncode in returncodes, output)
         self.assertEqual("", output, output)
 
+    @unittest.skipUnless(os.getenv('RUN_CODE_TESTS', None) == '1',
+                         'Must set environment var RUN_CODE_TESTS=1')
     def test_2to3(self):
         # As we modernize the source code, we can remove more and more nofixes
         self.run_checker(["2to3",
@@ -54,6 +57,8 @@ class CodeTest(DuplicityTestCase):
                           "--nofix=xrange",
                           _top_dir])
 
+    @unittest.skipUnless(os.getenv('RUN_CODE_TESTS', None) == '1',
+                         'Must set environment var RUN_CODE_TESTS=1')
     def test_pylint(self):
         self.run_checker(["pylint",
                           "-E",
@@ -71,6 +76,8 @@ class CodeTest(DuplicityTestCase):
                          # --msg-template
                          [0, 32])
 
+    @unittest.skipUnless(os.getenv('RUN_CODE_TESTS', None) == '1',
+                         'Must set environment var RUN_CODE_TESTS=1')
     def test_pep8(self):
         # All these ignores are just because when this test was added, I didn't
         # want to fix all of the code.  Over time we can remove some of these

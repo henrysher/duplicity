@@ -225,7 +225,7 @@ class FTPBackendTest(BackendInstanceBase):
         os.makedirs('testfiles/output')
         url = 'ftp://user:pass@hostname/testfiles/output'
         self.backend = duplicity.backend.get_backend_object(url)
-        self.assertEqual(self.backend.__class__.__name__, 'FTPBackend')
+        self.assertEqual(self.backend.__class__.__name__, 'LFTPBackend')
 
 
 class FTPSBackendTest(BackendInstanceBase):
@@ -234,7 +234,7 @@ class FTPSBackendTest(BackendInstanceBase):
         os.makedirs('testfiles/output')
         url = 'ftps://user:pass@hostname/testfiles/output'
         self.backend = duplicity.backend.get_backend_object(url)
-        self.assertEqual(self.backend.__class__.__name__, 'FTPBackend')
+        self.assertEqual(self.backend.__class__.__name__, 'LFTPBackend')
 
 
 if __name__ == "__main__":

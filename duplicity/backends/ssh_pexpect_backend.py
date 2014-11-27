@@ -50,6 +50,9 @@ class SSHPExpectBackend(duplicity.backend.Backend):
         self.sftp_command = "sftp"
         if globals.sftp_command: self.sftp_command = globals.sftp_command
 
+        self.scheme = duplicity.backend.strip_prefix(parsed_url.scheme, 'pexpect')
+        self.use_scp = ( self.scheme == 'scp' )
+
         # host string of form [user@]hostname
         if parsed_url.username:
             self.host_string = parsed_url.username + "@" + parsed_url.hostname
@@ -212,7 +215,7 @@ class SSHPExpectBackend(duplicity.backend.Backend):
             raise BackendException("Error running '%s': %s" % (commandline, msg))
 
     def _put(self, source_path, remote_filename):
-        if globals.use_scp:
+        if self.use_scp:
             self.put_scp(source_path, remote_filename)
         else:
             self.put_sftp(source_path, remote_filename)
@@ -234,7 +237,7 @@ class SSHPExpectBackend(duplicity.backend.Backend):
         self.run_scp_command(commandline)
 
     def _get(self, remote_filename, local_path):
-        if globals.use_scp:
+        if self.use_scp:
             self.get_scp(remote_filename, local_path)
         else:
             self.get_sftp(remote_filename, local_path)
@@ -280,3 +283,7 @@ class SSHPExpectBackend(duplicity.backend.Backend):
         commands.append("rm \"%s\"" % filename)
         commandline = ("%s %s %s" % (self.sftp_command, globals.ssh_options, self.host_string))
         self.run_sftp_command(commandline, commands)
+
+duplicity.backend.register_backend("pexpect+sftp", SSHPExpectBackend)
+duplicity.backend.register_backend("pexpect+scp", SSHPExpectBackend)
+duplicity.backend.uses_netloc.extend([ 'pexpect+sftp', 'pexpect+scp' ])
