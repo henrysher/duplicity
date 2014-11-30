@@ -77,13 +77,13 @@ Hints:
   Consider using the options --ssl-cacert-file, --ssl-no-check-certificate .""" % ", ".join(cacert_candidates) )
             # check if file is accessible (libssl errors are not very detailed)
             if not os.access(self.cacert_file, os.R_OK):
-                raise FatalBackendException("Cacert database file '%s' is not readable." % cacert_file)
+                raise FatalBackendException("Cacert database file '%s' is not readable." % self.cacert_file)
 
         def connect(self):
             # create new socket
             sock = socket.create_connection((self.host, self.port),
                                             self.timeout)
-            if self.tunnel_host:
+            if self._tunnel_host:
                 self.sock = sock
                 self.tunnel()
 

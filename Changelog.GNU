@@ -1,3 +1,9 @@
+2014-11-30  Kenneth Loafman  <kenneth@loafman.com>
+
+    * In webdavbackend.py:
+      - Fixed bug 1396106 with change by Tim Ruffing, mispelled member.
+      - Added missing 'self.' before member in error message.
+
 2014-11-20  Kenneth Loafman  <kenneth@loafman.com>
 
     * Undid move of testing/test_code.py.  Instead I fixed it

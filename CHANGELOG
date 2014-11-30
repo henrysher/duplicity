@@ -26,6 +26,9 @@ Enhancements:
   - Fix some pylint/pep8 nits that prevented the test_code.py test from passing.
 * Merged in lp:~mterry/duplicity/debian-dir
   - Add a debian/ directory to make it easier to manage the PPAs for duplicity.
+* In webdavbackend.py:
+  - Fixed bug 1396106 with change by Tim Ruffing, mispelled member.
+  - Added missing 'self.' before member in error message.
 
 
 New in v0.7.00 (2014/10/23)
