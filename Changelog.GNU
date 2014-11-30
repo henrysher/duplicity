@@ -5,6 +5,8 @@
       - Added missing 'self.' before member in error message.
     * Merged in lp:~adrien-delhorme/duplicity/hubic
       - Add Hubic support through pyrax and a custom pyrax_identity module.
+    * Fixed bug 1385599 with changes by Yannick Molin. SSL settings are now
+      conditioned on protocol ftp or ftps.
 
 2014-11-20  Kenneth Loafman  <kenneth@loafman.com>
 

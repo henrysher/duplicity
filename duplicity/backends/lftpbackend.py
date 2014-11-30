@@ -108,9 +108,12 @@ Hints:
         os.write(self.tempfile, "set ssl:verify-certificate " + ( "false" if globals.ssl_no_check_certificate else "true" ) + "\n")
         if globals.ssl_cacert_file :
             os.write(self.tempfile, "set ssl:ca-file '" + globals.ssl_cacert_file + "'\n")
-        os.write(self.tempfile, "set ftp:ssl-allow true\n")
-        os.write(self.tempfile, "set ftp:ssl-protect-data true\n")
-        os.write(self.tempfile, "set ftp:ssl-protect-list true\n")
+        if self.parsed_url.scheme == 'ftps':
+            os.write(self.tempfile, "set ftp:ssl-allow true\n")
+            os.write(self.tempfile, "set ftp:ssl-protect-data true\n")
+            os.write(self.tempfile, "set ftp:ssl-protect-list true\n")
+        else:
+            os.write(self.tempfile, "set ftp:ssl-allow false\n")
         os.write(self.tempfile, "set http:use-propfind true\n")
         os.write(self.tempfile, "set net:timeout %s\n" % globals.timeout)
         os.write(self.tempfile, "set net:max-retries %s\n" % globals.num_retries)
