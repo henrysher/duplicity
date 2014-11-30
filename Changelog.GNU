@@ -3,6 +3,8 @@
     * In webdavbackend.py:
       - Fixed bug 1396106 with change by Tim Ruffing, mispelled member.
       - Added missing 'self.' before member in error message.
+    * Merged in lp:~adrien-delhorme/duplicity/hubic
+      - Add Hubic support through pyrax and a custom pyrax_identity module.
 
 2014-11-20  Kenneth Loafman  <kenneth@loafman.com>
 

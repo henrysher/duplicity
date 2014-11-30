@@ -64,7 +64,7 @@ Some backends also require additional components (probably available as packages
 .B Cloud Files Python API (deprecated)
 - http://www.rackspace.com/knowledge_center/article/python-api-installation-for-cloud-files
 .TP
-.BR "cfpyrax backend" " (Rackspace Cloud)"
+.BR "cfpyrax backend" " (Rackspace Cloud) and " "hubic backend" " (hubic.com)"
 .B Rackspace CloudFiles Pyrax API
 - http://docs.rackspace.com/sdks/guide/content/python.html
 .TP
@@ -1143,6 +1143,15 @@ gs://bucket[/prefix]
 hsi://user[:password]@other.host/some_dir
 .RE
 .PP
+.B "hubiC"
+.PP
+.RS
+cf+hubic://container_name
+.PP
+See also
+.B "A NOTE ON HUBIC"
+.RE
+.PP
 .B "IMAP email storage"
 .PP
 .RS
@@ -1634,6 +1643,25 @@ https://code.google.com/apis/console#:storage
 .br
 Create Access Keys:
 https://code.google.com/apis/console#:storage:legacy
+
+.SH A NOTE ON HUBIC
+The hubic backend requires the pyrax library to be installed on the system. See REQUIREMENTS above. 
+You will need to set your credentials for hubiC in a file called ~/.hubic_credentials, following this
+pattern:
+.PP
+.RS
+[hubic]
+.br
+email = your_email
+.br
+password = your_password
+.br
+client_id = api_client_id
+.br
+client_secret = api_secret_key
+.br
+redirect_uri = http://localhost/
+.RE
 
 .SH A NOTE ON IMAP
 An IMAP account can be used as a target for the upload.  The userid may
