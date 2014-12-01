@@ -1,6 +1,8 @@
 2014-12-01  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug 1236248 with changes by az, manpage warning about --extra-clean.
+    * Fixed bug 1255453 with changes by Gaudenz Steinlin, report backend import
+      results, both normal and failed, at INFO log level.
 
 2014-11-30  Kenneth Loafman  <kenneth@loafman.com>
 

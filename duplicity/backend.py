@@ -105,11 +105,9 @@ def import_backends():
             try:
                 __import__(imp)
                 res = "Succeeded"
-                level = log.INFO
             except Exception:
                 res = "Failed: " + str(sys.exc_info()[1])
-                level = log.WARNING
-            log.Log(_("Import of %s %s") % (imp, res), level)
+            log.Log(_("Import of %s %s") % (imp, res), log.INFO)
         else:
             continue
 
@@ -497,7 +495,7 @@ class BackendWrapper(object):
     Represents a generic duplicity backend, capable of storing and
     retrieving files.
     """
-    
+
     def __init__(self, backend):
         self.backend = backend
 
