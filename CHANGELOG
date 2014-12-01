@@ -1,4 +1,4 @@
-New in v0.7.01 (2014/11/??)
+New in v0.7.01 (2014/12/??)
 ---------------------------
 Enhancements:
 * Undid move of testing/test_code.py.  Instead I fixed it
@@ -33,6 +33,7 @@ Enhancements:
   - Add Hubic support through pyrax and a custom pyrax_identity module.
 * Fixed bug 1385599 with changes by Yannick Molin. SSL settings are now
   conditioned on protocol ftp or ftps.
+* Fixed bug 1236248 with changes by az, manpage warning about --extra-clean.
 
 
 New in v0.7.00 (2014/10/23)

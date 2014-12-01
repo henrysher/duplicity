@@ -1,3 +1,7 @@
+2014-12-01  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug 1236248 with changes by az, manpage warning about --extra-clean.
+
 2014-11-30  Kenneth Loafman  <kenneth@loafman.com>
 
     * In webdavbackend.py:
