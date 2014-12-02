@@ -1,6 +1,7 @@
 2014-12-01  Kenneth Loafman  <kenneth@loafman.com>
 
-    * Fixed bug 1236248 with changes by az, manpage warning about --extra-clean.
+    * Partial fix of bug 1236248 with changes by az, manpage warning about
+      --extra-clean, however, recovery with missing sig files is broken.
     * Fixed bug 1255453 with changes by Gaudenz Steinlin, report backend import
       results, both normal and failed, at INFO log level.
 

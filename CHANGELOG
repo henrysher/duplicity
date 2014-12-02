@@ -33,7 +33,8 @@ Enhancements:
   - Add Hubic support through pyrax and a custom pyrax_identity module.
 * Fixed bug 1385599 with changes by Yannick Molin. SSL settings are now
   conditioned on protocol ftp or ftps.
-* Fixed bug 1236248 with changes by az, manpage warning about --extra-clean.
+* Partial fix of bug 1236248 with changes by az, manpage warning about
+  --extra-clean, however, recovery with missing sig files is broken.
 * Fixed bug 1255453 with changes by Gaudenz Steinlin, report backend import
   results, both normal and failed, at INFO log level.
 
