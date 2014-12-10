@@ -323,25 +323,30 @@ def GPGWriteFile(block_iter, filename, profile,
     data_size = target_size - max_footer_size
     file = GPGFile(True, path.Path(filename), profile)
     at_end_of_blockiter = 0
-    while True:
-        bytes_to_go = data_size - get_current_size()
-        if bytes_to_go < block_iter.get_read_size():
-            break
-        try:
-            data = block_iter.next().data
-        except StopIteration:
-            at_end_of_blockiter = 1
-            break
-        file.write(data)
+    try:
+        while True:
+            bytes_to_go = data_size - get_current_size()
+            if bytes_to_go < block_iter.get_read_size():
+                break
+            try:
+                data = block_iter.next().data
+            except StopIteration:
+                at_end_of_blockiter = 1
+                break
+            file.write(data)
 
-    file.write(block_iter.get_footer())
-    if not at_end_of_blockiter:
-        # don't pad last volume
-        cursize = get_current_size()
-        if cursize < target_size:
-            top_off(target_size - cursize, file)
-    file.close()
-    return at_end_of_blockiter
+        file.write(block_iter.get_footer())
+        if not at_end_of_blockiter:
+            # don't pad last volume
+            cursize = get_current_size()
+            if cursize < target_size:
+                top_off(target_size - cursize, file)
+        file.close()
+        return at_end_of_blockiter
+    except Exception:
+        # ensure that GPG processing terminates
+        file.close()
+        raise
 
 
 def GzipWriteFile(block_iter, filename,

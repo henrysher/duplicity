@@ -37,6 +37,8 @@ Enhancements:
   --extra-clean, however, recovery with missing sig files is broken.
 * Fixed bug 1255453 with changes by Gaudenz Steinlin, report backend import
   results, both normal and failed, at INFO log level.
+* Manually merged in lp:~m4ktub/duplicity/0.6-reliability
+  - Per fix proposed in Bug #1395341.
 
 
 New in v0.7.00 (2014/10/23)

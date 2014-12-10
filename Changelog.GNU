@@ -1,3 +1,8 @@
+2014-12-10  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Manually merged in lp:~m4ktub/duplicity/0.6-reliability
+      - Per fix proposed in Bug #1395341.
+
 2014-12-01  Kenneth Loafman  <kenneth@loafman.com>
 
     * Partial fix of bug 1236248 with changes by az, manpage warning about
