@@ -2,6 +2,7 @@
 
     * Manually merged in lp:~m4ktub/duplicity/0.6-reliability
       - Per fix proposed in Bug #1395341.
+    * Modded .bzrignore to ignore *.egg test dependencies, normalized, sorted.
 
 2014-12-01  Kenneth Loafman  <kenneth@loafman.com>
 
