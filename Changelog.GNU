@@ -1,3 +1,9 @@
+2014-12-11  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~ed.so/duplicity/paramiko.identyfile
+      - fix identity file parsing of --ssh-options for paramiko
+      - manpage fixes
+
 2014-12-10  Kenneth Loafman  <kenneth@loafman.com>
 
     * Manually merged in lp:~m4ktub/duplicity/0.6-reliability

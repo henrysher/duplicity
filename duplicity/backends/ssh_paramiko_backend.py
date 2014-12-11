@@ -172,10 +172,10 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
             self.config.update({'port':int(self.config['port'])})
         else:
             self.config.update({'port':22})
-        # alternative ssh private key, identity file
-        m=re.search("-oidentityfile=(\S+)",globals.ssh_options,re.I)
+        # parse ssh options for alternative ssh private key, identity file
+        m=re.search("^(?:.+\s+)?(?:-oIdentityFile=|-i\s+)(([\"'])([^\\2]+)\\2|[\S]+).*",globals.ssh_options)
         if (m!=None):
-            keyfilename=m.group(1)
+            keyfilename=m.group(3) if m.group(3) else m.group(1)
             self.config['identityfile'] = keyfilename
         # ensure ~ is expanded and identity exists in dictionary
         if 'identityfile' in self.config:

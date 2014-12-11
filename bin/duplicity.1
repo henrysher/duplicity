@@ -60,10 +60,6 @@ Some backends also require additional components (probably available as packages
 .B boto version 2.0+
 - http://github.com/boto/boto
 .TP
-.BR "cloudfiles backend (deprecated)" " (e.g. Rackspace Open Cloud)"
-.B Cloud Files Python API (deprecated)
-- http://www.rackspace.com/knowledge_center/article/python-api-installation-for-cloud-files
-.TP
 .BR "cfpyrax backend" " (Rackspace Cloud) and " "hubic backend" " (hubic.com)"
 .B Rackspace CloudFiles Pyrax API
 - http://docs.rackspace.com/sdks/guide/content/python.html
@@ -671,7 +667,7 @@ Write specially-formatted versions of output messages to the specified file.
 The format used is designed to be easily consumable by other programs.
 
 .TP
-.BI "--max_blocksize " number
+.BI "--max-blocksize " number
 determines the number of the blocks examined for changes during the diff process.
 For files < 1MB the blocksize is a constant of 512.
 For files over 1MB the size is given by:
@@ -910,22 +906,32 @@ See also
 
 .TP
 .BI "--ssh-options " options
-Allows you to pass options to the ssh backend.  The
+Allows you to pass options to the ssh backend.
+Can be specified multiple times or as a space separated options list.
+The
 .I options
-list should be of the form "-oOpt1=parm1 -oOpt2=parm2" where the option string is
+list should be of the form "-oOpt1='parm1' -oOpt2='parm2'" where the option string is
 quoted and the only spaces allowed are between options. The option string
 will be passed verbatim to both scp and sftp, whose command line syntax
 differs slightly hence the options should therefore be given in the long option format described in
-.BR ssh_config(5) ,
-like in this example:
+.BR ssh_config(5).
 
-duplicity --ssh-options="-oProtocol=2 -oIdentityFile=/my/backup/id" /home/me scp://uid@other.host/some_dir
+example of a list:
+
+duplicity --ssh-options="-oProtocol=2 -oIdentityFile='/my/backup/id'" /home/me scp://user@host/some_dir
+
+example with multiple parameters:
+
+duplicity --ssh-options="-oProtocol=2" --ssh-options="-oIdentityFile='/my/backup/id'" /home/me scp://user@host/some_dir
 
 .B NOTE:
-.I ssh paramiko backend
+The
+.I "ssh paramiko backend"
 currently supports only the
+.B -i
+or
 .B -oIdentityFile
-setting.
+setting. If needed provide more host specific options via ssh_config file.
 .RE
 
 .TP

@@ -40,6 +40,9 @@ Enhancements:
 * Manually merged in lp:~m4ktub/duplicity/0.6-reliability
   - Per fix proposed in Bug #1395341.
 * Modded .bzrignore to ignore *.egg test dependencies, normalized, sorted.
+* Merged in lp:~ed.so/duplicity/paramiko.identyfile
+  - fix identity file parsing of --ssh-options for paramiko
+  - manpage fixes
 
 
 New in v0.7.00 (2014/10/23)
