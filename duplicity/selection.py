@@ -21,16 +21,16 @@
 
 from future_builtins import filter, map
 
-import os #@UnusedImport
-import re #@UnusedImport
-import stat #@UnusedImport
+import os  # @UnusedImport
+import re  # @UnusedImport
+import stat  # @UnusedImport
 import sys
 
-from duplicity.path import * #@UnusedWildImport
-from duplicity import log #@Reimport
-from duplicity import globals #@Reimport
+from duplicity.path import *  # @UnusedWildImport
+from duplicity import log  # @Reimport
+from duplicity import globals  # @Reimport
 from duplicity import diffdir
-from duplicity import util #@Reimport
+from duplicity import util  # @Reimport
 
 """Iterate exactly the requested files in a directory
 
@@ -98,7 +98,7 @@ class Select:
 
     def set_iter(self):
         """Initialize generator, prepare to iterate."""
-        self.rootpath.setdata() # this may have changed since Select init
+        self.rootpath.setdata()  # this may have changed since Select init
         self.iter = self.Iterate(self.rootpath)
         self.next = self.iter.next
         self.__iter__ = lambda: self
@@ -140,7 +140,7 @@ class Select:
 
             """
             # todo: get around circular dependency issue by importing here
-            from duplicity import robust #@Reimport
+            from duplicity import robust  # @Reimport
             for filename in robust.listpath(path):
                 new_path = robust.check_common_error(
                     error_handler, Path.append, (path, filename))
@@ -151,7 +151,7 @@ class Select:
                              log.WarningCode.cannot_read,
                              util.escape(new_path.name))
                     if diffdir.stats:
-                        diffdir.stats.Errors +=1
+                        diffdir.stats.Errors += 1
                     new_path = None
                 elif new_path:
                     s = self.Select(new_path)
@@ -162,7 +162,7 @@ class Select:
 
         if not path.type:
             # base doesn't exist
-            log.Warn(_("Warning: base %s doesn't exist, continuing") %
+            log.Warn(_("Warning: base %s doesn't exist, continuing") % 
                      util.ufn(path.name))
             return
         log.Debug(_("Selecting %s") % util.ufn(path.name))
@@ -272,7 +272,7 @@ class Select:
 cannot match any files in the base directory
     %s
 Useful file specifications begin with the base directory or some
-pattern (such as '**') which matches the base directory.""") %
+pattern (such as '**') which matches the base directory.""") % 
             (exc, util.ufn(self.prefix)), log.ErrorCode.file_prefix_error)
         elif isinstance(exc, GlobbingError):
             log.FatalError(_("Fatal Error while processing expression\n"
@@ -289,11 +289,11 @@ pattern (such as '**') which matches the base directory.""") %
     %s
 only specifies that files be included.  Because the default is to
 include all files, the expression is redundant.  Exiting because this
-probably isn't what you meant.""") %
+probably isn't what you meant.""") % 
             (self.selection_functions[-1].name,),
             log.ErrorCode.redundant_inclusion)
 
-    def add_selection_func(self, sel_func, add_to_start = None):
+    def add_selection_func(self, sel_func, add_to_start=None):
         """Add another selection function at the end or beginning"""
         if add_to_start:
             self.selection_functions.insert(0, sel_func)
@@ -315,7 +315,7 @@ probably isn't what you meant.""") %
                     self.filelist_read(filelist_fp, inc_default, filelist_name)
         log.Notice(_("Sorting filelist %s") % filelist_name)
         tuple_list.sort()
-        i = [0] # We have to put index in list because of stupid scoping rules
+        i = [0]  # We have to put index in list because of stupid scoping rules
 
         def selection_function(path):
             while 1:
@@ -326,7 +326,7 @@ probably isn't what you meant.""") %
                 if move_on:
                     i[0] += 1
                     if include is None:
-                        continue # later line may match
+                        continue  # later line may match
                 return include
 
         selection_function.exclude = something_excluded or inc_default == 0
@@ -341,7 +341,7 @@ probably isn't what you meant.""") %
             prefix_warnings[0] += 1
             if prefix_warnings[0] < 6:
                 log.Warn(_("Warning: file specification '%s' in filelist %s\n"
-                           "doesn't start with correct prefix %s.  Ignoring.") %
+                           "doesn't start with correct prefix %s.  Ignoring.") % 
                          (exc, filelist_name, util.ufn(self.prefix)))
                 if prefix_warnings[0] == 5:
                     log.Warn(_("Future prefix errors will not be logged."))
@@ -350,7 +350,7 @@ probably isn't what you meant.""") %
         separator = globals.null_separator and "\0" or "\n"
         for line in filelist_fp.read().split(separator):
             if not line:
-                continue # skip blanks
+                continue  # skip blanks
             try:
                 tuple = self.filelist_parse_line(line, include)
             except FilePrefixError as exc:
@@ -383,8 +383,8 @@ probably isn't what you meant.""") %
 
         if not line.startswith(self.prefix):
             raise FilePrefixError(line)
-        line = line[len(self.prefix):] # Discard prefix
-        index = tuple(filter(lambda x: x, line.split("/"))) # remove empties
+        line = line[len(self.prefix):]  # Discard prefix
+        index = tuple(filter(lambda x: x, line.split("/")))  # remove empties
         return (index, include)
 
     def filelist_pair_match(self, path, pair):
@@ -405,16 +405,16 @@ probably isn't what you meant.""") %
             if index == path.index:
                 return (1, True)
             elif index[:len(path.index)] == path.index:
-                return (1, False) # /foo/bar implicitly includes /foo
+                return (1, False)  # /foo/bar implicitly includes /foo
             else:
-                return (None, False) # path greater, not initial sequence
+                return (None, False)  # path greater, not initial sequence
         elif include == 0:
             if path.index[:len(index)] == index:
-                return (0, False) # /foo implicitly excludes /foo/bar
+                return (0, False)  # /foo implicitly excludes /foo/bar
             elif index < path.index:
                 return (None, True)
             else:
-                return (None, False) # path greater, not initial sequence
+                return (None, False)  # path greater, not initial sequence
         else:
             assert 0, "Include is %s, should be 0 or 1" % (include,)
 
@@ -430,9 +430,9 @@ probably isn't what you meant.""") %
         log.Notice(_("Reading globbing filelist %s") % list_name)
         separator = globals.null_separator and "\0" or "\n"
         for line in filelist_fp.read().split(separator):
-            if not line: # skip blanks
+            if not line:  # skip blanks
                 continue
-            if line[0] == "#": # skip comments
+            if line[0] == "#":  # skip comments
                 continue
             if line[:2] == "+ ":
                 yield self.glob_get_sf(line[2:], 1)
@@ -549,13 +549,13 @@ probably isn't what you meant.""") %
         def include_sel_func(path):
             if (path.index == tuple[:len(path.index)] or
                     path.index[:len(tuple)] == tuple):
-                return 1 # /foo/bar implicitly matches /foo, vice-versa
+                return 1  # /foo/bar implicitly matches /foo, vice-versa
             else:
                 return None
 
         def exclude_sel_func(path):
             if path.index[:len(tuple)] == tuple:
-                return 0 # /foo excludes /foo/bar, not vice-versa
+                return 0  # /foo excludes /foo/bar, not vice-versa
             else:
                 return None
 
@@ -592,9 +592,9 @@ probably isn't what you meant.""") %
         glob_comp_re = re_comp("^%s($|/)" % self.glob_to_re(glob_str))
 
         if glob_str.find("**") != -1:
-            glob_str = glob_str[:glob_str.find("**")+2] # truncate after **
+            glob_str = glob_str[:glob_str.find("**") + 2]  # truncate after **
 
-        scan_comp_re = re_comp("^(%s)$" %
+        scan_comp_re = re_comp("^(%s)$" % 
                                "|".join(self.glob_get_prefix_res(glob_str)))
 
         def include_sel_func(path):
@@ -628,7 +628,7 @@ probably isn't what you meant.""") %
             raise GlobbingError("Consecutive '/'s found in globbing string "
                                 + glob_str)
 
-        prefixes = ["/".join(glob_parts[:i+1]) for i in range(len(glob_parts))]
+        prefixes = ["/".join(glob_parts[:i + 1]) for i in range(len(glob_parts))]
         # we must make exception for root "/", only dir to end in slash
         if prefixes[0] == "":
             prefixes[0] = "/"
@@ -647,8 +647,8 @@ probably isn't what you meant.""") %
         """
         i, n, res = 0, len(pat), ''
         while i < n:
-            c, s = pat[i], pat[i:i+2]
-            i = i+1
+            c, s = pat[i], pat[i:i + 2]
+            i = i + 1
             if s == '**':
                 res = res + '.*'
                 i = i + 1
@@ -659,17 +659,17 @@ probably isn't what you meant.""") %
             elif c == '[':
                 j = i
                 if j < n and pat[j] in '!^':
-                    j = j+1
+                    j = j + 1
                 if j < n and pat[j] == ']':
-                    j = j+1
+                    j = j + 1
                 while j < n and pat[j] != ']':
-                    j = j+1
+                    j = j + 1
                 if j >= n:
-                    res = res + '\\[' # interpret the [ literally
+                    res = res + '\\['  # interpret the [ literally
                 else:
                     # Deal with inside of [..]
-                    stuff = pat[i:j].replace('\\','\\\\')
-                    i = j+1
+                    stuff = pat[i:j].replace('\\', '\\\\')
+                    i = j + 1
                     if stuff[0] in '!^':
                         stuff = '^' + stuff[1:]
                     res = res + '[' + stuff + ']'

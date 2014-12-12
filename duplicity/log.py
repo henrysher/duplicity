@@ -63,7 +63,7 @@ def Log(s, verb_level, code=1, extra=None, force_print=False):
     else:
         controlLine = '%d' % (code)
     if not s:
-        s = '' # If None is passed, standard logging would render it as 'None'
+        s = ''  # If None is passed, standard logging would render it as 'None'
 
     if force_print:
         initial_level = _logger.getEffectiveLevel()
@@ -122,8 +122,8 @@ def Progress(s, current, total=None):
 
 def _ElapsedSecs2Str(secs):
     tdelta = datetime.timedelta(seconds=secs)
-    hours,rem = divmod(tdelta.seconds, 3600)
-    minutes,seconds = divmod(rem, 60)
+    hours, rem = divmod(tdelta.seconds, 3600)
+    minutes, seconds = divmod(rem, 60)
     fmt = ""
     if tdelta.days > 0:
         fmt = "%dd," % (tdelta.days)
@@ -132,8 +132,8 @@ def _ElapsedSecs2Str(secs):
 
 def _RemainingSecs2Str(secs):
     tdelta = datetime.timedelta(seconds=secs)
-    hours,rem = divmod(tdelta.seconds, 3600)
-    minutes,seconds = divmod(rem, 60)
+    hours, rem = divmod(tdelta.seconds, 3600)
+    minutes, seconds = divmod(rem, 60)
     fmt = ""
     if tdelta.days > 0:
         fmt = "%dd" % (tdelta.days)
@@ -163,7 +163,7 @@ def _RemainingSecs2Str(secs):
 
 def TransferProgress(progress, eta, changed_bytes, elapsed, speed, stalled):
     """Shortcut used for upload progress messages (verbosity 5)."""
-    dots = int(0.4 * progress) # int(40.0 * progress / 100.0) -- for 40 chars
+    dots = int(0.4 * progress)  # int(40.0 * progress / 100.0) -- for 40 chars
     data_amount = float(changed_bytes) / 1024.0
     data_scale = "KB"
     if data_amount > 1000.0:
@@ -187,10 +187,10 @@ def TransferProgress(progress, eta, changed_bytes, elapsed, speed, stalled):
             speed_amount /= 1024.0
             speed_scale = "GB"
     s = "%.1f%s %s [%.1f%s/s] [%s>%s] %d%% ETA %s" % (data_amount, data_scale,
-                                                            _ElapsedSecs2Str(elapsed), 
-                                                            speed_amount, speed_scale, 
-                                                            '='*dots, ' '*(40-dots), 
-                                                            progress, 
+                                                            _ElapsedSecs2Str(elapsed),
+                                                            speed_amount, speed_scale,
+                                                            '=' * dots, ' ' * (40 - dots),
+                                                            progress,
                                                             eta_str
                                                           )
 
@@ -216,7 +216,7 @@ class WarningCode:
     unmatched_sig = 4
     incomplete_backup = 5
     orphaned_backup = 6
-    ftp_ncftp_v320 = 7 # moved from error
+    ftp_ncftp_v320 = 7  # moved from error
     cannot_iterate = 8
     cannot_stat = 9
     cannot_read = 10
@@ -233,7 +233,7 @@ class ErrorCode:
        These values should never change, as frontends rely upon them.
        Don't use 0 or negative numbers.  This code is returned by duplicity
        to indicate which error occurred via both exit code and log."""
-    generic = 1 # Don't use if possible, please create a new code and use it
+    generic = 1  # Don't use if possible, please create a new code and use it
     command_line = 2
     hostname_mismatch = 3
     no_manifests = 4
@@ -273,13 +273,13 @@ class ErrorCode:
     connection_failed = 38
     restart_file_not_found = 39
     gio_not_available = 40
-    source_dir_mismatch = 42 # 41 is reserved for par2
+    source_dir_mismatch = 42  # 41 is reserved for par2
     ftps_lftp_missing = 43
     volume_wrong_size = 44
     enryption_mismatch = 45
     pythonoptimize_set = 46
 
-    dpbx_nologin       = 47
+    dpbx_nologin = 47
 
     # 50->69 reserved for backend errors
     backend_error = 50
@@ -287,7 +287,7 @@ class ErrorCode:
     backend_not_found = 52
     backend_no_space = 53
     backend_command_error = 54
-    backend_code_error    = 55
+    backend_code_error = 55
 
     # Reserve 126 because it is used as an error code for pkexec
     # Reserve 127 because it is used as an error code for pkexec

@@ -31,9 +31,9 @@ class GPGTest(UnitTestCase):
     def setUp(self):
         super(GPGTest, self).setUp()
         self.unpack_testfiles()
-        self.default_profile = gpg.GPGProfile(passphrase = "foobar")
+        self.default_profile = gpg.GPGProfile(passphrase="foobar")
 
-    def gpg_cycle(self, s, profile = None):
+    def gpg_cycle(self, s, profile=None):
         """Test encryption/decryption cycle on string s"""
         epath = path.Path("testfiles/output/encrypted_file")
         if not profile:
@@ -68,33 +68,33 @@ class GPGTest(UnitTestCase):
 
     def test_gpg_asym(self):
         """Test GPG asymmetric encryption"""
-        profile = gpg.GPGProfile(passphrase = self.sign_passphrase,
-                                 recipients = [self.encrypt_key1,
+        profile = gpg.GPGProfile(passphrase=self.sign_passphrase,
+                                 recipients=[self.encrypt_key1,
                                                self.encrypt_key2])
         self.gpg_cycle("aoensutha aonetuh saoe", profile)
 
-        profile2 = gpg.GPGProfile(passphrase = self.sign_passphrase,
-                                  recipients = [self.encrypt_key1])
+        profile2 = gpg.GPGProfile(passphrase=self.sign_passphrase,
+                                  recipients=[self.encrypt_key1])
         self.gpg_cycle("aoeu" * 10000, profile2)
 
     def test_gpg_hidden_asym(self):
         """Test GPG asymmetric encryption with hidden key id"""
-        profile = gpg.GPGProfile(passphrase = self.sign_passphrase,
-                                 hidden_recipients = [self.encrypt_key1,
+        profile = gpg.GPGProfile(passphrase=self.sign_passphrase,
+                                 hidden_recipients=[self.encrypt_key1,
                                                       self.encrypt_key2])
         self.gpg_cycle("aoensutha aonetuh saoe", profile)
 
-        profile2 = gpg.GPGProfile(passphrase = self.sign_passphrase,
-                                  hidden_recipients = [self.encrypt_key1])
+        profile2 = gpg.GPGProfile(passphrase=self.sign_passphrase,
+                                  hidden_recipients=[self.encrypt_key1])
         self.gpg_cycle("aoeu" * 10000, profile2)
 
     def test_gpg_signing(self):
         """Test to make sure GPG reports the proper signature key"""
         plaintext = "hello" * 50000
 
-        signing_profile = gpg.GPGProfile(passphrase = self.sign_passphrase,
-                                         sign_key = self.sign_key,
-                                         recipients = [self.encrypt_key1])
+        signing_profile = gpg.GPGProfile(passphrase=self.sign_passphrase,
+                                         sign_key=self.sign_key,
+                                         recipients=[self.encrypt_key1])
 
         epath = path.Path("testfiles/output/encrypted_file")
         encrypted_signed_file = gpg.GPGFile(1, epath, signing_profile)
@@ -111,9 +111,9 @@ class GPGTest(UnitTestCase):
         """Test to make sure GPG reports the proper signature key even with hidden encryption key id"""
         plaintext = "hello" * 50000
 
-        signing_profile = gpg.GPGProfile(passphrase = self.sign_passphrase,
-                                         sign_key = self.sign_key,
-                                         hidden_recipients = [self.encrypt_key1])
+        signing_profile = gpg.GPGProfile(passphrase=self.sign_passphrase,
+                                         sign_key=self.sign_key,
+                                         hidden_recipients=[self.encrypt_key1])
 
         epath = path.Path("testfiles/output/encrypted_file")
         encrypted_signed_file = gpg.GPGFile(1, epath, signing_profile)
@@ -130,29 +130,29 @@ class GPGTest(UnitTestCase):
         """Test GPGWriteFile"""
         size = 400 * 1000
         gwfh = GPGWriteFile_Helper()
-        profile = gpg.GPGProfile(passphrase = "foobar")
-        for i in range(10): #@UnusedVariable
+        profile = gpg.GPGProfile(passphrase="foobar")
+        for i in range(10):  # @UnusedVariable
             gpg.GPGWriteFile(gwfh, "testfiles/output/gpgwrite.gpg",
-                             profile, size = size)
-            #print os.stat("testfiles/output/gpgwrite.gpg").st_size-size
+                             profile, size=size)
+            # print os.stat("testfiles/output/gpgwrite.gpg").st_size-size
             assert size - 64 * 1024 <= os.stat("testfiles/output/gpgwrite.gpg").st_size <= size + 64 * 1024
         gwfh.set_at_end()
         gpg.GPGWriteFile(gwfh, "testfiles/output/gpgwrite.gpg",
-                         profile, size = size)
-        #print os.stat("testfiles/output/gpgwrite.gpg").st_size
+                         profile, size=size)
+        # print os.stat("testfiles/output/gpgwrite.gpg").st_size
 
     def test_GzipWriteFile(self):
         """Test GzipWriteFile"""
         size = 400 * 1000
         gwfh = GPGWriteFile_Helper()
-        for i in range(10): #@UnusedVariable
+        for i in range(10):  # @UnusedVariable
             gpg.GzipWriteFile(gwfh, "testfiles/output/gzwrite.gz",
-                              size = size)
-            #print os.stat("testfiles/output/gzwrite.gz").st_size-size
+                              size=size)
+            # print os.stat("testfiles/output/gzwrite.gz").st_size-size
             assert size - 64 * 1024 <= os.stat("testfiles/output/gzwrite.gz").st_size <= size + 64 * 1024
         gwfh.set_at_end()
-        gpg.GzipWriteFile(gwfh, "testfiles/output/gzwrite.gz", size = size)
-        #print os.stat("testfiles/output/gzwrite.gz").st_size
+        gpg.GzipWriteFile(gwfh, "testfiles/output/gzwrite.gz", size=size)
+        # print os.stat("testfiles/output/gzwrite.gz").st_size
 
 
 class GPGWriteHelper2:
@@ -171,7 +171,7 @@ class GPGWriteFile_Helper:
 
     def get_buffer(self, size):
         """Return buffer of size size, consisting of half random data"""
-        s1 = size/2
+        s1 = size / 2
         s2 = size - s1
         return "a"*s1 + self.from_random_fp.read(s2)
 

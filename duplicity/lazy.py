@@ -28,47 +28,47 @@ class Iter:
     """Hold static methods for the manipulation of lazy iterators"""
 
     @staticmethod
-    def filter(predicate, iterator): #@NoSelf
+    def filter(predicate, iterator):  # @NoSelf
         """Like filter in a lazy functional programming language"""
         for i in iterator:
             if predicate(i):
                 yield i
 
     @staticmethod
-    def map(function, iterator): #@NoSelf
+    def map(function, iterator):  # @NoSelf
         """Like map in a lazy functional programming language"""
         for i in iterator:
             yield function(i)
 
     @staticmethod
-    def foreach(function, iterator): #@NoSelf
+    def foreach(function, iterator):  # @NoSelf
         """Run function on each element in iterator"""
         for i in iterator:
             function(i)
 
     @staticmethod
-    def cat(*iters): #@NoSelf
+    def cat(*iters):  # @NoSelf
         """Lazily concatenate iterators"""
         for iter in iters:
             for i in iter:
                 yield i
 
     @staticmethod
-    def cat2(iter_of_iters): #@NoSelf
+    def cat2(iter_of_iters):  # @NoSelf
         """Lazily concatenate iterators, iterated by big iterator"""
         for iter in iter_of_iters:
             for i in iter:
                 yield i
 
     @staticmethod
-    def empty(iter): #@NoSelf
+    def empty(iter):  # @NoSelf
         """True if iterator has length 0"""
-        for i in iter: #@UnusedVariable
+        for i in iter:  # @UnusedVariable
             return None
         return 1
 
     @staticmethod
-    def equal(iter1, iter2, verbose = None, operator = lambda x, y: x == y): #@NoSelf
+    def equal(iter1, iter2, verbose=None, operator=lambda x, y: x == y):  # @NoSelf
         """True if iterator 1 has same elements as iterator 2
 
         Use equality operator, or == if it is unspecified.
@@ -94,7 +94,7 @@ class Iter:
         return None
 
     @staticmethod
-    def Or(iter): #@NoSelf
+    def Or(iter):  # @NoSelf
         """True if any element in iterator is true.  Short circuiting"""
         i = None
         for i in iter:
@@ -103,7 +103,7 @@ class Iter:
         return i
 
     @staticmethod
-    def And(iter): #@NoSelf
+    def And(iter):  # @NoSelf
         """True if all elements in iterator are true.  Short circuiting"""
         i = 1
         for i in iter:
@@ -112,7 +112,7 @@ class Iter:
         return i
 
     @staticmethod
-    def len(iter): #@NoSelf
+    def len(iter):  # @NoSelf
         """Return length of iterator"""
         i = 0
         while 1:
@@ -120,10 +120,10 @@ class Iter:
                 iter.next()
             except StopIteration:
                 return i
-            i = i+1
+            i = i + 1
 
     @staticmethod
-    def foldr(f, default, iter): #@NoSelf
+    def foldr(f, default, iter):  # @NoSelf
         """foldr the "fundamental list recursion operator"?"""
         try:
             next = iter.next()
@@ -132,7 +132,7 @@ class Iter:
         return f(next, Iter.foldr(f, default, iter))
 
     @staticmethod
-    def foldl(f, default, iter): #@NoSelf
+    def foldl(f, default, iter):  # @NoSelf
         """the fundamental list iteration operator.."""
         while 1:
             try:
@@ -142,7 +142,7 @@ class Iter:
             default = f(default, next)
 
     @staticmethod
-    def multiplex(iter, num_of_forks, final_func = None, closing_func = None): #@NoSelf
+    def multiplex(iter, num_of_forks, final_func=None, closing_func=None):  # @NoSelf
         """Split a single iterater into a number of streams
 
         The return val will be a list with length num_of_forks, each
@@ -189,11 +189,11 @@ class Iter:
             forkposition[fork_num] -= 1
 
             blen = len(buffer)
-            if not (blen-1) in forkposition:
+            if not (blen - 1) in forkposition:
                 # Last position in buffer no longer needed
-                assert forkposition[fork_num] == blen-2
-                final_func(buffer[blen-1])
-                del buffer[blen-1]
+                assert forkposition[fork_num] == blen - 2
+                final_func(buffer[blen - 1])
+                del buffer[blen - 1]
             return return_val
 
         def make_iterator(fork_num):
@@ -212,7 +212,7 @@ class IterMultiplex2:
 
     """
     def __init__(self, iter):
-        self.a_leading_by = 0 # How many places a is ahead of b
+        self.a_leading_by = 0  # How many places a is ahead of b
         self.buffer = []
         self.iter = iter
 
@@ -222,7 +222,7 @@ class IterMultiplex2:
         while(1):
             if self.a_leading_by >= 0:
                 # a is in front, add new element
-                elem = iter.next() # exception will be passed
+                elem = iter.next()  # exception will be passed
                 buf.append(elem)
             else:
                 # b is in front, subtract an element
@@ -236,7 +236,7 @@ class IterMultiplex2:
         while(1):
             if self.a_leading_by <= 0:
                 # b is in front, add new element
-                elem = iter.next() # exception will be passed
+                elem = iter.next()  # exception will be passed
                 buf.append(elem)
             else:
                 # a is in front, subtract an element
@@ -331,12 +331,12 @@ class IterTreeReducer:
             return 1
 
         if index <= self.index:
-            log.Warn(_("Warning: oldindex %s >= newindex %s") %
+            log.Warn(_("Warning: oldindex %s >= newindex %s") % 
                      (util.uindex(self.index), util.uindex(index)))
             return 1
 
         if self.finish_branches(index) is None:
-            return None # We are no longer in the main tree
+            return None  # We are no longer in the main tree
         last_branch = self.branches[-1]
         if last_branch.start_successful:
             if last_branch.can_fast_process(*args):

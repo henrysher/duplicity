@@ -33,27 +33,27 @@ import email
 import duplicity.backend
 from duplicity import globals
 from duplicity import log
-from duplicity.errors import * #@UnusedWildImport
+from duplicity.errors import *  # @UnusedWildImport
 
 
 class ImapBackend(duplicity.backend.Backend):
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
 
-        log.Debug("I'm %s (scheme %s) connecting to %s as %s" %
+        log.Debug("I'm %s (scheme %s) connecting to %s as %s" % 
                   (self.__class__.__name__, parsed_url.scheme, parsed_url.hostname, parsed_url.username))
 
         #  Store url for reconnection on error
         self.url = parsed_url
 
         #  Set the username
-        if ( parsed_url.username is None ):
+        if (parsed_url.username is None):
             username = raw_input('Enter account userid: ')
         else:
             username = parsed_url.username
 
         #  Set the password
-        if ( not parsed_url.password ):
+        if (not parsed_url.password):
             if 'IMAP_PASSWORD' in os.environ:
                 password = os.environ.get('IMAP_PASSWORD')
             else:
@@ -99,16 +99,16 @@ class ImapBackend(duplicity.backend.Backend):
             log.Info("IMAP connected")
 
 
-    def prepareBody(self,f,rname):
+    def prepareBody(self, f, rname):
         mp = email.MIMEMultipart.MIMEMultipart()
 
         # I am going to use the remote_dir as the From address so that
         # multiple archives can be stored in an IMAP account and can be
         # accessed separately
-        mp["From"]=self.remote_dir
-        mp["Subject"]=rname
+        mp["From"] = self.remote_dir
+        mp["Subject"] = rname
 
-        a = email.MIMEBase.MIMEBase("application","binary")
+        a = email.MIMEBase.MIMEBase("application", "binary")
         a.set_payload(f.read())
 
         email.Encoders.encode_base64(a)
@@ -118,7 +118,7 @@ class ImapBackend(duplicity.backend.Backend):
         return mp.as_string()
 
     def _put(self, source_path, remote_filename):
-        f=source_path.open("rb")
+        f = source_path.open("rb")
         allowedTimeout = globals.timeout
         if (allowedTimeout == 0):
             # Allow a total timeout of 1 day
@@ -126,7 +126,7 @@ class ImapBackend(duplicity.backend.Backend):
         while allowedTimeout > 0:
             try:
                 self.conn.select(remote_filename)
-                body=self.prepareBody(f,remote_filename)
+                body = self.prepareBody(f, remote_filename)
                 # If we don't select the IMAP folder before
                 # append, the message goes into the INBOX.
                 self.conn.select(globals.imap_mailbox)
@@ -155,7 +155,7 @@ class ImapBackend(duplicity.backend.Backend):
         while allowedTimeout > 0:
             try:
                 self.conn.select(globals.imap_mailbox)
-                (result,list) = self.conn.search(None, 'Subject', remote_filename)
+                (result, list) = self.conn.search(None, 'Subject', remote_filename)
                 if result != "OK":
                     raise Exception(list[0])
 
@@ -163,11 +163,11 @@ class ImapBackend(duplicity.backend.Backend):
                 if list[0] == '':
                     raise Exception("no mail with subject %s")
 
-                (result,list) = self.conn.fetch(list[0],"(RFC822)")
+                (result, list) = self.conn.fetch(list[0], "(RFC822)")
 
                 if result != "OK":
                     raise Exception(list[0])
-                rawbody=list[0][1]
+                rawbody = list[0][1]
 
                 p = email.Parser.Parser()
 
@@ -197,7 +197,7 @@ class ImapBackend(duplicity.backend.Backend):
 
     def _list(self):
         ret = []
-        (result,list) = self.conn.select(globals.imap_mailbox)
+        (result, list) = self.conn.select(globals.imap_mailbox)
         if result != "OK":
             raise BackendException(list[0])
 
@@ -205,19 +205,19 @@ class ImapBackend(duplicity.backend.Backend):
         # address
 
         # Search returns an error if you haven't selected an IMAP folder.
-        (result,list) = self.conn.search(None, 'FROM', self.remote_dir)
-        if result!="OK":
+        (result, list) = self.conn.search(None, 'FROM', self.remote_dir)
+        if result != "OK":
             raise Exception(list[0])
-        if list[0]=='':
+        if list[0] == '':
             return ret
-        nums=list[0].split(" ")
-        set="%s:%s"%(nums[0],nums[-1])
-        (result,list) = self.conn.fetch(set,"(BODY[HEADER])")
-        if result!="OK":
+        nums = list[0].split(" ")
+        set = "%s:%s" % (nums[0], nums[-1])
+        (result, list) = self.conn.fetch(set, "(BODY[HEADER])")
+        if result != "OK":
             raise Exception(list[0])
 
         for msg in list:
-            if (len(msg)==1):continue
+            if (len(msg) == 1):continue
             io = StringIO.StringIO(msg[1])
             m = rfc822.Message(io)
             subj = m.getheader("subject")
@@ -227,24 +227,24 @@ class ImapBackend(duplicity.backend.Backend):
             if (not (header_from == None)):
                 if (re.compile("^" + self.remote_dir + "$").match(header_from)):
                     ret.append(subj)
-                    log.Info("IMAP LIST: %s %s" % (subj,header_from))
+                    log.Info("IMAP LIST: %s %s" % (subj, header_from))
         return ret
 
-    def imapf(self,fun,*args):
-        (ret,list)=fun(*args)
+    def imapf(self, fun, *args):
+        (ret, list) = fun(*args)
         if ret != "OK":
             raise Exception(list[0])
         return list
 
-    def delete_single_mail(self,i):
-        self.imapf(self.conn.store,i,"+FLAGS",'\\DELETED')
+    def delete_single_mail(self, i):
+        self.imapf(self.conn.store, i, "+FLAGS", '\\DELETED')
 
     def expunge(self):
-        list=self.imapf(self.conn.expunge)
+        list = self.imapf(self.conn.expunge)
 
     def _delete_list(self, filename_list):
         for filename in filename_list:
-            list = self.imapf(self.conn.search,None,"(SUBJECT %s)"%filename)
+            list = self.imapf(self.conn.search, None, "(SUBJECT %s)" % filename)
             list = list[0].split()
             if len(list) > 0 and list[0] != "":
                 self.delete_single_mail(list[0])

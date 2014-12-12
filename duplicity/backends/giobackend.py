@@ -37,7 +37,7 @@ def ensure_dbus():
         for line in lines:
             parts = line.split('=', 1)
             if len(parts) == 2:
-                if parts[0] == 'DBUS_SESSION_BUS_PID': # cleanup at end
+                if parts[0] == 'DBUS_SESSION_BUS_PID':  # cleanup at end
                     atexit.register(os.kill, int(parts[1]), signal.SIGTERM)
                 os.environ[parts[0]] = parts[1]
 
@@ -47,8 +47,8 @@ class GIOBackend(duplicity.backend.Backend):
        URLs look like schema://user@server/path.
     """
     def __init__(self, parsed_url):
-        from gi.repository import Gio #@UnresolvedImport
-        from gi.repository import GLib #@UnresolvedImport
+        from gi.repository import Gio  # @UnresolvedImport
+        from gi.repository import GLib  # @UnresolvedImport
 
         class DupMountOperation(Gio.MountOperation):
             """A simple MountOperation that grabs the password from the environment
@@ -86,7 +86,7 @@ class GIOBackend(duplicity.backend.Backend):
         self.remote_file.mount_enclosing_volume(Gio.MountMountFlags.NONE,
                                                 op, None,
                                                 self.__done_with_mount, loop)
-        loop.run() # halt program until we're done mounting
+        loop.run()  # halt program until we're done mounting
 
         # Now make the directory if it doesn't exist
         try:
@@ -96,8 +96,8 @@ class GIOBackend(duplicity.backend.Backend):
                 raise
 
     def __done_with_mount(self, fileobj, result, loop):
-        from gi.repository import Gio #@UnresolvedImport
-        from gi.repository import GLib #@UnresolvedImport
+        from gi.repository import Gio  # @UnresolvedImport
+        from gi.repository import GLib  # @UnresolvedImport
         try:
             fileobj.mount_enclosing_volume_finish(result)
         except GLib.GError as e:
@@ -111,14 +111,14 @@ class GIOBackend(duplicity.backend.Backend):
         pass
 
     def __copy_file(self, source, target):
-        from gi.repository import Gio #@UnresolvedImport
+        from gi.repository import Gio  # @UnresolvedImport
         source.copy(target,
                     Gio.FileCopyFlags.OVERWRITE | Gio.FileCopyFlags.NOFOLLOW_SYMLINKS,
                     None, self.__copy_progress, None)
 
     def _error_code(self, operation, e):
-        from gi.repository import Gio #@UnresolvedImport
-        from gi.repository import GLib #@UnresolvedImport
+        from gi.repository import Gio  # @UnresolvedImport
+        from gi.repository import GLib  # @UnresolvedImport
         if isinstance(e, GLib.GError):
             if e.code == Gio.IOErrorEnum.FAILED and operation == 'delete':
                 # Sometimes delete will return a generic failure on a file not
@@ -132,19 +132,19 @@ class GIOBackend(duplicity.backend.Backend):
                 return log.ErrorCode.backend_no_space
 
     def _put(self, source_path, remote_filename):
-        from gi.repository import Gio #@UnresolvedImport
+        from gi.repository import Gio  # @UnresolvedImport
         source_file = Gio.File.new_for_path(source_path.name)
         target_file = self.remote_file.get_child(remote_filename)
         self.__copy_file(source_file, target_file)
 
     def _get(self, filename, local_path):
-        from gi.repository import Gio #@UnresolvedImport
+        from gi.repository import Gio  # @UnresolvedImport
         source_file = self.remote_file.get_child(filename)
         target_file = Gio.File.new_for_path(local_path.name)
         self.__copy_file(source_file, target_file)
 
     def _list(self):
-        from gi.repository import Gio #@UnresolvedImport
+        from gi.repository import Gio  # @UnresolvedImport
         files = []
         enum = self.remote_file.enumerate_children(Gio.FILE_ATTRIBUTE_STANDARD_NAME,
                                                    Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS,
@@ -160,7 +160,7 @@ class GIOBackend(duplicity.backend.Backend):
         target_file.delete(None)
 
     def _query(self, filename):
-        from gi.repository import Gio #@UnresolvedImport
+        from gi.repository import Gio  # @UnresolvedImport
         target_file = self.remote_file.get_child(filename)
         info = target_file.query_info(Gio.FILE_ATTRIBUTE_STANDARD_SIZE,
                                       Gio.FileQueryInfoFlags.NONE, None)

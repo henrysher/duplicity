@@ -106,9 +106,9 @@ class RestartTest(FunctionalTestCase):
         self.backup("full", "testfiles/largefiles", fail=3)
         assert not os.system("rm testfiles/largefiles/file2")
         self.backup("full", "testfiles/largefiles")
-        #TODO: we can't verify but we need to to check for other errors that might show up
+        # TODO: we can't verify but we need to to check for other errors that might show up
         # there should be 2 differences found, one missing file, one mtime change
-        #self.verify("testfiles/largefiles")
+        # self.verify("testfiles/largefiles")
 
     def test_last_file_missing_at_end(self):
         """
@@ -120,9 +120,9 @@ class RestartTest(FunctionalTestCase):
         self.backup("full", "testfiles/largefiles", fail=6)
         assert not os.system("rm testfiles/largefiles/file3")
         self.backup("full", "testfiles/largefiles")
-        #TODO: we can't verify but we need to to check for other errors that might show up
+        # TODO: we can't verify but we need to to check for other errors that might show up
         # there should be 2 differences found, one missing file, one mtime change
-        #self.verify("testfiles/largefiles")
+        # self.verify("testfiles/largefiles")
 
     def test_restart_incremental(self):
         """

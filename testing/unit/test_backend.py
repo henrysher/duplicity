@@ -23,8 +23,8 @@ import mock
 import unittest
 
 import duplicity.backend
-import duplicity.backends #@UnusedImport
-from duplicity.errors import * #@UnusedWildImport
+import duplicity.backends  # @UnusedImport
+from duplicity.errors import *  # @UnusedWildImport
 from duplicity import globals
 from duplicity import path
 from . import UnitTestCase
@@ -37,7 +37,7 @@ class ParsedUrlTest(UnitTestCase):
         pu = duplicity.backend.ParsedUrl("scp://ben@foo.bar:1234/a/b")
         assert pu.scheme == "scp", pu.scheme
         assert pu.netloc == "ben@foo.bar:1234", pu.netloc
-        assert pu.path =="/a/b", pu.path
+        assert pu.path == "/a/b", pu.path
         assert pu.username == "ben", pu.username
         assert pu.port == 1234, pu.port
         assert pu.hostname == "foo.bar", pu.hostname
@@ -154,7 +154,7 @@ class BackendWrapperTest(UnitTestCase):
         except:
             # Old versions of mock don't let you mark non-present attributes
             # like this.
-            return # can't use self.skip() since that needs py27
+            return  # can't use self.skip() since that needs py27
         self.mock._put.side_effect = Exception
         self.backend.put(self.local, self.remote)
         exit_mock.assert_called_once_with(50)

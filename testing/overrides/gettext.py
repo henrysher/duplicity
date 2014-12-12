@@ -23,7 +23,7 @@
 # if we ever get a unicode->ascii translation by accident.
 
 def install(*args, **kwargs):
-    ZWSP = u"​" # ZERO WIDTH SPACE, basically an invisible space separator
+    ZWSP = u"​"  # ZERO WIDTH SPACE, basically an invisible space separator
     import __builtin__
     __builtin__.__dict__['_'] = lambda x: x + ZWSP
     __builtin__.__dict__['ngettext'] = lambda one, more, n: one + ZWSP if n == 1 else more + ZWSP

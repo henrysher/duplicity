@@ -21,11 +21,11 @@
 
 import os, sys, unittest
 
-from duplicity.path import * #@UnusedWildImport
+from duplicity.path import *  # @UnusedWildImport
 from duplicity import diffdir
 from duplicity import selection
 from duplicity import util
-from duplicity import tarfile #@Reimport
+from duplicity import tarfile  # @Reimport
 from . import UnitTestCase
 
 
@@ -53,7 +53,7 @@ class DDTest(UnitTestCase):
         diffdir.write_block_iter(sigtar, "testfiles/output/sigtar")
 
         i = 0
-        for tarinfo in tarfile.TarFile("testfiles/output/sigtar", "r"): #@UnusedVariable
+        for tarinfo in tarfile.TarFile("testfiles/output/sigtar", "r"):  # @UnusedVariable
             i += 1
         assert i >= 5, "There should be at least 5 files in sigtar"
 
@@ -71,12 +71,12 @@ class DDTest(UnitTestCase):
                                  "testfiles/output/difftar")
 
         size = os.stat("testfiles/output/difftar").st_size
-        assert size == 0 or size == 10240, size # 10240 is size of one record
+        assert size == 0 or size == 10240, size  # 10240 is size of one record
         if size != 0:
             fin = open("testfiles/output/difftar", "rb")
             diff_buf = fin.read()
             assert not fin.close()
-            assert diff_buf == '\0'*10240
+            assert diff_buf == '\0' * 10240
 
     def test_empty_diff(self):
         """Test producing a diff against same sig; should be len 0"""
@@ -93,7 +93,7 @@ class DDTest(UnitTestCase):
         diffdir.write_block_iter(diffdir.DirDelta(select2, sigtar_fp),
                                  "testfiles/output/difftar")
 
-        size = os.stat("testfiles/output/difftar").st_size #@UnusedVariable
+        size = os.stat("testfiles/output/difftar").st_size  # @UnusedVariable
 
     def test_empty_diff2(self):
         """Test producing diff against directories of special files"""
@@ -161,8 +161,8 @@ class DDTest(UnitTestCase):
         those produced by DirDelta_WriteSig and other methods.
 
         """
-        deltadir1 = Path("testfiles/output/dir.deltatar1") #@UnusedVariable
-        deltadir2 = Path("testfiles/output/dir.deltatar2") #@UnusedVariable
+        deltadir1 = Path("testfiles/output/dir.deltatar1")  # @UnusedVariable
+        deltadir2 = Path("testfiles/output/dir.deltatar2")  # @UnusedVariable
         cur_full_sigs = Path("testfiles/output/fullsig.dir1")
 
         cur_dir = Path("testfiles/dir1")
@@ -172,8 +172,8 @@ class DDTest(UnitTestCase):
 
         sigstack = [cur_full_sigs]
         for dirname in ['dir2', 'dir3', 'dir4']:
-            #print "Processing ", dirname
-            old_dir = cur_dir #@UnusedVariable
+            # print "Processing ", dirname
+            old_dir = cur_dir  # @UnusedVariable
             cur_dir = Path("testfiles/" + dirname)
 
             old_full_sigs = cur_full_sigs
@@ -196,7 +196,7 @@ class DDTest(UnitTestCase):
             sigstack.append(incsig)
             diffdir.write_block_iter(block_iter, delta2)
 
-            #print delta1.name, delta2.name
+            # print delta1.name, delta2.name
             compare_tar(delta1.open("rb"), delta2.open("rb"))
             assert not os.system("cmp %s %s" % (delta1.name, delta2.name))
 
@@ -207,7 +207,7 @@ class DDTest(UnitTestCase):
     def test_combine_path_iters(self):
         """Test diffdir.combine_path_iters"""
         class Dummy:
-            def __init__(self, index, other = None):
+            def __init__(self, index, other=None):
                 self.index = index
                 self.other = other
             def __repr__(self): return "(%s %s)" % (self.index, self.other)
@@ -219,7 +219,7 @@ class DDTest(UnitTestCase):
 
         def get_iter2():
             yield Dummy((), 2)
-            yield Dummy((1,5))
+            yield Dummy((1, 5))
             yield Dummy((2,))
 
         def get_iter3():
@@ -234,7 +234,7 @@ class DDTest(UnitTestCase):
         elem2 = result.next()
         assert elem2.index == (1,) and elem2.other is None, elem2
         elem3 = result.next()
-        assert elem3.index == (1,5) and elem3.other is None
+        assert elem3.index == (1, 5) and elem3.other is None
         elem4 = result.next()
         assert elem4.index == (2,) and elem4.other == 1
         try: elem5 = result.next()
@@ -253,7 +253,7 @@ def compare_tar(tarfile1, tarfile2):
         except StopIteration:
             assert 0, ("Premature end to second tarfile, "
                        "ti1.name = %s" % ti1.name)
-        #print "Comparing ", ti1.name, ti2.name
+        # print "Comparing ", ti1.name, ti2.name
         assert tarinfo_eq(ti1, ti2), "%s %s" % (ti1.name, ti2.name)
         if ti1.size != 0:
             fp1 = tf1.extractfile(ti1)

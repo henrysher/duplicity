@@ -37,7 +37,7 @@ class VolumeInfoTest(UnitTestCase):
         vi.set_hash("MD5", "aoseutaohe")
         s = vi.to_string()
         assert type(s) is types.StringType
-        #print "---------\n%s\n---------" % s
+        # print "---------\n%s\n---------" % s
         vi2 = manifest.VolumeInfo()
         vi2.from_string(s)
         assert vi == vi2
@@ -52,7 +52,7 @@ class VolumeInfoTest(UnitTestCase):
                     None)
         s = vi.to_string()
         assert type(s) is types.StringType
-        #print "---------\n%s\n---------" % s
+        # print "---------\n%s\n---------" % s
         vi2 = manifest.VolumeInfo()
         vi2.from_string(s)
         assert vi == vi2
@@ -61,18 +61,18 @@ class VolumeInfoTest(UnitTestCase):
         """Test to see if contains() works"""
         vi = manifest.VolumeInfo()
         vi.set_info(1, ("1", "2"), None, ("1", "3"), None)
-        assert vi.contains(("1",), recursive = 1)
-        assert not vi.contains(("1",), recursive = 0)
+        assert vi.contains(("1",), recursive=1)
+        assert not vi.contains(("1",), recursive=0)
 
         vi2 = manifest.VolumeInfo()
         vi2.set_info(1, ("A",), None, ("Z",), None)
-        assert vi2.contains(("M",), recursive = 1)
-        assert vi2.contains(("M",), recursive = 0)
+        assert vi2.contains(("M",), recursive=1)
+        assert vi2.contains(("M",), recursive=0)
 
         vi3 = manifest.VolumeInfo()
         vi3.set_info(1, ("A",), None, ("Z",), None)
-        assert not vi3.contains(("3",), recursive = 1)
-        assert not vi3.contains(("3",), recursive = 0)
+        assert not vi3.contains(("3",), recursive=1)
+        assert not vi3.contains(("3",), recursive=0)
 
 
 class ManifestTest(UnitTestCase):
@@ -91,7 +91,7 @@ class ManifestTest(UnitTestCase):
         m.set_dirinfo()
 
         s = m.to_string()
-        #print "---------\n%s\n---------" % s
+        # print "---------\n%s\n---------" % s
         assert s.lower().startswith("hostname")
         assert s.endswith("\n")
 

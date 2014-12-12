@@ -53,8 +53,8 @@ class GPGProfile:
     """
     Just hold some GPG settings, avoid passing tons of arguments
     """
-    def __init__(self, passphrase = None, sign_key = None,
-                 recipients = None, hidden_recipients = None):
+    def __init__(self, passphrase=None, sign_key=None,
+                 recipients=None, hidden_recipients=None):
         """
         Set all data with initializer
 
@@ -71,13 +71,13 @@ class GPGProfile:
         self.sign_key = sign_key
         self.encrypt_secring = None
         if recipients is not None:
-            assert type(recipients) is types.ListType # must be list, not tuple
+            assert type(recipients) is types.ListType  # must be list, not tuple
             self.recipients = recipients
         else:
             self.recipients = []
 
         if hidden_recipients is not None:
-            assert type(hidden_recipients) is types.ListType # must be list, not tuple
+            assert type(hidden_recipients) is types.ListType  # must be list, not tuple
             self.hidden_recipients = hidden_recipients
         else:
             self.hidden_recipients = []
@@ -100,10 +100,10 @@ class GPGFile:
         If passphrase is false, do not set passphrase - GPG program
         should prompt for it.
         """
-        self.status_fp = None # used to find signature
-        self.closed = None # set to true after file closed
-        self.logger_fp = tempfile.TemporaryFile( dir=tempdir.default().dir() )
-        self.stderr_fp = tempfile.TemporaryFile( dir=tempdir.default().dir() )
+        self.status_fp = None  # used to find signature
+        self.closed = None  # set to true after file closed
+        self.logger_fp = tempfile.TemporaryFile(dir=tempdir.default().dir())
+        self.stderr_fp = tempfile.TemporaryFile(dir=tempdir.default().dir())
         self.name = encrypt_path
         self.byte_count = 0
 
@@ -146,9 +146,9 @@ class GPGFile:
                 gnupg.options.extra_args.append('--force-mdc')
             # Skip the passphrase if using the agent
             if globals.use_agent:
-                gnupg_fhs = ['stdin',]
+                gnupg_fhs = ['stdin', ]
             else:
-                gnupg_fhs = ['stdin','passphrase']
+                gnupg_fhs = ['stdin', 'passphrase']
             p1 = gnupg.run(cmdlist, create_fhs=gnupg_fhs,
                            attach_fhs={'stdout': encrypt_path.open("wb"),
                                        'stderr': self.stderr_fp,
@@ -161,12 +161,12 @@ class GPGFile:
             if (profile.recipients or profile.hidden_recipients) and profile.encrypt_secring:
                 cmdlist.append('--secret-keyring')
                 cmdlist.append(profile.encrypt_secring)
-            self.status_fp = tempfile.TemporaryFile( dir=tempdir.default().dir() )
+            self.status_fp = tempfile.TemporaryFile(dir=tempdir.default().dir())
             # Skip the passphrase if using the agent
             if globals.use_agent:
-                gnupg_fhs = ['stdout',]
+                gnupg_fhs = ['stdout', ]
             else:
-                gnupg_fhs = ['stdout','passphrase']
+                gnupg_fhs = ['stdout', 'passphrase']
             p1 = gnupg.run(['--decrypt'], create_fhs=gnupg_fhs,
                            attach_fhs={'stdin': encrypt_path.open("rb"),
                                        'status': self.status_fp,
@@ -179,7 +179,7 @@ class GPGFile:
         self.gpg_process = p1
         self.encrypt = encrypt
 
-    def read(self, length = -1):
+    def read(self, length=-1):
         try:
             res = self.gpg_output.read(length)
             if res is not None:
@@ -279,8 +279,8 @@ class GPGFile:
 
 
 def GPGWriteFile(block_iter, filename, profile,
-                 size = 200 * 1024 * 1024,
-                 max_footer_size = 16 * 1024):
+                 size=200 * 1024 * 1024,
+                 max_footer_size=16 * 1024):
     """
     Write GPG compressed file of given size
 
@@ -319,7 +319,7 @@ def GPGWriteFile(block_iter, filename, profile,
     def get_current_size():
         return os.stat(filename).st_size
 
-    target_size = size - 50 * 1024 # fudge factor, compensate for gpg buffering
+    target_size = size - 50 * 1024  # fudge factor, compensate for gpg buffering
     data_size = target_size - max_footer_size
     file = GPGFile(True, path.Path(filename), profile)
     at_end_of_blockiter = 0
@@ -350,8 +350,8 @@ def GPGWriteFile(block_iter, filename, profile,
 
 
 def GzipWriteFile(block_iter, filename,
-                  size = 200 * 1024 * 1024,
-                  max_footer_size = 16 * 1024):
+                  size=200 * 1024 * 1024,
+                  max_footer_size=16 * 1024):
     """
     Write gzipped compressed file of given size
 
@@ -395,7 +395,7 @@ def GzipWriteFile(block_iter, filename,
     return at_end_of_blockiter
 
 
-def get_hash(hash, path, hex = 1):
+def get_hash(hash, path, hex=1):
     """
     Return hash of path
 

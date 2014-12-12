@@ -1,3 +1,8 @@
+2014-12-12  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Source formatted, using PyDev, all source files to fix some easily fixed
+      PEP8 issues. Use ignore space when comparing against previous versions.
+
 2014-12-11  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~ed.so/duplicity/paramiko.identyfile

@@ -229,8 +229,8 @@ class BotoBackend(duplicity.backend.Backend):
         upload_start = time.time()
         self.upload(source_path.name, key, headers)
         upload_end = time.time()
-        total_s = abs(upload_end-upload_start) or 1  # prevent a zero value!
-        rough_upload_speed = os.path.getsize(source_path.name)/total_s
+        total_s = abs(upload_end - upload_start) or 1  # prevent a zero value!
+        rough_upload_speed = os.path.getsize(source_path.name) / total_s
         log.Debug("Uploaded %s/%s to %s Storage at roughly %f bytes/second" % (self.straight_url, remote_filename, storage_class, rough_upload_speed))
 
     def _get(self, remote_filename, local_path):
@@ -272,7 +272,7 @@ class BotoBackend(duplicity.backend.Backend):
     def _query(self, filename):
         key = self.bucket.lookup(self.key_prefix + filename)
         if key is None:
-            return {'size': -1}
+            return {'size':-1}
         return {'size': key.size}
 
     def upload(self, filename, key, headers):

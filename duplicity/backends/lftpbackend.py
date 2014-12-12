@@ -61,13 +61,13 @@ class LFTPBackend(duplicity.backend.Backend):
 #        # strip lftp+ prefix
 #        self.url_string = duplicity.backend.strip_prefix(self.url_string, 'lftp')
 
-        self.scheme = duplicity.backend.strip_prefix( parsed_url.scheme, 'lftp' ).lower()
-        self.scheme = re.sub('^webdav','http',self.scheme)
+        self.scheme = duplicity.backend.strip_prefix(parsed_url.scheme, 'lftp').lower()
+        self.scheme = re.sub('^webdav', 'http', self.scheme)
         self.url_string = self.scheme + '://' + parsed_url.hostname
         if parsed_url.port :
             self.url_string += ":%s" % parsed_url.port
 
-        self.remote_path = re.sub('^/','',parsed_url.path)
+        self.remote_path = re.sub('^/', '', parsed_url.path)
 
         # Use an explicit directory name.
         if self.remote_path[-1] != '/':
@@ -77,7 +77,7 @@ class LFTPBackend(duplicity.backend.Backend):
         if self.parsed_url.username:
             self.username = self.parsed_url.username
             self.password = self.get_password()
-            self.authflag = "-u '%s,%s'" % (self.username,self.password)
+            self.authflag = "-u '%s,%s'" % (self.username, self.password)
 
         if globals.ftp_connection == 'regular':
             self.conn_opt = 'off'
@@ -102,10 +102,10 @@ class LFTPBackend(duplicity.backend.Backend):
                 raise duplicity.errors.FatalBackendException("""For certificate verification a cacert database file is needed in one of these locations: %s
 Hints:
   Consult the man page, chapter 'SSL Certificate Verification'.
-  Consider using the options --ssl-cacert-file, --ssl-no-check-certificate .""" % ", ".join(cacert_candidates) )
+  Consider using the options --ssl-cacert-file, --ssl-no-check-certificate .""" % ", ".join(cacert_candidates))
 
         self.tempfile, self.tempname = tempdir.default().mkstemp()
-        os.write(self.tempfile, "set ssl:verify-certificate " + ( "false" if globals.ssl_no_check_certificate else "true" ) + "\n")
+        os.write(self.tempfile, "set ssl:verify-certificate " + ("false" if globals.ssl_no_check_certificate else "true") + "\n")
         if globals.ssl_cacert_file :
             os.write(self.tempfile, "set ssl:ca-file '" + globals.ssl_cacert_file + "'\n")
         if self.parsed_url.scheme == 'ftps':
@@ -120,7 +120,7 @@ Hints:
         os.write(self.tempfile, "set ftp:passive-mode %s\n" % self.conn_opt)
         if log.getverbosity() >= log.DEBUG :
             os.write(self.tempfile, "debug\n")
-        os.write(self.tempfile, "open %s %s\n" % (self.authflag, self.url_string) )
+        os.write(self.tempfile, "open %s %s\n" % (self.authflag, self.url_string))
 #        os.write(self.tempfile, "open %s %s\n" % (self.portflag, self.parsed_url.hostname))
         # allow .netrc auth by only setting user/pass when user was actually given
 #        if self.parsed_url.username:
@@ -129,10 +129,10 @@ Hints:
         if log.getverbosity() >= log.DEBUG :
             f = open(self.tempname, 'r')
             log.Debug("SETTINGS: \n"
-                  "%s" % f.readlines() )
+                  "%s" % f.readlines())
 
     def _put(self, source_path, remote_filename):
-        #remote_path = os.path.join(urllib.unquote(self.parsed_url.path.lstrip('/')), remote_filename).rstrip()
+        # remote_path = os.path.join(urllib.unquote(self.parsed_url.path.lstrip('/')), remote_filename).rstrip()
         commandline = "lftp -c 'source \'%s\'; mkdir -p %s; put \'%s\' -o \'%s\''" % \
             (self.tempname, self.remote_path, source_path.name, self.remote_path + remote_filename)
         log.Debug("CMD: %s" % commandline)
@@ -144,9 +144,9 @@ Hints:
                   "%s" % (l))
 
     def _get(self, remote_filename, local_path):
-        #remote_path = os.path.join(urllib.unquote(self.parsed_url.path), remote_filename).rstrip()
+        # remote_path = os.path.join(urllib.unquote(self.parsed_url.path), remote_filename).rstrip()
         commandline = "lftp -c 'source \'%s\'; get \'%s\' -o \'%s\''" % \
-            (self.tempname, self.remote_path+remote_filename, local_path.name)
+            (self.tempname, self.remote_path + remote_filename, local_path.name)
         log.Debug("CMD: %s" % commandline)
         _, l, e = self.subprocess_popen(commandline)
         log.Debug("STDERR:\n"
@@ -156,9 +156,9 @@ Hints:
 
     def _list(self):
         # Do a long listing to avoid connection reset
-        #remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
+        # remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
         remote_dir = urllib.unquote(self.parsed_url.path)
-        #print remote_dir
+        # print remote_dir
         commandline = "lftp -c 'source \'%s\'; cd \'%s\' || exit 0; ls'" % (self.tempname, self.remote_path)
         log.Debug("CMD: %s" % commandline)
         _, l, e = self.subprocess_popen(commandline)
@@ -171,7 +171,7 @@ Hints:
         return [x.split()[-1] for x in l.split('\n') if x]
 
     def _delete(self, filename):
-        #remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
+        # remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
         commandline = "lftp -c 'source \'%s\'; cd \'%s\'; rm \'%s\''" % (self.tempname, self.remote_path, filename)
         log.Debug("CMD: %s" % commandline)
         _, l, e = self.subprocess_popen(commandline)

@@ -36,10 +36,10 @@ from duplicity import globals
 from duplicity import gpg
 from duplicity import util
 from duplicity import librsync
-from duplicity import log #@UnusedImport
+from duplicity import log  # @UnusedImport
 from duplicity import dup_time
 from duplicity import cached_ops
-from duplicity.lazy import * #@UnusedWildImport
+from duplicity.lazy import *  # @UnusedWildImport
 
 _copy_blocksize = 64 * 1024
 _tmp_path_counter = 1
@@ -61,7 +61,7 @@ class ROPath:
     have a name.  They are required to be indexed though.
 
     """
-    def __init__(self, index, stat = None):
+    def __init__(self, index, stat=None):
         """ROPath initializer"""
         self.opened, self.fileobj = None, None
         self.index = index
@@ -83,7 +83,7 @@ class ROPath:
         elif stat.S_ISFIFO(st_mode):
             self.type = "fifo"
         elif stat.S_ISSOCK(st_mode):
-            raise PathException(util.ufn(self.get_relative_path()) +
+            raise PathException(util.ufn(self.get_relative_path()) + 
                                 u"is a socket, unsupported by tar")
             self.type = "sock"
         elif stat.S_ISCHR(st_mode):
@@ -257,7 +257,7 @@ class ROPath:
         else:
             ti.name = "."
         if self.isdir():
-            ti.name += "/" # tar dir naming convention
+            ti.name += "/"  # tar dir naming convention
 
         ti.size = 0
         if self.type:
@@ -313,7 +313,7 @@ class ROPath:
     def __eq__(self, other):
         """Used to compare two ROPaths.  Doesn't look at fileobjs"""
         if not self.type and not other.type:
-            return 1 # neither exists
+            return 1  # neither exists
         if not self.stat and other.stat or not other.stat and self.stat:
             return 0
         if self.type != other.type:
@@ -338,7 +338,7 @@ class ROPath:
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    def compare_verbose(self, other, include_data = 0):
+    def compare_verbose(self, other, include_data=0):
         """Compare ROPaths like __eq__, but log reason if different
 
         This is placed in a separate function from __eq__ because
@@ -362,18 +362,18 @@ class ROPath:
             log_diff(_("File %s is missing"))
             return 0
         if self.type != other.type:
-            log_diff(_("File %%s has type %s, expected %s") %
+            log_diff(_("File %%s has type %s, expected %s") % 
                      (other.type, self.type))
             return 0
 
         if self.isreg() or self.isdir() or self.isfifo():
             if not self.perms_equal(other):
-                log_diff(_("File %%s has permissions %s, expected %s") %
+                log_diff(_("File %%s has permissions %s, expected %s") % 
                          (other.getperms(), self.getperms()))
                 return 0
             if ((int(self.stat.st_mtime) != int(other.stat.st_mtime)) and
                     (self.stat.st_mtime > 0 or other.stat.st_mtime > 0)):
-                log_diff(_("File %%s has mtime %s, expected %s") %
+                log_diff(_("File %%s has mtime %s, expected %s") % 
                          (dup_time.timetopretty(int(other.stat.st_mtime)),
                           dup_time.timetopretty(int(self.stat.st_mtime))))
                 return 0
@@ -389,12 +389,12 @@ class ROPath:
             if self.symtext == other.symtext:
                 return 1
             else:
-                log_diff(_("Symlink %%s points to %s, expected %s") %
+                log_diff(_("Symlink %%s points to %s, expected %s") % 
                          (other.symtext, self.symtext))
                 return 0
         elif self.isdev():
             if not self.perms_equal(other):
-                log_diff(_("File %%s has permissions %s, expected %s") %
+                log_diff(_("File %%s has permissions %s, expected %s") % 
                          (other.getperms(), self.getperms()))
                 return 0
             if self.devnums != other.devnums:
@@ -437,7 +437,7 @@ class ROPath:
             os.symlink(self.symtext, other.name)
             os.lchown(other.name, self.stat.st_uid, self.stat.st_gid)
             other.setdata()
-            return # no need to copy symlink attributes
+            return  # no need to copy symlink attributes
         elif self.isfifo():
             os.mkfifo(other.name)
         elif self.issock():
@@ -482,7 +482,7 @@ class Path(ROPath):
 
     def rename_index(self, index):
         if not globals.rename or not index:
-            return index # early exit
+            return index  # early exit
         path = os.path.normcase(os.path.join(*index))
         tail = []
         while path and path not in globals.rename:
@@ -491,9 +491,9 @@ class Path(ROPath):
         if path:
             return globals.rename[path].split(os.sep) + tail
         else:
-            return index # no rename found
+            return index  # no rename found
 
-    def __init__(self, base, index = ()):
+    def __init__(self, base, index=()):
         """Path initializer"""
         # self.opened should be true if the file has been opened, and
         # self.fileobj can override returned fileobj
@@ -510,7 +510,7 @@ class Path(ROPath):
         except OSError as e:
             err_string = errno.errorcode[e[0]]
             if err_string in ["ENOENT", "ENOTDIR", "ELOOP", "ENOTCONN"]:
-                self.stat, self.type = None, None # file doesn't exist
+                self.stat, self.type = None, None  # file doesn't exist
                 self.mode = None
             else:
                 raise
@@ -535,7 +535,7 @@ class Path(ROPath):
         """Return true if path is a directory and is empty"""
         return self.isdir() and not self.listdir()
 
-    def open(self, mode = "rb"):
+    def open(self, mode="rb"):
         """
         Return fileobj associated with self
 
@@ -583,7 +583,7 @@ class Path(ROPath):
 
     def deltree(self):
         """Remove self by recursively deleting files under it"""
-        from duplicity import selection # todo: avoid circ. dep. issue
+        from duplicity import selection  # todo: avoid circ. dep. issue
         log.Info(_("Deleting tree %s") % util.ufn(self.name))
         itr = IterTreeReducer(PathDeleter, [])
         for path in selection.Select(self).set_iter():
@@ -598,7 +598,7 @@ class Path(ROPath):
         else:
             components = self.base.split("/")
             if len(components) == 2 and not components[0]:
-                return Path("/") # already in root directory
+                return Path("/")  # already in root directory
             else:
                 return Path("/".join(components[:-1]))
 
@@ -645,7 +645,7 @@ class Path(ROPath):
         global _tmp_path_counter
         parent_dir = self.get_parent_dir()
         while 1:
-            temp_path = parent_dir.append("duplicity_temp." +
+            temp_path = parent_dir.append("duplicity_temp." + 
                                           str(_tmp_path_counter))
             if not temp_path.type:
                 return temp_path
@@ -653,9 +653,9 @@ class Path(ROPath):
             assert _tmp_path_counter < 10000, \
                    u"Warning too many temp files created for " + util.ufn(self.name)
 
-    def compare_recursive(self, other, verbose = None):
+    def compare_recursive(self, other, verbose=None):
         """Compare self to other Path, descending down directories"""
-        from duplicity import selection # todo: avoid circ. dep. issue
+        from duplicity import selection  # todo: avoid circ. dep. issue
         selfsel = selection.Select(self).set_iter()
         othersel = selection.Select(other).set_iter()
         return Iter.equal(selfsel, othersel, verbose)
@@ -664,7 +664,7 @@ class Path(ROPath):
         """Return string representation"""
         return "(%s %s %s)" % (self.index, self.name, self.type)
 
-    def quote(self, s = None):
+    def quote(self, s=None):
         """
         Return quoted version of s (defaults to self.name)
 
@@ -673,15 +673,15 @@ class Path(ROPath):
         """
         if not s:
             s = self.name
-        return '"%s"' % self.regex_chars_to_quote.sub(lambda m: "\\"+m.group(0), s)
+        return '"%s"' % self.regex_chars_to_quote.sub(lambda m: "\\" + m.group(0), s)
 
     def unquote(self, s):
         """Return unquoted version of string s, as quoted by above quote()"""
-        assert s[0] == s[-1] == "\"" # string must be quoted by above
+        assert s[0] == s[-1] == "\""  # string must be quoted by above
         result = ""; i = 1
-        while i < len(s)-1:
+        while i < len(s) - 1:
             if s[i] == "\\":
-                result += s[i+1]
+                result += s[i + 1]
                 i += 2
             else:
                 result += s[i]
@@ -719,7 +719,7 @@ class DupPath(Path):
     Based on the file name, files that are compressed or encrypted
     will have different open() methods.
     """
-    def __init__(self, base, index = (), parseresults = None):
+    def __init__(self, base, index=(), parseresults=None):
         """
         DupPath initializer
 
@@ -736,7 +736,7 @@ class DupPath(Path):
 
         Path.__init__(self, base, index)
 
-    def filtered_open(self, mode = "rb", gpg_profile = None):
+    def filtered_open(self, mode="rb", gpg_profile=None):
         """
         Return fileobj with appropriate encryption/compression
 

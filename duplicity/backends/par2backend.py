@@ -144,7 +144,7 @@ class Par2Backend(backend.Backend):
 
         remote_list = self.list()
         filename_list = [filename]
-        c =  re.compile(r'%s(?:\.vol[\d+]*)?\.par2' % filename)
+        c = re.compile(r'%s(?:\.vol[\d+]*)?\.par2' % filename)
         for remote_filename in remote_list:
             if c.match(remote_filename):
                 self.wrapped_backend._delete(remote_filename)
@@ -155,7 +155,7 @@ class Par2Backend(backend.Backend):
         remote_list = self.list()
 
         for filename in filename_list[:]:
-            c =  re.compile(r'%s(?:\.vol[\d+]*)?\.par2' % filename)
+            c = re.compile(r'%s(?:\.vol[\d+]*)?\.par2' % filename)
             for remote_filename in remote_list:
                 if c.match(remote_filename):
                     filename_list.append(remote_filename)

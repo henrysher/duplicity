@@ -51,7 +51,7 @@ class RdiffdirTest(FunctionalTestCase):
         assert sig_path.exists()
 
         # FIXME: How does this work?  Path comparisons don't seem to work right
-        #assert new_path.compare_recursive(seq_path, verbose = 1)
+        # assert new_path.compare_recursive(seq_path, verbose = 1)
 
         for dirname in dirname_list[1:]:
             new_path = path.Path(dirname)
@@ -59,7 +59,7 @@ class RdiffdirTest(FunctionalTestCase):
             # Make delta
             if delta_path.exists(): delta_path.delete()
             assert not delta_path.exists()
-            self.run_rdiffdir("delta %s %s %s" %
+            self.run_rdiffdir("delta %s %s %s" % 
                               (sig_path.name, new_path.name, delta_path.name))
             delta_path.setdata()
             assert delta_path.exists()
@@ -68,7 +68,7 @@ class RdiffdirTest(FunctionalTestCase):
             self.run_rdiffdir("patch %s %s" % (seq_path.name, delta_path.name))
             seq_path.setdata()
             new_path.setdata()
-            assert new_path.compare_recursive(seq_path, verbose = 1)
+            assert new_path.compare_recursive(seq_path, verbose=1)
 
             # Make new signature
             sig_path.delete()

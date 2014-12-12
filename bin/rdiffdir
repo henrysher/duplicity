@@ -42,8 +42,8 @@ gzip_compress = None
 # specified file.
 sig_fileobj = None
 
-select_opts = [] # Add selection argument tuples to this
-select_files = [] # Will hold file objects when filelist given
+select_opts = []  # Add selection argument tuples to this
+select_files = []  # Will hold file objects when filelist given
 
 def parse_cmdline_options(arglist):
     """Parse argument list"""
@@ -122,9 +122,9 @@ def check_does_not_exist(filename):
 def get_action(args):
     """Figure out the main action from the arguments"""
     def require_args(num, upper_bound_too=True):
-        if len(args)-1 < num:
+        if len(args) - 1 < num:
             command_line_error("Too few arguments")
-        elif upper_bound_too and len(args)-1 > num:
+        elif upper_bound_too and len(args) - 1 > num:
             command_line_error("Too many arguments")
 
     if not args:

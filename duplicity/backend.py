@@ -167,7 +167,7 @@ def strip_prefix(url_string, prefix_scheme):
     """
     strip the prefix from a string e.g. par2+ftp://... -> ftp://...
     """
-    return re.sub('(?i)^'+re.escape(prefix_scheme)+'\+','',url_string)
+    return re.sub('(?i)^' + re.escape(prefix_scheme) + '\+', '', url_string)
 
 def is_backend_url(url_string):
     """
@@ -202,7 +202,7 @@ def get_backend_object(url_string):
     for prefix in _backend_prefixes:
         if url_string.startswith(prefix + '+'):
             factory = _backend_prefixes[prefix]
-            pu = ParsedUrl(strip_prefix(url_string,prefix))
+            pu = ParsedUrl(strip_prefix(url_string, prefix))
             break
 
     if factory is None:
@@ -302,10 +302,10 @@ class ParsedUrl:
         self.port = None
         try:
             self.port = pu.port
-        except Exception: # not raised in python2.7+, just returns None
+        except Exception:  # not raised in python2.7+, just returns None
             # old style rsync://host::[/]dest, are still valid, though they contain no port
-            if not ( self.scheme in ['rsync'] and re.search('::[^:]*$', self.url_string)):
-                raise InvalidBackendURL("Syntax error (port) in: %s A%s B%s C%s" % (url_string, (self.scheme in ['rsync']), re.search('::[^:]+$', self.netloc), self.netloc ) )
+            if not (self.scheme in ['rsync'] and re.search('::[^:]*$', self.url_string)):
+                raise InvalidBackendURL("Syntax error (port) in: %s A%s B%s C%s" % (url_string, (self.scheme in ['rsync']), re.search('::[^:]+$', self.netloc), self.netloc))
 
         # Our URL system uses two slashes more than urlparse's does when using
         # non-netloc URLs.  And we want to make sure that if urlparse assuming
@@ -341,7 +341,7 @@ class ParsedUrl:
 def strip_auth_from_url(parsed_url):
     """Return a URL from a urlparse object without a username or password."""
 
-    clean_url = re.sub('^([^:/]+://)(.*@)?(.*)',r'\1\3',parsed_url.geturl())
+    clean_url = re.sub('^([^:/]+://)(.*@)?(.*)', r'\1\3', parsed_url.geturl())
     return clean_url
 
 def _get_code_from_exception(backend, operation, e):
@@ -395,9 +395,9 @@ def retry(operation, fatal=True):
                                  % (n, e.__class__.__name__, util.uexc(e)))
                     if not at_end:
                         if isinstance(e, TemporaryLoadException):
-                            time.sleep(90) # wait longer before trying again
+                            time.sleep(90)  # wait longer before trying again
                         else:
-                            time.sleep(30) # wait a bit before trying again
+                            time.sleep(30)  # wait a bit before trying again
                         if hasattr(self.backend, '_retry_cleanup'):
                             self.backend._retry_cleanup()
 
@@ -429,8 +429,8 @@ class Backend(object):
             password = os.environ['FTP_PASSWORD']
         except KeyError:
             if self.use_getpass:
-                password = getpass.getpass("Password for '%s@%s': " %
-                                           (self.parsed_url.username,self.parsed_url.hostname) )
+                password = getpass.getpass("Password for '%s@%s': " % 
+                                           (self.parsed_url.username, self.parsed_url.hostname))
                 os.environ['FTP_PASSWORD'] = password
             else:
                 password = None
@@ -446,7 +446,7 @@ class Backend(object):
         the ':password@' may be substituted.
         """
         if self.parsed_url.password:
-            return re.sub( r'(:([^\s:/@]+)@([^\s@]+))', r':*****@\3', commandline )
+            return re.sub(r'(:([^\s:/@]+)@([^\s@]+))', r':*****@\3', commandline)
         else:
             return commandline
 
@@ -485,7 +485,7 @@ class Backend(object):
                 """ ignore a predefined set of error codes """
                 return 0, '', ''
             except (KeyError, ValueError):
-                raise BackendException("Error running '%s': returned %d, with output:\n%s" %
+                raise BackendException("Error running '%s': returned %d, with output:\n%s" % 
                                        (private, result, stdout + '\n' + stderr))
         return result, stdout, stderr
 
@@ -637,7 +637,7 @@ class BackendWrapper(object):
         except Exception as e:
             code = _get_code_from_exception(self.backend, 'query', e)
             if code == log.ErrorCode.backend_not_found:
-                return {'size': -1}
+                return {'size':-1}
             else:
                 raise e
 
@@ -649,7 +649,7 @@ class BackendWrapper(object):
         if hasattr(self.backend, '_close'):
             self.backend._close()
 
-    def get_fileobj_read(self, filename, parseresults = None):
+    def get_fileobj_read(self, filename, parseresults=None):
         """
         Return fileobject opened for reading of filename on backend
 
@@ -664,7 +664,7 @@ class BackendWrapper(object):
         tdp.setdata()
         return tdp.filtered_open_with_delete("rb")
 
-    def get_data(self, filename, parseresults = None):
+    def get_data(self, filename, parseresults=None):
         """
         Retrieve a file from backend, process it, return contents.
         """

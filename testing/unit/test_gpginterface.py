@@ -29,8 +29,8 @@ import sys
 
 from duplicity import gpginterface
 
-__author__   = "Frank J. Tobin, ftobin@neverending.org"
-__version__  = "0.2.2"
+__author__ = "Frank J. Tobin, ftobin@neverending.org"
+__version__ = "0.2.2"
 __revision__ = "$Id: GnuPGInterfacetest.py,v 1.11 2009/06/06 17:35:19 loafman Exp $"
 
 class BasicTest(unittest.TestCase):
@@ -64,7 +64,7 @@ class GnuPGTests(BasicTest):
         # We'll handle the passphrase manually
         if passphrase != None: creations.append('passphrase')
 
-        proc = self.gnupg.run( args, create_fhs=creations )
+        proc = self.gnupg.run(args, create_fhs=creations)
 
         if passphrase != None:
             proc.handles['passphrase'].write(passphrase)
@@ -92,12 +92,12 @@ class GnuPGTests(BasicTest):
 
         creations = []
         # We'll handle the passphrase manually
-        if passphrase != None: proc.handles.append('passphrase') #@UndefinedVariable
+        if passphrase != None: proc.handles.append('passphrase')  # @UndefinedVariable
 
         attachments = { 'stdin': stdin, 'stdout': stdout }
 
-        proc = self.gnupg.run( args, create_fhs=creations,
-                               attach_fhs=attachments )
+        proc = self.gnupg.run(args, create_fhs=creations,
+                               attach_fhs=attachments)
 
         if passphrase != None:
             proc.handles['passphrase'].write(passphrase)
@@ -111,12 +111,12 @@ class GnuPGTests(BasicTest):
         """Do GnuPG operations using solely the create_fhs feature"""
         plaintext = "Three blind mice"
 
-        ciphertext = self.do_create_fh_operation( ['--symmetric'],
-                                                  plaintext )
+        ciphertext = self.do_create_fh_operation(['--symmetric'],
+                                                  plaintext)
 
-        decryption = self.do_create_fh_operation( ['--decrypt'],
+        decryption = self.do_create_fh_operation(['--decrypt'],
                                                   ciphertext,
-                                                  self.gnupg.passphrase )
+                                                  self.gnupg.passphrase)
         assert decryption == plaintext, \
                "GnuPG decrypted output does not match original input"
 
@@ -129,13 +129,13 @@ class GnuPGTests(BasicTest):
         temp1 = tempfile.TemporaryFile()
         temp2 = tempfile.TemporaryFile()
 
-        self.do_attach_fh_operation( ['--symmetric'],
-                                     stdin=plainfile, stdout=temp1 )
+        self.do_attach_fh_operation(['--symmetric'],
+                                     stdin=plainfile, stdout=temp1)
 
         temp1.seek(0)
 
-        self.do_attach_fh_operation( ['--decrypt'],
-                                     stdin=temp1, stdout=temp2 )
+        self.do_attach_fh_operation(['--decrypt'],
+                                     stdin=temp1, stdout=temp2)
 
         plainfile.seek(0)
         temp2.seek(0)
@@ -161,9 +161,9 @@ class OptionsTests(BasicTest):
         """test Options boolean options that they generate
         proper arguments"""
 
-        booleans = [ 'armor',      'no_greeting',  'no_verbose',
-                     'batch',      'always_trust', 'rfc1991',
-                     'quiet',      'openpgp',      'force_v3_sigs',
+        booleans = [ 'armor', 'no_greeting', 'no_verbose',
+                     'batch', 'always_trust', 'rfc1991',
+                     'quiet', 'openpgp', 'force_v3_sigs',
                      'no_options', 'textmode' ]
 
         for option in booleans:
@@ -172,7 +172,7 @@ class OptionsTests(BasicTest):
             arg = self.option_to_arg(option)
 
             should_be = [arg]
-            result    = self.gnupg.options.get_args()
+            result = self.gnupg.options.get_args()
 
             assert should_be == result, \
                    "failure to set option '%s'; should be %s, but result is %s" \
@@ -193,7 +193,7 @@ class OptionsTests(BasicTest):
             arg = self.option_to_arg(option)
 
             should_be = [arg, string_value]
-            result    = self.gnupg.options.get_args()
+            result = self.gnupg.options.get_args()
 
             assert should_be == result, \
                    "failure to set option '%s'; should be %s, but result is %s" \
@@ -231,7 +231,7 @@ class PipesTests(unittest.TestCase):
     def test_constructor(self):
         self.pipe = gpginterface.Pipe(1, 2, 0)
         assert self.pipe.parent == 1
-        assert self.pipe.child  == 2
+        assert self.pipe.child == 2
         assert not self.pipe.direct
 
 ########################################################################

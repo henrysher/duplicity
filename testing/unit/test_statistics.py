@@ -21,7 +21,7 @@
 
 import sys, unittest
 
-from duplicity.statistics import * #@UnusedWildImport
+from duplicity.statistics import *  # @UnusedWildImport
 from duplicity import path
 from . import UnitTestCase
 
@@ -88,7 +88,7 @@ TotalDestinationSizeChange 12 (12 bytes)
         s = StatsObj()
         self.set_obj(s)
         statline = s.get_stats_line(("sample", "index", "w", "new\nline"))
-        assert statline == "sample/index/w/new\\nline 1 2 3 4 5 7 8 9 10 11",\
+        assert statline == "sample/index/w/new\\nline 1 2 3 4 5 7 8 9 10 11", \
                repr(statline)
 
         statline = s.get_stats_line(())

@@ -34,7 +34,7 @@ class HSIBackend(duplicity.backend.Backend):
             self.remote_prefix = ""
 
     def _put(self, source_path, remote_filename):
-        commandline = '%s "put %s : %s%s"' % (hsi_command,source_path.name,self.remote_prefix,remote_filename)
+        commandline = '%s "put %s : %s%s"' % (hsi_command, source_path.name, self.remote_prefix, remote_filename)
         self.subprocess_popen(commandline)
 
     def _get(self, remote_filename, local_path):
@@ -44,7 +44,7 @@ class HSIBackend(duplicity.backend.Backend):
     def _list(self):
         commandline = '%s "ls -l %s"' % (hsi_command, self.remote_dir)
         l = os.popen3(commandline)[2].readlines()[3:]
-        for i in range(0,len(l)):
+        for i in range(0, len(l)):
             l[i] = l[i].split()[-1]
         return [x for x in l if x]
 

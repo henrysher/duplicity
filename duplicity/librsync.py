@@ -51,7 +51,7 @@ class LikeFile:
     # appropriate cycle() method
     maker = None
 
-    def __init__(self, infile, need_seek = None):
+    def __init__(self, infile, need_seek=None):
         """LikeFile initializer - zero buffers, set eofs off"""
         self.check_file(infile, need_seek)
         self.infile = infile
@@ -60,7 +60,7 @@ class LikeFile:
         self.outbuf = array.array('c')
         self.eof = self.infile_eof = None
 
-    def check_file(self, file, need_seek = None):
+    def check_file(self, file, need_seek=None):
         """Raise type error if file doesn't have necessary attributes"""
         if not hasattr(file, "read"):
             raise TypeError("Basis file must have a read() method")
@@ -69,7 +69,7 @@ class LikeFile:
         if need_seek and not hasattr(file, "seek"):
             raise TypeError("Basis file must have a seek() method")
 
-    def read(self, length = -1):
+    def read(self, length=-1):
         """Build up self.outbuf, return first length bytes"""
         if length == -1:
             while not self.eof:
@@ -116,7 +116,7 @@ class LikeFile:
 
 class SigFile(LikeFile):
     """File-like object which incrementally generates a librsync signature"""
-    def __init__(self, infile, blocksize = _librsync.RS_DEFAULT_BLOCK_LEN):
+    def __init__(self, infile, blocksize=_librsync.RS_DEFAULT_BLOCK_LEN):
         """SigFile initializer - takes basis file
 
         basis file only needs to have read() and close() methods.  It
@@ -178,7 +178,7 @@ class SigGenerator:
     module, not filelike object
 
     """
-    def __init__(self, blocksize = _librsync.RS_DEFAULT_BLOCK_LEN):
+    def __init__(self, blocksize=_librsync.RS_DEFAULT_BLOCK_LEN):
         """Return new signature instance"""
         try:
             self.sig_maker = _librsync.new_sigmaker(blocksize)
@@ -210,6 +210,6 @@ class SigGenerator:
     def getsig(self):
         """Return signature over given data"""
         while not self.process_buffer():
-            pass # keep running until eof
+            pass  # keep running until eof
         return ''.join(self.sigstring_list)
 

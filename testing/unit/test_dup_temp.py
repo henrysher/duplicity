@@ -49,9 +49,9 @@ class TempTest(UnitTestCase):
     def test_tempduppath(self):
         """Allocate new tempduppath, then open_with_delete"""
         # pr indicates file is gzipped
-        pr = file_naming.ParseResults("inc", manifest = 1,
-                                      start_time = 1, end_time = 3,
-                                      compressed = 1)
+        pr = file_naming.ParseResults("inc", manifest=1,
+                                      start_time=1, end_time=3,
+                                      compressed=1)
 
         tdp = dup_temp.new_tempduppath(pr)
         assert not tdp.exists()

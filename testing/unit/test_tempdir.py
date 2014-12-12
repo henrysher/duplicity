@@ -42,7 +42,7 @@ class TempDirTest(UnitTestCase):
         td.forget(fname)
 
         fo, fname = td.mkstemp_file()
-        fo.close() # don't forget, leave to cleanup()
+        fo.close()  # don't forget, leave to cleanup()
 
         td.cleanup()
 

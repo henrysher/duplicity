@@ -38,7 +38,7 @@ from duplicity import tarfile
 import duplicity.globals as globals
 import duplicity.log as log
 
-def exception_traceback(limit = 50):
+def exception_traceback(limit=50):
     """
     @return A string representation in typical Python format of the
             currently active/raised exception.
@@ -147,13 +147,13 @@ def ignore_missing(fn, filename):
 
 def release_lockfile():
     if globals.lockfile and globals.lockfile.is_locked():
-        log.Debug(_("Releasing lockfile %s") % globals.lockfile )
+        log.Debug(_("Releasing lockfile %s") % globals.lockfile)
         try:
             globals.lockfile.release()
         except UnlockError:
             pass
 
-def copyfileobj(infp, outfp, byte_count = -1):
+def copyfileobj(infp, outfp, byte_count=-1):
     """Copy byte_count bytes from infp to outfp, or all if byte_count < 0
 
     Returns the number of bytes actually written (may be less than

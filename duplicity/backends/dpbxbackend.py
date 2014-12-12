@@ -56,12 +56,12 @@ ACCESS_TYPE = 'app_folder'
 _TOKEN_CACHE_FILE = os.path.expanduser("~/.dropbox.token_store.txt")
 
 def log_exception(e):
-    log.Error('Exception [%s]:'%(e,))
+    log.Error('Exception [%s]:' % (e,))
     f = StringIO.StringIO()
     traceback.print_exc(file=f)
     f.seek(0)
     for s in f.readlines():
-        log.Error('| '+s.rstrip())
+        log.Error('| ' + s.rstrip())
     f.close()
 
 def command(login_required=True):
@@ -108,13 +108,13 @@ class DPBXBackend(duplicity.backend.Backend):
                     stored_creds = f.read()
                     f.close()
                     self.set_token(*stored_creds.split('|'))
-                    log.Info( "[loaded access token]" )
+                    log.Info("[loaded access token]")
                 except IOError:
-                    pass # don't worry if it's not there
+                    pass  # don't worry if it's not there
 
             def write_creds(self, token):
-                open(self.TOKEN_FILE, 'w').close() # create/reset file
-                os.chmod(self.TOKEN_FILE, 0o600)     # set it -rw------ (NOOP in Windows?)
+                open(self.TOKEN_FILE, 'w').close()  # create/reset file
+                os.chmod(self.TOKEN_FILE, 0o600)  # set it -rw------ (NOOP in Windows?)
                 # now write the content
                 f = open(self.TOKEN_FILE, 'w')
                 f.write("|".join([token.key, token.secret]))
@@ -129,7 +129,7 @@ class DPBXBackend(duplicity.backend.Backend):
                 request_token = self.obtain_request_token()
                 url = self.build_authorize_url(request_token)
                 print
-                print '-'*72
+                print '-' * 72
                 print "url:", url
                 print "Please authorize in the browser. After you're done, press enter."
                 raw_input()
@@ -152,12 +152,12 @@ class DPBXBackend(duplicity.backend.Backend):
 
     def login(self):
         if not self.sess.is_linked():
-            try: # to login to the box
+            try:  # to login to the box
                 self.sess.link()
             except rest.ErrorResponse as e:
                 log.FatalError('dpbx Error: %s\n' % util.uexc(e), log.ErrorCode.dpbx_nologin)
-            if not self.sess.is_linked(): # stil not logged in
-                log.FatalError("dpbx Cannot login: check your credentials",log.ErrorCode.dpbx_nologin)
+            if not self.sess.is_linked():  # stil not logged in
+                log.FatalError("dpbx Cannot login: check your credentials", log.ErrorCode.dpbx_nologin)
 
     def _error_code(self, operation, e):
         if isinstance(e, rest.ErrorResponse):
@@ -166,19 +166,19 @@ class DPBXBackend(duplicity.backend.Backend):
 
     @command()
     def _put(self, source_path, remote_filename):
-        remote_dir  = urllib.unquote(self.parsed_url.path.lstrip('/'))
+        remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/'))
         remote_path = os.path.join(remote_dir, remote_filename).rstrip()
         from_file = open(source_path.name, "rb")
         resp = self.api_client.put_file(remote_path, from_file)
-        log.Debug( 'dpbx,put(%s,%s): %s'%(source_path.name, remote_path, resp))
+        log.Debug('dpbx,put(%s,%s): %s' % (source_path.name, remote_path, resp))
 
     @command()
     def _get(self, remote_filename, local_path):
         remote_path = os.path.join(urllib.unquote(self.parsed_url.path), remote_filename).rstrip()
 
-        to_file = open( local_path.name, 'wb' )
+        to_file = open(local_path.name, 'wb')
         f, metadata = self.api_client.get_file_and_metadata(remote_path)
-        log.Debug('dpbx.get(%s,%s): %s'%(remote_path,local_path.name,metadata))
+        log.Debug('dpbx.get(%s,%s): %s' % (remote_path, local_path.name, metadata))
         # print 'Metadata:', metadata
         to_file.write(f.read())
         f.close()
@@ -191,7 +191,7 @@ class DPBXBackend(duplicity.backend.Backend):
         # Do a long listing to avoid connection reset
         remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
         resp = self.api_client.metadata(remote_dir)
-        log.Debug('dpbx.list(%s): %s'%(remote_dir,resp))
+        log.Debug('dpbx.list(%s): %s' % (remote_dir, resp))
         l = []
         if 'contents' in resp:
             encoding = locale.getdefaultlocale()[1]
@@ -205,9 +205,9 @@ class DPBXBackend(duplicity.backend.Backend):
     @command()
     def _delete(self, filename):
         remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
-        remote_name = os.path.join( remote_dir, filename )
-        resp = self.api_client.file_delete( remote_name )
-        log.Debug('dpbx.delete(%s): %s'%(remote_name,resp))
+        remote_name = os.path.join(remote_dir, filename)
+        resp = self.api_client.file_delete(remote_name)
+        log.Debug('dpbx.delete(%s): %s' % (remote_name, resp))
 
     @command()
     def _close(self):
@@ -237,10 +237,10 @@ class DPBXBackend(duplicity.backend.Backend):
     def _mkdir(self, path):
         """create a new directory"""
         resp = self.api_client.file_create_folder(path)
-        log.Debug('dpbx._mkdir(%s): %s'%(path,resp))
+        log.Debug('dpbx._mkdir(%s): %s' % (path, resp))
 
 def etacsufbo(s):
-    return ''.join(reduce(lambda x,y:(x and len(x[-1])==1)and(x.append(y+
-        x.pop(-1))and x or x)or(x+[y]),s,[]))
+    return ''.join(reduce(lambda x, y:(x and len(x[-1]) == 1)and(x.append(y + 
+        x.pop(-1))and x or x)or(x + [y]), s, []))
 
 duplicity.backend.register_backend("dpbx", DPBXBackend)

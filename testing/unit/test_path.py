@@ -21,8 +21,8 @@
 
 import sys, unittest
 
-from duplicity import log #@UnusedImport
-from duplicity.path import * #@UnusedWildImport
+from duplicity import log  # @UnusedImport
+from duplicity.path import *  # @UnusedWildImport
 from . import UnitTestCase
 
 
@@ -42,7 +42,7 @@ class PathTest(UnitTestCase):
 
     # FIXME: How does this test make any sense?  Two separate Path objects 
     # will never be equal (they don't implement __cmp__ or __eq__)
-    #def test_compare(self):
+    # def test_compare(self):
     #    """Test directory comparisons"""
     #    assert not os.system("cp -pR testfiles/dir1 testfiles/output")
     #    assert Path("testfiles/dir1").compare_recursive(Path("testfiles/output"), 1)
@@ -57,7 +57,7 @@ class PathTest(UnitTestCase):
 
     def test_unquote(self):
         """Test path unquoting"""
-        p = Path("foo") # just to provide unquote function
+        p = Path("foo")  # just to provide unquote function
         def t(s):
             """Run test on string s"""
             quoted_version = p.quote(s)

@@ -31,7 +31,7 @@ class TimeException(Exception):
     pass
 
 _interval_conv_dict = {"s": 1, "m": 60, "h": 3600, "D": 86400,
-                       "W": 7*86400, "M": 30*86400, "Y": 365*86400}
+                       "W": 7 * 86400, "M": 30 * 86400, "Y": 365 * 86400}
 _integer_regexp = re.compile("^[0-9]+$")
 _interval_regexp = re.compile("^([0-9]+)([smhDWMY])")
 _genstr_date_regexp1 = re.compile("^(?P<year>[0-9]{4})[-/]"
@@ -61,7 +61,7 @@ current time zone), or ordinary dates like 2/4/1997 or 2001-04-23
 (various combinations are acceptable, but the month always precedes
 the day).""")
 
-def setcurtime(time_in_secs = None):
+def setcurtime(time_in_secs=None):
     """Sets the current time in curtime and curtimestr"""
     global curtime, curtimestr
     t = time_in_secs or int(time.time())
@@ -82,7 +82,7 @@ def timetostring(timeinseconds):
         #    1. Save the tuple returned by localtime.
         #    2. Pass the DST flag into gettzd
         lcltime = time.localtime(timeinseconds)
-        return time.strftime("%Y-%m-%dT%H" + globals.time_separator +
+        return time.strftime("%Y-%m-%dT%H" + globals.time_separator + 
                              "%M" + globals.time_separator + "%S",
                              lcltime) + gettzd(lcltime[-1])
     else:
@@ -193,7 +193,7 @@ def intstringtoseconds(interval_string):
         num, ext = int(match.group(1)), match.group(2)
         if ext not in _interval_conv_dict or num < 0:
             error()
-        total += num*_interval_conv_dict[ext]
+        total += num * _interval_conv_dict[ext]
         interval_string = interval_string[match.end(0):]
     return total
 
@@ -211,15 +211,15 @@ def gettzd(dstflag):
     # time.localtime()
 
     if dstflag > 0:
-        offset = -1 * time.altzone/60
+        offset = -1 * time.altzone / 60
     else:
-        offset = -1 * time.timezone/60
+        offset = -1 * time.timezone / 60
     if offset > 0:
         prefix = "+"
     elif offset < 0:
         prefix = "-"
     else:
-        return "Z" # time is already in UTC
+        return "Z"  # time is already in UTC
 
     hours, minutes = map(abs, divmod(offset, 60))
     assert 0 <= hours <= 23
@@ -230,7 +230,7 @@ def tzdtoseconds(tzd):
     """Given w3 compliant TZD, return how far ahead UTC is"""
     if tzd == "Z":
         return 0
-    assert len(tzd) == 6 # only accept forms like +08:00 for now
+    assert len(tzd) == 6  # only accept forms like +08:00 for now
     assert (tzd[0] == "-" or tzd[0] == "+") and \
            tzd[3] == globals.time_separator
     return -60 * (60 * int(tzd[:3]) + int(tzd[4:]))
@@ -251,7 +251,7 @@ def cmp(time1, time2):
     else:
         return 1
 
-def genstrtotime(timestr, override_curtime = None):
+def genstrtotime(timestr, override_curtime=None):
     """Convert a generic time string to a time in seconds"""
     if override_curtime is None:
         override_curtime = curtime
@@ -272,11 +272,11 @@ def genstrtotime(timestr, override_curtime = None):
     # localtime() is a bad idea, since we transition to/from DST between
     # calls to this method on the same run
 
-    t = stringtotime(timestr) or stringtotime(timestr+gettzd(0))
+    t = stringtotime(timestr) or stringtotime(timestr + gettzd(0))
     if t:
         return t
 
-    try: # test for an interval, like "2 days ago"
+    try:  # test for an interval, like "2 days ago"
         return override_curtime - intstringtoseconds(timestr)
     except TimeException:
         pass

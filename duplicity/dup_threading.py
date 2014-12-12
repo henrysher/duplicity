@@ -53,7 +53,7 @@ def threading_supported():
     """
     return _threading_supported
 
-def require_threading(reason = None):
+def require_threading(reason=None):
     """
     Assert that threading is required for operation to continue. Raise
     an appropriate exception if this is not the case.
@@ -178,7 +178,7 @@ def async_split(fn):
     # used for significant amounts of work.
 
 
-    cv = threading.Condition() #@UndefinedVariable
+    cv = threading.Condition()  # @UndefinedVariable
     state = { 'done': False,
               'error': None,
               'trace': None,
@@ -244,13 +244,13 @@ class Value:
       value.transform(lambda val: val + 1)
     """
 
-    def __init__(self, value = None):
+    def __init__(self, value=None):
         """
         Initialuze with the given value.
         """
         self.__value = value
 
-        self.__cv = threading.Condition() #@UndefinedVariable
+        self.__cv = threading.Condition()  # @UndefinedVariable
 
     def get(self):
         """

@@ -37,7 +37,7 @@ from duplicity import globals
 from duplicity import log
 from duplicity.errors import BackendException
 
-read_blocksize=65635            # for doing scp retrievals, where we need to read ourselves
+read_blocksize = 65635  # for doing scp retrievals, where we need to read ourselves
 
 class SSHParamikoBackend(duplicity.backend.Backend):
     """This backend accesses files using the sftp protocol, or scp when the --use-scp option is given.
@@ -83,18 +83,18 @@ class SSHParamikoBackend(duplicity.backend.Backend):
             """
             def missing_host_key(self, client, hostname, key):
                 fp = hexlify(key.get_fingerprint())
-                fingerprint = ':'.join(a+b for a,b in zip(fp[::2], fp[1::2]))
+                fingerprint = ':'.join(a + b for a, b in zip(fp[::2], fp[1::2]))
                 question = """The authenticity of host '%s' can't be established.
 %s key fingerprint is %s.
 Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_name().upper(), fingerprint)
                 while True:
                     sys.stdout.write(question)
                     choice = raw_input().lower()
-                    if choice in ['yes','y']:
+                    if choice in ['yes', 'y']:
                         paramiko.AutoAddPolicy.missing_host_key(self, client, hostname, key)
                         return
-                    elif choice in ['no','n']:
-                        raise AuthenticityException( hostname )
+                    elif choice in ['no', 'n']:
+                        raise AuthenticityException(hostname)
                     else:
                         question = "Please type 'yes' or 'no': "
 
@@ -108,24 +108,24 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         # paramiko uses logging with the normal python severity levels,
         # but duplicity uses both custom levels and inverted logic...*sigh*
         self.client.set_log_channel("sshbackend")
-        ours=paramiko.util.get_logger("sshbackend")
-        dest=logging.StreamHandler(sys.stderr)
+        ours = paramiko.util.get_logger("sshbackend")
+        dest = logging.StreamHandler(sys.stderr)
         dest.setFormatter(logging.Formatter('ssh: %(message)s'))
         ours.addHandler(dest)
 
         # ..and the duplicity levels are neither linear,
         # nor are the names compatible with python logging, eg. 'NOTICE'...WAAAAAH!
-        plevel=logging.getLogger("duplicity").getEffectiveLevel()
+        plevel = logging.getLogger("duplicity").getEffectiveLevel()
         if plevel <= 1:
-            wanted=logging.DEBUG
+            wanted = logging.DEBUG
         elif plevel <= 5:
-            wanted=logging.INFO
+            wanted = logging.INFO
         elif plevel <= 7:
-            wanted=logging.WARNING
+            wanted = logging.WARNING
         elif plevel <= 9:
-            wanted=logging.ERROR
+            wanted = logging.ERROR
         else:
-            wanted=logging.CRITICAL
+            wanted = logging.CRITICAL
         ours.setLevel(wanted)
 
         # load known_hosts files
@@ -152,11 +152,11 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         rationale is that it is easiest to deal wrt overwriting multiple
         values from ssh_config file. (ede 03/2012)
         """
-        self.config={'hostname':parsed_url.hostname}
+        self.config = {'hostname':parsed_url.hostname}
         # get system host config entries
-        self.config.update(self.gethostconfig('/etc/ssh/ssh_config',parsed_url.hostname))
+        self.config.update(self.gethostconfig('/etc/ssh/ssh_config', parsed_url.hostname))
         # update with user's config file
-        self.config.update(self.gethostconfig('~/.ssh/config',parsed_url.hostname))
+        self.config.update(self.gethostconfig('~/.ssh/config', parsed_url.hostname))
         # update with url values
         # username from url
         if parsed_url.username:
@@ -173,9 +173,9 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         else:
             self.config.update({'port':22})
         # parse ssh options for alternative ssh private key, identity file
-        m=re.search("^(?:.+\s+)?(?:-oIdentityFile=|-i\s+)(([\"'])([^\\2]+)\\2|[\S]+).*",globals.ssh_options)
-        if (m!=None):
-            keyfilename=m.group(3) if m.group(3) else m.group(1)
+        m = re.search("^(?:.+\s+)?(?:-oIdentityFile=|-i\s+)(([\"'])([^\\2]+)\\2|[\S]+).*", globals.ssh_options)
+        if (m != None):
+            keyfilename = m.group(3) if m.group(3) else m.group(1)
             self.config['identityfile'] = keyfilename
         # ensure ~ is expanded and identity exists in dictionary
         if 'identityfile' in self.config:
@@ -214,23 +214,23 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
             raise BackendException("ssh connection to %s@%s:%d failed: %s" % (
                                     self.config['user'],
                                     self.config['hostname'],
-                                    self.config['port'],e))
+                                    self.config['port'], e))
         self.client.get_transport().set_keepalive((int)(globals.timeout / 2))
 
         self.scheme = duplicity.backend.strip_prefix(parsed_url.scheme, 'paramiko')
-        self.use_scp = ( self.scheme == 'scp' )
+        self.use_scp = (self.scheme == 'scp')
 
         # scp or sftp?
         if (self.use_scp):
             # sanity-check the directory name
-            if (re.search("'",self.remote_dir)):
+            if (re.search("'", self.remote_dir)):
                 raise BackendException("cannot handle directory names with single quotes with --use-scp!")
 
             # make directory if needed
-            self.runremote("test -d '%s' || mkdir -p '%s'" % (self.remote_dir,self.remote_dir),False,"scp mkdir ")
+            self.runremote("test -d '%s' || mkdir -p '%s'" % (self.remote_dir, self.remote_dir), False, "scp mkdir ")
         else:
             try:
-                self.sftp=self.client.open_sftp()
+                self.sftp = self.client.open_sftp()
             except Exception as e:
                 raise BackendException("sftp negotiation failed: %s" % e)
 
@@ -239,93 +239,93 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
             if len(dirs) > 0:
                 if not dirs[0]:
                     dirs = dirs[1:]
-                    dirs[0]= '/' + dirs[0]
+                    dirs[0] = '/' + dirs[0]
                 for d in dirs:
                     if (d == ''):
                         continue
                     try:
-                        attrs=self.sftp.stat(d)
+                        attrs = self.sftp.stat(d)
                     except IOError as e:
                         if e.errno == errno.ENOENT:
                             try:
                                 self.sftp.mkdir(d)
                             except Exception as e:
-                                raise BackendException("sftp mkdir %s failed: %s" % (self.sftp.normalize(".")+"/"+d,e))
+                                raise BackendException("sftp mkdir %s failed: %s" % (self.sftp.normalize(".") + "/" + d, e))
                         else:
-                            raise BackendException("sftp stat %s failed: %s" % (self.sftp.normalize(".")+"/"+d,e))
+                            raise BackendException("sftp stat %s failed: %s" % (self.sftp.normalize(".") + "/" + d, e))
                     try:
                         self.sftp.chdir(d)
                     except Exception as e:
-                        raise BackendException("sftp chdir to %s failed: %s" % (self.sftp.normalize(".")+"/"+d,e))
+                        raise BackendException("sftp chdir to %s failed: %s" % (self.sftp.normalize(".") + "/" + d, e))
 
     def _put(self, source_path, remote_filename):
         if self.use_scp:
-            f=file(source_path.name,'rb')
+            f = file(source_path.name, 'rb')
             try:
-                chan=self.client.get_transport().open_session()
+                chan = self.client.get_transport().open_session()
                 chan.settimeout(globals.timeout)
-                chan.exec_command("scp -t '%s'" % self.remote_dir) # scp in sink mode uses the arg as base directory
+                chan.exec_command("scp -t '%s'" % self.remote_dir)  # scp in sink mode uses the arg as base directory
             except Exception as e:
                 raise BackendException("scp execution failed: %s" % e)
             # scp protocol: one 0x0 after startup, one after the Create meta, one after saving
             # if there's a problem: 0x1 or 0x02 and some error text
-            response=chan.recv(1)
-            if (response!="\0"):
+            response = chan.recv(1)
+            if (response != "\0"):
                 raise BackendException("scp remote error: %s" % chan.recv(-1))
-            fstat=os.stat(source_path.name)
-            chan.send('C%s %d %s\n' %(oct(fstat.st_mode)[-4:], fstat.st_size, remote_filename))
-            response=chan.recv(1)
-            if (response!="\0"):
+            fstat = os.stat(source_path.name)
+            chan.send('C%s %d %s\n' % (oct(fstat.st_mode)[-4:], fstat.st_size, remote_filename))
+            response = chan.recv(1)
+            if (response != "\0"):
                 raise BackendException("scp remote error: %s" % chan.recv(-1))
-            chan.sendall(f.read()+'\0')
+            chan.sendall(f.read() + '\0')
             f.close()
-            response=chan.recv(1)
-            if (response!="\0"):
+            response = chan.recv(1)
+            if (response != "\0"):
                 raise BackendException("scp remote error: %s" % chan.recv(-1))
             chan.close()
         else:
-            self.sftp.put(source_path.name,remote_filename)
+            self.sftp.put(source_path.name, remote_filename)
 
     def _get(self, remote_filename, local_path):
         if self.use_scp:
             try:
-                chan=self.client.get_transport().open_session()
+                chan = self.client.get_transport().open_session()
                 chan.settimeout(globals.timeout)
-                chan.exec_command("scp -f '%s/%s'" % (self.remote_dir,remote_filename))
+                chan.exec_command("scp -f '%s/%s'" % (self.remote_dir, remote_filename))
             except Exception as e:
                 raise BackendException("scp execution failed: %s" % e)
 
-            chan.send('\0')     # overall ready indicator
-            msg=chan.recv(-1)
-            m=re.match(r"C([0-7]{4})\s+(\d+)\s+(\S.*)$",msg)
-            if (m==None or m.group(3)!=remote_filename):
-                raise BackendException("scp get %s failed: incorrect response '%s'" % (remote_filename,msg))
-            chan.recv(1)        # dispose of the newline trailing the C message
+            chan.send('\0')  # overall ready indicator
+            msg = chan.recv(-1)
+            m = re.match(r"C([0-7]{4})\s+(\d+)\s+(\S.*)$", msg)
+            if (m == None or m.group(3) != remote_filename):
+                raise BackendException("scp get %s failed: incorrect response '%s'" % (remote_filename, msg))
+            chan.recv(1)  # dispose of the newline trailing the C message
 
-            size=int(m.group(2))
-            togo=size
-            f=file(local_path.name,'wb')
-            chan.send('\0')     # ready for data
+            size = int(m.group(2))
+            togo = size
+            f = file(local_path.name, 'wb')
+            chan.send('\0')  # ready for data
             try:
-                while togo>0:
-                    if togo>read_blocksize:
+                while togo > 0:
+                    if togo > read_blocksize:
                         blocksize = read_blocksize
                     else:
                         blocksize = togo
-                    buff=chan.recv(blocksize)
+                    buff = chan.recv(blocksize)
                     f.write(buff)
-                    togo-=len(buff)
+                    togo -= len(buff)
             except Exception as e:
-                raise BackendException("scp get %s failed: %s" % (remote_filename,e))
+                raise BackendException("scp get %s failed: %s" % (remote_filename, e))
 
-            msg=chan.recv(1)    # check the final status
-            if msg!='\0':
-                raise BackendException("scp get %s failed: %s" % (remote_filename,chan.recv(-1)))
+            msg = chan.recv(1)  # check the final status
+            if msg != '\0':
+                raise BackendException("scp get %s failed: %s" % (remote_filename, chan.recv(-1)))
             f.close()
-            chan.send('\0')     # send final done indicator
+            chan.send('\0')  # send final done indicator
             chan.close()
         else:
-            self.sftp.get(remote_filename,local_path.name)
+            self.sftp.get(remote_filename, local_path.name)
 
     def _list(self):
         # In scp mode unavoidable quoting issues will make this fail if the
@@ -344,19 +344,19 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         else:
             self.sftp.remove(filename)
 
-    def runremote(self,cmd,ignoreexitcode=False,errorprefix=""):
+    def runremote(self, cmd, ignoreexitcode=False, errorprefix=""):
         """small convenience function that opens a shell channel, runs remote command and returns
         stdout of command. throws an exception if exit code!=0 and not ignored"""
         try:
-            chan=self.client.get_transport().open_session()
+            chan = self.client.get_transport().open_session()
             chan.settimeout(globals.timeout)
             chan.exec_command(cmd)
         except Exception as e:
-            raise BackendException("%sexecution failed: %s" % (errorprefix,e))
-        output=chan.recv(-1)
-        res=chan.recv_exit_status()
-        if (res!=0 and not ignoreexitcode):
-            raise BackendException("%sfailed(%d): %s" % (errorprefix,res,chan.recv_stderr(4096)))
+            raise BackendException("%sexecution failed: %s" % (errorprefix, e))
+        output = chan.recv(-1)
+        res = chan.recv_exit_status()
+        if (res != 0 and not ignoreexitcode):
+            raise BackendException("%sfailed(%d): %s" % (errorprefix, res, chan.recv_stderr(4096)))
         return output
 
     def gethostconfig(self, file, host):

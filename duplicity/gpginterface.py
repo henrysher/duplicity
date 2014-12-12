@@ -233,11 +233,11 @@ from duplicity import log
 try:
     import threading
 except ImportError:
-    import dummy_threading #@UnusedImport
+    import dummy_threading  # @UnusedImport
     log.Warn(_("Threading not available -- zombie processes may appear"))
 
-__author__   = "Frank J. Tobin, ftobin@neverending.org"
-__version__  = "0.3.2"
+__author__ = "Frank J. Tobin, ftobin@neverending.org"
+__version__ = "0.3.2"
 __revision__ = "$Id: GnuPGInterface.py,v 1.6 2009/06/06 17:35:19 loafman Exp $"
 
 # "standard" filehandles attached to processes
@@ -370,7 +370,7 @@ class GnuPG:
 
         if handle_passphrase:
             passphrase_fh = process.handles['passphrase']
-            passphrase_fh.write( self.passphrase )
+            passphrase_fh.write(self.passphrase)
             passphrase_fh.close()
             del process.handles['passphrase']
 
@@ -438,12 +438,12 @@ class GnuPG:
         # child
         for std in _stds:
             p = process._pipes[std]
-            os.dup2( p.child, getattr(sys, "__%s__" % std).fileno() )
+            os.dup2(p.child, getattr(sys, "__%s__" % std).fileno())
 
         for k, p in process._pipes.items():
             if p.direct and k not in _stds:
                 # we want the fh to stay open after execing
-                fcntl.fcntl( p.child, fcntl.F_SETFD, 0 )
+                fcntl.fcntl(p.child, fcntl.F_SETFD, 0)
 
         fd_args = []
 
@@ -457,7 +457,7 @@ class GnuPG:
         command = [ self.call ] + fd_args + self.options.get_args() \
                   + gnupg_commands + args
 
-        os.execvp( command[0], command )
+        os.execvp(command[0], command)
 
 
 class Pipe:
@@ -575,48 +575,48 @@ class Options:
         # miscellaneous arguments
         self.extra_args = []
 
-    def get_args( self ):
+    def get_args(self):
         """Generate a list of GnuPG arguments based upon attributes."""
 
         return self.get_meta_args() + self.get_standard_args() + self.extra_args
 
-    def get_standard_args( self ):
+    def get_standard_args(self):
         """Generate a list of standard, non-meta or extra arguments"""
         args = []
-        if self.homedir != None: args.extend( [ '--homedir', self.homedir ] )
-        if self.options != None: args.extend( [ '--options', self.options ] )
-        if self.comment != None: args.extend( [ '--comment', self.comment ] )
-        if self.compress_algo != None: args.extend( [ '--compress-algo', self.compress_algo ] )
-        if self.default_key != None: args.extend( [ '--default-key', self.default_key ] )
+        if self.homedir != None: args.extend([ '--homedir', self.homedir ])
+        if self.options != None: args.extend([ '--options', self.options ])
+        if self.comment != None: args.extend([ '--comment', self.comment ])
+        if self.compress_algo != None: args.extend([ '--compress-algo', self.compress_algo ])
+        if self.default_key != None: args.extend([ '--default-key', self.default_key ])
 
-        if self.no_options: args.append( '--no-options' )
-        if self.armor: args.append( '--armor' )
-        if self.textmode: args.append( '--textmode' )
-        if self.no_greeting: args.append( '--no-greeting' )
-        if self.verbose: args.append( '--verbose' )
-        if self.no_verbose: args.append( '--no-verbose' )
-        if self.quiet: args.append( '--quiet' )
-        if self.batch: args.append( '--batch' )
-        if self.always_trust: args.append( '--always-trust' )
-        if self.force_v3_sigs: args.append( '--force-v3-sigs' )
-        if self.rfc1991: args.append( '--rfc1991' )
-        if self.openpgp: args.append( '--openpgp' )
+        if self.no_options: args.append('--no-options')
+        if self.armor: args.append('--armor')
+        if self.textmode: args.append('--textmode')
+        if self.no_greeting: args.append('--no-greeting')
+        if self.verbose: args.append('--verbose')
+        if self.no_verbose: args.append('--no-verbose')
+        if self.quiet: args.append('--quiet')
+        if self.batch: args.append('--batch')
+        if self.always_trust: args.append('--always-trust')
+        if self.force_v3_sigs: args.append('--force-v3-sigs')
+        if self.rfc1991: args.append('--rfc1991')
+        if self.openpgp: args.append('--openpgp')
 
-        for r in self.recipients: args.extend( [ '--recipient',  r ] )
-        for r in self.hidden_recipients: args.extend( [ '--hidden-recipient',  r ] )
-        for r in self.encrypt_to: args.extend( [ '--encrypt-to', r ] )
+        for r in self.recipients: args.extend([ '--recipient', r ])
+        for r in self.hidden_recipients: args.extend([ '--hidden-recipient', r ])
+        for r in self.encrypt_to: args.extend([ '--encrypt-to', r ])
 
         return args
 
-    def get_meta_args( self ):
+    def get_meta_args(self):
         """Get a list of generated meta-arguments"""
         args = []
 
-        if self.meta_pgp_5_compatible: args.extend( [ '--compress-algo', '1',
+        if self.meta_pgp_5_compatible: args.extend([ '--compress-algo', '1',
                                                       '--force-v3-sigs'
-                                                      ] )
-        if self.meta_pgp_2_compatible: args.append( '--rfc1991' )
-        if not self.meta_interactive: args.extend( [ '--batch', '--no-tty' ] )
+                                                      ])
+        if self.meta_pgp_2_compatible: args.append('--rfc1991')
+        if not self.meta_interactive: args.extend([ '--batch', '--no-tty' ])
 
         return args
 
@@ -645,11 +645,11 @@ class Process:
     """
 
     def __init__(self):
-        self._pipes   = {}
-        self.handles  = {}
-        self.pid      = None
-        self._waited  = None
-        self.thread   = None
+        self._pipes = {}
+        self.handles = {}
+        self.pid = None
+        self._waited = None
+        self.thread = None
         self.returned = None
 
     def wait(self):
@@ -679,7 +679,7 @@ def threaded_waitpid(process):
 
 
 def _run_doctests():
-    import doctest, gpginterface #@UnresolvedImport
+    import doctest, gpginterface  # @UnresolvedImport
     return doctest.testmod(GnuPGInterface)
 
 # deprecated

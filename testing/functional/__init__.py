@@ -85,8 +85,8 @@ class FunctionalTestCase(DuplicityTestCase):
         child.wait()
 
         return_val = child.exitstatus
-        #output = child.read()
-        #print "Ran duplicity command: ", cmdline, "\n with return_val: ", return_val, "\n and output:\n", output
+        # output = child.read()
+        # print "Ran duplicity command: ", cmdline, "\n with return_val: ", return_val, "\n and output:\n", output
 
         if fail:
             self.assertEqual(30, return_val)

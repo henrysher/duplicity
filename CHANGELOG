@@ -43,6 +43,8 @@ Enhancements:
 * Merged in lp:~ed.so/duplicity/paramiko.identyfile
   - fix identity file parsing of --ssh-options for paramiko
   - manpage fixes
+* Source formatted, using PyDev, all source files to fix some easily fixed
+  PEP8 issues. Use ignore space when comparing against previous versions.
 
 
 New in v0.7.00 (2014/10/23)

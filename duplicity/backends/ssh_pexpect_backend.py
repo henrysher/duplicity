@@ -51,7 +51,7 @@ class SSHPExpectBackend(duplicity.backend.Backend):
         if globals.sftp_command: self.sftp_command = globals.sftp_command
 
         self.scheme = duplicity.backend.strip_prefix(parsed_url.scheme, 'pexpect')
-        self.use_scp = ( self.scheme == 'scp' )
+        self.use_scp = (self.scheme == 'scp')
 
         # host string of form [user@]hostname
         if parsed_url.username:
@@ -82,7 +82,7 @@ class SSHPExpectBackend(duplicity.backend.Backend):
         """ Run an scp command, responding to password prompts """
         import pexpect
         log.Info("Running '%s'" % commandline)
-        child = pexpect.spawn(commandline, timeout = None)
+        child = pexpect.spawn(commandline, timeout=None)
         if globals.ssh_askpass:
             state = "authorizing"
         else:
@@ -139,14 +139,14 @@ class SSHPExpectBackend(duplicity.backend.Backend):
                     break
                 elif match == 2:
                     state = "copying"
-        child.close(force = True)
+        child.close(force=True)
         if child.exitstatus != 0:
             raise BackendException("Error running '%s'" % commandline)
 
     def run_sftp_command(self, commandline, commands):
         """ Run an sftp command, responding to password prompts, passing commands from list """
         import pexpect
-        maxread = 2000 # expected read buffer size
+        maxread = 2000  # expected read buffer size
         responses = [pexpect.EOF,
                      "(?i)timeout, server not responding",
                      "sftp>",
@@ -159,13 +159,13 @@ class SSHPExpectBackend(duplicity.backend.Backend):
                      "open(.*): Failure"]
         max_response_len = max([len(p) for p in responses[1:]])
         log.Info("Running '%s'" % (commandline))
-        child = pexpect.spawn(commandline, timeout = None, maxread=maxread)
+        child = pexpect.spawn(commandline, timeout=None, maxread=maxread)
         cmdloc = 0
         passprompt = 0
         while 1:
             msg = ""
             match = child.expect(responses,
-                                 searchwindowsize=maxread+max_response_len)
+                                 searchwindowsize=maxread + max_response_len)
             log.Debug("State = sftp, Before = '%s'" % (child.before.strip()))
             if match == 0:
                 break
@@ -185,7 +185,7 @@ class SSHPExpectBackend(duplicity.backend.Backend):
             elif match == 3:
                 passprompt += 1
                 child.sendline(self.password)
-                if (passprompt>1):
+                if (passprompt > 1):
                     raise BackendException("Invalid SSH password.")
             elif match == 4:
                 if not child.before.strip().startswith("mkdir"):
@@ -208,7 +208,7 @@ class SSHPExpectBackend(duplicity.backend.Backend):
             elif match == 9:
                 msg = "Could not open file in command='%s'" % (commandline,)
                 break
-        child.close(force = True)
+        child.close(force=True)
         if child.exitstatus == 0:
             return res
         else:
@@ -224,7 +224,7 @@ class SSHPExpectBackend(duplicity.backend.Backend):
         commands = ["put \"%s\" \"%s.%s.part\"" %
                     (source_path.name, self.remote_prefix, remote_filename),
                     "rename \"%s.%s.part\" \"%s%s\"" %
-                    (self.remote_prefix, remote_filename,self.remote_prefix, remote_filename)]
+                    (self.remote_prefix, remote_filename, self.remote_prefix, remote_filename)]
         commandline = ("%s %s %s" % (self.sftp_command,
                                      globals.ssh_options,
                                      self.host_string))
@@ -264,7 +264,7 @@ class SSHPExpectBackend(duplicity.backend.Backend):
         if len(dirs) > 0:
             if not dirs[0] :
                 dirs = dirs[1:]
-                dirs[0]= '/' + dirs[0]
+                dirs[0] = '/' + dirs[0]
         mkdir_commands = [];
         for d in dirs:
             mkdir_commands += ["mkdir \"%s\"" % (d)] + ["cd \"%s\"" % (d)]

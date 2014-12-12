@@ -80,7 +80,7 @@ class Snapshot(sys_collections.deque):
         progressfd.close()
 
 
-    def __init__(self, iterable = [], maxlen = 10):
+    def __init__(self, iterable=[], maxlen=10):
         super(Snapshot, self).__init__(iterable, maxlen)
         self.last_vol = 0
 
@@ -163,10 +163,10 @@ class ProgressTracker():
         if self.stall_last_time is None:
             self.stall_last_time = current_time
         if (current_time - self.stall_last_time).seconds > max(5, 2 * globals.progress_rate):
-            log.TransferProgress(100.0 * self.progress_estimation, 
-                                    self.time_estimation, self.total_bytecount, 
+            log.TransferProgress(100.0 * self.progress_estimation,
+                                    self.time_estimation, self.total_bytecount,
                                     (current_time - self.start_time).seconds,
-                                    self.speed, 
+                                    self.speed,
                                     True
                                 )
             return
@@ -199,7 +199,7 @@ class ProgressTracker():
             # Compute mean ratio of data transfer, estimating unknown progress
             change_ratio = float(self.total_bytecount) / float(diffdir.stats.RawDeltaSize)
             change_delta = change_ratio - self.change_mean_ratio
-            self.change_mean_ratio += change_delta / float(self.nsteps) # mean cumulated ratio
+            self.change_mean_ratio += change_delta / float(self.nsteps)  # mean cumulated ratio
             self.change_r_estimation += change_delta * (change_ratio - self.change_mean_ratio)
             change_sigma = math.sqrt(math.fabs(self.change_r_estimation / float(self.nsteps)))
         
@@ -210,7 +210,7 @@ class ProgressTracker():
                 Use 50% confidence interval lower bound during first half of the progression. Conversely, use 50% C.I. upper bound during
                 the second half. Scale it to the changes/total ratio
             """
-            self.current_estimation = float(changes) / float(total_changes) * ( 
+            self.current_estimation = float(changes) / float(total_changes) * (
                                             (self.change_mean_ratio - 0.67 * change_sigma) * (1.0 - self.current_estimation) + 
                                             (self.change_mean_ratio + 0.67 * change_sigma) * self.current_estimation 
                                         )
@@ -218,7 +218,7 @@ class ProgressTracker():
             In case that we overpassed the 100%, drop the confidence and trust more the mean as the sigma may be large.
             """
             if self.current_estimation > 1.0:
-                self.current_estimation = float(changes) / float(total_changes) * ( 
+                self.current_estimation = float(changes) / float(total_changes) * (
                                                 (self.change_mean_ratio - 0.33 * change_sigma) * (1.0 - self.current_estimation) + 
                                                 (self.change_mean_ratio + 0.33 * change_sigma) * self.current_estimation 
                                             )
@@ -238,7 +238,7 @@ class ProgressTracker():
         """
         Estimate the time just as a projection of the remaining time, fit to a [(1 - x) / x] curve
         """
-        self.elapsed_sum += elapsed # As sum of timedeltas, so as to avoid clock skew in long runs (adding also microseconds)
+        self.elapsed_sum += elapsed  # As sum of timedeltas, so as to avoid clock skew in long runs (adding also microseconds)
         projection = 1.0
         if self.progress_estimation > 0:
             projection = (1.0 - self.progress_estimation) / self.progress_estimation
@@ -260,10 +260,10 @@ class ProgressTracker():
         for x in self.transfers:
             self.speed = 0.3 * x + 0.7 * self.speed
 
-        log.TransferProgress(100.0 * self.progress_estimation, 
-                                self.time_estimation, 
-                                self.total_bytecount, 
-                                (current_time - self.start_time).seconds, 
+        log.TransferProgress(100.0 * self.progress_estimation,
+                                self.time_estimation,
+                                self.total_bytecount,
+                                (current_time - self.start_time).seconds,
                                 self.speed,
                                 False
                             )
@@ -277,7 +277,7 @@ class ProgressTracker():
         volume and for the current volume
         """
         changing = max(bytecount - self.last_bytecount, 0)
-        self.total_bytecount += int(changing) # Annotate only changing bytes since last probe
+        self.total_bytecount += int(changing)  # Annotate only changing bytes since last probe
         self.last_bytecount = bytecount
         if changing > 0:
             self.stall_last_time = datetime.now()

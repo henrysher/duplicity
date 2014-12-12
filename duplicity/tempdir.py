@@ -55,7 +55,7 @@ def default():
     _defaultLock.acquire()
     try:
         if _defaultInstance is None or _defaultInstance.dir() is None:
-            _defaultInstance = TemporaryDirectory(temproot = globals.temproot)
+            _defaultInstance = TemporaryDirectory(temproot=globals.temproot)
         return _defaultInstance
     finally:
         _defaultLock.release()
@@ -106,7 +106,7 @@ class TemporaryDirectory:
     well. The impact should however be limited to the removal of an
     'attackers' file.
     """
-    def __init__(self, temproot = None):
+    def __init__(self, temproot=None):
         """
         Create a new TemporaryDirectory backed by a unique and
         securely created file system directory.

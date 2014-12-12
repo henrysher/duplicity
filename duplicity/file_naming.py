@@ -38,7 +38,7 @@ full_sig_re_short = None
 new_sig_re = None
 new_sig_re_short = None
 
-def prepare_regex(force = False):
+def prepare_regex(force=False):
     global full_vol_re
     global full_vol_re_short
     global full_manifest_re
@@ -151,7 +151,7 @@ def to_base36(n):
     if n == mod:
         return last_digit
     else:
-        return to_base36(div)+last_digit
+        return to_base36(div) + last_digit
 
 
 def from_base36(s):
@@ -193,8 +193,8 @@ def get_suffix(encrypted, gzipped):
     return suffix
 
 
-def get(type, volume_number = None, manifest = False,
-        encrypted = False, gzipped = False, partial = False):
+def get(type, volume_number=None, manifest=False,
+        encrypted=False, gzipped=False, partial=False):
     """
     Return duplicity filename of specified type
 
@@ -219,18 +219,18 @@ def get(type, volume_number = None, manifest = False,
         assert not (volume_number and part_string)
         if type == "full-sig":
             if globals.short_filenames:
-                return (globals.file_prefix + globals.file_prefix_signature + "dfs.%s.st%s%s" %
+                return (globals.file_prefix + globals.file_prefix_signature + "dfs.%s.st%s%s" % 
                         (to_base36(dup_time.curtime), part_string, suffix))
             else:
-                return (globals.file_prefix + globals.file_prefix_signature + "duplicity-full-signatures.%s.sigtar%s%s" %
+                return (globals.file_prefix + globals.file_prefix_signature + "duplicity-full-signatures.%s.sigtar%s%s" % 
                         (dup_time.curtimestr, part_string, suffix))
         elif type == "new-sig":
             if globals.short_filenames:
-                return (globals.file_prefix + globals.file_prefix_signature + "dns.%s.%s.st%s%s" %
+                return (globals.file_prefix + globals.file_prefix_signature + "dns.%s.%s.st%s%s" % 
                         (to_base36(dup_time.prevtime), to_base36(dup_time.curtime),
                          part_string, suffix))
             else:
-                return (globals.file_prefix + globals.file_prefix_signature + "duplicity-new-signatures.%s.to.%s.sigtar%s%s" %
+                return (globals.file_prefix + globals.file_prefix_signature + "duplicity-new-signatures.%s.to.%s.sigtar%s%s" % 
                         (dup_time.prevtimestr, dup_time.curtimestr,
                          part_string, suffix))
     else:
@@ -315,11 +315,11 @@ def parse(filename):
             t = str2time((m1 or m2).group("time"), short)
             if t:
                 if m1:
-                    return ParseResults("full", time = t,
-                                        volume_number = get_vol_num(m1.group("num"), short))
+                    return ParseResults("full", time=t,
+                                        volume_number=get_vol_num(m1.group("num"), short))
                 else:
-                    return ParseResults("full", time = t, manifest = True,
-                                        partial = (m2.group("partial") != None))
+                    return ParseResults("full", time=t, manifest=True,
+                                        partial=(m2.group("partial") != None))
         return None
 
     def check_inc():
@@ -339,11 +339,11 @@ def parse(filename):
             t2 = str2time((m1 or m2).group("end_time"), short)
             if t1 and t2:
                 if m1:
-                    return ParseResults("inc", start_time = t1,
-                                        end_time = t2, volume_number = get_vol_num(m1.group("num"), short))
+                    return ParseResults("inc", start_time=t1,
+                                        end_time=t2, volume_number=get_vol_num(m1.group("num"), short))
                 else:
-                    return ParseResults("inc", start_time = t1, end_time = t2, manifest = 1,
-                                        partial = (m2.group("partial") != None))
+                    return ParseResults("inc", start_time=t1, end_time=t2, manifest=1,
+                                        partial=(m2.group("partial") != None))
         return None
 
     def check_sig():
@@ -359,8 +359,8 @@ def parse(filename):
         if m:
             t = str2time(m.group("time"), short)
             if t:
-                return ParseResults("full-sig", time = t,
-                                    partial = (m.group("partial") != None))
+                return ParseResults("full-sig", time=t,
+                                    partial=(m.group("partial") != None))
             else:
                 return None
 
@@ -373,8 +373,8 @@ def parse(filename):
             t1 = str2time(m.group("start_time"), short)
             t2 = str2time(m.group("end_time"), short)
             if t1 and t2:
-                return ParseResults("new-sig", start_time = t1, end_time = t2,
-                                    partial = (m.group("partial") != None))
+                return ParseResults("new-sig", start_time=t1, end_time=t2,
+                                    partial=(m.group("partial") != None))
         return None
 
     def set_encryption_or_compression(pr):
@@ -408,9 +408,9 @@ class ParseResults:
     """
     Hold information taken from a duplicity filename
     """
-    def __init__(self, type, manifest = None, volume_number = None,
-                 time = None, start_time = None, end_time = None,
-                 encrypted = None, compressed = None, partial = False):
+    def __init__(self, type, manifest=None, volume_number=None,
+                 time=None, start_time=None, end_time=None,
+                 encrypted=None, compressed=None, partial=False):
 
         assert type in ["full-sig", "new-sig", "inc", "full"]
 
@@ -427,7 +427,7 @@ class ParseResults:
         self.time = time
         self.start_time, self.end_time = start_time, end_time
 
-        self.compressed = compressed # true if gzip compressed
-        self.encrypted = encrypted # true if gpg encrypted
+        self.compressed = compressed  # true if gzip compressed
+        self.encrypted = encrypted  # true if gpg encrypted
 
         self.partial = partial

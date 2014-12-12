@@ -65,7 +65,7 @@ def getpass_safe(message):
     message = message.encode(locale.getpreferredencoding(), 'replace')
     return getpass.getpass(message)
 
-def get_passphrase(n, action, for_signing = False):
+def get_passphrase(n, action, for_signing=False):
     """
     Check to make sure passphrase is indeed needed, then get
     the passphrase from environment, from gpg-agent, or user
@@ -95,17 +95,17 @@ def get_passphrase(n, action, for_signing = False):
 
     # check if we can reuse an already set (signing_)passphrase
     # if signing key is also an encryption key assume that the passphrase is identical
-    if ( for_signing
+    if (for_signing
          and (globals.gpg_profile.sign_key in globals.gpg_profile.recipients
          or globals.gpg_profile.sign_key in globals.gpg_profile.hidden_recipients)
-         and 'PASSPHRASE' in os.environ ):
+         and 'PASSPHRASE' in os.environ):
         log.Notice(_("Reuse configured PASSPHRASE as SIGN_PASSPHRASE"))
         return os.environ['PASSPHRASE']
     # if one encryption key is also the signing key assume that the passphrase is identical
-    if ( not for_signing
+    if (not for_signing
          and (globals.gpg_profile.sign_key in globals.gpg_profile.recipients
          or globals.gpg_profile.sign_key in globals.gpg_profile.hidden_recipients)
-         and 'SIGN_PASSPHRASE' in os.environ ):
+         and 'SIGN_PASSPHRASE' in os.environ):
         log.Notice(_("Reuse configured SIGN_PASSPHRASE as PASSPHRASE"))
         return os.environ['SIGN_PASSPHRASE']
 
@@ -160,12 +160,12 @@ def get_passphrase(n, action, for_signing = False):
                     if use_cache and globals.gpg_profile.signing_passphrase:
                         pass1 = globals.gpg_profile.signing_passphrase
                     else:
-                        pass1 = getpass_safe(_("GnuPG passphrase for signing key:")+" ")
+                        pass1 = getpass_safe(_("GnuPG passphrase for signing key:") + " ")
                 else:
                     if use_cache and globals.gpg_profile.passphrase:
                         pass1 = globals.gpg_profile.passphrase
                     else:
-                        pass1 = getpass_safe(_("GnuPG passphrase:")+" ")
+                        pass1 = getpass_safe(_("GnuPG passphrase:") + " ")
 
             if n == 1:
                 pass2 = pass1
@@ -291,7 +291,7 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
         info = backend.query_info([dest_filename])[dest_filename]
         size = info['size']
         if size is None:
-            return # error querying file
+            return  # error querying file
         if size != orig_size:
             code_extra = "%s %d %d" % (util.escape(dest_filename), orig_size, size)
             log.FatalError(_("File %s was corrupted during upload.") % util.ufn(dest_filename),
@@ -304,7 +304,7 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
         instead of copying.
         """
         putsize = tdp.getsize()
-        if globals.skip_volume != vol_num: # for testing purposes only
+        if globals.skip_volume != vol_num:  # for testing purposes only
             backend.put(tdp, dest_filename)
         validate_block(putsize, dest_filename)
         if tdp.stat:
@@ -382,7 +382,7 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
 
     while not at_end:
         # set up iterator
-        tarblock_iter.remember_next_index() # keep track of start index
+        tarblock_iter.remember_next_index()  # keep track of start index
 
         # Create volume
         vol_num += 1
@@ -939,7 +939,7 @@ def remove_old(col_stats):
                    "\n" + chain_times_str(chainlist))
         # Add signature files too, since they won't be needed anymore
         chainlist += col_stats.get_signature_chains_older_than(globals.remove_time)
-        chainlist.reverse() # save oldest for last
+        chainlist.reverse()  # save oldest for last
         for chain in chainlist:
             # if remove_all_inc_of_but_n_full_mode mode, remove only incrementals one and not full
             if globals.remove_all_inc_of_but_n_full_mode:
@@ -1143,7 +1143,7 @@ def sync_archive(decrypt):
                     # password for the --encrypt-key
                     globals.gpg_profile.passphrase = get_passphrase(1, "sync")
                 else:
-                    local_missing = [] # don't download if we can't decrypt
+                    local_missing = []  # don't download if we can't decrypt
             for fn in local_spurious:
                 remove_local(fn)
             if hasattr(globals.backend, 'pre_process_download'):
@@ -1337,7 +1337,7 @@ See https://bugs.launchpad.net/duplicity/+bug/931175
         log.shutdown()
         sys.exit(2)
 
-    globals.lockfile.acquire(timeout = 0)
+    globals.lockfile.acquire(timeout=0)
 
     try:
         do_backup(action)
@@ -1351,7 +1351,7 @@ def do_backup(action):
     if globals.pydevd:
         pysrc = "/opt/Aptana Studio 3/plugins/org.python.pydev.debug_2.2.4.2011111522/pysrc"
         sys.path.append(pysrc)
-        import pydevd #@UnresolvedImport
+        import pydevd  # @UnresolvedImport
         pydevd.settrace()
     # end remote debugger startup
 
@@ -1472,7 +1472,7 @@ def do_backup(action):
                     # only ask for a passphrase if there was a previous backup
                     if col_stats.all_backup_chains:
                         globals.gpg_profile.passphrase = get_passphrase(1, action)
-                    check_last_manifest(col_stats) # not needed for full backup
+                    check_last_manifest(col_stats)  # not needed for full backup
                 incremental_backup(sig_chain)
     globals.backend.close()
     log.shutdown()

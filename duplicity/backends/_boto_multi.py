@@ -29,7 +29,7 @@ import traceback
 
 from duplicity import globals
 from duplicity import log
-from duplicity.errors import * #@UnusedWildImport
+from duplicity.errors import *  # @UnusedWildImport
 from duplicity.filechunkio import FileChunkIO
 from duplicity import progress
 
@@ -125,7 +125,7 @@ class BotoBackend(BotoSingleBackend):
 
         log.Debug("Uploading %d bytes in %d chunks" % (bytes, chunks))
 
-        mp = self.bucket.initiate_multipart_upload(key.key, headers,encrypt_key=globals.s3_use_sse)
+        mp = self.bucket.initiate_multipart_upload(key.key, headers, encrypt_key=globals.s3_use_sse)
 
         # Initiate a queue to share progress data between the pool
         # workers and a consumer thread, that will collect and report
@@ -204,7 +204,7 @@ def multipart_upload_worker(scheme, parsed_url, storage_uri, bucket_name, multip
                                                  num_cb=max(2, 8 * bytes / (1024 * 1024))
                                                  )  # Max num of callbacks = 8 times x megabyte
                         end = time.time()
-                        log.Debug("{name}: Uploaded chunk {chunk} at roughly {speed} bytes/second".format(name=worker_name, chunk=offset+1, speed=(bytes/max(1, abs(end-start)))))
+                        log.Debug("{name}: Uploaded chunk {chunk} at roughly {speed} bytes/second".format(name=worker_name, chunk=offset + 1, speed=(bytes / max(1, abs(end - start)))))
                     break
             conn.close()
             conn = None

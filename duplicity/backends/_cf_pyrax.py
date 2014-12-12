@@ -93,7 +93,7 @@ class PyraxBackend(duplicity.backend.Backend):
         objs = self.container.get_object_names()
         keys = objs
         while len(objs) == 10000:
-            objs = self.container.get_object_names(marker = keys[-1])
+            objs = self.container.get_object_names(marker=keys[-1])
             keys += objs
         return keys
 

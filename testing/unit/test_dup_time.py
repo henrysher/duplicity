@@ -44,9 +44,9 @@ class TimeTest:
     def testCmp(self):
         """Test time comparisons"""
         cmp = dup_time.cmp
-        assert cmp(1,2) == -1
-        assert cmp(2,2) == 0
-        assert cmp(5,1) == 1
+        assert cmp(1, 2) == -1
+        assert cmp(2, 2) == 0
+        assert cmp(5, 1) == 1
         assert cmp("2001-09-01T21:49:04Z", "2001-08-01T21:49:04Z") == 1
         assert cmp("2001-09-01T04:49:04+03:23", "2001-09-01T21:49:04Z") == -1
         assert cmp("2001-09-01T12:00:00Z", "2001-09-01T04:00:00-08:00") == 0
@@ -59,9 +59,9 @@ class TimeTest:
         """Like testCmp but with new separator"""
         self.set_global('time_separator', "_")
         cmp = dup_time.cmp
-        assert cmp(1,2) == -1
-        assert cmp(2,2) == 0
-        assert cmp(5,1) == 1
+        assert cmp(1, 2) == -1
+        assert cmp(2, 2) == 0
+        assert cmp(5, 1) == 1
         assert cmp("2001-09-01T21_49_04Z", "2001-08-01T21_49_04Z") == 1
         assert cmp("2001-09-01T04_49_04+03_23", "2001-09-01T21_49_04Z") == -1
         assert cmp("2001-09-01T12_00_00Z", "2001-09-01T04_00_00-08_00") == 0
@@ -82,21 +82,21 @@ class TimeTest:
             try: i2s(s)
             except dup_time.TimeException: pass
             else: assert 0, s
-        assert i2s("7D") == 7*86400
+        assert i2s("7D") == 7 * 86400
         assert i2s("232s") == 232
-        assert i2s("2M") == 2*30*86400
-        assert i2s("400m") == 400*60
-        assert i2s("1Y") == 365*86400
-        assert i2s("30h") == 30*60*60
-        assert i2s("3W") == 3*7*86400
+        assert i2s("2M") == 2 * 30 * 86400
+        assert i2s("400m") == 400 * 60
+        assert i2s("1Y") == 365 * 86400
+        assert i2s("30h") == 30 * 60 * 60
+        assert i2s("3W") == 3 * 7 * 86400
 
     def testIntervalsComposite(self):
         """Like above, but allow composite intervals"""
         i2s = dup_time.intstringtoseconds
-        assert i2s("7D2h") == 7*86400 + 2*3600
-        assert i2s("2Y3s") == 2*365*86400 + 3
-        assert i2s("1M2W4D2h5m20s") == (30*86400 + 2*7*86400 + 4*86400 +
-                                        2*3600 + 5*60 + 20)
+        assert i2s("7D2h") == 7 * 86400 + 2 * 3600
+        assert i2s("2Y3s") == 2 * 365 * 86400 + 3
+        assert i2s("1M2W4D2h5m20s") == (30 * 86400 + 2 * 7 * 86400 + 4 * 86400 + 
+                                        2 * 3600 + 5 * 60 + 20)
 
     def testPrettyIntervals(self):
         """Test printable interval conversion"""
@@ -111,7 +111,7 @@ class TimeTest:
         """Test genstrtotime, conversion of arbitrary string to time"""
         g2t = dup_time.genstrtotime
         assert g2t('now', 1000) == 1000
-        assert g2t('2h3s', 10000) == 10000 - 2*3600 - 3
+        assert g2t('2h3s', 10000) == 10000 - 2 * 3600 - 3
         assert g2t('2001-09-01T21:49:04Z') == \
                dup_time.stringtotime('2001-09-01T21:49:04Z')
         assert g2t('2002-04-26T04:22:01') == \

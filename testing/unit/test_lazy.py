@@ -22,7 +22,7 @@
 import unittest, pickle, sys
 from functools import reduce
 
-from duplicity.lazy import * #@UnusedWildImport
+from duplicity.lazy import *  # @UnusedWildImport
 from . import UnitTestCase
 
 
@@ -76,13 +76,13 @@ class IterEqualTestCase(Iterators):
 
     def testNormal(self):
         """See if normal iterators are equal"""
-        assert Iter.equal(iter((1,2,3)), iter((1,2,3)))
+        assert Iter.equal(iter((1, 2, 3)), iter((1, 2, 3)))
         assert Iter.equal(self.odds(), iter(range(1, 100, 2)))
-        assert Iter.equal(iter((1,2,3)), iter(range(1, 4)))
+        assert Iter.equal(iter((1, 2, 3)), iter(range(1, 4)))
 
     def testNormalInequality(self):
         """See if normal unequals work"""
-        assert not Iter.equal(iter((1,2,3)), iter((1,2,4)))
+        assert not Iter.equal(iter((1, 2, 3)), iter((1, 2, 4)))
         assert not Iter.equal(self.odds(), iter(["hello", "there"]))
 
     def testGenerators(self):
@@ -97,8 +97,8 @@ class IterEqualTestCase(Iterators):
 
     def testLength(self):
         """Differently sized iterators"""
-        assert not Iter.equal(iter((1,2,3)), iter((1,2)))
-        assert not Iter.equal(iter((1,2)), iter((1,2,3)))
+        assert not Iter.equal(iter((1, 2, 3)), iter((1, 2)))
+        assert not Iter.equal(iter((1, 2)), iter((1, 2, 3)))
 
 
 class FilterTestCase(Iterators):
@@ -128,7 +128,7 @@ class MapTestCase(Iterators):
     """Test mapping of iterators"""
     def testNumbers(self):
         """1 to 100 * 2 = 2 to 200"""
-        assert Iter.equal(Iter.map(lambda x: 2*x, self.one_to_100()),
+        assert Iter.equal(Iter.map(lambda x: 2 * x, self.one_to_100()),
                           iter(range(2, 201, 2)))
 
     def testShortcut(self):
@@ -181,7 +181,7 @@ class AndOrTestCase(Iterators):
 
     def testNormalAnd(self):
         """And should go through true iterators, picking last"""
-        assert Iter.And(iter([1,2,3,4])) == 4
+        assert Iter.And(iter([1, 2, 3, 4])) == 4
         self.assertRaises(Exception, Iter.And, self.trueerror_maker())
 
     def testNormalOr(self):
@@ -212,8 +212,8 @@ class FoldingTest(Iterators):
 
     def testLen(self):
         """Use folds to calculate length of lists"""
-        assert Iter.foldl(lambda x, y: x+1, 0, self.evens()) == 50
-        assert Iter.foldr(lambda x, y: y+1, 0, self.odds()) == 50
+        assert Iter.foldl(lambda x, y: x + 1, 0, self.evens()) == 50
+        assert Iter.foldr(lambda x, y: y + 1, 0, self.odds()) == 50
 
 class MultiplexTest(Iterators):
     def testSingle(self):
@@ -248,11 +248,11 @@ class ITRBadder(ITRBranch):
     def end_process(self):
         if self.base_index:
             summand = self.base_index[-1]
-            #print "Adding ", summand
+            # print "Adding ", summand
             self.total += summand
 
     def branch_process(self, subinstance):
-        #print "Adding subinstance ", subinstance.total
+        # print "Adding subinstance ", subinstance.total
         self.total += subinstance.total
 
 class ITRBadder2(ITRBranch):
@@ -260,8 +260,8 @@ class ITRBadder2(ITRBranch):
         self.total = 0
 
     def end_process(self):
-        #print "Adding ", self.base_index
-        self.total += reduce(lambda x,y: x+y, self.base_index, 0)
+        # print "Adding ", self.base_index
+        self.total += reduce(lambda x, y: x + y, self.base_index, 0)
 
     def can_fast_process(self, index):
         if len(index) == 3: return 1
@@ -271,7 +271,7 @@ class ITRBadder2(ITRBranch):
         self.total += index[0] + index[1] + index[2]
 
     def branch_process(self, subinstance):
-        #print "Adding branch ", subinstance.total
+        # print "Adding branch ", subinstance.total
         self.total += subinstance.total
 
 class TreeReducerTest(UnitTestCase):
@@ -279,13 +279,13 @@ class TreeReducerTest(UnitTestCase):
         super(TreeReducerTest, self).setUp()
 
         self.i1 = [(), (1,), (2,), (3,)]
-        self.i2 = [(0,), (0,1), (0,1,0), (0,1,1), (0,2), (0,2,1), (0,3)]
+        self.i2 = [(0,), (0, 1), (0, 1, 0), (0, 1, 1), (0, 2), (0, 2, 1), (0, 3)]
 
         self.i1a = [(), (1,)]
         self.i1b = [(2,), (3,)]
-        self.i2a = [(0,), (0,1), (0,1,0)]
-        self.i2b = [(0,1,1), (0,2)]
-        self.i2c = [(0,2,1), (0,3)]
+        self.i2a = [(0,), (0, 1), (0, 1, 0)]
+        self.i2b = [(0, 1, 1), (0, 2)]
+        self.i2c = [(0, 2, 1), (0, 3)]
 
     def testTreeReducer(self):
         """testing IterTreeReducer"""

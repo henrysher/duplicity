@@ -23,7 +23,7 @@ import errno
 
 tmp_file_index = 1
 
-def check_common_error(error_handler, function, args = ()):
+def check_common_error(error_handler, function, args=()):
     """Apply function to args, if error, run error_handler on exception
 
     This only catches certain exceptions which seem innocent

@@ -71,16 +71,16 @@ def get_fileobj_duppath(dirpath, partname, permname, remname, overwrite=False):
     if not globals.restart:
         td = tempdir.TemporaryDirectory(dirpath.name)
         tdpname = td.mktemp()
-        tdp = TempDupPath(tdpname, parseresults = file_naming.parse(partname))
-        fh = FileobjHooked(tdp.filtered_open("wb"), tdp = tdp, dirpath = dirpath,
-                           partname = partname, permname = permname, remname = remname)
+        tdp = TempDupPath(tdpname, parseresults=file_naming.parse(partname))
+        fh = FileobjHooked(tdp.filtered_open("wb"), tdp=tdp, dirpath=dirpath,
+                           partname=partname, permname=permname, remname=remname)
     else:
-        dp = path.DupPath(dirpath.name, index = (partname,))
+        dp = path.DupPath(dirpath.name, index=(partname,))
         mode = "ab"
         if overwrite:
             mode = "wb"
-        fh = FileobjHooked(dp.filtered_open(mode), tdp = None, dirpath = dirpath,
-                           partname = partname, permname = permname, remname = remname)
+        fh = FileobjHooked(dp.filtered_open(mode), tdp=None, dirpath=dirpath,
+                           partname=partname, permname=permname, remname=remname)
 
     def rename_and_forget():
         tdp.rename(dirpath.append(partname))
@@ -97,7 +97,7 @@ def new_tempduppath(parseresults):
     Return a new TempDupPath, using settings from parseresults
     """
     filename = tempdir.default().mktemp()
-    return TempDupPath(filename, parseresults = parseresults)
+    return TempDupPath(filename, parseresults=parseresults)
 
 
 class TempDupPath(path.DupPath):
@@ -119,11 +119,11 @@ class TempDupPath(path.DupPath):
         fh.addhook(self.delete)
         return fh
 
-    def open_with_delete(self, mode = "rb"):
+    def open_with_delete(self, mode="rb"):
         """
         Returns a fileobj.  When that is closed, delete file
         """
-        assert mode == "rb" # Why write a file and then close it immediately?
+        assert mode == "rb"  # Why write a file and then close it immediately?
         fh = FileobjHooked(path.DupPath.open(self, mode))
         fh.addhook(self.delete)
         return fh
@@ -133,19 +133,19 @@ class FileobjHooked:
     """
     Simulate a file, but add hook on close
     """
-    def __init__(self, fileobj, tdp = None, dirpath = None,
-                 partname = None, permname = None, remname = None):
+    def __init__(self, fileobj, tdp=None, dirpath=None,
+                 partname=None, permname=None, remname=None):
         """
         Initializer.  fileobj is the file object to simulate
         """
-        self.fileobj = fileobj      # the actual file object
-        self.closed = False         # True if closed
-        self.hooklist = []          # filled later with thunks to run on close
-        self.tdp = tdp              # TempDupPath object
-        self.dirpath = dirpath      # path to directory
-        self.partname = partname    # partial filename
-        self.permname = permname    # permanent filename
-        self.remname = remname      # remote filename
+        self.fileobj = fileobj  # the actual file object
+        self.closed = False  # True if closed
+        self.hooklist = []  # filled later with thunks to run on close
+        self.tdp = tdp  # TempDupPath object
+        self.dirpath = dirpath  # path to directory
+        self.partname = partname  # partial filename
+        self.permname = permname  # permanent filename
+        self.remname = remname  # remote filename
 
     def write(self, buf):
         """
@@ -179,12 +179,12 @@ class FileobjHooked:
         tgt = self.dirpath.append(self.remname)
         src_iter = SrcIter(src)
         if pr.compressed:
-            gpg.GzipWriteFile(src_iter, tgt.name, size = sys.maxsize)
+            gpg.GzipWriteFile(src_iter, tgt.name, size=sys.maxsize)
         elif pr.encrypted:
-            gpg.GPGWriteFile(src_iter, tgt.name, globals.gpg_profile, size = sys.maxsize)
+            gpg.GPGWriteFile(src_iter, tgt.name, globals.gpg_profile, size=sys.maxsize)
         else:
             os.system("cp -p \"%s\" \"%s\"" % (src.name, tgt.name))
-        globals.backend.move(tgt) #@UndefinedVariable
+        globals.backend.move(tgt)  # @UndefinedVariable
 
     def to_final(self):
         """
@@ -195,12 +195,12 @@ class FileobjHooked:
         src_iter = SrcIter(src)
         pr = file_naming.parse(self.permname)
         if pr.compressed:
-            gpg.GzipWriteFile(src_iter, tgt.name, size = sys.maxsize)
+            gpg.GzipWriteFile(src_iter, tgt.name, size=sys.maxsize)
             os.unlink(src.name)
         else:
             os.rename(src.name, tgt.name)
 
-    def read(self, length = -1):
+    def read(self, length=-1):
         """
         Read fileobj, return result of read()
         """
@@ -260,7 +260,7 @@ class SrcIter:
         try:
             res = Block(self.fp.read(self.get_read_size()))
         except Exception:
-            log.FatalError(_("Failed to read %s: %s") %
+            log.FatalError(_("Failed to read %s: %s") % 
                            (util.ufn(self.src.name), sys.exc_info()),
                            log.ErrorCode.generic)
         if not res.data:

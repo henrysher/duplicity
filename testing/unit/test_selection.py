@@ -22,8 +22,8 @@
 import types
 import StringIO, unittest, sys
 
-from duplicity.selection import * #@UnusedWildImport
-from duplicity.lazy import * #@UnusedWildImport
+from duplicity.selection import *  # @UnusedWildImport
+from duplicity.lazy import *  # @UnusedWildImport
 from . import UnitTestCase
 
 
@@ -177,7 +177,7 @@ testfiles/select/1/1
 - testfiles/select/3""")
         sf = self.Select.filelist_get_sf(fp, 0, "test1")
         sf_val1 = sf(self.root)
-        assert sf_val1 == 1 or sf_val1 == None # either is OK
+        assert sf_val1 == 1 or sf_val1 == None  # either is OK
         sf_val2 = sf(self.makeext("1"))
         assert sf_val2 == 1 or sf_val2 == None
         assert sf(self.makeext("1/1")) == 0
@@ -275,7 +275,7 @@ class ParseArgsTest(UnitTestCase):
         self.unpack_testfiles()
         self.root = None
 
-    def ParseTest(self, tuplelist, indicies, filelists = []):
+    def ParseTest(self, tuplelist, indicies, filelists=[]):
         """No error if running select on tuple goes over indicies"""
         if not self.root:
             self.root = Path("testfiles/select")
@@ -283,7 +283,7 @@ class ParseArgsTest(UnitTestCase):
         self.Select.ParseArgs(tuplelist, self.remake_filelists(filelists))
         self.Select.set_iter()
         assert Iter.equal(Iter.map(lambda path: path.index, self.Select),
-                          iter(indicies), verbose = 1)
+                          iter(indicies), verbose=1)
 
     def remake_filelists(self, filelist):
         """Turn strings in filelist into fileobjs"""

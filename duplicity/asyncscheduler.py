@@ -32,7 +32,7 @@ from duplicity.dup_threading import interruptably_wait
 from duplicity.dup_threading import async_split
 from duplicity.dup_threading import with_lock
 
-thread    = duplicity.dup_threading.thread_module()
+thread = duplicity.dup_threading.thread_module()
 threading = duplicity.dup_threading.threading_module()
 
 class AsyncScheduler:
@@ -63,17 +63,17 @@ class AsyncScheduler:
         given level of concurrency.
         """
         log.Info("%s: %s" % (self.__class__.__name__,
-                             _("instantiating at concurrency %d") %
+                             _("instantiating at concurrency %d") % 
                                (concurrency)))
         assert concurrency >= 0, "%s concurrency level must be >= 0" % (self.__class__.__name__,)
 
-        self.__failed        = False        # has at least one task failed so far?
-        self.__failed_waiter = None         # when __failed, the waiter of the first task that failed
-        self.__concurrency   = concurrency
-        self.__worker_count  = 0            # number of active workers
-        self.__waiter_count  = 0            # number of threads waiting to submit work
-        self.__barrier       = False        # barrier currently in effect?
-        self.__cv            = threading.Condition() # for simplicity, we use a single cv with its lock
+        self.__failed = False  # has at least one task failed so far?
+        self.__failed_waiter = None  # when __failed, the waiter of the first task that failed
+        self.__concurrency = concurrency
+        self.__worker_count = 0  # number of active workers
+        self.__waiter_count = 0  # number of threads waiting to submit work
+        self.__barrier = False  # barrier currently in effect?
+        self.__cv = threading.Condition()  # for simplicity, we use a single cv with its lock
 #                                                    # for everything, even if the resulting notifyAll():s
 #                                                    # are not technically efficient.
 
@@ -193,7 +193,7 @@ class AsyncScheduler:
                                      "this is a bug" % (self.__class__.__name__,))
 
         def wait_for_and_register_launch():
-            check_pending_failure()    # raise on fail
+            check_pending_failure()  # raise on fail
             while self.__worker_count >= self.__concurrency or self.__barrier:
                 if self.__worker_count == 0:
                     assert self.__barrier, "barrier should be in effect"
@@ -204,7 +204,7 @@ class AsyncScheduler:
                     self.__cv.wait()
                     self.__waiter_count -= 1
 
-                check_pending_failure() # raise on fail
+                check_pending_failure()  # raise on fail
 
             self.__worker_count += 1
             log.Debug("%s: %s" % (self.__class__.__name__,

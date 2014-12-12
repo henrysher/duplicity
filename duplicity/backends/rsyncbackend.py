@@ -87,7 +87,7 @@ class RsyncBackend(duplicity.backend.Backend):
             portOption = " -e 'ssh -oBatchMode=yes%s'" % port
         rsyncOptions = globals.rsync_options
         if rsyncOptions:
-            rsyncOptions= " " + rsyncOptions
+            rsyncOptions = " " + rsyncOptions
         # build cmd
         self.cmd = "rsync%s%s" % (portOption, rsyncOptions)
 
@@ -104,7 +104,7 @@ class RsyncBackend(duplicity.backend.Backend):
         if m:
             return m.group(2), m.group(1).lstrip(':')
         raise InvalidBackendURL("Could not determine rsync path: %s"
-                                    "" % self.munge_password( url ) )
+                                    "" % self.munge_password(url))
 
     def _put(self, source_path, remote_filename):
         remote_path = os.path.join(self.url_string, remote_filename)
@@ -143,10 +143,10 @@ class RsyncBackend(duplicity.backend.Backend):
             path = os.path.join (dir, file)
             to_delete.append (path)
             f = open (path, 'w')
-            print >>exclude, file
+            print >> exclude, file
             f.close()
         exclude.close()
-        commandline = ("%s --recursive --delete --exclude-from=%s %s/ %s" %
+        commandline = ("%s --recursive --delete --exclude-from=%s %s/ %s" % 
                                    (self.cmd, exclude_name, dir, self.url_string))
         self.subprocess_popen(commandline)
         for file in to_delete:

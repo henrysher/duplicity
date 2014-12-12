@@ -40,7 +40,7 @@ class Manifest:
     """
     List of volumes and information about each one
     """
-    def __init__(self, fh = None):
+    def __init__(self, fh=None):
         """
         Create blank Manifest
 
@@ -52,7 +52,7 @@ class Manifest:
         """
         self.hostname = None
         self.local_dirname = None
-        self.volume_info_dict = {} # dictionary vol numbers -> vol infos
+        self.volume_info_dict = {}  # dictionary vol numbers -> vol infos
         self.fh = fh
 
     def set_dirinfo(self):
@@ -64,7 +64,7 @@ class Manifest:
         @return: manifest
         """
         self.hostname = globals.hostname
-        self.local_dirname = globals.local_path.name #@UndefinedVariable
+        self.local_dirname = globals.local_path.name  # @UndefinedVariable
         if self.fh:
             if self.hostname:
                 self.fh.write("Hostname %s\n" % self.hostname)
@@ -92,16 +92,16 @@ class Manifest:
             code = log.ErrorCode.hostname_mismatch
             code_extra = "%s %s" % (util.escape(globals.hostname), util.escape(self.hostname))
 
-        elif (self.local_dirname and self.local_dirname != globals.local_path.name): #@UndefinedVariable
+        elif (self.local_dirname and self.local_dirname != globals.local_path.name):  # @UndefinedVariable
             errmsg = _("Fatal Error: Backup source directory has changed.\n"
                        "Current directory: %s\n"
-                       "Previous directory: %s") % (globals.local_path.name, self.local_dirname) #@UndefinedVariable
+                       "Previous directory: %s") % (globals.local_path.name, self.local_dirname)  # @UndefinedVariable
             code = log.ErrorCode.source_dir_mismatch
-            code_extra = "%s %s" % (util.escape(globals.local_path.name), util.escape(self.local_dirname)) #@UndefinedVariable
+            code_extra = "%s %s" % (util.escape(globals.local_path.name), util.escape(self.local_dirname))  # @UndefinedVariable
         else:
             return
 
-        log.FatalError(errmsg + "\n\n" +
+        log.FatalError(errmsg + "\n\n" + 
                        _("Aborting because you may have accidentally tried to "
                          "backup two different data sets to the same remote "
                          "location, or using the same archive directory.  If "
@@ -325,12 +325,12 @@ class VolumeInfo:
 
         slist = ["Volume %d:" % self.volume_number]
         whitespace = "    "
-        slist.append("%sStartingPath   %s %s" %
+        slist.append("%sStartingPath   %s %s" % 
                      (whitespace, index_to_string(self.start_index), (self.start_block or " ")))
-        slist.append("%sEndingPath     %s %s" %
+        slist.append("%sEndingPath     %s %s" % 
                      (whitespace, index_to_string(self.end_index), (self.end_block or " ")))
         for key in self.hashes:
-            slist.append("%sHash %s %s" %
+            slist.append("%sHash %s %s" % 
                          (whitespace, key, self.hashes[key]))
         return "\n".join(slist)
 
@@ -417,7 +417,7 @@ class VolumeInfo:
         """
         return not self.__eq__(other)
 
-    def contains(self, index_prefix, recursive = 1):
+    def contains(self, index_prefix, recursive=1):
         """
         Return true if volume might contain index
 
@@ -427,7 +427,7 @@ class VolumeInfo:
         indicies.
         """
         if recursive:
-            return (self.start_index[:len(index_prefix)] <=
+            return (self.start_index[:len(index_prefix)] <= 
                     index_prefix <= self.end_index)
         else:
             return self.start_index <= index_prefix <= self.end_index
@@ -439,7 +439,7 @@ def Quote(s):
     Return quoted version of s safe to put in a manifest or volume info
     """
     if not nonnormal_char_re.search(s):
-        return s # no quoting necessary
+        return s  # no quoting necessary
     slist = []
     for char in s:
         if nonnormal_char_re.search(char):
@@ -457,13 +457,13 @@ def Unquote(quoted_string):
         return quoted_string
     assert quoted_string[0] == quoted_string[-1]
     return_list = []
-    i = 1 # skip initial char
-    while i < len(quoted_string)-1:
+    i = 1  # skip initial char
+    while i < len(quoted_string) - 1:
         char = quoted_string[i]
         if char == "\\":
             # quoted section
-            assert quoted_string[i+1] == "x"
-            return_list.append(chr(int(quoted_string[i+2:i+4], 16)))
+            assert quoted_string[i + 1] == "x"
+            return_list.append(chr(int(quoted_string[i + 2:i + 4], 16)))
             i += 4
         else:
             return_list.append(char)

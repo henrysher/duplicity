@@ -44,7 +44,7 @@ remote_sigchain_filename_list = ["duplicity-full-signatures.2002-08-17T16:17:01-
                                  "duplicity-new-signatures.2002-08-17T16:17:01-07:00.to.2002-08-18T00:04:30-07:00.sigtar.gpg",
                                  "duplicity-new-signatures.2002-08-18T00:04:30-07:00.to.2002-08-20T00:00:00-07:00.sigtar.gpg"]
 
-local_sigchain_filename_list =  ["duplicity-full-signatures.2002-08-17T16:17:01-07:00.sigtar.gz",
+local_sigchain_filename_list = ["duplicity-full-signatures.2002-08-17T16:17:01-07:00.sigtar.gz",
                                  "duplicity-new-signatures.2002-08-17T16:17:01-07:00.to.2002-08-18T00:04:30-07:00.sigtar.gz",
                                  "duplicity-new-signatures.2002-08-18T00:04:30-07:00.to.2002-08-20T00:00:00-07:00.sigtar.gz"]
 
@@ -82,20 +82,20 @@ class CollectionTest(UnitTestCase):
         self.archive_dir_backend = backend.get_backend("file://testfiles/collectionstest"
                                                        "/archive_dir")
 
-        self.real_backend = backend.get_backend("file://%s/%s" %
+        self.real_backend = backend.get_backend("file://%s/%s" % 
                                                 (col_test_dir.name, "remote_dir"))
-        self.output_dir = path.Path("testfiles/output") # used as a temp directory
+        self.output_dir = path.Path("testfiles/output")  # used as a temp directory
         self.output_dir_backend = backend.get_backend("file://testfiles/output")
 
     def set_gpg_profile(self):
         """Set gpg profile to standard "foobar" sym"""
-        self.set_global('gpg_profile', gpg.GPGProfile(passphrase = "foobar"))
+        self.set_global('gpg_profile', gpg.GPGProfile(passphrase="foobar"))
 
     def test_backup_chains(self):
         """Test basic backup chain construction"""
         random.shuffle(filename_list1)
         cs = collections.CollectionsStatus(None, globals.archive_dir)
-        chains, orphaned, incomplete = cs.get_backup_chains(filename_list1) #@UnusedVariable
+        chains, orphaned, incomplete = cs.get_backup_chains(filename_list1)  # @UnusedVariable
         if len(chains) != 1 or len(orphaned) != 0:
             print chains
             print orphaned
@@ -129,13 +129,13 @@ class CollectionTest(UnitTestCase):
     def test_sig_chains(self):
         """Test making signature chains from filename list"""
         cs = collections.CollectionsStatus(None, globals.archive_dir)
-        chains, orphaned_paths = cs.get_signature_chains(local = 1)
+        chains, orphaned_paths = cs.get_signature_chains(local=1)
         self.sig_chains_helper(chains, orphaned_paths)
 
     def test_sig_chains2(self):
         """Test making signature chains from filename list on backend"""
         cs = collections.CollectionsStatus(self.archive_dir_backend, globals.archive_dir)
-        chains, orphaned_paths = cs.get_signature_chains(local = None)
+        chains, orphaned_paths = cs.get_signature_chains(local=None)
         self.sig_chains_helper(chains, orphaned_paths)
 
     def sig_chains_helper(self, chains, orphaned_paths):
@@ -204,7 +204,7 @@ class CollectionTest(UnitTestCase):
                       "duplicity-full.2002-08-15T01:01:01-07:00.vol1.difftar.gpg",
                       "duplicity-inc.2000-08-17T16:17:01-07:00.to.2000-08-18T00:04:30-07:00.manifest.gpg",
                       "duplicity-inc.2000-08-17T16:17:01-07:00.to.2000-08-18T00:04:30-07:00.vol1.difftar.gpg"]
-        local_received_list, remote_received_list = cs.get_extraneous(False) #@UnusedVariable
+        local_received_list, remote_received_list = cs.get_extraneous(False)  # @UnusedVariable
         errors = []
         for filename in remote_received_list:
             if filename not in right_list:
@@ -212,7 +212,7 @@ class CollectionTest(UnitTestCase):
             else: right_list.remove(filename)
         for filename in right_list:
             errors.append("### Didn't receive extraneous filename " + filename)
-        assert not errors, "\n"+"\n".join(errors)
+        assert not errors, "\n" + "\n".join(errors)
 
     def test_get_olderthan(self):
         """Test getting list of files older than a certain time"""

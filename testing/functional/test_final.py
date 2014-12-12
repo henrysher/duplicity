@@ -30,52 +30,52 @@ class FinalTest(FunctionalTestCase):
     """
     Test backup/restore using duplicity binary
     """
-    def runtest(self, dirlist, backup_options = [], restore_options = []):
+    def runtest(self, dirlist, backup_options=[], restore_options=[]):
         """Run backup/restore test on directories in dirlist"""
         assert len(dirlist) >= 1
 
         # Back up directories to local backend
         current_time = 100000
-        self.backup("full", dirlist[0], current_time = current_time,
-                    options = backup_options)
+        self.backup("full", dirlist[0], current_time=current_time,
+                    options=backup_options)
         for new_dir in dirlist[1:]:
             current_time += 100000
-            self.backup("inc", new_dir, current_time = current_time,
-                        options = backup_options)
+            self.backup("inc", new_dir, current_time=current_time,
+                        options=backup_options)
 
         # Restore each and compare them
         for i in range(len(dirlist)):
             dirname = dirlist[i]
-            current_time = 100000*(i + 1)
-            self.restore(time = current_time, options = restore_options)
+            current_time = 100000 * (i + 1)
+            self.restore(time=current_time, options=restore_options)
             self.check_same(dirname, "testfiles/restore_out")
             self.verify(dirname,
-                        time = current_time, options = restore_options)
+                        time=current_time, options=restore_options)
 
     def check_same(self, filename1, filename2):
         """Verify two filenames are the same"""
         path1, path2 = path.Path(filename1), path.Path(filename2)
-        assert path1.compare_recursive(path2, verbose = 1)
+        assert path1.compare_recursive(path2, verbose=1)
 
-    def test_basic_cycle(self, backup_options = [], restore_options = []):
+    def test_basic_cycle(self, backup_options=[], restore_options=[]):
         """Run backup/restore test on basic directories"""
         self.runtest(["testfiles/dir1",
                       "testfiles/dir2",
                       "testfiles/dir3"],
-                     backup_options = backup_options,
-                     restore_options = restore_options)
+                     backup_options=backup_options,
+                     restore_options=restore_options)
 
         # Test restoring various sub files
         for filename, time, dir in [('symbolic_link', 99999, 'dir1'),
                                     ('directory_to_file', 100100, 'dir1'),
                                     ('directory_to_file', 200100, 'dir2'),
                                     ('largefile', 300000, 'dir3')]:
-            self.restore(filename, time, options = restore_options)
+            self.restore(filename, time, options=restore_options)
             self.check_same('testfiles/%s/%s' % (dir, filename),
                             'testfiles/restore_out')
             self.verify('testfiles/%s/%s' % (dir, filename),
-                        file_to_verify = filename, time = time,
-                        options = restore_options)
+                        file_to_verify=filename, time=time,
+                        options=restore_options)
 
     def test_asym_cycle(self):
         """Like test_basic_cycle but use asymmetric encryption and signing"""
@@ -83,8 +83,8 @@ class FinalTest(FunctionalTestCase):
                           "--sign-key", self.sign_key]
         restore_options = ["--encrypt-key", self.encrypt_key1,
                            "--sign-key", self.sign_key]
-        self.test_basic_cycle(backup_options = backup_options,
-                              restore_options = restore_options)
+        self.test_basic_cycle(backup_options=backup_options,
+                              restore_options=restore_options)
 
     def test_asym_with_hidden_recipient_cycle(self):
         """Like test_basic_cycle but use asymmetric encryption (hiding key id) and signing"""
@@ -92,8 +92,8 @@ class FinalTest(FunctionalTestCase):
                           "--sign-key", self.sign_key]
         restore_options = ["--hidden-encrypt-key", self.encrypt_key1,
                            "--sign-key", self.sign_key]
-        self.test_basic_cycle(backup_options = backup_options,
-                              restore_options = restore_options)
+        self.test_basic_cycle(backup_options=backup_options,
+                              restore_options=restore_options)
 
     def test_single_regfile(self):
         """Test backing and restoring up a single regular file"""
@@ -142,10 +142,10 @@ class FinalTest(FunctionalTestCase):
 
     def test_remove_older_than(self):
         """Test removing old backup chains"""
-        first_chain = self.backup("full", "testfiles/dir1", current_time = 10000)
-        first_chain |= self.backup("inc", "testfiles/dir2", current_time = 20000)
-        second_chain = self.backup("full", "testfiles/dir1", current_time = 30000)
-        second_chain |= self.backup("inc", "testfiles/dir3", current_time = 40000)
+        first_chain = self.backup("full", "testfiles/dir1", current_time=10000)
+        first_chain |= self.backup("inc", "testfiles/dir2", current_time=20000)
+        second_chain = self.backup("full", "testfiles/dir1", current_time=30000)
+        second_chain |= self.backup("inc", "testfiles/dir3", current_time=40000)
 
         self.assertEqual(self.get_backend_files(), first_chain | second_chain)
 

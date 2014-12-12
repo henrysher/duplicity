@@ -74,7 +74,7 @@ class VerifiedHTTPSConnection(httplib.HTTPSConnection):
                 raise FatalBackendException("""For certificate verification a cacert database file is needed in one of these locations: %s
 Hints:
   Consult the man page, chapter 'SSL Certificate Verification'.
-  Consider using the options --ssl-cacert-file, --ssl-no-check-certificate .""" % ", ".join(cacert_candidates) )
+  Consider using the options --ssl-cacert-file, --ssl-no-check-certificate .""" % ", ".join(cacert_candidates))
             # check if file is accessible (libssl errors are not very detailed)
             if not os.access(self.cacert_file, os.R_OK):
                 raise FatalBackendException("Cacert database file '%s' is not readable." % self.cacert_file)
@@ -98,7 +98,7 @@ Hints:
                 return httplib.HTTPSConnection.request(self, *args, **kwargs)
             except ssl.SSLError as e:
                 # encapsulate ssl errors
-                raise BackendException("SSL failed: %s" % util.uexc(e),log.ErrorCode.backend_error)
+                raise BackendException("SSL failed: %s" % util.uexc(e), log.ErrorCode.backend_error)
 
 
 class WebDAVBackend(duplicity.backend.Backend):
@@ -114,7 +114,7 @@ class WebDAVBackend(duplicity.backend.Backend):
        request body MUST be treated as if it were an 'allprop' request.  "
     it was retired because e.g. box.net didn't support <D:allprop/>
     """
-    listbody =""
+    listbody = ""
 
     """Connect to remote store using WebDAV Protocol"""
     def __init__(self, parsed_url):
@@ -134,14 +134,14 @@ class WebDAVBackend(duplicity.backend.Backend):
 
         self.conn = None
 
-    def sanitize_path(self,path):
+    def sanitize_path(self, path):
         if path:
             foldpath = re.compile('/+')
-            return foldpath.sub('/', path + '/' )
+            return foldpath.sub('/', path + '/')
         else:
             return '/'
 
-    def getText(self,nodelist):
+    def getText(self, nodelist):
         rc = ""
         for node in nodelist:
             if node.nodeType == node.TEXT_NODE:
@@ -163,9 +163,9 @@ class WebDAVBackend(duplicity.backend.Backend):
         log.Info("WebDAV create connection on '%s'" % (self.parsed_url.hostname))
         self._close()
         # http schemes needed for redirect urls from servers
-        if self.parsed_url.scheme in ['webdav','http']:
+        if self.parsed_url.scheme in ['webdav', 'http']:
             self.conn = httplib.HTTPConnection(self.parsed_url.hostname, self.parsed_url.port)
-        elif self.parsed_url.scheme in ['webdavs','https']:
+        elif self.parsed_url.scheme in ['webdavs', 'https']:
             if globals.ssl_no_check_certificate:
                 self.conn = httplib.HTTPSConnection(self.parsed_url.hostname, self.parsed_url.port)
             else:
@@ -182,30 +182,30 @@ class WebDAVBackend(duplicity.backend.Backend):
         Wraps the connection.request method to retry once if authentication is
         required
         """
-        self._close() # or we get previous request's data or exception
+        self._close()  # or we get previous request's data or exception
         self.connect()
 
-        quoted_path = urllib.quote(path,"/:~")
+        quoted_path = urllib.quote(path, "/:~")
 
         if self.digest_challenge is not None:
             self.headers['Authorization'] = self.get_digest_authorization(path)
 
-        log.Info("WebDAV %s %s request with headers: %s " % (method,quoted_path,self.headers))
-        log.Info("WebDAV data length: %s " % len(str(data)) )
+        log.Info("WebDAV %s %s request with headers: %s " % (method, quoted_path, self.headers))
+        log.Info("WebDAV data length: %s " % len(str(data)))
         self.conn.request(method, quoted_path, data, self.headers)
         response = self.conn.getresponse()
-        log.Info("WebDAV response status %s with reason '%s'." % (response.status,response.reason))
+        log.Info("WebDAV response status %s with reason '%s'." % (response.status, response.reason))
         # resolve redirects and reset url on listing requests (they usually come before everything else)
-        if response.status in [301,302] and method == 'PROPFIND':
-            redirect_url = response.getheader('location',None)
+        if response.status in [301, 302] and method == 'PROPFIND':
+            redirect_url = response.getheader('location', None)
             response.close()
             if redirect_url:
-                log.Notice("WebDAV redirect to: %s " % urllib.unquote(redirect_url) )
+                log.Notice("WebDAV redirect to: %s " % urllib.unquote(redirect_url))
                 if redirected > 10:
                     raise FatalBackendException("WebDAV redirected 10 times. Giving up.")
                 self.parsed_url = duplicity.backend.ParsedUrl(redirect_url)
                 self.directory = self.sanitize_path(self.parsed_url.path)
-                return self.request(method,self.directory,data,redirected+1)
+                return self.request(method, self.directory, data, redirected + 1)
             else:
                 raise FatalBackendException("WebDAV missing location header in redirect response.")
         elif response.status == 401:
@@ -213,11 +213,11 @@ class WebDAVBackend(duplicity.backend.Backend):
             response.close()
             self.headers['Authorization'] = self.get_authorization(response, quoted_path)
             log.Info("WebDAV retry request with authentification headers.")
-            log.Info("WebDAV %s %s request2 with headers: %s " % (method,quoted_path,self.headers))
-            log.Info("WebDAV data length: %s " % len(str(data)) )
+            log.Info("WebDAV %s %s request2 with headers: %s " % (method, quoted_path, self.headers))
+            log.Info("WebDAV data length: %s " % len(str(data)))
             self.conn.request(method, quoted_path, data, self.headers)
             response = self.conn.getresponse()
-            log.Info("WebDAV response2 status %s with reason '%s'." % (response.status,response.reason))
+            log.Info("WebDAV response2 status %s with reason '%s'." % (response.status, response.reason))
 
         return response
 
@@ -275,7 +275,7 @@ class WebDAVBackend(duplicity.backend.Backend):
             del self.headers['Depth']
             # if the target collection does not exist, create it.
             if response.status == 404:
-                response.close() # otherwise next request fails with ResponseNotReady
+                response.close()  # otherwise next request fails with ResponseNotReady
                 self.makedir()
                 # just created an empty folder, so return empty
                 return []
@@ -286,7 +286,7 @@ class WebDAVBackend(duplicity.backend.Backend):
                 status = response.status
                 reason = response.reason
                 response.close()
-                raise BackendException("Bad status code %s reason %s." % (status,reason))
+                raise BackendException("Bad status code %s reason %s." % (status, reason))
 
             log.Debug("%s" % (document,))
             dom = xml.dom.minidom.parseString(document)
@@ -307,9 +307,9 @@ class WebDAVBackend(duplicity.backend.Backend):
         # url causes directory to start with /, but it might be given
         # with or without trailing / (which is required)
         if dirs[-1] == '':
-            dirs=dirs[0:-1]
-        for i in range(1,len(dirs)):
-            d="/".join(dirs[0:i+1])+"/"
+            dirs = dirs[0:-1]
+        for i in range(1, len(dirs)):
+            d = "/".join(dirs[0:i + 1]) + "/"
 
             self.headers['Depth'] = "1"
             response = self.request("PROPFIND", d)
@@ -322,7 +322,7 @@ class WebDAVBackend(duplicity.backend.Backend):
 
                 res = self.request("MKCOL", d)
                 if res.status != 201:
-                    raise BackendException("WebDAV MKCOL %s failed: %s %s" % (d,res.status,res.reason))
+                    raise BackendException("WebDAV MKCOL %s failed: %s %s" % (d, res.status, res.reason))
 
     def taste_href(self, href):
         """
@@ -356,7 +356,7 @@ class WebDAVBackend(duplicity.backend.Backend):
             raise BackendException(m)
 
         if filename.startswith(self.directory):
-            filename = filename.replace(self.directory,'',1)
+            filename = filename.replace(self.directory, '', 1)
             return filename
         else:
             return None
@@ -378,7 +378,7 @@ class WebDAVBackend(duplicity.backend.Backend):
                 status = response.status
                 reason = response.reason
                 response.close()
-                raise BackendException("Bad status code %s reason %s." % (status,reason))
+                raise BackendException("Bad status code %s reason %s." % (status, reason))
         except Exception as e:
             raise e
         finally:
@@ -398,7 +398,7 @@ class WebDAVBackend(duplicity.backend.Backend):
                 status = response.status
                 reason = response.reason
                 response.close()
-                raise BackendException("Bad status code %s reason %s." % (status,reason))
+                raise BackendException("Bad status code %s reason %s." % (status, reason))
         except Exception as e:
             raise e
         finally:
@@ -416,7 +416,7 @@ class WebDAVBackend(duplicity.backend.Backend):
                 status = response.status
                 reason = response.reason
                 response.close()
-                raise BackendException("Bad status code %s reason %s." % (status,reason))
+                raise BackendException("Bad status code %s reason %s." % (status, reason))
         except Exception as e:
             raise e
         finally:

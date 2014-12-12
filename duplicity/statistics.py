@@ -51,7 +51,7 @@ class StatsObj:
     stat_time_attrs = ('StartTime',
                        'EndTime',
                        'ElapsedTime')
-    stat_attrs = (('Filename',) + stat_time_attrs +
+    stat_attrs = (('Filename',) + stat_time_attrs + 
                   stat_misc_attrs + stat_file_attrs)
 
     # Below, the second value in each pair is true iff the value
@@ -68,9 +68,9 @@ class StatsObj:
                        ('RawDeltaSize', True))
 
     # This is used in get_byte_summary_string below
-    byte_abbrev_list = ((1024*1024*1024*1024, "TB"),
-                        (1024*1024*1024, "GB"),
-                        (1024*1024, "MB"),
+    byte_abbrev_list = ((1024 * 1024 * 1024 * 1024, "TB"),
+                        (1024 * 1024 * 1024, "GB"),
+                        (1024 * 1024, "MB"),
                         (1024, "KB"))
 
     def __init__(self):
@@ -97,9 +97,9 @@ class StatsObj:
         duplicity destination directory, or None if not available.
 
         """
-        return 0 # this needs to be re-done for duplicity
+        return 0  # this needs to be re-done for duplicity
 
-    def get_stats_line(self, index, use_repr = 1):
+    def get_stats_line(self, index, use_repr=1):
         """Return one line abbreviated version of full stats string"""
         file_attrs = [str(self.get_stat(a)) for a in self.stat_file_attrs]
         if not index:
@@ -110,7 +110,7 @@ class StatsObj:
                 # use repr to quote newlines in relative filename, then
                 # take of leading and trailing quote and quote spaces.
                 filename = self.space_regex.sub("\\x20", repr(filename)[1:-1])
-        return " ".join([filename,] + file_attrs)
+        return " ".join([filename, ] + file_attrs)
 
     def set_stats_from_line(self, line):
         """Set statistics from given line"""
@@ -143,16 +143,16 @@ class StatsObj:
         """Return portion of statistics string dealing with time"""
         timelist = []
         if self.StartTime is not None:
-            timelist.append("StartTime %.2f (%s)\n" %
+            timelist.append("StartTime %.2f (%s)\n" % 
                      (self.StartTime, dup_time.timetopretty(self.StartTime)))
         if self.EndTime is not None:
-            timelist.append("EndTime %.2f (%s)\n" %
+            timelist.append("EndTime %.2f (%s)\n" % 
                          (self.EndTime, dup_time.timetopretty(self.EndTime)))
         if self.ElapsedTime or (self.StartTime is not None and
                                 self.EndTime is not None):
             if self.ElapsedTime is None:
                 self.ElapsedTime = self.EndTime - self.StartTime
-            timelist.append("ElapsedTime %.2f (%s)\n" %
+            timelist.append("ElapsedTime %.2f (%s)\n" % 
                  (self.ElapsedTime, dup_time.inttopretty(self.ElapsedTime)))
         return "".join(timelist)
 
@@ -177,7 +177,7 @@ class StatsObj:
         misc_string = ""
         tdsc = self.TotalDestinationSizeChange
         if tdsc is not None:
-            misc_string += ("TotalDestinationSizeChange %s (%s)\n" %
+            misc_string += ("TotalDestinationSizeChange %s (%s)\n" % 
                             (tdsc, self.get_byte_summary_string(tdsc)))
         if self.Errors is not None:
             misc_string += "Errors %d\n" % self.Errors
@@ -194,7 +194,7 @@ class StatsObj:
         for abbrev_bytes, abbrev_string in self.byte_abbrev_list:
             if byte_count >= abbrev_bytes:
                 # Now get 3 significant figures
-                abbrev_count = float(byte_count)/abbrev_bytes
+                abbrev_count = float(byte_count) / abbrev_bytes
                 if abbrev_count >= 100:
                     precision = 0
                 elif abbrev_count >= 10:
@@ -236,9 +236,9 @@ class StatsObj:
                     val1 = None
                 val2 = float(value_string)
                 if val1 == val2:
-                    self.set_stat(attr, val1) # use integer val
+                    self.set_stat(attr, val1)  # use integer val
                 else:
-                    self.set_stat(attr, val2) # use float
+                    self.set_stat(attr, val2)  # use float
             except ValueError:
                 error(line)
         return self
@@ -273,7 +273,7 @@ class StatsObj:
                 if statobj.get_stat(attr) is None:
                     self.set_stat(attr, None)
                 elif self.get_stat(attr) is not None:
-                    self.set_stat(attr, statobj.get_stat(attr) +
+                    self.set_stat(attr, statobj.get_stat(attr) + 
                                   self.get_stat(attr))
 
         # Don't compute average starting/stopping time
@@ -283,7 +283,7 @@ class StatsObj:
         for attr in self.stat_attrs:
             if self.get_stat(attr) is not None:
                 self.set_stat(attr,
-                              self.get_stat(attr)/float(len(statobj_list)))
+                              self.get_stat(attr) / float(len(statobj_list)))
         return self
 
     def get_statsobj_copy(self):
@@ -324,7 +324,7 @@ class StatsDeltaProcess(StatsObj):
 
     def add_deleted_file(self):
         """Add stats of file no longer in source directory"""
-        self.DeletedFiles += 1 # can't add size since not available
+        self.DeletedFiles += 1  # can't add size since not available
         self.DeltaEntries += 1
 
     def add_unchanged_file(self, path):

@@ -25,11 +25,11 @@ import sys, cStringIO, unittest
 
 from duplicity import diffdir
 from duplicity import patchdir
-from duplicity import log #@UnusedImport
+from duplicity import log  # @UnusedImport
 from duplicity import selection
-from duplicity import tarfile #@UnusedImport
-from duplicity import librsync #@UnusedImport
-from duplicity.path import * #@UnusedWildImport
+from duplicity import tarfile  # @UnusedImport
+from duplicity import librsync  # @UnusedImport
+from duplicity.path import *  # @UnusedWildImport
 from . import UnitTestCase
 
 
@@ -65,7 +65,7 @@ class PatchingTest(UnitTestCase):
         sig = Path("testfiles/output/sig.tar")
         diff = Path("testfiles/output/diff.tar")
         seq_path = Path("testfiles/output/sequence")
-        new_path, old_path = None, None # set below in for loop
+        new_path, old_path = None, None  # set below in for loop
 
         # Write initial full backup to diff.tar
         for dirname in filelist:
@@ -79,7 +79,7 @@ class PatchingTest(UnitTestCase):
             diffdir.write_block_iter(deltablock, diff)
 
             patchdir.Patch(seq_path, diff.open("rb"))
-            #print "#########", seq_path, new_path
+            # print "#########", seq_path, new_path
             assert seq_path.compare_recursive(new_path, 1)
 
     def test_block_tar(self):
@@ -137,12 +137,12 @@ class CollateItersTest(UnitTestCase):
 
     def test_collate(self):
         """Test collate_iters function"""
-        indicies = [index(i) for i in [0,1,2,3]]
+        indicies = [index(i) for i in [0, 1, 2, 3]]
         helper = lambda i: indicies[i]
 
         makeiter1 = lambda: iter(indicies)
-        makeiter2 = lambda: map(helper, [0,1,3])
-        makeiter3 = lambda: map(helper, [1,2])
+        makeiter2 = lambda: map(helper, [0, 1, 3])
+        makeiter3 = lambda: map(helper, [1, 2])
 
         outiter = patchdir.collate_iters([makeiter1(), makeiter2()])
         assert Iter.equal(outiter,
@@ -166,7 +166,7 @@ class CollateItersTest(UnitTestCase):
 
     def test_tuple(self):
         """Test indexed tuple"""
-        i = patchdir.IndexedTuple((1,2,3), ("a", "b"))
+        i = patchdir.IndexedTuple((1, 2, 3), ("a", "b"))
         i2 = patchdir.IndexedTuple((), ("hello", "there", "how are you"))
 
         assert i[0] == "a"
