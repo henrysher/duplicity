@@ -24,6 +24,7 @@ import os
 import unittest
 
 from duplicity import path
+from duplicity import globals
 from . import CmdError, FunctionalTestCase
 
 
@@ -73,22 +74,8 @@ class VerifyTest(FunctionalTestCase):
             self.verify('testfiles/%s/%s' % (dir, filename),
                         file_to_verify = filename, options = restore_options)
 
-    # def test_verify_compare_data(self, backup_options = [], restore_options = []):
-    #     """Test that verify works in the basic case when the --compare-data option is used"""
-    #     self.runtest(["testfiles/dir1",
-    #                   "testfiles/dir2"],
-    #                  backup_options = backup_options,
-    #                  restore_options = restore_options)
-    #
-    #     # Test verify for various sub files with --compare-data
-    #     restore_options.extend("--compare-data")
-    #     for filename, dir in [('new_file', 'dir2'),
-    #                           ('executable', 'dir1')]:
-    #         self.verify('testfiles/%s/%s' % (dir, filename),
-    #                     file_to_verify = filename, options = restore_options)
-
     def test_verify_changed_source_file(self, backup_options = [], restore_options = []):
-        """Test verify gives no error if a source files is changed (without --compare-data)"""
+        """Test verify gives no error if a source file is changed (without --compare-data)"""
         self.runtest(["testfiles/dir1",
                       "testfiles/dir2"],
                      backup_options = backup_options,
@@ -103,6 +90,41 @@ class VerifyTest(FunctionalTestCase):
                               ('executable', 'dir1')]:
             self.verify('testfiles/%s/%s' % (dir, filename),
                         file_to_verify = filename, options = restore_options)
+
+    def test_verify_compare_data(self, backup_options = [], restore_options = []):
+        """Test that verify works in the basic case when the --compare-data option is used"""
+        self.runtest(["testfiles/dir1",
+                      "testfiles/dir2"],
+                     backup_options = backup_options,
+                     restore_options = restore_options)
+
+        # Test verify for various sub files with --compare-data
+        globals.compare_data = True
+        for filename, dir in [('new_file', 'dir2'),
+                              ('executable', 'dir1')]:
+            self.verify('testfiles/%s/%s' % (dir, filename),
+                        file_to_verify = filename, options = restore_options)
+
+    def test_verify_compare_data_changed_source_file(self, backup_options = [], restore_options = []):
+        """Test verify gives an error if a source file is changed (with --compare-data)"""
+        self.runtest(["testfiles/dir1",
+                      "testfiles/dir2"],
+                     backup_options = backup_options,
+                     restore_options = restore_options)
+
+        # Edit source file for one of the files.
+        f = open('testfiles/dir2/new_file', 'w')
+        f.write('This changes a source file.')
+
+        # Test verify for edited file fails with --compare-data
+        globals.compare_data = True
+        for filename, dir in [('new_file', 'dir2'),
+                              ('executable', 'dir1')]:
+            try:
+                self.verify('testfiles/%s/%s' % (dir, filename),
+                        file_to_verify = filename, options = restore_options)
+            except CmdError as e:
+                self.assertEqual(e.exit_status, 1, str(e))
 
 if __name__ == "__main__":
     unittest.main()
