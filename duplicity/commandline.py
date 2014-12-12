@@ -895,8 +895,8 @@ def set_archive_dir(dirstring):
 
 def set_sign_key(sign_key):
     """Set globals.sign_key assuming proper key given"""
-    if not len(sign_key) == 8 or not re.search("^[0-9A-F]*$", sign_key):
-        log.FatalError(_("Sign key should be an 8 character hex string, like "
+    if not re.search("^(0x)?([0-9A-Fa-f]{8}|[0-9A-Fa-f]{16}|[0-9A-Fa-f]{40})$", sign_key):
+        log.FatalError(_("Sign key should be an 8, 16 alt. 40 character hex string, like "
                          "'AA0E73D2'.\nReceived '%s' instead.") % (sign_key,),
                        log.ErrorCode.bad_sign_key)
     globals.gpg_profile.sign_key = sign_key

@@ -2,6 +2,8 @@
 
     * Source formatted, using PyDev, all source files to fix some easily fixed
       PEP8 issues. Use ignore space when comparing against previous versions.
+    * Merge in lp:~andol/duplicity/signkeyformat
+      - Allow --sign-key to use short format, long format alt. full fingerprint.
 
 2014-12-11  Kenneth Loafman  <kenneth@loafman.com>
 

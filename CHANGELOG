@@ -45,6 +45,8 @@ Enhancements:
   - manpage fixes
 * Source formatted, using PyDev, all source files to fix some easily fixed
   PEP8 issues. Use ignore space when comparing against previous versions.
+* Merge in lp:~andol/duplicity/signkeyformat
+  - Allow --sign-key to use short format, long format alt. full fingerprint.
 
 
 New in v0.7.00 (2014/10/23)
