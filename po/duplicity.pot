@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2014-12-12 08:26-0600\n"
+"POT-Creation-Date: 2014-12-17 14:19-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -417,42 +417,42 @@ msgstr ""
 msgid "task execution done (success: %s)"
 msgstr ""
 
-#: ../duplicity/backend.py:110
+#: ../duplicity/backend.py:102
 #, python-format
 msgid "Import of %s %s"
 msgstr ""
 
-#: ../duplicity/backend.py:217
+#: ../duplicity/backend.py:209
 #, python-format
 msgid "Could not initialize backend: %s"
 msgstr ""
 
-#: ../duplicity/backend.py:375
+#: ../duplicity/backend.py:367
 #, python-format
 msgid "Backtrace of previous error: %s"
 msgstr ""
 
-#: ../duplicity/backend.py:390
+#: ../duplicity/backend.py:382
 #, python-format
 msgid "Giving up after %s attempts. %s: %s"
 msgstr ""
 
-#: ../duplicity/backend.py:394
+#: ../duplicity/backend.py:386
 #, python-format
 msgid "Attempt %s failed. %s: %s"
 msgstr ""
 
-#: ../duplicity/backend.py:477
+#: ../duplicity/backend.py:469
 #, python-format
 msgid "Reading results of '%s'"
 msgstr ""
 
-#: ../duplicity/backend.py:504
+#: ../duplicity/backend.py:496
 #, python-format
 msgid "Writing %s"
 msgstr ""
 
-#: ../duplicity/backend.py:545
+#: ../duplicity/backend.py:537
 #, python-format
 msgid "File %s not found locally after get from backend"
 msgstr ""
@@ -965,7 +965,7 @@ msgstr ""
 #: ../duplicity/commandline.py:899
 #, python-format
 msgid ""
-"Sign key should be an 8 character hex string, like 'AA0E73D2'.\n"
+"Sign key should be an 8, 16 alt. 40 character hex string, like 'AA0E73D2'.\n"
 "Received '%s' instead."
 msgstr ""
 

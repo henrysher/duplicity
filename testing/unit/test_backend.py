@@ -130,11 +130,9 @@ class ParsedUrlTest(UnitTestCase):
     def test_errors(self):
         """Test various url errors"""
         self.assertRaises(InvalidBackendURL, duplicity.backend.ParsedUrl,
-                          "ssh:///home")  # we require a hostname for ssh
-        self.assertRaises(InvalidBackendURL, duplicity.backend.ParsedUrl,
                           "file:path")  # no relative paths for non-netloc schemes
         self.assertRaises(UnsupportedBackendScheme, duplicity.backend.get_backend,
-                          "foo://foo@bar:pass@example.com/home")
+                          "ssh://foo@bar:pass@example.com/home")
 
 
 class BackendWrapperTest(UnitTestCase):
@@ -264,7 +262,7 @@ class BackendWrapperTest(UnitTestCase):
         self.mock._move.return_value = False
         self.backend.move(self.local, self.remote)
         self.mock._move.assert_called_once_with(self.local, self.remote)
-        self.mock._put.assert_called_once_with(self.local, self.remote) 
+        self.mock._put.assert_called_once_with(self.local, self.remote)
         self.local.delete.assert_called_once_with()
 
     def test_move_fallback_undefined(self):

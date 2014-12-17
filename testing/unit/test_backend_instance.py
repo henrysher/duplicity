@@ -191,13 +191,13 @@ class Par2BackendTest(BackendInstanceBase):
     # a missing file
 
 
-class RsyncBackendTest(BackendInstanceBase):
-    def setUp(self):
-        super(RsyncBackendTest, self).setUp()
-        os.makedirs('testfiles/output')  # rsync needs it to exist first
-        url = 'rsync://%s/testfiles/output' % os.getcwd()
-        self.backend = duplicity.backend.get_backend_object(url)
-        self.assertEqual(self.backend.__class__.__name__, 'RsyncBackend')
+# class RsyncBackendTest(BackendInstanceBase):
+#     def setUp(self):
+#         super(RsyncBackendTest, self).setUp()
+#         os.makedirs('testfiles/output')  # rsync needs it to exist first
+#         url = 'rsync://%s/testfiles/output' % os.getcwd()
+#         self.backend = duplicity.backend.get_backend_object(url)
+#         self.assertEqual(self.backend.__class__.__name__, 'RsyncBackend')
 
 
 class TahoeBackendTest(BackendInstanceBase):

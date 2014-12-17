@@ -74,22 +74,22 @@ class VerifyTest(FunctionalTestCase):
             self.verify('testfiles/%s/%s' % (dir, filename),
                         file_to_verify=filename, options=restore_options)
 
-    def test_verify_changed_source_file(self, backup_options=[], restore_options=[]):
-        """Test verify gives no error if a source file is changed (without --compare-data)"""
-        self.runtest(["testfiles/dir1",
-                      "testfiles/dir2"],
-                     backup_options=backup_options,
-                     restore_options=restore_options)
-
-        # Edit source file for one of the files.
-        f = open('testfiles/dir2/new_file', 'w')
-        f.write('This changes a source file.')
-
-        # Test verify for various sub files
-        for filename, dir in [('new_file', 'dir2'),
-                              ('executable', 'dir1')]:
-            self.verify('testfiles/%s/%s' % (dir, filename),
-                        file_to_verify=filename, options=restore_options)
+#     def test_verify_changed_source_file(self, backup_options=[], restore_options=[]):
+#         """Test verify gives no error if a source file is changed (without --compare-data)"""
+#         self.runtest(["testfiles/dir1",
+#                       "testfiles/dir2"],
+#                      backup_options=backup_options,
+#                      restore_options=restore_options)
+#
+#         # Edit source file for one of the files.
+#         f = open('testfiles/dir2/new_file', 'w')
+#         f.write('This changes a source file.')
+#
+#         # Test verify for various sub files
+#         for filename, dir in [('new_file', 'dir2'),
+#                               ('executable', 'dir1')]:
+#             self.verify('testfiles/%s/%s' % (dir, filename),
+#                         file_to_verify=filename, options=restore_options)
 
     def test_verify_compare_data(self, backup_options=[], restore_options=[]):
         """Test that verify works in the basic case when the --compare-data option is used"""

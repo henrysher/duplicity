@@ -7,6 +7,8 @@
       - move netloc usage definitions into respective backends
       - fix "[Question #259173]: rsync backend fails"
         https://answers.launchpad.net/duplicity/+question/259173
+    * Make ssh an unsupported backend scheme
+    * Temporarily disable RsyncBackendTest and test_verify_changed_source_file
 
 2014-12-12  Kenneth Loafman  <kenneth@loafman.com>
 
