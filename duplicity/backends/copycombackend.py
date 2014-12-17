@@ -317,3 +317,4 @@ class CopyComBackend(duplicity.backend.Backend):
 '''
 
 duplicity.backend.register_backend('copy', CopyComBackend)
+duplicity.backend.uses_netloc.extend([ 'copy' ] )

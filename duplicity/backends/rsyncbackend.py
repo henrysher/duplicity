@@ -154,3 +154,4 @@ class RsyncBackend(duplicity.backend.Backend):
         os.rmdir (dir)
 
 duplicity.backend.register_backend("rsync", RsyncBackend)
+duplicity.backend.uses_netloc.extend([ 'rsync' ])

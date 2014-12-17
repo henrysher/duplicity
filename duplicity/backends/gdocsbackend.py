@@ -183,3 +183,4 @@ class GDocsBackend(duplicity.backend.Backend):
         return result
 
 duplicity.backend.register_backend('gdocs', GDocsBackend)
+duplicity.backend.uses_netloc.extend([ 'gdocs' ])
