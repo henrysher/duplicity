@@ -257,5 +257,6 @@ class ImapBackend(duplicity.backend.Backend):
         self.conn.close()
         self.conn.logout()
 
-duplicity.backend.register_backend("imap", ImapBackend);
-duplicity.backend.register_backend("imaps", ImapBackend);
+duplicity.backend.register_backend("imap", ImapBackend)
+duplicity.backend.register_backend("imaps", ImapBackend)
+duplicity.backend.uses_netloc.extend([ 'imap', 'imaps' ])

@@ -123,3 +123,4 @@ class MegaBackend(duplicity.backend.Backend):
         return result
 
 duplicity.backend.register_backend('mega', MegaBackend)
+duplicity.backend.uses_netloc.extend([ 'mega' ])

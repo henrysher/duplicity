@@ -221,9 +221,9 @@ class SSHPExpectBackend(duplicity.backend.Backend):
             self.put_sftp(source_path, remote_filename)
 
     def put_sftp(self, source_path, remote_filename):
-        commands = ["put \"%s\" \"%s.%s.part\"" %
+        commands = ["put \"%s\" \"%s.%s.part\"" % 
                     (source_path.name, self.remote_prefix, remote_filename),
-                    "rename \"%s.%s.part\" \"%s%s\"" %
+                    "rename \"%s.%s.part\" \"%s%s\"" % 
                     (self.remote_prefix, remote_filename, self.remote_prefix, remote_filename)]
         commandline = ("%s %s %s" % (self.sftp_command,
                                      globals.ssh_options,
@@ -243,7 +243,7 @@ class SSHPExpectBackend(duplicity.backend.Backend):
             self.get_sftp(remote_filename, local_path)
 
     def get_sftp(self, remote_filename, local_path):
-        commands = ["get \"%s%s\" \"%s\"" %
+        commands = ["get \"%s%s\" \"%s\"" % 
                     (self.remote_prefix, remote_filename, local_path.name)]
         commandline = ("%s %s %s" % (self.sftp_command,
                                      globals.ssh_options,

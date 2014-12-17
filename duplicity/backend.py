@@ -72,17 +72,9 @@ _backend_prefixes = {}
 # This looks similar to urlparse's 'uses_netloc' list, but urlparse doesn't use
 # that list for parsing, only creating urls.  And doesn't include our custom
 # schemes anyway.  So we keep our own here for our own use.
-uses_netloc = ['ftp',
-               'ftps',
-               'hsi',
-               's3',
-               'scp', 'ssh', 'sftp',
-               'webdav', 'webdavs',
-               'gdocs',
-               'http', 'https',
-               'imap', 'imaps',
-               'mega',
-               'copy']
+#
+# NOTE: this is filled by the respective backends during registering
+uses_netloc = []
 
 
 def import_backends():

@@ -3,6 +3,10 @@
     * Merge in lp:~hooloovoo/duplicity/verify-not-check-source
       - Tests to validate that duplicity does not check filesystem source during
         verify unless --compare-data is specified
+    * Merge in lp:~ed.so/duplicity/move_netloc
+      - move netloc usage definitions into respective backends
+      - fix "[Question #259173]: rsync backend fails"
+        https://answers.launchpad.net/duplicity/+question/259173
 
 2014-12-12  Kenneth Loafman  <kenneth@loafman.com>
 
