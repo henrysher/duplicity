@@ -1,3 +1,9 @@
+2014-12-17  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merge in lp:~hooloovoo/duplicity/verify-not-check-source
+      - Tests to validate that duplicity does not check filesystem source during
+        verify unless --compare-data is specified
+
 2014-12-12  Kenneth Loafman  <kenneth@loafman.com>
 
     * Source formatted, using PyDev, all source files to fix some easily fixed
