@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2014-12-17 14:19-0600\n"
+"POT-Creation-Date: 2014-12-19 07:59-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1171,66 +1171,66 @@ msgstr ""
 msgid "Warning: %s has negative mtime, treating as 0."
 msgstr ""
 
-#: ../duplicity/path.py:353
+#: ../duplicity/path.py:352
 msgid "Difference found:"
 msgstr ""
 
-#: ../duplicity/path.py:359
+#: ../duplicity/path.py:361
 #, python-format
 msgid "New file %s"
 msgstr ""
 
-#: ../duplicity/path.py:362
+#: ../duplicity/path.py:364
 #, python-format
 msgid "File %s is missing"
 msgstr ""
 
-#: ../duplicity/path.py:365
+#: ../duplicity/path.py:367
 #, python-format
 msgid "File %%s has type %s, expected %s"
 msgstr ""
 
-#: ../duplicity/path.py:371 ../duplicity/path.py:397
+#: ../duplicity/path.py:373 ../duplicity/path.py:399
 #, python-format
 msgid "File %%s has permissions %s, expected %s"
 msgstr ""
 
-#: ../duplicity/path.py:376
+#: ../duplicity/path.py:378
 #, python-format
 msgid "File %%s has mtime %s, expected %s"
 msgstr ""
 
-#: ../duplicity/path.py:384
+#: ../duplicity/path.py:386
 #, python-format
 msgid "Data for file %s is different"
 msgstr ""
 
-#: ../duplicity/path.py:392
+#: ../duplicity/path.py:394
 #, python-format
 msgid "Symlink %%s points to %s, expected %s"
 msgstr ""
 
-#: ../duplicity/path.py:401
+#: ../duplicity/path.py:403
 #, python-format
 msgid "Device file %%s has numbers %s, expected %s"
 msgstr ""
 
-#: ../duplicity/path.py:561
+#: ../duplicity/path.py:563
 #, python-format
 msgid "Making directory %s"
 msgstr ""
 
-#: ../duplicity/path.py:571
+#: ../duplicity/path.py:573
 #, python-format
 msgid "Deleting %s"
 msgstr ""
 
-#: ../duplicity/path.py:580
+#: ../duplicity/path.py:582
 #, python-format
 msgid "Touching %s"
 msgstr ""
 
-#: ../duplicity/path.py:587
+#: ../duplicity/path.py:589
 #, python-format
 msgid "Deleting tree %s"
 msgstr ""

@@ -83,7 +83,7 @@ class ROPath:
         elif stat.S_ISFIFO(st_mode):
             self.type = "fifo"
         elif stat.S_ISSOCK(st_mode):
-            raise PathException(util.ufn(self.get_relative_path()) + 
+            raise PathException(util.ufn(self.get_relative_path()) +
                                 u"is a socket, unsupported by tar")
             self.type = "sock"
         elif stat.S_ISCHR(st_mode):
@@ -206,10 +206,10 @@ class ROPath:
         self.mode = tarinfo.mode
         self.stat = StatResult()
 
-        """ Set user and group id 
+        """ Set user and group id
         use numeric id if name lookup fails
         OR
-        --numeric-owner is set 
+        --numeric-owner is set
         """
         try:
             if globals.numeric_owner:
@@ -345,13 +345,15 @@ class ROPath:
         __eq__ should be very time sensitive, and logging statements
         would slow it down.  Used when verifying.
 
-        If include_data is true, also read all the data of regular
-        files and see if they differ.
+        Only run if include_data is true.
 
         """
         def log_diff(log_string):
             log_str = _("Difference found:") + u" " + log_string
             log.Notice(log_str % (util.ufn(self.get_relative_path())))
+
+        if include_data is False:
+            return True
 
         if not self.type and not other.type:
             return 1
@@ -362,22 +364,22 @@ class ROPath:
             log_diff(_("File %s is missing"))
             return 0
         if self.type != other.type:
-            log_diff(_("File %%s has type %s, expected %s") % 
+            log_diff(_("File %%s has type %s, expected %s") %
                      (other.type, self.type))
             return 0
 
         if self.isreg() or self.isdir() or self.isfifo():
             if not self.perms_equal(other):
-                log_diff(_("File %%s has permissions %s, expected %s") % 
+                log_diff(_("File %%s has permissions %s, expected %s") %
                          (other.getperms(), self.getperms()))
                 return 0
             if ((int(self.stat.st_mtime) != int(other.stat.st_mtime)) and
                     (self.stat.st_mtime > 0 or other.stat.st_mtime > 0)):
-                log_diff(_("File %%s has mtime %s, expected %s") % 
+                log_diff(_("File %%s has mtime %s, expected %s") %
                          (dup_time.timetopretty(int(other.stat.st_mtime)),
                           dup_time.timetopretty(int(self.stat.st_mtime))))
                 return 0
-            if self.isreg() and include_data:
+            if self.isreg():
                 if self.compare_data(other):
                     return 1
                 else:
@@ -389,12 +391,12 @@ class ROPath:
             if self.symtext == other.symtext:
                 return 1
             else:
-                log_diff(_("Symlink %%s points to %s, expected %s") % 
+                log_diff(_("Symlink %%s points to %s, expected %s") %
                          (other.symtext, self.symtext))
                 return 0
         elif self.isdev():
             if not self.perms_equal(other):
-                log_diff(_("File %%s has permissions %s, expected %s") % 
+                log_diff(_("File %%s has permissions %s, expected %s") %
                          (other.getperms(), self.getperms()))
                 return 0
             if self.devnums != other.devnums:
@@ -645,7 +647,7 @@ class Path(ROPath):
         global _tmp_path_counter
         parent_dir = self.get_parent_dir()
         while 1:
-            temp_path = parent_dir.append("duplicity_temp." + 
+            temp_path = parent_dir.append("duplicity_temp." +
                                           str(_tmp_path_counter))
             if not temp_path.type:
                 return temp_path

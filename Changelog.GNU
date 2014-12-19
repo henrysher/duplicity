@@ -1,3 +1,16 @@
+2014-12-18  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merge in lp:~hooloovoo/duplicity/test-verify-improvements
+      - Fix up test_verify, which was a bit of a mess:
+      - Simplify test_verify.py to just do a simple backup and verify on a
+        single file in each test.
+      - Modify tests to correctly use --compare-data option.
+      - Add tests for when the source files have atime/mtime manipulated.
+    * Fix duplicity verify to ignore the file system when globals.compare_data is
+      False.  This means that verify only validates the viability of the backup
+      itself unless --compare-data is specified.
+    * Reenable test_verify_changed_source_file test
+
 2014-12-17  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merge in lp:~hooloovoo/duplicity/verify-not-check-source

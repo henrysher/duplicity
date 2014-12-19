@@ -23,8 +23,6 @@
 import os
 import unittest
 
-from duplicity import path
-from duplicity import globals
 from . import CmdError, FunctionalTestCase
 
 
@@ -32,99 +30,97 @@ class VerifyTest(FunctionalTestCase):
     """
     Test verify using duplicity binary
     """
-    def runtest(self, dirlist, backup_options=[], restore_options=[]):
-        """Run backup/restore test on directories in dirlist
-        This is identical to test_final.runtest"""
-        assert len(dirlist) >= 1
+    def test_verify(self):
+        """Test that verify (without --compare-data) works in the basic case"""
+        self.backup("full", "testfiles/various_file_types", options=[])
+        self.verify('testfiles/various_file_types/executable', file_to_verify='executable', options=[])
 
-        # Back up directories to local backend
-        current_time = 100000
-        self.backup("full", dirlist[0], current_time=current_time,
-                    options=backup_options)
-        for new_dir in dirlist[1:]:
-            current_time += 100000
-            self.backup("inc", new_dir, current_time=current_time,
-                        options=backup_options)
+    def test_verify_changed_source_file(self):
+        """Test verify (without --compare-data) gives no error if a source file is changed"""
+        # TODO fix code to make this test pass (Bug #1354880)
+        self.backup("full", "testfiles/various_file_types", options=[])
 
-        # Restore each and compare them
-        for i in range(len(dirlist)):
-            dirname = dirlist[i]
-            current_time = 100000 * (i + 1)
-            self.restore(time=current_time, options=restore_options)
-            self.check_same(dirname, "testfiles/restore_out")
-            self.verify(dirname,
-                        time=current_time, options=restore_options)
+        # Edit source file
+        f = open('testfiles/various_file_types/executable', 'w')
+        f.write('This changes a source file.')
 
-    def check_same(self, filename1, filename2):
-        """Verify two filenames are the same
-        This is identical to test_final.check_same"""
-        path1, path2 = path.Path(filename1), path.Path(filename2)
-        assert path1.compare_recursive(path2, verbose=1)
+        # Test verify for the file
+        self.verify('testfiles/various_file_types/executable', file_to_verify='executable', options=[])
 
-    def test_verify(self, backup_options=[], restore_options=[]):
-        """Test that verify works in the basic case"""
-        self.runtest(["testfiles/dir1",
-                      "testfiles/dir2"],
-                     backup_options=backup_options,
-                     restore_options=restore_options)
+    def test_verify_changed_source_file_adjust_mtime(self):
+        """Test verify (without --compare-data) gives no error if a source file is changed and the mtime is changed
+        (changing anything about the source files shouldn't matter)"""
 
-        # Test verify for various sub files
-        for filename, dir in [('new_file', 'dir2'),
-                              ('executable', 'dir1')]:
-            self.verify('testfiles/%s/%s' % (dir, filename),
-                        file_to_verify=filename, options=restore_options)
+        # Get the atime and mtime of the file
+        file_info = os.stat('testfiles/various_file_types/executable')
 
-#     def test_verify_changed_source_file(self, backup_options=[], restore_options=[]):
-#         """Test verify gives no error if a source file is changed (without --compare-data)"""
-#         self.runtest(["testfiles/dir1",
-#                       "testfiles/dir2"],
-#                      backup_options=backup_options,
-#                      restore_options=restore_options)
-#
-#         # Edit source file for one of the files.
-#         f = open('testfiles/dir2/new_file', 'w')
-#         f.write('This changes a source file.')
-#
-#         # Test verify for various sub files
-#         for filename, dir in [('new_file', 'dir2'),
-#                               ('executable', 'dir1')]:
-#             self.verify('testfiles/%s/%s' % (dir, filename),
-#                         file_to_verify=filename, options=restore_options)
+        # Set the atime and mtime of the file to the time that we collected, as on some systems
+        # the times from a stat call don't match what a utime will set.
+        os.utime('testfiles/various_file_types/executable', (file_info.st_atime, file_info.st_mtime))
 
-    def test_verify_compare_data(self, backup_options=[], restore_options=[]):
+        self.backup("full", "testfiles/various_file_types", options=[])
+
+        # Edit source file
+        f = open('testfiles/various_file_types/executable', 'w')
+        f.write('This changes a source file.')
+
+        # Set the atime and mtime for the file back to what it was prior to the edit
+        os.utime('testfiles/various_file_types/executable', (file_info.st_atime, file_info.st_mtime))
+
+        # Test verify for the file
+        self.verify('testfiles/various_file_types/executable', file_to_verify='executable', options=[])
+
+    def test_verify_compare_data(self):
         """Test that verify works in the basic case when the --compare-data option is used"""
-        self.runtest(["testfiles/dir1",
-                      "testfiles/dir2"],
-                     backup_options=backup_options,
-                     restore_options=restore_options)
+        self.backup("full", "testfiles/various_file_types", options=[])
 
-        # Test verify for various sub files with --compare-data
-        globals.compare_data = True
-        for filename, dir in [('new_file', 'dir2'),
-                              ('executable', 'dir1')]:
-            self.verify('testfiles/%s/%s' % (dir, filename),
-                        file_to_verify=filename, options=restore_options)
+        # Test verify for the file with --compare-data
+        self.verify('testfiles/various_file_types/executable', file_to_verify='executable',
+                    options=["--compare-data"])
 
-    def test_verify_compare_data_changed_source_file(self, backup_options=[], restore_options=[]):
-        """Test verify gives an error if a source file is changed (with --compare-data)"""
-        self.runtest(["testfiles/dir1",
-                      "testfiles/dir2"],
-                     backup_options=backup_options,
-                     restore_options=restore_options)
+    def test_verify_compare_data_changed_source_file(self):
+        """Test verify with --compare-data gives an error if a source file is changed"""
+        self.backup("full", "testfiles/various_file_types", options=[])
 
-        # Edit source file for one of the files.
-        f = open('testfiles/dir2/new_file', 'w')
+        # Edit source file
+        f = open('testfiles/various_file_types/executable', 'w')
         f.write('This changes a source file.')
 
         # Test verify for edited file fails with --compare-data
-        globals.compare_data = True
-        for filename, dir in [('new_file', 'dir2'),
-                              ('executable', 'dir1')]:
-            try:
-                self.verify('testfiles/%s/%s' % (dir, filename),
-                        file_to_verify=filename, options=restore_options)
-            except CmdError as e:
-                self.assertEqual(e.exit_status, 1, str(e))
+        try:
+            self.verify('testfiles/various_file_types/executable', file_to_verify='executable',
+                        options=["--compare-data"])
+        except CmdError as e:
+            self.assertEqual(e.exit_status, 1, str(e))
+        else:
+            self.fail('Expected CmdError not thrown')
+
+    def test_verify_compare_data_changed_source_file_adjust_mtime(self):
+        """Test verify with --compare-data gives an error if a source file is changed, even if the mtime is changed"""
+
+        # Get the atime and mtime of the file
+        file_info = os.stat('testfiles/various_file_types/executable')
+
+        # Set the atime and mtime of the file to the time that we collected, as on some systems
+        # the times from a stat call don't match what a utime will set
+        os.utime('testfiles/various_file_types/executable', (file_info.st_atime, file_info.st_mtime))
+
+        self.backup("full", "testfiles/various_file_types", options=[])
+        # Edit source file
+        f = open('testfiles/various_file_types/executable', 'w')
+        f.write('This changes a source file.')
+
+        # Set the atime and mtime for the file back to what it was prior to the edit
+        os.utime('testfiles/various_file_types/executable', (file_info.st_atime, file_info.st_mtime))
+
+        # Test verify for edited file fails with --compare-data
+        try:
+            self.verify('testfiles/various_file_types/executable', file_to_verify='executable',
+                        options=["--compare-data"])
+        except CmdError as e:
+            self.assertEqual(e.exit_status, 1, str(e))
+        else:
+            self.fail('Expected CmdError not thrown')
 
 if __name__ == "__main__":
     unittest.main()
