@@ -95,7 +95,7 @@ echo "Normal verify before we've done anything. This should pass and does on 0.6
 $DUPLICITY_CMD verify file://$TARGETDIR $SOURCEDIR 
 echo "-----------"
 echo "Corrupt the archive."
-find $TARGETDIR -name duplicity-full*.vol* -exec dd if=/dev/urandom of='{}' bs=1024 seek=$((RANDOM%10+1)) count=1 conv=notrunc \; 
+find $TARGETDIR -name 'duplicity-full*.vol*' -exec dd if=/dev/urandom of='{}' bs=1024 seek=$((RANDOM%10+1)) count=1 conv=notrunc \; 
 echo "-----------"
 echo "Verify again. This should fail, as verify should check the integrity of the archive in either mode, and it does on 0.6.23."
 $DUPLICITY_CMD verify file://$TARGETDIR $SOURCEDIR

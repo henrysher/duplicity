@@ -37,12 +37,12 @@ class VerifyTest(FunctionalTestCase):
 
     def test_verify_changed_source_file(self):
         """Test verify (without --compare-data) gives no error if a source file is changed"""
-        # TODO fix code to make this test pass (Bug #1354880)
+        # This test was made to pass in fixing Bug #1354880
         self.backup("full", "testfiles/various_file_types", options=[])
 
         # Edit source file
-        f = open('testfiles/various_file_types/executable', 'w')
-        f.write('This changes a source file.')
+        with open('testfiles/various_file_types/executable', 'r+') as f:
+            f.write('This changes a source file.')
 
         # Test verify for the file
         self.verify('testfiles/various_file_types/executable', file_to_verify='executable', options=[])
@@ -61,8 +61,8 @@ class VerifyTest(FunctionalTestCase):
         self.backup("full", "testfiles/various_file_types", options=[])
 
         # Edit source file
-        f = open('testfiles/various_file_types/executable', 'w')
-        f.write('This changes a source file.')
+        with open('testfiles/various_file_types/executable', 'r+') as f:
+            f.write('This changes a source file.')
 
         # Set the atime and mtime for the file back to what it was prior to the edit
         os.utime('testfiles/various_file_types/executable', (file_info.st_atime, file_info.st_mtime))
@@ -83,8 +83,8 @@ class VerifyTest(FunctionalTestCase):
         self.backup("full", "testfiles/various_file_types", options=[])
 
         # Edit source file
-        f = open('testfiles/various_file_types/executable', 'w')
-        f.write('This changes a source file.')
+        with open('testfiles/various_file_types/executable', 'r+') as f:
+            f.write('This changes a source file.')
 
         # Test verify for edited file fails with --compare-data
         try:
@@ -107,8 +107,8 @@ class VerifyTest(FunctionalTestCase):
 
         self.backup("full", "testfiles/various_file_types", options=[])
         # Edit source file
-        f = open('testfiles/various_file_types/executable', 'w')
-        f.write('This changes a source file.')
+        with open('testfiles/various_file_types/executable', 'r+') as f:
+            f.write('This changes a source file.')
 
         # Set the atime and mtime for the file back to what it was prior to the edit
         os.utime('testfiles/various_file_types/executable', (file_info.st_atime, file_info.st_mtime))
@@ -121,6 +121,44 @@ class VerifyTest(FunctionalTestCase):
             self.assertEqual(e.exit_status, 1, str(e))
         else:
             self.fail('Expected CmdError not thrown')
+
+
+    def test_verify_corrupt_archive(self):
+        """Test verify (without --compare-data) gives an error if the archive is corrupted"""
+        self.backup("full", "testfiles/various_file_types", options=[])
+        output_files = os.listdir("testfiles/output")
+        archives = [elem for elem in output_files if "vol" in elem]
+        for archive in archives:
+            # Edit source file
+            with open("testfiles/output/" + archive, 'r+') as f:
+                f.write('This writes text into each archive file to corrupt it.')
+        # Test verify for the file
+        try:
+            self.verify('testfiles/various_file_types/executable', file_to_verify='executable', options=[])
+        except CmdError as e:
+            # Should return a 21 error code for "hash mismatch"
+            self.assertEqual(e.exit_status, 21, str(e))
+        else:
+            self.fail('Expected Hash Mismatch Error not thrown')
+
+    def test_verify_corrupt_archive_compare_data(self):
+        """Test verify with --compare-data gives an error if the archive is corrupted"""
+        self.backup("full", "testfiles/various_file_types", options=[])
+        output_files = os.listdir("testfiles/output")
+        archives = [elem for elem in output_files if "vol" in elem]
+        for archive in archives:
+            # Edit source file
+            with open("testfiles/output/" + archive, 'r+') as f:
+                f.write('This writes text into each archive file to corrupt it.')
+        # Test verify for the file
+        try:
+            self.verify('testfiles/various_file_types/executable', file_to_verify='executable',
+                        options=["--compare-data"])
+        except CmdError as e:
+            # Should return a 21 error code for "hash mismatch"
+            self.assertEqual(e.exit_status, 21, str(e))
+        else:
+            self.fail('Expected Hash Mismatch Error not thrown')
 
 if __name__ == "__main__":
     unittest.main()
