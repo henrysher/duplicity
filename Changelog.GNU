@@ -6,6 +6,10 @@
         that the file is properly closed.
       - Small edit to find statement in verify_test.sh to make it work as
         expected (enclose string in quotes).
+    * Merged in lp:~hooloovoo/duplicity/add-else-to-badupload-try-except
+      - Badupload test previously did not have an else in the try-except. The
+        test passed if the except was triggered, but would also pass if the
+        test did not trigger an error at all.
 
 2014-12-18  Kenneth Loafman  <kenneth@loafman.com>
 
