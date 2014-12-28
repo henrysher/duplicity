@@ -66,6 +66,12 @@ Enhancements:
   False.  This means that verify only validates the viability of the backup
   itself unless --compare-data is specified.
 * Reenable test_verify_changed_source_file test
+* Merged in lp:~hooloovoo/duplicity/add-additional-verify-tests-for-corrupted-archives
+  - Add tests to test_verify.py to test that verify fails if the archive
+    file is corrupted. Changed file objects to use the with keyword to ensure
+    that the file is properly closed.
+  - Small edit to find statement in verify_test.sh to make it work as
+    expected (enclose string in quotes).
 
 
 New in v0.7.00 (2014/10/23)

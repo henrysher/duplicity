@@ -2,6 +2,8 @@
 # Script to show the current behaviour of duplicity's verify action
 # (c) 2014 Aaron Whitehouse <aaron@whitehouse.kiwi.nz>
 # GPLv2 or any later version
+# These tests have all now been implemented in the test suite (functional/test_verify.py)
+# Perhaps this file should now be removed.
 export PASSPHRASE=test
 
 TESTDIR=/tmp/duplicity_test
@@ -22,12 +24,14 @@ echo "Testing behaviour of verify when the source files change after the backup.
 echo "This is a test" > $SOURCEDIR/test.txt
 $DUPLICITY_CMD $SOURCEDIR file://$TARGETDIR
 echo "-----------"
-echo "Normal verify before we've done anything. This should pass and does" 
+echo "Normal verify before we've done anything. This should pass and does"
 echo "on 0.6.23."
+# Implemented in the test suite as functional/test_verify.py test_verify
 $DUPLICITY_CMD verify file://$TARGETDIR $SOURCEDIR 
 echo "-----------"
 echo "Change the source file after sleeping for a second."
 # Sleep for a second, as otherwise the mtime can be the same even if it was edited after backup.
+# Implemented in the test suite as functional/test_verify.py test_verify_changed_source_file
 sleep 1
 echo "This is changing the test file." > $SOURCEDIR/test.txt
 echo "-----------"
@@ -38,6 +42,7 @@ echo "Verify again, but with --compare-data. As --compare-data is designed to"
 echo "check against the filesystem, this should fail and does on 0.6.23."
 echo "Note that this should flag a difference in the Data as well, but does not"
 echo "on 0.6.23, whereas it does so in the Second Test."
+# Implemented in the test suite as functional/test_verify.py test_verify_compare_data_changed_source_file
 $DUPLICITY_CMD verify --compare-data file://$TARGETDIR $SOURCEDIR
 
 rm -r $TESTDIR
@@ -57,7 +62,8 @@ echo "This is a second test that doesn't change mtime" > $SOURCEDIR/test.txt
 $DUPLICITY_CMD $SOURCEDIR file://$TARGETDIR
 echo "-----------"
 echo "Normal verify before we've done anything. This should pass and does on 0.6.23."
-$DUPLICITY_CMD verify file://$TARGETDIR $SOURCEDIR 
+# Implemented in the test suite as functional/test_verify.py test_verify
+$DUPLICITY_CMD verify file://$TARGETDIR $SOURCEDIR
 echo "-----------"
 echo "Change the source file after sleeping for a second, but change the mtime to match the original."
 # Sleep for a second, as otherwise the mtime can be the same even if it was edited after backup.
@@ -69,11 +75,13 @@ rm -f $SOURCEDIR/test-temp.txt
 touch --reference=$SOURCEDIR/test.txt $SOURCEDIR
 echo "-----------"
 echo "Verify again. This should pass and does on 0.6.23 (though only because it is 'tricked' by the mtime)."
+# Implemented in the test suite as functional/test_verify.py test_verify test_verify_changed_source_file_adjust_mtime
 $DUPLICITY_CMD verify file://$TARGETDIR $SOURCEDIR
 echo "-----------"
 echo "Verify again, but with --compare-data. As --compare-data is designed to" 
 echo "check against the filesystem, this should fail and currently does."
 echo "Note that, unlike the First Test, on 0.6.23 this flags a difference in the Data."
+# Implemented in the test suite as functional/test_verify.py test_verify_compare_data_changed_source_file_adjust_mtime
 $DUPLICITY_CMD verify --compare-data file://$TARGETDIR $SOURCEDIR
 
 rm -r $TESTDIR
@@ -92,16 +100,19 @@ echo "This is a third test that just corrupts the archive." > $SOURCEDIR/test.tx
 $DUPLICITY_CMD $SOURCEDIR file://$TARGETDIR
 echo "-----------"
 echo "Normal verify before we've done anything. This should pass and does on 0.6.23."
-$DUPLICITY_CMD verify file://$TARGETDIR $SOURCEDIR 
+# Implemented in the test suite as functional/test_verify.py test_verify
+$DUPLICITY_CMD verify file://$TARGETDIR $SOURCEDIR
 echo "-----------"
 echo "Corrupt the archive."
-find $TARGETDIR -name duplicity-full*.vol* -exec dd if=/dev/urandom of='{}' bs=1024 seek=$((RANDOM%10+1)) count=1 conv=notrunc \; 
+find $TARGETDIR -name 'duplicity-full*.vol*' -exec dd if=/dev/urandom of='{}' bs=1024 seek=$((RANDOM%10+1)) count=1 conv=notrunc \; 
 echo "-----------"
 echo "Verify again. This should fail, as verify should check the integrity of the archive in either mode, and it does on 0.6.23."
+# Implemented in the test suite as functional/test_verify.py test_verify_corrupt_archive
 $DUPLICITY_CMD verify file://$TARGETDIR $SOURCEDIR
 echo "-----------"
 echo "Verify again, but with --compare-data. This should also fail, as verify should check the integrity of the archive"
 echo "in either mode, and it does on 0.6.23."
+# Implemented in the test suite as functional/test_verify.py test_verify_corrupt_archive_compare_data
 $DUPLICITY_CMD verify --compare-data file://$TARGETDIR $SOURCEDIR
 
 rm -r $TESTDIR

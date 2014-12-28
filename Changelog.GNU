@@ -1,3 +1,12 @@
+2014-12-28  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~hooloovoo/duplicity/add-additional-verify-tests-for-corrupted-archives
+      - Add tests to test_verify.py to test that verify fails if the archive
+        file is corrupted. Changed file objects to use the with keyword to ensure
+        that the file is properly closed.
+      - Small edit to find statement in verify_test.sh to make it work as
+        expected (enclose string in quotes).
+
 2014-12-18  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merge in lp:~hooloovoo/duplicity/test-verify-improvements
