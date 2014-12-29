@@ -1,3 +1,9 @@
+2014-12-29  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug 1406173 by applying patch from Tyler Ham
+      - Ignore .par2 files in remote file list
+    * Removed redundant shell test testing/verify_test.sh
+
 2014-12-28  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~hooloovoo/duplicity/add-additional-verify-tests-for-corrupted-archives

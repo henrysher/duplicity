@@ -164,7 +164,19 @@ class Par2Backend(backend.Backend):
 
 
     def list(self):
-        return self.wrapped_backend._list()
+        """
+        Return list of filenames (byte strings) present in backend
+        
+        Files ending with ".par2" will be excluded from the list.
+        """
+        remote_list = self.wrapped_backend._list()
+        
+        c = re.compile(r'(?!.*\.par2$)')
+        filtered_list = []
+        for filename in remote_list:
+            if c.match(filename):
+                filtered_list.append(filename)
+        return filtered_list
 
     def retry_cleanup(self):
         self.wrapped_backend._retry_cleanup()
