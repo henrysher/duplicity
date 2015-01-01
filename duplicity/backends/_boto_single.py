@@ -181,7 +181,10 @@ class BotoBackend(duplicity.backend.Backend):
         del self.storage_uri
         self.storage_uri = boto.storage_uri(self.boto_uri_str)
         self.conn = get_connection(self.scheme, self.parsed_url, self.storage_uri)
-        self.bucket = self.conn.lookup(self.bucket_name)
+        try:
+            self.bucket = self.conn.get_bucket(self.bucket_name)
+        except Exception as err:
+            raise BackendException(err.message)
 
     def _retry_cleanup(self):
         self.resetConnection()
@@ -225,7 +228,7 @@ class BotoBackend(duplicity.backend.Backend):
             'Content-Type': 'application/octet-stream',
             'x-amz-storage-class': storage_class
         }
-        
+
         upload_start = time.time()
         self.upload(source_path.name, key, headers)
         upload_end = time.time()

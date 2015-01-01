@@ -3,6 +3,8 @@
     * Misc fixes for the following PEP8 issues:
        - E211, E221, E222, E225, E226, E228
        - see http://pep8.readthedocs.org
+    * Fixed bug 1278529 by applying patch supplied in report
+      - Use get_bucket() rather than lookup() on S3 to get proper error msg.
 
 2014-12-29  Kenneth Loafman  <kenneth@loafman.com>
 
