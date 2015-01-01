@@ -237,7 +237,7 @@ def restart_position_iterator(tarblock_iter):
                     break
             if tarblock_iter.previous_index > last_index:
                 log.Warn(_("File %s complete in backup set.\n"
-                           "Continuing restart on file %s.") %
+                           "Continuing restart on file %s.") % 
                            (util.uindex(last_index), util.uindex(tarblock_iter.previous_index)),
                            log.ErrorCode.restart_file_not_found)
                 # We went too far! Stuff the data back into place before restarting
@@ -246,7 +246,7 @@ def restart_position_iterator(tarblock_iter):
             iter_result = tarblock_iter.next()
     except StopIteration:
         log.Warn(_("File %s missing in backup set.\n"
-                   "Continuing restart on file %s.") %
+                   "Continuing restart on file %s.") % 
                    (util.uindex(last_index), util.uindex(tarblock_iter.previous_index)),
                    log.ErrorCode.restart_file_not_found)
 
@@ -351,7 +351,7 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
         validate_encryption_settings(globals.restart.last_backup, mf)
         mf.fh = man_outfp
         last_block = globals.restart.last_block
-        log.Notice(_("Restarting after volume %s, file %s, block %s") %
+        log.Notice(_("Restarting after volume %s, file %s, block %s") % 
                    (globals.restart.start_vol,
                     util.uindex(globals.restart.last_index),
                     globals.restart.last_block))
@@ -760,7 +760,7 @@ def restore_get_enc_fileobj(backend, filename, volume_info):
     """ verify hash of the remote file """
     verified, hash_pair, calculated_hash = restore_check_hash(volume_info, tdp)
     if not verified:
-        log.FatalError("%s\n %s\n %s\n %s\n" %
+        log.FatalError("%s\n %s\n %s\n %s\n" % 
                        (_("Invalid data - %s hash mismatch for file:") % hash_pair[0],
                         util.ufn(filename),
                         _("Calculated hash: %s") % calculated_hash,
@@ -802,7 +802,7 @@ def restore_add_sig_check(fileobj):
         """Thunk run when closing volume file"""
         actual_sig = fileobj.fileobj.get_signature()
         if actual_sig != globals.gpg_profile.sign_key:
-            log.FatalError(_("Volume was signed by key %s, not %s") %
+            log.FatalError(_("Volume was signed by key %s, not %s") % 
                            (actual_sig, globals.gpg_profile.sign_key),
                            log.ErrorCode.unsigned_volume)
     fileobj.addhook(check_signature)
@@ -832,7 +832,7 @@ def verify(col_stats):
         total_count += 1
     # Unfortunately, ngettext doesn't handle multiple number variables, so we
     # split up the string.
-    log.Notice(_("Verify complete: %s, %s.") %
+    log.Notice(_("Verify complete: %s, %s.") % 
                (ngettext("%d file compared",
                          "%d files compared", total_count) % total_count,
                 ngettext("%d difference found",
@@ -917,7 +917,7 @@ def remove_old(col_stats):
 
     req_list = col_stats.get_older_than_required(globals.remove_time)
     if req_list:
-        log.Warn("%s\n%s\n%s" %
+        log.Warn("%s\n%s\n%s" % 
                  (_("There are backup set(s) at time(s):"),
                   set_times_str(req_list),
                   _("Which can't be deleted because newer sets depend on them.")))
@@ -935,7 +935,7 @@ def remove_old(col_stats):
     if globals.force:
         log.Notice(ngettext("Deleting backup chain at time:",
                             "Deleting backup chains at times:",
-                            len(chainlist)) +
+                            len(chainlist)) + 
                    "\n" + chain_times_str(chainlist))
         # Add signature files too, since they won't be needed anymore
         chainlist += col_stats.get_signature_chains_older_than(globals.remove_time)
@@ -959,8 +959,8 @@ def remove_old(col_stats):
     else:
         log.Notice(ngettext("Found old backup chain at the following time:",
                             "Found old backup chains at the following times:",
-                            len(chainlist)) +
-                   "\n" + chain_times_str(chainlist) + "\n" +
+                            len(chainlist)) + 
+                   "\n" + chain_times_str(chainlist) + "\n" + 
                    _("Rerun command with --force option to actually delete."))
 
 
@@ -1070,7 +1070,7 @@ def sync_archive(decrypt):
                         name = self.fileobj.name
                     else:
                         name = None
-                    log.FatalError(_("Failed to read %s: %s") %
+                    log.FatalError(_("Failed to read %s: %s") % 
                                    (util.ufn(name), sys.exc_info()),
                                    log.ErrorCode.generic)
                 if not res.data:
@@ -1206,10 +1206,10 @@ def check_resources(action):
         needspace = (((globals.async_concurrency + 1) * globals.volsize)
                      + int(0.30 * globals.volsize))
         if freespace < needspace:
-            log.FatalError(_("Temp space has %d available, backup needs approx %d.") %
+            log.FatalError(_("Temp space has %d available, backup needs approx %d.") % 
                            (freespace, needspace), log.ErrorCode.not_enough_freespace)
         else:
-            log.Info(_("Temp has %d available, backup will use approx %d.") %
+            log.Info(_("Temp has %d available, backup will use approx %d.") % 
                      (freespace, needspace))
 
         # Some environments like Cygwin run with an artificially
@@ -1277,7 +1277,7 @@ class Restart:
             elif mf_len - self.start_vol > 0:
                 # upload of N vols failed, fix manifest and restart
                 log.Notice(_("RESTART: Volumes %d to %d failed to upload before termination.\n"
-                             "         Restarting backup at volume %d.") %
+                             "         Restarting backup at volume %d.") % 
                              (self.start_vol + 1, mf_len, self.start_vol + 1))
                 for vol in range(self.start_vol + 1, mf_len + 1):
                     mf.del_volume_info(vol)
@@ -1285,7 +1285,7 @@ class Restart:
                 # this is an 'impossible' state, remove last partial and restart
                 log.Notice(_("RESTART: Impossible backup state: manifest has %d vols, remote has %d vols.\n"
                              "         Restart is impossible ... duplicity will clean off the last partial\n"
-                             "         backup then restart the backup from the beginning.") %
+                             "         backup then restart the backup from the beginning.") % 
                              (mf_len, self.start_vol))
                 self.last_backup.delete()
                 os.execve(sys.argv[0], sys.argv, os.environ)

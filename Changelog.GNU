@@ -1,6 +1,12 @@
+2015-01-01  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Misc fixes for the following PEP8 issues:
+       - E211, E221, E222, E225, E226, E228
+       - see http://pep8.readthedocs.org
+
 2014-12-29  Kenneth Loafman  <kenneth@loafman.com>
 
-    * Fixed bug 1406173 by applying patch from Tyler Ham
+    * Fixed bug 1406173 by applying patch supplied in report
       - Ignore .par2 files in remote file list
     * Removed redundant shell test testing/verify_test.sh
 

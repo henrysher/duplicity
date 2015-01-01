@@ -173,7 +173,7 @@ class GPGWriteFile_Helper:
         """Return buffer of size size, consisting of half random data"""
         s1 = size / 2
         s2 = size - s1
-        return "a"*s1 + self.from_random_fp.read(s2)
+        return "a" * s1 + self.from_random_fp.read(s2)
 
     def next(self):
         if self.at_end: raise StopIteration

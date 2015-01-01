@@ -122,7 +122,6 @@ class VerifyTest(FunctionalTestCase):
         else:
             self.fail('Expected CmdError not thrown')
 
-
     def test_verify_corrupt_archive(self):
         """Test verify (without --compare-data) gives an error if the archive is corrupted"""
         self.backup("full", "testfiles/various_file_types", options=[])

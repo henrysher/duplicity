@@ -59,7 +59,7 @@ class HubicIdentity(BaseIdentity):
         self._redirect_uri = cfg.get("hubic", "redirect_uri")
 
     def _parse_error(self, resp):
-        if not 'location' in resp.headers:
+        if 'location' not in resp.headers:
             return None
         query = urlparse.urlsplit(resp.headers['location']).query
         qs = dict(urlparse.parse_qsl(query))

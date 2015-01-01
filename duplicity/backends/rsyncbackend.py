@@ -112,37 +112,37 @@ class RsyncBackend(duplicity.backend.Backend):
         self.subprocess_popen(commandline)
 
     def _get(self, remote_filename, local_path):
-        remote_path = os.path.join (self.url_string, remote_filename)
+        remote_path = os.path.join(self.url_string, remote_filename)
         commandline = "%s %s %s" % (self.cmd, remote_path, local_path.name)
         self.subprocess_popen(commandline)
 
     def _list(self):
-        def split (str):
-            line = str.split ()
-            if len (line) > 4 and line[4] != '.':
+        def split(str):
+            line = str.split()
+            if len(line) > 4 and line[4] != '.':
                 return line[4]
             else:
                 return None
         commandline = "%s %s" % (self.cmd, self.url_string)
         result, stdout, stderr = self.subprocess_popen(commandline)
-        return [x for x in map (split, stdout.split('\n')) if x]
+        return [x for x in map(split, stdout.split('\n')) if x]
 
     def _delete_list(self, filename_list):
         delete_list = filename_list
         dont_delete_list = []
-        for file in self._list ():
+        for file in self._list():
             if file in delete_list:
-                delete_list.remove (file)
+                delete_list.remove(file)
             else:
-                dont_delete_list.append (file)
+                dont_delete_list.append(file)
 
         dir = tempfile.mkdtemp()
         exclude, exclude_name = tempdir.default().mkstemp_file()
         to_delete = [exclude_name]
         for file in dont_delete_list:
-            path = os.path.join (dir, file)
-            to_delete.append (path)
-            f = open (path, 'w')
+            path = os.path.join(dir, file)
+            to_delete.append(path)
+            f = open(path, 'w')
             print >> exclude, file
             f.close()
         exclude.close()
@@ -151,7 +151,7 @@ class RsyncBackend(duplicity.backend.Backend):
         self.subprocess_popen(commandline)
         for file in to_delete:
             util.ignore_missing(os.unlink, file)
-        os.rmdir (dir)
+        os.rmdir(dir)
 
 duplicity.backend.register_backend("rsync", RsyncBackend)
 duplicity.backend.uses_netloc.extend([ 'rsync' ])

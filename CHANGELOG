@@ -79,6 +79,9 @@ Enhancements:
 * Fixed bug 1406173 by applying patch supplied in report
   - Ignore .par2 files in remote file list
 * Removed redundant shell test testing/verify_test.sh
+* Misc fixes for the following PEP8 issues:
+   - E211, E221, E222, E225, E226, E228
+   - see http://pep8.readthedocs.org
 
 
 New in v0.7.00 (2014/10/23)
