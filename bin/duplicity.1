@@ -91,6 +91,13 @@ Some backends also require additional components (probably available as packages
 .B Python library for mega API
 - https://github.com/ckornacker/mega.py, ubuntu ppa - ppa:ckornacker/backup
 .TP
+.BR "OneDrive backend" " (Microsoft OneDrive)"
+.B python-requests
+- http://python-requests.org
+.br
+.B python-requests-oauthlib
+- https://github.com/requests/requests-oauthlib
+.TP
 .BR "ncftp backend" " (ftp, select via ncftp+ftp://)"
 .B NcFTP
 - http://www.ncftp.com/
@@ -1176,6 +1183,12 @@ See also
 .PP
 .RS
 mega://user[:password]@mega.co.nz/some_dir
+.RE
+.PP
+.B "OneDrive Backend"
+.PP
+.RS
+onedrive://some_dir
 .RE
 .PP
 .B "Par2 Wrapper Backend"
