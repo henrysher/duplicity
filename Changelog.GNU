@@ -1,3 +1,8 @@
+2015-01-08  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~stapelberg+ubuntu/duplicity/add-onedrive-backend
+      - Add a Microsoft OneDrive backend
+
 2015-01-01  Kenneth Loafman  <kenneth@loafman.com>
 
     * Misc fixes for the following PEP8 issues:
