@@ -5,6 +5,15 @@
     * Merged in lp:~hooloovoo/duplicity/filelist_select_bug_1408411
       - Adds functional test cases that fail because of Bug #1408411 (commented
         out), to assist in fixing that bug.
+    * Merged in lp:~hooloovoo/duplicity/process_filelists_for_spaces_etc
+      - Process filelists to remove imperfections such as blank lines, comments
+        and leading/trailing whitespace. Also correctly processes quoted folders
+        containing spaces in their names. Extensive unit and functional tests to
+        test these changes (and selection more generally).
+      - The branch does add an additional folder to testfiles.tar.gz called
+        select2. This included a folder with a trailing space, to test the quote
+        test. The subfolders also have clearer names than in the "select" folder
+        (eg "1sub2sub3") which makes it easier to keep track of issues in tests.
 
 2015-01-01  Kenneth Loafman  <kenneth@loafman.com>
 

@@ -2,6 +2,7 @@
 #
 # Copyright 2002 Ben Escoto <ben@emerose.org>
 # Copyright 2007 Kenneth Loafman <kenneth@loafman.com>
+# Copyright 2014 Aaron Whitehouse <aaron@whitehouse.kiwi.nz>
 #
 # This file is part of duplicity.
 #
@@ -349,30 +350,37 @@ probably isn't what you meant.""") %
         something_excluded, tuple_list = None, []
         separator = globals.null_separator and "\0" or "\n"
         for line in filelist_fp.read().split(separator):
-            if not line:
-                continue  # skip blanks
             try:
                 tuple = self.filelist_parse_line(line, include)
             except FilePrefixError as exc:
                 incr_warnings(exc)
                 continue
-            tuple_list.append(tuple)
+            if not tuple:
+                # Skip blanks/full-line comments
+                continue
+            else:
+                tuple_list.append(tuple)
             if not tuple[1]:
                 something_excluded = 1
         if filelist_fp not in (sys.stdin,) and filelist_fp.close():
             log.Warn(_("Error closing filelist %s") % filelist_name)
         return (tuple_list, something_excluded)
 
-    def filelist_parse_line(self, line, include):
-        """Parse a single line of a filelist, returning a pair
-
-        pair will be of form (index, include), where index is another
-        tuple, and include is 1 if the line specifies that we are
-        including a file.  The default is given as an argument.
-        prefix is the string that the index is relative to.
-
+    def filelist_sanitise_line(self, line, include_default):
         """
+        Sanitises lines of both normal and globbing filelists, returning (line, include) and line=None if blank/comment
+
+        The aim is to parse filelists in a consistent way, prior to the interpretation of globbing statements.
+        The function removes whitespace, comment lines and processes modifiers (leading +/-) and quotes.
+        """
+
         line = line.strip()
+        if not line:  # skip blanks
+            return None, include_default
+        if line[0] == "#":  # skip full-line comments
+            return None, include_default
+
+        include = include_default
         if line[:2] == "+ ":
             # Check for "+ "/"- " syntax
             include = 1
@@ -380,6 +388,27 @@ probably isn't what you meant.""") %
         elif line[:2] == "- ":
             include = 0
             line = line[2:]
+
+        if (line[:1] == "'" and line[-1:] == "'") or (line[:1] == '"' and line[-1:] == '"'):
+            line = line[1:-1]
+
+        return line, include
+
+    def filelist_parse_line(self, line, include):
+        """Parse a single line of a filelist, returning a pair or None if the line is blank/a comment
+
+        Pair will be of form (index, include), where index is another
+        tuple, and include is 1 if the line specifies that we are
+        including a file.  The default is given as an argument.
+        prefix is the string that the index is relative to.
+
+        """
+
+        line, include = self.filelist_sanitise_line(line, include)
+
+        if not line:
+            # Skip blanks and comments
+            return None
 
         if not line.startswith(self.prefix):
             raise FilePrefixError(line)
@@ -430,16 +459,11 @@ probably isn't what you meant.""") %
         log.Notice(_("Reading globbing filelist %s") % list_name)
         separator = globals.null_separator and "\0" or "\n"
         for line in filelist_fp.read().split(separator):
-            if not line:  # skip blanks
+            line, include = self.filelist_sanitise_line(line, inc_default)
+            if not line:
+                # Skip blanks and comment lines
                 continue
-            if line[0] == "#":  # skip comments
-                continue
-            if line[:2] == "+ ":
-                yield self.glob_get_sf(line[2:], 1)
-            elif line[:2] == "- ":
-                yield self.glob_get_sf(line[2:], 0)
-            else:
-                yield self.glob_get_sf(line, inc_default)
+            yield self.glob_get_sf(line, include)
 
     def other_filesystems_get_sf(self, include):
         """Return selection function matching files on other filesystems"""
