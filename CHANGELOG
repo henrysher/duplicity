@@ -86,6 +86,9 @@ Enhancements:
   - Use get_bucket() rather than lookup() on S3 to get proper error msg.
 * Merged in lp:~stapelberg+ubuntu/duplicity/add-onedrive-backend
   - Add a Microsoft OneDrive backend
+* Merged in lp:~hooloovoo/duplicity/filelist_select_bug_1408411
+  - Adds functional test cases that fail because of Bug #1408411 (commented
+    out), to assist in fixing that bug.
 
 
 New in v0.7.00 (2014/10/23)

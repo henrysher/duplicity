@@ -2,6 +2,9 @@
 
     * Merged in lp:~stapelberg+ubuntu/duplicity/add-onedrive-backend
       - Add a Microsoft OneDrive backend
+    * Merged in lp:~hooloovoo/duplicity/filelist_select_bug_1408411
+      - Adds functional test cases that fail because of Bug #1408411 (commented
+        out), to assist in fixing that bug.
 
 2015-01-01  Kenneth Loafman  <kenneth@loafman.com>
 
