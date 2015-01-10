@@ -78,4 +78,8 @@ class AzureBackend(duplicity.backend.Backend):
         # http://azure.microsoft.com/en-us/documentation/articles/storage-python-how-to-use-blob-storage/#delete-blobs
         self.blob_service.delete_blob(self.container, filename) 
 
+    def _query(self, filename):
+        prop = self.blob_service.get_blob_properties(self.container, filename)
+        return {'size': int(prop['content-length'])}
+
 duplicity.backend.register_backend('azure', AzureBackend)
