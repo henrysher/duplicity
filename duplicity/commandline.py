@@ -860,6 +860,7 @@ def usage():
   copy://%(user)s[:%(password)s]@%(other_host)s/%(some_dir)s
   dpbx:///%(some_dir)s
   onedrive://%(some_dir)s
+  azure://%(container_name)s
 
 """ % dict
 
