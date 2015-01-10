@@ -49,6 +49,7 @@ class AzureBackend(duplicity.backend.Backend):
 
         account_name = os.environ['AZURE_ACCOUNT_NAME']
         account_key = os.environ['AZURE_ACCOUNT_KEY']
+        self.WindowsAzureMissingResourceError = azure.WindowsAzureMissingResourceError
         self.blob_service = BlobService(account_name=account_name, account_key=account_key)
         self.container = parsed_url.path.lstrip('/')
         try:
@@ -76,10 +77,14 @@ class AzureBackend(duplicity.backend.Backend):
 
     def _delete(self, filename):
         # http://azure.microsoft.com/en-us/documentation/articles/storage-python-how-to-use-blob-storage/#delete-blobs
-        self.blob_service.delete_blob(self.container, filename) 
+        self.blob_service.delete_blob(self.container, filename)
 
     def _query(self, filename):
         prop = self.blob_service.get_blob_properties(self.container, filename)
         return {'size': int(prop['content-length'])}
+
+    def _error_code(self, operation, e):
+        if isinstance(e, self.WindowsAzureMissingResourceError):
+            return log.ErrorCode.backend_not_found
 
 duplicity.backend.register_backend('azure', AzureBackend)
