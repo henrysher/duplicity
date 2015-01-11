@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2014-12-28 07:35-0600\n"
+"POT-Creation-Date: 2015-01-11 10:46-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -953,51 +953,51 @@ msgid "Backends and their URL formats:"
 msgstr ""
 
 #. Header in usage help
-#: ../duplicity/commandline.py:866
+#: ../duplicity/commandline.py:868
 msgid "Commands:"
 msgstr ""
 
-#: ../duplicity/commandline.py:890
+#: ../duplicity/commandline.py:892
 #, python-format
 msgid "Specified archive directory '%s' does not exist, or is not a directory"
 msgstr ""
 
-#: ../duplicity/commandline.py:899
+#: ../duplicity/commandline.py:901
 #, python-format
 msgid ""
 "Sign key should be an 8, 16 alt. 40 character hex string, like 'AA0E73D2'.\n"
 "Received '%s' instead."
 msgstr ""
 
-#: ../duplicity/commandline.py:959
+#: ../duplicity/commandline.py:961
 #, python-format
 msgid ""
 "Restore destination directory %s already exists.\n"
 "Will not overwrite."
 msgstr ""
 
-#: ../duplicity/commandline.py:964
+#: ../duplicity/commandline.py:966
 #, python-format
 msgid "Verify directory %s does not exist"
 msgstr ""
 
-#: ../duplicity/commandline.py:970
+#: ../duplicity/commandline.py:972
 #, python-format
 msgid "Backup source directory %s does not exist."
 msgstr ""
 
-#: ../duplicity/commandline.py:999
+#: ../duplicity/commandline.py:1001
 #, python-format
 msgid "Command line warning: %s"
 msgstr ""
 
-#: ../duplicity/commandline.py:999
+#: ../duplicity/commandline.py:1001
 msgid ""
 "Selection options --exclude/--include\n"
 "currently work only when backing up,not restoring."
 msgstr ""
 
-#: ../duplicity/commandline.py:1047
+#: ../duplicity/commandline.py:1049
 #, python-format
 msgid ""
 "Bad URL '%s'.\n"
@@ -1005,7 +1005,7 @@ msgid ""
 "\"file:///usr/local\".  See the man page for more information."
 msgstr ""
 
-#: ../duplicity/commandline.py:1072
+#: ../duplicity/commandline.py:1074
 msgid "Main action: "
 msgstr ""
 
@@ -1240,33 +1240,33 @@ msgstr ""
 msgid "Error listing directory %s"
 msgstr ""
 
-#: ../duplicity/selection.py:121
+#: ../duplicity/selection.py:122
 #, python-format
 msgid "Skipping socket %s"
 msgstr ""
 
-#: ../duplicity/selection.py:125
+#: ../duplicity/selection.py:126
 #, python-format
 msgid "Error initializing file %s"
 msgstr ""
 
-#: ../duplicity/selection.py:129 ../duplicity/selection.py:150
+#: ../duplicity/selection.py:130 ../duplicity/selection.py:151
 #, python-format
 msgid "Error accessing possibly locked file %s"
 msgstr ""
 
-#: ../duplicity/selection.py:165
+#: ../duplicity/selection.py:166
 #, python-format
 msgid "Warning: base %s doesn't exist, continuing"
 msgstr ""
 
-#: ../duplicity/selection.py:168 ../duplicity/selection.py:186
-#: ../duplicity/selection.py:189
+#: ../duplicity/selection.py:169 ../duplicity/selection.py:187
+#: ../duplicity/selection.py:190
 #, python-format
 msgid "Selecting %s"
 msgstr ""
 
-#: ../duplicity/selection.py:270
+#: ../duplicity/selection.py:271
 #, python-format
 msgid ""
 "Fatal Error: The file specification\n"
@@ -1277,14 +1277,14 @@ msgid ""
 "pattern (such as '**') which matches the base directory."
 msgstr ""
 
-#: ../duplicity/selection.py:278
+#: ../duplicity/selection.py:279
 #, python-format
 msgid ""
 "Fatal Error while processing expression\n"
 "%s"
 msgstr ""
 
-#: ../duplicity/selection.py:288
+#: ../duplicity/selection.py:289
 #, python-format
 msgid ""
 "Last selection expression:\n"
@@ -1294,43 +1294,43 @@ msgid ""
 "probably isn't what you meant."
 msgstr ""
 
-#: ../duplicity/selection.py:313
+#: ../duplicity/selection.py:314
 #, python-format
 msgid "Reading filelist %s"
 msgstr ""
 
-#: ../duplicity/selection.py:316
+#: ../duplicity/selection.py:317
 #, python-format
 msgid "Sorting filelist %s"
 msgstr ""
 
-#: ../duplicity/selection.py:343
+#: ../duplicity/selection.py:344
 #, python-format
 msgid ""
 "Warning: file specification '%s' in filelist %s\n"
 "doesn't start with correct prefix %s.  Ignoring."
 msgstr ""
 
-#: ../duplicity/selection.py:347
+#: ../duplicity/selection.py:348
 msgid "Future prefix errors will not be logged."
 msgstr ""
 
-#: ../duplicity/selection.py:363
+#: ../duplicity/selection.py:366
 #, python-format
 msgid "Error closing filelist %s"
 msgstr ""
 
-#: ../duplicity/selection.py:430
+#: ../duplicity/selection.py:459
 #, python-format
 msgid "Reading globbing filelist %s"
 msgstr ""
 
-#: ../duplicity/selection.py:463
+#: ../duplicity/selection.py:487
 #, python-format
 msgid "Error compiling regular expression %s"
 msgstr ""
 
-#: ../duplicity/selection.py:479
+#: ../duplicity/selection.py:503
 msgid ""
 "Warning: exclude-device-files is not the first selector.\n"
 "This may not be what you intended"
