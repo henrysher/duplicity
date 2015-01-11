@@ -3,6 +3,8 @@
     * Merged in lp:~9-sa/duplicity/FixBug1408289
       - Fix bug #1408289
       - Wrong attribute name prevented raise of client exception, working now
+    * Merged in lp:~noizyland/duplicity/azurebackend
+      - Add backend for Azure Blob Storage Service
 
 2015-01-08  Kenneth Loafman  <kenneth@loafman.com>
 
