@@ -98,6 +98,9 @@ Enhancements:
     select2. This included a folder with a trailing space, to test the quote
     test. The subfolders also have clearer names than in the "select" folder
     (eg "1sub2sub3") which makes it easier to keep track of issues in tests.
+* Merged in lp:~9-sa/duplicity/FixBug1408289
+  - Fix bug #1408289
+  - Wrong attribute name prevented raise of client exception, working now
 
 
 New in v0.7.00 (2014/10/23)

@@ -1,3 +1,9 @@
+2015-01-11  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~9-sa/duplicity/FixBug1408289
+      - Fix bug #1408289
+      - Wrong attribute name prevented raise of client exception, working now
+
 2015-01-08  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~stapelberg+ubuntu/duplicity/add-onedrive-backend

@@ -73,7 +73,7 @@ class PyraxBackend(duplicity.backend.Backend):
         if isinstance(e, self.nso_exc):
             return log.ErrorCode.backend_not_found
         elif isinstance(e, self.client_exc):
-            if e.status == 404:
+            if e.code == 404:
                 return log.ErrorCode.backend_not_found
         elif hasattr(e, 'http_status'):
             if e.http_status == 404:
