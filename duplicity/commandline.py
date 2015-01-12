@@ -856,6 +856,7 @@ def usage():
   webdav://%(user)s[:%(password)s]@%(other_host)s/%(some_dir)s
   webdavs://%(user)s[:%(password)s]@%(other_host)s/%(some_dir)s
   gdocs://%(user)s[:%(password)s]@%(other_host)s/%(some_dir)s
+  pydrive://%(user)s@%(other_host)s/%(some_dir)s
   mega://%(user)s[:%(password)s]@%(other_host)s/%(some_dir)s
   copy://%(user)s[:%(password)s]@%(other_host)s/%(some_dir)s
   dpbx:///%(some_dir)s

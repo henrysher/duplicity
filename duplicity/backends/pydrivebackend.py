@@ -104,3 +104,4 @@ class PyDriveBackend(duplicity.backend.Backend):
         return {'size': size}
                    
 duplicity.backend.register_backend('pydrive', PyDriveBackend)
+duplicity.backend.uses_netloc.extend([ 'pydrive' ])
