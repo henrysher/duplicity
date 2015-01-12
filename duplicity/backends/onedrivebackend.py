@@ -151,14 +151,14 @@ class OneDriveBackend(duplicity.backend.Backend):
                            'Original error: %s' % (
                                self.OAUTH_TOKEN_PATH, e)))
 
-        if not 'id' in user_info_response.json():
+        if 'id' not in user_info_response.json():
             log.Error('user info response lacks the "id" field.')
 
         self.user_id = user_info_response.json()['id']
 
     def resolve_directory(self):
         """Ensures self.directory_id contains the folder id for the path.
-        
+
         There is no API call to resolve a logical path (e.g.
         /backups/duplicity/notebook/), so we recursively list directories
         until we get the object id of the configured directory, creating
@@ -212,7 +212,7 @@ class OneDriveBackend(duplicity.backend.Backend):
     def get_file_id(self, remote_filename):
         """Returns the file id from cache, updating the cache if necessary."""
         if (self.names_to_ids is None or
-            remote_filename not in self.names_to_ids):
+                remote_filename not in self.names_to_ids):
             self._list()
         return self.names_to_ids.get(remote_filename)
 
@@ -239,7 +239,7 @@ class OneDriveBackend(duplicity.backend.Backend):
         response = self.http_client.get(self.API_URI + 'me/skydrive/quota')
         response.raise_for_status()
         if ('available' in response.json() and
-            source_size > response.json()['available']):
+                source_size > response.json()['available']):
             raise BackendException((
                 'Out of space: trying to store "%s" (%d bytes), but only '
                 '%d bytes available on OneDrive.' % (
@@ -263,8 +263,8 @@ class OneDriveBackend(duplicity.backend.Backend):
                 url,
                 headers=headers)
             response.raise_for_status()
-            if (not 'bits-packet-type' in response.headers or
-                response.headers['bits-packet-type'].lower() != 'ack'):
+            if ('bits-packet-type' not in response.headers or
+                    response.headers['bits-packet-type'].lower() != 'ack'):
                 raise BackendException((
                     'File "%s" cannot be uploaded: '
                     'Could not create BITS session: '

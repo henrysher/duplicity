@@ -1,3 +1,7 @@
+2015-01-12  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed some recently added 2to3 and pep8 issues.
+
 2015-01-11  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~9-sa/duplicity/FixBug1408289

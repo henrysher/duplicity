@@ -208,7 +208,7 @@ def main():
     if action == "sig":
         write_sig(file_args[0], get_fileobj(file_args[1], "wb"))
     elif action == "delta":
-        sig_infp = map(lambda fname: get_fileobj(fname, "rb"), file_args[0:-2])
+        sig_infp = [get_fileobj(fname, "rb") for fname in file_args[0:-2]]
         delta_outfp = get_fileobj(file_args[-1], "wb")
         if sig_fileobj:
             write_delta_and_sig(file_args[-2], sig_infp,

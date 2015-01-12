@@ -1,3 +1,8 @@
+New in v0.7.02 (2015/02/??)
+---------------------------
+* Fixed some recently added 2to3 and pep8 issues.
+
+
 New in v0.7.01 (2015/01/11)
 ---------------------------
 Enhancements:

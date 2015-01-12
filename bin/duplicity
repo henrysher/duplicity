@@ -739,8 +739,8 @@ def restore_get_patched_rop_iter(col_stats):
                 file_names.append(backup_set.volume_name_dict[vol_num])
         globals.backend.pre_process_download(file_names)
 
-    fileobj_iters = map(get_fileobj_iter, backup_setlist)
-    tarfiles = map(patchdir.TarFile_FromFileobjs, fileobj_iters)
+    fileobj_iters = list(map(get_fileobj_iter, backup_setlist))
+    tarfiles = list(map(patchdir.TarFile_FromFileobjs, fileobj_iters))
     return patchdir.tarfiles2rop_iter(tarfiles, index)
 
 
@@ -908,12 +908,10 @@ def remove_old(col_stats):
     assert globals.remove_time is not None
     def set_times_str(setlist):
         """Return string listing times of sets in setlist"""
-        return "\n".join(map(lambda s: dup_time.timetopretty(s.get_time()),
-                             setlist))
+        return "\n".join([dup_time.timetopretty(s.get_time()) for s in setlist])
     def chain_times_str(chainlist):
         """Return string listing times of chains in chainlist"""
-        return "\n".join(map(lambda s: dup_time.timetopretty(s.end_time),
-                             chainlist))
+        return "\n".join([dup_time.timetopretty(s.end_time) for s in chainlist])
 
     req_list = col_stats.get_older_than_required(globals.remove_time)
     if req_list:
@@ -1094,7 +1092,7 @@ def sync_archive(decrypt):
         if pr.manifest:
             copy_raw(src_iter, tdp.name)
         else:
-            gpg.GzipWriteFile(src_iter, tdp.name, size=sys.maxint)
+            gpg.GzipWriteFile(src_iter, tdp.name, size=sys.maxsize)
         tdp.setdata()
         tdp.move(globals.archive_dir.append(loc_name))
 
@@ -1419,7 +1417,7 @@ def do_backup(action):
         action = "full"
     log.PrintCollectionStatus(col_stats)
 
-    os.umask(077)
+    os.umask(0o77)
 
     # get the passphrase if we need to based on action/options
     globals.gpg_profile.passphrase = get_passphrase(1, action)
