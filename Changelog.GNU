@@ -1,6 +1,10 @@
 2015-01-12  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed some recently added 2to3 and pep8 issues.
+    * Merged in lp:~vincegt/duplicity/swift_regionname
+      - Fixes bug #1376628
+      - Add mapping of SWIFT_REGIONNAME to select region inside SWIFT when a
+        provider proposes more than one region.
 
 2015-01-11  Kenneth Loafman  <kenneth@loafman.com>
 
