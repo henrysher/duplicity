@@ -56,10 +56,6 @@ It is best used under GNU/Linux.
 
 Some backends also require additional components (probably available as packages for your specific platform):
 .TP
-.BR "azure backend" " (Azure Blob Storage Service)"
-.B Microsoft Azure SDK for Python
-- https://github.com/Azure/azure-sdk-for-python
-.TP
 .BR "boto backend" " (S3 Amazon Web Services, Google Cloud Storage)"
 .B boto version 2.0+
 - http://github.com/boto/boto
@@ -149,7 +145,21 @@ for ssl certificate verification of HTTPS connections
 .br
 (also see
 .BR "A NOTE ON SSL CERTIFICATE VERIFICATION" ).
-
+.TP
+.BR "pydrive backend" " (Google PyDrive)"
+.B Google Drive APIs Python Client Library
+- https://github.com/westerngateguard/duplicity-pydrive-backend
+To enable pydrive backend you need:
+1. To install PyDrive
+python pip install PyDrive
+2. To create a service account in "Google developers console" at
+https://console.developers.google.com
+2.1 Copy the email address of the created account
+2.2 Download the .p12 keyfile, then convert it to the .pem format:
+openssl pkcs12 -in XXX.p12  -nodes -nocerts > pydriveprivatekey.pem
+3. To use the backend, the remote URL will be in the form of
+pydrive://<service account' email address>@developer.gserviceaccount.com/remote/path/on/google/drive?keyfile=/path/to/your/pydriveprivatekey.pem
+.br
 .SH DESCRIPTION
 Duplicity incrementally backs up files and folders into
 tar-format volumes encrypted with GnuPG and places them to a
@@ -1102,15 +1112,6 @@ and are mentioned below the scheme's syntax summary.
 Formats of each of the URL schemes follow:
 
 .PP
-.BR "Azure"
-.PP
-.RS
-azure://container_name
-.PP
-See also
-.B "A NOTE ON AZURE ACCESS"
-.RE
-.PP
 .BR "Cloud Files" " (Rackspace)"
 .PP
 .RS
@@ -1574,17 +1575,6 @@ or contained in matched files.  So for instance
 matches any files whose full pathnames contain 7 consecutive digits
 which aren't followed by 'foo'.  However, it wouldn't match /home even
 if /home/ben/1234567 existed.
-
-.SH A NOTE ON AZURE ACCESS
-The Azure backend requires the Microsoft Azure SDK for Python to be installed
-on the system.
-See
-.B REQUIREMENTS
-above.
-
-It uses two environment variables for authentification:
-.BR AZURE_ACCOUNT_NAME " (required),"
-.BR AZURE_ACCOUNT_KEY " (required)"
 
 .SH A NOTE ON CLOUD FILES ACCESS
 Pyrax is Rackspace's next-generation Cloud management API, including

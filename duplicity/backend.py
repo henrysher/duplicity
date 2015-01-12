@@ -252,6 +252,12 @@ class ParsedUrl:
         except Exception:
             raise InvalidBackendURL("Syntax error in: %s" % url_string)
 
+        if pu.query:     
+            try:
+                self.keyfile = urlparse.parse_qs(pu.query)['keyfile']
+            except Exception:
+                raise InvalidBackendURL("Syntax error (keyfile) in: %s" % url_string)
+                
         try:
             self.scheme = pu.scheme
         except Exception:
