@@ -5,6 +5,12 @@ New in v0.7.02 (2015/02/??)
   - Fixes bug #1376628
   - Add mapping of SWIFT_REGIONNAME to select region inside SWIFT when a
     provider proposes more than one region.
+* Merged in lp:~aaron-whitehouse/duplicity/progress_option_error
+  - Added test_exclude_globbing_filelist_progress_option into
+    functional/test_selection.py, which shows the error reported in
+    Bug #1264744 - that the --exclude-globbing-filelist does not backup
+    the correct files if the --progress option is used. Test is marked as
+    an expected failure so as not to cause the test suite to fail.
 
 
 New in v0.7.01 (2015/01/11)

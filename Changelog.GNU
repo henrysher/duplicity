@@ -1,3 +1,12 @@
+2015-01-13  Kenneth Loafman  <kenneth@loafman.com>
+
+* Merged in lp:~aaron-whitehouse/duplicity/progress_option_error
+  - Added test_exclude_globbing_filelist_progress_option into
+    functional/test_selection.py, which shows the error reported in
+    Bug #1264744 - that the --exclude-globbing-filelist does not backup
+    the correct files if the --progress option is used. Test is marked as
+    an expected failure so as not to cause the test suite to fail.
+
 2015-01-12  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed some recently added 2to3 and pep8 issues.
