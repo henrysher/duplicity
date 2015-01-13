@@ -343,6 +343,41 @@ class TestExcludeGlobbingFilelistTest(IncludeExcludeFunctionalTest):
         restored = self.directory_tree_to_list_of_lists(restore_dir)
         self.assertEqual(restored, self.expected_restored_tree_with_trailing_space)
 
+    @unittest.expectedFailure
+    def test_exclude_globbing_filelist_progress_option(self):
+        """Test that exclude globbing filelist is unaffected by the --progress option"""
+        # ToDo - currently fails. Bug #1264744 (https://bugs.launchpad.net/duplicity/+bug/1264744)
+        # Create a filelist identical to that used in test_exclude_globbing_filelist
+        with open('testfiles/exclude.txt', 'w') as f:
+            f.write('+ testfiles/select2/3/3sub3/3sub3sub2/3sub3sub2_file.txt\n'
+                    'testfiles/select2/3/3sub3/3sub3sub2\n'
+                    '+ testfiles/select2/3/3sub2/3sub2sub2\n'
+                    '+ testfiles/select2/3/3sub3\n'
+                    '- testfiles/select2/3/3sub1\n'  # - added to ensure it makes no difference
+                    'testfiles/select2/2/2sub1/2sub1sub3\n'
+                    'testfiles/select2/2/2sub1/2sub1sub2\n'
+                    '+ testfiles/select2/2/2sub1\n'
+                    'testfiles/select2/1/1sub3/1sub3sub2\n'
+                    'testfiles/select2/1/1sub3/1sub3sub1\n'
+                    'testfiles/select2/1/1sub2/1sub2sub3\n'
+                    '+ testfiles/select2/1/1sub2/1sub2sub1\n'
+                    'testfiles/select2/1/1sub1/1sub1sub3/1sub1sub3_file.txt\n'
+                    'testfiles/select2/1/1sub1/1sub1sub2\n'
+                    '- testfiles/select2/1/1sub2\n'  # - added to ensure it makes no difference
+                    '+ testfiles/select2/1.py\n'
+                    '+ testfiles/select2/3\n'
+                    '+ testfiles/select2/1\n'
+                    'testfiles/select2/**')
+
+        # Backup the files exactly as in test_exclude_globbing_filelist, but with the --progress option
+        self.backup("full", "testfiles/select2", options=["--exclude-globbing-filelist=testfiles/exclude.txt",
+                                                          "--progress"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        # The restored files should match those restored in test_exclude_globbing_filelist
+        self.assertEqual(restored, self.expected_restored_tree)
+
 class TestIncludeGlobbingFilelistTest(IncludeExcludeFunctionalTest):
     """
     Test --include-globbing-filelist using duplicity binary.
