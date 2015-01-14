@@ -17,6 +17,8 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import string
+import os
+
 import duplicity.backend
 from duplicity.errors import BackendException
 
@@ -34,15 +36,13 @@ class PyDriveBackend(duplicity.backend.Backend):
             from pydrive.drive import GoogleDrive
         except ImportError:
             raise BackendException('PyDrive backend requires PyDrive installation'
-                                   'python pip install PyDrive')
-        try: 
-            keyFilePath = parsed_url.keyfile
-            keyfile = open(keyFilePath[0], "r+")
-            key = keyfile.read();
-            keyfile.close()
-        except:
-            raise BackendException("Can't find/open/read the keyfile. Please read the manpage (man duplicity) for configuration info.") 
-        credentials = SignedJwtAssertionCredentials(parsed_url.username + '@' + parsed_url.hostname, key, scope='https://www.googleapis.com/auth/drive')
+                                   'Please read the manpage to fix.')
+        
+        if 'GOOGLE_DRIVE_ACCOUNT_KEY' not in os.environ:
+            raise BackendException('GOOGLE_DRIVE_ACCOUNT_KEY environment variable not set. Please read the manpage to fix.')
+        account_key = os.environ['GOOGLE_DRIVE_ACCOUNT_KEY']
+
+        credentials = SignedJwtAssertionCredentials(parsed_url.username + '@' + parsed_url.hostname, account_key, scope='https://www.googleapis.com/auth/drive')
         credentials.authorize(httplib2.Http())
         gauth = GoogleAuth()
         gauth.credentials = credentials
@@ -57,7 +57,7 @@ class PyDriveBackend(duplicity.backend.Backend):
             file_in_root.Upload()
             parent_folder_id = file_in_root['parents'][0]['id']
                          
-        # Fetch destination folder entry (and create hierarchy if required).
+        # Fetch destination folder entry and create hierarchy if required.
         folder_names = string.split(parsed_url.path, '/')
         for folder_name in folder_names:
             if not folder_name:
