@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-12-10 18:10+0000\n"
+"POT-Creation-Date: 2015-01-13 16:55+0000\n"
 "PO-Revision-Date: 2015-01-10 15:43+0000\n"
 "Last-Translator: Úr Balázs <urbalazs@gmail.com>\n"
 "Language-Team: Hungarian <hu@li.org>\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2015-01-11 05:58+0000\n"
+"X-Launchpad-Export-Date: 2015-01-14 05:45+0000\n"
 "X-Generator: Launchpad (build 17298)\n"
 
 #: ../bin/duplicity:102
@@ -189,17 +189,17 @@ msgid "Run duplicity again with the --force option to actually delete."
 msgstr ""
 "Indítsd el a duplicity-t újra a --force kapcsolóval, hogy valóban töröljek."
 
-#: ../bin/duplicity:921
+#: ../bin/duplicity:919
 msgid "There are backup set(s) at time(s):"
 msgstr ""
 "A következő biztonsági mentés készlet(ek)et találtam a megadott "
 "időpont(ok)ban:"
 
-#: ../bin/duplicity:923
+#: ../bin/duplicity:921
 msgid "Which can't be deleted because newer sets depend on them."
 msgstr "Amiket nem lehet törölni, mert újabb készletek függnek tőlük."
 
-#: ../bin/duplicity:927
+#: ../bin/duplicity:925
 msgid ""
 "Current active backup chain is older than specified time.  However, it will "
 "not be deleted.  To remove all your backups, manually purge the repository."
@@ -208,109 +208,109 @@ msgstr ""
 "ellenére nem törlöm ezeket. Az összes biztonsági mentést manuálisan töröld a "
 "raktárból."
 
-#: ../bin/duplicity:933
+#: ../bin/duplicity:931
 msgid "No old backup sets found, nothing deleted."
 msgstr "Nem találtam régi biztonsági mentés készletet, nem töröltem semmit."
 
-#: ../bin/duplicity:936
+#: ../bin/duplicity:934
 msgid "Deleting backup chain at time:"
 msgid_plural "Deleting backup chains at times:"
 msgstr[0] "Biztonsági mentés lánc törlése a következő időpontban:"
 msgstr[1] "Biztonsági mentés láncok törlése a következő időpontokban:"
 
-#: ../bin/duplicity:947
+#: ../bin/duplicity:945
 #, python-format
 msgid "Deleting incremental signature chain %s"
 msgstr "A(z) %s növekményes aláírás lánc törlése"
 
-#: ../bin/duplicity:949
+#: ../bin/duplicity:947
 #, python-format
 msgid "Deleting incremental backup chain %s"
 msgstr "A(z) %s növekményes biztonsági mentés lánc törlése"
 
-#: ../bin/duplicity:952
+#: ../bin/duplicity:950
 #, python-format
 msgid "Deleting complete signature chain %s"
 msgstr "A teljes %s aláírás lánc törlése"
 
-#: ../bin/duplicity:954
+#: ../bin/duplicity:952
 #, python-format
 msgid "Deleting complete backup chain %s"
 msgstr "A teljes %s biztonsági mentés lánc törlése"
 
-#: ../bin/duplicity:960
+#: ../bin/duplicity:958
 msgid "Found old backup chain at the following time:"
 msgid_plural "Found old backup chains at the following times:"
 msgstr[0] "Régi biztonsági mentés lánc található a következő időpontban:"
 msgstr[1] ""
 "Régi biztonsági mentés láncok találhatók a következő időpontokban:"
 
-#: ../bin/duplicity:964
+#: ../bin/duplicity:962
 msgid "Rerun command with --force option to actually delete."
 msgstr ""
 "Futtasd le a parancsot újra a --force kapcsolóval, hogy valóban töröljem."
 
-#: ../bin/duplicity:1041
+#: ../bin/duplicity:1039
 #, python-format
 msgid "Deleting local %s (not authoritative at backend)."
 msgstr "Helyi %s törlése (nem hiteles a tárhelyen)."
 
-#: ../bin/duplicity:1045
+#: ../bin/duplicity:1043
 #, python-format
 msgid "Unable to delete %s: %s"
 msgstr "Nem tudtam törölni: %s: %s"
 
-#: ../bin/duplicity:1073 ../duplicity/dup_temp.py:263
+#: ../bin/duplicity:1071 ../duplicity/dup_temp.py:263
 #, python-format
 msgid "Failed to read %s: %s"
 msgstr "Nem tudtam beolvasni: %s: %s"
 
-#: ../bin/duplicity:1087
+#: ../bin/duplicity:1085
 #, python-format
 msgid "Copying %s to local cache."
 msgstr "%s másolása a helyi gyorsítótárba."
 
-#: ../bin/duplicity:1135
+#: ../bin/duplicity:1133
 msgid "Local and Remote metadata are synchronized, no sync needed."
 msgstr ""
 "Helyi és távoli metaadatok szinkronban vannak, nem kell szinkronizálni."
 
-#: ../bin/duplicity:1140
+#: ../bin/duplicity:1138
 msgid "Synchronizing remote metadata to local cache..."
 msgstr "Távoli metaadatok letöltése a helyi gyorsítótárba..."
 
-#: ../bin/duplicity:1155
+#: ../bin/duplicity:1153
 msgid "Sync would copy the following from remote to local:"
 msgstr "A következőt nem tudtam letölteni a helyi gyorsítótárba:"
 
-#: ../bin/duplicity:1158
+#: ../bin/duplicity:1156
 msgid "Sync would remove the following spurious local files:"
 msgstr ""
 "Szinkronizálás során le kell törölni a következő hamis helyi állományokat:"
 
-#: ../bin/duplicity:1201
+#: ../bin/duplicity:1199
 msgid "Unable to get free space on temp."
 msgstr "Nincs már szabad hely az átmeneti (temp) tárolóban."
 
-#: ../bin/duplicity:1209
+#: ../bin/duplicity:1207
 #, python-format
 msgid "Temp space has %d available, backup needs approx %d."
 msgstr ""
 "Az átmeneti (temp) tárolóban %d hely van, a biztonsági mentéshez kb. %d "
 "kellene."
 
-#: ../bin/duplicity:1212
+#: ../bin/duplicity:1210
 #, python-format
 msgid "Temp has %d available, backup will use approx %d."
 msgstr ""
 "Az átmeneti (temp) tárolóban %d hely van, a biztonsági mentéshez kb. %d "
 "kellene."
 
-#: ../bin/duplicity:1220
+#: ../bin/duplicity:1218
 msgid "Unable to get max open files."
 msgstr "Nem sikerült lekérdezni, hogy hány állomány nyitható meg egy időben."
 
-#: ../bin/duplicity:1224
+#: ../bin/duplicity:1222
 #, python-format
 msgid ""
 "Max open files of %s is too low, should be >= 1024.\n"
@@ -320,7 +320,7 @@ msgstr ""
 ">=1024 kellene.\n"
 "A megoldás: 'ulimit -n 1024' (vagy még magasabb érték).\n"
 
-#: ../bin/duplicity:1273
+#: ../bin/duplicity:1271
 msgid ""
 "RESTART: The first volume failed to upload before termination.\n"
 "         Restart is impossible...starting backup from beginning."
@@ -328,7 +328,7 @@ msgstr ""
 "ÚJRAKEZDÉS: Az első köteget nem sikerült feltölteni a tárhelyre.\n"
 "            Nem tudom helyreállítani... biztonsági mentés újraindítása."
 
-#: ../bin/duplicity:1279
+#: ../bin/duplicity:1277
 #, python-format
 msgid ""
 "RESTART: Volumes %d to %d failed to upload before termination.\n"
@@ -337,7 +337,7 @@ msgstr ""
 "ÚJRAKEZDÉS: Az %d - %d köteget nem sikerült feltölteni a tárhelyre.\n"
 "            Biztonsági mentés újraindítása a %d. kötegnél."
 
-#: ../bin/duplicity:1286
+#: ../bin/duplicity:1284
 #, python-format
 msgid ""
 "RESTART: Impossible backup state: manifest has %d vols, remote has %d vols.\n"
@@ -351,7 +351,7 @@ msgstr ""
 "kötegeit,\n"
 "            majd újraindítom a biztonsági mentést."
 
-#: ../bin/duplicity:1308
+#: ../bin/duplicity:1306
 msgid ""
 "\n"
 "PYTHONOPTIMIZE in the environment causes duplicity to fail to\n"
@@ -368,31 +368,31 @@ msgid ""
 "See http://www.nongnu.org/duplicity/\n"
 msgstr ""
 
-#: ../bin/duplicity:1399
+#: ../bin/duplicity:1397
 #, python-format
 msgid "Last %s backup left a partial set, restarting."
 msgstr ""
 "Az utolsó %s biztonsági mentés hiányos készletet hagyott maga után, "
 "újraindítás."
 
-#: ../bin/duplicity:1403
+#: ../bin/duplicity:1401
 #, python-format
 msgid "Cleaning up previous partial %s backup set, restarting."
 msgstr "Előző %s hiányos biztonsági mentés tisztítása, újraindítás."
 
-#: ../bin/duplicity:1414
+#: ../bin/duplicity:1412
 msgid "Last full backup date:"
 msgstr "Utolsó teljes biztonsági mentés dátuma:"
 
-#: ../bin/duplicity:1416
+#: ../bin/duplicity:1414
 msgid "Last full backup date: none"
 msgstr "Legutolsó teljes biztonsági mentés dátuma: nincs."
 
-#: ../bin/duplicity:1418
+#: ../bin/duplicity:1416
 msgid "Last full backup is too old, forcing full backup"
 msgstr "Legutolsó teljes biztonsági mentés túl régi, teljes mentés kell."
 
-#: ../bin/duplicity:1461
+#: ../bin/duplicity:1459
 msgid ""
 "When using symmetric encryption, the signing passphrase must equal the "
 "encryption passphrase."
@@ -400,21 +400,21 @@ msgstr ""
 "Szimmetrikus titkosítás használatakor az aláíró jelszónak meg kell egyeznie "
 "a titkosítási jelszóval."
 
-#: ../bin/duplicity:1514
+#: ../bin/duplicity:1512
 msgid "INT intercepted...exiting."
 msgstr "INT jelzés érkezett... kilépés."
 
-#: ../bin/duplicity:1522
+#: ../bin/duplicity:1520
 #, python-format
 msgid "GPG error detail: %s"
 msgstr "GPG hiba részletei: %s"
 
-#: ../bin/duplicity:1532
+#: ../bin/duplicity:1530
 #, python-format
 msgid "User error detail: %s"
 msgstr "Felhasználói hiba: %s"
 
-#: ../bin/duplicity:1542
+#: ../bin/duplicity:1540
 #, python-format
 msgid "Backend error detail: %s"
 msgstr "Tárhely hiba részletei: %s"
@@ -823,17 +823,17 @@ msgid "Backends and their URL formats:"
 msgstr "Tárhelyek és azok URL formátumai:"
 
 #. TRANSL: Header in usage help
-#: ../duplicity/commandline.py:867
+#: ../duplicity/commandline.py:868
 msgid "Commands:"
 msgstr "Parancsok:"
 
-#: ../duplicity/commandline.py:891
+#: ../duplicity/commandline.py:892
 #, python-format
 msgid ""
 "Specified archive directory '%s' does not exist, or is not a directory"
 msgstr "A megadott '%s' archív könyvtár nem létezik, vagy nem könyvtár"
 
-#: ../duplicity/commandline.py:899
+#: ../duplicity/commandline.py:908
 #, python-format
 msgid ""
 "Sign key should be an 8 character hex string, like 'AA0E73D2'.\n"
@@ -842,7 +842,7 @@ msgstr ""
 "Az aláíró kulcs egy 8 karakter hosszú hex szöveg, pl. 'AA0E73D2'.\n"
 "Ehelyett ezt kaptam: '%s'."
 
-#: ../duplicity/commandline.py:960
+#: ../duplicity/commandline.py:961
 #, python-format
 msgid ""
 "Restore destination directory %s already exists.\n"
@@ -851,22 +851,22 @@ msgstr ""
 "A visszaállításhoz kért %s könyvár már létezik.\n"
 "Nem írom felül."
 
-#: ../duplicity/commandline.py:965
+#: ../duplicity/commandline.py:966
 #, python-format
 msgid "Verify directory %s does not exist"
 msgstr "Az ellenőrzéshez kért %s könyvtár nem létezik"
 
-#: ../duplicity/commandline.py:971
+#: ../duplicity/commandline.py:972
 #, python-format
 msgid "Backup source directory %s does not exist."
 msgstr "Biztonsági mentés %s forráskönyvtár nem létezik."
 
-#: ../duplicity/commandline.py:1000
+#: ../duplicity/commandline.py:1001
 #, python-format
 msgid "Command line warning: %s"
 msgstr "Parancssori figyelmetetés: %s"
 
-#: ../duplicity/commandline.py:1000
+#: ../duplicity/commandline.py:1001
 msgid ""
 "Selection options --exclude/--include\n"
 "currently work only when backing up,not restoring."
@@ -874,7 +874,7 @@ msgstr ""
 "Az --exclude/--include állományválasztó opciók jelenleg csak \n"
 "biztonsági mentéshez használhatók, visszaállításhoz nem."
 
-#: ../duplicity/commandline.py:1048
+#: ../duplicity/commandline.py:1049
 #, python-format
 msgid ""
 "Bad URL '%s'.\n"
@@ -885,7 +885,7 @@ msgstr ""
 "Néhány példa-URL: \"scp://user@host.net:1234/path\" vagy\n"
 "\"file:///usr/local\". Olvass utána a \"man\" oldalon."
 
-#: ../duplicity/commandline.py:1073
+#: ../duplicity/commandline.py:1074
 msgid "Main action: "
 msgstr "Fő művelet: "
 
