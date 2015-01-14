@@ -1,5 +1,14 @@
 2015-01-13  Kenneth Loafman  <kenneth@loafman.com>
 
+    * Merged in lp:~noizyland/duplicity/fix_azurebackend_container_names
+      - Azure Backend examples have underscores in the container names.  These
+        are not valid Azure container names.  The underscores have been replaced
+        with hypens and a note about valid container names added to the man page.
+      - Also corrects a problem where Azure Exceptions were returing unicode
+        strings that were not being handled correctly.
+
+2015-01-13  Kenneth Loafman  <kenneth@loafman.com>
+
 * Merged in lp:~aaron-whitehouse/duplicity/progress_option_error
   - Added test_exclude_globbing_filelist_progress_option into
     functional/test_selection.py, which shows the error reported in

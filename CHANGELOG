@@ -11,6 +11,12 @@ New in v0.7.02 (2015/02/??)
     Bug #1264744 - that the --exclude-globbing-filelist does not backup
     the correct files if the --progress option is used. Test is marked as
     an expected failure so as not to cause the test suite to fail.
+* Merged in lp:~noizyland/duplicity/fix_azurebackend_container_names
+  - Azure Backend examples have underscores in the container names.  These
+    are not valid Azure container names.  The underscores have been replaced
+    with hypens and a note about valid container names added to the man page.
+  - Also corrects a problem where Azure Exceptions were returing unicode
+    strings that were not being handled correctly.
 
 
 New in v0.7.01 (2015/01/11)
