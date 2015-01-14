@@ -69,7 +69,7 @@ class SwiftBackend(duplicity.backend.Backend):
             conn_kwargs['auth_version'] = '1'
         if 'SWIFT_TENANTNAME' in os.environ:
             conn_kwargs['tenant_name'] = os.environ['SWIFT_TENANTNAME']
-	if 'SWIFT_REGIONNAME' in os.environ:
+        if 'SWIFT_REGIONNAME' in os.environ:
             conn_kwargs['os_options'] = {'region_name':os.environ['SWIFT_REGIONNAME']}
 
         self.container = parsed_url.path.lstrip('/')

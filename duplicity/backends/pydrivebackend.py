@@ -63,7 +63,7 @@ class PyDriveBackend(duplicity.backend.Backend):
             if not folder_name:
                 continue
             file_list = self.drive.ListFile({'q': "'" + parent_folder_id + "' in parents"}).GetList()
-            folder =  next((item for item in file_list if item['title'] == folder_name and item['mimeType'] == 'application/vnd.google-apps.folder'), None)
+            folder = next((item for item in file_list if item['title'] == folder_name and item['mimeType'] == 'application/vnd.google-apps.folder'), None)
             if folder is None:
                 folder = self.drive.CreateFile({'title': folder_name, 'mimeType': "application/vnd.google-apps.folder", 'parents': [{'id': parent_folder_id}]})
                 folder.Upload()

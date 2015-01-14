@@ -8,10 +8,11 @@
         strings that were not being handled correctly.
     * Merged in lp:~user3942934/duplicity/pydrive
       - Currently duplicity uses gdocs backend for Google Drive backups.
-        gdocs uses deprecated API and don't allow backups for managed Google 
+        gdocs uses deprecated API and don't allow backups for managed Google
         accounts.  (see https://bugs.launchpad.net/duplicity/+bug/1315684)
-      - Added pydrive backend that solves both of those problems. Published 
+      - Added pydrive backend that solves both of those problems. Published
         also on https://github.com/westerngateguard/duplicity-pydrive-backend.
+    * Fixed some tabs/spaces problems that were causing install failures.
 
 2015-01-13  Kenneth Loafman  <kenneth@loafman.com>
 
