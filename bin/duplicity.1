@@ -149,7 +149,15 @@ for ssl certificate verification of HTTPS connections
 .br
 (also see
 .BR "A NOTE ON SSL CERTIFICATE VERIFICATION" ).
-
+.TP
+.BR "pydrive backend"
+.B PyDrive -- a wrapper library of google-api-python-client
+- https://pypi.python.org/pypi/PyDrive
+.br
+(also see
+.BR "A NOTE ON PYDRIVE BACKEND"
+) below.
+.br
 .SH DESCRIPTION
 Duplicity incrementally backs up files and folders into
 tar-format volumes encrypted with GnuPG and places them to a
@@ -1277,6 +1285,16 @@ webdav[s]://user[:password]@other.host[:port]/some_dir
 .B alternatively
 try lftp+webdav[s]://
 .RE
+.PP
+.BR "pydrive"
+.PP
+.RS
+pydrive://<service account' email address>@developer.gserviceaccount.com/some_dir
+.PP
+See also
+.B "A NOTE ON PYDRIVE BACKEND"
+below.
+.RE
 
 .SH TIME FORMATS
 duplicity uses time strings in two places.  Firstly, many of the files
@@ -1878,6 +1896,27 @@ variables can be used instead:
 If
 .B SWIFT_AUTHVERSION
 is unspecified, it will default to version 1.
+
+.SH A NOTE ON PYDRIVE BACKEND
+The pydrive backend requires Python PyDrive package to be installed on the system. See
+.B REQUIREMENTS
+above.
+ 
+You need to create a service account in "Google developers console" at https://console.developers.google.com
+
+Make sure Drive API is enabled. 
+
+The email address of the account will be used as part of URL. See
+.B URL FORMAT
+above.
+
+Download the .p12 key file of the account and convert it to the .pem format:
+.br
+openssl pkcs12 -in XXX.p12  -nodes -nocerts > pydriveprivatekey.pem
+
+The content of .pem file should be passed to 
+.BR GOOGLE_DRIVE_ACCOUNT_KEY
+environment variable for authentification.
 
 .SH A NOTE ON SYMMETRIC ENCRYPTION AND SIGNING
 Signing and symmetrically encrypt at the same time with the gpg binary on the

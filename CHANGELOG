@@ -17,6 +17,12 @@ New in v0.7.02 (2015/02/??)
     with hypens and a note about valid container names added to the man page.
   - Also corrects a problem where Azure Exceptions were returing unicode
     strings that were not being handled correctly.
+* Merged in lp:~user3942934/duplicity/pydrive
+  - Currently duplicity uses gdocs backend for Google Drive backups.
+    gdocs uses deprecated API and don't allow backups for managed Google 
+    accounts.  (see https://bugs.launchpad.net/duplicity/+bug/1315684)
+  - Added pydrive backend that solves both of those problems. Published 
+    also on https://github.com/westerngateguard/duplicity-pydrive-backend.
 
 
 New in v0.7.01 (2015/01/11)

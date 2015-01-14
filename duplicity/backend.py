@@ -251,7 +251,7 @@ class ParsedUrl:
             pu = urlparse.urlparse(url_string)
         except Exception:
             raise InvalidBackendURL("Syntax error in: %s" % url_string)
-
+                
         try:
             self.scheme = pu.scheme
         except Exception:
