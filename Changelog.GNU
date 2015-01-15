@@ -1,6 +1,7 @@
 2015-01-15  Kenneth Loafman  <kenneth@loafman.com>
 
-* Fixed variable typo in commandline.py that was causing build fails.
+    * Fixed variable typo in commandline.py that was causing build fails.
+    * Merged in lp:~duplicity-team/duplicity/po-updates
 
 2015-01-13  Kenneth Loafman  <kenneth@loafman.com>
 
