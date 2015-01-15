@@ -24,6 +24,7 @@ New in v0.7.02 (2015/02/??)
   - Added pydrive backend that solves both of those problems. Published
     also on https://github.com/westerngateguard/duplicity-pydrive-backend.
 * Fixed some tabs/spaces problems that were causing install failures.
+* Fixed variable typo in commandline.py that was causing build fails.
 
 
 New in v0.7.01 (2015/01/11)

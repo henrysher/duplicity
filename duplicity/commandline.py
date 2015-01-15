@@ -685,7 +685,7 @@ def parse_cmdline_options(arglist):
 
 def command_line_error(message):
     """Indicate a command line error and exit"""
-    log.FatalError(_("Command line error: %s") % (message,) + "\n" + 
+    log.FatalError(_("Command line error: %s") % (message,) + "\n" +
                    _("Enter 'duplicity --help' for help screen."),
                    log.ErrorCode.command_line)
 
@@ -861,7 +861,7 @@ def usage():
   copy://%(user)s[:%(password)s]@%(other_host)s/%(some_dir)s
   dpbx:///%(some_dir)s
   onedrive://%(some_dir)s
-  azure://%(container-name)s
+  azure://%(container_name)s
 
 """ % dict
 
@@ -964,7 +964,7 @@ def process_local_dir(action, local_pathname):
                            log.ErrorCode.restore_dir_exists)
     elif action == "verify":
         if not local_path.exists():
-            log.FatalError(_("Verify directory %s does not exist") % 
+            log.FatalError(_("Verify directory %s does not exist") %
                            (util.ufn(local_path.name),),
                            log.ErrorCode.verify_dir_doesnt_exist)
     else:
