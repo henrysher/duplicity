@@ -1,3 +1,7 @@
+2015-01-17  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Remove 'gs' and 's3+http' from uses_netloc[].  Fixes Bug 1411803.
+
 2015-01-15  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed variable typo in commandline.py that was causing build fails.

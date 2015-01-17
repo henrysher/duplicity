@@ -26,6 +26,7 @@ New in v0.7.02 (2015/02/??)
 * Fixed some tabs/spaces problems that were causing install failures.
 * Fixed variable typo in commandline.py that was causing build fails.
 * Merged in lp:~duplicity-team/duplicity/po-updates
+* Remove 'gs' and 's3+http' from uses_netloc[].  Fixes Bug 1411803.
 
 
 New in v0.7.01 (2015/01/11)
