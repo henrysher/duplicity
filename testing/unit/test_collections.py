@@ -82,7 +82,7 @@ class CollectionTest(UnitTestCase):
         self.archive_dir_backend = backend.get_backend("file://testfiles/collectionstest"
                                                        "/archive_dir")
 
-        self.real_backend = backend.get_backend("file://%s/%s" % 
+        self.real_backend = backend.get_backend("file://%s/%s" %
                                                 (col_test_dir.name, "remote_dir"))
         self.output_dir = path.Path("testfiles/output")  # used as a temp directory
         self.output_dir_backend = backend.get_backend("file://testfiles/output")
@@ -227,8 +227,7 @@ class CollectionTest(UnitTestCase):
         oldsets_required = cs.get_older_than_required(
             dup_time.genstrtotime("2002-08-17T20:00:00-07:00"))
         oldset_times = [s.get_time() for s in oldsets_required]
-        right_times_required = [dup_time.genstrtotime(
-                                   '2002-08-17T16:17:01-07:00')]
+        right_times_required = [dup_time.genstrtotime('2002-08-17T16:17:01-07:00')]
         assert oldset_times == right_times_required, \
                [oldset_times, right_times_required]
 

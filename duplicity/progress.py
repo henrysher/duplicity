@@ -66,11 +66,11 @@ class Snapshot(sys_collections.deque):
                 snapshot = pickle.load(progressfd)
                 progressfd.close()
             except:
-                log.Warn("Warning, cannot read stored progress information from previous backup", log.WarningCode.cannot_stat) 
+                log.Warn("Warning, cannot read stored progress information from previous backup", log.WarningCode.cannot_stat)
                 snapshot = Snapshot()
         # Reached here no cached data found or wrong marshalling
         return snapshot
-        
+
     def marshall(self):
         """
         Serializes object to cache
@@ -125,7 +125,7 @@ class ProgressTracker():
         self.current_estimation = 0.0
         self.prev_estimation = 0.0
         self.prev_data = None
-            
+
     def snapshot_progress(self, volume):
         """
         Snapshots the current progress status for each volume into the disk cache
@@ -134,7 +134,7 @@ class ProgressTracker():
         """
         if self.prev_data is not None:
             self.prev_data.push_snapshot(volume, self.progress_estimation)
-            self.prev_data.marshall() 
+            self.prev_data.marshall()
 
     def has_collected_evidence(self):
         """
@@ -142,7 +142,7 @@ class ProgressTracker():
         yet started the first dry-run pass to collect some information
         """
         return (self.total_stats is not None)
-    
+
     def log_upload_progress(self):
         """
         Aproximative and evolving method of computing the progress of upload
@@ -158,28 +158,28 @@ class ProgressTracker():
         else:
             elapsed = timedelta()
         self.last_time = current_time
-    
+
         # Detect (and report) a stallment if no changing data for more than 5 seconds
         if self.stall_last_time is None:
             self.stall_last_time = current_time
         if (current_time - self.stall_last_time).seconds > max(5, 2 * globals.progress_rate):
             log.TransferProgress(100.0 * self.progress_estimation,
-                                    self.time_estimation, self.total_bytecount,
-                                    (current_time - self.start_time).seconds,
-                                    self.speed,
-                                    True
-                                )
+                                 self.time_estimation, self.total_bytecount,
+                                 (current_time - self.start_time).seconds,
+                                 self.speed,
+                                 True
+                                 )
             return
-    
+
         self.nsteps += 1
-    
+
         """
         Compute the ratio of information being written for deltas vs file sizes
         Using Knuth algorithm to estimate approximate upper bound in % of completion
         The progress is estimated on the current bytes written vs the total bytes to
-        change as estimated by a first-dry-run. The weight is the ratio of changing 
+        change as estimated by a first-dry-run. The weight is the ratio of changing
         data (Delta) against the total file sizes. (pessimistic estimation)
-        The method computes the upper bound for the progress, when using a sufficient 
+        The method computes the upper bound for the progress, when using a sufficient
         large volsize to accomodate and changes, as using a small volsize may inject
         statistical noise.
         """
@@ -188,7 +188,7 @@ class ProgressTracker():
         total_changes = self.total_stats.NewFileSize + self.total_stats.ChangedFileSize
         if total_changes == 0 or diffdir.stats.RawDeltaSize == 0:
             return
-    
+
         # Snapshot current values for progress
         last_progress_estimation = self.progress_estimation
 
@@ -202,7 +202,7 @@ class ProgressTracker():
             self.change_mean_ratio += change_delta / float(self.nsteps)  # mean cumulated ratio
             self.change_r_estimation += change_delta * (change_ratio - self.change_mean_ratio)
             change_sigma = math.sqrt(math.fabs(self.change_r_estimation / float(self.nsteps)))
-        
+
             """
             Combine variables for progress estimation
             Fit a smoothed curve that covers the most common data density distributions, aiming for a large number of incremental changes.
@@ -211,17 +211,17 @@ class ProgressTracker():
                 the second half. Scale it to the changes/total ratio
             """
             self.current_estimation = float(changes) / float(total_changes) * (
-                                            (self.change_mean_ratio - 0.67 * change_sigma) * (1.0 - self.current_estimation) + 
-                                            (self.change_mean_ratio + 0.67 * change_sigma) * self.current_estimation 
-                                        )
+                (self.change_mean_ratio - 0.67 * change_sigma) * (1.0 - self.current_estimation) +
+                (self.change_mean_ratio + 0.67 * change_sigma) * self.current_estimation
+            )
             """
             In case that we overpassed the 100%, drop the confidence and trust more the mean as the sigma may be large.
             """
             if self.current_estimation > 1.0:
                 self.current_estimation = float(changes) / float(total_changes) * (
-                                                (self.change_mean_ratio - 0.33 * change_sigma) * (1.0 - self.current_estimation) + 
-                                                (self.change_mean_ratio + 0.33 * change_sigma) * self.current_estimation 
-                                            )
+                    (self.change_mean_ratio - 0.33 * change_sigma) * (1.0 - self.current_estimation) +
+                    (self.change_mean_ratio + 0.33 * change_sigma) * self.current_estimation
+                )
             """
             Meh!, if again overpassed the 100%, drop the confidence to 0 and trust only the mean.
             """
@@ -233,7 +233,7 @@ class ProgressTracker():
         For the last step uploading of signature and manifests
         """
         self.progress_estimation = max(0.0, min(self.prev_estimation + (1.0 - self.prev_estimation) * self.current_estimation, 0.99))
-    
+
 
         """
         Estimate the time just as a projection of the remaining time, fit to a [(1 - x) / x] curve
@@ -247,11 +247,11 @@ class ProgressTracker():
         # Apply values only when monotonic, so the estimates look more consistent to the human eye
         if self.progress_estimation < last_progress_estimation:
             self.progress_estimation = last_progress_estimation
-    
+
         """
         Compute Exponential Moving Average of speed as bytes/sec of the last 30 probes
         """
-        if elapsed.total_seconds() > 0: 
+        if elapsed.total_seconds() > 0:
             self.transfers.append(float(self.total_bytecount - self.last_total_bytecount) / float(elapsed.total_seconds()))
         self.last_total_bytecount = self.total_bytecount
         if len(self.transfers) > 30:
@@ -261,14 +261,14 @@ class ProgressTracker():
             self.speed = 0.3 * x + 0.7 * self.speed
 
         log.TransferProgress(100.0 * self.progress_estimation,
-                                self.time_estimation,
-                                self.total_bytecount,
-                                (current_time - self.start_time).seconds,
-                                self.speed,
-                                False
-                            )
-    
-    
+                             self.time_estimation,
+                             self.total_bytecount,
+                             (current_time - self.start_time).seconds,
+                             self.speed,
+                             False
+                             )
+
+
     def annotate_written_bytes(self, bytecount):
         """
         Annotate the number of bytes that have been added/changed since last time
@@ -281,7 +281,7 @@ class ProgressTracker():
         self.last_bytecount = bytecount
         if changing > 0:
             self.stall_last_time = datetime.now()
-    
+
     def set_evidence(self, stats, is_full):
         """
         Stores the collected statistics from a first-pass dry-run, to use this
@@ -289,7 +289,7 @@ class ProgressTracker():
         """
         self.total_stats = stats
         self.is_full = is_full
-            
+
     def set_start_volume(self, volume):
         self.prev_data = Snapshot.unmarshall()
         self.prev_estimation = self.prev_data.get_snapshot(volume)
@@ -300,7 +300,7 @@ class ProgressTracker():
         Elapsed seconds since the first call to log_upload_progress method
         """
         return (datetime.now() - self.start_time).seconds
-    
+
 
 def report_transfer(bytecount, totalbytes):
     """
@@ -316,8 +316,8 @@ def report_transfer(bytecount, totalbytes):
 
 class LogProgressThread(threading.Thread):
     """
-    Background thread that reports progress to the log, 
-    every --progress-rate seconds 
+    Background thread that reports progress to the log,
+    every --progress-rate seconds
     """
     def __init__(self):
         super(LogProgressThread, self).__init__()

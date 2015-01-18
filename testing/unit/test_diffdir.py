@@ -190,9 +190,9 @@ class DDTest(UnitTestCase):
 
             # Write new signature and delta to deltadir2 and sigdir2, compare
             block_iter = diffdir.DirDelta_WriteSig(
-                            get_sel(cur_dir),
-                            [p.open("rb") for p in sigstack],
-                            incsig.open("wb"))
+                get_sel(cur_dir),
+                [p.open("rb") for p in sigstack],
+                incsig.open("wb"))
             sigstack.append(incsig)
             diffdir.write_block_iter(block_iter, delta2)
 

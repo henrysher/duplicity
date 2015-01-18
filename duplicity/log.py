@@ -173,7 +173,7 @@ def TransferProgress(progress, eta, changed_bytes, elapsed, speed, stalled):
         data_amount /= 1024.0
         data_scale = "GB"
     if stalled:
-        eta_str = "Stalled!" 
+        eta_str = "Stalled!"
         speed_amount = 0
         speed_scale = "B"
     else:
@@ -187,12 +187,12 @@ def TransferProgress(progress, eta, changed_bytes, elapsed, speed, stalled):
             speed_amount /= 1024.0
             speed_scale = "GB"
     s = "%.1f%s %s [%.1f%s/s] [%s>%s] %d%% ETA %s" % (data_amount, data_scale,
-                                                            _ElapsedSecs2Str(elapsed),
-                                                            speed_amount, speed_scale,
-                                                            '=' * dots, ' ' * (40 - dots),
-                                                            progress,
-                                                            eta_str
-                                                          )
+                                                      _ElapsedSecs2Str(elapsed),
+                                                      speed_amount, speed_scale,
+                                                      '=' * dots, ' ' * (40 - dots),
+                                                      progress,
+                                                      eta_str
+                                                      )
 
     controlLine = "%d %d %d %d %d %d" % (changed_bytes, elapsed, progress, eta, speed, stalled)
     Log(s, NOTICE, InfoCode.upload_progress, controlLine)

@@ -82,10 +82,11 @@ class GDocsBackend(duplicity.backend.Backend):
         # enable uploads for all file types.
         # (see http://googleappsdeveloper.blogspot.com/2011/05/upload-all-file-types-to-any-google.html)
         file = source_path.open()
-        uploader = gdata.client.ResumableUploader(
-          self.client, file, GDocsBackend.BACKUP_DOCUMENT_TYPE, os.path.getsize(file.name),
-          chunk_size=gdata.client.ResumableUploader.DEFAULT_CHUNK_SIZE,
-          desired_class=gdata.docs.data.Resource)
+        uploader = gdata.client.ResumableUploader(self.client, file,
+            GDocsBackend.BACKUP_DOCUMENT_TYPE,
+            os.path.getsize(file.name),
+            chunk_size=gdata.client.ResumableUploader.DEFAULT_CHUNK_SIZE,
+            desired_class=gdata.docs.data.Resource)
         if uploader:
             # Chunked upload.
             entry = gdata.docs.data.Resource(title=atom.data.Title(text=remote_filename))

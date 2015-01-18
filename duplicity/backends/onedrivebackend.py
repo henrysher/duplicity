@@ -98,16 +98,16 @@ class OneDriveBackend(duplicity.backend.Backend):
                        'Trying to create a new one. (original error: %s)' % e))
 
         self.http_client = OAuth2Session(
-                self.CLIENT_ID,
-                scope=self.OAUTH_SCOPE,
-                redirect_uri=self.OAUTH_REDIRECT_URI,
-                token=token,
-                auto_refresh_kwargs={
-                    'client_id': self.CLIENT_ID,
-                    'client_secret': self.CLIENT_SECRET,
-                },
-                auto_refresh_url=self.OAUTH_TOKEN_URI,
-                token_updater=token_updater)
+            self.CLIENT_ID,
+            scope=self.OAUTH_SCOPE,
+            redirect_uri=self.OAUTH_REDIRECT_URI,
+            token=token,
+            auto_refresh_kwargs={
+                'client_id': self.CLIENT_ID,
+                'client_secret': self.CLIENT_SECRET,
+            },
+            auto_refresh_url=self.OAUTH_TOKEN_URI,
+            token_updater=token_updater)
 
         # Send a request to make sure the token is valid (or could at least be
         # refreshed successfully, which will happen under the covers). In case
@@ -124,7 +124,7 @@ class OneDriveBackend(duplicity.backend.Backend):
                                 'interactively, so duplicity cannot possibly '
                                 'access OneDrive.' % self.OAUTH_TOKEN_PATH))
             authorization_url, state = self.http_client.authorization_url(
-                    self.OAUTH_AUTHORIZE_URI, display='touch')
+                self.OAUTH_AUTHORIZE_URI, display='touch')
 
             print ''
             print ('In order to authorize duplicity to access your OneDrive, '
@@ -176,10 +176,10 @@ class OneDriveBackend(duplicity.backend.Backend):
                         tried_mkdir = True
                         continue
                     raise BackendException((
-                            'Could not resolve/create directory "%s" on '
-                            'OneDrive: %s not in %s (files of folder %s)' % (
-                                self.directory, component,
-                                names_to_ids.keys(), object_id)))
+                        'Could not resolve/create directory "%s" on '
+                        'OneDrive: %s not in %s (files of folder %s)' % (
+                            self.directory, component,
+                            names_to_ids.keys(), object_id)))
                 break
             object_id = names_to_ids[component]
         self.directory_id = object_id

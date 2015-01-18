@@ -163,7 +163,7 @@ class Select:
 
         if not path.type:
             # base doesn't exist
-            log.Warn(_("Warning: base %s doesn't exist, continuing") % 
+            log.Warn(_("Warning: base %s doesn't exist, continuing") %
                      util.ufn(path.name))
             return
         log.Debug(_("Selecting %s") % util.ufn(path.name))
@@ -267,14 +267,14 @@ class Select:
     def parse_catch_error(self, exc):
         """Deal with selection error exc"""
         if isinstance(exc, FilePrefixError):
-            log.FatalError(_(
-"""Fatal Error: The file specification
+            log.FatalError(_("""\
+Fatal Error: The file specification
     %s
 cannot match any files in the base directory
     %s
 Useful file specifications begin with the base directory or some
-pattern (such as '**') which matches the base directory.""") % 
-            (exc, util.ufn(self.prefix)), log.ErrorCode.file_prefix_error)
+pattern (such as '**') which matches the base directory.""") %
+                           (exc, util.ufn(self.prefix)), log.ErrorCode.file_prefix_error)
         elif isinstance(exc, GlobbingError):
             log.FatalError(_("Fatal Error while processing expression\n"
                              "%s") % exc, log.ErrorCode.globbing_error)
@@ -285,14 +285,14 @@ pattern (such as '**') which matches the base directory.""") %
         """Exit with error if last selection function isn't an exclude"""
         if (self.selection_functions and
                 not self.selection_functions[-1].exclude):
-            log.FatalError(_(
-"""Last selection expression:
+            log.FatalError(_("""\
+Last selection expression:
     %s
 only specifies that files be included.  Because the default is to
 include all files, the expression is redundant.  Exiting because this
-probably isn't what you meant.""") % 
-            (self.selection_functions[-1].name,),
-            log.ErrorCode.redundant_inclusion)
+probably isn't what you meant.""") %
+                           (self.selection_functions[-1].name,),
+                           log.ErrorCode.redundant_inclusion)
 
     def add_selection_func(self, sel_func, add_to_start=None):
         """Add another selection function at the end or beginning"""
@@ -342,7 +342,7 @@ probably isn't what you meant.""") %
             prefix_warnings[0] += 1
             if prefix_warnings[0] < 6:
                 log.Warn(_("Warning: file specification '%s' in filelist %s\n"
-                           "doesn't start with correct prefix %s.  Ignoring.") % 
+                           "doesn't start with correct prefix %s.  Ignoring.") %
                          (exc, filelist_name, util.ufn(self.prefix)))
                 if prefix_warnings[0] == 5:
                     log.Warn(_("Future prefix errors will not be logged."))
@@ -618,7 +618,7 @@ probably isn't what you meant.""") %
         if glob_str.find("**") != -1:
             glob_str = glob_str[:glob_str.find("**") + 2]  # truncate after **
 
-        scan_comp_re = re_comp("^(%s)$" % 
+        scan_comp_re = re_comp("^(%s)$" %
                                "|".join(self.glob_get_prefix_res(glob_str)))
 
         def include_sel_func(path):

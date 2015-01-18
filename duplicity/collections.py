@@ -137,7 +137,7 @@ class BackupSet:
                     and pr.start_time == self.start_time
                     and pr.end_time == self.end_time):
                 self.local_manifest_path = \
-                              globals.archive_dir.append(local_filename)
+                    globals.archive_dir.append(local_filename)
                 break
 
     def delete(self):
@@ -315,12 +315,12 @@ class BackupChain:
                 log.Info(_("Preferring Backupset over previous one!"))
                 self.incset_list[-1] = incset
             else:
-                log.Info(_("Ignoring incremental Backupset (start_time: %s; needed: %s)") % 
+                log.Info(_("Ignoring incremental Backupset (start_time: %s; needed: %s)") %
                          (dup_time.timetopretty(incset.start_time),
                           dup_time.timetopretty(self.end_time)))
                 return False
         self.end_time = incset.end_time
-        log.Info(_("Added incremental Backupset (start_time: %s / end_time: %s)") % 
+        log.Info(_("Added incremental Backupset (start_time: %s / end_time: %s)") %
                  (dup_time.timetopretty(incset.start_time),
                   dup_time.timetopretty(incset.end_time)))
         assert self.end_time
@@ -392,9 +392,9 @@ class BackupChain:
         l = ["-------------------------",
              _("Chain start time: ") + dup_time.timetopretty(self.start_time),
              _("Chain end time: ") + dup_time.timetopretty(self.end_time),
-             _("Number of contained backup sets: %d") % 
+             _("Number of contained backup sets: %d") %
              (len(self.incset_list) + 1,),
-             _("Total number of contained volumes: %d") % 
+             _("Total number of contained volumes: %d") %
              (self.get_num_volumes(),),
              set_schema % (_("Type of backup set:"), _("Time:"), _("Num volumes:"))]
 
@@ -622,17 +622,17 @@ class CollectionsStatus:
         """
         l = [_("Collection Status"),
              u"-----------------",
-             _("Connecting with backend: %s") % 
+             _("Connecting with backend: %s") %
              (self.backend.__class__.__name__,),
              _("Archive dir: %s") % (util.ufn(self.archive_dir.name),)]
 
-        l.append("\n" + 
+        l.append("\n" +
                  ngettext("Found %d secondary backup chain.",
                           "Found %d secondary backup chains.",
                           len(self.other_backup_chains))
                  % len(self.other_backup_chains))
         for i in range(len(self.other_backup_chains)):
-            l.append(_("Secondary chain %d of %d:") % 
+            l.append(_("Secondary chain %d of %d:") %
                      (i + 1, len(self.other_backup_chains)))
             l.append(unicode(self.other_backup_chains[i]))
             l.append("")
@@ -675,14 +675,14 @@ class CollectionsStatus:
         backend_filename_list = self.backend.list()
         log.Debug(ngettext("%d file exists on backend",
                            "%d files exist on backend",
-                           len(backend_filename_list)) % 
+                           len(backend_filename_list)) %
                   len(backend_filename_list))
 
         # get local filename list
         local_filename_list = self.archive_dir.listdir()
         log.Debug(ngettext("%d file exists in cache",
                            "%d files exist in cache",
-                           len(local_filename_list)) % 
+                           len(local_filename_list)) %
                   len(local_filename_list))
 
         # check for partial backups
@@ -1042,11 +1042,11 @@ class CollectionsStatus:
         assert self.values_set
         old_chains = []
         for chain in self.all_backup_chains:
-            if chain.end_time < t and (
-                not self.matched_chain_pair or
-                chain is not self.matched_chain_pair[1]):
-                # don't delete the active (matched) chain
-                old_chains.append(chain)
+            if (chain.end_time < t and
+                (not self.matched_chain_pair or
+                 chain is not self.matched_chain_pair[1])):
+                    # don't delete the active (matched) chain
+                    old_chains.append(chain)
         return old_chains
 
     def get_signature_chains_older_than(self, t):
@@ -1062,11 +1062,11 @@ class CollectionsStatus:
         assert self.values_set
         old_chains = []
         for chain in self.all_sig_chains:
-            if chain.end_time < t and (
-                not self.matched_chain_pair or
-                chain is not self.matched_chain_pair[0]):
-                # don't delete the active (matched) chain
-                old_chains.append(chain)
+            if (chain.end_time < t and
+                (not self.matched_chain_pair or
+                 chain is not self.matched_chain_pair[0])):
+                    # don't delete the active (matched) chain
+                    old_chains.append(chain)
         return old_chains
 
     def get_last_full_backup_time(self):

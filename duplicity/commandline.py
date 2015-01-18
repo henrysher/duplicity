@@ -922,8 +922,8 @@ def args_to_path_backend(arg1, arg2):
     arg1_is_backend, arg2_is_backend = backend.is_backend_url(arg1), backend.is_backend_url(arg2)
 
     if not arg1_is_backend and not arg2_is_backend:
-        command_line_error(
-"""One of the arguments must be an URL.  Examples of URL strings are
+        command_line_error("""\
+One of the arguments must be an URL.  Examples of URL strings are
 "scp://user@host.net:1234/path" and "file:///usr/local".  See the man
 page for more information.""")
     if arg1_is_backend and arg2_is_backend:

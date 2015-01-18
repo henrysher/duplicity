@@ -3,7 +3,7 @@
 !!! This was renamed to gpginterface.py.
     Please refer to duplicity's README for the reason. !!!
 
-gpginterface is a Python module to interface with GnuPG which based on 
+gpginterface is a Python module to interface with GnuPG which based on
 GnuPGInterface by Frank J. Tobin.
 It concentrates on interacting with GnuPG via filehandles,
 providing access to control GnuPG via versatile and extensible means.
@@ -385,17 +385,15 @@ class GnuPG:
 
         for fh_name in create_fhs + attach_fhs.keys():
             if fh_name not in _fd_modes:
-                raise KeyError(
-                      "unrecognized filehandle name '%s'; must be one of %s" \
-                      % (fh_name, _fd_modes.keys()))
+                raise KeyError("unrecognized filehandle name '%s'; must be one of %s" \
+                               % (fh_name, _fd_modes.keys()))
 
         for fh_name in create_fhs:
             # make sure the user doesn't specify a filehandle
             # to be created *and* attached
             if fh_name in attach_fhs:
-                raise ValueError(
-                      "cannot have filehandle '%s' in both create_fhs and attach_fhs" \
-                      % fh_name)
+                raise ValueError("cannot have filehandle '%s' in both create_fhs and attach_fhs" \
+                                 % fh_name)
 
             pipe = os.pipe()
             # fix by drt@un.bewaff.net noting
@@ -612,9 +610,8 @@ class Options:
         """Get a list of generated meta-arguments"""
         args = []
 
-        if self.meta_pgp_5_compatible: args.extend([ '--compress-algo', '1',
-                                                      '--force-v3-sigs'
-                                                      ])
+        if self.meta_pgp_5_compatible: args.extend(['--compress-algo', '1',
+                                                    '--force-v3-sigs'])
         if self.meta_pgp_2_compatible: args.append('--rfc1991')
         if not self.meta_interactive: args.extend([ '--batch', '--no-tty' ])
 

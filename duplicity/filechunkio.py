@@ -19,7 +19,7 @@ class FileChunkIO(io.FileIO):
     A class that allows you reading only a chunk of a file.
     """
     def __init__(self, name, mode='r', closefd=True, offset=0, bytes=None,
-        *args, **kwargs):
+                 *args, **kwargs):
         """
         Open a file chunk. The mode can only be 'r' for reading. Offset
         is the amount of bytes that the chunks starts after the real file's

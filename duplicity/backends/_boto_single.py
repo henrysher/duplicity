@@ -219,15 +219,15 @@ class BotoBackend(duplicity.backend.Backend):
         log.Info("Uploading %s/%s to %s Storage" % (self.straight_url, remote_filename, storage_class))
         if globals.s3_use_sse:
             headers = {
-            'Content-Type': 'application/octet-stream',
-            'x-amz-storage-class': storage_class,
-            'x-amz-server-side-encryption': 'AES256'
-        }
+                'Content-Type': 'application/octet-stream',
+                'x-amz-storage-class': storage_class,
+                'x-amz-server-side-encryption': 'AES256'
+            }
         else:
             headers = {
-            'Content-Type': 'application/octet-stream',
-            'x-amz-storage-class': storage_class
-        }
+                'Content-Type': 'application/octet-stream',
+                'x-amz-storage-class': storage_class
+            }
 
         upload_start = time.time()
         self.upload(source_path.name, key, headers)

@@ -88,7 +88,7 @@ class GnuPGTests(BasicTest):
         # Make sure we're getting the passphrase to GnuPG
         # somehow!
         assert passphrase != None or self.gnupg.passphrase != None, \
-               "No way to send the passphrase to GnuPG!"
+            "No way to send the passphrase to GnuPG!"
 
         creations = []
         # We'll handle the passphrase manually

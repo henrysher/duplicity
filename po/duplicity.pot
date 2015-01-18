@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2015-01-12 09:55-0600\n"
+"POT-Creation-Date: 2015-01-18 12:26-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -314,7 +314,7 @@ msgid ""
 "         backup then restart the backup from the beginning."
 msgstr ""
 
-#: ../bin/duplicity:1306
+#: ../bin/duplicity:1305
 msgid ""
 "\n"
 "PYTHONOPTIMIZE in the environment causes duplicity to fail to\n"
@@ -324,49 +324,49 @@ msgid ""
 "See https://bugs.launchpad.net/duplicity/+bug/931175\n"
 msgstr ""
 
-#: ../bin/duplicity:1397
+#: ../bin/duplicity:1396
 #, python-format
 msgid "Last %s backup left a partial set, restarting."
 msgstr ""
 
-#: ../bin/duplicity:1401
+#: ../bin/duplicity:1400
 #, python-format
 msgid "Cleaning up previous partial %s backup set, restarting."
 msgstr ""
 
-#: ../bin/duplicity:1412
+#: ../bin/duplicity:1411
 msgid "Last full backup date:"
 msgstr ""
 
-#: ../bin/duplicity:1414
+#: ../bin/duplicity:1413
 msgid "Last full backup date: none"
 msgstr ""
 
-#: ../bin/duplicity:1416
+#: ../bin/duplicity:1415
 msgid "Last full backup is too old, forcing full backup"
 msgstr ""
 
-#: ../bin/duplicity:1459
+#: ../bin/duplicity:1458
 msgid ""
 "When using symmetric encryption, the signing passphrase must equal the "
 "encryption passphrase."
 msgstr ""
 
-#: ../bin/duplicity:1512
+#: ../bin/duplicity:1511
 msgid "INT intercepted...exiting."
 msgstr ""
 
-#: ../bin/duplicity:1520
+#: ../bin/duplicity:1519
 #, python-format
 msgid "GPG error detail: %s"
 msgstr ""
 
-#: ../bin/duplicity:1530
+#: ../bin/duplicity:1529
 #, python-format
 msgid "User error detail: %s"
 msgstr ""
 
-#: ../bin/duplicity:1540
+#: ../bin/duplicity:1539
 #, python-format
 msgid "Backend error detail: %s"
 msgstr ""
@@ -953,51 +953,51 @@ msgid "Backends and their URL formats:"
 msgstr ""
 
 #. Header in usage help
-#: ../duplicity/commandline.py:868
+#: ../duplicity/commandline.py:869
 msgid "Commands:"
 msgstr ""
 
-#: ../duplicity/commandline.py:892
+#: ../duplicity/commandline.py:893
 #, python-format
 msgid "Specified archive directory '%s' does not exist, or is not a directory"
 msgstr ""
 
-#: ../duplicity/commandline.py:901
+#: ../duplicity/commandline.py:902
 #, python-format
 msgid ""
 "Sign key should be an 8, 16 alt. 40 character hex string, like 'AA0E73D2'.\n"
 "Received '%s' instead."
 msgstr ""
 
-#: ../duplicity/commandline.py:961
+#: ../duplicity/commandline.py:962
 #, python-format
 msgid ""
 "Restore destination directory %s already exists.\n"
 "Will not overwrite."
 msgstr ""
 
-#: ../duplicity/commandline.py:966
+#: ../duplicity/commandline.py:967
 #, python-format
 msgid "Verify directory %s does not exist"
 msgstr ""
 
-#: ../duplicity/commandline.py:972
+#: ../duplicity/commandline.py:973
 #, python-format
 msgid "Backup source directory %s does not exist."
 msgstr ""
 
-#: ../duplicity/commandline.py:1001
+#: ../duplicity/commandline.py:1002
 #, python-format
 msgid "Command line warning: %s"
 msgstr ""
 
-#: ../duplicity/commandline.py:1001
+#: ../duplicity/commandline.py:1002
 msgid ""
 "Selection options --exclude/--include\n"
 "currently work only when backing up,not restoring."
 msgstr ""
 
-#: ../duplicity/commandline.py:1049
+#: ../duplicity/commandline.py:1050
 #, python-format
 msgid ""
 "Bad URL '%s'.\n"
@@ -1005,7 +1005,7 @@ msgid ""
 "\"file:///usr/local\".  See the man page for more information."
 msgstr ""
 
-#: ../duplicity/commandline.py:1074
+#: ../duplicity/commandline.py:1075
 msgid "Main action: "
 msgstr ""
 
@@ -1066,7 +1066,7 @@ msgstr ""
 msgid "Threading not available -- zombie processes may appear"
 msgstr ""
 
-#: ../duplicity/gpginterface.py:677
+#: ../duplicity/gpginterface.py:674
 #, python-format
 msgid "GPG process %d terminated before wait()"
 msgstr ""
@@ -1266,7 +1266,7 @@ msgstr ""
 msgid "Selecting %s"
 msgstr ""
 
-#: ../duplicity/selection.py:271
+#: ../duplicity/selection.py:270
 #, python-format
 msgid ""
 "Fatal Error: The file specification\n"
@@ -1284,7 +1284,7 @@ msgid ""
 "%s"
 msgstr ""
 
-#: ../duplicity/selection.py:289
+#: ../duplicity/selection.py:288
 #, python-format
 msgid ""
 "Last selection expression:\n"

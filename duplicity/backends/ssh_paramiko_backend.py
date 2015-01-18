@@ -212,9 +212,9 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                                 key_filename=self.config['identityfile'])
         except Exception as e:
             raise BackendException("ssh connection to %s@%s:%d failed: %s" % (
-                                    self.config['user'],
-                                    self.config['hostname'],
-                                    self.config['port'], e))
+                self.config['user'],
+                self.config['hostname'],
+                self.config['port'], e))
         self.client.get_transport().set_keepalive((int)(globals.timeout / 2))
 
         self.scheme = duplicity.backend.strip_prefix(parsed_url.scheme, 'paramiko')

@@ -1,3 +1,9 @@
+2015-01-18  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Misc fixes for the following PEP8 issues:
+      - E111, E121, E122, E124, E125, E126
+      - see http://pep8.readthedocs.org
+
 2015-01-17  Kenneth Loafman  <kenneth@loafman.com>
 
     * Remove 'gs' and 's3+http' from uses_netloc[].  Fixes Bug 1411803.
