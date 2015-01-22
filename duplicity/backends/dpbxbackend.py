@@ -124,7 +124,7 @@ class DPBXBackend(duplicity.backend.Backend):
                 os.unlink(self.TOKEN_FILE)
 
             def link(self):
-                if not sys.stdout.isatty() or not sys.stdin.isatty() :
+                if not sys.stdout.isatty() or not sys.stdin.isatty():
                     log.FatalError('dpbx error: cannot interact, but need human attention', log.ErrorCode.backend_command_error)
                 request_token = self.obtain_request_token()
                 url = self.build_authorize_url(request_token)
@@ -141,9 +141,9 @@ class DPBXBackend(duplicity.backend.Backend):
                 self.delete_creds()
                 session.DropboxSession.unlink(self)
 
-        self.sess = StoredSession(etacsufbo(APP_KEY)
-                                  , etacsufbo(APP_SECRET)
-                                  , access_type=ACCESS_TYPE)
+        self.sess = StoredSession(etacsufbo(APP_KEY),
+                                  etacsufbo(APP_SECRET),
+                                  access_type=ACCESS_TYPE)
         self.api_client = client.DropboxClient(self.sess)
         self.sess.load_creds()
 
@@ -213,14 +213,14 @@ class DPBXBackend(duplicity.backend.Backend):
         """close backend session? no! just "flush" the data"""
         info = self.api_client.account_info()
         log.Debug('dpbx.close():')
-        for k in info :
+        for k in info:
             log.Debug(':: %s=[%s]' % (k, info[k]))
         entries = []
         more = True
         cursor = None
-        while more :
+        while more:
             info = self.api_client.delta(cursor)
-            if info.get('reset', False) :
+            if info.get('reset', False):
                 log.Debug("delta returned True value for \"reset\", no matter")
             cursor = info.get('cursor', None)
             more = info.get('more', False)
@@ -229,8 +229,8 @@ class DPBXBackend(duplicity.backend.Backend):
         for path, meta in entries:
             mm = meta and 'ok' or 'DELETE'
             log.Info(':: :: [%s] %s' % (path, mm))
-            if meta :
-                for k in meta :
+            if meta:
+                for k in meta:
                     log.Debug(':: :: :: %s=[%s]' % (k, meta[k]))
 
     def _mkdir(self, path):

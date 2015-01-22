@@ -40,7 +40,7 @@ class ImapBackend(duplicity.backend.Backend):
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
 
-        log.Debug("I'm %s (scheme %s) connecting to %s as %s" % 
+        log.Debug("I'm %s (scheme %s) connecting to %s as %s" %
                   (self.__class__.__name__, parsed_url.scheme, parsed_url.hostname, parsed_url.username))
 
         #  Store url for reconnection on error
@@ -259,4 +259,4 @@ class ImapBackend(duplicity.backend.Backend):
 
 duplicity.backend.register_backend("imap", ImapBackend)
 duplicity.backend.register_backend("imaps", ImapBackend)
-duplicity.backend.uses_netloc.extend([ 'imap', 'imaps' ])
+duplicity.backend.uses_netloc.extend(['imap', 'imaps'])

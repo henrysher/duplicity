@@ -64,7 +64,7 @@ class LFTPBackend(duplicity.backend.Backend):
         self.scheme = duplicity.backend.strip_prefix(parsed_url.scheme, 'lftp').lower()
         self.scheme = re.sub('^webdav', 'http', self.scheme)
         self.url_string = self.scheme + '://' + parsed_url.hostname
-        if parsed_url.port :
+        if parsed_url.port:
             self.url_string += ":%s" % parsed_url.port
 
         self.remote_path = re.sub('^/', '', parsed_url.path)
@@ -92,7 +92,7 @@ class LFTPBackend(duplicity.backend.Backend):
                                  "/etc/duplicity/cacert.pem"]
             #
             if not self.cacert_file:
-                for path in cacert_candidates :
+                for path in cacert_candidates:
                     path = os.path.expanduser(path)
                     if (os.path.isfile(path)):
                         self.cacert_file = path
@@ -106,7 +106,7 @@ Hints:
 
         self.tempfile, self.tempname = tempdir.default().mkstemp()
         os.write(self.tempfile, "set ssl:verify-certificate " + ("false" if globals.ssl_no_check_certificate else "true") + "\n")
-        if globals.ssl_cacert_file :
+        if globals.ssl_cacert_file:
             os.write(self.tempfile, "set ssl:ca-file '" + globals.ssl_cacert_file + "'\n")
         if self.parsed_url.scheme == 'ftps':
             os.write(self.tempfile, "set ftp:ssl-allow true\n")
@@ -118,7 +118,7 @@ Hints:
         os.write(self.tempfile, "set net:timeout %s\n" % globals.timeout)
         os.write(self.tempfile, "set net:max-retries %s\n" % globals.num_retries)
         os.write(self.tempfile, "set ftp:passive-mode %s\n" % self.conn_opt)
-        if log.getverbosity() >= log.DEBUG :
+        if log.getverbosity() >= log.DEBUG:
             os.write(self.tempfile, "debug\n")
         os.write(self.tempfile, "open %s %s\n" % (self.authflag, self.url_string))
 #        os.write(self.tempfile, "open %s %s\n" % (self.portflag, self.parsed_url.hostname))
@@ -126,7 +126,7 @@ Hints:
 #        if self.parsed_url.username:
 #            os.write(self.tempfile, "user %s %s\n" % (self.parsed_url.username, self.password))
         os.close(self.tempfile)
-        if log.getverbosity() >= log.DEBUG :
+        if log.getverbosity() >= log.DEBUG:
             f = open(self.tempname, 'r')
             log.Debug("SETTINGS: \n"
                       "%s" % f.readlines())
@@ -193,9 +193,9 @@ duplicity.backend.register_backend("lftp+webdavs", LFTPBackend)
 duplicity.backend.register_backend("lftp+http", LFTPBackend)
 duplicity.backend.register_backend("lftp+https", LFTPBackend)
 
-duplicity.backend.uses_netloc.extend([ 'ftp', 'ftps', 'fish',
-                                       'lftp+ftp', 'lftp+ftps',
-                                       'lftp+fish', 'lftp+sftp',
-                                       'lftp+webdav', 'lftp+webdavs',
-                                       'lftp+http', 'lftp+https' ]
+duplicity.backend.uses_netloc.extend(['ftp', 'ftps', 'fish',
+                                      'lftp+ftp', 'lftp+ftps',
+                                      'lftp+fish', 'lftp+sftp',
+                                      'lftp+webdav', 'lftp+webdavs',
+                                      'lftp+http', 'lftp+https']
                                      )

@@ -40,41 +40,43 @@ class CodeTest(DuplicityTestCase):
                          'Must set environment var RUN_CODE_TESTS=1')
     def test_2to3(self):
         # As we modernize the source code, we can remove more and more nofixes
-        self.run_checker(["2to3",
-                          "--nofix=next",
-                          "--nofix=types",
-                          "--nofix=unicode",
-        # The following fixes we don't want to remove, since they are false
-        # positives, things we don't care about, or real incompatibilities
-        # but which 2to3 can fix for us better automatically.
-                          "--nofix=callable",
-                          "--nofix=dict",
-                          "--nofix=future",
-                          "--nofix=imports",
-                          "--nofix=print",
-                          "--nofix=raw_input",
-                          "--nofix=urllib",
-                          "--nofix=xrange",
-                          _top_dir])
+        self.run_checker([
+            "2to3",
+            "--nofix=next",
+            "--nofix=types",
+            "--nofix=unicode",
+            # The following fixes we don't want to remove, since they are false
+            # positives, things we don't care about, or real incompatibilities
+            # but which 2to3 can fix for us better automatically.
+            "--nofix=callable",
+            "--nofix=dict",
+            "--nofix=future",
+            "--nofix=imports",
+            "--nofix=print",
+            "--nofix=raw_input",
+            "--nofix=urllib",
+            "--nofix=xrange",
+            _top_dir])
 
     @unittest.skipUnless(os.getenv('RUN_CODE_TESTS', None) == '1',
                          'Must set environment var RUN_CODE_TESTS=1')
     def test_pylint(self):
-        self.run_checker(["pylint",
-                          "-E",
-                          "--msg-template={msg_id}: {line}: {msg}",
-                          "--disable=E0203",  # Access to member before its definition line
-                          "--disable=E0602",  # Undefined variable
-                          "--disable=E0611",  # No name in module
-                          "--disable=E1101",  # Has no member
-                          "--disable=E1103",  # Maybe has no member
-                          "--ignore=_librsync.so",
-                          os.path.join(_top_dir, 'duplicity'),
-                          os.path.join(_top_dir, 'bin/duplicity'),
-                          os.path.join(_top_dir, 'bin/rdiffdir')],
-                         # Allow usage errors, older versions don't have
-                         # --msg-template
-                         [0, 32])
+        self.run_checker([
+            "pylint",
+            "-E",
+            "--msg-template={msg_id}: {line}: {msg}",
+            "--disable=E0203",  # Access to member before its definition line
+            "--disable=E0602",  # Undefined variable
+            "--disable=E0611",  # No name in module
+            "--disable=E1101",  # Has no member
+            "--disable=E1103",  # Maybe has no member
+            "--ignore=_librsync.so",
+            os.path.join(_top_dir, 'duplicity'),
+            os.path.join(_top_dir, 'bin/duplicity'),
+            os.path.join(_top_dir, 'bin/rdiffdir')],
+            # Allow usage errors, older versions don't have
+            # --msg-template
+            [0, 32])
 
     @unittest.skipUnless(os.getenv('RUN_CODE_TESTS', None) == '1',
                          'Must set environment var RUN_CODE_TESTS=1')
@@ -84,9 +86,6 @@ class CodeTest(DuplicityTestCase):
         # and clean up the code.  But for now, let's at least get *some* pep8
         # coverage.
         ignores = [
-            "E201",
-            "E202",
-            "E203",
             "E231",
             "E241",
             "E251",

@@ -94,7 +94,7 @@ class GnuPGTests(BasicTest):
         # We'll handle the passphrase manually
         if passphrase != None: proc.handles.append('passphrase')  # @UndefinedVariable
 
-        attachments = { 'stdin': stdin, 'stdout': stdout }
+        attachments = {'stdin': stdin, 'stdout': stdout}
 
         proc = self.gnupg.run(args, create_fhs=creations,
                               attach_fhs=attachments)
@@ -161,10 +161,10 @@ class OptionsTests(BasicTest):
         """test Options boolean options that they generate
         proper arguments"""
 
-        booleans = [ 'armor', 'no_greeting', 'no_verbose',
-                     'batch', 'always_trust', 'rfc1991',
-                     'quiet', 'openpgp', 'force_v3_sigs',
-                     'no_options', 'textmode' ]
+        booleans = ['armor', 'no_greeting', 'no_verbose',
+                    'batch', 'always_trust', 'rfc1991',
+                    'quiet', 'openpgp', 'force_v3_sigs',
+                    'no_options', 'textmode']
 
         for option in booleans:
             self.reset_options()
@@ -182,8 +182,8 @@ class OptionsTests(BasicTest):
         """test Options string-taking options that they generate
         proper arguments"""
 
-        strings = [ 'homedir', 'default_key', 'comment', 'compress_algo',
-                    'options' ]
+        strings = ['homedir', 'default_key', 'comment', 'compress_algo',
+                   'options']
 
         string_value = 'test-argument'
 
@@ -203,7 +203,7 @@ class OptionsTests(BasicTest):
         """test Options string-taking options that they generate
         proper arguments"""
 
-        lists = [ 'recipients', 'encrypt_to' ]
+        lists = ['recipients', 'encrypt_to']
         list_value = ['test1', 'test2']
 
         for option in lists:

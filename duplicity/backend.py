@@ -251,7 +251,7 @@ class ParsedUrl:
             pu = urlparse.urlparse(url_string)
         except Exception:
             raise InvalidBackendURL("Syntax error in: %s" % url_string)
-                
+
         try:
             self.scheme = pu.scheme
         except Exception:
@@ -421,7 +421,7 @@ class Backend(object):
             password = os.environ['FTP_PASSWORD']
         except KeyError:
             if self.use_getpass:
-                password = getpass.getpass("Password for '%s@%s': " % 
+                password = getpass.getpass("Password for '%s@%s': " %
                                            (self.parsed_url.username, self.parsed_url.hostname))
                 os.environ['FTP_PASSWORD'] = password
             else:
@@ -472,12 +472,12 @@ class Backend(object):
             try:
                 m = re.search("^\s*([\S]+)", commandline)
                 cmd = m.group(1)
-                ignores = self.popen_breaks[ cmd ]
+                ignores = self.popen_breaks[cmd]
                 ignores.index(result)
                 """ ignore a predefined set of error codes """
                 return 0, '', ''
             except (KeyError, ValueError):
-                raise BackendException("Error running '%s': returned %d, with output:\n%s" % 
+                raise BackendException("Error running '%s': returned %d, with output:\n%s" %
                                        (private, result, stdout + '\n' + stderr))
         return result, stdout, stderr
 

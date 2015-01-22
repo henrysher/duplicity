@@ -66,8 +66,8 @@ class StatsObjTest(UnitTestCase):
 
         self.set_obj(s)
         stats_string = s.get_stats_string()
-        assert stats_string == \
-"""StartTime 13.00 (Wed Dec 31 18:00:13 1969)
+        assert stats_string == """\
+StartTime 13.00 (Wed Dec 31 18:00:13 1969)
 EndTime 14.00 (Wed Dec 31 18:00:14 1969)
 ElapsedTime 1.00 (1 second)
 SourceFiles 1

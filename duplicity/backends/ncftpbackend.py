@@ -67,7 +67,7 @@ class NCFTPBackend(duplicity.backend.Backend):
         # This squelches the "file not found" result from ncftpls when
         # the ftp backend looks for a collection that does not exist.
         # version 3.2.2 has error code 5, 1280 is some legacy value
-        self.popen_breaks[ 'ncftpls' ] = [ 5, 1280 ]
+        self.popen_breaks['ncftpls'] = [5, 1280]
 
         # Use an explicit directory name.
         if self.url_string[-1] != '/':
@@ -115,4 +115,4 @@ class NCFTPBackend(duplicity.backend.Backend):
         self.subprocess_popen(commandline)
 
 duplicity.backend.register_backend("ncftp+ftp", NCFTPBackend)
-duplicity.backend.uses_netloc.extend([ 'ncftp+ftp' ])
+duplicity.backend.uses_netloc.extend(['ncftp+ftp'])

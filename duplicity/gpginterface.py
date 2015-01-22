@@ -241,23 +241,24 @@ __version__ = "0.3.2"
 __revision__ = "$Id: GnuPGInterface.py,v 1.6 2009/06/06 17:35:19 loafman Exp $"
 
 # "standard" filehandles attached to processes
-_stds = [ 'stdin', 'stdout', 'stderr' ]
+_stds = ['stdin', 'stdout', 'stderr']
 
 # the permissions each type of fh needs to be opened with
-_fd_modes = { 'stdin':      'w',
-              'stdout':     'r',
-              'stderr':     'r',
-              'passphrase': 'w',
-              'command':    'w',
-              'logger':     'r',
-              'status':     'r'
-              }
+_fd_modes = {'stdin':      'w',
+             'stdout':     'r',
+             'stderr':     'r',
+             'passphrase': 'w',
+             'command':    'w',
+             'logger':     'r',
+             'status':     'r'
+             }
 
 # correlation between handle names and the arguments we'll pass
-_fd_options = { 'passphrase': '--passphrase-fd',
-                'logger':     '--logger-fd',
-                'status':     '--status-fd',
-                'command':    '--command-fd' }
+_fd_options = {'passphrase': '--passphrase-fd',
+               'logger':     '--logger-fd',
+               'status':     '--status-fd',
+               'command':    '--command-fd'
+               }
 
 class GnuPG:
     """Class instances represent GnuPG.
@@ -448,12 +449,11 @@ class GnuPG:
         for k, p in process._pipes.items():
             # set command-line options for non-standard fds
             if k not in _stds:
-                fd_args.extend([ _fd_options[k], "%d" % p.child ])
+                fd_args.extend([_fd_options[k], "%d" % p.child])
 
             if not p.direct: os.close(p.parent)
 
-        command = [ self.call ] + fd_args + self.options.get_args() \
-            + gnupg_commands + args
+        command = [self.call] + fd_args + self.options.get_args() + gnupg_commands + args
 
         os.execvp(command[0], command)
 
@@ -581,11 +581,11 @@ class Options:
     def get_standard_args(self):
         """Generate a list of standard, non-meta or extra arguments"""
         args = []
-        if self.homedir != None: args.extend([ '--homedir', self.homedir ])
-        if self.options != None: args.extend([ '--options', self.options ])
-        if self.comment != None: args.extend([ '--comment', self.comment ])
-        if self.compress_algo != None: args.extend([ '--compress-algo', self.compress_algo ])
-        if self.default_key != None: args.extend([ '--default-key', self.default_key ])
+        if self.homedir != None: args.extend(['--homedir', self.homedir])
+        if self.options != None: args.extend(['--options', self.options])
+        if self.comment != None: args.extend(['--comment', self.comment])
+        if self.compress_algo != None: args.extend(['--compress-algo', self.compress_algo])
+        if self.default_key != None: args.extend(['--default-key', self.default_key])
 
         if self.no_options: args.append('--no-options')
         if self.armor: args.append('--armor')
@@ -600,9 +600,9 @@ class Options:
         if self.rfc1991: args.append('--rfc1991')
         if self.openpgp: args.append('--openpgp')
 
-        for r in self.recipients: args.extend([ '--recipient', r ])
-        for r in self.hidden_recipients: args.extend([ '--hidden-recipient', r ])
-        for r in self.encrypt_to: args.extend([ '--encrypt-to', r ])
+        for r in self.recipients: args.extend(['--recipient', r])
+        for r in self.hidden_recipients: args.extend(['--hidden-recipient', r])
+        for r in self.encrypt_to: args.extend(['--encrypt-to', r])
 
         return args
 
@@ -613,7 +613,7 @@ class Options:
         if self.meta_pgp_5_compatible: args.extend(['--compress-algo', '1',
                                                     '--force-v3-sigs'])
         if self.meta_pgp_2_compatible: args.append('--rfc1991')
-        if not self.meta_interactive: args.extend([ '--batch', '--no-tty' ])
+        if not self.meta_interactive: args.extend(['--batch', '--no-tty'])
 
         return args
 

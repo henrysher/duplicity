@@ -64,14 +64,15 @@ class VerifiedHTTPSConnection(httplib.HTTPSConnection):
                                  "/etc/duplicity/cacert.pem"]
             #
             if not self.cacert_file:
-                for path in cacert_candidates :
+                for path in cacert_candidates:
                     path = os.path.expanduser(path)
                     if (os.path.isfile(path)):
                         self.cacert_file = path
                         break
             # still no cacert file, inform user
             if not self.cacert_file:
-                raise FatalBackendException("""For certificate verification a cacert database file is needed in one of these locations: %s
+                raise FatalBackendException("""\
+For certificate verification a cacert database file is needed in one of these locations: %s
 Hints:
   Consult the man page, chapter 'SSL Certificate Verification'.
   Consider using the options --ssl-cacert-file, --ssl-no-check-certificate .""" % ", ".join(cacert_candidates))
@@ -426,5 +427,5 @@ duplicity.backend.register_backend("http", WebDAVBackend)
 duplicity.backend.register_backend("https", WebDAVBackend)
 duplicity.backend.register_backend("webdav", WebDAVBackend)
 duplicity.backend.register_backend("webdavs", WebDAVBackend)
-duplicity.backend.uses_netloc.extend([ 'http', 'https', 'webdav', 'webdavs' ])
+duplicity.backend.uses_netloc.extend(['http', 'https', 'webdav', 'webdavs'])
 

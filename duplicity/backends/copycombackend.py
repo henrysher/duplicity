@@ -29,7 +29,7 @@ class CoPyCloud:
     API_URI = 'https://api.copy.com'
     DEFAULT_ENCODING = 'latin-1'
     DEFAULT_HEADERS = {'X-Client-Type': 'api', 'X-Api-Version': '1.0',
-                       'X-Authorization': '', 'Accept': 'application/json' }
+                       'X-Authorization': '', 'Accept': 'application/json'}
 
     PART_MAX_SIZE = 1024 * 1024
     PARTS_HEADER_FMT = '!IIIIII'
@@ -46,7 +46,7 @@ class CoPyCloud:
     def __init__(self, username, password):
         import urllib3
         self.http = urllib3.connection_from_url(self.API_URI, block=True, maxsize=1)
-        res = self.__post_req('auth_user', {'username': username, 'password' : password})
+        res = self.__post_req('auth_user', {'username': username, 'password': password})
 
         if not res or 'auth_token' not in res:
             raise CoPyCloud.Error("Invalid Login")
@@ -317,4 +317,4 @@ class CopyComBackend(duplicity.backend.Backend):
 '''
 
 duplicity.backend.register_backend('copy', CopyComBackend)
-duplicity.backend.uses_netloc.extend([ 'copy' ])
+duplicity.backend.uses_netloc.extend(['copy'])

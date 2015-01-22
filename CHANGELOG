@@ -31,7 +31,7 @@ New in v0.7.02 (2015/02/??)
   - E111, E121, E122, E124, E125, E126
   - see http://pep8.readthedocs.org
 * Misc fixes for the following PEP8 issues:
-  - E127, E128
+  - E127, E128, 201, 202, 203
   - see http://pep8.readthedocs.org
 
 

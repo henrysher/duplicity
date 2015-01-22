@@ -105,7 +105,7 @@ class MegaBackend(duplicity.backend.Backend):
 
     def __filter_entries(self, entries, parent_id=None, title=None, type=None):
         result = {}
-        type_map = { 'folder': 1, 'file': 0 }
+        type_map = {'folder': 1, 'file': 0}
 
         for k, v in entries.items():
             try:
@@ -123,4 +123,4 @@ class MegaBackend(duplicity.backend.Backend):
         return result
 
 duplicity.backend.register_backend('mega', MegaBackend)
-duplicity.backend.uses_netloc.extend([ 'mega' ])
+duplicity.backend.uses_netloc.extend(['mega'])

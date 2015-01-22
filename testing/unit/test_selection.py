@@ -458,7 +458,7 @@ testfiles/select/1/1
         assert select.filelist_get_sf(StringIO.StringIO("/foo/bar"), 1, "test")(root) == 1
         assert select.filelist_get_sf(StringIO.StringIO("/"), 0, "test")(root) == 0
         assert select.filelist_get_sf(StringIO.StringIO("/foo/bar"), 0,
-                               "test")(root) == None
+                                      "test")(root) == None
 
     def testOtherFilesystems(self):
         """Test to see if --exclude-other-filesystems works correctly"""

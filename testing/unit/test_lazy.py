@@ -107,7 +107,7 @@ class FilterTestCase(Iterators):
         """empty iterators -> empty iterators"""
         assert Iter.empty(Iter.filter(self.alwayserror,
                                       self.empty())), \
-               "Filtering an empty iterator should result in empty iterator"
+            "Filtering an empty iterator should result in empty iterator"
 
     def testNum1(self):
         """Test numbers 1 - 100 #1"""

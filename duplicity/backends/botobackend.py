@@ -31,4 +31,4 @@ else:
 duplicity.backend.register_backend("gs", BotoBackend)
 duplicity.backend.register_backend("s3", BotoBackend)
 duplicity.backend.register_backend("s3+http", BotoBackend)
-duplicity.backend.uses_netloc.extend([ 's3' ])
+duplicity.backend.uses_netloc.extend(['s3'])

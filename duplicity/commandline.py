@@ -634,9 +634,9 @@ def parse_cmdline_options(arglist):
         globals.remove_time = dup_time.genstrtotime(arg)
         num_expect = 1
     elif cmd == "remove-all-but-n-full" or cmd == "remove-all-inc-of-but-n-full":
-        if cmd == "remove-all-but-n-full" :
+        if cmd == "remove-all-but-n-full":
             globals.remove_all_but_n_full_mode = True
-        if cmd == "remove-all-inc-of-but-n-full" :
+        if cmd == "remove-all-inc-of-but-n-full":
             globals.remove_all_inc_of_but_n_full_mode = True
         try:
             arg = args.pop(0)
@@ -699,128 +699,129 @@ def usage():
     dict = {
         # TRANSL: Used in usage help to represent a Unix-style path name. Example:
         # rsync://user[:password]@other_host[:port]//absolute_path
-        'absolute_path'  : _("absolute_path"),
+        'absolute_path': _("absolute_path"),
 
         # TRANSL: Used in usage help. Example:
         # tahoe://alias/some_dir
-        'alias'          : _("alias"),
+        'alias': _("alias"),
 
         # TRANSL: Used in help to represent a "bucket name" for Amazon Web
         # Services' Simple Storage Service (S3). Example:
         # s3://other.host/bucket_name[/prefix]
-        'bucket_name'    : _("bucket_name"),
+        'bucket_name': _("bucket_name"),
 
         # TRANSL: abbreviation for "character" (noun)
-        'char'           : _("char"),
+        'char': _("char"),
 
         # TRANSL: noun
-        'command'        : _("command"),
+        'command': _("command"),
 
         # TRANSL: Used in usage help to represent the name of a container in
         # Amazon Web Services' Cloudfront. Example:
         # cf+http://container_name
-        'container_name' : _("container_name"),
+        'container_name': _("container_name"),
 
         # TRANSL: noun
-        'count'          : _("count"),
+        'count': _("count"),
 
         # TRANSL: Used in usage help to represent the name of a file directory
-        'directory'      : _("directory"),
+        'directory': _("directory"),
 
         # TRANSL: Used in usage help to represent the name of a file. Example:
         # --log-file <filename>
-        'filename'       : _("filename"),
+        'filename': _("filename"),
 
         # TRANSL: Used in usage help to represent an ID for a GnuPG key. Example:
         # --encrypt-key <gpg_key_id>
-        'gpg_key_id'     : _("gpg-key-id"),
+        'gpg_key_id': _("gpg-key-id"),
 
         # TRANSL: Used in usage help, e.g. to represent the name of a code
         # module. Example:
         # rsync://user[:password]@other.host[:port]::/module/some_dir
-        'module'         : _("module"),
+        'module': _("module"),
 
         # TRANSL: Used in usage help to represent a desired number of
         # something. Example:
         # --num-retries <number>
-        'number'         : _("number"),
+        'number': _("number"),
 
         # TRANSL: Used in usage help. (Should be consistent with the "Options:"
         # header.) Example:
         # duplicity [full|incremental] [options] source_dir target_url
-        'options'        : _("options"),
+        'options': _("options"),
 
         # TRANSL: Used in usage help to represent an internet hostname. Example:
         # ftp://user[:password]@other.host[:port]/some_dir
-        'other_host'     : _("other.host"),
+        'other_host': _("other.host"),
 
         # TRANSL: Used in usage help. Example:
         # ftp://user[:password]@other.host[:port]/some_dir
-        'password'       : _("password"),
+        'password': _("password"),
 
         # TRANSL: Used in usage help to represent a Unix-style path name. Example:
         # --archive-dir <path>
-        'path'           : _("path"),
+        'path': _("path"),
 
         # TRANSL: Used in usage help to represent a TCP port number. Example:
         # ftp://user[:password]@other.host[:port]/some_dir
-        'port'           : _("port"),
+        'port': _("port"),
 
         # TRANSL: Used in usage help. This represents a string to be used as a
         # prefix to names for backup files created by Duplicity. Example:
         # s3://other.host/bucket_name[/prefix]
-        'prefix'         : _("prefix"),
+        'prefix': _("prefix"),
 
         # TRANSL: Used in usage help to represent a Unix-style path name. Example:
         # rsync://user[:password]@other.host[:port]/relative_path
-        'relative_path'  : _("relative_path"),
+        'relative_path': _("relative_path"),
 
         # TRANSL: Used in usage help. Example:
         # --timeout <seconds>
-        'seconds'        : _("seconds"),
+        'seconds': _("seconds"),
 
         # TRANSL: Used in usage help to represent a "glob" style pattern for
         # matching one or more files, as described in the documentation.
         # Example:
         # --exclude <shell_pattern>
-        'shell_pattern'  : _("shell_pattern"),
+        'shell_pattern': _("shell_pattern"),
 
         # TRANSL: Used in usage help to represent the name of a single file
         # directory or a Unix-style path to a directory. Example:
         # file:///some_dir
-        'some_dir'       : _("some_dir"),
+        'some_dir': _("some_dir"),
 
         # TRANSL: Used in usage help to represent the name of a single file
         # directory or a Unix-style path to a directory where files will be
         # coming FROM. Example:
         # duplicity [full|incremental] [options] source_dir target_url
-        'source_dir'     : _("source_dir"),
+        'source_dir': _("source_dir"),
 
         # TRANSL: Used in usage help to represent a URL files will be coming
         # FROM. Example:
         # duplicity [restore] [options] source_url target_dir
-        'source_url'     : _("source_url"),
+        'source_url': _("source_url"),
 
         # TRANSL: Used in usage help to represent the name of a single file
         # directory or a Unix-style path to a directory. where files will be
         # going TO. Example:
         # duplicity [restore] [options] source_url target_dir
-        'target_dir'     : _("target_dir"),
+        'target_dir': _("target_dir"),
 
         # TRANSL: Used in usage help to represent a URL files will be going TO.
         # Example:
         # duplicity [full|incremental] [options] source_dir target_url
-        'target_url'     : _("target_url"),
+        'target_url': _("target_url"),
 
         # TRANSL: Used in usage help to represent a time spec for a previous
         # point in time, as described in the documentation. Example:
         # duplicity remove-older-than time [options] target_url
-        'time'           : _("time"),
+        'time': _("time"),
 
         # TRANSL: Used in usage help to represent a user name (i.e. login).
         # Example:
         # ftp://user[:password]@other.host[:port]/some_dir
-        'user'           : _("user") }
+        'user': _("user")
+    }
 
     # TRANSL: Header in usage help
     msg = """

@@ -179,10 +179,10 @@ def async_split(fn):
 
 
     cv = threading.Condition()  # @UndefinedVariable
-    state = { 'done': False,
-              'error': None,
-              'trace': None,
-              'value': None }
+    state = {'done': False,
+             'error': None,
+             'trace': None,
+             'value': None}
 
     def waiter():
         cv.acquire()
