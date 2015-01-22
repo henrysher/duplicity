@@ -134,7 +134,8 @@ class OneDriveBackend(duplicity.backend.Backend):
 
             redirected_to = raw_input('URL of the blank page: ')
 
-            token = self.http_client.fetch_token(self.OAUTH_TOKEN_URI,
+            token = self.http_client.fetch_token(
+                self.OAUTH_TOKEN_URI,
                 client_secret=self.CLIENT_SECRET,
                 authorization_response=redirected_to)
 

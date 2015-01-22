@@ -153,10 +153,10 @@ def get_index_from_tarinfo(tarinfo):
                     difftype = "snapshot"
                 multivol = 1
                 name, num_subs = \
-                      re.subn("(?s)^multivol_(diff|snapshot)/?(.*)/[0-9]+$",
-                              "\\2", tiname)
+                    re.subn("(?s)^multivol_(diff|snapshot)/?(.*)/[0-9]+$",
+                            "\\2", tiname)
                 if num_subs != 1:
-                    raise PatchDirException(u"Unrecognized diff entry %s" % 
+                    raise PatchDirException(u"Unrecognized diff entry %s" %
                                             util.ufn(tiname))
             else:
                 difftype = prefix[:-1]  # strip trailing /
@@ -166,7 +166,7 @@ def get_index_from_tarinfo(tarinfo):
                 multivol = 0
             break
     else:
-        raise PatchDirException(u"Unrecognized diff entry %s" % 
+        raise PatchDirException(u"Unrecognized diff entry %s" %
                                 util.ufn(tiname))
     if name == "." or name == "":
         index = ()
@@ -507,7 +507,7 @@ def integrate_patch_iters(iter_list):
                 yield final_ropath
         except Exception as e:
             filename = normalized[-1].get_ropath().get_relative_path()
-            log.Warn(_("Error '%s' patching %s") % 
+            log.Warn(_("Error '%s' patching %s") %
                      (util.uexc(e), util.ufn(filename)),
                      log.WarningCode.cannot_process,
                      util.escape(filename))
@@ -579,7 +579,7 @@ class ROPath_IterWriter(ITRBranch):
 
     def can_fast_process(self, index, ropath):
         """Can fast process (no recursion) if ropath isn't a directory"""
-        log.Info(_("Writing %s of type %s") % 
+        log.Info(_("Writing %s of type %s") %
                  (util.ufn(ropath.get_relative_path()), ropath.type),
                  log.InfoCode.patch_file_writing,
                  "%s %s" % (util.escape(ropath.get_relative_path()), ropath.type))

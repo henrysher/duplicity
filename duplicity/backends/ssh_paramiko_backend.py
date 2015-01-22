@@ -190,8 +190,8 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                 # simply always use a list.
                 self.config['identityfile'] = [self.config['identityfile']]
 
-            self.config['identityfile'] = [os.path.expanduser(i) for i in
-                    self.config['identityfile']]
+            self.config['identityfile'] = [
+                os.path.expanduser(i) for i in self.config['identityfile']]
         else:
             self.config['identityfile'] = None
 

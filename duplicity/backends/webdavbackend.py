@@ -59,9 +59,9 @@ class VerifiedHTTPSConnection(httplib.HTTPSConnection):
             httplib.HTTPSConnection.__init__(self, *args, **kwargs)
 
             self.cacert_file = globals.ssl_cacert_file
-            cacert_candidates = [ "~/.duplicity/cacert.pem", \
-                             "~/duplicity_cacert.pem", \
-                             "/etc/duplicity/cacert.pem" ]
+            cacert_candidates = ["~/.duplicity/cacert.pem",
+                                 "~/duplicity_cacert.pem",
+                                 "/etc/duplicity/cacert.pem"]
             #
             if not self.cacert_file:
                 for path in cacert_candidates :

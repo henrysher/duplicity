@@ -313,7 +313,7 @@ probably isn't what you meant.""") %
         """
         log.Notice(_("Reading filelist %s") % filelist_name)
         tuple_list, something_excluded = \
-                    self.filelist_read(filelist_fp, inc_default, filelist_name)
+            self.filelist_read(filelist_fp, inc_default, filelist_name)
         log.Notice(_("Sorting filelist %s") % filelist_name)
         tuple_list.sort()
         i = [0]  # We have to put index in list because of stupid scoping rules
@@ -323,7 +323,7 @@ probably isn't what you meant.""") %
                 if i[0] >= len(tuple_list):
                     return None
                 include, move_on = \
-                         self.filelist_pair_match(path, tuple_list[i[0]])
+                    self.filelist_pair_match(path, tuple_list[i[0]])
                 if move_on:
                     i[0] += 1
                     if include is None:

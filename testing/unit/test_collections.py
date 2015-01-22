@@ -45,8 +45,8 @@ remote_sigchain_filename_list = ["duplicity-full-signatures.2002-08-17T16:17:01-
                                  "duplicity-new-signatures.2002-08-18T00:04:30-07:00.to.2002-08-20T00:00:00-07:00.sigtar.gpg"]
 
 local_sigchain_filename_list = ["duplicity-full-signatures.2002-08-17T16:17:01-07:00.sigtar.gz",
-                                 "duplicity-new-signatures.2002-08-17T16:17:01-07:00.to.2002-08-18T00:04:30-07:00.sigtar.gz",
-                                 "duplicity-new-signatures.2002-08-18T00:04:30-07:00.to.2002-08-20T00:00:00-07:00.sigtar.gz"]
+                                "duplicity-new-signatures.2002-08-17T16:17:01-07:00.to.2002-08-18T00:04:30-07:00.sigtar.gz",
+                                "duplicity-new-signatures.2002-08-18T00:04:30-07:00.to.2002-08-20T00:00:00-07:00.sigtar.gz"]
 
 # A filename list with some incomplete volumes, an older full volume,
 # and a complete chain.
@@ -222,14 +222,14 @@ class CollectionTest(UnitTestCase):
         oldset_times = [s.get_time() for s in oldsets]
         right_times = [dup_time.genstrtotime('2001-01-01T16:17:01-07:00')]
         assert oldset_times == right_times, \
-               [oldset_times, right_times]
+            [oldset_times, right_times]
 
         oldsets_required = cs.get_older_than_required(
             dup_time.genstrtotime("2002-08-17T20:00:00-07:00"))
         oldset_times = [s.get_time() for s in oldsets_required]
         right_times_required = [dup_time.genstrtotime('2002-08-17T16:17:01-07:00')]
         assert oldset_times == right_times_required, \
-               [oldset_times, right_times_required]
+            [oldset_times, right_times_required]
 
 
 if __name__ == "__main__":

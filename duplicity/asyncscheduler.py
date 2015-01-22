@@ -63,8 +63,8 @@ class AsyncScheduler:
         given level of concurrency.
         """
         log.Info("%s: %s" % (self.__class__.__name__,
-                             _("instantiating at concurrency %d") % 
-                               (concurrency)))
+                             _("instantiating at concurrency %d") %
+                             (concurrency)))
         assert concurrency >= 0, "%s concurrency level must be >= 0" % (self.__class__.__name__,)
 
         self.__failed = False  # has at least one task failed so far?

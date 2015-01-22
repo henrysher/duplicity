@@ -87,9 +87,9 @@ class LFTPBackend(duplicity.backend.Backend):
         # check for cacert file if https
         self.cacert_file = globals.ssl_cacert_file
         if self.scheme == 'https' and not globals.ssl_no_check_certificate:
-            cacert_candidates = [ "~/.duplicity/cacert.pem", \
-                             "~/duplicity_cacert.pem", \
-                             "/etc/duplicity/cacert.pem" ]
+            cacert_candidates = ["~/.duplicity/cacert.pem",
+                                 "~/duplicity_cacert.pem",
+                                 "/etc/duplicity/cacert.pem"]
             #
             if not self.cacert_file:
                 for path in cacert_candidates :
@@ -129,7 +129,7 @@ Hints:
         if log.getverbosity() >= log.DEBUG :
             f = open(self.tempname, 'r')
             log.Debug("SETTINGS: \n"
-                  "%s" % f.readlines())
+                      "%s" % f.readlines())
 
     def _put(self, source_path, remote_filename):
         # remote_path = os.path.join(urllib.unquote(self.parsed_url.path.lstrip('/')), remote_filename).rstrip()

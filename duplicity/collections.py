@@ -99,7 +99,7 @@ class BackupSet:
         else:
             assert pr.volume_number is not None
             assert pr.volume_number not in self.volume_name_dict, \
-                   (self.volume_name_dict, filename)
+                (self.volume_name_dict, filename)
             self.volume_name_dict[pr.volume_number] = filename
 
         return True
@@ -363,7 +363,7 @@ class BackupChain:
         suitable for log messages.
         """
         return "[%s]-[%s]" % (dup_time.timetopretty(self.start_time),
-                      dup_time.timetopretty(self.end_time))
+                              dup_time.timetopretty(self.end_time))
 
     def to_log_info(self, prefix=''):
         """
@@ -694,17 +694,17 @@ class CollectionsStatus:
 
         # get various backup sets and chains
         (backup_chains, self.orphaned_backup_sets,
-                 self.incomplete_backup_sets) = \
-                 self.get_backup_chains(partials + backend_filename_list)
+         self.incomplete_backup_sets) = \
+            self.get_backup_chains(partials + backend_filename_list)
         backup_chains = self.get_sorted_chains(backup_chains)
         self.all_backup_chains = backup_chains
 
         assert len(backup_chains) == len(self.all_backup_chains), "get_sorted_chains() did something more than re-ordering"
 
         local_sig_chains, self.local_orphaned_sig_names = \
-                            self.get_signature_chains(True)
+            self.get_signature_chains(True)
         remote_sig_chains, self.remote_orphaned_sig_names = \
-                            self.get_signature_chains(False, filelist=backend_filename_list)
+            self.get_signature_chains(False, filelist=backend_filename_list)
         self.set_matched_chain_pair(local_sig_chains + remote_sig_chains,
                                     backup_chains)
         self.warn(sig_chain_warning)
@@ -836,7 +836,7 @@ class CollectionsStatus:
                 for chain in chains:
                     if chain.add_inc(set):
                         log.Debug(_("Added set %s to pre-existing chain %s") % (set.get_timestr(),
-                                                     chain.short_desc()))
+                                                                                chain.short_desc()))
                         break
                 else:
                     log.Debug(_("Found orphaned set %s") % (set.get_timestr(),))

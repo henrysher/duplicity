@@ -144,16 +144,16 @@ class StatsObj:
         timelist = []
         if self.StartTime is not None:
             timelist.append("StartTime %.2f (%s)\n" % 
-                     (self.StartTime, dup_time.timetopretty(self.StartTime)))
+                            (self.StartTime, dup_time.timetopretty(self.StartTime)))
         if self.EndTime is not None:
             timelist.append("EndTime %.2f (%s)\n" % 
-                         (self.EndTime, dup_time.timetopretty(self.EndTime)))
+                            (self.EndTime, dup_time.timetopretty(self.EndTime)))
         if self.ElapsedTime or (self.StartTime is not None and
                                 self.EndTime is not None):
             if self.ElapsedTime is None:
                 self.ElapsedTime = self.EndTime - self.StartTime
             timelist.append("ElapsedTime %.2f (%s)\n" % 
-                 (self.ElapsedTime, dup_time.inttopretty(self.ElapsedTime)))
+                            (self.ElapsedTime, dup_time.inttopretty(self.ElapsedTime)))
         return "".join(timelist)
 
     def get_filestats_string(self):

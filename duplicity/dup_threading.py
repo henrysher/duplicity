@@ -66,8 +66,8 @@ def require_threading(reason=None):
         if reason is None:
             reason = "(no reason given)"
         raise errors.NotSupported("threading was needed because [%s], but "\
-                                      "is not supported by the python "\
-                                      "interpreter" % (reason,))
+                                  "is not supported by the python "\
+                                  "interpreter" % (reason,))
 
 def thread_module():
     """

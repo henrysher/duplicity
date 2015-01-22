@@ -70,7 +70,7 @@ class GPGTest(UnitTestCase):
         """Test GPG asymmetric encryption"""
         profile = gpg.GPGProfile(passphrase=self.sign_passphrase,
                                  recipients=[self.encrypt_key1,
-                                               self.encrypt_key2])
+                                             self.encrypt_key2])
         self.gpg_cycle("aoensutha aonetuh saoe", profile)
 
         profile2 = gpg.GPGProfile(passphrase=self.sign_passphrase,
@@ -81,7 +81,7 @@ class GPGTest(UnitTestCase):
         """Test GPG asymmetric encryption with hidden key id"""
         profile = gpg.GPGProfile(passphrase=self.sign_passphrase,
                                  hidden_recipients=[self.encrypt_key1,
-                                                      self.encrypt_key2])
+                                                    self.encrypt_key2])
         self.gpg_cycle("aoensutha aonetuh saoe", profile)
 
         profile2 = gpg.GPGProfile(passphrase=self.sign_passphrase,

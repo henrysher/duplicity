@@ -96,18 +96,18 @@ def get_passphrase(n, action, for_signing=False):
     # check if we can reuse an already set (signing_)passphrase
     # if signing key is also an encryption key assume that the passphrase is identical
     if (for_signing
-         and (globals.gpg_profile.sign_key in globals.gpg_profile.recipients
-         or globals.gpg_profile.sign_key in globals.gpg_profile.hidden_recipients)
-         and 'PASSPHRASE' in os.environ):
-        log.Notice(_("Reuse configured PASSPHRASE as SIGN_PASSPHRASE"))
-        return os.environ['PASSPHRASE']
+        and (globals.gpg_profile.sign_key in globals.gpg_profile.recipients
+             or globals.gpg_profile.sign_key in globals.gpg_profile.hidden_recipients)
+        and 'PASSPHRASE' in os.environ): # noqa
+            log.Notice(_("Reuse configured PASSPHRASE as SIGN_PASSPHRASE"))
+            return os.environ['PASSPHRASE']
     # if one encryption key is also the signing key assume that the passphrase is identical
     if (not for_signing
-         and (globals.gpg_profile.sign_key in globals.gpg_profile.recipients
-         or globals.gpg_profile.sign_key in globals.gpg_profile.hidden_recipients)
-         and 'SIGN_PASSPHRASE' in os.environ):
-        log.Notice(_("Reuse configured SIGN_PASSPHRASE as PASSPHRASE"))
-        return os.environ['SIGN_PASSPHRASE']
+        and (globals.gpg_profile.sign_key in globals.gpg_profile.recipients
+             or globals.gpg_profile.sign_key in globals.gpg_profile.hidden_recipients)
+        and 'SIGN_PASSPHRASE' in os.environ): # noqa
+            log.Notice(_("Reuse configured SIGN_PASSPHRASE as PASSPHRASE"))
+            return os.environ['SIGN_PASSPHRASE']
 
     # Next, verify we need to ask the user
 
@@ -238,8 +238,8 @@ def restart_position_iterator(tarblock_iter):
             if tarblock_iter.previous_index > last_index:
                 log.Warn(_("File %s complete in backup set.\n"
                            "Continuing restart on file %s.") %
-                           (util.uindex(last_index), util.uindex(tarblock_iter.previous_index)),
-                           log.ErrorCode.restart_file_not_found)
+                         (util.uindex(last_index), util.uindex(tarblock_iter.previous_index)),
+                         log.ErrorCode.restart_file_not_found)
                 # We went too far! Stuff the data back into place before restarting
                 tarblock_iter.queue_index_data(iter_result)
                 break
@@ -247,8 +247,8 @@ def restart_position_iterator(tarblock_iter):
     except StopIteration:
         log.Warn(_("File %s missing in backup set.\n"
                    "Continuing restart on file %s.") %
-                   (util.uindex(last_index), util.uindex(tarblock_iter.previous_index)),
-                   log.ErrorCode.restart_file_not_found)
+                 (util.uindex(last_index), util.uindex(tarblock_iter.previous_index)),
+                 log.ErrorCode.restart_file_not_found)
 
 
 def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
@@ -550,8 +550,8 @@ def full_backup(col_stats):
             progress.progress_thread.finished = True
             progress.progress_thread.join()
             log.TransferProgress(100.0, 0, progress.tracker.total_bytecount,
-                                progress.tracker.total_elapsed_seconds(),
-                                progress.tracker.speed, False)
+                                 progress.tracker.total_elapsed_seconds(),
+                                 progress.tracker.speed, False)
 
         col_stats.set_values(sig_chain_warning=None)
 
@@ -645,8 +645,8 @@ def incremental_backup(sig_chain):
             progress.progress_thread.finished = True
             progress.progress_thread.join()
             log.TransferProgress(100.0, 0, progress.tracker.total_bytecount,
-                                progress.tracker.total_elapsed_seconds(),
-                                progress.tracker.speed, False)
+                                 progress.tracker.total_elapsed_seconds(),
+                                 progress.tracker.speed, False)
 
     print_statistics(diffdir.stats, bytes_written)
 
@@ -1221,7 +1221,7 @@ def check_resources(action):
         if maxopen < 1024:
             log.FatalError(_("Max open files of %s is too low, should be >= 1024.\n"
                              "Use 'ulimit -n 1024' or higher to correct.\n") % (maxopen,),
-                             log.ErrorCode.maxopen_too_low)
+                           log.ErrorCode.maxopen_too_low)
 
 def log_startup_parms(verbosity=log.INFO):
     """
@@ -1276,7 +1276,7 @@ class Restart:
                 # upload of N vols failed, fix manifest and restart
                 log.Notice(_("RESTART: Volumes %d to %d failed to upload before termination.\n"
                              "         Restarting backup at volume %d.") %
-                             (self.start_vol + 1, mf_len, self.start_vol + 1))
+                           (self.start_vol + 1, mf_len, self.start_vol + 1))
                 for vol in range(self.start_vol + 1, mf_len + 1):
                     mf.del_volume_info(vol)
             else:
@@ -1284,7 +1284,7 @@ class Restart:
                 log.Notice(_("RESTART: Impossible backup state: manifest has %d vols, remote has %d vols.\n"
                              "         Restart is impossible ... duplicity will clean off the last partial\n"
                              "         backup then restart the backup from the beginning.") %
-                             (mf_len, self.start_vol))
+                           (mf_len, self.start_vol))
                 self.last_backup.delete()
                 os.execve(sys.argv[0], sys.argv, os.environ)
 

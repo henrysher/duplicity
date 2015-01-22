@@ -1,3 +1,9 @@
+2015-01-22  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Misc fixes for the following PEP8 issues:
+      - E127, E128
+      - see http://pep8.readthedocs.org
+
 2015-01-18  Kenneth Loafman  <kenneth@loafman.com>
 
     * Misc fixes for the following PEP8 issues:

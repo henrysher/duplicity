@@ -185,7 +185,7 @@ class DDTest(UnitTestCase):
 
             # Write old-style delta to deltadir1
             diffdir.write_block_iter(diffdir.DirDelta(get_sel(cur_dir),
-                                               old_full_sigs.open("rb")),
+                                                      old_full_sigs.open("rb")),
                                      delta1)
 
             # Write new signature and delta to deltadir2 and sigdir2, compare

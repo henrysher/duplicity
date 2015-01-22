@@ -94,7 +94,7 @@ class DPBXBackend(duplicity.backend.Backend):
     """Connect to remote store using Dr*pB*x service"""
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
-        
+
         global client, rest, session
         from dropbox import client, rest, session
 
@@ -142,9 +142,8 @@ class DPBXBackend(duplicity.backend.Backend):
                 session.DropboxSession.unlink(self)
 
         self.sess = StoredSession(etacsufbo(APP_KEY)
-                    , etacsufbo(APP_SECRET)
-                    , access_type=ACCESS_TYPE)
-        #            , locale='en')
+                                  , etacsufbo(APP_SECRET)
+                                  , access_type=ACCESS_TYPE)
         self.api_client = client.DropboxClient(self.sess)
         self.sess.load_creds()
 
@@ -240,7 +239,7 @@ class DPBXBackend(duplicity.backend.Backend):
         log.Debug('dpbx._mkdir(%s): %s' % (path, resp))
 
 def etacsufbo(s):
-    return ''.join(reduce(lambda x, y:(x and len(x[-1]) == 1)and(x.append(y + 
-        x.pop(-1))and x or x)or(x + [y]), s, []))
+    return ''.join(reduce(lambda x, y:(x and len(x[-1]) == 1) and
+                          (x.append(y + x.pop(-1)) and x or x) or (x + [y]), s, []))
 
 duplicity.backend.register_backend("dpbx", DPBXBackend)

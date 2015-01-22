@@ -471,19 +471,19 @@ testfiles/select/1/1
         else:
             sfval = None
         assert sf(Path("/usr/bin")) == sfval, \
-               "Assumption: /usr/bin is on the same filesystem as /"
+            "Assumption: /usr/bin is on the same filesystem as /"
         if os.path.ismount("/dev"):
             sfval = 0
         else:
             sfval = None
         assert sf(Path("/dev")) == sfval, \
-               "Assumption: /dev is on a different filesystem"
+            "Assumption: /dev is on a different filesystem"
         if os.path.ismount("/proc"):
             sfval = 0
         else:
             sfval = None
         assert sf(Path("/proc")) == sfval, \
-               "Assumption: /proc is on a different filesystem"
+            "Assumption: /proc is on a different filesystem"
 
 class ParseArgsTest(UnitTestCase):
     """Test argument parsing"""
@@ -517,14 +517,14 @@ class ParseArgsTest(UnitTestCase):
         self.ParseTest([("--include", "testfiles/select/1/1"),
                         ("--exclude", "**")],
                        [(), ('1',), ("1", "1"), ("1", '1', '1'),
-                             ('1', '1', '2'), ('1', '1', '3')])
+                        ('1', '1', '2'), ('1', '1', '3')])
 
     def testParse2(self):
         """Test three level include/exclude"""
         self.ParseTest([("--exclude", "testfiles/select/1/1/1"),
-                               ("--include", "testfiles/select/1/1"),
-                               ("--exclude", "testfiles/select/1"),
-                               ("--exclude", "**")],
+                        ("--include", "testfiles/select/1/1"),
+                        ("--exclude", "testfiles/select/1"),
+                        ("--exclude", "**")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')])
 

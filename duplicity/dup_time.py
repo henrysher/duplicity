@@ -82,7 +82,7 @@ def timetostring(timeinseconds):
         #    1. Save the tuple returned by localtime.
         #    2. Pass the DST flag into gettzd
         lcltime = time.localtime(timeinseconds)
-        return time.strftime("%Y-%m-%dT%H" + globals.time_separator + 
+        return time.strftime("%Y-%m-%dT%H" + globals.time_separator +
                              "%M" + globals.time_separator + "%S",
                              lcltime) + gettzd(lcltime[-1])
     else:
@@ -120,12 +120,12 @@ def stringtotime(timestring):
         # works in terms of the current timezone and we have a
         # timezone offset in the string.
         timetuple = (year, month, day, hour, minute, second, -1, -1, 0)
-        
+
         if len(timestring) == 16:
             # as said in documentation, time.gmtime() and timegm() are each others' inverse.
             # As far as UTC format is used in new file format,
             # do not rely on system's python DST and tzdata settings
-            # and use functions that working with UTC 
+            # and use functions that working with UTC
             utc_in_secs = calendar.timegm(timetuple)
         else:
             # mktime assumed that the tuple was a local time. Compensate
@@ -232,7 +232,7 @@ def tzdtoseconds(tzd):
         return 0
     assert len(tzd) == 6  # only accept forms like +08:00 for now
     assert (tzd[0] == "-" or tzd[0] == "+") and \
-           tzd[3] == globals.time_separator
+        tzd[3] == globals.time_separator
     return -60 * (60 * int(tzd[:3]) + int(tzd[4:]))
 
 def cmp(time1, time2):
@@ -282,9 +282,9 @@ def genstrtotime(timestr, override_curtime=None):
         pass
 
     # Now check for dates like 2001/3/23
-    match = _genstr_date_regexp1.search(timestr) or \
-            _genstr_date_regexp2.search(timestr) or \
-            _genstr_date_regexp3.search(timestr)
+    match = (_genstr_date_regexp1.search(timestr) or
+             _genstr_date_regexp2.search(timestr) or
+             _genstr_date_regexp3.search(timestr))
     if not match:
         error()
     timestr = "%s-%02d-%02dT00:00:00%s" % (match.group('year'),

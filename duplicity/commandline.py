@@ -360,7 +360,7 @@ def parse_cmdline_options(arglist):
 
     parser.add_option("--gio", action="callback", dest="use_gio",
                       callback=lambda o, s, v, p: (setattr(p.values, o.dest, True),
-                                                     old_fn_deprecation(s)))
+                                                   old_fn_deprecation(s)))
 
     parser.add_option("--gpg-options", action="extend", metavar=_("options"))
 
@@ -1000,13 +1000,13 @@ def check_consistency(action):
                                "restoring or verifying")
         if select_opts and action == "restore":
             log.Warn(_("Command line warning: %s") % _("Selection options --exclude/--include\n"
-                                                        "currently work only when backing up,"
-                                                        "not restoring."))
+                                                       "currently work only when backing up,"
+                                                       "not restoring."))
     else:
         assert action == "inc" or action == "full"
         if verify:
             command_line_error("--verify option cannot be used "
-                                      "when backing up")
+                               "when backing up")
         if globals.restore_dir:
             command_line_error("restore option incompatible with %s backup"
                                % (action,))
@@ -1050,7 +1050,7 @@ def ProcessCommandLine(cmdline_list):
             log.FatalError(_("""Bad URL '%s'.
 Examples of URL strings are "scp://user@host.net:1234/path" and
 "file:///usr/local".  See the man page for more information.""") % (args[0],),
-                                               log.ErrorCode.bad_url)
+                           log.ErrorCode.bad_url)
     elif len(args) == 2:
         # Figure out whether backup or restore
         backup, local_pathname = set_backend(args[0], args[1])

@@ -30,6 +30,9 @@ New in v0.7.02 (2015/02/??)
 * Misc fixes for the following PEP8 issues:
   - E111, E121, E122, E124, E125, E126
   - see http://pep8.readthedocs.org
+* Misc fixes for the following PEP8 issues:
+  - E127, E128
+  - see http://pep8.readthedocs.org
 
 
 New in v0.7.01 (2015/01/11)

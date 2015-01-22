@@ -95,7 +95,7 @@ class TimeTest:
         i2s = dup_time.intstringtoseconds
         assert i2s("7D2h") == 7 * 86400 + 2 * 3600
         assert i2s("2Y3s") == 2 * 365 * 86400 + 3
-        assert i2s("1M2W4D2h5m20s") == (30 * 86400 + 2 * 7 * 86400 + 4 * 86400 + 
+        assert i2s("1M2W4D2h5m20s") == (30 * 86400 + 2 * 7 * 86400 + 4 * 86400 +
                                         2 * 3600 + 5 * 60 + 20)
 
     def testPrettyIntervals(self):
@@ -113,9 +113,9 @@ class TimeTest:
         assert g2t('now', 1000) == 1000
         assert g2t('2h3s', 10000) == 10000 - 2 * 3600 - 3
         assert g2t('2001-09-01T21:49:04Z') == \
-               dup_time.stringtotime('2001-09-01T21:49:04Z')
+            dup_time.stringtotime('2001-09-01T21:49:04Z')
         assert g2t('2002-04-26T04:22:01') == \
-               dup_time.stringtotime('2002-04-26T04:22:01' + dup_time.gettzd(0))
+            dup_time.stringtotime('2002-04-26T04:22:01' + dup_time.gettzd(0))
         t = dup_time.stringtotime('2001-05-12T00:00:00' + dup_time.gettzd(0))
         assert g2t('2001-05-12') == t
         assert g2t('2001/05/12') == t
@@ -128,21 +128,21 @@ class TimeTest:
         self.assertRaises(dup_time.TimeException, g2t, "hello")
         self.assertRaises(dup_time.TimeException, g2t, "")
         self.assertRaises(dup_time.TimeException, g2t, "3q")
-    
+
     def testConvertion(self):
         t = int(time.time())
         assert dup_time.stringtotime(dup_time.timetostring(t)) == t
 
 
 class TimeTest1(TimeTest, UnitTestCase):
-    
+
     def setUp(self):
         super(TimeTest1, self).setUp()
         self.set_global('old_filenames', False)
 
 
 class TimeTest2(TimeTest, UnitTestCase):
-    
+
     def setUp(self):
         super(TimeTest2, self).setUp()
         self.set_global('old_filenames', True)

@@ -83,7 +83,7 @@ class ROPath:
         elif stat.S_ISFIFO(st_mode):
             self.type = "fifo"
         elif stat.S_ISSOCK(st_mode):
-            raise PathException(util.ufn(self.get_relative_path()) + 
+            raise PathException(util.ufn(self.get_relative_path()) +
                                 u"is a socket, unsupported by tar")
             self.type = "sock"
         elif stat.S_ISCHR(st_mode):
@@ -162,7 +162,7 @@ class ROPath:
     def open(self, mode):
         """Return fileobj associated with self"""
         assert mode == "rb" and self.fileobj and not self.opened, \
-               "%s %s %s" % (mode, self.fileobj, self.opened)
+            "%s %s %s" % (mode, self.fileobj, self.opened)
         self.opened = 1
         return self.fileobj
 
@@ -364,18 +364,18 @@ class ROPath:
             log_diff(_("File %s is missing"))
             return 0
         if self.type != other.type:
-            log_diff(_("File %%s has type %s, expected %s") % 
+            log_diff(_("File %%s has type %s, expected %s") %
                      (other.type, self.type))
             return 0
 
         if self.isreg() or self.isdir() or self.isfifo():
             if not self.perms_equal(other):
-                log_diff(_("File %%s has permissions %s, expected %s") % 
+                log_diff(_("File %%s has permissions %s, expected %s") %
                          (other.getperms(), self.getperms()))
                 return 0
             if ((int(self.stat.st_mtime) != int(other.stat.st_mtime)) and
                     (self.stat.st_mtime > 0 or other.stat.st_mtime > 0)):
-                log_diff(_("File %%s has mtime %s, expected %s") % 
+                log_diff(_("File %%s has mtime %s, expected %s") %
                          (dup_time.timetopretty(int(other.stat.st_mtime)),
                           dup_time.timetopretty(int(self.stat.st_mtime))))
                 return 0
@@ -391,12 +391,12 @@ class ROPath:
             if self.symtext == other.symtext:
                 return 1
             else:
-                log_diff(_("Symlink %%s points to %s, expected %s") % 
+                log_diff(_("Symlink %%s points to %s, expected %s") %
                          (other.symtext, self.symtext))
                 return 0
         elif self.isdev():
             if not self.perms_equal(other):
-                log_diff(_("File %%s has permissions %s, expected %s") % 
+                log_diff(_("File %%s has permissions %s, expected %s") %
                          (other.getperms(), self.getperms()))
                 return 0
             if self.devnums != other.devnums:
@@ -647,13 +647,13 @@ class Path(ROPath):
         global _tmp_path_counter
         parent_dir = self.get_parent_dir()
         while 1:
-            temp_path = parent_dir.append("duplicity_temp." + 
+            temp_path = parent_dir.append("duplicity_temp." +
                                           str(_tmp_path_counter))
             if not temp_path.type:
                 return temp_path
             _tmp_path_counter += 1
             assert _tmp_path_counter < 10000, \
-                   u"Warning too many temp files created for " + util.ufn(self.name)
+                u"Warning too many temp files created for " + util.ufn(self.name)
 
     def compare_recursive(self, other, verbose=None):
         """Compare self to other Path, descending down directories"""

@@ -453,7 +453,7 @@ class GnuPG:
             if not p.direct: os.close(p.parent)
 
         command = [ self.call ] + fd_args + self.options.get_args() \
-                  + gnupg_commands + args
+            + gnupg_commands + args
 
         os.execvp(command[0], command)
 
