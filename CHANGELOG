@@ -38,6 +38,7 @@ New in v0.7.02 (2015/02/??)
   - Aligned commandline.py options and manpage contents.
 * Changed --s3_multipart_max_timeout to --s3-multipart-max-timeout to be
   consistent with commandline option naming conventions.
+* Applied patch from Adam Reichold to fix bug # 1413792
 
 
 New in v0.7.01 (2015/01/11)

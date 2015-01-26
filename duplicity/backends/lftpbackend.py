@@ -69,6 +69,10 @@ class LFTPBackend(duplicity.backend.Backend):
 
         self.remote_path = re.sub('^/', '', parsed_url.path)
 
+        # Fix up an empty remote path
+        if len(self.remote_path) == 0:
+            self.remote_path = '/'
+
         # Use an explicit directory name.
         if self.remote_path[-1] != '/':
             self.remote_path += '/'
