@@ -382,16 +382,16 @@ create the archive directory in
 
 The archive directory can be shared between backups to multiple targets,
 because a subdirectory of the archive dir is used for individual backups (see
-.B --name
+.BI --name
 ).
 
 The combination of archive directory and backup name must be unique
 in order to separate the data of different backups.
 
 The interaction between the
-.B --archive-dir
+.BI --archive-dir
 and the
-.B --name
+.BI --name
 options allows for four possible combinations for the location of the archive dir:
 
 .RS
@@ -430,7 +430,7 @@ Alternatively you might choose
 .BR cloudfiles .
 
 .TP
-.B --compare-data
+.BI --compare-data
 Enable data comparison of regular files on action verify.
 This is disabled by default for performance reasons.
 
@@ -487,9 +487,9 @@ See the
 section for more information.
 
 .TP
-.B --exclude-filelist-stdin
+.BI --exclude-filelist-stdin
 Like
-.B --exclude-filelist,
+.BI --exclude-filelist,
 but the list of files will be read from standard input.  See the
 .B FILE SELECTION
 section for more information.
@@ -497,12 +497,12 @@ section for more information.
 .TP
 .BR "--exclude-globbing-filelist " filename
 Like
-.B --exclude-filelist
+.BI --exclude-filelist
 but each line of the filelist will be interpreted according to the
 same rules as
-.B --include
+.BI --include
 and
-.B --exclude.
+.BI --exclude.
 
 .TP
 .BR "--exclude-if-present " filename
@@ -510,25 +510,25 @@ Exclude directories if filename is present. This option needs to
 come before any other include or exclude options.
 
 .TP
-.B --exclude-other-filesystems
+.BI --exclude-other-filesystems
 Exclude files on file systems (identified by device number) other than
 the file system the root of the source directory is on.
 
 .TP
 .BI "--exclude-regexp " regexp
 Exclude files matching the given regexp.  Unlike the
-.B --exclude
+.BI --exclude
 option, this option does not match files in a directory it matches.
 See the
 .B FILE SELECTION
 section for more information.
 
 .TP
-.B --extra-clean
+.BI --extra-clean
 When cleaning up, be more aggressive about saving space.  For example, this
 may delete signature files for old backup chains.
 
-.B Caution: 
+.B Caution:
 Without signature files those old backup chains are unrestorable. Do not
 use --extra-clean unless you know what you're doing.
 
@@ -566,22 +566,22 @@ See the
 section for more information.
 
 .TP
-.B --force
+.BI --force
 Proceed even if data loss might result.  Duplicity will let the user
 know when this option is required.
 
 .TP
-.B --ftp-passive
+.BI --ftp-passive
 Use passive (PASV) data connections.  The default is to use passive,
 but to fallback to regular if the passive connection fails or times
 out.
 
 .TP
-.B --ftp-regular
+.BI --ftp-regular
 Use regular (PORT) data connections.
 
 .TP
-.B --gio
+.BI --gio
 Use the GIO backend and interpret any URLs as GIO would.
 
 .TP
@@ -589,14 +589,14 @@ Use the GIO backend and interpret any URLs as GIO would.
 Same as
 .BR --encrypt-key ,
 but it hides user's key id from encrypted file. It uses the gpg's
-.B --hidden-recipient
+.BI --hidden-recipient
 command to obfuscate the owner of the backup. On restore, gpg will
 automatically try all available secret keys in order to decrypt the
 backup. See gpg(1) for more details.
 
 
 .TP
-.B --ignore-errors
+.BI --ignore-errors
 Try to ignore certain errors if they happen. This option is only
 intended to allow the restoration of a backup in the face of certain
 problems that would otherwise cause the backup to fail. It is not ever
@@ -617,6 +617,11 @@ contact duplicity maintainers. The need to use this option under
 production circumstances would normally be considered a bug.
 
 .TP
+.BI "--imap-full-address " email_address
+The full email address of the user name when logging into an imap server.
+If not supplied just the user name part of the email address is used.
+
+.TP
 .BI "--imap-mailbox " option
 Allows you to specify a different mailbox.  The default is
 "INBOX".
@@ -632,7 +637,7 @@ quoted and the only spaces allowed are between options.
 .TP
 .BI "--include " shell_pattern
 Similar to
-.B --exclude
+.BI --exclude
 but include matched files instead.  Unlike
 .BR --exclude ,
 this option will also match parent directories of matched files
@@ -649,7 +654,7 @@ but include the listed files instead.  See the
 section for more information.
 
 .TP
-.B --include-filelist-stdin
+.BI --include-filelist-stdin
 Like
 .BR --include-filelist ,
 but read the list of included files from standard input.
@@ -657,12 +662,12 @@ but read the list of included files from standard input.
 .TP
 .BI "--include-globbing-filelist " filename
 Like
-.B --include-filelist
+.BI --include-filelist
 but each line of the filelist will be interpreted according to the
 same rules as
-.B --include
+.BI --include
 and
-.B --exclude.
+.BI --exclude.
 
 .TP
 .BI "--include-regexp " regexp
@@ -708,24 +713,27 @@ example, someone may use "home_daily_s3" for the daily backup of a
 home directory to Amazon S3. The structure of the name is up to the
 user, it is only important that the names be distinct. The symbolic
 name is currently only used to affect the expansion of
-.B --archive-dir
+.BI --archive-dir
 , but may be used for additional features in the future. Users running
 more than one distinct backup are encouraged to use this option.
 
 If not specified, the default value is a hash of the backend URL.
 
 .TP
-.B --no-encryption
-Do not use GnuPG to encrypt files on remote system.  Instead just
-write gzipped volumes.
+.BI --no-compression
+Do not use GZip to compress files on remote system.
 
 .TP
-.B --no-print-statistics
+.BI --no-encryption
+Do not use GnuPG to encrypt files on remote system.
+
+.TP
+.BI --no-print-statistics
 By default duplicity will print statistics about the current session
 after a successful backup.  This switch disables that behavior.
 
 .TP
-.B --null-separator
+.BI --null-separator
 Use nulls (\\0) instead of newlines (\\n) as line separators, which
 may help when dealing with filenames containing newlines.  This
 affects the expected format of the files specified by the
@@ -733,7 +741,7 @@ affects the expected format of the files specified by the
 the directory statistics file.
 
 .TP
-.B --numeric-owner
+.BI --numeric-owner
 On restore always use the numeric uid/gid from the archive and not the
 archived user/group names, which is the default behaviour.
 Recommended for restoring from live cds which might have the users with
@@ -744,18 +752,22 @@ identical names but different uids/gids.
 Number of retries to make on errors before giving up.
 
 .TP
-.B --old-filenames
+.BI --old-filenames
 Use the old filename format (incompatible with Windows/Samba) rather than
 the new filename format.
+
+.TP
+.BI "--par2-options " options
+Verbatim options to pass to par2.
 
 .TP
 .BI "--par2-redundancy " percent
 Adjust the level of redundancy in
 .I percent
-for Par2 recovery files (default 10%)
+for Par2 recovery files (default 10%).
 
 .TP
-.B --progress
+.BI --progress
 When selected, duplicity will output the current upload progress and estimated
 upload time. To annotate changes, it will perform a first dry-run before a full
 or incremental, and then runs the real operation estimating the real upload
@@ -765,7 +777,7 @@ progress.
 .BI "--progress-rate " number
 Sets the update rate at which duplicity will output the upload progress
 messages (requires
-.B --progress
+.BI --progress
 option). Default is to prompt the status each 3 seconds.
 
 .TP
@@ -793,7 +805,7 @@ duplicity --rsync-options="--partial-dir=.rsync-partial" /home/me rsync://uid@ot
 .BI "--s3-european-buckets"
 When using the Amazon S3 backend, create buckets in Europe instead of
 the default (requires
-.B --s3-use-new-style
+.BI --s3-use-new-style
 ). Also see the
 .B EUROPEAN S3 BUCKETS
 section.
@@ -836,9 +848,13 @@ uploaded in parallel. Useful if you want to saturate your bandwidth
 or if large files are failing during upload.
 
 .TP
+.BI "--s3-use-3-use-server-side-encryption"
+Allow use of server side encryption in S3
+
+.TP
 .BI "--s3-multipart-chunk-size"
 Chunk size (in MB) used for S3 multipart uploads. Make this smaller than
-.B --volsize
+.BI --volsize
 to maximize the use of your bandwidth. For example, a chunk size of 10MB
 with a volsize of 30MB will result in 3 chunks per volume upload.
 
@@ -851,12 +867,11 @@ required to ensure you don't overload your system while maximizing the use of
 your bandwidth.
 
 .TP
-.BI "--s3_multipart_max_timeout"
+.BI "--s3-multipart-max-timeout"
 You can control the maximum time (in seconds) a multipart upload can spend on
 uploading a single chunk to S3. This may be useful if you find your system
 hanging on multipart uploads or if you'd like to control the time variance
 when uploading to S3 to ensure you kill connections to slow S3 endpoints.
-
 
 .TP
 .BI "--scp-command " command
@@ -908,20 +923,10 @@ See also
 .BI "A NOTE ON SYMMETRIC ENCRYPTION AND SIGNING"
 
 .TP
-.B --ssh-askpass
+.BI --ssh-askpass
 Tells the ssh backend to prompt the user for the remote system password,
 if it was not defined in target url and no FTP_PASSWORD env var is set.
 This password is also used for passphrase-protected ssh keys.
-
-.TP
-.BI "--ssh-backend " backend
-Allows the explicit selection of a ssh backend. Defaults to
-.BR paramiko .
-Alternatively you might choose
-.BR pexpect .
-.br
-See also
-.BR "A NOTE ON SSH BACKENDS" .
 
 .TP
 .BI "--ssh-options " options
@@ -962,7 +967,7 @@ See also
 .BR "A NOTE ON SSL CERTIFICATE VERIFICATION" .
 
 .TP
-.B --ssl-no-check-certificate
+.BI --ssl-no-check-certificate
 .B (only webdav backend)
 Disable ssl certificate verification.
 .br
@@ -1013,14 +1018,6 @@ GnuPG 2 and newer ignore this option and will always use a running
 if no passphrase was delivered.
 
 .TP
-.BI --use-scp
-If this option is specified, then the ssh backend will use the
-scp protocol rather than sftp for backend operations.
-.br
-See also
-.BR "A NOTE ON SSH BACKENDS" .
-
-.TP
 .BI "--verbosity " level ", -v" level
 Specify output verbosity level (log level).
 Named levels and corresponding values are
@@ -1055,7 +1052,7 @@ Mb. Default is 25Mb.
 In decreasing order of importance, specifies the directory to use for
 temporary files (inherited from Python's tempfile module).
 Eventually the option
-.B --tempdir
+.BI --tempdir
 supercedes any of these.
 .TP
 .B FTP_PASSWORD
@@ -1382,7 +1379,7 @@ duplicity /usr scp://user@host/backup
 .RE
 because the include and exclude directives match exactly the same
 files, and the
-.B --include
+.BI --include
 comes first, giving it precedence.  Similarly,
 .PP
 .RS
@@ -1427,7 +1424,7 @@ into a shell, so the shell does not interpret the globbing patterns
 before duplicity sees them.
 
 The
-.B --exclude
+.BI --exclude
 pattern option matches a file if:
 .PP
 .B 1.
@@ -1454,7 +1451,7 @@ the file is a directory which contains a file matched by the option.
 For example,
 
 .RS
-.B --exclude
+.BI --exclude
 /usr/local
 .RE
 
@@ -1464,7 +1461,7 @@ is the same as --exclude /usr/local --exclude '/usr/local/**'.
 On the other hand
 
 .RS
-.B --include
+.BI --include
 /usr/local
 .RE
 
@@ -1476,7 +1473,7 @@ that included subdirectories have somewhere to go.
 Finally,
 
 .RS
-.B --include
+.BI --include
 ignorecase:'/usr/[a-z0-9]foo/*/**.py'
 .RE
 
@@ -1490,7 +1487,7 @@ The
 .BR --exclude-filelist ,
 .BR --include-filelist-stdin ,
 and
-.B --exclude-filelist-stdin
+.BI --exclude-filelist-stdin
 options also introduce file selection conditions.  They direct
 duplicity to read in a file, each line of which is a file
 specification, and to include or exclude the matching files.  Lines
@@ -1545,14 +1542,14 @@ specification condition.  Finally, it is undefined what happens with
 specifications.
 
 The
-.B --include-globbing-filelist
+.BI --include-globbing-filelist
 and
-.B --exclude-globbing-filelist
+.BI --exclude-globbing-filelist
 options also specify filelists, but each line in the filelist will be
 interpreted as a globbing pattern the way
-.B --include
+.BI --include
 and
-.B --exclude
+.BI --exclude
 options are interpreted (although "+ " and "- " prefixing is still
 allowed).  For instance, if the file "globbing-list.txt" contains the
 lines:
@@ -1572,16 +1569,16 @@ would be exactly the same as specifying
 on the command line.
 
 Finally, the
-.B --include-regexp
+.BI --include-regexp
 and
-.B --exclude-regexp
+.BI --exclude-regexp
 options allow files to be included and excluded if their filenames match a
 python regular expression.  Regular expression syntax is too
 complicated to explain here, but is covered in Python's library
 reference.  Unlike the
-.B --include
+.BI --include
 and
-.B --exclude
+.BI --exclude
 options, the regular expression options don't match files containing
 or contained in matched files.  So for instance
 .PP
@@ -1676,10 +1673,10 @@ because it may allow for faster data transfers.
 .PP
 duplicity will create a new bucket the first time a bucket access is
 attempted. At this point, the bucket will be created in Europe if
-.B --s3-european-buckets
+.BI --s3-european-buckets
 was given. For reasons having to do with how the Amazon S3 service
 works, this also requires the use of the
-.B --s3-use-new-style
+.BI --s3-use-new-style
 option. This option turns on subdomain based bucket addressing in
 S3. The details are beyond the scope of this man page, but it is
 important to know that your bucket must not contain upper case letters
@@ -1688,12 +1685,12 @@ hostname. Consequently, for reasons of backwards compatibility, use of
 subdomain based bucket addressing is not enabled by default.
 .PP
 Note that you will need to use
-.B --s3-use-new-style
+.BI --s3-use-new-style
 for all operations on European buckets; not just upon initial
 creation.
 .PP
 You only need to use
-.B --s3-european-buckets
+.BI --s3-european-buckets
 upon initial creation, but you may may use it at all times for
 consistency.
 .PP
@@ -1731,7 +1728,7 @@ Create Access Keys:
 https://code.google.com/apis/console#:storage:legacy
 
 .SH A NOTE ON HUBIC
-The hubic backend requires the pyrax library to be installed on the system. See REQUIREMENTS above. 
+The hubic backend requires the pyrax library to be installed on the system. See REQUIREMENTS above.
 You will need to set your credentials for hubiC in a file called ~/.hubic_credentials, following this
 pattern:
 .PP
@@ -1868,7 +1865,7 @@ You can however specify the option
 to point duplicity to a copy in a different location.
 .PP
 Finally there is the
-.B --ssl-no-check-certificate
+.BI --ssl-no-check-certificate
 option to disable certificate verification alltogether, in case some ssl library
 is missing or verification is not wanted. Use it with care, as even with self signed
 servers manually providing the private ca certificate is definitely the safer option.
@@ -1901,10 +1898,10 @@ is unspecified, it will default to version 1.
 The pydrive backend requires Python PyDrive package to be installed on the system. See
 .B REQUIREMENTS
 above.
- 
+
 You need to create a service account in "Google developers console" at https://console.developers.google.com
 
-Make sure Drive API is enabled. 
+Make sure Drive API is enabled.
 
 The email address of the account will be used as part of URL. See
 .B URL FORMAT
@@ -1914,7 +1911,7 @@ Download the .p12 key file of the account and convert it to the .pem format:
 .br
 openssl pkcs12 -in XXX.p12  -nodes -nocerts > pydriveprivatekey.pem
 
-The content of .pem file should be passed to 
+The content of .pem file should be passed to
 .BR GOOGLE_DRIVE_ACCOUNT_KEY
 environment variable for authentification.
 

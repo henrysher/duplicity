@@ -1,5 +1,13 @@
 2015-01-22  Kenneth Loafman  <kenneth@loafman.com>
 
+    * Fixed bug # 1414418
+      - Aligned commandline.py options and help display contents.
+      - Aligned commandline.py options and manpage contents.
+    * Changed --s3_multipart_max_timeout to --s3-multipart-max-timeout to be
+      consistent with commandline option naming conventions.
+
+2015-01-22  Kenneth Loafman  <kenneth@loafman.com>
+
     * Misc fixes for the following PEP8 issues:
       - E127, E128, 201, 202, 203
       - see http://pep8.readthedocs.org

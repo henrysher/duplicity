@@ -384,8 +384,7 @@ def parse_cmdline_options(arglist):
     # Whether to use the full email address as the user name when
     # logging into an imap server. If false just the user name
     # part of the email address is used.
-    parser.add_option("--imap-full-address", action="store_true",
-                      help=optparse.SUPPRESS_HELP)
+    parser.add_option("--imap-full-address", action="store_true")
 
     # Name of the imap folder where we want to store backups.
     # Can be changed with a command line argument.
@@ -505,7 +504,7 @@ def parse_cmdline_options(arglist):
 
     # Number of seconds to wait for each part of a multipart upload to S3. Use this
     # to prevent hangups when doing a multipart upload to S3.
-    parser.add_option("--s3_multipart_max_timeout", type="int", metavar=_("number"))
+    parser.add_option("--s3-multipart-max-timeout", type="int", metavar=_("number"))
 
     # Option to allow the s3/boto backend use the multiprocessing version.
     parser.add_option("--s3-use-multiprocessing", action="store_true")
