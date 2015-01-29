@@ -28,7 +28,7 @@ from duplicity import globals
 class Par2Backend(backend.Backend):
     """This backend wrap around other backends and create Par2 recovery files
     before the file and the Par2 files are transfered with the wrapped backend.
-    
+
     If a received file is corrupt it will try to repair it on the fly.
     """
     def __init__(self, parsed_url):
@@ -55,10 +55,10 @@ class Par2Backend(backend.Backend):
     def transfer(self, method, source_path, remote_filename):
         """create Par2 files and transfer the given file and the Par2 files
         with the wrapped backend.
-        
+
         Par2 must run on the real filename or it would restore the
         temp-filename later on. So first of all create a tempdir and symlink
-        the soure_path with remote_filename into this. 
+        the soure_path with remote_filename into this.
         """
         import pexpect
 
@@ -96,7 +96,7 @@ class Par2Backend(backend.Backend):
         """transfer remote_filename and the related .par2 file into
         a temp-dir. remote_filename will be renamed into local_path before
         finishing.
-        
+
         If "par2 verify" detect an error transfer the Par2-volumes into the
         temp-dir and try to repair.
         """
@@ -166,11 +166,11 @@ class Par2Backend(backend.Backend):
     def list(self):
         """
         Return list of filenames (byte strings) present in backend
-        
+
         Files ending with ".par2" will be excluded from the list.
         """
         remote_list = self.wrapped_backend._list()
-        
+
         c = re.compile(r'(?!.*\.par2$)')
         filtered_list = []
         for filename in remote_list:

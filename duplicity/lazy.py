@@ -331,7 +331,7 @@ class IterTreeReducer:
             return 1
 
         if index <= self.index:
-            log.Warn(_("Warning: oldindex %s >= newindex %s") % 
+            log.Warn(_("Warning: oldindex %s >= newindex %s") %
                      (util.uindex(self.index), util.uindex(index)))
             return 1
 

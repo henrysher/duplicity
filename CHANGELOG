@@ -40,6 +40,9 @@ New in v0.7.02 (2015/02/??)
   consistent with commandline option naming conventions.
 * Applied patch from Adam Reichold to fix bug # 1413792.
 * Ongoing pep8 corrections.
+* Merged in lp:~angusgr/duplicity/exclude-older-than
+  - Add "--exclude-older-than" commandline option, that allows you to only
+    back up files with a modification date newer than a particular threshold.
 
 
 New in v0.7.01 (2015/01/11)

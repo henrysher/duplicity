@@ -40,7 +40,7 @@ class PathTest(UnitTestCase):
         p.deltree()
         assert not p.type, p.type
 
-    # FIXME: How does this test make any sense?  Two separate Path objects 
+    # FIXME: How does this test make any sense?  Two separate Path objects
     # will never be equal (they don't implement __cmp__ or __eq__)
     # def test_compare(self):
     #    """Test directory comparisons"""

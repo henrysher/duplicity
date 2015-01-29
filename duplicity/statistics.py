@@ -51,7 +51,7 @@ class StatsObj:
     stat_time_attrs = ('StartTime',
                        'EndTime',
                        'ElapsedTime')
-    stat_attrs = (('Filename',) + stat_time_attrs + 
+    stat_attrs = (('Filename',) + stat_time_attrs +
                   stat_misc_attrs + stat_file_attrs)
 
     # Below, the second value in each pair is true iff the value
@@ -143,16 +143,16 @@ class StatsObj:
         """Return portion of statistics string dealing with time"""
         timelist = []
         if self.StartTime is not None:
-            timelist.append("StartTime %.2f (%s)\n" % 
+            timelist.append("StartTime %.2f (%s)\n" %
                             (self.StartTime, dup_time.timetopretty(self.StartTime)))
         if self.EndTime is not None:
-            timelist.append("EndTime %.2f (%s)\n" % 
+            timelist.append("EndTime %.2f (%s)\n" %
                             (self.EndTime, dup_time.timetopretty(self.EndTime)))
         if self.ElapsedTime or (self.StartTime is not None and
                                 self.EndTime is not None):
             if self.ElapsedTime is None:
                 self.ElapsedTime = self.EndTime - self.StartTime
-            timelist.append("ElapsedTime %.2f (%s)\n" % 
+            timelist.append("ElapsedTime %.2f (%s)\n" %
                             (self.ElapsedTime, dup_time.inttopretty(self.ElapsedTime)))
         return "".join(timelist)
 
@@ -177,7 +177,7 @@ class StatsObj:
         misc_string = ""
         tdsc = self.TotalDestinationSizeChange
         if tdsc is not None:
-            misc_string += ("TotalDestinationSizeChange %s (%s)\n" % 
+            misc_string += ("TotalDestinationSizeChange %s (%s)\n" %
                             (tdsc, self.get_byte_summary_string(tdsc)))
         if self.Errors is not None:
             misc_string += "Errors %d\n" % self.Errors
@@ -273,7 +273,7 @@ class StatsObj:
                 if statobj.get_stat(attr) is None:
                     self.set_stat(attr, None)
                 elif self.get_stat(attr) is not None:
-                    self.set_stat(attr, statobj.get_stat(attr) + 
+                    self.set_stat(attr, statobj.get_stat(attr) +
                                   self.get_stat(attr))
 
         # Don't compute average starting/stopping time

@@ -136,7 +136,7 @@ class FileNamingShort(UnitTestCase, FileNamingBase):
         super(FileNamingShort, self).setUp()
         self.set_global('short_filenames', 1)
 
-        
+
 class FileNamingPrefixes(UnitTestCase, FileNamingBase):
     """Test filename parsing and generation with prefixes"""
     def setUp(self):

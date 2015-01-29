@@ -510,6 +510,15 @@ Exclude directories if filename is present. This option needs to
 come before any other include or exclude options.
 
 .TP
+.BR "--exclude-older-than " time
+Exclude any files whose modification date is earlier than the specified
+.IR time .
+This can be used to produce a partial backup that contains only
+recently changed files. See the
+.B TIME FORMATS
+section for more information.
+
+.TP
 .BI --exclude-other-filesystems
 Exclude files on file systems (identified by device number) other than
 the file system the root of the source directory is on.

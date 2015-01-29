@@ -161,14 +161,14 @@ def log_delta_path(delta_path, new_path=None, stats=None):
     if delta_path.difftype == "snapshot":
         if new_path and stats:
             stats.add_new_file(new_path)
-        log.Info(_("A %s") % 
+        log.Info(_("A %s") %
                  (util.ufn(delta_path.get_relative_path())),
                  log.InfoCode.diff_file_new,
                  util.escape(delta_path.get_relative_path()))
     else:
         if new_path and stats:
             stats.add_changed_file(new_path)
-        log.Info(_("M %s") % 
+        log.Info(_("M %s") %
                  (util.ufn(delta_path.get_relative_path())),
                  log.InfoCode.diff_file_changed,
                  util.escape(delta_path.get_relative_path()))
@@ -198,7 +198,7 @@ def get_delta_iter(new_iter, sig_iter, sig_fileobj=None):
             # such a way as to fool us; LP: #929067)
             if sig_path and sig_path.exists() and sig_path.index != ():
                 # but signature says it did
-                log.Info(_("D %s") % 
+                log.Info(_("D %s") %
                          (util.ufn(sig_path.get_relative_path())),
                          log.InfoCode.diff_file_deleted,
                          util.escape(sig_path.get_relative_path()))

@@ -165,8 +165,8 @@ class RestartTest(FunctionalTestCase):
                              ".part" % (name, name, name))
         assert not os.system("rm testfiles/cache/%s/*.manifest" % name)
         assert not os.system("""echo 'Volume 2:
-    StartingPath   foo  
-    EndingPath     bar  
+    StartingPath   foo
+    EndingPath     bar
     Hash SHA1 sha1' >> testfiles/cache/%s/*.manifest.part""" % name)
 
     def test_split_after_small(self):

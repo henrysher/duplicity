@@ -101,7 +101,7 @@ class Manifest:
         else:
             return
 
-        log.FatalError(errmsg + "\n\n" + 
+        log.FatalError(errmsg + "\n\n" +
                        _("Aborting because you may have accidentally tried to "
                          "backup two different data sets to the same remote "
                          "location, or using the same archive directory.  If "
@@ -325,12 +325,12 @@ class VolumeInfo:
 
         slist = ["Volume %d:" % self.volume_number]
         whitespace = "    "
-        slist.append("%sStartingPath   %s %s" % 
+        slist.append("%sStartingPath   %s %s" %
                      (whitespace, index_to_string(self.start_index), (self.start_block or " ")))
-        slist.append("%sEndingPath     %s %s" % 
+        slist.append("%sEndingPath     %s %s" %
                      (whitespace, index_to_string(self.end_index), (self.end_block or " ")))
         for key in self.hashes:
-            slist.append("%sHash %s %s" % 
+            slist.append("%sHash %s %s" %
                          (whitespace, key, self.hashes[key]))
         return "\n".join(slist)
 
@@ -427,7 +427,7 @@ class VolumeInfo:
         indicies.
         """
         if recursive:
-            return (self.start_index[:len(index_prefix)] <= 
+            return (self.start_index[:len(index_prefix)] <=
                     index_prefix <= self.end_index)
         else:
             return self.start_index <= index_prefix <= self.end_index

@@ -1,6 +1,9 @@
 2015-01-29  Kenneth Loafman  <kenneth@loafman.com>
 
     * Ongoing pep8 corrections.
+    * Merged in lp:~angusgr/duplicity/exclude-older-than
+      - Add "--exclude-older-than" commandline option, that allows you to only
+        back up files with a modification date newer than a particular threshold.
 
 2015-01-22  Kenneth Loafman  <kenneth@loafman.com>
 
