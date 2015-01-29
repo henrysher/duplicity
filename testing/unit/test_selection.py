@@ -684,6 +684,8 @@ class ParseArgsTest(UnitTestCase):
 
     def test_include_globbing_filelist_asterisk(self):
         """Filelist glob test with * instead of 'testfiles'"""
+        # Thank you to Elifarley Cruz for this test case
+        # (https://bugs.launchpad.net/duplicity/+bug/884371).
         self.ParseTest([("--include-globbing-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '1'),
                         ('1', '1', '2'), ('1', '1', '3')],
