@@ -687,5 +687,45 @@ class TestAsterisks(IncludeExcludeFunctionalTest):
         self.backup("full", "testfiles/select/1", options=["--exclude-globbing-filelist=testfiles/filelist.txt"])
         self.restore_and_check()
 
+    def test_commandline_asterisks_single_excludes_only(self):
+        """test_commandline_include_exclude with single asterisks on exclude lines."""
+        self.backup("full", "testfiles/select/1",
+                    options=["--include", "testfiles/select/1/2/1",
+                             "--exclude", "testfiles/*/1/2",
+                             "--exclude", "*/select/1/1",
+                             "--exclude", "*/select/1/3"])
+        self.restore_and_check()
+
+    @unittest.expectedFailure
+    def test_commandline_asterisks_single_both(self):
+        """test_commandline_include_exclude with single asterisks on both exclude and include lines."""
+        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        self.backup("full", "testfiles/select/1",
+                    options=["--include", "*/select/1/2/1",
+                             "--exclude", "testfiles/*/1/2",
+                             "--exclude", "*/select/1/1",
+                             "--exclude", "*/select/1/3"])
+        self.restore_and_check()
+
+    def test_commandline_asterisks_double_exclude_only(self):
+        """test_commandline_include_exclude with double asterisks on exclude lines."""
+        self.backup("full", "testfiles/select/1",
+                    options=["--include", "testfiles/select/1/2/1",
+                             "--exclude", "**/1/2",
+                             "--exclude", "**/1/1",
+                             "--exclude", "**/1/3"])
+        self.restore_and_check()
+
+    @unittest.expectedFailure
+    def test_commandline_asterisks_double_both(self):
+        """test_commandline_include_exclude with double asterisks on both exclude and include lines."""
+        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        self.backup("full", "testfiles/select/1",
+                    options=["--include", "**/1/2/1",
+                             "--exclude", "**/1/2",
+                             "--exclude", "**/1/1",
+                             "--exclude", "**/1/3"])
+        self.restore_and_check()
+
 if __name__ == "__main__":
     unittest.main()
