@@ -31,83 +31,85 @@ class IncludeExcludeFunctionalTest(FunctionalTestCase):
     """
 
     # These tests assume the following files and logic, with:
-        # "is" meaning that the file is included specifically
-        # "ia" meaning that the file should be included automatically because its parent is included
-        # "ic" meaning that the folder is included because its contents are included
-        # "es" meaning that the file is excluded specifically
-        # "ea" meaning that the file should be excluded automatically because its parent is included
-        # select2 (es)
-        # --- 1.doc (ea)
-        # --- 1.py (is)
-        # --- 1 (is)
-        # ------ 1sub1 (ia)
-        # --------- 1sub1sub1 (ia)
-        # ------------ 1sub1sub1_file.txt (ia)
-        # --------- 1sub1sub2 (es)
-        # ------------ 1sub1sub2_file.txt (ea)
-        # --------- 1sub1sub3 (ia)
-        # ------------ 1sub1sub3_file.txt (es)
-        # ------ 1sub2 (ic)
-        # --------- 1sub2sub1 (is)
-        # --------- 1sub2sub2 (ea)
-        # --------- 1sub2sub3 (es)  # Not necessary as also ea, but to ensure there are no issues doing so
-        # ------ 1sub3 (ia)
-        # --------- 1sub3sub1 (es)
-        # --------- 1sub3sub2 (es)
-        # --------- 1sub3sub3 (ia)
-        # --- 2 (ic)
-        # ------ 2sub1 (is)
-        # --------- 2sub1sub1 (ia)
-        # ------------ 2sub1sub1_file.txt (ia)
-        # --------- 2sub1sub2 (es)
-        # --------- 2sub1sub3 (es)
-        # ------ 2sub2 (ea)
-        # --------- 2sub2sub1 (ea)
-        # --------- 2sub2sub2 (ea)
-        # --------- 2sub2sub3 (ea)
-        # ------ 2sub3 (ea)
-        # --------- 2sub3sub1 (ea)
-        # --------- 2sub3sub3 (ea)
-        # --------- 2sub3sub2 (ea)
-        # --- 3 (is)
-        # ------ 3sub1 (es)
-        # --------- 3sub1sub1 (ea)
-        # --------- 3sub1sub2 (ea)
-        # --------- 3sub1sub3 (ea)
-        # ------ 3sub2 (ia)
-        # --------- 3sub2sub1 (ia)
-        # --------- 3sub2sub2 (ia)
-        # --------- 3sub2sub3 (ia)
-        # ------ 3sub3 (is)  # Not necessary as also ia, but to ensure there are no issues doing so
-        # --------- 3sub3sub1 (ia)
-        # --------- 3sub3sub2 (es, ic)
-        # ------------ 3sub3sub2_file.txt (is)
-        # --------- 3sub3sub3 (ia)
-        # --- trailing_space  (ea)  # Note this is "trailing_space ". Excluded until trailing_space test, when (is)
-        # ------ trailing_space sub1 (ea)  # Excluded until trailing_space test, when (ia)
-        # ------ trailing_space sub2 (ea)  # Excluded until trailing_space test, when (es, ic)
-        # --------- trailing_space sub2_file.txt (ea)  # Excluded until trailing_space test, when (is)
+    # "is" meaning that the file is included specifically
+    # "ia" meaning that the file should be included automatically because its parent is included
+    # "ic" meaning that the folder is included because its contents are included
+    # "es" meaning that the file is excluded specifically
+    # "ea" meaning that the file should be excluded automatically because its parent is included
+    # select2 (es)
+    # --- 1.doc (ea)
+    # --- 1.py (is)
+    # --- 1 (is)
+    # ------ 1sub1 (ia)
+    # --------- 1sub1sub1 (ia)
+    # ------------ 1sub1sub1_file.txt (ia)
+    # --------- 1sub1sub2 (es)
+    # ------------ 1sub1sub2_file.txt (ea)
+    # --------- 1sub1sub3 (ia)
+    # ------------ 1sub1sub3_file.txt (es)
+    # ------ 1sub2 (ic)
+    # --------- 1sub2sub1 (is)
+    # --------- 1sub2sub2 (ea)
+    # --------- 1sub2sub3 (es)  # Not necessary as also ea, but to ensure there are no issues doing so
+    # ------ 1sub3 (ia)
+    # --------- 1sub3sub1 (es)
+    # --------- 1sub3sub2 (es)
+    # --------- 1sub3sub3 (ia)
+    # --- 2 (ic)
+    # ------ 2sub1 (is)
+    # --------- 2sub1sub1 (ia)
+    # ------------ 2sub1sub1_file.txt (ia)
+    # --------- 2sub1sub2 (es)
+    # --------- 2sub1sub3 (es)
+    # ------ 2sub2 (ea)
+    # --------- 2sub2sub1 (ea)
+    # --------- 2sub2sub2 (ea)
+    # --------- 2sub2sub3 (ea)
+    # ------ 2sub3 (ea)
+    # --------- 2sub3sub1 (ea)
+    # --------- 2sub3sub3 (ea)
+    # --------- 2sub3sub2 (ea)
+    # --- 3 (is)
+    # ------ 3sub1 (es)
+    # --------- 3sub1sub1 (ea)
+    # --------- 3sub1sub2 (ea)
+    # --------- 3sub1sub3 (ea)
+    # ------ 3sub2 (ia)
+    # --------- 3sub2sub1 (ia)
+    # --------- 3sub2sub2 (ia)
+    # --------- 3sub2sub3 (ia)
+    # ------ 3sub3 (is)  # Not necessary as also ia, but to ensure there are no issues doing so
+    # --------- 3sub3sub1 (ia)
+    # --------- 3sub3sub2 (es, ic)
+    # ------------ 3sub3sub2_file.txt (is)
+    # --------- 3sub3sub3 (ia)
+    # --- trailing_space  (ea)  # Note this is "trailing_space ". Excluded until trailing_space test, when (is)
+    # ------ trailing_space sub1 (ea)  # Excluded until trailing_space test, when (ia)
+    # ------ trailing_space sub2 (ea)  # Excluded until trailing_space test, when (es, ic)
+    # --------- trailing_space sub2_file.txt (ea)  # Excluded until trailing_space test, when (is)
 
-    complete_directory_tree = [['1', '2', '3', 'trailing_space ', '1.doc', '1.py'],
-                              ['1sub1', '1sub2', '1sub3'],
-                              ['1sub1sub1', '1sub1sub2', '1sub1sub3'],
-                              ['1sub1sub1_file.txt'],
-                              ['1sub1sub2_file.txt'],
-                              ['1sub1sub3_file.txt'],
-                              ['1sub2sub1', '1sub2sub2', '1sub2sub3'],
-                              ['1sub3sub1', '1sub3sub2', '1sub3sub3'],
-                              ['2sub1', '2sub2', '2sub3'],
-                              ['2sub1sub1', '2sub1sub2', '2sub1sub3'],
-                              ['2sub1sub1_file.txt'],
-                              ['2sub2sub1', '2sub2sub2', '2sub2sub3'],
-                              ['2sub3sub1', '2sub3sub2', '2sub3sub3'],
-                              ['3sub1', '3sub2', '3sub3'],
-                              ['3sub1sub1', '3sub1sub2', '3sub1sub3'],
-                              ['3sub2sub1', '3sub2sub2', '3sub2sub3'],
-                              ['3sub3sub1', '3sub3sub2', '3sub3sub3'],
-                              ['3sub3sub2_file.txt'],
-                              ['trailing_space sub1', 'trailing_space sub2'],
-                              ['trailing_space sub2_file.txt']]
+    complete_directory_tree = [
+        ['1', '2', '3', 'trailing_space ', '1.doc', '1.py'],
+        ['1sub1', '1sub2', '1sub3'],
+        ['1sub1sub1', '1sub1sub2', '1sub1sub3'],
+        ['1sub1sub1_file.txt'],
+        ['1sub1sub2_file.txt'],
+        ['1sub1sub3_file.txt'],
+        ['1sub2sub1', '1sub2sub2', '1sub2sub3'],
+        ['1sub3sub1', '1sub3sub2', '1sub3sub3'],
+        ['2sub1', '2sub2', '2sub3'],
+        ['2sub1sub1', '2sub1sub2', '2sub1sub3'],
+        ['2sub1sub1_file.txt'],
+        ['2sub2sub1', '2sub2sub2', '2sub2sub3'],
+        ['2sub3sub1', '2sub3sub2', '2sub3sub3'],
+        ['3sub1', '3sub2', '3sub3'],
+        ['3sub1sub1', '3sub1sub2', '3sub1sub3'],
+        ['3sub2sub1', '3sub2sub2', '3sub2sub3'],
+        ['3sub3sub1', '3sub3sub2', '3sub3sub3'],
+        ['3sub3sub2_file.txt'],
+        ['trailing_space sub1', 'trailing_space sub2'],
+        ['trailing_space sub2_file.txt']
+    ]
 
     expected_restored_tree = [['1', '2', '3', '1.py'],
                               ['1sub1', '1sub2', '1sub3'],

@@ -1,3 +1,7 @@
+2015-01-29  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Ongoing pep8 corrections.
+
 2015-01-22  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug # 1414418
@@ -5,7 +9,7 @@
       - Aligned commandline.py options and manpage contents.
     * Changed --s3_multipart_max_timeout to --s3-multipart-max-timeout to be
       consistent with commandline option naming conventions.
-    * Applied patch from Adam Reichold to fix bug # 1413792
+    * Applied patch from Adam Reichold to fix bug # 1413792.
 
 2015-01-22  Kenneth Loafman  <kenneth@loafman.com>
 
