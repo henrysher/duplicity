@@ -682,6 +682,215 @@ class ParseArgsTest(UnitTestCase):
                         '- testfiles/select/1\n'
                         '- **'])
 
+    def test_include_globbing_filelist_asterisk(self):
+        """Filelist glob test with * instead of 'testfiles'"""
+        # Thank you to Elifarley Cruz for this test case
+        # (https://bugs.launchpad.net/duplicity/+bug/884371).
+        self.ParseTest([("--include-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '1'),
+                        ('1', '1', '2'), ('1', '1', '3')],
+                       ["*/select/1/1\n"
+                        "- **"])
+
+    def test_include_globbing_filelist_asterisk_2(self):
+        """Identical to test_globbing_filelist, but with the exclude 'select' replaced with '*'"""
+        self.ParseTest([("--include-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '2'),
+                        ('1', '1', '3')],
+                       ["- testfiles/*/1/1/1\n"
+                        "testfiles/select/1/1\n"
+                        "- testfiles/select/1\n"
+                        "- **"])
+
+    @unittest.expectedFailure
+    def test_include_globbing_filelist_asterisk_3(self):
+        """Identical to test_globbing_filelist, but with the auto-include 'select' replaced with '*'"""
+        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        self.ParseTest([("--include-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '2'),
+                        ('1', '1', '3')],
+                       ["- testfiles/select/1/1/1\n"
+                        "testfiles/*/1/1\n"
+                        "- testfiles/select/1\n"
+                        "- **"])
+
+    @unittest.expectedFailure
+    def test_include_globbing_filelist_asterisk_4(self):
+        """Identical to test_globbing_filelist, but with a specific include 'select' replaced with '*'"""
+        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        self.ParseTest([("--include-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '2'),
+                        ('1', '1', '3')],
+                       ["- testfiles/select/1/1/1\n"
+                        "+ testfiles/*/1/1\n"
+                        "- testfiles/select/1\n"
+                        "- **"])
+
+    @unittest.expectedFailure
+    def test_include_globbing_filelist_asterisk_5(self):
+        """Identical to test_globbing_filelist, but with all 'select's replaced with '*'"""
+        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        self.ParseTest([("--include-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '2'),
+                        ('1', '1', '3')],
+                       ["- testfiles/*/1/1/1\n"
+                        "+ testfiles/*/1/1\n"
+                        "- testfiles/*/1\n"
+                        "- **"])
+
+    def test_include_globbing_filelist_asterisk_6(self):
+        """Identical to test_globbing_filelist, but with numerous excluded folders replaced with '*'"""
+        self.ParseTest([("--include-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '2'),
+                        ('1', '1', '3')],
+                       ["- */*/1/1/1\n"
+                        "+ testfiles/select/1/1\n"
+                        "- */*/1\n"
+                        "- **"])
+
+    @unittest.expectedFailure
+    def test_include_globbing_filelist_asterisk_7(self):
+        """Identical to test_globbing_filelist, but with numerous included/excluded folders replaced with '*'"""
+        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        self.ParseTest([("--include-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '2'),
+                        ('1', '1', '3')],
+                       ["- */*/1/1/1\n"
+                        "+ */*/1/1\n"
+                        "- */*/1\n"
+                        "- **"])
+
+
+    def test_include_globbing_filelist_double_asterisk_1(self):
+        """Identical to test_globbing_filelist, but with the exclude 'select' replaced with '**'"""
+        self.ParseTest([("--include-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '2'),
+                        ('1', '1', '3')],
+                       ["- testfiles/**/1/1/1\n"
+                        "testfiles/select/1/1\n"
+                        "- testfiles/select/1\n"
+                        "- **"])
+
+    @unittest.expectedFailure
+    def test_include_globbing_filelist_double_asterisk_2(self):
+        """Identical to test_globbing_filelist, but with the include 'select' replaced with '**'"""
+        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        self.ParseTest([("--include-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '2'),
+                        ('1', '1', '3')],
+                       ["- testfiles/select/1/1/1\n"
+                        "testfiles/**/1/1\n"
+                        "- testfiles/select/1\n"
+                        "- **"])
+
+    def test_include_globbing_filelist_double_asterisk_3(self):
+        """Identical to test_globbing_filelist, but with the exclude 'testfiles/select' replaced with '**'"""
+        self.ParseTest([("--include-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '2'),
+                        ('1', '1', '3')],
+                       ["- **/1/1/1\n"
+                        "testfiles/select/1/1\n"
+                        "- testfiles/select/1\n"
+                        "- **"])
+
+    @unittest.expectedFailure
+    def test_include_globbing_filelist_double_asterisk_4(self):
+        """Identical to test_globbing_filelist, but with the include 'testfiles/select' replaced with '**'"""
+        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        self.ParseTest([("--include-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '2'),
+                        ('1', '1', '3')],
+                       ["- testfiles/select/1/1/1\n"
+                        "**/1/1\n"
+                        "- testfiles/select/1\n"
+                        "- **"])
+
+    @unittest.expectedFailure
+    def test_include_globbing_filelist_double_asterisk_5(self):
+        """Identical to test_globbing_filelist, but with all 'testfiles/select's replaced with '**'"""
+        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        self.ParseTest([("--include-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '2'),
+                        ('1', '1', '3')],
+                       ["- **/1/1/1\n"
+                        "**/1/1\n"
+                        "- **/1\n"
+                        "- **"])
+
+    def test_exclude_globbing_filelist(self):
+        """Exclude version of test_globbing_filelist"""
+        self.ParseTest([("--exclude-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '2'),
+                        ('1', '1', '3')],
+                       ["testfiles/select/1/1/1\n"
+                        "+ testfiles/select/1/1\n"
+                        "testfiles/select/1\n"
+                        "- **"])
+
+    def test_exclude_globbing_filelist_asterisk_1(self):
+        """Exclude version of test_include_globbing_filelist_asterisk"""
+        self.ParseTest([("--exclude-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '1'),
+                        ('1', '1', '2'), ('1', '1', '3')],
+                       ["+ */select/1/1\n"
+                        "- **"])
+
+    def test_exclude_globbing_filelist_asterisk_2(self):
+        """Identical to test_exclude_globbing_filelist, but with the exclude 'select' replaced with '*'"""
+        self.ParseTest([("--exclude-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '2'),
+                        ('1', '1', '3')],
+                       ["testfiles/*/1/1/1\n"
+                        "+ testfiles/select/1/1\n"
+                        "testfiles/select/1\n"
+                        "- **"])
+
+    @unittest.expectedFailure
+    def test_exclude_globbing_filelist_asterisk_3(self):
+        """Identical to test_exclude_globbing_filelist, but with the include 'select' replaced with '*'"""
+        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        self.ParseTest([("--exclude-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '2'),
+                        ('1', '1', '3')],
+                       ["testfiles/select/1/1/1\n"
+                        "+ testfiles/*/1/1\n"
+                        "testfiles/select/1\n"
+                        "- **"])
+
+    def test_exclude_globbing_filelist_asterisk_4(self):
+        """Identical to test_exclude_globbing_filelist, but with numerous excluded folders replaced with '*'"""
+        self.ParseTest([("--exclude-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '2'),
+                        ('1', '1', '3')],
+                       ["*/select/1/1/1\n"
+                        "+ testfiles/select/1/1\n"
+                        "*/*/1\n"
+                        "- **"])
+
+    @unittest.expectedFailure
+    def test_exclude_globbing_filelist_asterisk_5(self):
+        """Identical to test_exclude_globbing_filelist, but with numerous included/excluded folders replaced with '*'"""
+        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        self.ParseTest([("--exclude-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '2'),
+                        ('1', '1', '3')],
+                       ["*/select/1/1/1\n"
+                        "+ */*/1/1\n"
+                        "*/*/1\n"
+                        "- **"])
+
+    @unittest.expectedFailure
+    def test_exclude_globbing_filelist_double_asterisk(self):
+        """Identical to test_exclude_globbing_filelist, but with all included/excluded folders replaced with '**'"""
+        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        self.ParseTest([("--exclude-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '2'),
+                        ('1', '1', '3')],
+                       ["**/1/1/1\n"
+                        "+ **/1/1\n"
+                        "**/1\n"
+                        "- **"])
+
     def testGlob(self):
         """Test globbing expression"""
         self.ParseTest([("--exclude", "**[3-5]"),
