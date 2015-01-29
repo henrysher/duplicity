@@ -316,6 +316,10 @@ def parse_cmdline_options(arglist):
     parser.add_option("--exclude-regexp", metavar=_("regular_expression"),
                       dest="", type="string", action="callback", callback=add_selection)
 
+    # Exclude any files with modification dates older than this from the backup
+    parser.add_option("--exclude-older-than", type="time", metavar=_("time"),
+                      dest="", action="callback", callback=add_selection)
+
     # Whether we should be particularly aggressive when cleaning up
     parser.add_option("--extra-clean", action="store_true")
 

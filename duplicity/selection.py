@@ -245,6 +245,8 @@ class Select:
                     self.add_selection_func(self.other_filesystems_get_sf(0))
                 elif opt == "--exclude-regexp":
                     self.add_selection_func(self.regexp_get_sf(arg, 0))
+                elif opt == "--exclude-older-than":
+                    self.add_selection_func(self.exclude_older_get_sf(arg))
                 elif opt == "--include":
                     self.add_selection_func(self.glob_get_sf(arg, 1))
                 elif opt == "--include-filelist":
@@ -643,6 +645,24 @@ probably isn't what you meant.""") %
             return include_sel_func
         else:
             return exclude_sel_func
+
+    def exclude_older_get_sf(self, date):
+        """Return selection function based on files older than modification date """
+
+        def sel_func(path):
+            if not path.isreg():
+                return None
+            try:
+                if os.path.getmtime(path.name) < date:
+                    return 0
+            except OSError, e:
+                pass # this is probably only on a race condition of file being deleted
+            return None
+
+        sel_func.exclude = True
+        sel_func.name = "Select older than %s" % (date,)
+        return sel_func
+
 
     def glob_get_prefix_res(self, glob_str):
         """Return list of regexps equivalent to prefixes of glob_str"""
