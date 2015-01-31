@@ -49,7 +49,7 @@ def LoggerToDupLevel(verb):
     return DupToLoggerLevel(verb)
 
 def LevelName(level):
-    if   level >= 9:
+    if level >= 9:
         return "DEBUG"
     elif level >= 5:
         return "INFO"

@@ -213,7 +213,7 @@ class Multivol_Filelike:
         """Add next chunk to buffer"""
         if self.at_end:
             return None
-        index, difftype, multivol = get_index_from_tarinfo(# @UnusedVariable
+        index, difftype, multivol = get_index_from_tarinfo(  # @UnusedVariable
             self.tarinfo_list[0])
         if not multivol or index != self.index:
             # we've moved on
@@ -435,7 +435,7 @@ class IndexedTuple:
             return None
 
     def __str__(self):
-        return  "(%s).%s" % (", ".join(map(str, self.data)), self.index)
+        return "(%s).%s" % (", ".join(map(str, self.data)), self.index)
 
 def normalize_ps(patch_sequence):
     """Given an sequence of ROPath deltas, remove blank and unnecessary

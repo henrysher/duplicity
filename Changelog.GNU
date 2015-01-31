@@ -5,7 +5,7 @@
         not work correctly when excludes (in a filelist or in a commandline option)
         contain both a single or double asterisk and a trailing slash.
     * Misc fixes for the following PEP8 issues:
-      - E231, E241
+      - E231, E241, E251, E261, E262, E271, E272
       - see http://pep8.readthedocs.org
     * Fixes for 2to3 issues
 
