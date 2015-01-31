@@ -1,9 +1,21 @@
+2015-01-31  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/bug_932482_trailing_slashes_and_wildcards_error
+      - Added functional and unit tests to show Bug #932482 - that selection does
+        not work correctly when excludes (in a filelist or in a commandline option)
+        contain both a single or double asterisk and a trailing slash.
+
 2015-01-29  Kenneth Loafman  <kenneth@loafman.com>
 
     * Ongoing pep8 corrections.
     * Merged in lp:~angusgr/duplicity/exclude-older-than
       - Add "--exclude-older-than" commandline option, that allows you to only
         back up files with a modification date newer than a particular threshold.
+    * Merged in lp:~aaron-whitehouse/duplicity/bug_884371_asterisks_in_includes
+      - Added tests to unit/test_selection.py and funtional/test_selection.py
+        to show the behaviour reported in Bug #884371, i.e. that selection is
+        incorrect when there is a * or ** on an include line of a filelist or
+        commandline --include.
 
 2015-01-22  Kenneth Loafman  <kenneth@loafman.com>
 
