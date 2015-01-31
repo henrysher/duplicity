@@ -817,6 +817,40 @@ class ParseArgsTest(UnitTestCase):
                         "- **/1\n"
                         "- **"])
 
+    def test_include_globbing_filelist_trailing_slashes(self):
+        """Filelist glob test similar to globbing filelist, but with trailing slashes"""
+        self.ParseTest([("--include-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '2'),
+                        ('1', '1', '3')],
+                       ["- testfiles/select/1/1/1/\n"
+                        "testfiles/select/1/1/\n"
+                        "- testfiles/select/1/\n"
+                        "- **"])
+
+    @unittest.expectedFailure
+    def test_include_globbing_filelist_trailing_slashes_and_single_asterisks(self):
+        """Filelist glob test similar to globbing filelist, but with trailing slashes and single asterisks"""
+        # Todo: Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
+        self.ParseTest([("--include-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '2'),
+                        ('1', '1', '3')],
+                       ["- */select/1/1/1/\n"
+                        "testfiles/select/1/1/\n"
+                        "- testfiles/*/1/\n"
+                        "- **"])
+
+    @unittest.expectedFailure
+    def test_include_globbing_filelist_trailing_slashes_and_double_asterisks(self):
+        """Filelist glob test similar to globbing filelist, but with trailing slashes and double asterisks"""
+        # Todo: Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
+        self.ParseTest([("--include-globbing-filelist", "file")],
+                       [(), ('1',), ('1', '1'), ('1', '1', '2'),
+                        ('1', '1', '3')],
+                       ["- **/1/1/1/\n"
+                        "testfiles/select/1/1/\n"
+                        "- **/1/\n"
+                        "- **"])
+
     def test_exclude_globbing_filelist(self):
         """Exclude version of test_globbing_filelist"""
         self.ParseTest([("--exclude-globbing-filelist", "file")],

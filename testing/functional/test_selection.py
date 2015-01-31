@@ -727,5 +727,76 @@ class TestAsterisks(IncludeExcludeFunctionalTest):
                              "--exclude", "**/1/3"])
         self.restore_and_check()
 
+class TestTrailingSlash(IncludeExcludeFunctionalTest):
+    """ Test to check that a trailing slash works as expected
+     Exhibits the issue reported in Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)."""
+
+    def restore_and_check(self):
+        """Restores the backup and compares to what is expected."""
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, [['2'], ['1']])
+
+    def test_exclude_globbing_filelist_trailing_slashes(self):
+        """test_exclude_globbing_filelist_asterisks_none with trailing slashes."""
+        with open("testfiles/filelist.txt", 'w') as f:
+            f.write("+ testfiles/select/1/2/1/\n"
+                    "- testfiles/select/1/2/\n"
+                    "- testfiles/select/1/1/\n"
+                    "- testfiles/select/1/3/")
+        self.backup("full", "testfiles/select/1", options=["--exclude-globbing-filelist=testfiles/filelist.txt"])
+        self.restore_and_check()
+
+    @unittest.expectedFailure
+    def test_exclude_globbing_filelist_trailing_slashes_single_wildcards_excludes(self):
+        """test_exclude_globbing_filelist_trailing_slashes with single wildcards in excludes."""
+        # Todo: Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
+        with open("testfiles/filelist.txt", 'w') as f:
+            f.write("+ testfiles/select/1/2/1/\n"
+                    "- */select/1/2/\n"
+                    "- testfiles/*/1/1/\n"
+                    "- */*/1/3/")
+        self.backup("full", "testfiles/select/1", options=["--exclude-globbing-filelist=testfiles/filelist.txt"])
+        self.restore_and_check()
+
+    @unittest.expectedFailure
+    def test_exclude_globbing_filelist_trailing_slashes_double_wildcards_excludes(self):
+        """test_exclude_globbing_filelist_trailing_slashes with double wildcards in excludes."""
+        # Todo: Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
+        with open("testfiles/filelist.txt", 'w') as f:
+            f.write("+ testfiles/select/1/2/1/\n"
+                    "- **/1/2/\n"
+                    "- **/1/1/\n"
+                    "- **/1/3/")
+        self.backup("full", "testfiles/select/1", options=["--exclude-globbing-filelist=testfiles/filelist.txt"])
+        self.restore_and_check()
+
+    @unittest.expectedFailure
+    def test_exclude_globbing_filelist_trailing_slashes_double_wildcards_excludes(self):
+        """test_exclude_globbing_filelist_trailing_slashes with double wildcards in excludes."""
+        # Todo: Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482) and likely
+        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        with open("testfiles/filelist.txt", 'w') as f:
+            f.write("+ **/1/2/1/\n"
+                    "- **/1/2/\n"
+                    "- **/1/1/\n"
+                    "- **/1/3/")
+        self.backup("full", "testfiles/select/1", options=["--exclude-globbing-filelist=testfiles/filelist.txt"])
+        self.restore_and_check()
+
+    @unittest.expectedFailure
+    def test_exclude_globbing_filelist_trailing_slashes_wildcards(self):
+        """test_commandline_asterisks_single_excludes_only with trailing slashes."""
+         # Todo: Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
+        self.backup("full", "testfiles/select/1",
+                    options=["--include", "testfiles/select/1/2/1/",
+                             "--exclude", "testfiles/*/1/2/",
+                             "--exclude", "*/select/1/1/",
+                             "--exclude", "*/select/1/3/"])
+        self.restore_and_check()
+
+
+
 if __name__ == "__main__":
     unittest.main()
