@@ -49,11 +49,16 @@ def LoggerToDupLevel(verb):
     return DupToLoggerLevel(verb)
 
 def LevelName(level):
-    if   level >= 9: return "DEBUG"
-    elif level >= 5: return "INFO"
-    elif level >= 3: return "NOTICE"
-    elif level >= 1: return "WARNING"
-    else:            return "ERROR"
+    if   level >= 9:
+        return "DEBUG"
+    elif level >= 5:
+        return "INFO"
+    elif level >= 3:
+        return "NOTICE"
+    elif level >= 1:
+        return "WARNING"
+    else:
+        return "ERROR"
 
 def Log(s, verb_level, code=1, extra=None, force_print=False):
     """Write s to stderr if verbosity level low enough"""

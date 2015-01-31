@@ -217,7 +217,8 @@ class ImapBackend(duplicity.backend.Backend):
             raise Exception(list[0])
 
         for msg in list:
-            if (len(msg) == 1):continue
+            if (len(msg) == 1):
+                continue
             io = StringIO.StringIO(msg[1])
             m = rfc822.Message(io)
             subj = m.getheader("subject")

@@ -83,7 +83,7 @@ class MegaBackend(duplicity.backend.Backend):
 
     def _list(self):
         entries = self.client.get_files_in_node(self.folder)
-        return [self.client.get_name_from_file({entry:entries[entry]}) for entry in entries]
+        return [self.client.get_name_from_file({entry: entries[entry]}) for entry in entries]
 
     def _delete(self, filename):
         files = self.client.get_files()
@@ -98,7 +98,7 @@ class MegaBackend(duplicity.backend.Backend):
     def __get_node_name(self, handle):
         """get node name from public handle"""
         files = self.client.get_files()
-        return self.client.get_name_from_file({handle:files[handle]})
+        return self.client.get_name_from_file({handle: files[handle]})
 
     def __authorize(self, email, password):
         self.client.login(email, password)
@@ -118,7 +118,7 @@ class MegaBackend(duplicity.backend.Backend):
             except AssertionError:
                 continue
 
-            result.update({k:v})
+            result.update({k: v})
 
         return result
 

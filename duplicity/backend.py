@@ -629,7 +629,7 @@ class BackendWrapper(object):
         except Exception as e:
             code = _get_code_from_exception(self.backend, 'query', e)
             if code == log.ErrorCode.backend_not_found:
-                return {'size':-1}
+                return {'size': -1}
             else:
                 raise e
 

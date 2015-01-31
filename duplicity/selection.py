@@ -655,7 +655,7 @@ probably isn't what you meant.""") %
             try:
                 if os.path.getmtime(path.name) < date:
                     return 0
-            except OSError, e:
+            except OSError as e:
                 pass  # this is probably only on a race condition of file being deleted
             return None
 

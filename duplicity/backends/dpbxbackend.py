@@ -239,7 +239,7 @@ class DPBXBackend(duplicity.backend.Backend):
         log.Debug('dpbx._mkdir(%s): %s' % (path, resp))
 
 def etacsufbo(s):
-    return ''.join(reduce(lambda x, y:(x and len(x[-1]) == 1) and
+    return ''.join(reduce(lambda x, y: (x and len(x[-1]) == 1) and
                           (x.append(y + x.pop(-1)) and x or x) or (x + [y]), s, []))
 
 duplicity.backend.register_backend("dpbx", DPBXBackend)

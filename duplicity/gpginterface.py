@@ -244,20 +244,20 @@ __revision__ = "$Id: GnuPGInterface.py,v 1.6 2009/06/06 17:35:19 loafman Exp $"
 _stds = ['stdin', 'stdout', 'stderr']
 
 # the permissions each type of fh needs to be opened with
-_fd_modes = {'stdin':      'w',
-             'stdout':     'r',
-             'stderr':     'r',
+_fd_modes = {'stdin': 'w',
+             'stdout': 'r',
+             'stderr': 'r',
              'passphrase': 'w',
-             'command':    'w',
-             'logger':     'r',
-             'status':     'r'
+             'command': 'w',
+             'logger': 'r',
+             'status': 'r'
              }
 
 # correlation between handle names and the arguments we'll pass
 _fd_options = {'passphrase': '--passphrase-fd',
-               'logger':     '--logger-fd',
-               'status':     '--status-fd',
-               'command':    '--command-fd'
+               'logger': '--logger-fd',
+               'status': '--status-fd',
+               'command': '--command-fd'
                }
 
 class GnuPG:

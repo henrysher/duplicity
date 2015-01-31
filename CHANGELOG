@@ -31,7 +31,7 @@ New in v0.7.02 (2015/02/??)
   - E111, E121, E122, E124, E125, E126
   - see http://pep8.readthedocs.org
 * Misc fixes for the following PEP8 issues:
-  - E127, E128, 201, 202, 203
+  - E127, E128, E201, E202, E203
   - see http://pep8.readthedocs.org
 * Fixed bug # 1414418
   - Aligned commandline.py options and help display contents.
@@ -52,6 +52,10 @@ New in v0.7.02 (2015/02/??)
   - Added functional and unit tests to show Bug #932482 - that selection does
     not work correctly when excludes (in a filelist or in a commandline option)
     contain both a single or double asterisk and a trailing slash.
+* Misc fixes for the following PEP8 issues:
+  - E231, E241
+  - see http://pep8.readthedocs.org
+* Fixes for 2to3 issues
 
 
 New in v0.7.01 (2015/01/11)

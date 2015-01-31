@@ -152,7 +152,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         rationale is that it is easiest to deal wrt overwriting multiple
         values from ssh_config file. (ede 03/2012)
         """
-        self.config = {'hostname':parsed_url.hostname}
+        self.config = {'hostname': parsed_url.hostname}
         # get system host config entries
         self.config.update(self.gethostconfig('/etc/ssh/ssh_config', parsed_url.hostname))
         # update with user's config file
@@ -160,18 +160,18 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         # update with url values
         # username from url
         if parsed_url.username:
-            self.config.update({'user':parsed_url.username})
+            self.config.update({'user': parsed_url.username})
         # username from input
         if 'user' not in self.config:
-            self.config.update({'user':getpass.getuser()})
+            self.config.update({'user': getpass.getuser()})
         # port from url
         if parsed_url.port:
-            self.config.update({'port':parsed_url.port})
+            self.config.update({'port': parsed_url.port})
         # ensure there is deafult 22 or an int value
         if 'port' in self.config:
-            self.config.update({'port':int(self.config['port'])})
+            self.config.update({'port': int(self.config['port'])})
         else:
-            self.config.update({'port':22})
+            self.config.update({'port': 22})
         # parse ssh options for alternative ssh private key, identity file
         m = re.search("^(?:.+\s+)?(?:-oIdentityFile=|-i\s+)(([\"'])([^\\2]+)\\2|[\S]+).*", globals.ssh_options)
         if (m != None):

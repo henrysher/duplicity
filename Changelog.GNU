@@ -4,6 +4,10 @@
       - Added functional and unit tests to show Bug #932482 - that selection does
         not work correctly when excludes (in a filelist or in a commandline option)
         contain both a single or double asterisk and a trailing slash.
+    * Misc fixes for the following PEP8 issues:
+      - E231, E241
+      - see http://pep8.readthedocs.org
+    * Fixes for 2to3 issues
 
 2015-01-29  Kenneth Loafman  <kenneth@loafman.com>
 
@@ -29,7 +33,7 @@
 2015-01-22  Kenneth Loafman  <kenneth@loafman.com>
 
     * Misc fixes for the following PEP8 issues:
-      - E127, E128, 201, 202, 203
+      - E127, E128, E201, E202, E203
       - see http://pep8.readthedocs.org
 
 2015-01-18  Kenneth Loafman  <kenneth@loafman.com>
