@@ -27,6 +27,7 @@ import duplicity.backend
 from duplicity import log
 from duplicity import util
 
+
 def ensure_dbus():
     # GIO requires a dbus session bus which can start the gvfs daemons
     # when required.  So we make sure that such a bus exists and that our
@@ -40,6 +41,7 @@ def ensure_dbus():
                 if parts[0] == 'DBUS_SESSION_BUS_PID':  # cleanup at end
                     atexit.register(os.kill, int(parts[1]), signal.SIGTERM)
                 os.environ[parts[0]] = parts[1]
+
 
 class GIOBackend(duplicity.backend.Backend):
     """Use this backend when saving to a GIO URL.

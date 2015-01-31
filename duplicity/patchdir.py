@@ -38,6 +38,7 @@ from duplicity.lazy import *  # @UnusedWildImport
 
 """Functions for patching of directories"""
 
+
 class PatchDirException(Exception):
     pass
 
@@ -48,10 +49,12 @@ def Patch(base_path, difftar_fileobj):
     patch_diff_tarfile(base_path, diff_tarfile)
     assert not difftar_fileobj.close()
 
+
 def Patch_from_iter(base_path, fileobj_iter, restrict_index=()):
     """Patch given base_path and iterator of delta file objects"""
     diff_tarfile = TarFile_FromFileobjs(fileobj_iter)
     patch_diff_tarfile(base_path, diff_tarfile, restrict_index)
+
 
 def patch_diff_tarfile(base_path, diff_tarfile, restrict_index=()):
     """Patch given Path object using delta tarfile (as in tarfile.TarFile)
@@ -85,9 +88,11 @@ def patch_diff_tarfile(base_path, diff_tarfile, restrict_index=()):
     ITR.Finish()
     base_path.setdata()
 
+
 def empty_iter():
     if 0:
         yield 1  # this never happens, but fools into generator treatment
+
 
 def filter_path_iter(path_iter, index):
     """Rewrite path elements of path_iter so they start with index
@@ -102,6 +107,7 @@ def filter_path_iter(path_iter, index):
         if path.index[:l] == index:
             path.index = path.index[l:]
             yield path
+
 
 def difftar2path_iter(diff_tarfile):
     """Turn file-like difftarobj into iterator of ROPaths"""
@@ -138,6 +144,7 @@ def difftar2path_iter(diff_tarfile):
                 ropath.setfileobj(diff_tarfile.extractfile(tarinfo_list[0]))
         yield ropath
         tarinfo_list[0] = tar_iter.next()
+
 
 def get_index_from_tarinfo(tarinfo):
     """Return (index, difftype, multivol) pair from tarinfo object"""
@@ -393,6 +400,7 @@ def collate_iters(iter_list):
             yield tuple(yieldval)
     return yield_tuples(iter_num, overflow, elems)
 
+
 class IndexedTuple:
     """Like a tuple, but has .index (used previously by collate_iters)"""
     def __init__(self, index, sequence):
@@ -408,12 +416,16 @@ class IndexedTuple:
 
     def __lt__(self, other):
         return self.__cmp__(other) == -1
+
     def __le__(self, other):
         return self.__cmp__(other) != 1
+
     def __ne__(self, other):
         return not self.__eq__(other)
+
     def __gt__(self, other):
         return self.__cmp__(other) == 1
+
     def __ge__(self, other):
         return self.__cmp__(other) != -1
 
@@ -429,13 +441,14 @@ class IndexedTuple:
     def __eq__(self, other):
         if isinstance(other, IndexedTuple):
             return self.index == other.index and self.data == other.data
-        elif type(other) is types.TupleType:
+        elif isinstance(other, types.TupleType):
             return self.data == other
         else:
             return None
 
     def __str__(self):
         return "(%s).%s" % (", ".join(map(str, self.data)), self.index)
+
 
 def normalize_ps(patch_sequence):
     """Given an sequence of ROPath deltas, remove blank and unnecessary
@@ -457,6 +470,7 @@ def normalize_ps(patch_sequence):
                 break
         i -= 1
     return result_list
+
 
 def patch_seq2ropath(patch_seq):
     """Apply the patches in patch_seq, return single ropath"""
@@ -489,6 +503,7 @@ def patch_seq2ropath(patch_seq):
     result.setfileobj(current_file)
     return result
 
+
 def integrate_patch_iters(iter_list):
     """Combine a list of iterators of ropath patches
 
@@ -512,6 +527,7 @@ def integrate_patch_iters(iter_list):
                      log.WarningCode.cannot_process,
                      util.escape(filename))
 
+
 def tarfiles2rop_iter(tarfile_list, restrict_index=()):
     """Integrate tarfiles of diffs into single ROPath iter
 
@@ -524,6 +540,7 @@ def tarfiles2rop_iter(tarfile_list, restrict_index=()):
         # Apply filter before integration
         diff_iters = [filter_path_iter(x, restrict_index) for x in diff_iters]
     return integrate_patch_iters(diff_iters)
+
 
 def Write_ROPaths(base_path, rop_iter):
     """Write out ropaths in rop_iter starting at base_path
@@ -539,6 +556,7 @@ def Write_ROPaths(base_path, rop_iter):
     ITR.Finish()
     base_path.setdata()
     return return_val
+
 
 class ROPath_IterWriter(ITRBranch):
     """Used in Write_ROPaths above

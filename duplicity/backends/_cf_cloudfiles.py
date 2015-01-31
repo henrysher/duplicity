@@ -25,6 +25,7 @@ from duplicity import log
 from duplicity import util
 from duplicity.errors import BackendException
 
+
 class CloudFilesBackend(duplicity.backend.Backend):
     """
     Backend for Rackspace's CloudFiles

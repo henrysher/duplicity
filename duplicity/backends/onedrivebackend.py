@@ -41,6 +41,8 @@ from duplicity import log
 # http://msdn.microsoft.com/en-us/library/dn659752.aspx
 # http://msdn.microsoft.com/en-us/library/dn631844.aspx
 # https://gist.github.com/rgregg/37ba8929768a62131e85
+
+
 class OneDriveBackend(duplicity.backend.Backend):
     """Uses Microsoft OneDrive (formerly SkyDrive) for backups."""
 

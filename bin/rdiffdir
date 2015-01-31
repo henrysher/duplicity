@@ -45,9 +45,11 @@ sig_fileobj = None
 select_opts = []  # Add selection argument tuples to this
 select_files = []  # Will hold file objects when filelist given
 
+
 def parse_cmdline_options(arglist):
     """Parse argument list"""
     global gzip_compress, select_opts, select_files, sig_fileobj
+
     def sel_fl(filename):
         """Helper function for including/excluding filelists below"""
         try:
@@ -103,11 +105,13 @@ def parse_cmdline_options(arglist):
 
     return args
 
+
 def command_line_error(message):
     """Indicate a command line error and exit"""
     sys.stderr.write("Error: %s\n" % (message,))
     sys.stderr.write("See the rdiffdir manual page for instructions\n")
     sys.exit(1)
+
 
 def check_does_not_exist(filename):
     """Exit with error message if filename already exists"""
@@ -118,6 +122,7 @@ def check_does_not_exist(filename):
     else:
         log.FatalError(_("File %s already exists, will not "
                          "overwrite.") % util.ufn(filename))
+
 
 def get_action(args):
     """Figure out the main action from the arguments"""
@@ -141,12 +146,14 @@ def get_action(args):
         require_args(2)
     return command, args[1:]
 
+
 def get_selection(filename):
     """Return selection iter starting at path with arguments applied"""
     global select_opts, select_files
     sel = selection.Select(path.Path(filename))
     sel.ParseArgs(select_opts, select_files)
     return sel.set_iter()
+
 
 def get_fileobj(filename, mode):
     """Get file object or stdin/stdout from filename"""
@@ -169,15 +176,18 @@ def get_fileobj(filename, mode):
     else:
         return fp
 
+
 def write_sig(dirname, outfp):
     """Write signature of dirname into file object outfp"""
     diffdir.write_block_iter(diffdir.DirSig(get_selection(dirname)), outfp)
+
 
 def write_delta(dirname, sig_infp, outfp):
     """Write delta to fileobj outfp, reading from dirname and sig_infp"""
     delta_iter = diffdir.DirDelta(get_selection(dirname), sig_infp)
     diffdir.write_block_iter(delta_iter, outfp)
     assert not outfp.close()
+
 
 def write_delta_and_sig(dirname, sig_infp, outfp, sig_outfp):
     """Write delta and also signature of dirname"""
@@ -186,13 +196,16 @@ def write_delta_and_sig(dirname, sig_infp, outfp, sig_outfp):
     diffdir.write_block_iter(delta_iter, outfp)
     assert not sig_outfp.close()
 
+
 def patch(dirname, deltafp):
     """Patch dirname, reading delta tar from deltafp"""
     patchdir.Patch(path.Path(dirname), deltafp)
 
+
 def write_tar(dirname, outfp):
     """Store dirname into a tarfile, write to outfp"""
     diffdir.write_block_iter(diffdir.DirFull(get_selection(dirname)), outfp)
+
 
 def write_tar_and_sig(dirname, outfp, sig_outfp):
     """Write tar of dirname to outfp, signature of same to sig_outfp"""

@@ -37,8 +37,10 @@ from duplicity import manifest
 from duplicity import util
 from duplicity.gpg import GPGError
 
+
 class CollectionsError(Exception):
     pass
+
 
 class BackupSet:
     """
@@ -740,7 +742,7 @@ class CollectionsStatus:
                     continue
 
                 # Found a matching pair:
-                if self.matched_chain_pair == None:
+                if self.matched_chain_pair is None:
                     self.matched_chain_pair = (sig_chains[i], latest_backup_chain)
 
                 break
@@ -802,6 +804,7 @@ class CollectionsStatus:
                   % [util.ufn(f) for f in filename_list])
         # First put filenames in set form
         sets = []
+
         def add_to_sets(filename):
             """
             Try adding filename to existing sets, or make new one
@@ -817,11 +820,13 @@ class CollectionsStatus:
                     sets.append(new_set)
                 else:
                     log.Debug(_("Ignoring file (rejected by backup set) '%s'") % util.ufn(filename))
+
         for f in filename_list:
             add_to_sets(f)
         sets, incomplete_sets = self.get_sorted_sets(sets)
 
         chains, orphaned_sets = [], []
+
         def add_to_chains(set):
             """
             Try adding set to existing chains, or make new one

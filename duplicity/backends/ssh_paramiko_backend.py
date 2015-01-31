@@ -39,6 +39,7 @@ from duplicity.errors import BackendException
 
 read_blocksize = 65635  # for doing scp retrievals, where we need to read ourselves
 
+
 class SSHParamikoBackend(duplicity.backend.Backend):
     """This backend accesses files using the sftp protocol, or scp when the --use-scp option is given.
     It does not need any local client programs, but an ssh server and the sftp program must be installed on the remote
@@ -174,7 +175,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
             self.config.update({'port': 22})
         # parse ssh options for alternative ssh private key, identity file
         m = re.search("^(?:.+\s+)?(?:-oIdentityFile=|-i\s+)(([\"'])([^\\2]+)\\2|[\S]+).*", globals.ssh_options)
-        if (m != None):
+        if (m is not None):
             keyfilename = m.group(3) if m.group(3) else m.group(1)
             self.config['identityfile'] = keyfilename
         # ensure ~ is expanded and identity exists in dictionary
@@ -298,7 +299,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
             chan.send('\0')  # overall ready indicator
             msg = chan.recv(-1)
             m = re.match(r"C([0-7]{4})\s+(\d+)\s+(\S.*)$", msg)
-            if (m == None or m.group(3) != remote_filename):
+            if (m is None or m.group(3) is not remote_filename):
                 raise BackendException("scp get %s failed: incorrect response '%s'" % (remote_filename, msg))
             chan.recv(1)  # dispose of the newline trailing the C message
 

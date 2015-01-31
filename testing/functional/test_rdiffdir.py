@@ -57,7 +57,8 @@ class RdiffdirTest(FunctionalTestCase):
             new_path = path.Path(dirname)
 
             # Make delta
-            if delta_path.exists(): delta_path.delete()
+            if delta_path.exists():
+                delta_path.delete()
             assert not delta_path.exists()
             self.run_rdiffdir("delta %s %s %s" %
                               (sig_path.name, new_path.name, delta_path.name))

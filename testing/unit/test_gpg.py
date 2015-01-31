@@ -156,7 +156,8 @@ class GPGTest(UnitTestCase):
 
 
 class GPGWriteHelper2:
-    def __init__(self, data): self.data = data
+    def __init__(self, data):
+        self.data = data
 
 
 class GPGWriteFile_Helper:
@@ -176,7 +177,8 @@ class GPGWriteFile_Helper:
         return "a" * s1 + self.from_random_fp.read(s2)
 
     def next(self):
-        if self.at_end: raise StopIteration
+        if self.at_end:
+            raise StopIteration
         block_data = self.get_buffer(self.get_read_size())
         return GPGWriteHelper2(block_data)
 

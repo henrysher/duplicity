@@ -35,6 +35,7 @@ from duplicity import log
 from duplicity import util
 from duplicity.errors import BackendException, FatalBackendException
 
+
 class CustomMethodRequest(urllib2.Request):
     """
     This request subclass allows explicit specification of
@@ -47,6 +48,7 @@ class CustomMethodRequest(urllib2.Request):
 
     def get_method(self):
         return self.method
+
 
 class VerifiedHTTPSConnection(httplib.HTTPSConnection):
         def __init__(self, *args, **kwargs):
@@ -159,7 +161,8 @@ class WebDAVBackend(duplicity.backend.Backend):
         # "[Errno 32] Broken pipe" or SSl errors that render the connection unusable
         """
         if not forced and self.conn \
-            and self.conn.host == self.parsed_url.hostname: return
+                and self.conn.host == self.parsed_url.hostname:
+            return
 
         log.Info("WebDAV create connection on '%s'" % (self.parsed_url.hostname))
         self._close()
@@ -221,8 +224,6 @@ class WebDAVBackend(duplicity.backend.Backend):
             log.Info("WebDAV response2 status %s with reason '%s'." % (response.status, response.reason))
 
         return response
-
-
 
     def get_authorization(self, response, path):
         """
@@ -300,7 +301,8 @@ class WebDAVBackend(duplicity.backend.Backend):
         except Exception as e:
             raise e
         finally:
-            if response: response.close()
+            if response:
+                response.close()
 
     def makedir(self):
         """Make (nested) directories on the server."""
@@ -383,7 +385,8 @@ class WebDAVBackend(duplicity.backend.Backend):
         except Exception as e:
             raise e
         finally:
-            if response: response.close()
+            if response:
+                response.close()
 
     def _put(self, source_path, remote_filename):
         url = self.directory + remote_filename
@@ -403,7 +406,8 @@ class WebDAVBackend(duplicity.backend.Backend):
         except Exception as e:
             raise e
         finally:
-            if response: response.close()
+            if response:
+                response.close()
 
     def _delete(self, filename):
         url = self.directory + filename
@@ -421,11 +425,11 @@ class WebDAVBackend(duplicity.backend.Backend):
         except Exception as e:
             raise e
         finally:
-            if response: response.close()
+            if response:
+                response.close()
 
 duplicity.backend.register_backend("http", WebDAVBackend)
 duplicity.backend.register_backend("https", WebDAVBackend)
 duplicity.backend.register_backend("webdav", WebDAVBackend)
 duplicity.backend.register_backend("webdavs", WebDAVBackend)
 duplicity.backend.uses_netloc.extend(['http', 'https', 'webdav', 'webdavs'])
-

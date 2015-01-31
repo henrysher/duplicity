@@ -58,6 +58,7 @@ class PathTest(UnitTestCase):
     def test_unquote(self):
         """Test path unquoting"""
         p = Path("foo")  # just to provide unquote function
+
         def t(s):
             """Run test on string s"""
             quoted_version = p.quote(s)

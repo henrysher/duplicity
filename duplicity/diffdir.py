@@ -41,6 +41,7 @@ from duplicity import progress
 stats = None
 tracker = None
 
+
 class DiffDirException(Exception):
     pass
 
@@ -80,7 +81,7 @@ def DirDelta(path_iter, dirsig_fileobj_list):
     """
     global stats
     stats = statistics.StatsDeltaProcess()
-    if type(dirsig_fileobj_list) is types.ListType:
+    if isinstance(dirsig_fileobj_list, types.ListType):
         sig_iter = combine_path_iters([sigtar2path_iter(x) for x
                                        in dirsig_fileobj_list])
     else:
@@ -361,7 +362,7 @@ def DirDelta_WriteSig(path_iter, sig_infp_list, newsig_outfp):
     """
     global stats
     stats = statistics.StatsDeltaProcess()
-    if type(sig_infp_list) is types.ListType:
+    if isinstance(sig_infp_list, types.ListType):
         sig_path_iter = get_combined_path_iter(sig_infp_list)
     else:
         sig_path_iter = sigtar2path_iter(sig_infp_list)
@@ -406,6 +407,7 @@ class FileWithSignature:
     File-like object which also computes signature as it is read
     """
     blocksize = 32 * 1024
+
     def __init__(self, infile, callback, filelen, *extra_args):
         """
         FileTee initializer
@@ -713,7 +715,7 @@ def write_block_iter(block_iter, out_obj):
     """
     if isinstance(out_obj, Path):
         fp = open(out_obj.name, "wb")
-    elif type(out_obj) is types.StringType:
+    elif isinstance(out_obj, types.StringType):
         fp = open(out_obj, "wb")
     else:
         fp = out_obj

@@ -27,7 +27,6 @@ from duplicity import path
 from . import UnitTestCase
 
 
-
 class VolumeInfoTest(UnitTestCase):
     """Test VolumeInfo"""
     def test_basic(self):
@@ -36,7 +35,7 @@ class VolumeInfoTest(UnitTestCase):
         vi.set_info(3, ("hello", "there"), None, (), None)
         vi.set_hash("MD5", "aoseutaohe")
         s = vi.to_string()
-        assert type(s) is types.StringType
+        assert isinstance(s, types.StringType)
         # print "---------\n%s\n---------" % s
         vi2 = manifest.VolumeInfo()
         vi2.from_string(s)
@@ -51,7 +50,7 @@ class VolumeInfoTest(UnitTestCase):
                     ("\n",),
                     None)
         s = vi.to_string()
-        assert type(s) is types.StringType
+        assert isinstance(s, types.StringType)
         # print "---------\n%s\n---------" % s
         vi2 = manifest.VolumeInfo()
         vi2.from_string(s)
@@ -85,7 +84,8 @@ class ManifestTest(UnitTestCase):
         vi3 = manifest.VolumeInfo()
         vi3.set_info(34, (), None, (), None)
         m = manifest.Manifest()
-        for vi in [vi1, vi2, vi3]: m.add_volume_info(vi)
+        for vi in [vi1, vi2, vi3]:
+            m.add_volume_info(vi)
 
         self.set_global('local_path', path.Path("Foobar"))
         m.set_dirinfo()

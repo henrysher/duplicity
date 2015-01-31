@@ -31,6 +31,7 @@ from duplicity import dup_time
 class StatsException(Exception):
     pass
 
+
 class StatsObj:
     """Contains various statistics, provide string conversion functions"""
     # used when quoting files in get_stats_line

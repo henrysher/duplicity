@@ -35,6 +35,7 @@ from duplicity import globals
 from duplicity import log
 from duplicity.errors import BackendException
 
+
 class SSHPExpectBackend(duplicity.backend.Backend):
     """This backend copies files using scp.  List not supported.  Filenames
        should not need any quoting or this will break."""
@@ -45,10 +46,12 @@ class SSHPExpectBackend(duplicity.backend.Backend):
         self.retry_delay = 10
 
         self.scp_command = "scp"
-        if globals.scp_command: self.scp_command = globals.scp_command
+        if globals.scp_command:
+            self.scp_command = globals.scp_command
 
         self.sftp_command = "sftp"
-        if globals.sftp_command: self.sftp_command = globals.sftp_command
+        if globals.sftp_command:
+            self.sftp_command = globals.sftp_command
 
         self.scheme = duplicity.backend.strip_prefix(parsed_url.scheme, 'pexpect')
         self.use_scp = (self.scheme == 'scp')
@@ -201,7 +204,7 @@ class SSHPExpectBackend(duplicity.backend.Backend):
             elif match == 7:
                 if not child.before.strip().startswith("Removing"):
                     msg = "Could not delete file in command='%s'" % (commandline,)
-                    break;
+                    break
             elif match == 8:
                 msg = "Could not delete file in command='%s'" % (commandline,)
                 break
@@ -265,7 +268,7 @@ class SSHPExpectBackend(duplicity.backend.Backend):
             if not dirs[0]:
                 dirs = dirs[1:]
                 dirs[0] = '/' + dirs[0]
-        mkdir_commands = [];
+        mkdir_commands = []
         for d in dirs:
             mkdir_commands += ["mkdir \"%s\"" % (d)] + ["cd \"%s\"" % (d)]
 

@@ -27,6 +27,7 @@ from duplicity import globals
 from duplicity import log
 from duplicity import tempdir
 
+
 class NCFTPBackend(duplicity.backend.Backend):
     """Connect to remote store using File Transfer Protocol"""
     def __init__(self, parsed_url):
@@ -87,7 +88,7 @@ class NCFTPBackend(duplicity.backend.Backend):
         os.close(self.tempfile)
         self.flags = "-f %s %s -t %s -o useCLNT=0,useHELP_SITE=0 " % \
             (self.tempname, self.conn_opt, globals.timeout)
-        if parsed_url.port != None and parsed_url.port != 21:
+        if parsed_url.port is not None and parsed_url.port != 21:
             self.flags += " -P '%s'" % (parsed_url.port)
 
     def _put(self, source_path, remote_filename):

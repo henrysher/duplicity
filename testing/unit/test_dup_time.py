@@ -29,7 +29,7 @@ class TimeTest:
         """test timetostring and stringtotime"""
         dup_time.setcurtime()
         assert type(dup_time.curtime) in (types.IntType, types.LongType)
-        assert type(dup_time.curtimestr) is types.StringType
+        assert isinstance(dup_time.curtimestr, types.StringType)
         assert (dup_time.cmp(int(dup_time.curtime), dup_time.curtimestr) == 0 or
                 dup_time.cmp(int(dup_time.curtime) + 1, dup_time.curtimestr) == 0)
         time.sleep(1.05)
@@ -79,9 +79,12 @@ class TimeTest:
         """Test converting strings to intervals"""
         i2s = dup_time.intstringtoseconds
         for s in ["32", "", "d", "231I", "MM", "s", "-2h"]:
-            try: i2s(s)
-            except dup_time.TimeException: pass
-            else: assert 0, s
+            try:
+                i2s(s)
+            except dup_time.TimeException:
+                pass
+            else:
+                assert 0, s
         assert i2s("7D") == 7 * 86400
         assert i2s("232s") == 232
         assert i2s("2M") == 2 * 30 * 86400

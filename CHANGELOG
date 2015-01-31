@@ -53,7 +53,8 @@ New in v0.7.02 (2015/02/??)
     not work correctly when excludes (in a filelist or in a commandline option)
     contain both a single or double asterisk and a trailing slash.
 * Misc fixes for the following PEP8 issues:
-  - E231, E241, E251, E261, E262, E271, E272
+  - E231, E241, E251, E261, E262, E271, E272, E301, E302, E303, E502,
+    E701, E702, E703, E711, E721, W291, W292, W293, W391
   - see http://pep8.readthedocs.org
 * Fixes for 2to3 issues
 

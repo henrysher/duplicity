@@ -260,6 +260,7 @@ _fd_options = {'passphrase': '--passphrase-fd',
                'command': '--command-fd'
                }
 
+
 class GnuPG:
     """Class instances represent GnuPG.
 
@@ -349,9 +350,12 @@ class GnuPG:
         and can be written to.
         """
 
-        if args == None: args = []
-        if create_fhs == None: create_fhs = []
-        if attach_fhs == None: attach_fhs = {}
+        if args is None:
+            args = []
+        if create_fhs is None:
+            create_fhs = []
+        if attach_fhs is None:
+            attach_fhs = {}
 
         for std in _stds:
             if std not in attach_fhs \
@@ -360,7 +364,7 @@ class GnuPG:
 
         handle_passphrase = 0
 
-        if self.passphrase != None \
+        if self.passphrase is not None \
            and 'passphrase' not in attach_fhs \
            and 'passphrase' not in create_fhs:
             handle_passphrase = 1
@@ -377,7 +381,6 @@ class GnuPG:
 
         return process
 
-
     def _attach_fork_exec(self, gnupg_commands, args, create_fhs, attach_fhs):
         """This is like run(), but without the passphrase-helping
         (note that run() calls this)."""
@@ -386,14 +389,14 @@ class GnuPG:
 
         for fh_name in create_fhs + attach_fhs.keys():
             if fh_name not in _fd_modes:
-                raise KeyError("unrecognized filehandle name '%s'; must be one of %s" \
+                raise KeyError("unrecognized filehandle name '%s'; must be one of %s"
                                % (fh_name, _fd_modes.keys()))
 
         for fh_name in create_fhs:
             # make sure the user doesn't specify a filehandle
             # to be created *and* attached
             if fh_name in attach_fhs:
-                raise ValueError("cannot have filehandle '%s' in both create_fhs and attach_fhs" \
+                raise ValueError("cannot have filehandle '%s' in both create_fhs and attach_fhs"
                                  % fh_name)
 
             pipe = os.pipe()
@@ -401,7 +404,8 @@ class GnuPG:
             # that since pipes are unidirectional on some systems,
             # so we have to 'turn the pipe around'
             # if we are writing
-            if _fd_modes[fh_name] == 'w': pipe = (pipe[1], pipe[0])
+            if _fd_modes[fh_name] == 'w':
+                pipe = (pipe[1], pipe[0])
             process._pipes[fh_name] = Pipe(pipe[0], pipe[1], 0)
 
         for fh_name, fh in attach_fhs.items():
@@ -415,9 +419,9 @@ class GnuPG:
                                               args=(process,))
             process.thread.start()
 
-        if process.pid == 0: self._as_child(process, gnupg_commands, args)
+        if process.pid == 0:
+            self._as_child(process, gnupg_commands, args)
         return self._as_parent(process)
-
 
     def _as_parent(self, process):
         """Stuff run after forking in parent"""
@@ -430,7 +434,6 @@ class GnuPG:
         del process._pipes
 
         return process
-
 
     def _as_child(self, process, gnupg_commands, args):
         """Stuff run after forking in child"""
@@ -451,7 +454,8 @@ class GnuPG:
             if k not in _stds:
                 fd_args.extend([_fd_options[k], "%d" % p.child])
 
-            if not p.direct: os.close(p.parent)
+            if not p.direct:
+                os.close(p.parent)
 
         command = [self.call] + fd_args + self.options.get_args() + gnupg_commands + args
 
@@ -581,28 +585,48 @@ class Options:
     def get_standard_args(self):
         """Generate a list of standard, non-meta or extra arguments"""
         args = []
-        if self.homedir != None: args.extend(['--homedir', self.homedir])
-        if self.options != None: args.extend(['--options', self.options])
-        if self.comment != None: args.extend(['--comment', self.comment])
-        if self.compress_algo != None: args.extend(['--compress-algo', self.compress_algo])
-        if self.default_key != None: args.extend(['--default-key', self.default_key])
+        if self.homedir is not None:
+            args.extend(['--homedir', self.homedir])
+        if self.options is not None:
+            args.extend(['--options', self.options])
+        if self.comment is not None:
+            args.extend(['--comment', self.comment])
+        if self.compress_algo is not None:
+            args.extend(['--compress-algo', self.compress_algo])
+        if self.default_key is not None:
+            args.extend(['--default-key', self.default_key])
 
-        if self.no_options: args.append('--no-options')
-        if self.armor: args.append('--armor')
-        if self.textmode: args.append('--textmode')
-        if self.no_greeting: args.append('--no-greeting')
-        if self.verbose: args.append('--verbose')
-        if self.no_verbose: args.append('--no-verbose')
-        if self.quiet: args.append('--quiet')
-        if self.batch: args.append('--batch')
-        if self.always_trust: args.append('--always-trust')
-        if self.force_v3_sigs: args.append('--force-v3-sigs')
-        if self.rfc1991: args.append('--rfc1991')
-        if self.openpgp: args.append('--openpgp')
+        if self.no_options:
+            args.append('--no-options')
+        if self.armor:
+            args.append('--armor')
+        if self.textmode:
+            args.append('--textmode')
+        if self.no_greeting:
+            args.append('--no-greeting')
+        if self.verbose:
+            args.append('--verbose')
+        if self.no_verbose:
+            args.append('--no-verbose')
+        if self.quiet:
+            args.append('--quiet')
+        if self.batch:
+            args.append('--batch')
+        if self.always_trust:
+            args.append('--always-trust')
+        if self.force_v3_sigs:
+            args.append('--force-v3-sigs')
+        if self.rfc1991:
+            args.append('--rfc1991')
+        if self.openpgp:
+            args.append('--openpgp')
 
-        for r in self.recipients: args.extend(['--recipient', r])
-        for r in self.hidden_recipients: args.extend(['--hidden-recipient', r])
-        for r in self.encrypt_to: args.extend(['--encrypt-to', r])
+        for r in self.recipients:
+            args.extend(['--recipient', r])
+        for r in self.hidden_recipients:
+            args.extend(['--hidden-recipient', r])
+        for r in self.encrypt_to:
+            args.extend(['--encrypt-to', r])
 
         return args
 
@@ -610,10 +634,13 @@ class Options:
         """Get a list of generated meta-arguments"""
         args = []
 
-        if self.meta_pgp_5_compatible: args.extend(['--compress-algo', '1',
-                                                    '--force-v3-sigs'])
-        if self.meta_pgp_2_compatible: args.append('--rfc1991')
-        if not self.meta_interactive: args.extend(['--batch', '--no-tty'])
+        if self.meta_pgp_5_compatible:
+            args.extend(['--compress-algo', '1',
+                         '--force-v3-sigs'])
+        if self.meta_pgp_2_compatible:
+            args.append('--rfc1991')
+        if not self.meta_interactive:
+            args.extend(['--batch', '--no-tty'])
 
         return args
 
@@ -654,7 +681,7 @@ class Process:
         Wait on threaded_waitpid to exit and examine results.
         Will raise an IOError if the process exits non-zero.
         """
-        if self.returned == None:
+        if self.returned is None:
             self.thread.join()
         if self.returned != 0:
             raise IOError("GnuPG exited non-zero, with code %d" % (self.returned >> 8))

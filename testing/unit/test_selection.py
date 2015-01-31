@@ -44,12 +44,12 @@ class MatchingTest(UnitTestCase):
         sf1 = self.Select.regexp_get_sf(".*\.py", 1)
         assert sf1(self.makeext("1.py")) == 1
         assert sf1(self.makeext("usr/foo.py")) == 1
-        assert sf1(self.root.append("1.doc")) == None
+        assert sf1(self.root.append("1.doc")) is None
 
         sf2 = self.Select.regexp_get_sf("hello", 0)
         assert sf2(Path("hello")) == 0
         assert sf2(Path("foohello_there")) == 0
-        assert sf2(Path("foo")) == None
+        assert sf2(Path("foo")) is None
 
     def testTupleInclude(self):
         """Test include selection function made from a regular filename"""
@@ -60,9 +60,9 @@ class MatchingTest(UnitTestCase):
         assert sf2(self.makeext("usr")) == 1
         assert sf2(self.makeext("usr/local")) == 1
         assert sf2(self.makeext("usr/local/bin")) == 1
-        assert sf2(self.makeext("usr/local/doc")) == None
+        assert sf2(self.makeext("usr/local/doc")) is None
         assert sf2(self.makeext("usr/local/bin/gzip")) == 1
-        assert sf2(self.makeext("usr/local/bingzip")) == None
+        assert sf2(self.makeext("usr/local/bingzip")) is None
 
     def testTupleExclude(self):
         """Test exclude selection function made from a regular filename"""
@@ -70,12 +70,12 @@ class MatchingTest(UnitTestCase):
                           self.Select.glob_get_filename_sf, "foo", 0)
 
         sf2 = self.Select.glob_get_sf("testfiles/select/usr/local/bin/", 0)
-        assert sf2(self.makeext("usr")) == None
-        assert sf2(self.makeext("usr/local")) == None
+        assert sf2(self.makeext("usr")) is None
+        assert sf2(self.makeext("usr/local")) is None
         assert sf2(self.makeext("usr/local/bin")) == 0
-        assert sf2(self.makeext("usr/local/doc")) == None
+        assert sf2(self.makeext("usr/local/doc")) is None
         assert sf2(self.makeext("usr/local/bin/gzip")) == 0
-        assert sf2(self.makeext("usr/local/bingzip")) == None
+        assert sf2(self.makeext("usr/local/bingzip")) is None
 
     def testGlobStarInclude(self):
         """Test a few globbing patterns, including **"""
@@ -95,8 +95,8 @@ class MatchingTest(UnitTestCase):
         assert sf1(self.makeext("/usr/local/bin")) == 0
 
         sf2 = self.Select.glob_get_sf("**.py", 0)
-        assert sf2(self.makeext("foo")) == None, sf2(self.makeext("foo"))
-        assert sf2(self.makeext("usr/local/bin")) == None
+        assert sf2(self.makeext("foo")) is None, sf2(self.makeext("foo"))
+        assert sf2(self.makeext("usr/local/bin")) is None
         assert sf2(self.makeext("what/ever.py")) == 0
         assert sf2(self.makeext("what/ever.py/foo")) == 0
 
@@ -110,12 +110,12 @@ testfiles/select/3/3/2""")
         sf = self.Select.filelist_get_sf(fp, 1, "test")
         assert sf(self.root) == 1
         assert sf(self.makeext("1")) == 1
-        assert sf(self.makeext("1/1")) == None
+        assert sf(self.makeext("1/1")) is None
         assert sf(self.makeext("1/2/3")) == 1
-        assert sf(self.makeext("2/2")) == None
+        assert sf(self.makeext("2/2")) is None
         assert sf(self.makeext("3")) == 1
         assert sf(self.makeext("3/3")) == 1
-        assert sf(self.makeext("3/3/3")) == None
+        assert sf(self.makeext("3/3/3")) is None
 
     def test_filelist_include_1_trailing_white_space(self):
         """Test trailing whitespace is ignored in included filelist (1 space)"""
@@ -126,12 +126,12 @@ testfiles/select/3/3/2""")
         sf = self.Select.filelist_get_sf(fp, 1, "test")
         assert sf(self.root) == 1
         assert sf(self.makeext("1")) == 1
-        assert sf(self.makeext("1/1")) == None
+        assert sf(self.makeext("1/1")) is None
         assert sf(self.makeext("1/2/3")) == 1
-        assert sf(self.makeext("2/2")) == None
+        assert sf(self.makeext("2/2")) is None
         assert sf(self.makeext("3")) == 1
         assert sf(self.makeext("3/3")) == 1
-        assert sf(self.makeext("3/3/3")) == None
+        assert sf(self.makeext("3/3/3")) is None
 
     def test_filelist_include_2_trailing_white_spaces(self):
         """Test trailing whitespace is ignored in included filelist (2 space)"""
@@ -142,12 +142,12 @@ testfiles/select/3/3/2""")
         sf = self.Select.filelist_get_sf(fp, 1, "test")
         assert sf(self.root) == 1
         assert sf(self.makeext("1")) == 1
-        assert sf(self.makeext("1/1")) == None
+        assert sf(self.makeext("1/1")) is None
         assert sf(self.makeext("1/2/3")) == 1
-        assert sf(self.makeext("2/2")) == None
+        assert sf(self.makeext("2/2")) is None
         assert sf(self.makeext("3")) == 1
         assert sf(self.makeext("3/3")) == 1
-        assert sf(self.makeext("3/3/3")) == None
+        assert sf(self.makeext("3/3/3")) is None
 
     def test_filelist_include_1_leading_white_space(self):
         """Test leading whitespace is ignored in included filelist (1 space)"""
@@ -158,12 +158,12 @@ testfiles/select/3/3/2""")
         sf = self.Select.filelist_get_sf(fp, 1, "test")
         assert sf(self.root) == 1
         assert sf(self.makeext("1")) == 1
-        assert sf(self.makeext("1/1")) == None
+        assert sf(self.makeext("1/1")) is None
         assert sf(self.makeext("1/2/3")) == 1
-        assert sf(self.makeext("2/2")) == None
+        assert sf(self.makeext("2/2")) is None
         assert sf(self.makeext("3")) == 1
         assert sf(self.makeext("3/3")) == 1
-        assert sf(self.makeext("3/3/3")) == None
+        assert sf(self.makeext("3/3/3")) is None
 
     def test_filelist_include_2_leading_white_spaces(self):
         """Test leading whitespace is ignored in included filelist (1 space)"""
@@ -174,12 +174,12 @@ testfiles/select/3/3/2""")
         sf = self.Select.filelist_get_sf(fp, 1, "test")
         assert sf(self.root) == 1
         assert sf(self.makeext("1")) == 1
-        assert sf(self.makeext("1/1")) == None
+        assert sf(self.makeext("1/1")) is None
         assert sf(self.makeext("1/2/3")) == 1
-        assert sf(self.makeext("2/2")) == None
+        assert sf(self.makeext("2/2")) is None
         assert sf(self.makeext("3")) == 1
         assert sf(self.makeext("3/3")) == 1
-        assert sf(self.makeext("3/3/3")) == None
+        assert sf(self.makeext("3/3/3")) is None
 
     def testFilelistIncludeNullSep(self):
         """Test included filelist but with null_separator set"""
@@ -188,12 +188,12 @@ testfiles/select/3/3/2""")
         sf = self.Select.filelist_get_sf(fp, 1, "test")
         assert sf(self.root) == 1
         assert sf(self.makeext("1")) == 1
-        assert sf(self.makeext("1/1")) == None
+        assert sf(self.makeext("1/1")) is None
         assert sf(self.makeext("1/2/3")) == 1
-        assert sf(self.makeext("2/2")) == None
+        assert sf(self.makeext("2/2")) is None
         assert sf(self.makeext("3")) == 1
         assert sf(self.makeext("3/3")) == 1
-        assert sf(self.makeext("3/3/3")) == None
+        assert sf(self.makeext("3/3/3")) is None
         assert sf(self.makeext("hello\nthere")) == 1
 
     def testFilelistExclude(self):
@@ -206,14 +206,14 @@ this is a badly formed line which should be ignored
 testfiles/select/1/2/3
 testfiles/select/3/3/2""")
         sf = self.Select.filelist_get_sf(fp, 0, "test")
-        assert sf(self.root) == None
+        assert sf(self.root) is None
         assert sf(self.makeext("1")) == 0
         assert sf(self.makeext("1/1")) == 0
         assert sf(self.makeext("1/2/3")) == 0
-        assert sf(self.makeext("2/2")) == None
-        assert sf(self.makeext("3")) == None
+        assert sf(self.makeext("2/2")) is None
+        assert sf(self.makeext("3")) is None
         assert sf(self.makeext("3/3/2")) == 0
-        assert sf(self.makeext("3/3/3")) == None
+        assert sf(self.makeext("3/3/3")) is None
 
     def testFilelistInclude2(self):
         """testFilelistInclude2 - with modifiers"""
@@ -225,11 +225,11 @@ testfiles/select/1/1
         sf = self.Select.filelist_get_sf(fp, 1, "test1")
         assert sf(self.makeext("1")) == 1
         assert sf(self.makeext("1/1")) == 1
-        assert sf(self.makeext("1/1/2")) == None
+        assert sf(self.makeext("1/1/2")) is None
         assert sf(self.makeext("1/2")) == 0
         assert sf(self.makeext("1/2/3")) == 0
         assert sf(self.makeext("1/3")) == 1
-        assert sf(self.makeext("2")) == None
+        assert sf(self.makeext("2")) is None
         assert sf(self.makeext("3")) == 0
 
     def testFilelistInclude3(self):
@@ -242,12 +242,12 @@ testfiles/select/1""")
         sf = self.Select.filelist_get_sf(fp, 1, "test1")
         assert sf(self.makeext("1")) == 1
         assert sf(self.makeext("1/1")) == 1
-        assert sf(self.makeext("1/1/2")) == None
+        assert sf(self.makeext("1/1/2")) is None
         assert sf(self.makeext("1/2")) == 0
         assert sf(self.makeext("1/2/3")) == 0
         assert sf(self.makeext("1/3")) == 1
-        assert sf(self.makeext("2")) == None
-        assert sf(self.makeext("3")) == None
+        assert sf(self.makeext("2")) is None
+        assert sf(self.makeext("3")) is None
 
 #     def test_filelist_include_excluded_folder_with_included_contents(self):
 #         """Check that excluded folder is included if subfolder is included at higher priority. """
@@ -260,13 +260,13 @@ testfiles/select/1""")
 # testfiles/select/1""")
 #         sf = self.Select.filelist_get_sf(fp, 1, "test1")
 #         assert sf(self.makeext("1")) == 1
-#         assert sf(self.makeext("1/1")) == None
+#         assert sf(self.makeext("1/1")) is None
 #         assert sf(self.makeext("1/2/1")) == 1
 #         assert sf(self.makeext("1/2")) == 0  # ToDo - what should this return?
 #         assert sf(self.makeext("1/2/3")) == 0
 #         assert sf(self.makeext("1/3")) == 1
-#         assert sf(self.makeext("2")) == None
-#         assert sf(self.makeext("3")) == None
+#         assert sf(self.makeext("2")) is None
+#         assert sf(self.makeext("3")) is None
 
     def testFilelistExclude2(self):
         """testFilelistExclude2 - with modifiers"""
@@ -277,15 +277,15 @@ testfiles/select/1/1
 - testfiles/select/3""")
         sf = self.Select.filelist_get_sf(fp, 0, "test1")
         sf_val1 = sf(self.root)
-        assert sf_val1 == 1 or sf_val1 == None  # either is OK
+        assert sf_val1 == 1 or sf_val1 is None  # either is OK
         sf_val2 = sf(self.makeext("1"))
-        assert sf_val2 == 1 or sf_val2 == None
+        assert sf_val2 == 1 or sf_val2 is None
         assert sf(self.makeext("1/1")) == 0
         assert sf(self.makeext("1/1/2")) == 0
         assert sf(self.makeext("1/2")) == 0
         assert sf(self.makeext("1/2/3")) == 0
         assert sf(self.makeext("1/3")) == 1
-        assert sf(self.makeext("2")) == None
+        assert sf(self.makeext("2")) is None
         assert sf(self.makeext("3")) == 0
 
     def test_filelist_exclude_2_with_trailing_white_space(self):
@@ -296,15 +296,15 @@ testfiles/select/1/1
                                "- testfiles/select/3")
         sf = self.Select.filelist_get_sf(fp, 0, "test1")
         sf_val1 = sf(self.root)
-        assert sf_val1 == 1 or sf_val1 == None  # either is OK
+        assert sf_val1 == 1 or sf_val1 is None  # either is OK
         sf_val2 = sf(self.makeext("1"))
-        assert sf_val2 == 1 or sf_val2 == None
+        assert sf_val2 == 1 or sf_val2 is None
         assert sf(self.makeext("1/1")) == 0
         assert sf(self.makeext("1/1/2")) == 0
         assert sf(self.makeext("1/2")) == 0
         assert sf(self.makeext("1/2/3")) == 0
         assert sf(self.makeext("1/3")) == 1
-        assert sf(self.makeext("2")) == None
+        assert sf(self.makeext("2")) is None
         assert sf(self.makeext("3")) == 0
 
     def test_filelist_exclude_with_single_quotes(self):
@@ -315,15 +315,15 @@ testfiles/select/1/1
                                "- testfiles/select/3")
         sf = self.Select.filelist_get_sf(fp, 0, "test1")
         sf_val1 = sf(self.root)
-        assert sf_val1 == 1 or sf_val1 == None  # either is OK
+        assert sf_val1 == 1 or sf_val1 is None  # either is OK
         sf_val2 = sf(self.makeext("1"))
-        assert sf_val2 == 1 or sf_val2 == None
+        assert sf_val2 == 1 or sf_val2 is None
         assert sf(self.makeext("1/1")) == 0
         assert sf(self.makeext("1/1/2")) == 0
         assert sf(self.makeext("1/2")) == 0
         assert sf(self.makeext("1/2/3")) == 0
         assert sf(self.makeext("1/3")) == 1
-        assert sf(self.makeext("2")) == None
+        assert sf(self.makeext("2")) is None
         assert sf(self.makeext("3")) == 0
 
     def test_filelist_exclude_with_full_line_comment(self):
@@ -335,15 +335,15 @@ testfiles/select/1/1
                                "- testfiles/select/3")
         sf = self.Select.filelist_get_sf(fp, 0, "test1")
         sf_val1 = sf(self.root)
-        assert sf_val1 == 1 or sf_val1 == None  # either is OK
+        assert sf_val1 == 1 or sf_val1 is None  # either is OK
         sf_val2 = sf(self.makeext("1"))
-        assert sf_val2 == 1 or sf_val2 == None
+        assert sf_val2 == 1 or sf_val2 is None
         assert sf(self.makeext("1/1")) == 0
         assert sf(self.makeext("1/1/2")) == 0
         assert sf(self.makeext("1/2")) == 0
         assert sf(self.makeext("1/2/3")) == 0
         assert sf(self.makeext("1/3")) == 1
-        assert sf(self.makeext("2")) == None
+        assert sf(self.makeext("2")) is None
         assert sf(self.makeext("3")) == 0
 
     def test_filelist_exclude_with_blank_line(self):
@@ -355,15 +355,15 @@ testfiles/select/1/1
                                "- testfiles/select/3")
         sf = self.Select.filelist_get_sf(fp, 0, "test1")
         sf_val1 = sf(self.root)
-        assert sf_val1 == 1 or sf_val1 == None  # either is OK
+        assert sf_val1 == 1 or sf_val1 is None  # either is OK
         sf_val2 = sf(self.makeext("1"))
-        assert sf_val2 == 1 or sf_val2 == None
+        assert sf_val2 == 1 or sf_val2 is None
         assert sf(self.makeext("1/1")) == 0
         assert sf(self.makeext("1/1/2")) == 0
         assert sf(self.makeext("1/2")) == 0
         assert sf(self.makeext("1/2/3")) == 0
         assert sf(self.makeext("1/3")) == 1
-        assert sf(self.makeext("2")) == None
+        assert sf(self.makeext("2")) is None
         assert sf(self.makeext("3")) == 0
 
     def test_filelist_exclude_with_blank_line_and_whitespace(self):
@@ -375,15 +375,15 @@ testfiles/select/1/1
                                "- testfiles/select/3")
         sf = self.Select.filelist_get_sf(fp, 0, "test1")
         sf_val1 = sf(self.root)
-        assert sf_val1 == 1 or sf_val1 == None  # either is OK
+        assert sf_val1 == 1 or sf_val1 is None  # either is OK
         sf_val2 = sf(self.makeext("1"))
-        assert sf_val2 == 1 or sf_val2 == None
+        assert sf_val2 == 1 or sf_val2 is None
         assert sf(self.makeext("1/1")) == 0
         assert sf(self.makeext("1/1/2")) == 0
         assert sf(self.makeext("1/2")) == 0
         assert sf(self.makeext("1/2/3")) == 0
         assert sf(self.makeext("1/3")) == 1
-        assert sf(self.makeext("2")) == None
+        assert sf(self.makeext("2")) is None
         assert sf(self.makeext("3")) == 0
 
     def test_filelist_exclude_with_double_quotes(self):
@@ -394,15 +394,15 @@ testfiles/select/1/1
                                '- testfiles/select/3')
         sf = self.Select.filelist_get_sf(fp, 0, "test1")
         sf_val1 = sf(self.root)
-        assert sf_val1 == 1 or sf_val1 == None  # either is OK
+        assert sf_val1 == 1 or sf_val1 is None  # either is OK
         sf_val2 = sf(self.makeext("1"))
-        assert sf_val2 == 1 or sf_val2 == None
+        assert sf_val2 == 1 or sf_val2 is None
         assert sf(self.makeext("1/1")) == 0
         assert sf(self.makeext("1/1/2")) == 0
         assert sf(self.makeext("1/2")) == 0
         assert sf(self.makeext("1/2/3")) == 0
         assert sf(self.makeext("1/3")) == 1
-        assert sf(self.makeext("2")) == None
+        assert sf(self.makeext("2")) is None
         assert sf(self.makeext("3")) == 0
 
     def testGlobRE(self):
@@ -445,20 +445,20 @@ testfiles/select/1/1
         assert select.glob_get_sf("/foo", 1)(root) == 1
         assert select.glob_get_sf("/foo/bar", 1)(root) == 1
         assert select.glob_get_sf("/", 0)(root) == 0
-        assert select.glob_get_sf("/foo", 0)(root) == None
+        assert select.glob_get_sf("/foo", 0)(root) is None
 
         assert select.glob_get_sf("**.py", 1)(root) == 2
         assert select.glob_get_sf("**", 1)(root) == 1
         assert select.glob_get_sf("ignorecase:/", 1)(root) == 1
-        assert select.glob_get_sf("**.py", 0)(root) == None
+        assert select.glob_get_sf("**.py", 0)(root) is None
         assert select.glob_get_sf("**", 0)(root) == 0
-        assert select.glob_get_sf("/foo/*", 0)(root) == None
+        assert select.glob_get_sf("/foo/*", 0)(root) is None
 
         assert select.filelist_get_sf(StringIO.StringIO("/"), 1, "test")(root) == 1
         assert select.filelist_get_sf(StringIO.StringIO("/foo/bar"), 1, "test")(root) == 1
         assert select.filelist_get_sf(StringIO.StringIO("/"), 0, "test")(root) == 0
         assert select.filelist_get_sf(StringIO.StringIO("/foo/bar"), 0,
-                                      "test")(root) == None
+                                      "test")(root) is None
 
     def testOtherFilesystems(self):
         """Test to see if --exclude-other-filesystems works correctly"""
@@ -485,6 +485,7 @@ testfiles/select/1/1
         assert sf(Path("/proc")) == sfval, \
             "Assumption: /proc is on a different filesystem"
 
+
 class ParseArgsTest(UnitTestCase):
     """Test argument parsing"""
     def setUp(self):
@@ -506,7 +507,7 @@ class ParseArgsTest(UnitTestCase):
         """Turn strings in filelist into fileobjs"""
         new_filelists = []
         for f in filelist:
-            if type(f) is types.StringType:
+            if isinstance(f, types.StringType):
                 new_filelists.append(StringIO.StringIO(f))
             else:
                 new_filelists.append(f)
@@ -759,7 +760,6 @@ class ParseArgsTest(UnitTestCase):
                         "+ */*/1/1\n"
                         "- */*/1\n"
                         "- **"])
-
 
     def test_include_globbing_filelist_double_asterisk_1(self):
         """Identical to test_globbing_filelist, but with the exclude 'select' replaced with '**'"""

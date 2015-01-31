@@ -38,6 +38,7 @@ full_sig_re_short = None
 new_sig_re = None
 new_sig_re_short = None
 
+
 def prepare_regex(force=False):
     global full_vol_re
     global full_vol_re_short
@@ -277,6 +278,7 @@ def parse(filename):
     Parse duplicity filename, return None or ParseResults object
     """
     filename = filename.lower()
+
     def str2time(timestr, short):
         """
         Return time in seconds if string can be converted, None otherwise
@@ -319,7 +321,7 @@ def parse(filename):
                                         volume_number=get_vol_num(m1.group("num"), short))
                 else:
                     return ParseResults("full", time=t, manifest=True,
-                                        partial=(m2.group("partial") != None))
+                                        partial=(m2.group("partial") is not None))
         return None
 
     def check_inc():
@@ -343,7 +345,7 @@ def parse(filename):
                                         end_time=t2, volume_number=get_vol_num(m1.group("num"), short))
                 else:
                     return ParseResults("inc", start_time=t1, end_time=t2, manifest=1,
-                                        partial=(m2.group("partial") != None))
+                                        partial=(m2.group("partial") is not None))
         return None
 
     def check_sig():
@@ -360,7 +362,7 @@ def parse(filename):
             t = str2time(m.group("time"), short)
             if t:
                 return ParseResults("full-sig", time=t,
-                                    partial=(m.group("partial") != None))
+                                    partial=(m.group("partial") is not None))
             else:
                 return None
 
@@ -374,7 +376,7 @@ def parse(filename):
             t2 = str2time(m.group("end_time"), short)
             if t1 and t2:
                 return ParseResults("new-sig", start_time=t1, end_time=t2,
-                                    partial=(m.group("partial") != None))
+                                    partial=(m.group("partial") is not None))
         return None
 
     def set_encryption_or_compression(pr):

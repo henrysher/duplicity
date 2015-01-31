@@ -40,13 +40,16 @@ documentation on what this code does can be found on the man page.
 
 """
 
+
 class SelectError(Exception):
     """Some error dealing with the Select class"""
     pass
 
+
 class FilePrefixError(SelectError):
     """Signals that a specified file doesn't start with correct prefix"""
     pass
+
 
 class GlobbingError(SelectError):
     """Something has gone wrong when parsing a glob string"""
@@ -339,6 +342,7 @@ probably isn't what you meant.""") %
     def filelist_read(self, filelist_fp, include, filelist_name):
         """Read filelist from fp, return (tuplelist, something_excluded)"""
         prefix_warnings = [0]
+
         def incr_warnings(exc):
             """Warn if prefix is incorrect"""
             prefix_warnings[0] += 1
@@ -471,11 +475,13 @@ probably isn't what you meant.""") %
         """Return selection function matching files on other filesystems"""
         assert include == 0 or include == 1
         root_devloc = self.rootpath.getdevloc()
+
         def sel_func(path):
             if path.exists() and path.getdevloc() != root_devloc:
                 return include
             else:
                 return None
+
         sel_func.exclude = not include
         sel_func.name = "Match other filesystems"
         return sel_func
@@ -504,11 +510,13 @@ probably isn't what you meant.""") %
         if self.selection_functions:
             log.Warn(_("Warning: exclude-device-files is not the first "
                        "selector.\nThis may not be what you intended"))
+
         def sel_func(path):
             if path.isdev():
                 return 0
             else:
                 return None
+
         sel_func.exclude = 1
         sel_func.name = "Exclude device files"
         return sel_func
@@ -663,7 +671,6 @@ probably isn't what you meant.""") %
         sel_func.name = "Select older than %s" % (date,)
         return sel_func
 
-
     def glob_get_prefix_res(self, glob_str):
         """Return list of regexps equivalent to prefixes of glob_str"""
         glob_parts = glob_str.split("/")
@@ -720,4 +727,3 @@ probably isn't what you meant.""") %
             else:
                 res = res + re.escape(c)
         return res
-

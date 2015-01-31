@@ -25,8 +25,10 @@ Error/exception classes that do not fit naturally anywhere else.
 
 from duplicity import log
 
+
 class DuplicityError(Exception):
     pass
+
 
 class UserError(DuplicityError):
     """
@@ -36,12 +38,14 @@ class UserError(DuplicityError):
     """
     pass
 
+
 class NotSupported(DuplicityError):
     """
     Exception raised when an action cannot be completed because some
     particular feature is not supported by the environment.
     """
     pass
+
 
 class ConflictingScheme(DuplicityError):
     """
@@ -50,11 +54,13 @@ class ConflictingScheme(DuplicityError):
     """
     pass
 
+
 class InvalidBackendURL(UserError):
     """
     Raised to indicate a URL was not a valid backend URL.
     """
     pass
+
 
 class UnsupportedBackendScheme(InvalidBackendURL, UserError):
     """
@@ -66,6 +72,7 @@ class UnsupportedBackendScheme(InvalidBackendURL, UserError):
                                    ("scheme not supported in url: %s" % (url,)))
         self.url = url
 
+
 class BackendException(DuplicityError):
     """
     Raised to indicate a backend specific problem.
@@ -74,11 +81,13 @@ class BackendException(DuplicityError):
         super(BackendException, self).__init__(msg)
         self.code = code
 
+
 class FatalBackendException(BackendException):
     """
     Raised to indicate a backend failed fatally.
     """
     pass
+
 
 class TemporaryLoadException(BackendException):
     """
@@ -86,4 +95,3 @@ class TemporaryLoadException(BackendException):
     Duplicity should back off for a bit and try again.
     """
     pass
-

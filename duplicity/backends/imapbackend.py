@@ -98,7 +98,6 @@ class ImapBackend(duplicity.backend.Backend):
             self.conn.select(globals.imap_mailbox)
             log.Info("IMAP connected")
 
-
     def prepareBody(self, f, rname):
         mp = email.MIMEMultipart.MIMEMultipart()
 
@@ -225,7 +224,7 @@ class ImapBackend(duplicity.backend.Backend):
             header_from = m.getheader("from")
 
             # Catch messages with empty headers which cause an exception.
-            if (not (header_from == None)):
+            if (not (header_from is None)):
                 if (re.compile("^" + self.remote_dir + "$").match(header_from)):
                     ret.append(subj)
                     log.Info("IMAP LIST: %s %s" % (subj, header_from))

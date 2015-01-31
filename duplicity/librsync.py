@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+from __builtin__ import isinstance
 
 """Provides a high-level interface to some librsync functions
 
@@ -30,6 +31,7 @@ from . import _librsync
 import types, array
 
 blocksize = _librsync.RS_JOB_BLOCKSIZE
+
 
 class librsyncError(Exception):
     """Signifies error in internal librsync processing (bad signature, etc.)
@@ -129,6 +131,7 @@ class SigFile(LikeFile):
         except _librsync.librsyncError as e:
             raise librsyncError(str(e))
 
+
 class DeltaFile(LikeFile):
     """File-like object which incrementally generates a librsync delta"""
     def __init__(self, signature, new_file):
@@ -140,7 +143,7 @@ class DeltaFile(LikeFile):
 
         """
         LikeFile.__init__(self, new_file)
-        if type(signature) is types.StringType:
+        if isinstance(signature, types.StringType):
             sig_string = signature
         else:
             self.check_file(signature)
@@ -163,7 +166,7 @@ class PatchedFile(LikeFile):
 
         """
         LikeFile.__init__(self, delta_file)
-        if type(basis_file) is not types.FileType:
+        if not isinstance(basis_file, types.FileType):
             raise TypeError("basis_file must be a (true) file")
         try:
             self.maker = _librsync.new_patchmaker(basis_file)
@@ -212,4 +215,3 @@ class SigGenerator:
         while not self.process_buffer():
             pass  # keep running until eof
         return ''.join(self.sigstring_list)
-

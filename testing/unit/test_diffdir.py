@@ -40,7 +40,8 @@ class DDTest(UnitTestCase):
         blocksize = 32 * 1024
         while 1:
             buf = infp.read(blocksize)
-            if not buf: break
+            if not buf:
+                break
             outfp.write(buf)
         assert not infp.close()
         assert not outfp.close()
@@ -210,7 +211,9 @@ class DDTest(UnitTestCase):
             def __init__(self, index, other=None):
                 self.index = index
                 self.other = other
-            def __repr__(self): return "(%s %s)" % (self.index, self.other)
+
+            def __repr__(self):
+                return "(%s %s)" % (self.index, self.other)
 
         def get_iter1():
             yield Dummy(())
@@ -237,9 +240,12 @@ class DDTest(UnitTestCase):
         assert elem3.index == (1, 5) and elem3.other is None
         elem4 = result.next()
         assert elem4.index == (2,) and elem4.other == 1
-        try: elem5 = result.next()
-        except StopIteration: pass
-        else: assert 0, elem5
+        try:
+            elem5 = result.next()
+        except StopIteration:
+            pass
+        else:
+            assert 0, elem5
 
 
 def compare_tar(tarfile1, tarfile2):
@@ -249,7 +255,8 @@ def compare_tar(tarfile1, tarfile2):
     tf2_iter = iter(tf2)
 
     for ti1 in tf1:
-        try: ti2 = tf2_iter.next()
+        try:
+            ti2 = tf2_iter.next()
         except StopIteration:
             assert 0, ("Premature end to second tarfile, "
                        "ti1.name = %s" % ti1.name)
@@ -263,13 +270,17 @@ def compare_tar(tarfile1, tarfile2):
             buf2 = fp2.read()
             fp2.close()
             assert buf1 == buf2
-    try: ti2 = tf2_iter.next()
-    except StopIteration: pass
-    else: assert 0, ("Premature end to first tarfile, "
-                     "ti2.name = %s" % ti2.name)
+    try:
+        ti2 = tf2_iter.next()
+    except StopIteration:
+        pass
+    else:
+        assert 0, ("Premature end to first tarfile, "
+                   "ti2.name = %s" % ti2.name)
 
     tarfile1.close()
     tarfile2.close()
+
 
 def tarinfo_eq(ti1, ti2):
     if ti1.name != ti2.name:

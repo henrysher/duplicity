@@ -26,6 +26,7 @@ import duplicity.backend
 from duplicity.errors import InvalidBackendURL
 from duplicity import globals, tempdir, util
 
+
 class RsyncBackend(duplicity.backend.Backend):
     """Connect to remote store using rsync
 

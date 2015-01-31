@@ -38,15 +38,18 @@ MAX = 9
 
 _logger = None
 
+
 def DupToLoggerLevel(verb):
     """Convert duplicity level to the logging module's system, where higher is
        more severe"""
     return MAX - verb + 1
 
+
 def LoggerToDupLevel(verb):
     """Convert logging module level to duplicity's system, where lowere is
        more severe"""
     return DupToLoggerLevel(verb)
+
 
 def LevelName(level):
     if level >= 9:
@@ -59,6 +62,7 @@ def LevelName(level):
         return "WARNING"
     else:
         return "ERROR"
+
 
 def Log(s, verb_level, code=1, extra=None, force_print=False):
     """Write s to stderr if verbosity level low enough"""
@@ -88,9 +92,11 @@ def Log(s, verb_level, code=1, extra=None, force_print=False):
     if force_print:
         _logger.setLevel(initial_level)
 
+
 def Debug(s):
     """Shortcut used for debug message (verbosity 9)."""
     Log(s, DEBUG)
+
 
 class InfoCode:
     """Enumeration class to hold info code values.
@@ -113,9 +119,11 @@ class InfoCode:
     skipping_socket = 15
     upload_progress = 16
 
+
 def Info(s, code=InfoCode.generic, extra=None):
     """Shortcut used for info messages (verbosity 5)."""
     Log(s, INFO, code, extra)
+
 
 def Progress(s, current, total=None):
     """Shortcut used for progress messages (verbosity 5)."""
@@ -124,6 +132,7 @@ def Progress(s, current, total=None):
     else:
         controlLine = '%d' % current
     Log(s, INFO, InfoCode.progress, controlLine)
+
 
 def _ElapsedSecs2Str(secs):
     tdelta = datetime.timedelta(seconds=secs)
@@ -134,6 +143,7 @@ def _ElapsedSecs2Str(secs):
         fmt = "%dd," % (tdelta.days)
     fmt = "%s%02d:%02d:%02d" % (fmt, hours, minutes, seconds)
     return fmt
+
 
 def _RemainingSecs2Str(secs):
     tdelta = datetime.timedelta(seconds=secs)
@@ -165,6 +175,7 @@ def _RemainingSecs2Str(secs):
     else:
         fmt = "%dsec" % seconds
     return fmt
+
 
 def TransferProgress(progress, eta, changed_bytes, elapsed, speed, stalled):
     """Shortcut used for upload progress messages (verbosity 5)."""
@@ -202,14 +213,17 @@ def TransferProgress(progress, eta, changed_bytes, elapsed, speed, stalled):
     controlLine = "%d %d %d %d %d %d" % (changed_bytes, elapsed, progress, eta, speed, stalled)
     Log(s, NOTICE, InfoCode.upload_progress, controlLine)
 
+
 def PrintCollectionStatus(col_stats, force_print=False):
     """Prints a collection status to the log"""
     Log(unicode(col_stats), 8, InfoCode.collection_status,
         '\n' + '\n'.join(col_stats.to_log_info()), force_print)
 
+
 def Notice(s):
     """Shortcut used for notice messages (verbosity 3, the default)."""
     Log(s, NOTICE)
+
 
 class WarningCode:
     """Enumeration class to hold warning code values.
@@ -229,9 +243,11 @@ class WarningCode:
     cannot_process = 12
     process_skipped = 13
 
+
 def Warn(s, code=WarningCode.generic, extra=None):
     """Shortcut used for warning messages (verbosity 2)"""
     Log(s, WARNING, code, extra)
+
 
 class ErrorCode:
     """Enumeration class to hold error code values.
@@ -298,9 +314,11 @@ class ErrorCode:
     # Reserve 127 because it is used as an error code for pkexec
     # Reserve 255 because it is used as an error code for gksu
 
+
 def Error(s, code=ErrorCode.generic, extra=None):
     """Write error message"""
     Log(s, ERROR, code, extra)
+
 
 def FatalError(s, code=ErrorCode.generic, extra=None):
     """Write fatal error message and exit"""
@@ -308,15 +326,18 @@ def FatalError(s, code=ErrorCode.generic, extra=None):
     shutdown()
     sys.exit(code)
 
+
 class OutFilter(logging.Filter):
     """Filter that only allows warning or less important messages"""
     def filter(self, record):
         return record.msg and record.levelno <= DupToLoggerLevel(WARNING)
 
+
 class ErrFilter(logging.Filter):
     """Filter that only allows messages more important than warnings"""
     def filter(self, record):
         return record.msg and record.levelno > DupToLoggerLevel(WARNING)
+
 
 def setup():
     """Initialize logging"""
@@ -337,6 +358,7 @@ def setup():
     errHandler = logging.StreamHandler(sys.stderr)
     errHandler.addFilter(ErrFilter())
     _logger.addHandler(errHandler)
+
 
 class MachineFormatter(logging.Formatter):
     """Formatter that creates messages in a syntax easily consumable by other
@@ -360,11 +382,13 @@ class MachineFormatter(logging.Formatter):
         # Add a newline so consumers know the message is over.
         return s + '\n'
 
+
 class MachineFilter(logging.Filter):
     """Filter that only allows levels that are consumable by other processes."""
     def filter(self, record):
         # We only want to allow records that have our custom level names
         return hasattr(record, 'levelName')
+
 
 def add_fd(fd):
     """Add stream to which to write machine-readable logging"""
@@ -374,6 +398,7 @@ def add_fd(fd):
     handler.addFilter(MachineFilter())
     _logger.addHandler(handler)
 
+
 def add_file(filename):
     """Add file to which to write machine-readable logging"""
     global _logger
@@ -382,17 +407,19 @@ def add_file(filename):
     handler.addFilter(MachineFilter())
     _logger.addHandler(handler)
 
+
 def setverbosity(verb):
     """Set the verbosity level"""
     global _logger
     _logger.setLevel(DupToLoggerLevel(verb))
+
 
 def getverbosity():
     """Get the verbosity level"""
     global _logger
     return LoggerToDupLevel(_logger.getEffectiveLevel())
 
+
 def shutdown():
     """Cleanup and flush loggers"""
     logging.shutdown()
-

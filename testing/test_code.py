@@ -86,21 +86,8 @@ class CodeTest(DuplicityTestCase):
         # and clean up the code.  But for now, let's at least get *some* pep8
         # coverage.
         ignores = [
-            "E301",
-            "E302",
-            "E303",
             "E401",
             "E501",
-            "E502",
-            "E701",
-            "E702",
-            "E703",
-            "E711",
-            "E721",
-            "W291",
-            "W292",
-            "W293",
-            "W391"
         ]
         self.run_checker(["pep8",
                           "--ignore=" + ','.join(ignores),

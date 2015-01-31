@@ -38,6 +38,7 @@ from duplicity import tarfile
 import duplicity.globals as globals
 import duplicity.log as log
 
+
 def exception_traceback(limit=50):
     """
     @return A string representation in typical Python format of the
@@ -53,15 +54,18 @@ def exception_traceback(limit=50):
 
     return uexc(msg)
 
+
 def escape(string):
     "Convert a (bytes) filename to a format suitable for logging (quoted utf8)"
     string = ufn(string).encode('unicode-escape', 'replace')
     return u"'%s'" % string.decode('utf8', 'replace')
 
+
 def ufn(filename):
     "Convert a (bytes) filename to unicode for printing"
     assert not isinstance(filename, unicode)
     return filename.decode(sys.getfilesystemencoding(), 'replace')
+
 
 def uindex(index):
     "Convert an index (a tuple of path parts) to unicode for printing"
@@ -70,12 +74,14 @@ def uindex(index):
     else:
         return u'.'
 
+
 def uexc(e):
     # Exceptions in duplicity often have path names in them, which if they are
     # non-ascii will cause a UnicodeDecodeError when implicitly decoding to
     # unicode.  So we decode manually, using the filesystem encoding.
     # 99.99% of the time, this will be a fine encoding to use.
     return ufn(str(e))
+
 
 def maybe_ignore_errors(fn):
     """
@@ -96,16 +102,21 @@ def maybe_ignore_errors(fn):
         else:
             raise
 
+
 class BlackHoleList(list):
     def append(self, x):
         pass
 
+
 class FakeTarFile:
     debug = 0
+
     def __iter__(self):
         return iter([])
+
     def close(self):
         pass
+
 
 def make_tarfile(mode, fp):
     # We often use 'empty' tarfiles for signatures that haven't been filled out
@@ -121,6 +132,7 @@ def make_tarfile(mode, fp):
     except tarfile.ReadError:
         return FakeTarFile()
 
+
 def get_tarinfo_name(ti):
     # Python versions before 2.6 ensure that directories end with /, but 2.6
     # and later ensure they they *don't* have /.  ::shrug::  Internally, we
@@ -129,6 +141,7 @@ def get_tarinfo_name(ti):
         return ti.name + "/"
     else:
         return ti.name
+
 
 def ignore_missing(fn, filename):
     """
@@ -145,6 +158,7 @@ def ignore_missing(fn, filename):
         else:
             raise
 
+
 def release_lockfile():
     if globals.lockfile and globals.lockfile.is_locked():
         log.Debug(_("Releasing lockfile %s") % globals.lockfile)
@@ -152,6 +166,7 @@ def release_lockfile():
             globals.lockfile.release()
         except UnlockError:
             pass
+
 
 def copyfileobj(infp, outfp, byte_count=-1):
     """Copy byte_count bytes from infp to outfp, or all if byte_count < 0

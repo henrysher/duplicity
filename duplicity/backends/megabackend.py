@@ -109,11 +109,11 @@ class MegaBackend(duplicity.backend.Backend):
 
         for k, v in entries.items():
             try:
-                if parent_id != None:
+                if parent_id is not None:
                     assert(v['p'] == parent_id)
-                if title != None:
+                if title is not None:
                     assert(v['a']['n'] == title)
-                if type != None:
+                if type is not None:
                     assert(v['t'] == type_map[type])
             except AssertionError:
                 continue

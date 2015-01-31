@@ -44,7 +44,8 @@ class PatchingTest(UnitTestCase):
         blocksize = 32 * 1024
         while 1:
             buf = infp.read(blocksize)
-            if not buf: break
+            if not buf:
+                break
             outfp.write(buf)
         assert not infp.close()
         assert not outfp.close()
@@ -75,7 +76,8 @@ class PatchingTest(UnitTestCase):
                 diffdir.write_block_iter(sigblock, sig)
                 deltablock = diffdir.DirDelta(self.get_sel(new_path),
                                               sig.open("rb"))
-            else: deltablock = diffdir.DirFull(self.get_sel(new_path))
+            else:
+                deltablock = diffdir.DirFull(self.get_sel(new_path))
             diffdir.write_block_iter(deltablock, diff)
 
             patchdir.Patch(seq_path, diff.open("rb"))
@@ -94,7 +96,8 @@ class PatchingTest(UnitTestCase):
 
         tf = patchdir.TarFile_FromFileobjs(get_fileobjs())
         namelist = []
-        for tarinfo in tf: namelist.append(tarinfo.name)
+        for tarinfo in tf:
+            namelist.append(tarinfo.name)
         for i in range(1, 6):
             assert ("tmp/%d" % i) in namelist, namelist
 
@@ -129,6 +132,7 @@ class index:
     """Used below to test the iter collation"""
     def __init__(self, index):
         self.index = index
+
 
 class CollateItersTest(UnitTestCase):
     def setUp(self):
@@ -192,7 +196,8 @@ class TestInnerFuncs(UnitTestCase):
     def check_output(self):
         """Make sure testfiles/output exists"""
         out = Path("testfiles/output")
-        if not (out.exists() and out.isdir()): out.mkdir()
+        if not (out.exists() and out.isdir()):
+            out.mkdir()
         self.out = out
 
     def snapshot(self):
