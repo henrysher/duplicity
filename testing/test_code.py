@@ -86,8 +86,6 @@ class CodeTest(DuplicityTestCase):
         # and clean up the code.  But for now, let's at least get *some* pep8
         # coverage.
         ignores = [
-            "E231",
-            "E241",
             "E251",
             "E261",
             "E262",
