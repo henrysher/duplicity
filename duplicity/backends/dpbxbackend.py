@@ -26,10 +26,12 @@
 
 import os
 import urllib
-import locale, sys
+import locale
+import sys
 from functools import reduce
 
-import traceback, StringIO
+import traceback
+import StringIO
 
 import duplicity.backend
 from duplicity import log

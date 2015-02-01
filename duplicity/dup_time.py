@@ -23,7 +23,10 @@
 
 from future_builtins import map
 
-import time, types, re, calendar
+import time
+import types
+import re
+import calendar
 from duplicity import globals
 
 

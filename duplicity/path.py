@@ -28,7 +28,12 @@ associates stat information with filenames
 
 from future_builtins import filter
 
-import stat, errno, socket, time, re, gzip
+import stat
+import errno
+import socket
+import time
+import re
+import gzip
 
 from duplicity import tarfile
 from duplicity import file_naming

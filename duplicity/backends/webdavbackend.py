@@ -22,7 +22,8 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import base64
-import httplib, os
+import httplib
+import os
 import re
 import urllib
 import urllib2
@@ -54,7 +55,8 @@ class VerifiedHTTPSConnection(httplib.HTTPSConnection):
         def __init__(self, *args, **kwargs):
             try:
                 global socket, ssl
-                import socket, ssl
+                import socket
+                import ssl
             except ImportError:
                 raise FatalBackendException("Missing socket or ssl libraries.")
 

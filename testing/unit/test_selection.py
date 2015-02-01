@@ -21,7 +21,9 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import types
-import StringIO, unittest, sys
+import StringIO
+import unittest
+import sys
 
 from duplicity.selection import *  # @UnusedWildImport
 from duplicity.lazy import *  # @UnusedWildImport

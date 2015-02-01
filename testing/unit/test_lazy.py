@@ -19,7 +19,9 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import unittest, pickle, sys
+import unittest
+import pickle
+import sys
 from functools import reduce
 
 from duplicity.lazy import *  # @UnusedWildImport

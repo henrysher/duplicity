@@ -23,7 +23,9 @@
 
 from future_builtins import map
 
-import re, time, os
+import re
+import time
+import os
 
 from duplicity import dup_time
 

@@ -21,7 +21,8 @@
 
 """Manage temporary files"""
 
-import os, sys
+import os
+import sys
 
 from duplicity import log
 from duplicity import util

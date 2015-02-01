@@ -28,7 +28,8 @@ which is written in C.  The goal was to use C as little as possible...
 """
 
 from . import _librsync
-import types, array
+import types
+import array
 
 blocksize = _librsync.RS_JOB_BLOCKSIZE
 

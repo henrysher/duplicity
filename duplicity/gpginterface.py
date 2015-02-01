@@ -703,7 +703,8 @@ def threaded_waitpid(process):
 
 
 def _run_doctests():
-    import doctest, gpginterface  # @UnresolvedImport
+    import doctest
+    from . import gpginterface
     return doctest.testmod(GnuPGInterface)
 
 # deprecated

@@ -81,12 +81,7 @@ class CodeTest(DuplicityTestCase):
     @unittest.skipUnless(os.getenv('RUN_CODE_TESTS', None) == '1',
                          'Must set environment var RUN_CODE_TESTS=1')
     def test_pep8(self):
-        # All these ignores are just because when this test was added, I didn't
-        # want to fix all of the code.  Over time we can remove some of these
-        # and clean up the code.  But for now, let's at least get *some* pep8
-        # coverage.
         ignores = [
-            "E401",
             "E501",
         ]
         self.run_checker(["pep8",

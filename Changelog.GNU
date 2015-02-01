@@ -1,3 +1,9 @@
+2015-02-01  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Misc fixes for the following PEP8 issues:
+      - E401
+      - see http://pep8.readthedocs.org
+
 2015-01-31  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~aaron-whitehouse/duplicity/bug_932482_trailing_slashes_and_wildcards_error

@@ -57,6 +57,9 @@ New in v0.7.02 (2015/02/??)
     E701, E702, E703, E711, E721, W291, W292, W293, W391
   - see http://pep8.readthedocs.org
 * Fixes for 2to3 issues
+* Misc fixes for the following PEP8 issues:
+  - E401
+  - see http://pep8.readthedocs.org
 
 
 New in v0.7.01 (2015/01/11)

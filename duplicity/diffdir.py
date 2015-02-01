@@ -29,7 +29,9 @@ the second, the ROPath iterator is put into tar block form.
 
 from future_builtins import map
 
-import cStringIO, types, math
+import cStringIO
+import types
+import math
 from duplicity import statistics
 from duplicity import util
 from duplicity import globals

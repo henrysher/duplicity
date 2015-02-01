@@ -27,8 +27,16 @@
 # Please send mail to me or the mailing list if you find bugs or have
 # any suggestions.
 
-import gzip, os, sys, time, types
-import traceback, platform, statvfs, resource, re
+import gzip
+import os
+import sys
+import time
+import types
+import traceback
+import platform
+import statvfs
+import resource
+import re
 import threading
 from datetime import datetime
 from lockfile import FileLock
@@ -62,7 +70,8 @@ exit_val = None
 def getpass_safe(message):
     # getpass() in Python 2.x will call str() on our prompt.  So we can't pass
     # in non-ascii characters.
-    import getpass, locale
+    import getpass
+    import locale
     message = message.encode(locale.getpreferredencoding(), 'replace')
     return getpass.getpass(message)
 

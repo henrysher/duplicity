@@ -25,7 +25,12 @@ which is now patched with some code for iterative threaded execution
 see duplicity's README for details
 """
 
-import os, types, tempfile, re, gzip, locale
+import os
+import types
+import tempfile
+import re
+import gzip
+import locale
 
 from duplicity import globals
 from duplicity import gpginterface

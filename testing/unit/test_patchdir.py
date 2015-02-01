@@ -21,7 +21,9 @@
 
 from future_builtins import map
 
-import sys, cStringIO, unittest
+import sys
+import cStringIO
+import unittest
 
 from duplicity import diffdir
 from duplicity import patchdir
