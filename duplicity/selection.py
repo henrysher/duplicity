@@ -253,9 +253,6 @@ class Select:
                     for sf in self.filelist_globbing_get_sfs(filelists[filelists_index], 1, arg):
                         self.add_selection_func(sf)
                     filelists_index += 1
-                    # self.add_selection_func(self.filelist_get_sf(
-                    #     filelists[filelists_index], 1, arg))
-                    # filelists_index += 1
                 elif opt == "--include-regexp":
                     self.add_selection_func(self.regexp_get_sf(arg, 1))
                 else:
@@ -302,70 +299,71 @@ probably isn't what you meant.""") %
         else:
             self.selection_functions.append(sel_func)
 
-    def filelist_get_sf(self, filelist_fp, inc_default, filelist_name):
-        """Return selection function by reading list of files
+    # def filelist_get_sf(self, filelist_fp, inc_default, filelist_name):
+    #     """Return selection function by reading list of files
+    #
+    #     The format of the filelist is documented in the man page.
+    #     filelist_fp should be an (open) file object.
+    #     inc_default should be true if this is an include list,
+    #     false for an exclude list.
+    #     filelist_name is just a string used for logging.
+    #
+    #     """
+    #     log.Notice(_("Reading filelist %s") % filelist_name)
+    #     tuple_list, something_excluded = \
+    #         self.filelist_read(filelist_fp, inc_default, filelist_name)
+    #     log.Notice(_("Sorting filelist %s") % filelist_name)
+    #     tuple_list.sort()
+    #     i = [0]  # We have to put index in list because of stupid scoping rules
+    #
+    #     def selection_function(path):
+    #         while 1:
+    #             if i[0] >= len(tuple_list):
+    #                 return None
+    #             include, move_on = \
+    #                 self.filelist_pair_match(path, tuple_list[i[0]])
+    #             if move_on:
+    #                 i[0] += 1
+    #                 if include is None:
+    #                     continue  # later line may match
+    #             return include
+    #
+    #     selection_function.exclude = something_excluded or inc_default == 0
+    #     selection_function.name = "Filelist: " + filelist_name
+    #     return selection_function
 
-        The format of the filelist is documented in the man page.
-        filelist_fp should be an (open) file object.
-        inc_default should be true if this is an include list,
-        false for an exclude list.
-        filelist_name is just a string used for logging.
-
-        """
-        log.Notice(_("Reading filelist %s") % filelist_name)
-        tuple_list, something_excluded = \
-            self.filelist_read(filelist_fp, inc_default, filelist_name)
-        log.Notice(_("Sorting filelist %s") % filelist_name)
-        tuple_list.sort()
-        i = [0]  # We have to put index in list because of stupid scoping rules
-
-        def selection_function(path):
-            while 1:
-                if i[0] >= len(tuple_list):
-                    return None
-                include, move_on = \
-                    self.filelist_pair_match(path, tuple_list[i[0]])
-                if move_on:
-                    i[0] += 1
-                    if include is None:
-                        continue  # later line may match
-                return include
-
-        selection_function.exclude = something_excluded or inc_default == 0
-        selection_function.name = "Filelist: " + filelist_name
-        return selection_function
-
-    def filelist_read(self, filelist_fp, include, filelist_name):
-        """Read filelist from fp, return (tuplelist, something_excluded)"""
-        prefix_warnings = [0]
-        def incr_warnings(exc):
-            """Warn if prefix is incorrect"""
-            prefix_warnings[0] += 1
-            if prefix_warnings[0] < 6:
-                log.Warn(_("Warning: file specification '%s' in filelist %s\n"
-                           "doesn't start with correct prefix %s.  Ignoring.") %
-                         (exc, filelist_name, util.ufn(self.prefix)))
-                if prefix_warnings[0] == 5:
-                    log.Warn(_("Future prefix errors will not be logged."))
-
-        something_excluded, tuple_list = None, []
-        separator = globals.null_separator and "\0" or "\n"
-        for line in filelist_fp.read().split(separator):
-            try:
-                tuple = self.filelist_parse_line(line, include)
-            except FilePrefixError as exc:
-                incr_warnings(exc)
-                continue
-            if not tuple:
-                # Skip blanks/full-line comments
-                continue
-            else:
-                tuple_list.append(tuple)
-            if not tuple[1]:
-                something_excluded = 1
-        if filelist_fp not in (sys.stdin,) and filelist_fp.close():
-            log.Warn(_("Error closing filelist %s") % filelist_name)
-        return (tuple_list, something_excluded)
+    # def filelist_read(self, filelist_fp, include, filelist_name):
+    #     """Read filelist from fp, return (tuplelist, something_excluded)"""
+    #     prefix_warnings = [0]
+    #     def incr_warnings(exc):
+    #         """Warn if prefix is incorrect"""
+    #         prefix_warnings[0] += 1
+    #         if prefix_warnings[0] < 6:
+    #             log.Warn(_("Warning: file specification '%s' in filelist %s\n"
+    #                        "doesn't start with correct prefix %s.  Ignoring.") %
+    #                      (exc, filelist_name, util.ufn(self.prefix)))
+    #             if prefix_warnings[0] == 5:
+    #                 log.Warn(_("Future prefix errors will not be logged."))
+    #
+    #     something_excluded, tuple_list = None, []
+    #     separator = globals.null_separator and "\0" or "\n"
+    #     for line in filelist_fp.read().split(separator):
+    #         try:
+    #             tuple = self.filelist_parse_line(line, include)
+    #         except FilePrefixError as exc:
+    #             incr_warnings(exc)
+    #             continue
+    #         if not tuple:
+    #             # Skip blanks/full-line comments
+    #             continue
+    #         else:
+    #             tuple_list.append(tuple)
+    #         if not tuple[1]:
+    #             something_excluded = 1
+    #     if filelist_fp not in (sys.stdin,) and filelist_fp.close():
+    # ToDo: Does --include-filelist-stdin still work without this?
+    #         log.Warn(_("Error closing filelist %s") % filelist_name)
+    #     return (tuple_list, something_excluded)
 
     def filelist_sanitise_line(self, line, include_default):
         """
@@ -395,58 +393,58 @@ probably isn't what you meant.""") %
 
         return line, include
 
-    def filelist_parse_line(self, line, include):
-        """Parse a single line of a filelist, returning a pair or None if the line is blank/a comment
+    # def filelist_parse_line(self, line, include):
+    #     """Parse a single line of a filelist, returning a pair or None if the line is blank/a comment
+    #
+    #     Pair will be of form (index, include), where index is another
+    #     tuple, and include is 1 if the line specifies that we are
+    #     including a file.  The default is given as an argument.
+    #     prefix is the string that the index is relative to.
+    #
+    #     """
+    #
+    #     line, include = self.filelist_sanitise_line(line, include)
+    #
+    #     if not line:
+    #         # Skip blanks and comments
+    #         return None
+    #
+    #     if not line.startswith(self.prefix):
+    #         raise FilePrefixError(line)
+    #     line = line[len(self.prefix):]  # Discard prefix
+    #     index = tuple(filter(lambda x: x, line.split("/")))  # remove empties
+    #     return (index, include)
 
-        Pair will be of form (index, include), where index is another
-        tuple, and include is 1 if the line specifies that we are
-        including a file.  The default is given as an argument.
-        prefix is the string that the index is relative to.
-
-        """
-
-        line, include = self.filelist_sanitise_line(line, include)
-
-        if not line:
-            # Skip blanks and comments
-            return None
-
-        if not line.startswith(self.prefix):
-            raise FilePrefixError(line)
-        line = line[len(self.prefix):]  # Discard prefix
-        index = tuple(filter(lambda x: x, line.split("/")))  # remove empties
-        return (index, include)
-
-    def filelist_pair_match(self, path, pair):
-        """Matches a filelist tuple against a path
-
-        Returns a pair (include, move_on).  include is None if the
-        tuple doesn't match either way, and 0/1 if the tuple excludes
-        or includes the path.
-
-        move_on is true if the tuple cannot match a later index, and
-        so we should move on to the next tuple in the index.
-
-        """
-        index, include = pair
-        if include == 1:
-            if index < path.index:
-                return (None, True)
-            if index == path.index:
-                return (1, True)
-            elif index[:len(path.index)] == path.index:
-                return (1, False)  # /foo/bar implicitly includes /foo
-            else:
-                return (None, False)  # path greater, not initial sequence
-        elif include == 0:
-            if path.index[:len(index)] == index:
-                return (0, False)  # /foo implicitly excludes /foo/bar
-            elif index < path.index:
-                return (None, True)
-            else:
-                return (None, False)  # path greater, not initial sequence
-        else:
-            assert 0, "Include is %s, should be 0 or 1" % (include,)
+    # def filelist_pair_match(self, path, pair):
+    #     """Matches a filelist tuple against a path
+    #
+    #     Returns a pair (include, move_on).  include is None if the
+    #     tuple doesn't match either way, and 0/1 if the tuple excludes
+    #     or includes the path.
+    #
+    #     move_on is true if the tuple cannot match a later index, and
+    #     so we should move on to the next tuple in the index.
+    #
+    #     """
+    #     index, include = pair
+    #     if include == 1:
+    #         if index < path.index:
+    #             return (None, True)
+    #         if index == path.index:
+    #             return (1, True)
+    #         elif index[:len(path.index)] == path.index:
+    #             return (1, False)  # /foo/bar implicitly includes /foo
+    #         else:
+    #             return (None, False)  # path greater, not initial sequence
+    #     elif include == 0:
+    #         if path.index[:len(index)] == index:
+    #             return (0, False)  # /foo implicitly excludes /foo/bar
+    #         elif index < path.index:
+    #             return (None, True)
+    #         else:
+    #             return (None, False)  # path greater, not initial sequence
+    #     else:
+    #         assert 0, "Include is %s, should be 0 or 1" % (include,)
 
     def filelist_globbing_get_sfs(self, filelist_fp, inc_default, list_name):
         """Return list of selection functions by reading fileobj

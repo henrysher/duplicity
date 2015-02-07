@@ -72,6 +72,12 @@ def old_fn_deprecation(opt):
               "Use of default filenames is strongly suggested.") % opt,
             log.ERROR, force_print=True)
 
+def old_globbing_filelist_deprecation(opt):
+    log.Log(_("Warning: Option %s is pending deprecation and will be removed in a future release.\n"
+              "--include-filelist and --exclude-filelist now accept globbing characters and should "
+              "be used instead.") % opt,
+            log.ERROR, force_print=True)
+
 def expand_fn(filename):
     return os.path.expanduser(os.path.expandvars(filename))
 
@@ -302,7 +308,9 @@ def parse_cmdline_options(arglist):
                                                    select_files.append(sys.stdin)))
 
     parser.add_option("--exclude-globbing-filelist", type="file", metavar=_("filename"),
-                      dest="", action="callback", callback=add_filelist)
+                      dest="", action="callback", callback=lambda o, s, v, p: (add_filelist(o, s, v, p),
+                                                                               old_globbing_filelist_deprecation(s)),
+                      help=optparse.SUPPRESS_HELP)
 
     # TRANSL: Used in usage help to represent the name of a file. Example:
     # --log-file <filename>
@@ -403,7 +411,9 @@ def parse_cmdline_options(arglist):
                       callback=lambda o, s, v, p: (select_opts.append(("--include-filelist", "standard input")),
                                                    select_files.append(sys.stdin)))
     parser.add_option("--include-globbing-filelist", type="file", metavar=_("filename"),
-                      dest="", action="callback", callback=add_filelist)
+                      dest="", action="callback", callback=lambda o, s, v, p: (add_filelist(o, s, v, p),
+                                                                               old_globbing_filelist_deprecation(s)),
+                      help=optparse.SUPPRESS_HELP)
     parser.add_option("--include-regexp", metavar=_("regular_expression"), dest="",
                       type="string", action="callback", callback=add_selection)
 

@@ -100,154 +100,154 @@ class MatchingTest(UnitTestCase):
         assert sf2(self.makeext("what/ever.py")) == 0
         assert sf2(self.makeext("what/ever.py/foo")) == 0
 
-    def testFilelistInclude(self):
-        """Test included filelist"""
-        fp = StringIO.StringIO("""
-testfiles/select/1/2
-testfiles/select/1
-testfiles/select/1/2/3
-testfiles/select/3/3/2""")
-        sf = self.Select.filelist_get_sf(fp, 1, "test")
-        assert sf(self.root) == 1
-        assert sf(self.makeext("1")) == 1
-        assert sf(self.makeext("1/1")) == None
-        assert sf(self.makeext("1/2/3")) == 1
-        assert sf(self.makeext("2/2")) == None
-        assert sf(self.makeext("3")) == 1
-        assert sf(self.makeext("3/3")) == 1
-        assert sf(self.makeext("3/3/3")) == None
+#     def testFilelistInclude(self):
+#         """Test included filelist"""
+#         fp = StringIO.StringIO("""
+# testfiles/select/1/2
+# testfiles/select/1
+# testfiles/select/1/2/3
+# testfiles/select/3/3/2""")
+#         sf = self.Select.filelist_get_sf(fp, 1, "test")
+#         assert sf(self.root) == 1
+#         assert sf(self.makeext("1")) == 1
+#         assert sf(self.makeext("1/1")) == None
+#         assert sf(self.makeext("1/2/3")) == 1
+#         assert sf(self.makeext("2/2")) == None
+#         assert sf(self.makeext("3")) == 1
+#         assert sf(self.makeext("3/3")) == 1
+#         assert sf(self.makeext("3/3/3")) == None
+#
+#     def test_filelist_include_1_trailing_white_space(self):
+#         """Test trailing whitespace is ignored in included filelist (1 space)"""
+#         fp = StringIO.StringIO("testfiles/select/1/2\n"
+#                                "testfiles/select/1 \n"
+#                                "testfiles/select/1/2/3\n"
+#                                "testfiles/select/3/3/2")
+#         sf = self.Select.filelist_get_sf(fp, 1, "test")
+#         assert sf(self.root) == 1
+#         assert sf(self.makeext("1")) == 1
+#         assert sf(self.makeext("1/1")) == None
+#         assert sf(self.makeext("1/2/3")) == 1
+#         assert sf(self.makeext("2/2")) == None
+#         assert sf(self.makeext("3")) == 1
+#         assert sf(self.makeext("3/3")) == 1
+#         assert sf(self.makeext("3/3/3")) == None
 
-    def test_filelist_include_1_trailing_white_space(self):
-        """Test trailing whitespace is ignored in included filelist (1 space)"""
-        fp = StringIO.StringIO("testfiles/select/1/2\n"
-                               "testfiles/select/1 \n"
-                               "testfiles/select/1/2/3\n"
-                               "testfiles/select/3/3/2")
-        sf = self.Select.filelist_get_sf(fp, 1, "test")
-        assert sf(self.root) == 1
-        assert sf(self.makeext("1")) == 1
-        assert sf(self.makeext("1/1")) == None
-        assert sf(self.makeext("1/2/3")) == 1
-        assert sf(self.makeext("2/2")) == None
-        assert sf(self.makeext("3")) == 1
-        assert sf(self.makeext("3/3")) == 1
-        assert sf(self.makeext("3/3/3")) == None
-
-    def test_filelist_include_2_trailing_white_spaces(self):
-        """Test trailing whitespace is ignored in included filelist (2 space)"""
-        fp = StringIO.StringIO("testfiles/select/1/2\n"
-                               "testfiles/select/1\n"
-                               "testfiles/select/1/2/3  \n"
-                               "testfiles/select/3/3/2")
-        sf = self.Select.filelist_get_sf(fp, 1, "test")
-        assert sf(self.root) == 1
-        assert sf(self.makeext("1")) == 1
-        assert sf(self.makeext("1/1")) == None
-        assert sf(self.makeext("1/2/3")) == 1
-        assert sf(self.makeext("2/2")) == None
-        assert sf(self.makeext("3")) == 1
-        assert sf(self.makeext("3/3")) == 1
-        assert sf(self.makeext("3/3/3")) == None
-
-    def test_filelist_include_1_leading_white_space(self):
-        """Test leading whitespace is ignored in included filelist (1 space)"""
-        fp = StringIO.StringIO(" testfiles/select/1/2\n"
-                               "testfiles/select/1\n"
-                               "testfiles/select/1/2/3\n"
-                               "testfiles/select/3/3/2")
-        sf = self.Select.filelist_get_sf(fp, 1, "test")
-        assert sf(self.root) == 1
-        assert sf(self.makeext("1")) == 1
-        assert sf(self.makeext("1/1")) == None
-        assert sf(self.makeext("1/2/3")) == 1
-        assert sf(self.makeext("2/2")) == None
-        assert sf(self.makeext("3")) == 1
-        assert sf(self.makeext("3/3")) == 1
-        assert sf(self.makeext("3/3/3")) == None
-
-    def test_filelist_include_2_leading_white_spaces(self):
-        """Test leading whitespace is ignored in included filelist (1 space)"""
-        fp = StringIO.StringIO("testfiles/select/1/2\n"
-                               "testfiles/select/1\n"
-                               "testfiles/select/1/2/3\n"
-                               "  testfiles/select/3/3/2")
-        sf = self.Select.filelist_get_sf(fp, 1, "test")
-        assert sf(self.root) == 1
-        assert sf(self.makeext("1")) == 1
-        assert sf(self.makeext("1/1")) == None
-        assert sf(self.makeext("1/2/3")) == 1
-        assert sf(self.makeext("2/2")) == None
-        assert sf(self.makeext("3")) == 1
-        assert sf(self.makeext("3/3")) == 1
-        assert sf(self.makeext("3/3/3")) == None
-
-    def testFilelistIncludeNullSep(self):
-        """Test included filelist but with null_separator set"""
-        fp = StringIO.StringIO("""\0testfiles/select/1/2\0testfiles/select/1\0testfiles/select/1/2/3\0testfiles/select/3/3/2\0testfiles/select/hello\nthere\0""")
-        self.set_global('null_separator', 1)
-        sf = self.Select.filelist_get_sf(fp, 1, "test")
-        assert sf(self.root) == 1
-        assert sf(self.makeext("1")) == 1
-        assert sf(self.makeext("1/1")) == None
-        assert sf(self.makeext("1/2/3")) == 1
-        assert sf(self.makeext("2/2")) == None
-        assert sf(self.makeext("3")) == 1
-        assert sf(self.makeext("3/3")) == 1
-        assert sf(self.makeext("3/3/3")) == None
-        assert sf(self.makeext("hello\nthere")) == 1
-
-    def testFilelistExclude(self):
-        """Test included filelist"""
-        fp = StringIO.StringIO("""
-testfiles/select/1/2
-testfiles/select/1
-this is a badly formed line which should be ignored
-
-testfiles/select/1/2/3
-testfiles/select/3/3/2""")
-        sf = self.Select.filelist_get_sf(fp, 0, "test")
-        assert sf(self.root) == None
-        assert sf(self.makeext("1")) == 0
-        assert sf(self.makeext("1/1")) == 0
-        assert sf(self.makeext("1/2/3")) == 0
-        assert sf(self.makeext("2/2")) == None
-        assert sf(self.makeext("3")) == None
-        assert sf(self.makeext("3/3/2")) == 0
-        assert sf(self.makeext("3/3/3")) == None
-
-    def testFilelistInclude2(self):
-        """testFilelistInclude2 - with modifiers"""
-        fp = StringIO.StringIO("""
-testfiles/select/1/1
-- testfiles/select/1/2
-+ testfiles/select/1/3
-- testfiles/select/3""")
-        sf = self.Select.filelist_get_sf(fp, 1, "test1")
-        assert sf(self.makeext("1")) == 1
-        assert sf(self.makeext("1/1")) == 1
-        assert sf(self.makeext("1/1/2")) == None
-        assert sf(self.makeext("1/2")) == 0
-        assert sf(self.makeext("1/2/3")) == 0
-        assert sf(self.makeext("1/3")) == 1
-        assert sf(self.makeext("2")) == None
-        assert sf(self.makeext("3")) == 0
-
-    def testFilelistInclude3(self):
-        """testFilelistInclude3 - with modifiers to check - works as expected"""
-        fp = StringIO.StringIO("""
-testfiles/select/1/1
-- testfiles/select/1/2
-+ testfiles/select/1/3
-testfiles/select/1""")
-        sf = self.Select.filelist_get_sf(fp, 1, "test1")
-        assert sf(self.makeext("1")) == 1
-        assert sf(self.makeext("1/1")) == 1
-        assert sf(self.makeext("1/1/2")) == None
-        assert sf(self.makeext("1/2")) == 0
-        assert sf(self.makeext("1/2/3")) == 0
-        assert sf(self.makeext("1/3")) == 1
-        assert sf(self.makeext("2")) == None
-        assert sf(self.makeext("3")) == None
+#     def test_filelist_include_2_trailing_white_spaces(self):
+#         """Test trailing whitespace is ignored in included filelist (2 space)"""
+#         fp = StringIO.StringIO("testfiles/select/1/2\n"
+#                                "testfiles/select/1\n"
+#                                "testfiles/select/1/2/3  \n"
+#                                "testfiles/select/3/3/2")
+#         sf = self.Select.filelist_get_sf(fp, 1, "test")
+#         assert sf(self.root) == 1
+#         assert sf(self.makeext("1")) == 1
+#         assert sf(self.makeext("1/1")) == None
+#         assert sf(self.makeext("1/2/3")) == 1
+#         assert sf(self.makeext("2/2")) == None
+#         assert sf(self.makeext("3")) == 1
+#         assert sf(self.makeext("3/3")) == 1
+#         assert sf(self.makeext("3/3/3")) == None
+#
+#     def test_filelist_include_1_leading_white_space(self):
+#         """Test leading whitespace is ignored in included filelist (1 space)"""
+#         fp = StringIO.StringIO(" testfiles/select/1/2\n"
+#                                "testfiles/select/1\n"
+#                                "testfiles/select/1/2/3\n"
+#                                "testfiles/select/3/3/2")
+#         sf = self.Select.filelist_get_sf(fp, 1, "test")
+#         assert sf(self.root) == 1
+#         assert sf(self.makeext("1")) == 1
+#         assert sf(self.makeext("1/1")) == None
+#         assert sf(self.makeext("1/2/3")) == 1
+#         assert sf(self.makeext("2/2")) == None
+#         assert sf(self.makeext("3")) == 1
+#         assert sf(self.makeext("3/3")) == 1
+#         assert sf(self.makeext("3/3/3")) == None
+#
+#     def test_filelist_include_2_leading_white_spaces(self):
+#         """Test leading whitespace is ignored in included filelist (1 space)"""
+#         fp = StringIO.StringIO("testfiles/select/1/2\n"
+#                                "testfiles/select/1\n"
+#                                "testfiles/select/1/2/3\n"
+#                                "  testfiles/select/3/3/2")
+#         sf = self.Select.filelist_get_sf(fp, 1, "test")
+#         assert sf(self.root) == 1
+#         assert sf(self.makeext("1")) == 1
+#         assert sf(self.makeext("1/1")) == None
+#         assert sf(self.makeext("1/2/3")) == 1
+#         assert sf(self.makeext("2/2")) == None
+#         assert sf(self.makeext("3")) == 1
+#         assert sf(self.makeext("3/3")) == 1
+#         assert sf(self.makeext("3/3/3")) == None
+#
+#     def testFilelistIncludeNullSep(self):
+#         """Test included filelist but with null_separator set"""
+#         fp = StringIO.StringIO("""\0testfiles/select/1/2\0testfiles/select/1\0testfiles/select/1/2/3\0testfiles/select/3/3/2\0testfiles/select/hello\nthere\0""")
+#         self.set_global('null_separator', 1)
+#         sf = self.Select.filelist_get_sf(fp, 1, "test")
+#         assert sf(self.root) == 1
+#         assert sf(self.makeext("1")) == 1
+#         assert sf(self.makeext("1/1")) == None
+#         assert sf(self.makeext("1/2/3")) == 1
+#         assert sf(self.makeext("2/2")) == None
+#         assert sf(self.makeext("3")) == 1
+#         assert sf(self.makeext("3/3")) == 1
+#         assert sf(self.makeext("3/3/3")) == None
+#         assert sf(self.makeext("hello\nthere")) == 1
+#
+#     def testFilelistExclude(self):
+#         """Test included filelist"""
+#         fp = StringIO.StringIO("""
+# testfiles/select/1/2
+# testfiles/select/1
+# this is a badly formed line which should be ignored
+#
+# testfiles/select/1/2/3
+# testfiles/select/3/3/2""")
+#         sf = self.Select.filelist_get_sf(fp, 0, "test")
+#         assert sf(self.root) == None
+#         assert sf(self.makeext("1")) == 0
+#         assert sf(self.makeext("1/1")) == 0
+#         assert sf(self.makeext("1/2/3")) == 0
+#         assert sf(self.makeext("2/2")) == None
+#         assert sf(self.makeext("3")) == None
+#         assert sf(self.makeext("3/3/2")) == 0
+#         assert sf(self.makeext("3/3/3")) == None
+#
+#     def testFilelistInclude2(self):
+#         """testFilelistInclude2 - with modifiers"""
+#         fp = StringIO.StringIO("""
+# testfiles/select/1/1
+# - testfiles/select/1/2
+# + testfiles/select/1/3
+# - testfiles/select/3""")
+#         sf = self.Select.filelist_get_sf(fp, 1, "test1")
+#         assert sf(self.makeext("1")) == 1
+#         assert sf(self.makeext("1/1")) == 1
+#         assert sf(self.makeext("1/1/2")) == None
+#         assert sf(self.makeext("1/2")) == 0
+#         assert sf(self.makeext("1/2/3")) == 0
+#         assert sf(self.makeext("1/3")) == 1
+#         assert sf(self.makeext("2")) == None
+#         assert sf(self.makeext("3")) == 0
+#
+#     def testFilelistInclude3(self):
+#         """testFilelistInclude3 - with modifiers to check - works as expected"""
+#         fp = StringIO.StringIO("""
+# testfiles/select/1/1
+# - testfiles/select/1/2
+# + testfiles/select/1/3
+# testfiles/select/1""")
+#         sf = self.Select.filelist_get_sf(fp, 1, "test1")
+#         assert sf(self.makeext("1")) == 1
+#         assert sf(self.makeext("1/1")) == 1
+#         assert sf(self.makeext("1/1/2")) == None
+#         assert sf(self.makeext("1/2")) == 0
+#         assert sf(self.makeext("1/2/3")) == 0
+#         assert sf(self.makeext("1/3")) == 1
+#         assert sf(self.makeext("2")) == None
+#         assert sf(self.makeext("3")) == None
 
 #     def test_filelist_include_excluded_folder_with_included_contents(self):
 #         """Check that excluded folder is included if subfolder is included at higher priority. """
@@ -268,142 +268,142 @@ testfiles/select/1""")
 #         assert sf(self.makeext("2")) == None
 #         assert sf(self.makeext("3")) == None
 
-    def testFilelistExclude2(self):
-        """testFilelistExclude2 - with modifiers"""
-        fp = StringIO.StringIO("""
-testfiles/select/1/1
-- testfiles/select/1/2
-+ testfiles/select/1/3
-- testfiles/select/3""")
-        sf = self.Select.filelist_get_sf(fp, 0, "test1")
-        sf_val1 = sf(self.root)
-        assert sf_val1 == 1 or sf_val1 == None  # either is OK
-        sf_val2 = sf(self.makeext("1"))
-        assert sf_val2 == 1 or sf_val2 == None
-        assert sf(self.makeext("1/1")) == 0
-        assert sf(self.makeext("1/1/2")) == 0
-        assert sf(self.makeext("1/2")) == 0
-        assert sf(self.makeext("1/2/3")) == 0
-        assert sf(self.makeext("1/3")) == 1
-        assert sf(self.makeext("2")) == None
-        assert sf(self.makeext("3")) == 0
-
-    def test_filelist_exclude_2_with_trailing_white_space(self):
-        """testFilelistExclude2 with modifiers - test trailing whitespace is ignored (1 and 2 spaces)"""
-        fp = StringIO.StringIO("testfiles/select/1/1\n"
-                               "- testfiles/select/1/2 \n"
-                               "+ testfiles/select/1/3  \n"
-                               "- testfiles/select/3")
-        sf = self.Select.filelist_get_sf(fp, 0, "test1")
-        sf_val1 = sf(self.root)
-        assert sf_val1 == 1 or sf_val1 == None  # either is OK
-        sf_val2 = sf(self.makeext("1"))
-        assert sf_val2 == 1 or sf_val2 == None
-        assert sf(self.makeext("1/1")) == 0
-        assert sf(self.makeext("1/1/2")) == 0
-        assert sf(self.makeext("1/2")) == 0
-        assert sf(self.makeext("1/2/3")) == 0
-        assert sf(self.makeext("1/3")) == 1
-        assert sf(self.makeext("2")) == None
-        assert sf(self.makeext("3")) == 0
-
-    def test_filelist_exclude_with_single_quotes(self):
-        """testFilelistExclude2 with modifiers - test unnecessary single quotes are ignored"""
-        fp = StringIO.StringIO("testfiles/select/1/1\n"
-                               "- testfiles/select/1/2\n"
-                               "+ 'testfiles/select/1/3'\n"
-                               "- testfiles/select/3")
-        sf = self.Select.filelist_get_sf(fp, 0, "test1")
-        sf_val1 = sf(self.root)
-        assert sf_val1 == 1 or sf_val1 == None  # either is OK
-        sf_val2 = sf(self.makeext("1"))
-        assert sf_val2 == 1 or sf_val2 == None
-        assert sf(self.makeext("1/1")) == 0
-        assert sf(self.makeext("1/1/2")) == 0
-        assert sf(self.makeext("1/2")) == 0
-        assert sf(self.makeext("1/2/3")) == 0
-        assert sf(self.makeext("1/3")) == 1
-        assert sf(self.makeext("2")) == None
-        assert sf(self.makeext("3")) == 0
-
-    def test_filelist_exclude_with_full_line_comment(self):
-        """testFilelistExclude2 with modifiers - test full-line comment is ignored"""
-        fp = StringIO.StringIO("testfiles/select/1/1\n"
-                               "- testfiles/select/1/2\n"
-                               "# This is a full-line comment\n"
-                               "+ testfiles/select/1/3\n"
-                               "- testfiles/select/3")
-        sf = self.Select.filelist_get_sf(fp, 0, "test1")
-        sf_val1 = sf(self.root)
-        assert sf_val1 == 1 or sf_val1 == None  # either is OK
-        sf_val2 = sf(self.makeext("1"))
-        assert sf_val2 == 1 or sf_val2 == None
-        assert sf(self.makeext("1/1")) == 0
-        assert sf(self.makeext("1/1/2")) == 0
-        assert sf(self.makeext("1/2")) == 0
-        assert sf(self.makeext("1/2/3")) == 0
-        assert sf(self.makeext("1/3")) == 1
-        assert sf(self.makeext("2")) == None
-        assert sf(self.makeext("3")) == 0
-
-    def test_filelist_exclude_with_blank_line(self):
-        """testFilelistExclude2 with modifiers - test blank line is ignored"""
-        fp = StringIO.StringIO("testfiles/select/1/1\n"
-                               "- testfiles/select/1/2\n"
-                               "\n"
-                               "+ testfiles/select/1/3\n"
-                               "- testfiles/select/3")
-        sf = self.Select.filelist_get_sf(fp, 0, "test1")
-        sf_val1 = sf(self.root)
-        assert sf_val1 == 1 or sf_val1 == None  # either is OK
-        sf_val2 = sf(self.makeext("1"))
-        assert sf_val2 == 1 or sf_val2 == None
-        assert sf(self.makeext("1/1")) == 0
-        assert sf(self.makeext("1/1/2")) == 0
-        assert sf(self.makeext("1/2")) == 0
-        assert sf(self.makeext("1/2/3")) == 0
-        assert sf(self.makeext("1/3")) == 1
-        assert sf(self.makeext("2")) == None
-        assert sf(self.makeext("3")) == 0
-
-    def test_filelist_exclude_with_blank_line_and_whitespace(self):
-        """testFilelistExclude2 with modifiers - test blank line with whitespace is ignored"""
-        fp = StringIO.StringIO("testfiles/select/1/1\n"
-                               "- testfiles/select/1/2\n"
-                               " \n"
-                               "+ testfiles/select/1/3\n"
-                               "- testfiles/select/3")
-        sf = self.Select.filelist_get_sf(fp, 0, "test1")
-        sf_val1 = sf(self.root)
-        assert sf_val1 == 1 or sf_val1 == None  # either is OK
-        sf_val2 = sf(self.makeext("1"))
-        assert sf_val2 == 1 or sf_val2 == None
-        assert sf(self.makeext("1/1")) == 0
-        assert sf(self.makeext("1/1/2")) == 0
-        assert sf(self.makeext("1/2")) == 0
-        assert sf(self.makeext("1/2/3")) == 0
-        assert sf(self.makeext("1/3")) == 1
-        assert sf(self.makeext("2")) == None
-        assert sf(self.makeext("3")) == 0
-
-    def test_filelist_exclude_with_double_quotes(self):
-        """testFilelistExclude2 with modifiers - test unnecessary double quotes are ignored"""
-        fp = StringIO.StringIO('testfiles/select/1/1\n'
-                               '- testfiles/select/1/2\n'
-                               '+ "testfiles/select/1/3"\n'
-                               '- testfiles/select/3')
-        sf = self.Select.filelist_get_sf(fp, 0, "test1")
-        sf_val1 = sf(self.root)
-        assert sf_val1 == 1 or sf_val1 == None  # either is OK
-        sf_val2 = sf(self.makeext("1"))
-        assert sf_val2 == 1 or sf_val2 == None
-        assert sf(self.makeext("1/1")) == 0
-        assert sf(self.makeext("1/1/2")) == 0
-        assert sf(self.makeext("1/2")) == 0
-        assert sf(self.makeext("1/2/3")) == 0
-        assert sf(self.makeext("1/3")) == 1
-        assert sf(self.makeext("2")) == None
-        assert sf(self.makeext("3")) == 0
+#     def testFilelistExclude2(self):
+#         """testFilelistExclude2 - with modifiers"""
+#         fp = StringIO.StringIO("""
+# testfiles/select/1/1
+# - testfiles/select/1/2
+# + testfiles/select/1/3
+# - testfiles/select/3""")
+#         sf = self.Select.filelist_get_sf(fp, 0, "test1")
+#         sf_val1 = sf(self.root)
+#         assert sf_val1 == 1 or sf_val1 == None  # either is OK
+#         sf_val2 = sf(self.makeext("1"))
+#         assert sf_val2 == 1 or sf_val2 == None
+#         assert sf(self.makeext("1/1")) == 0
+#         assert sf(self.makeext("1/1/2")) == 0
+#         assert sf(self.makeext("1/2")) == 0
+#         assert sf(self.makeext("1/2/3")) == 0
+#         assert sf(self.makeext("1/3")) == 1
+#         assert sf(self.makeext("2")) == None
+#         assert sf(self.makeext("3")) == 0
+#
+#     def test_filelist_exclude_2_with_trailing_white_space(self):
+#         """testFilelistExclude2 with modifiers - test trailing whitespace is ignored (1 and 2 spaces)"""
+#         fp = StringIO.StringIO("testfiles/select/1/1\n"
+#                                "- testfiles/select/1/2 \n"
+#                                "+ testfiles/select/1/3  \n"
+#                                "- testfiles/select/3")
+#         sf = self.Select.filelist_get_sf(fp, 0, "test1")
+#         sf_val1 = sf(self.root)
+#         assert sf_val1 == 1 or sf_val1 == None  # either is OK
+#         sf_val2 = sf(self.makeext("1"))
+#         assert sf_val2 == 1 or sf_val2 == None
+#         assert sf(self.makeext("1/1")) == 0
+#         assert sf(self.makeext("1/1/2")) == 0
+#         assert sf(self.makeext("1/2")) == 0
+#         assert sf(self.makeext("1/2/3")) == 0
+#         assert sf(self.makeext("1/3")) == 1
+#         assert sf(self.makeext("2")) == None
+#         assert sf(self.makeext("3")) == 0
+#
+#     def test_filelist_exclude_with_single_quotes(self):
+#         """testFilelistExclude2 with modifiers - test unnecessary single quotes are ignored"""
+#         fp = StringIO.StringIO("testfiles/select/1/1\n"
+#                                "- testfiles/select/1/2\n"
+#                                "+ 'testfiles/select/1/3'\n"
+#                                "- testfiles/select/3")
+#         sf = self.Select.filelist_get_sf(fp, 0, "test1")
+#         sf_val1 = sf(self.root)
+#         assert sf_val1 == 1 or sf_val1 == None  # either is OK
+#         sf_val2 = sf(self.makeext("1"))
+#         assert sf_val2 == 1 or sf_val2 == None
+#         assert sf(self.makeext("1/1")) == 0
+#         assert sf(self.makeext("1/1/2")) == 0
+#         assert sf(self.makeext("1/2")) == 0
+#         assert sf(self.makeext("1/2/3")) == 0
+#         assert sf(self.makeext("1/3")) == 1
+#         assert sf(self.makeext("2")) == None
+#         assert sf(self.makeext("3")) == 0
+#
+#     def test_filelist_exclude_with_full_line_comment(self):
+#         """testFilelistExclude2 with modifiers - test full-line comment is ignored"""
+#         fp = StringIO.StringIO("testfiles/select/1/1\n"
+#                                "- testfiles/select/1/2\n"
+#                                "# This is a full-line comment\n"
+#                                "+ testfiles/select/1/3\n"
+#                                "- testfiles/select/3")
+#         sf = self.Select.filelist_get_sf(fp, 0, "test1")
+#         sf_val1 = sf(self.root)
+#         assert sf_val1 == 1 or sf_val1 == None  # either is OK
+#         sf_val2 = sf(self.makeext("1"))
+#         assert sf_val2 == 1 or sf_val2 == None
+#         assert sf(self.makeext("1/1")) == 0
+#         assert sf(self.makeext("1/1/2")) == 0
+#         assert sf(self.makeext("1/2")) == 0
+#         assert sf(self.makeext("1/2/3")) == 0
+#         assert sf(self.makeext("1/3")) == 1
+#         assert sf(self.makeext("2")) == None
+#         assert sf(self.makeext("3")) == 0
+#
+#     def test_filelist_exclude_with_blank_line(self):
+#         """testFilelistExclude2 with modifiers - test blank line is ignored"""
+#         fp = StringIO.StringIO("testfiles/select/1/1\n"
+#                                "- testfiles/select/1/2\n"
+#                                "\n"
+#                                "+ testfiles/select/1/3\n"
+#                                "- testfiles/select/3")
+#         sf = self.Select.filelist_get_sf(fp, 0, "test1")
+#         sf_val1 = sf(self.root)
+#         assert sf_val1 == 1 or sf_val1 == None  # either is OK
+#         sf_val2 = sf(self.makeext("1"))
+#         assert sf_val2 == 1 or sf_val2 == None
+#         assert sf(self.makeext("1/1")) == 0
+#         assert sf(self.makeext("1/1/2")) == 0
+#         assert sf(self.makeext("1/2")) == 0
+#         assert sf(self.makeext("1/2/3")) == 0
+#         assert sf(self.makeext("1/3")) == 1
+#         assert sf(self.makeext("2")) == None
+#         assert sf(self.makeext("3")) == 0
+#
+#     def test_filelist_exclude_with_blank_line_and_whitespace(self):
+#         """testFilelistExclude2 with modifiers - test blank line with whitespace is ignored"""
+#         fp = StringIO.StringIO("testfiles/select/1/1\n"
+#                                "- testfiles/select/1/2\n"
+#                                " \n"
+#                                "+ testfiles/select/1/3\n"
+#                                "- testfiles/select/3")
+#         sf = self.Select.filelist_get_sf(fp, 0, "test1")
+#         sf_val1 = sf(self.root)
+#         assert sf_val1 == 1 or sf_val1 == None  # either is OK
+#         sf_val2 = sf(self.makeext("1"))
+#         assert sf_val2 == 1 or sf_val2 == None
+#         assert sf(self.makeext("1/1")) == 0
+#         assert sf(self.makeext("1/1/2")) == 0
+#         assert sf(self.makeext("1/2")) == 0
+#         assert sf(self.makeext("1/2/3")) == 0
+#         assert sf(self.makeext("1/3")) == 1
+#         assert sf(self.makeext("2")) == None
+#         assert sf(self.makeext("3")) == 0
+#
+#     def test_filelist_exclude_with_double_quotes(self):
+#         """testFilelistExclude2 with modifiers - test unnecessary double quotes are ignored"""
+#         fp = StringIO.StringIO('testfiles/select/1/1\n'
+#                                '- testfiles/select/1/2\n'
+#                                '+ "testfiles/select/1/3"\n'
+#                                '- testfiles/select/3')
+#         sf = self.Select.filelist_get_sf(fp, 0, "test1")
+#         sf_val1 = sf(self.root)
+#         assert sf_val1 == 1 or sf_val1 == None  # either is OK
+#         sf_val2 = sf(self.makeext("1"))
+#         assert sf_val2 == 1 or sf_val2 == None
+#         assert sf(self.makeext("1/1")) == 0
+#         assert sf(self.makeext("1/1/2")) == 0
+#         assert sf(self.makeext("1/2")) == 0
+#         assert sf(self.makeext("1/2/3")) == 0
+#         assert sf(self.makeext("1/3")) == 1
+#         assert sf(self.makeext("2")) == None
+#         assert sf(self.makeext("3")) == 0
 
     def testGlobRE(self):
         """testGlobRE - test translation of shell pattern to regular exp"""
@@ -454,11 +454,11 @@ testfiles/select/1/1
         assert select.glob_get_sf("**", 0)(root) == 0
         assert select.glob_get_sf("/foo/*", 0)(root) == None
 
-        assert select.filelist_get_sf(StringIO.StringIO("/"), 1, "test")(root) == 1
-        assert select.filelist_get_sf(StringIO.StringIO("/foo/bar"), 1, "test")(root) == 1
-        assert select.filelist_get_sf(StringIO.StringIO("/"), 0, "test")(root) == 0
-        assert select.filelist_get_sf(StringIO.StringIO("/foo/bar"), 0,
-                                      "test")(root) == None
+        # assert select.filelist_get_sf(StringIO.StringIO("/"), 1, "test")(root) == 1
+        # assert select.filelist_get_sf(StringIO.StringIO("/foo/bar"), 1, "test")(root) == 1
+        # assert select.filelist_get_sf(StringIO.StringIO("/"), 0, "test")(root) == 0
+        # assert select.filelist_get_sf(StringIO.StringIO("/foo/bar"), 0,
+        #                               "test")(root) == None
 
     def testOtherFilesystems(self):
         """Test to see if --exclude-other-filesystems works correctly"""
