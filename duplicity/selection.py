@@ -233,11 +233,9 @@ class Select:
                     self.add_selection_func(self.present_get_sf(arg, 0))
                 elif opt == "--exclude-device-files":
                     self.add_selection_func(self.devfiles_get_sf())
-                elif opt == "--exclude-filelist":
-                    self.add_selection_func(self.filelist_get_sf(
-                        filelists[filelists_index], 0, arg))
-                    filelists_index += 1
-                elif opt == "--exclude-globbing-filelist":
+                elif (opt == "--exclude-filelist") or (opt == "--exclude-globbing-filelist"):
+                    # --exclude-globbing-filelist is now deprecated, as all filelists are globbing
+                    # but keep this here for the short term for backwards-compatibility
                     for sf in self.filelist_globbing_get_sfs(filelists[filelists_index], 0, arg):
                         self.add_selection_func(sf)
                     filelists_index += 1
@@ -249,14 +247,15 @@ class Select:
                     self.add_selection_func(self.exclude_older_get_sf(arg))
                 elif opt == "--include":
                     self.add_selection_func(self.glob_get_sf(arg, 1))
-                elif opt == "--include-filelist":
-                    self.add_selection_func(self.filelist_get_sf(
-                        filelists[filelists_index], 1, arg))
-                    filelists_index += 1
-                elif opt == "--include-globbing-filelist":
+                elif (opt == "--include-filelist") or (opt == "--include-globbing-filelist"):
+                    # --include-globbing-filelist is now deprecated, as all filelists are globbing
+                    # but keep this here for the short term for backwards-compatibility
                     for sf in self.filelist_globbing_get_sfs(filelists[filelists_index], 1, arg):
                         self.add_selection_func(sf)
                     filelists_index += 1
+                    # self.add_selection_func(self.filelist_get_sf(
+                    #     filelists[filelists_index], 1, arg))
+                    # filelists_index += 1
                 elif opt == "--include-regexp":
                     self.add_selection_func(self.regexp_get_sf(arg, 1))
                 else:

@@ -463,12 +463,11 @@ class TestIncludeFilelistTest(IncludeExcludeFunctionalTest):
     """
     Test --include-filelist using duplicity binary.
     """
-    @unittest.expectedFailure
     def test_include_filelist(self):
         """Test that include filelist works in the basic case"""
         # See test_exclude_globbing_filelist above for explanation of what is expected. As this is an include filelist
         # any lines with no +/- modifier should be treated as if they have a +.
-        # ToDo Currently fails - Bug #1408411 (https://bugs.launchpad.net/duplicity/+bug/1408411)
+        # Regression test for Bug #1408411 (https://bugs.launchpad.net/duplicity/+bug/1408411)
         # Create a filelist
         with open('testfiles/include.txt', 'w') as f:
             f.write('testfiles/select2/3/3sub3/3sub3sub2/3sub3sub2_file.txt\n'
@@ -624,18 +623,16 @@ class TestIncludeExcludedForContents(IncludeExcludeFunctionalTest):
         self.backup("full", "testfiles/select/1", options=["--exclude-globbing-filelist=testfiles/exclude.txt"])
         self.restore_and_check()
 
-    @unittest.expectedFailure
     def test_include_filelist(self):
         """test an excluded folder is included for included contents with an include-filelist (non-globbing) """
-        # ToDo - currently fails - Bug #1408411 (https://bugs.launchpad.net/duplicity/+bug/1408411)
+        # Regression test for Bug #1408411 (https://bugs.launchpad.net/duplicity/+bug/1408411)
         self.write_filelist("testfiles/include.txt")
         self.backup("full", "testfiles/select/1", options=["--include-filelist=testfiles/include.txt"])
         self.restore_and_check()
 
-    @unittest.expectedFailure
     def test_exclude_filelist(self):
         """test an excluded folder is included for included contents with an exclude-filelist  (non-globbing) """
-        # ToDo - currently fails - Bug #1408411 (https://bugs.launchpad.net/duplicity/+bug/1408411)
+        # Regression test for Bug #1408411 (https://bugs.launchpad.net/duplicity/+bug/1408411)
         self.write_filelist("testfiles/exclude.txt")
         self.backup("full", "testfiles/select/1", options=["--exclude-filelist=testfiles/exclude.txt"])
         self.restore_and_check()
