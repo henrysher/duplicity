@@ -46,11 +46,12 @@ New in v0.7.02 (2015/02/??)
     contain both a single or double asterisk and a trailing slash.
 * Misc fixes for the following PEP8 issues:
   - E111, E121, E122, E124, E125, E126, E127, E128, E201, E202, E203,
-    E231, E241, E251, E261, E262, E271, E272, E301, E302, E303, E401, 
+    E231, E241, E251, E261, E262, E271, E272, E301, E302, E303, E401,
     E502, E701, E702, E703, E711, E721, W291, W292, W293, W391
-  - to run pep8 on duplicity use 'pep8 --ignore=E501' 
+  - to run pep8 on duplicity use 'pep8 --ignore=E501'
   - see http://pep8.readthedocs.org
 * Fixes for 2to3 issues
+* Fix spelling error in manpage, bug 1419314.
 
 
 New in v0.7.01 (2015/01/11)

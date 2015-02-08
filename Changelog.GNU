@@ -1,5 +1,9 @@
 2015-02-01  Kenneth Loafman  <kenneth@loafman.com>
 
+    * Fix spelling error in manpage, bug 1419314.
+
+2015-02-01  Kenneth Loafman  <kenneth@loafman.com>
+
     * Misc fixes for the following PEP8 issues:
       - E401
       - see http://pep8.readthedocs.org
