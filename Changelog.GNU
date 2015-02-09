@@ -1,4 +1,8 @@
-2015-02-01  Kenneth Loafman  <kenneth@loafman.com>
+2015-02-09  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fix _librsyncmodule.c compilation, bug 1416344, thanks to Kari Hautio.
+
+2015-02-08  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fix spelling error in manpage, bug 1419314.
 
