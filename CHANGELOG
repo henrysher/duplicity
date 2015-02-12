@@ -53,6 +53,7 @@ New in v0.7.02 (2015/02/??)
 * Fixes for 2to3 issues
 * Fix spelling error in manpage, bug 1419314.
 * Fix _librsyncmodule.c compilation, bug 1416344, thanks to Kari Hautio.
+* Really fix bug 1416344 based on comment #5 by Roman Tereshonkov
 
 
 New in v0.7.01 (2015/01/11)

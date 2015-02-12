@@ -1,3 +1,7 @@
+2015-02-12  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Really fix bug 1416344 based on comment #5 by Roman Tereshonkov
+
 2015-02-09  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fix _librsyncmodule.c compilation, bug 1416344, thanks to Kari Hautio.
