@@ -41,6 +41,20 @@ import threading
 from datetime import datetime
 from lockfile import FileLock
 
+if '--pydevd' in sys.argv:
+    # The following is for starting remote debugging in Eclipse with Pydev.
+    # Adjust the path to your location and version of Eclipse and Pydev.
+    pysrc = "/opt/eclipse/plugins/org.python.pydev_3.9.2.201502050007/pysrc"
+    sys.path.append(pysrc)
+    import pydevd  # @UnresolvedImport
+    pydevd.settrace()
+    # In a dev environment the path is screwed so fix it.
+    base = sys.path.pop(0)
+    base = base.split(os.path.sep)[:-1]
+    base = os.path.sep.join(base)
+    sys.path.insert(0, base)
+# end remote debugger startup
+
 from duplicity import log
 log.setup()
 
@@ -1360,15 +1374,6 @@ See https://bugs.launchpad.net/duplicity/+bug/931175
 
 
 def do_backup(action):
-    # The following is for starting remote debugging in Eclipse with Pydev.
-    # Adjust the path to your location and version of Eclipse and Pydev.
-    if globals.pydevd:
-        pysrc = "/opt/Aptana Studio 3/plugins/org.python.pydev.debug_2.2.4.2011111522/pysrc"
-        sys.path.append(pysrc)
-        import pydevd  # @UnresolvedImport
-        pydevd.settrace()
-    # end remote debugger startup
-
     # set the current time strings again now that we have time separator
     if globals.current_time:
         dup_time.setcurtime(globals.current_time)

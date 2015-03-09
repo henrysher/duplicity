@@ -1,6 +1,13 @@
+2015-03-09  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fix for --pydevd debug environment and location under Eclipse.
+    * Fix for bug where scp was actually working as scp and not working with
+      rsync.net because of using extraneous test command in restricted shell.
+      Was trying "test -d 'foo' || mkdir -p 'foo'", now only "mkdir -p foo".
+
 2015-02-12  Kenneth Loafman  <kenneth@loafman.com>
 
-    * Really fix bug 1416344 based on comment #5 by Roman Tereshonkov
+    * Really fix bug 1416344 based on comment #5 by Roman Tereshonkov.
 
 2015-02-09  Kenneth Loafman  <kenneth@loafman.com>
 

@@ -41,9 +41,9 @@ read_blocksize = 65635  # for doing scp retrievals, where we need to read oursel
 
 
 class SSHParamikoBackend(duplicity.backend.Backend):
-    """This backend accesses files using the sftp protocol, or scp when the --use-scp option is given.
+    """This backend accesses files using the sftp or scp protocols.
     It does not need any local client programs, but an ssh server and the sftp program must be installed on the remote
-    side (or with --use-scp, the programs scp, ls, mkdir, rm and a POSIX-compliant shell).
+    side (or with scp, the programs scp, ls, mkdir, rm and a POSIX-compliant shell).
 
     Authentication keys are requested from an ssh agent if present, then ~/.ssh/id_rsa/dsa are tried.
     If -oIdentityFile=path is present in --ssh-options, then that file is also tried.
@@ -52,7 +52,7 @@ class SSHParamikoBackend(duplicity.backend.Backend):
 
     Missing directories on the remote side will be created.
 
-    If --use-scp is active then all operations on the remote side require passing arguments through a shell,
+    If scp is active then all operations on the remote side require passing arguments through a shell,
     which introduces unavoidable quoting issues: directory and file names that contain single quotes will not work.
     This problem does not exist with sftp.
     """
@@ -225,10 +225,10 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         if (self.use_scp):
             # sanity-check the directory name
             if (re.search("'", self.remote_dir)):
-                raise BackendException("cannot handle directory names with single quotes with --use-scp!")
+                raise BackendException("cannot handle directory names with single quotes with scp")
 
             # make directory if needed
-            self.runremote("test -d '%s' || mkdir -p '%s'" % (self.remote_dir, self.remote_dir), False, "scp mkdir ")
+            self.runremote("mkdir -p '%s'" % (self.remote_dir, self.remote_dir), False, "scp mkdir ")
         else:
             try:
                 self.sftp = self.client.open_sftp()
