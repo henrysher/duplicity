@@ -228,7 +228,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                 raise BackendException("cannot handle directory names with single quotes with scp")
 
             # make directory if needed
-            self.runremote("mkdir -p '%s'" % (self.remote_dir, self.remote_dir), False, "scp mkdir ")
+            self.runremote("mkdir -p '%s'" % (self.remote_dir,), False, "scp mkdir ")
         else:
             try:
                 self.sftp = self.client.open_sftp()

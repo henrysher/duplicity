@@ -1,4 +1,4 @@
-New in v0.7.02 (2015/02/??)
+New in v0.7.02 (2015/03/10)
 ---------------------------
 * Merged in lp:~vincegt/duplicity/swift_regionname
   - Fixes bug #1376628
@@ -58,6 +58,7 @@ New in v0.7.02 (2015/02/??)
 * Fix for bug where scp was actually working as scp and not working with
   rsync.net because of using extraneous test command in restricted shell.
   Was trying "test -d 'foo' || mkdir -p 'foo'", now only "mkdir -p foo".
+* remove extraneous string format arg in previous scp fix.
 
 
 New in v0.7.01 (2015/01/11)

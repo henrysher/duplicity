@@ -1,3 +1,7 @@
+2015-03-10  Kenneth Loafman  <kenneth@loafman.com>
+
+    * remove extraneous string format arg in previous scp fix.
+
 2015-03-09  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fix for --pydevd debug environment and location under Eclipse.
