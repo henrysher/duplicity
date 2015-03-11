@@ -1,3 +1,7 @@
+2015-03-11  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Prep for 0.7.02.
+
 2015-03-10  Kenneth Loafman  <kenneth@loafman.com>
 
     * remove extraneous string format arg in previous scp fix.
