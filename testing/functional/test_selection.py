@@ -24,7 +24,6 @@ import unittest
 
 from . import FunctionalTestCase
 
-
 class IncludeExcludeFunctionalTest(FunctionalTestCase):
     """
     This contains methods used in the tests below for testing the include, exclude and various filelist features.
@@ -792,8 +791,6 @@ class TestTrailingSlash(IncludeExcludeFunctionalTest):
                              "--exclude", "*/select/1/1/",
                              "--exclude", "*/select/1/3/"])
         self.restore_and_check()
-
-
 
 if __name__ == "__main__":
     unittest.main()

@@ -481,28 +481,15 @@ reasons or if rdiff-backup is not handling device files correctly.
 .TP
 .BI "--exclude-filelist " filename
 Excludes the files listed in
-.IR filename .
-See the
-.B FILE SELECTION
-section for more information.
-
-.TP
-.BI --exclude-filelist-stdin
-Like
-.BI --exclude-filelist,
-but the list of files will be read from standard input.  See the
-.B FILE SELECTION
-section for more information.
-
-.TP
-.BR "--exclude-globbing-filelist " filename
-Like
-.BI --exclude-filelist
-but each line of the filelist will be interpreted according to the
+.IR filename,
+with each line of the filelist interpreted according to the
 same rules as
 .BI --include
 and
 .BI --exclude.
+See the
+.B FILE SELECTION
+section for more information.
 
 .TP
 .BR "--exclude-if-present " filename
@@ -663,22 +650,6 @@ but include the listed files instead.  See the
 section for more information.
 
 .TP
-.BI --include-filelist-stdin
-Like
-.BR --include-filelist ,
-but read the list of included files from standard input.
-
-.TP
-.BI "--include-globbing-filelist " filename
-Like
-.BI --include-filelist
-but each line of the filelist will be interpreted according to the
-same rules as
-.BI --include
-and
-.BI --exclude.
-
-.TP
 .BI "--include-regexp " regexp
 Include files matching the regular expression
 .IR regexp .
@@ -746,7 +717,7 @@ after a successful backup.  This switch disables that behavior.
 Use nulls (\\0) instead of newlines (\\n) as line separators, which
 may help when dealing with filenames containing newlines.  This
 affects the expected format of the files specified by the
---{include|exclude}-filelist[-stdin] switches as well as the format of
+--{include|exclude}-filelist switches as well as the format of
 the directory statistics file.
 
 .TP
@@ -1337,10 +1308,6 @@ to the current time zone settings.  For instance, "2002/3/5",
 "03-05-2002", and "2002-3-05" all mean March 5th, 2002.
 
 .SH FILE SELECTION
-duplicity accepts the same file selection options
-.B rdiff-backup
-does, including --exclude, --exclude-filelist-stdin, etc.
-
 When duplicity is run, it searches through the given source
 directory and backs up all the files specified by the file selection
 system.  The file selection system comprises a number of file
@@ -1353,19 +1320,11 @@ line options:
 .br
 --exclude-filelist
 .br
---exclude-filelist-stdin
-.br
---exclude-globbing-filelist
-.br
 --exclude-regexp
 .br
 --include
 .br
 --include-filelist
-.br
---include-filelist-stdin
-.br
---include-globbing-filelist
 .br
 --include-regexp
 .RE
@@ -1402,9 +1361,9 @@ would backup the /usr/local/bin directory (and its contents), but not
 The
 .BR include ,
 .BR exclude ,
-.BR include-globbing-filelist ,
+.BR include-filelist ,
 and
-.B exclude-globbing-filelist
+.B exclude-filelist
 options accept some
 .IR "extended shell globbing patterns" .
 These patterns can contain
@@ -1493,34 +1452,18 @@ match /usr alone.
 
 The
 .BR --include-filelist ,
-.BR --exclude-filelist ,
-.BR --include-filelist-stdin ,
 and
-.BI --exclude-filelist-stdin
+.BI --exclude-filelist ,
 options also introduce file selection conditions.  They direct
 duplicity to read in a file, each line of which is a file
 specification, and to include or exclude the matching files.  Lines
 are separated by newlines or nulls, depending on whether the
---null-separator switch was given.  Each line in a filelist is
-interpreted similarly to the way
-.I extended shell patterns
-are, with a few exceptions:
-.PP
-.B 1.
-Globbing patterns like
-.BR * ,
-.BR ** ,
-.BR ? ,
+--null-separator switch was given.  Each line in the filelist will be
+interpreted as a globbing pattern the way
+.BI --include
 and
-.B [...]
-are not expanded.
-.br
-.B 2.
-Include patterns do not match files in a directory that is included.
-So /usr/local in an include file will not match /usr/local/doc.
-.br
-.B 3.
-Lines starting with "+ " are interpreted as include directives, even
+.BI --exclude
+options are interpreted, except that lines starting with "+ " are interpreted as include directives, even
 if found in a filelist referenced by
 .BR --exclude-filelist .
 Similarly, lines starting with "- " exclude files even if they are
@@ -1544,23 +1487,18 @@ then
 .B "--include-filelist list.txt"
 would include /usr, /usr/local, and
 /usr/local/bin.  It would exclude /usr/local/doc,
-/usr/local/doc/python, etc.  It neither excludes nor includes
-/usr/local/man, leaving the fate of this directory to the next
-specification condition.  Finally, it is undefined what happens with
+/usr/local/doc/python, etc.  It would also include
+/usr/local/man, as this is included within /user/local.  Finally, it is undefined what happens with
 /var.  A single file list should not contain conflicting file
 specifications.
 
-The
-.BI --include-globbing-filelist
-and
-.BI --exclude-globbing-filelist
-options also specify filelists, but each line in the filelist will be
+Each line in the filelist will also be
 interpreted as a globbing pattern the way
 .BI --include
 and
 .BI --exclude
-options are interpreted (although "+ " and "- " prefixing is still
-allowed).  For instance, if the file "globbing-list.txt" contains the
+options are interpreted.
+For instance, if the file "list.txt" contains the
 lines:
 
 .RS
@@ -1572,7 +1510,7 @@ dir/foo
 .RE
 
 Then
-.B "--include-globbing-filelist globbing-list.txt"
+.B "--include-filelist list.txt"
 would be exactly the same as specifying
 .B "--include dir/foo --include dir/bar --exclude **"
 on the command line.

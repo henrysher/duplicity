@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2015-02-18 23:12+0000\n"
+"POT-Creation-Date: 2015-03-12 16:53+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1259,33 +1259,33 @@ msgstr ""
 msgid "Error listing directory %s"
 msgstr ""
 
-#: ../duplicity/selection.py:122
+#: ../duplicity/selection.py:125
 #, python-format
 msgid "Skipping socket %s"
 msgstr ""
 
-#: ../duplicity/selection.py:126
+#: ../duplicity/selection.py:129
 #, python-format
 msgid "Error initializing file %s"
 msgstr ""
 
-#: ../duplicity/selection.py:130 ../duplicity/selection.py:151
+#: ../duplicity/selection.py:133 ../duplicity/selection.py:155
 #, python-format
 msgid "Error accessing possibly locked file %s"
 msgstr ""
 
-#: ../duplicity/selection.py:166
+#: ../duplicity/selection.py:170
 #, python-format
 msgid "Warning: base %s doesn't exist, continuing"
 msgstr ""
 
-#: ../duplicity/selection.py:169 ../duplicity/selection.py:187
-#: ../duplicity/selection.py:190
+#: ../duplicity/selection.py:173 ../duplicity/selection.py:191
+#: ../duplicity/selection.py:194
 #, python-format
 msgid "Selecting %s"
 msgstr ""
 
-#: ../duplicity/selection.py:268
+#: ../duplicity/selection.py:275
 #, python-format
 msgid ""
 "Fatal Error: The file specification\n"
@@ -1296,14 +1296,14 @@ msgid ""
 "pattern (such as '**') which matches the base directory."
 msgstr ""
 
-#: ../duplicity/selection.py:277
+#: ../duplicity/selection.py:284
 #, python-format
 msgid ""
 "Fatal Error while processing expression\n"
 "%s"
 msgstr ""
 
-#: ../duplicity/selection.py:286
+#: ../duplicity/selection.py:294
 #, python-format
 msgid ""
 "Last selection expression:\n"
@@ -1313,17 +1313,17 @@ msgid ""
 "probably isn't what you meant."
 msgstr ""
 
-#: ../duplicity/selection.py:458
+#: ../duplicity/selection.py:351
 #, python-format
 msgid "Reading globbing filelist %s"
 msgstr ""
 
-#: ../duplicity/selection.py:486
+#: ../duplicity/selection.py:381
 #, python-format
 msgid "Error compiling regular expression %s"
 msgstr ""
 
-#: ../duplicity/selection.py:502
+#: ../duplicity/selection.py:398
 msgid ""
 "Warning: exclude-device-files is not the first selector.\n"
 "This may not be what you intended"
