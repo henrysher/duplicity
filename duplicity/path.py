@@ -28,7 +28,12 @@ associates stat information with filenames
 
 from future_builtins import filter
 
-import stat, errno, socket, time, re, gzip
+import stat
+import errno
+import socket
+import time
+import re
+import gzip
 
 from duplicity import tarfile
 from duplicity import file_naming
@@ -44,6 +49,7 @@ from duplicity.lazy import *  # @UnusedWildImport
 _copy_blocksize = 64 * 1024
 _tmp_path_counter = 1
 
+
 class StatResult:
     """Used to emulate the output of os.stat() and related"""
     # st_mode is required by the TarInfo class, but it's unclear how
@@ -53,6 +59,7 @@ class StatResult:
 
 class PathException(Exception):
     pass
+
 
 class ROPath:
     """Read only Path
@@ -410,9 +417,11 @@ class ROPath:
         """Compare data from two regular files, return true if same"""
         f1 = self.open("rb")
         f2 = other.open("rb")
+
         def close():
             assert not f1.close()
             assert not f2.close()
+
         while 1:
             buf1 = f1.read(_copy_blocksize)
             buf2 = f2.read(_copy_blocksize)
@@ -680,7 +689,8 @@ class Path(ROPath):
     def unquote(self, s):
         """Return unquoted version of string s, as quoted by above quote()"""
         assert s[0] == s[-1] == "\""  # string must be quoted by above
-        result = ""; i = 1
+        result = ""
+        i = 1
         while i < len(s) - 1:
             if s[i] == "\\":
                 result += s[i + 1]
@@ -767,9 +777,12 @@ class PathDeleter(ITRBranch):
     """Delete a directory.  Called by Path.deltree"""
     def start_process(self, index, path):
         self.path = path
+
     def end_process(self):
         self.path.delete()
+
     def can_fast_process(self, index, path):
         return not path.isdir()
+
     def fast_process(self, index, path):
         path.delete()

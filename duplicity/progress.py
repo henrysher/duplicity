@@ -47,6 +47,7 @@ import os
 tracker = None
 progress_thread = None
 
+
 class Snapshot(sys_collections.deque):
     """
     A convenience class for storing snapshots in a space/timing efficient manner
@@ -79,7 +80,6 @@ class Snapshot(sys_collections.deque):
         pickle.dump(self, progressfd)
         progressfd.close()
 
-
     def __init__(self, iterable=[], maxlen=10):
         super(Snapshot, self).__init__(iterable, maxlen)
         self.last_vol = 0
@@ -100,7 +100,6 @@ class Snapshot(sys_collections.deque):
     def clear(self):
         super(Snapshot, self).clear()
         self.last_vol = 0
-
 
 
 class ProgressTracker():
@@ -234,7 +233,6 @@ class ProgressTracker():
         """
         self.progress_estimation = max(0.0, min(self.prev_estimation + (1.0 - self.prev_estimation) * self.current_estimation, 0.99))
 
-
         """
         Estimate the time just as a projection of the remaining time, fit to a [(1 - x) / x] curve
         """
@@ -267,7 +265,6 @@ class ProgressTracker():
                              self.speed,
                              False
                              )
-
 
     def annotate_written_bytes(self, bytecount):
         """

@@ -58,8 +58,13 @@ _librsync_new_sigmaker(PyObject* self, PyObject* args)
   sm = PyObject_New(_librsync_SigMakerObject, &_librsync_SigMakerType);
   if (sm == NULL) return NULL;
 
+#ifdef RS_DEFAULT_STRONG_LEN /* librsync < 1.0.0 */
   sm->sig_job = rs_sig_begin((size_t)blocklen,
                              (size_t)RS_DEFAULT_STRONG_LEN);
+#else /* librsync >= 1.0.0 */
+  sm->sig_job = rs_sig_begin((size_t)blocklen,
+                             (size_t)8, RS_MD4_SIG_MAGIC);
+#endif
   return (PyObject*)sm;
 }
 

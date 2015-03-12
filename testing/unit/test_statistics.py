@@ -19,7 +19,8 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import sys, unittest
+import sys
+import unittest
 
 from duplicity.statistics import *  # @UnusedWildImport
 from duplicity import path
@@ -95,7 +96,7 @@ TotalDestinationSizeChange 12 (12 bytes)
         assert statline == ". 1 2 3 4 5 7 8 9 10 11"
 
         statline = s.get_stats_line(("file name with spaces",))
-        assert statline == ("file\\x20name\\x20with\\x20spaces " \
+        assert statline == ("file\\x20name\\x20with\\x20spaces "
                             "1 2 3 4 5 7 8 9 10 11"), repr(statline)
 
     def test_byte_summary(self):
@@ -115,8 +116,10 @@ TotalDestinationSizeChange 12 (12 bytes)
         s = StatsObj()
         s.set_stats_from_string("NewFiles 3 hello there")
         for attr in s.stat_attrs:
-            if attr == 'NewFiles': assert s.get_stat(attr) == 3
-            else: assert s.get_stat(attr) is None, (attr, s.__dict__[attr])
+            if attr == 'NewFiles':
+                assert s.get_stat(attr) == 3
+            else:
+                assert s.get_stat(attr) is None, (attr, s.__dict__[attr])
 
         s1 = StatsObj()
         self.set_obj(s1)
@@ -129,7 +132,8 @@ TotalDestinationSizeChange 12 (12 bytes)
     def test_write_path(self):
         """Test reading and writing of statistics object"""
         p = path.Path("testfiles/statstest")
-        if p.exists(): p.delete()
+        if p.exists():
+            p.delete()
         s = StatsObj()
         self.set_obj(s)
         s.write_stats_to_path(p)

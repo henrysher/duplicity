@@ -41,6 +41,8 @@ from duplicity import log
 # http://msdn.microsoft.com/en-us/library/dn659752.aspx
 # http://msdn.microsoft.com/en-us/library/dn631844.aspx
 # https://gist.github.com/rgregg/37ba8929768a62131e85
+
+
 class OneDriveBackend(duplicity.backend.Backend):
     """Uses Microsoft OneDrive (formerly SkyDrive) for backups."""
 
@@ -316,7 +318,7 @@ class OneDriveBackend(duplicity.backend.Backend):
     def _query(self, remote_filename):
         file_id = self.get_file_id(remote_filename)
         if file_id is None:
-            return {'size':-1}
+            return {'size': -1}
         response = self.http_client.get(self.API_URI + file_id)
         response.raise_for_status()
         if 'size' not in response.json():

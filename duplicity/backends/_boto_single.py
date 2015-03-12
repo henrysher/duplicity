@@ -275,7 +275,7 @@ class BotoBackend(duplicity.backend.Backend):
     def _query(self, filename):
         key = self.bucket.lookup(self.key_prefix + filename)
         if key is None:
-            return {'size':-1}
+            return {'size': -1}
         return {'size': key.size}
 
     def upload(self, filename, key, headers):

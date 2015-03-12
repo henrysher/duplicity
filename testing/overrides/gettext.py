@@ -22,6 +22,7 @@
 # always return a string with fancy unicode characters, which will notify us
 # if we ever get a unicode->ascii translation by accident.
 
+
 def install(*args, **kwargs):
     ZWSP = u"​"  # ZERO WIDTH SPACE, basically an invisible space separator
     import __builtin__

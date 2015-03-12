@@ -25,6 +25,7 @@ import duplicity.backend
 from duplicity import log
 from duplicity.errors import BackendException
 
+
 class CoPyCloud:
     API_URI = 'https://api.copy.com'
     DEFAULT_ENCODING = 'latin-1'
@@ -52,7 +53,6 @@ class CoPyCloud:
             raise CoPyCloud.Error("Invalid Login")
 
         self.DEFAULT_HEADERS['X-Authorization'] = res['auth_token'].encode('ascii', 'ignore')
-
 
     def __req(self, req_type, method, params={}, headers={}):
         import json
@@ -192,7 +192,6 @@ class CoPyCloud:
         for part in parts:
             f.seek(part['offset'])
             part['data'] = f.read(part['size'])
-
 
     def list_files(self, path=None, max_items=sys.maxsize):
         path = path = self.__sanitize_path(path)

@@ -19,7 +19,8 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import unittest, os
+import unittest
+import os
 
 from duplicity import path
 from . import FunctionalTestCase
@@ -57,7 +58,8 @@ class RdiffdirTest(FunctionalTestCase):
             new_path = path.Path(dirname)
 
             # Make delta
-            if delta_path.exists(): delta_path.delete()
+            if delta_path.exists():
+                delta_path.delete()
             assert not delta_path.exists()
             self.run_rdiffdir("delta %s %s %s" %
                               (sig_path.name, new_path.name, delta_path.name))

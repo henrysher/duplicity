@@ -46,12 +46,14 @@ import sys
 
 from duplicity import errors
 
+
 def threading_supported():
     """
     Returns whether threading is supported on the system we are
     running on.
     """
     return _threading_supported
+
 
 def require_threading(reason=None):
     """
@@ -65,9 +67,10 @@ def require_threading(reason=None):
     if not threading_supported():
         if reason is None:
             reason = "(no reason given)"
-        raise errors.NotSupported("threading was needed because [%s], but "\
-                                  "is not supported by the python "\
+        raise errors.NotSupported("threading was needed because [%s], but "
+                                  "is not supported by the python "
                                   "interpreter" % (reason,))
+
 
 def thread_module():
     """
@@ -76,12 +79,14 @@ def thread_module():
     """
     return thread
 
+
 def threading_module():
     """
     Returns the threading module, or dummy_thread if threading is not
     supported.
     """
     return threading
+
 
 def with_lock(lock, fn):
     """
@@ -100,6 +105,7 @@ def with_lock(lock, fn):
         return fn()
     finally:
         lock.release()
+
 
 def interruptably_wait(cv, waitFor):
     """
@@ -152,6 +158,7 @@ def interruptably_wait(cv, waitFor):
     while not waitFor():
         cv.wait(0.1)
 
+
 def async_split(fn):
     """
     Splits the act of calling the given function into one front-end
@@ -176,7 +183,6 @@ def async_split(fn):
     # closures work with respect to local variables in Python. We do
     # not care about hash lookup overhead since this is intended to be
     # used for significant amounts of work.
-
 
     cv = threading.Condition()  # @UndefinedVariable
     state = {'done': False,
@@ -218,6 +224,7 @@ def async_split(fn):
             return (False, waiter)
 
     return (waiter, caller)
+
 
 class Value:
     """

@@ -40,13 +40,16 @@ documentation on what this code does can be found on the man page.
 
 """
 
+
 class SelectError(Exception):
     """Some error dealing with the Select class"""
     pass
 
+
 class FilePrefixError(SelectError):
     """Signals that a specified file doesn't start with correct prefix"""
     pass
+
 
 class GlobbingError(SelectError):
     """Something has gone wrong when parsing a glob string"""
@@ -116,7 +119,6 @@ class Select:
 
         """
         # Only called by set_iter. Internal.
-
         def error_handler(exc, path, filename):
             fullpath = os.path.join(path.name, filename)
             try:
@@ -362,11 +364,13 @@ probably isn't what you meant.""") %
         # Internal. Used by ParseArgs and unit tests.
         assert include == 0 or include == 1
         root_devloc = self.rootpath.getdevloc()
+
         def sel_func(path):
             if path.exists() and path.getdevloc() != root_devloc:
                 return include
             else:
                 return None
+
         sel_func.exclude = not include
         sel_func.name = "Match other filesystems"
         return sel_func
@@ -397,11 +401,13 @@ probably isn't what you meant.""") %
         if self.selection_functions:
             log.Warn(_("Warning: exclude-device-files is not the first "
                        "selector.\nThis may not be what you intended"))
+
         def sel_func(path):
             if path.isdev():
                 return 0
             else:
                 return None
+
         sel_func.exclude = 1
         sel_func.name = "Exclude device files"
         return sel_func
@@ -460,7 +466,6 @@ probably isn't what you meant.""") %
 
         """
         # Internal. Used by glob_get_sf and unit tests.
-
         if not filename.startswith(self.prefix):
             raise FilePrefixError(filename)
         index = tuple(filter(lambda x: x,
@@ -555,14 +560,13 @@ probably isn't what you meant.""") %
             try:
                 if os.path.getmtime(path.name) < date:
                     return 0
-            except OSError, e:
+            except OSError as e:
                 pass  # this is probably only on a race condition of file being deleted
             return None
 
         sel_func.exclude = True
         sel_func.name = "Select older than %s" % (date,)
         return sel_func
-
 
     def glob_get_prefix_res(self, glob_str):
         """Return list of regexps equivalent to prefixes of glob_str"""
@@ -622,4 +626,3 @@ probably isn't what you meant.""") %
             else:
                 res = res + re.escape(c)
         return res
-

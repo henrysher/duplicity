@@ -22,6 +22,7 @@ import os
 import duplicity.backend
 from duplicity.errors import BackendException
 
+
 class PyDriveBackend(duplicity.backend.Backend):
     """Connect to remote store using PyDrive API"""
 

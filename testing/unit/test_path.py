@@ -19,7 +19,8 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import sys, unittest
+import sys
+import unittest
 
 from duplicity import log  # @UnusedImport
 from duplicity.path import *  # @UnusedWildImport
@@ -58,6 +59,7 @@ class PathTest(UnitTestCase):
     def test_unquote(self):
         """Test path unquoting"""
         p = Path("foo")  # just to provide unquote function
+
         def t(s):
             """Run test on string s"""
             quoted_version = p.quote(s)

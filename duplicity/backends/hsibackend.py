@@ -23,6 +23,8 @@ import os
 import duplicity.backend
 
 hsi_command = "hsi"
+
+
 class HSIBackend(duplicity.backend.Backend):
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)

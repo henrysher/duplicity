@@ -21,6 +21,7 @@
 import os.path
 import duplicity.backend
 
+
 class SXBackend(duplicity.backend.Backend):
     """Connect to remote store using Skylable Protocol"""
     def __init__(self, parsed_url):

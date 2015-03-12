@@ -23,13 +23,16 @@
 
 from future_builtins import map
 
-import re, time, os
+import re
+import time
+import os
 
 from duplicity import dup_time
 
 
 class StatsException(Exception):
     pass
+
 
 class StatsObj:
     """Contains various statistics, provide string conversion functions"""

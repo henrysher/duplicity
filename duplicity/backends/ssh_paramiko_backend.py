@@ -39,10 +39,11 @@ from duplicity.errors import BackendException
 
 read_blocksize = 65635  # for doing scp retrievals, where we need to read ourselves
 
+
 class SSHParamikoBackend(duplicity.backend.Backend):
-    """This backend accesses files using the sftp protocol, or scp when the --use-scp option is given.
+    """This backend accesses files using the sftp or scp protocols.
     It does not need any local client programs, but an ssh server and the sftp program must be installed on the remote
-    side (or with --use-scp, the programs scp, ls, mkdir, rm and a POSIX-compliant shell).
+    side (or with scp, the programs scp, ls, mkdir, rm and a POSIX-compliant shell).
 
     Authentication keys are requested from an ssh agent if present, then ~/.ssh/id_rsa/dsa are tried.
     If -oIdentityFile=path is present in --ssh-options, then that file is also tried.
@@ -51,7 +52,7 @@ class SSHParamikoBackend(duplicity.backend.Backend):
 
     Missing directories on the remote side will be created.
 
-    If --use-scp is active then all operations on the remote side require passing arguments through a shell,
+    If scp is active then all operations on the remote side require passing arguments through a shell,
     which introduces unavoidable quoting issues: directory and file names that contain single quotes will not work.
     This problem does not exist with sftp.
     """
@@ -152,7 +153,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         rationale is that it is easiest to deal wrt overwriting multiple
         values from ssh_config file. (ede 03/2012)
         """
-        self.config = {'hostname':parsed_url.hostname}
+        self.config = {'hostname': parsed_url.hostname}
         # get system host config entries
         self.config.update(self.gethostconfig('/etc/ssh/ssh_config', parsed_url.hostname))
         # update with user's config file
@@ -160,21 +161,21 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         # update with url values
         # username from url
         if parsed_url.username:
-            self.config.update({'user':parsed_url.username})
+            self.config.update({'user': parsed_url.username})
         # username from input
         if 'user' not in self.config:
-            self.config.update({'user':getpass.getuser()})
+            self.config.update({'user': getpass.getuser()})
         # port from url
         if parsed_url.port:
-            self.config.update({'port':parsed_url.port})
+            self.config.update({'port': parsed_url.port})
         # ensure there is deafult 22 or an int value
         if 'port' in self.config:
-            self.config.update({'port':int(self.config['port'])})
+            self.config.update({'port': int(self.config['port'])})
         else:
-            self.config.update({'port':22})
+            self.config.update({'port': 22})
         # parse ssh options for alternative ssh private key, identity file
         m = re.search("^(?:.+\s+)?(?:-oIdentityFile=|-i\s+)(([\"'])([^\\2]+)\\2|[\S]+).*", globals.ssh_options)
-        if (m != None):
+        if (m is not None):
             keyfilename = m.group(3) if m.group(3) else m.group(1)
             self.config['identityfile'] = keyfilename
         # ensure ~ is expanded and identity exists in dictionary
@@ -224,10 +225,10 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         if (self.use_scp):
             # sanity-check the directory name
             if (re.search("'", self.remote_dir)):
-                raise BackendException("cannot handle directory names with single quotes with --use-scp!")
+                raise BackendException("cannot handle directory names with single quotes with scp")
 
             # make directory if needed
-            self.runremote("test -d '%s' || mkdir -p '%s'" % (self.remote_dir, self.remote_dir), False, "scp mkdir ")
+            self.runremote("mkdir -p '%s'" % (self.remote_dir,), False, "scp mkdir ")
         else:
             try:
                 self.sftp = self.client.open_sftp()
@@ -298,7 +299,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
             chan.send('\0')  # overall ready indicator
             msg = chan.recv(-1)
             m = re.match(r"C([0-7]{4})\s+(\d+)\s+(\S.*)$", msg)
-            if (m == None or m.group(3) != remote_filename):
+            if (m is None or m.group(3) is not remote_filename):
                 raise BackendException("scp get %s failed: incorrect response '%s'" % (remote_filename, msg))
             chan.recv(1)  # dispose of the newline trailing the C message
 

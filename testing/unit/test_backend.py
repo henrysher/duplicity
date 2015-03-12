@@ -97,7 +97,7 @@ class ParsedUrlTest(UnitTestCase):
         assert pu.hostname == "example.com", pu.hostname
         assert pu.path == "/home", pu.path
         assert pu.username == "foo@bar", pu.username
-        assert pu.password == None, pu.password
+        assert pu.password is None, pu.password
         assert pu.port == 123, pu.port
 
         pu = duplicity.backend.ParsedUrl("imap://foo@bar@example.com/home")
@@ -106,8 +106,8 @@ class ParsedUrlTest(UnitTestCase):
         assert pu.hostname == "example.com", pu.hostname
         assert pu.path == "/home", pu.path
         assert pu.username == "foo@bar", pu.username
-        assert pu.password == None, pu.password
-        assert pu.port == None, pu.port
+        assert pu.password is None, pu.password
+        assert pu.port is None, pu.port
 
         pu = duplicity.backend.ParsedUrl("imap://foo@bar.com@example.com/home")
         assert pu.scheme == "imap", pu.scheme
@@ -115,8 +115,8 @@ class ParsedUrlTest(UnitTestCase):
         assert pu.hostname == "example.com", pu.hostname
         assert pu.path == "/home", pu.path
         assert pu.username == "foo@bar.com", pu.username
-        assert pu.password == None, pu.password
-        assert pu.port == None, pu.port
+        assert pu.password is None, pu.password
+        assert pu.port is None, pu.port
 
         pu = duplicity.backend.ParsedUrl("imap://foo%40bar.com@example.com/home")
         assert pu.scheme == "imap", pu.scheme
@@ -124,8 +124,8 @@ class ParsedUrlTest(UnitTestCase):
         assert pu.hostname == "example.com", pu.hostname
         assert pu.path == "/home", pu.path
         assert pu.username == "foo@bar.com", pu.username
-        assert pu.password == None, pu.password
-        assert pu.port == None, pu.port
+        assert pu.password is None, pu.password
+        assert pu.port is None, pu.port
 
     def test_errors(self):
         """Test various url errors"""

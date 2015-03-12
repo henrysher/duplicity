@@ -35,6 +35,7 @@ from duplicity.dup_threading import with_lock
 thread = duplicity.dup_threading.thread_module()
 threading = duplicity.dup_threading.threading_module()
 
+
 class AsyncScheduler:
     """
     Easy-to-use scheduler of function calls to be executed

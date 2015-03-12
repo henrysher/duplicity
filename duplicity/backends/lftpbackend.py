@@ -34,6 +34,7 @@ from duplicity import globals
 from duplicity import log
 from duplicity import tempdir
 
+
 class LFTPBackend(duplicity.backend.Backend):
     """Connect to remote store using File Transfer Protocol"""
     def __init__(self, parsed_url):

@@ -27,11 +27,33 @@
 # Please send mail to me or the mailing list if you find bugs or have
 # any suggestions.
 
-import gzip, os, sys, time, types
-import traceback, platform, statvfs, resource, re
+import gzip
+import os
+import sys
+import time
+import types
+import traceback
+import platform
+import statvfs
+import resource
+import re
 import threading
 from datetime import datetime
 from lockfile import FileLock
+
+if '--pydevd' in sys.argv:
+    # The following is for starting remote debugging in Eclipse with Pydev.
+    # Adjust the path to your location and version of Eclipse and Pydev.
+    pysrc = "/opt/eclipse/plugins/org.python.pydev_3.9.2.201502050007/pysrc"
+    sys.path.append(pysrc)
+    import pydevd  # @UnresolvedImport
+    pydevd.settrace()
+    # In a dev environment the path is screwed so fix it.
+    base = sys.path.pop(0)
+    base = base.split(os.path.sep)[:-1]
+    base = os.path.sep.join(base)
+    sys.path.insert(0, base)
+# end remote debugger startup
 
 from duplicity import log
 log.setup()
@@ -58,12 +80,15 @@ from duplicity import progress
 # If exit_val is not None, exit with given value at end.
 exit_val = None
 
+
 def getpass_safe(message):
     # getpass() in Python 2.x will call str() on our prompt.  So we can't pass
     # in non-ascii characters.
-    import getpass, locale
+    import getpass
+    import locale
     message = message.encode(locale.getpreferredencoding(), 'replace')
     return getpass.getpass(message)
+
 
 def get_passphrase(n, action, for_signing=False):
     """
@@ -310,7 +335,6 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
         if tdp.stat:
             tdp.delete()
         return putsize
-
 
     def validate_encryption_settings(backup_set, manifest):
         """
@@ -798,6 +822,7 @@ def restore_add_sig_check(fileobj):
     """
     assert (isinstance(fileobj, dup_temp.FileobjHooked) and
             isinstance(fileobj.fileobj, gpg.GPGFile)), fileobj
+
     def check_signature():
         """Thunk run when closing volume file"""
         actual_sig = fileobj.fileobj.get_signature()
@@ -805,6 +830,7 @@ def restore_add_sig_check(fileobj):
             log.FatalError(_("Volume was signed by key %s, not %s") %
                            (actual_sig, globals.gpg_profile.sign_key),
                            log.ErrorCode.unsigned_volume)
+
     fileobj.addhook(check_signature)
 
 
@@ -821,7 +847,8 @@ def verify(col_stats):
     global exit_val
     collated = diffdir.collate2iters(restore_get_patched_rop_iter(col_stats),
                                      globals.select)
-    diff_count = 0; total_count = 0
+    diff_count = 0
+    total_count = 0
     for backup_ropath, current_path in collated:
         if not backup_ropath:
             backup_ropath = path.ROPath(current_path.index)
@@ -906,9 +933,11 @@ def remove_old(col_stats):
     @return: void
     """
     assert globals.remove_time is not None
+
     def set_times_str(setlist):
         """Return string listing times of sets in setlist"""
         return "\n".join([dup_time.timetopretty(s.get_time()) for s in setlist])
+
     def chain_times_str(chainlist):
         """Return string listing times of chains in chainlist"""
         return "\n".join([dup_time.timetopretty(s.end_time) for s in chainlist])
@@ -1223,6 +1252,7 @@ def check_resources(action):
                              "Use 'ulimit -n 1024' or higher to correct.\n") % (maxopen,),
                            log.ErrorCode.maxopen_too_low)
 
+
 def log_startup_parms(verbosity=log.INFO):
     """
     log Python, duplicity, and system versions
@@ -1342,16 +1372,8 @@ See https://bugs.launchpad.net/duplicity/+bug/931175
     finally:
         util.release_lockfile()
 
-def do_backup(action):
-    # The following is for starting remote debugging in Eclipse with Pydev.
-    # Adjust the path to your location and version of Eclipse and Pydev.
-    if globals.pydevd:
-        pysrc = "/opt/Aptana Studio 3/plugins/org.python.pydev.debug_2.2.4.2011111522/pysrc"
-        sys.path.append(pysrc)
-        import pydevd  # @UnresolvedImport
-        pydevd.settrace()
-    # end remote debugger startup
 
+def do_backup(action):
     # set the current time strings again now that we have time separator
     if globals.current_time:
         dup_time.setcurtime(globals.current_time)

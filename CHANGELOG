@@ -1,6 +1,5 @@
-New in v0.7.02 (2015/02/??)
+New in v0.7.02 (2015/03/10)
 ---------------------------
-* Fixed some recently added 2to3 and pep8 issues.
 * Merged in lp:~vincegt/duplicity/swift_regionname
   - Fixes bug #1376628
   - Add mapping of SWIFT_REGIONNAME to select region inside SWIFT when a
@@ -27,27 +26,39 @@ New in v0.7.02 (2015/02/??)
 * Fixed variable typo in commandline.py that was causing build fails.
 * Merged in lp:~duplicity-team/duplicity/po-updates
 * Remove 'gs' and 's3+http' from uses_netloc[].  Fixes Bug 1411803.
-* Misc fixes for the following PEP8 issues:
-  - E111, E121, E122, E124, E125, E126
-  - see http://pep8.readthedocs.org
-* Misc fixes for the following PEP8 issues:
-  - E127, E128, 201, 202, 203
-  - see http://pep8.readthedocs.org
 * Fixed bug # 1414418
   - Aligned commandline.py options and help display contents.
   - Aligned commandline.py options and manpage contents.
 * Changed --s3_multipart_max_timeout to --s3-multipart-max-timeout to be
   consistent with commandline option naming conventions.
 * Applied patch from Adam Reichold to fix bug # 1413792.
-* Ongoing pep8 corrections.
 * Merged in lp:~angusgr/duplicity/exclude-older-than
   - Add "--exclude-older-than" commandline option, that allows you to only
     back up files with a modification date newer than a particular threshold.
-* Merged in lp:~aaron-whitehouse/duplicity/bug_884371_asterisks_in_includes 
+* Merged in lp:~aaron-whitehouse/duplicity/bug_884371_asterisks_in_includes
   - Added tests to unit/test_selection.py and funtional/test_selection.py
-    to show the behaviour reported in Bug #884371, i.e. that selection is 
-    incorrect when there is a * or ** on an include line of a filelist or 
+    to show the behaviour reported in Bug #884371, i.e. that selection is
+    incorrect when there is a * or ** on an include line of a filelist or
     commandline --include.
+* Merged in lp:~aaron-whitehouse/duplicity/bug_932482_trailing_slashes_and_wildcards_error
+  - Added functional and unit tests to show Bug #932482 - that selection does
+    not work correctly when excludes (in a filelist or in a commandline option)
+    contain both a single or double asterisk and a trailing slash.
+* Misc fixes for the following PEP8 issues:
+  - E111, E121, E122, E124, E125, E126, E127, E128, E201, E202, E203,
+    E231, E241, E251, E261, E262, E271, E272, E301, E302, E303, E401,
+    E502, E701, E702, E703, E711, E721, W291, W292, W293, W391
+  - to run pep8 on duplicity use 'pep8 --ignore=E501'
+  - see http://pep8.readthedocs.org
+* Fixes for 2to3 issues
+* Fix spelling error in manpage, bug 1419314.
+* Fix _librsyncmodule.c compilation, bug 1416344, thanks to Kari Hautio.
+* Really fix bug 1416344 based on comment #5 by Roman Tereshonkov.
+* Fix for --pydevd debug environment and location under Eclipse.
+* Fix for bug where scp was actually working as scp and not working with
+  rsync.net because of using extraneous test command in restricted shell.
+  Was trying "test -d 'foo' || mkdir -p 'foo'", now only "mkdir -p foo".
+* remove extraneous string format arg in previous scp fix.
 
 
 New in v0.7.01 (2015/01/11)

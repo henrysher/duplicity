@@ -23,7 +23,10 @@
 
 from future_builtins import map
 
-import time, types, re, calendar
+import time
+import types
+import re
+import calendar
 from duplicity import globals
 
 
@@ -61,6 +64,7 @@ current time zone), or ordinary dates like 2/4/1997 or 2001-04-23
 (various combinations are acceptable, but the month always precedes
 the day).""")
 
+
 def setcurtime(time_in_secs=None):
     """Sets the current time in curtime and curtimestr"""
     global curtime, curtimestr
@@ -68,11 +72,13 @@ def setcurtime(time_in_secs=None):
     assert type(t) in (types.LongType, types.IntType)
     curtime, curtimestr = t, timetostring(t)
 
+
 def setprevtime(time_in_secs):
     """Sets the previous time in prevtime and prevtimestr"""
     global prevtime, prevtimestr
     assert type(time_in_secs) in (types.LongType, types.IntType), prevtime
     prevtime, prevtimestr = time_in_secs, timetostring(time_in_secs)
+
 
 def timetostring(timeinseconds):
     """Return w3 or duplicity datetime compliant listing of timeinseconds"""
@@ -89,6 +95,7 @@ def timetostring(timeinseconds):
         # DST never applies to UTC
         lcltime = time.gmtime(timeinseconds)
         return time.strftime("%Y%m%dT%H%M%SZ", lcltime)
+
 
 def stringtotime(timestring):
     """Return time in seconds from w3 or duplicity timestring
@@ -145,13 +152,16 @@ def stringtotime(timestring):
     except (TypeError, ValueError, AssertionError):
         return None
 
+
 def timetopretty(timeinseconds):
     """Return pretty version of time"""
     return time.asctime(time.localtime(timeinseconds))
 
+
 def stringtopretty(timestring):
     """Return pretty version of time given w3 time string"""
     return timetopretty(stringtotime(timestring))
+
 
 def inttopretty(seconds):
     """Convert num of seconds to readable string like "2 hours"."""
@@ -177,6 +187,7 @@ def inttopretty(seconds):
             partlist.append("%.2f seconds" % seconds)
     return " ".join(partlist)
 
+
 def intstringtoseconds(interval_string):
     """Convert a string expressing an interval (e.g. "4D2s") to seconds"""
     def error():
@@ -196,6 +207,7 @@ def intstringtoseconds(interval_string):
         total += num * _interval_conv_dict[ext]
         interval_string = interval_string[match.end(0):]
     return total
+
 
 def gettzd(dstflag):
     """Return w3's timezone identification string.
@@ -226,6 +238,7 @@ def gettzd(dstflag):
     assert 0 <= minutes <= 59
     return "%s%02d%s%02d" % (prefix, hours, globals.time_separator, minutes)
 
+
 def tzdtoseconds(tzd):
     """Given w3 compliant TZD, return how far ahead UTC is"""
     if tzd == "Z":
@@ -235,12 +248,13 @@ def tzdtoseconds(tzd):
         tzd[3] == globals.time_separator
     return -60 * (60 * int(tzd[:3]) + int(tzd[4:]))
 
+
 def cmp(time1, time2):
     """Compare time1 and time2 and return -1, 0, or 1"""
-    if type(time1) is types.StringType:
+    if isinstance(time1, types.StringType):
         time1 = stringtotime(time1)
         assert time1 is not None
-    if type(time2) is types.StringType:
+    if isinstance(time2, types.StringType):
         time2 = stringtotime(time2)
         assert time2 is not None
 
@@ -250,6 +264,7 @@ def cmp(time1, time2):
         return 0
     else:
         return 1
+
 
 def genstrtotime(timestr, override_curtime=None):
     """Convert a generic time string to a time in seconds"""

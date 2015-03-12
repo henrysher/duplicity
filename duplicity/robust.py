@@ -23,6 +23,7 @@ import errno
 
 tmp_file_index = 1
 
+
 def check_common_error(error_handler, function, args=()):
     """Apply function to args, if error, run error_handler on exception
 
@@ -52,6 +53,7 @@ def check_common_error(error_handler, function, args=()):
         else:
             # Log.exception(1, 2)
             raise
+
 
 def listpath(path):
     """Like path.listdir() but return [] if error, and sort results"""

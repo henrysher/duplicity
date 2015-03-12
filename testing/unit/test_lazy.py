@@ -19,7 +19,9 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import unittest, pickle, sys
+import unittest
+import pickle
+import sys
 from functools import reduce
 
 from duplicity.lazy import *  # @UnusedWildImport
@@ -53,7 +55,8 @@ class Iterators(UnitTestCase):
         raise Exception
 
     def nameerror_maker(self):
-        if 0: yield 1
+        if 0:
+            yield 1
         raise NameError
 
     def typeerror_maker(self):
@@ -65,7 +68,8 @@ class Iterators(UnitTestCase):
         raise Exception
 
     def emptygen_maker(self):
-        if 0: yield 1
+        if 0:
+            yield 1
 
 
 class IterEqualTestCase(Iterators):
@@ -90,9 +94,11 @@ class IterEqualTestCase(Iterators):
         def f():
             yield 1
             yield "hello"
+
         def g():
             yield 1
             yield "hello"
+
         assert Iter.equal(f(), g())
 
     def testLength(self):
@@ -192,7 +198,8 @@ class AndOrTestCase(Iterators):
 
 class FoldingTest(Iterators):
     """Test folding operations"""
-    def f(self, x, y): return x + y
+    def f(self, x, y):
+        return x + y
 
     def testEmpty(self):
         """Folds of empty iterators should produce defaults"""
@@ -215,6 +222,7 @@ class FoldingTest(Iterators):
         assert Iter.foldl(lambda x, y: x + 1, 0, self.evens()) == 50
         assert Iter.foldr(lambda x, y: y + 1, 0, self.odds()) == 50
 
+
 class MultiplexTest(Iterators):
     def testSingle(self):
         """Test multiplex single stream"""
@@ -226,7 +234,10 @@ class MultiplexTest(Iterators):
     def testTrible(self):
         """Test splitting iterator into three"""
         counter = [0]
-        def ff(x): counter[0] += 1
+
+        def ff(x):
+            counter[0] += 1
+
         i_orig = self.one_to_100()
         i2_orig = self.one_to_100()
         i1, i2, i3 = Iter.multiplex(i_orig, 3, ff)
@@ -255,6 +266,7 @@ class ITRBadder(ITRBranch):
         # print "Adding subinstance ", subinstance.total
         self.total += subinstance.total
 
+
 class ITRBadder2(ITRBranch):
     def start_process(self, index):
         self.total = 0
@@ -264,8 +276,10 @@ class ITRBadder2(ITRBranch):
         self.total += reduce(lambda x, y: x + y, self.base_index, 0)
 
     def can_fast_process(self, index):
-        if len(index) == 3: return 1
-        else: return None
+        if len(index) == 3:
+            return 1
+        else:
+            return None
 
     def fast_process(self, index):
         self.total += index[0] + index[1] + index[2]
@@ -273,6 +287,7 @@ class ITRBadder2(ITRBranch):
     def branch_process(self, subinstance):
         # print "Adding branch ", subinstance.total
         self.total += subinstance.total
+
 
 class TreeReducerTest(UnitTestCase):
     def setUp(self):
@@ -299,8 +314,10 @@ class TreeReducerTest(UnitTestCase):
         itm2 = IterTreeReducer(ITRBadder2, [])
         for index in self.i2:
             val = itm2(index)
-            if index == (): assert not val
-            else: assert val
+            if index == ():
+                assert not val
+            else:
+                assert val
         itm2.Finish()
         assert itm2.root_branch.total == 12, itm2.root_branch.total
 
@@ -320,18 +337,24 @@ class TreeReducerTest(UnitTestCase):
         itm2a = IterTreeReducer(ITRBadder2, [])
         for index in self.i2a:
             val = itm2a(index)
-            if index == (): assert not val
-            else: assert val
+            if index == ():
+                assert not val
+            else:
+                assert val
         itm2b = pickle.loads(pickle.dumps(itm2a))
         for index in self.i2b:
             val = itm2b(index)
-            if index == (): assert not val
-            else: assert val
+            if index == ():
+                assert not val
+            else:
+                assert val
         itm2c = pickle.loads(pickle.dumps(itm2b))
         for index in self.i2c:
             val = itm2c(index)
-            if index == (): assert not val
-            else: assert val
+            if index == ():
+                assert not val
+            else:
+                assert val
         itm2c.Finish()
         assert itm2c.root_branch.total == 12, itm2c.root_branch.total
 

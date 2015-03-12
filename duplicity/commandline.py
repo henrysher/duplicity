@@ -66,6 +66,7 @@ commands = ["cleanup",
             "verify",
             ]
 
+
 def old_fn_deprecation(opt):
     log.Log(_("Warning: Option %s is pending deprecation "
               "and will be removed in a future release.\n"
@@ -122,14 +123,17 @@ def generate_default_backup_name(backend_url):
     burlhash.update(backend_url)
     return burlhash.hexdigest()
 
+
 def check_file(option, opt, value):
     return expand_fn(value)
+
 
 def check_time(option, opt, value):
     try:
         return dup_time.genstrtotime(value)
     except dup_time.TimeException as e:
         raise optparse.OptionValueError(str(e))
+
 
 def check_verbosity(option, opt, value):
     fail = False
@@ -198,7 +202,10 @@ See:
     http://bugs.python.org/issue2931
     http://mail.python.org/pipermail/python-dev/2006-May/065458.html
 """
+
+
 class OPHelpFix(optparse.OptionParser):
+
     def _get_encoding(self, file):
         """
         try to get the encoding or use UTF-8
@@ -940,6 +947,7 @@ def set_selection():
     sel.ParseArgs(select_opts, select_files)
     globals.select = sel.set_iter()
 
+
 def args_to_path_backend(arg1, arg2):
     """
     Given exactly two arguments, arg1 and arg2, figure out which one
@@ -1007,6 +1015,7 @@ def process_local_dir(action, local_pathname):
 def check_consistency(action):
     """Final consistency check, see if something wrong with command line"""
     global full_backup, select_opts, list_current
+
     def assert_only_one(arglist):
         """Raises error if two or more of the elements of arglist are true"""
         n = 0
@@ -1014,6 +1023,7 @@ def check_consistency(action):
             if m:
                 n += 1
         assert n <= 1, "Invalid syntax, two conflicting modes specified"
+
     if action in ["list-current", "collection-status",
                   "cleanup", "remove-old", "remove-all-but-n-full", "remove-all-inc-of-but-n-full"]:
         assert_only_one([list_current, collection_status, cleanup,

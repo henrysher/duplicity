@@ -25,7 +25,12 @@ which is now patched with some code for iterative threaded execution
 see duplicity's README for details
 """
 
-import os, types, tempfile, re, gzip, locale
+import os
+import types
+import tempfile
+import re
+import gzip
+import locale
 
 from duplicity import globals
 from duplicity import gpginterface
@@ -64,20 +69,20 @@ class GPGProfile:
         keys, the format should be an 8 character hex key like
         'AA0E73D2'.
         """
-        assert passphrase is None or type(passphrase) is types.StringType
+        assert passphrase is None or isinstance(passphrase, types.StringType)
 
         self.passphrase = passphrase
         self.signing_passphrase = passphrase
         self.sign_key = sign_key
         self.encrypt_secring = None
         if recipients is not None:
-            assert type(recipients) is types.ListType  # must be list, not tuple
+            assert isinstance(recipients, types.ListType)  # must be list, not tuple
             self.recipients = recipients
         else:
             self.recipients = []
 
         if hidden_recipients is not None:
-            assert type(hidden_recipients) is types.ListType  # must be list, not tuple
+            assert isinstance(hidden_recipients, types.ListType)  # must be list, not tuple
             self.hidden_recipients = hidden_recipients
         else:
             self.hidden_recipients = []
@@ -370,10 +375,12 @@ def GzipWriteFile(block_iter, filename,
         def __init__(self, fileobj):
             self.fileobj = fileobj
             self.byte_count = 0
+
         def write(self, buf):
             result = self.fileobj.write(buf)
             self.byte_count += len(buf)
             return result
+
         def close(self):
             return self.fileobj.close()
 

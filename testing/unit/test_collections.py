@@ -19,7 +19,10 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import os, sys, random, unittest
+import os
+import sys
+import random
+import unittest
 
 from duplicity import collections
 from duplicity import backend
@@ -141,7 +144,8 @@ class CollectionTest(UnitTestCase):
     def sig_chains_helper(self, chains, orphaned_paths):
         """Test chains and orphaned_paths values for two above tests"""
         if orphaned_paths:
-            for op in orphaned_paths: print op
+            for op in orphaned_paths:
+                print op
             assert 0
         assert len(chains) == 1, chains
         assert chains[0].end_time == 1029826800
@@ -167,10 +171,12 @@ class CollectionTest(UnitTestCase):
         """
         fileobjlist = chain.get_fileobjs()
         assert len(fileobjlist) == 3
+
         def test_fileobj(i, s):
             buf = fileobjlist[i].read()
             fileobjlist[i].close()
             assert buf == s, (buf, s)
+
         test_fileobj(0, "Hello, world!")
         test_fileobj(1, "hello 1")
         test_fileobj(2, "Hello 2")
@@ -209,7 +215,8 @@ class CollectionTest(UnitTestCase):
         for filename in remote_received_list:
             if filename not in right_list:
                 errors.append("### Got bad extraneous filename " + filename)
-            else: right_list.remove(filename)
+            else:
+                right_list.remove(filename)
         for filename in right_list:
             errors.append("### Didn't receive extraneous filename " + filename)
         assert not errors, "\n" + "\n".join(errors)

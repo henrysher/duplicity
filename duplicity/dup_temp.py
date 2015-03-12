@@ -21,7 +21,8 @@
 
 """Manage temporary files"""
 
-import os, sys
+import os
+import sys
 
 from duplicity import log
 from duplicity import util
@@ -232,7 +233,6 @@ class FileobjHooked:
         """
         self.hooklist.append(hook)
 
-
     def get_name(self):
         """
         Return the name of the file
@@ -249,6 +249,7 @@ class Block:
     def __init__(self, data):
         self.data = data
 
+
 class SrcIter:
     """
     Iterate over source and return Block of data.
@@ -256,6 +257,7 @@ class SrcIter:
     def __init__(self, src):
         self.src = src
         self.fp = src.open("rb")
+
     def next(self):
         try:
             res = Block(self.fp.read(self.get_read_size()))
@@ -267,7 +269,9 @@ class SrcIter:
             self.fp.close()
             raise StopIteration
         return res
+
     def get_read_size(self):
         return 128 * 1024
+
     def get_footer(self):
         return ""

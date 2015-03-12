@@ -29,6 +29,7 @@ from duplicity import log
 from duplicity import globals
 from duplicity import util
 
+
 class ManifestError(Exception):
     """
     Exception raised when problem with manifest
@@ -152,6 +153,7 @@ class Manifest:
 
         vol_num_list = self.volume_info_dict.keys()
         vol_num_list.sort()
+
         def vol_num_to_string(vol_num):
             return self.volume_info_dict[vol_num].to_string()
         result = "%s%s\n" % (result,
@@ -434,6 +436,8 @@ class VolumeInfo:
 
 
 nonnormal_char_re = re.compile("(\\s|[\\\\\"'])")
+
+
 def Quote(s):
     """
     Return quoted version of s safe to put in a manifest or volume info

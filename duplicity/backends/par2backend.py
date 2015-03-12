@@ -25,6 +25,7 @@ from duplicity.errors import BackendException
 from duplicity import log
 from duplicity import globals
 
+
 class Par2Backend(backend.Backend):
     """This backend wrap around other backends and create Par2 recovery files
     before the file and the Par2 files are transfered with the wrapped backend.
@@ -161,7 +162,6 @@ class Par2Backend(backend.Backend):
                     filename_list.append(remote_filename)
 
         return self.wrapped_backend._delete_list(filename_list)
-
 
     def list(self):
         """

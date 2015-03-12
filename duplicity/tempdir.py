@@ -39,6 +39,7 @@ from duplicity import globals
 _defaultLock = threading.Lock()
 _defaultInstance = None
 
+
 def default():
     """
     Obtain the global default instance of TemporaryDirectory, creating
@@ -59,6 +60,7 @@ def default():
         return _defaultInstance
     finally:
         _defaultLock.release()
+
 
 class TemporaryDirectory:
     """

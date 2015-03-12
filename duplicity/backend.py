@@ -155,11 +155,13 @@ def register_backend_prefix(scheme, backend_factory):
 
     _backend_prefixes[scheme] = backend_factory
 
+
 def strip_prefix(url_string, prefix_scheme):
     """
     strip the prefix from a string e.g. par2+ftp://... -> ftp://...
     """
     return re.sub('(?i)^' + re.escape(prefix_scheme) + '\+', '', url_string)
+
 
 def is_backend_url(url_string):
     """
@@ -336,6 +338,7 @@ def strip_auth_from_url(parsed_url):
     clean_url = re.sub('^([^:/]+://)(.*@)?(.*)', r'\1\3', parsed_url.geturl())
     return clean_url
 
+
 def _get_code_from_exception(backend, operation, e):
     if isinstance(e, BackendException) and e.code != log.ErrorCode.backend_error:
         return e.code
@@ -350,6 +353,7 @@ def _get_code_from_exception(backend, operation, e):
         elif e.errno == errno.ENOSPC:
             return log.ErrorCode.backend_no_space
     return log.ErrorCode.backend_error
+
 
 def retry(operation, fatal=True):
     # Decorators with arguments introduce a new level of indirection.  So we
@@ -565,7 +569,7 @@ class BackendWrapper(object):
         """
         Delete each filename in filename_list, in order if possible.
         """
-        assert type(filename_list) is not types.StringType
+        assert not isinstance(filename_list, types.StringType)
         if hasattr(self.backend, '_delete_list'):
             self._do_delete_list(filename_list)
         elif hasattr(self.backend, '_delete'):
@@ -629,7 +633,7 @@ class BackendWrapper(object):
         except Exception as e:
             code = _get_code_from_exception(self.backend, 'query', e)
             if code == log.ErrorCode.backend_not_found:
-                return {'size':-1}
+                return {'size': -1}
             else:
                 raise e
 

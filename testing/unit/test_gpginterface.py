@@ -33,6 +33,7 @@ __author__ = "Frank J. Tobin, ftobin@neverending.org"
 __version__ = "0.2.2"
 __revision__ = "$Id: GnuPGInterfacetest.py,v 1.11 2009/06/06 17:35:19 loafman Exp $"
 
+
 class BasicTest(unittest.TestCase):
     """an initializer superclass"""
 
@@ -58,15 +59,16 @@ class GnuPGTests(BasicTest):
 
         # Make sure we're getting the passphrase to GnuPG
         # somehow!
-        assert passphrase != None or self.gnupg.passphrase != None, \
+        assert passphrase is not None or self.gnupg.passphrase is not None, \
             "No way to send the passphrase to GnuPG!"
 
         # We'll handle the passphrase manually
-        if passphrase != None: creations.append('passphrase')
+        if passphrase is not None:
+            creations.append('passphrase')
 
         proc = self.gnupg.run(args, create_fhs=creations)
 
-        if passphrase != None:
+        if passphrase is not None:
             proc.handles['passphrase'].write(passphrase)
             proc.handles['passphrase'].close()
 
@@ -81,31 +83,30 @@ class GnuPGTests(BasicTest):
 
         return ciphertext
 
-
     def do_attach_fh_operation(self, args, stdin, stdout,
                                passphrase=None):
 
         # Make sure we're getting the passphrase to GnuPG
         # somehow!
-        assert passphrase != None or self.gnupg.passphrase != None, \
+        assert passphrase is not None or self.gnupg.passphrase is not None, \
             "No way to send the passphrase to GnuPG!"
 
         creations = []
         # We'll handle the passphrase manually
-        if passphrase != None: proc.handles.append('passphrase')  # @UndefinedVariable
+        if passphrase is not None:
+            proc.handles.append('passphrase')  # @UndefinedVariable
 
         attachments = {'stdin': stdin, 'stdout': stdout}
 
         proc = self.gnupg.run(args, create_fhs=creations,
                               attach_fhs=attachments)
 
-        if passphrase != None:
+        if passphrase is not None:
             proc.handles['passphrase'].write(passphrase)
             proc.handles['passphrase'].close()
 
         # Checking to make sure GnuPG exited successfully
         proc.wait()
-
 
     def test_create_fhs_solely(self):
         """Do GnuPG operations using solely the create_fhs feature"""
@@ -119,7 +120,6 @@ class GnuPGTests(BasicTest):
                                                  self.gnupg.passphrase)
         assert decryption == plaintext, \
             "GnuPG decrypted output does not match original input"
-
 
     def test_attach_fhs(self):
         """Do GnuPG operations using the attach_fhs feature"""
@@ -212,11 +212,14 @@ class OptionsTests(BasicTest):
 
             # special case for recipients, since their
             # respective argument is 'recipient', not 'recipients'
-            if option == 'recipients': arg = '--recipient'
-            else: arg = self.option_to_arg(option)
+            if option == 'recipients':
+                arg = '--recipient'
+            else:
+                arg = self.option_to_arg(option)
 
             should_be = []
-            for v in list_value: should_be.extend([arg, v])
+            for v in list_value:
+                should_be.extend([arg, v])
 
             result = self.gnupg.options.get_args()
 
@@ -236,12 +239,15 @@ class PipesTests(unittest.TestCase):
 
 ########################################################################
 
+
 def fh_cmp(f1, f2, bufsize=8192):
     while 1:
         b1 = f1.read(bufsize)
         b2 = f2.read(bufsize)
-        if b1 != b2: return 0
-        if not b1:   return 1
+        if b1 != b2:
+            return 0
+        if not b1:
+            return 1
 
 ########################################################################
 

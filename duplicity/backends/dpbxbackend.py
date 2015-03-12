@@ -26,10 +26,12 @@
 
 import os
 import urllib
-import locale, sys
+import locale
+import sys
 from functools import reduce
 
-import traceback, StringIO
+import traceback
+import StringIO
 
 import duplicity.backend
 from duplicity import log
@@ -55,6 +57,7 @@ ACCESS_TYPE = 'app_folder'
 # This file will store cached value of oAuth token
 _TOKEN_CACHE_FILE = os.path.expanduser("~/.dropbox.token_store.txt")
 
+
 def log_exception(e):
     log.Error('Exception [%s]:' % (e,))
     f = StringIO.StringIO()
@@ -63,6 +66,7 @@ def log_exception(e):
     for s in f.readlines():
         log.Error('| ' + s.rstrip())
     f.close()
+
 
 def command(login_required=True):
     """a decorator for handling authentication and exceptions"""
@@ -89,6 +93,7 @@ def command(login_required=True):
         wrapper.__doc__ = f.__doc__
         return wrapper
     return decorate
+
 
 class DPBXBackend(duplicity.backend.Backend):
     """Connect to remote store using Dr*pB*x service"""
@@ -238,8 +243,9 @@ class DPBXBackend(duplicity.backend.Backend):
         resp = self.api_client.file_create_folder(path)
         log.Debug('dpbx._mkdir(%s): %s' % (path, resp))
 
+
 def etacsufbo(s):
-    return ''.join(reduce(lambda x, y:(x and len(x[-1]) == 1) and
+    return ''.join(reduce(lambda x, y: (x and len(x[-1]) == 1) and
                           (x.append(y + x.pop(-1)) and x or x) or (x + [y]), s, []))
 
 duplicity.backend.register_backend("dpbx", DPBXBackend)

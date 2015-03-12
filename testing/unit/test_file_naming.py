@@ -37,6 +37,7 @@ class Test36(UnitTestCase):
             b = file_naming.to_base36(n)
             assert file_naming.from_base36(b) == n, (b, n)
 
+
 class FileNamingBase:
     """Holds file naming test functions, for use in subclasses"""
     def test_basic(self):

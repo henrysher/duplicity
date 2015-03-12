@@ -21,7 +21,9 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import types
-import StringIO, unittest, sys
+import StringIO
+import unittest
+import sys
 
 from duplicity.selection import *  # @UnusedWildImport
 from duplicity.lazy import *  # @UnusedWildImport
@@ -44,12 +46,12 @@ class MatchingTest(UnitTestCase):
         sf1 = self.Select.regexp_get_sf(".*\.py", 1)
         assert sf1(self.makeext("1.py")) == 1
         assert sf1(self.makeext("usr/foo.py")) == 1
-        assert sf1(self.root.append("1.doc")) == None
+        assert sf1(self.root.append("1.doc")) is None
 
         sf2 = self.Select.regexp_get_sf("hello", 0)
         assert sf2(Path("hello")) == 0
         assert sf2(Path("foohello_there")) == 0
-        assert sf2(Path("foo")) == None
+        assert sf2(Path("foo")) is None
 
     def testTupleInclude(self):
         """Test include selection function made from a regular filename"""
@@ -60,9 +62,9 @@ class MatchingTest(UnitTestCase):
         assert sf2(self.makeext("usr")) == 1
         assert sf2(self.makeext("usr/local")) == 1
         assert sf2(self.makeext("usr/local/bin")) == 1
-        assert sf2(self.makeext("usr/local/doc")) == None
+        assert sf2(self.makeext("usr/local/doc")) is None
         assert sf2(self.makeext("usr/local/bin/gzip")) == 1
-        assert sf2(self.makeext("usr/local/bingzip")) == None
+        assert sf2(self.makeext("usr/local/bingzip")) is None
 
     def testTupleExclude(self):
         """Test exclude selection function made from a regular filename"""
@@ -70,12 +72,12 @@ class MatchingTest(UnitTestCase):
                           self.Select.glob_get_filename_sf, "foo", 0)
 
         sf2 = self.Select.glob_get_sf("testfiles/select/usr/local/bin/", 0)
-        assert sf2(self.makeext("usr")) == None
-        assert sf2(self.makeext("usr/local")) == None
+        assert sf2(self.makeext("usr")) is None
+        assert sf2(self.makeext("usr/local")) is None
         assert sf2(self.makeext("usr/local/bin")) == 0
-        assert sf2(self.makeext("usr/local/doc")) == None
+        assert sf2(self.makeext("usr/local/doc")) is None
         assert sf2(self.makeext("usr/local/bin/gzip")) == 0
-        assert sf2(self.makeext("usr/local/bingzip")) == None
+        assert sf2(self.makeext("usr/local/bingzip")) is None
 
     def testGlobStarInclude(self):
         """Test a few globbing patterns, including **"""
@@ -95,8 +97,8 @@ class MatchingTest(UnitTestCase):
         assert sf1(self.makeext("/usr/local/bin")) == 0
 
         sf2 = self.Select.glob_get_sf("**.py", 0)
-        assert sf2(self.makeext("foo")) == None, sf2(self.makeext("foo"))
-        assert sf2(self.makeext("usr/local/bin")) == None
+        assert sf2(self.makeext("foo")) is None, sf2(self.makeext("foo"))
+        assert sf2(self.makeext("usr/local/bin")) is None
         assert sf2(self.makeext("what/ever.py")) == 0
         assert sf2(self.makeext("what/ever.py/foo")) == 0
 
@@ -140,14 +142,14 @@ class MatchingTest(UnitTestCase):
         assert select.glob_get_sf("/foo", 1)(root) == 1
         assert select.glob_get_sf("/foo/bar", 1)(root) == 1
         assert select.glob_get_sf("/", 0)(root) == 0
-        assert select.glob_get_sf("/foo", 0)(root) == None
+        assert select.glob_get_sf("/foo", 0)(root) is None
 
         assert select.glob_get_sf("**.py", 1)(root) == 2
         assert select.glob_get_sf("**", 1)(root) == 1
         assert select.glob_get_sf("ignorecase:/", 1)(root) == 1
-        assert select.glob_get_sf("**.py", 0)(root) == None
+        assert select.glob_get_sf("**.py", 0)(root) is None
         assert select.glob_get_sf("**", 0)(root) == 0
-        assert select.glob_get_sf("/foo/*", 0)(root) == None
+        assert select.glob_get_sf("/foo/*", 0)(root) is None
 
     def testOtherFilesystems(self):
         """Test to see if --exclude-other-filesystems works correctly"""
@@ -174,6 +176,7 @@ class MatchingTest(UnitTestCase):
         assert sf(Path("/proc")) == sfval, \
             "Assumption: /proc is on a different filesystem"
 
+
 class ParseArgsTest(UnitTestCase):
     """Test argument parsing"""
     def setUp(self):
@@ -195,7 +198,7 @@ class ParseArgsTest(UnitTestCase):
         """Turn strings in filelist into fileobjs"""
         new_filelists = []
         for f in filelist:
-            if type(f) is types.StringType:
+            if isinstance(f, types.StringType):
                 new_filelists.append(StringIO.StringIO(f))
             else:
                 new_filelists.append(f)
@@ -448,7 +451,6 @@ class ParseArgsTest(UnitTestCase):
                         "+ */*/1/1\n"
                         "- */*/1\n"
                         "- **"])
-
 
     def test_include_filelist_double_asterisk_1(self):
         """Identical to test_filelist, but with the exclude 'select' replaced with '**'"""

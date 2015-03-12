@@ -1,13 +1,58 @@
+2015-03-11  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Prep for 0.7.02.
+
+2015-03-10  Kenneth Loafman  <kenneth@loafman.com>
+
+    * remove extraneous string format arg in previous scp fix.
+
+2015-03-09  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fix for --pydevd debug environment and location under Eclipse.
+    * Fix for bug where scp was actually working as scp and not working with
+      rsync.net because of using extraneous test command in restricted shell.
+      Was trying "test -d 'foo' || mkdir -p 'foo'", now only "mkdir -p foo".
+
+2015-02-12  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Really fix bug 1416344 based on comment #5 by Roman Tereshonkov.
+
+2015-02-09  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fix _librsyncmodule.c compilation, bug 1416344, thanks to Kari Hautio.
+
+2015-02-08  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fix spelling error in manpage, bug 1419314.
+
+2015-02-01  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Misc fixes for the following PEP8 issues:
+      - E401
+      - see http://pep8.readthedocs.org
+
+2015-01-31  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/bug_932482_trailing_slashes_and_wildcards_error
+      - Added functional and unit tests to show Bug #932482 - that selection does
+        not work correctly when excludes (in a filelist or in a commandline option)
+        contain both a single or double asterisk and a trailing slash.
+    * Misc fixes for the following PEP8 issues:
+      - E231, E241, E251, E261, E262, E271, E272, E301, E302, E303, E502,
+        E701, E702, E703, E711, E721, W291, W292, W293, W391
+      - see http://pep8.readthedocs.org
+    * Fixes for 2to3 issues
+
 2015-01-29  Kenneth Loafman  <kenneth@loafman.com>
 
     * Ongoing pep8 corrections.
     * Merged in lp:~angusgr/duplicity/exclude-older-than
       - Add "--exclude-older-than" commandline option, that allows you to only
         back up files with a modification date newer than a particular threshold.
-    * Merged in lp:~aaron-whitehouse/duplicity/bug_884371_asterisks_in_includes 
+    * Merged in lp:~aaron-whitehouse/duplicity/bug_884371_asterisks_in_includes
       - Added tests to unit/test_selection.py and funtional/test_selection.py
-        to show the behaviour reported in Bug #884371, i.e. that selection is 
-        incorrect when there is a * or ** on an include line of a filelist or 
+        to show the behaviour reported in Bug #884371, i.e. that selection is
+        incorrect when there is a * or ** on an include line of a filelist or
         commandline --include.
 
 2015-01-22  Kenneth Loafman  <kenneth@loafman.com>
@@ -22,7 +67,7 @@
 2015-01-22  Kenneth Loafman  <kenneth@loafman.com>
 
     * Misc fixes for the following PEP8 issues:
-      - E127, E128, 201, 202, 203
+      - E127, E128, E201, E202, E203
       - see http://pep8.readthedocs.org
 
 2015-01-18  Kenneth Loafman  <kenneth@loafman.com>
