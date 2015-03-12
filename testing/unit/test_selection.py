@@ -217,9 +217,9 @@ class ParseArgsTest(UnitTestCase):
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')])
 
-    def test_globbing_filelist(self):
+    def test_filelist(self):
         """Filelist glob test similar to above testParse2"""
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["- testfiles/select/1/1/1\n"
@@ -227,9 +227,9 @@ class ParseArgsTest(UnitTestCase):
                         "- testfiles/select/1\n"
                         "- **"])
 
-    def test_include_globbing_filelist_1_trailing_whitespace(self):
+    def test_include_filelist_1_trailing_whitespace(self):
         """Filelist glob test similar to globbing filelist, but with 1 trailing whitespace on include"""
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["- testfiles/select/1/1/1\n"
@@ -237,9 +237,9 @@ class ParseArgsTest(UnitTestCase):
                         "- testfiles/select/1\n"
                         "- **"])
 
-    def test_include_globbing_filelist_2_trailing_whitespaces(self):
+    def test_include_filelist_2_trailing_whitespaces(self):
         """Filelist glob test similar to globbing filelist, but with 2 trailing whitespaces on include"""
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["- testfiles/select/1/1/1\n"
@@ -247,9 +247,9 @@ class ParseArgsTest(UnitTestCase):
                         "- testfiles/select/1\n"
                         "- **"])
 
-    def test_include_globbing_filelist_1_leading_whitespace(self):
+    def test_include_filelist_1_leading_whitespace(self):
         """Filelist glob test similar to globbing filelist, but with 1 leading whitespace on include"""
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["- testfiles/select/1/1/1\n"
@@ -257,9 +257,9 @@ class ParseArgsTest(UnitTestCase):
                         "- testfiles/select/1\n"
                         "- **"])
 
-    def test_include_globbing_filelist_2_leading_whitespaces(self):
+    def test_include_filelist_2_leading_whitespaces(self):
         """Filelist glob test similar to globbing filelist, but with 2 leading whitespaces on include"""
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["- testfiles/select/1/1/1\n"
@@ -267,9 +267,9 @@ class ParseArgsTest(UnitTestCase):
                         "- testfiles/select/1\n"
                         "- **"])
 
-    def test_include_globbing_filelist_1_trailing_whitespace_exclude(self):
+    def test_include_filelist_1_trailing_whitespace_exclude(self):
         """Filelist glob test similar to globbing filelist, but with 1 trailing whitespace on exclude"""
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["- testfiles/select/1/1/1 \n"
@@ -277,9 +277,9 @@ class ParseArgsTest(UnitTestCase):
                         "- testfiles/select/1\n"
                         "- **"])
 
-    def test_include_globbing_filelist_2_trailing_whitespace_exclude(self):
+    def test_include_filelist_2_trailing_whitespace_exclude(self):
         """Filelist glob test similar to globbing filelist, but with 2 trailing whitespaces on exclude"""
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["- testfiles/select/1/1/1  \n"
@@ -287,9 +287,9 @@ class ParseArgsTest(UnitTestCase):
                         "- testfiles/select/1\n"
                         "- **"])
 
-    def test_include_globbing_filelist_1_leading_whitespace_exclude(self):
+    def test_include_filelist_1_leading_whitespace_exclude(self):
         """Filelist glob test similar to globbing filelist, but with 1 leading whitespace on exclude"""
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        [" - testfiles/select/1/1/1\n"
@@ -297,9 +297,9 @@ class ParseArgsTest(UnitTestCase):
                         "- testfiles/select/1\n"
                         "- **"])
 
-    def test_include_globbing_filelist_2_leading_whitespaces_exclude(self):
+    def test_include_filelist_2_leading_whitespaces_exclude(self):
         """Filelist glob test similar to globbing filelist, but with 2 leading whitespaces on exclude"""
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["  - testfiles/select/1/1/1\n"
@@ -307,9 +307,9 @@ class ParseArgsTest(UnitTestCase):
                         "- testfiles/select/1\n"
                         "- **"])
 
-    def test_include_globbing_filelist_check_excluded_folder_included_for_contents(self):
+    def test_include_filelist_check_excluded_folder_included_for_contents(self):
         """Filelist glob test to check excluded folder is included if contents are"""
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '1'), ('1', '1', '2'),
                         ('1', '1', '3'), ('1', '2'), ('1', '2', '1'), ('1', '3'), ('1', '3', '1'), ('1', '3', '2'),
                         ('1', '3', '3')],
@@ -318,9 +318,9 @@ class ParseArgsTest(UnitTestCase):
                         "testfiles/select/1\n"
                         "- **"])
 
-    def test_include_globbing_filelist_with_unnecessary_quotes(self):
+    def test_include_filelist_with_unnecessary_quotes(self):
         """Filelist glob test similar to globbing filelist, but with quotes around one of the paths."""
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["- 'testfiles/select/1/1/1'\n"
@@ -328,9 +328,9 @@ class ParseArgsTest(UnitTestCase):
                         "- testfiles/select/1\n"
                         "- **"])
 
-    def test_include_globbing_filelist_with_unnecessary_double_quotes(self):
+    def test_include_filelist_with_unnecessary_double_quotes(self):
         """Filelist glob test similar to globbing filelist, but with double quotes around one of the paths."""
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ['- "testfiles/select/1/1/1"\n'
@@ -338,9 +338,9 @@ class ParseArgsTest(UnitTestCase):
                         '- testfiles/select/1\n'
                         '- **'])
 
-    def test_include_globbing_filelist_with_full_line_comment(self):
+    def test_include_filelist_with_full_line_comment(self):
         """Filelist glob test similar to globbing filelist, but with a full-line comment."""
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ['- testfiles/select/1/1/1\n'
@@ -349,9 +349,9 @@ class ParseArgsTest(UnitTestCase):
                         '- testfiles/select/1\n'
                         '- **'])
 
-    def test_include_globbing_filelist_with_blank_line(self):
+    def test_include_filelist_with_blank_line(self):
         """Filelist glob test similar to globbing filelist, but with a blank line."""
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ['- testfiles/select/1/1/1\n'
@@ -360,9 +360,9 @@ class ParseArgsTest(UnitTestCase):
                         '- testfiles/select/1\n'
                         '- **'])
 
-    def test_include_globbing_filelist_with_blank_line_and_whitespace(self):
+    def test_include_filelist_with_blank_line_and_whitespace(self):
         """Filelist glob test similar to globbing filelist, but with a blank line and whitespace."""
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ['- testfiles/select/1/1/1\n'
@@ -371,19 +371,19 @@ class ParseArgsTest(UnitTestCase):
                         '- testfiles/select/1\n'
                         '- **'])
 
-    def test_include_globbing_filelist_asterisk(self):
+    def test_include_filelist_asterisk(self):
         """Filelist glob test with * instead of 'testfiles'"""
         # Thank you to Elifarley Cruz for this test case
         # (https://bugs.launchpad.net/duplicity/+bug/884371).
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '1'),
                         ('1', '1', '2'), ('1', '1', '3')],
                        ["*/select/1/1\n"
                         "- **"])
 
-    def test_include_globbing_filelist_asterisk_2(self):
-        """Identical to test_globbing_filelist, but with the exclude 'select' replaced with '*'"""
-        self.ParseTest([("--include-globbing-filelist", "file")],
+    def test_include_filelist_asterisk_2(self):
+        """Identical to test_filelist, but with the exclude 'select' replaced with '*'"""
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["- testfiles/*/1/1/1\n"
@@ -392,10 +392,10 @@ class ParseArgsTest(UnitTestCase):
                         "- **"])
 
     @unittest.expectedFailure
-    def test_include_globbing_filelist_asterisk_3(self):
-        """Identical to test_globbing_filelist, but with the auto-include 'select' replaced with '*'"""
+    def test_include_filelist_asterisk_3(self):
+        """Identical to test_filelist, but with the auto-include 'select' replaced with '*'"""
         # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["- testfiles/select/1/1/1\n"
@@ -404,10 +404,10 @@ class ParseArgsTest(UnitTestCase):
                         "- **"])
 
     @unittest.expectedFailure
-    def test_include_globbing_filelist_asterisk_4(self):
-        """Identical to test_globbing_filelist, but with a specific include 'select' replaced with '*'"""
+    def test_include_filelist_asterisk_4(self):
+        """Identical to test_filelist, but with a specific include 'select' replaced with '*'"""
         # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["- testfiles/select/1/1/1\n"
@@ -416,10 +416,10 @@ class ParseArgsTest(UnitTestCase):
                         "- **"])
 
     @unittest.expectedFailure
-    def test_include_globbing_filelist_asterisk_5(self):
-        """Identical to test_globbing_filelist, but with all 'select's replaced with '*'"""
+    def test_include_filelist_asterisk_5(self):
+        """Identical to test_filelist, but with all 'select's replaced with '*'"""
         # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["- testfiles/*/1/1/1\n"
@@ -427,9 +427,9 @@ class ParseArgsTest(UnitTestCase):
                         "- testfiles/*/1\n"
                         "- **"])
 
-    def test_include_globbing_filelist_asterisk_6(self):
-        """Identical to test_globbing_filelist, but with numerous excluded folders replaced with '*'"""
-        self.ParseTest([("--include-globbing-filelist", "file")],
+    def test_include_filelist_asterisk_6(self):
+        """Identical to test_filelist, but with numerous excluded folders replaced with '*'"""
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["- */*/1/1/1\n"
@@ -438,10 +438,10 @@ class ParseArgsTest(UnitTestCase):
                         "- **"])
 
     @unittest.expectedFailure
-    def test_include_globbing_filelist_asterisk_7(self):
-        """Identical to test_globbing_filelist, but with numerous included/excluded folders replaced with '*'"""
+    def test_include_filelist_asterisk_7(self):
+        """Identical to test_filelist, but with numerous included/excluded folders replaced with '*'"""
         # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["- */*/1/1/1\n"
@@ -450,9 +450,9 @@ class ParseArgsTest(UnitTestCase):
                         "- **"])
 
 
-    def test_include_globbing_filelist_double_asterisk_1(self):
-        """Identical to test_globbing_filelist, but with the exclude 'select' replaced with '**'"""
-        self.ParseTest([("--include-globbing-filelist", "file")],
+    def test_include_filelist_double_asterisk_1(self):
+        """Identical to test_filelist, but with the exclude 'select' replaced with '**'"""
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["- testfiles/**/1/1/1\n"
@@ -461,10 +461,10 @@ class ParseArgsTest(UnitTestCase):
                         "- **"])
 
     @unittest.expectedFailure
-    def test_include_globbing_filelist_double_asterisk_2(self):
-        """Identical to test_globbing_filelist, but with the include 'select' replaced with '**'"""
+    def test_include_filelist_double_asterisk_2(self):
+        """Identical to test_filelist, but with the include 'select' replaced with '**'"""
         # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["- testfiles/select/1/1/1\n"
@@ -472,9 +472,9 @@ class ParseArgsTest(UnitTestCase):
                         "- testfiles/select/1\n"
                         "- **"])
 
-    def test_include_globbing_filelist_double_asterisk_3(self):
-        """Identical to test_globbing_filelist, but with the exclude 'testfiles/select' replaced with '**'"""
-        self.ParseTest([("--include-globbing-filelist", "file")],
+    def test_include_filelist_double_asterisk_3(self):
+        """Identical to test_filelist, but with the exclude 'testfiles/select' replaced with '**'"""
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["- **/1/1/1\n"
@@ -483,10 +483,10 @@ class ParseArgsTest(UnitTestCase):
                         "- **"])
 
     @unittest.expectedFailure
-    def test_include_globbing_filelist_double_asterisk_4(self):
-        """Identical to test_globbing_filelist, but with the include 'testfiles/select' replaced with '**'"""
+    def test_include_filelist_double_asterisk_4(self):
+        """Identical to test_filelist, but with the include 'testfiles/select' replaced with '**'"""
         # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["- testfiles/select/1/1/1\n"
@@ -495,10 +495,10 @@ class ParseArgsTest(UnitTestCase):
                         "- **"])
 
     @unittest.expectedFailure
-    def test_include_globbing_filelist_double_asterisk_5(self):
-        """Identical to test_globbing_filelist, but with all 'testfiles/select's replaced with '**'"""
+    def test_include_filelist_double_asterisk_5(self):
+        """Identical to test_filelist, but with all 'testfiles/select's replaced with '**'"""
         # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["- **/1/1/1\n"
@@ -506,9 +506,9 @@ class ParseArgsTest(UnitTestCase):
                         "- **/1\n"
                         "- **"])
 
-    def test_include_globbing_filelist_trailing_slashes(self):
+    def test_include_filelist_trailing_slashes(self):
         """Filelist glob test similar to globbing filelist, but with trailing slashes"""
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["- testfiles/select/1/1/1/\n"
@@ -517,10 +517,10 @@ class ParseArgsTest(UnitTestCase):
                         "- **"])
 
     @unittest.expectedFailure
-    def test_include_globbing_filelist_trailing_slashes_and_single_asterisks(self):
+    def test_include_filelist_trailing_slashes_and_single_asterisks(self):
         """Filelist glob test similar to globbing filelist, but with trailing slashes and single asterisks"""
         # Todo: Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["- */select/1/1/1/\n"
@@ -529,10 +529,10 @@ class ParseArgsTest(UnitTestCase):
                         "- **"])
 
     @unittest.expectedFailure
-    def test_include_globbing_filelist_trailing_slashes_and_double_asterisks(self):
+    def test_include_filelist_trailing_slashes_and_double_asterisks(self):
         """Filelist glob test similar to globbing filelist, but with trailing slashes and double asterisks"""
         # Todo: Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["- **/1/1/1/\n"
@@ -541,17 +541,17 @@ class ParseArgsTest(UnitTestCase):
                         "- **"])
 
 
-    def test_globbing_filelist_null_separator(self):
-        """test_globbing_filelist, but with null_separator set"""
+    def test_filelist_null_separator(self):
+        """test_filelist, but with null_separator set"""
         self.set_global('null_separator', 1)
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["\0- testfiles/select/1/1/1\0testfiles/select/1/1\0- testfiles/select/1\0- **\0"])
 
-    def test_exclude_globbing_filelist(self):
-        """Exclude version of test_globbing_filelist"""
-        self.ParseTest([("--exclude-globbing-filelist", "file")],
+    def test_exclude_filelist(self):
+        """Exclude version of test_filelist"""
+        self.ParseTest([("--exclude-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["testfiles/select/1/1/1\n"
@@ -559,17 +559,17 @@ class ParseArgsTest(UnitTestCase):
                         "testfiles/select/1\n"
                         "- **"])
 
-    def test_exclude_globbing_filelist_asterisk_1(self):
-        """Exclude version of test_include_globbing_filelist_asterisk"""
-        self.ParseTest([("--exclude-globbing-filelist", "file")],
+    def test_exclude_filelist_asterisk_1(self):
+        """Exclude version of test_include_filelist_asterisk"""
+        self.ParseTest([("--exclude-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '1'),
                         ('1', '1', '2'), ('1', '1', '3')],
                        ["+ */select/1/1\n"
                         "- **"])
 
-    def test_exclude_globbing_filelist_asterisk_2(self):
-        """Identical to test_exclude_globbing_filelist, but with the exclude 'select' replaced with '*'"""
-        self.ParseTest([("--exclude-globbing-filelist", "file")],
+    def test_exclude_filelist_asterisk_2(self):
+        """Identical to test_exclude_filelist, but with the exclude 'select' replaced with '*'"""
+        self.ParseTest([("--exclude-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["testfiles/*/1/1/1\n"
@@ -578,10 +578,10 @@ class ParseArgsTest(UnitTestCase):
                         "- **"])
 
     @unittest.expectedFailure
-    def test_exclude_globbing_filelist_asterisk_3(self):
-        """Identical to test_exclude_globbing_filelist, but with the include 'select' replaced with '*'"""
+    def test_exclude_filelist_asterisk_3(self):
+        """Identical to test_exclude_filelist, but with the include 'select' replaced with '*'"""
         # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
-        self.ParseTest([("--exclude-globbing-filelist", "file")],
+        self.ParseTest([("--exclude-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["testfiles/select/1/1/1\n"
@@ -589,9 +589,9 @@ class ParseArgsTest(UnitTestCase):
                         "testfiles/select/1\n"
                         "- **"])
 
-    def test_exclude_globbing_filelist_asterisk_4(self):
-        """Identical to test_exclude_globbing_filelist, but with numerous excluded folders replaced with '*'"""
-        self.ParseTest([("--exclude-globbing-filelist", "file")],
+    def test_exclude_filelist_asterisk_4(self):
+        """Identical to test_exclude_filelist, but with numerous excluded folders replaced with '*'"""
+        self.ParseTest([("--exclude-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["*/select/1/1/1\n"
@@ -600,10 +600,10 @@ class ParseArgsTest(UnitTestCase):
                         "- **"])
 
     @unittest.expectedFailure
-    def test_exclude_globbing_filelist_asterisk_5(self):
-        """Identical to test_exclude_globbing_filelist, but with numerous included/excluded folders replaced with '*'"""
+    def test_exclude_filelist_asterisk_5(self):
+        """Identical to test_exclude_filelist, but with numerous included/excluded folders replaced with '*'"""
         # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
-        self.ParseTest([("--exclude-globbing-filelist", "file")],
+        self.ParseTest([("--exclude-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["*/select/1/1/1\n"
@@ -612,10 +612,10 @@ class ParseArgsTest(UnitTestCase):
                         "- **"])
 
     @unittest.expectedFailure
-    def test_exclude_globbing_filelist_double_asterisk(self):
-        """Identical to test_exclude_globbing_filelist, but with all included/excluded folders replaced with '**'"""
+    def test_exclude_filelist_double_asterisk(self):
+        """Identical to test_exclude_filelist, but with all included/excluded folders replaced with '**'"""
         # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
-        self.ParseTest([("--exclude-globbing-filelist", "file")],
+        self.ParseTest([("--exclude-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["**/1/1/1\n"
@@ -652,9 +652,9 @@ class ParseArgsTest(UnitTestCase):
                         ('3', '3'),
                         ('3', '3', '2')])
 
-    def test_globbing_filelist2(self):
+    def test_filelist2(self):
         """Filelist glob test similar to above testGlob"""
-        self.ParseTest([("--exclude-globbing-filelist", "asoeuth")],
+        self.ParseTest([("--exclude-filelist", "asoeuth")],
                        [(), ('1',), ('1', '1'),
                         ('1', '1', '1'), ('1', '1', '2'),
                         ('1', '2'), ('1', '2', '1'), ('1', '2', '2')],
@@ -663,7 +663,7 @@ class ParseArgsTest(UnitTestCase):
 + testfiles/select/1
 **
 """])
-        self.ParseTest([("--include-globbing-filelist", "file")],
+        self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'),
                         ('1', '1', '2'),
                         ('1', '2'),

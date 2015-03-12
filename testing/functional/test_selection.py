@@ -234,13 +234,13 @@ class TestIncludeExcludeOptions(IncludeExcludeFunctionalTest):
         self.assertEqual(restored, self.expected_restored_tree_with_trailing_space)
 
 
-class TestExcludeGlobbingFilelistTest(IncludeExcludeFunctionalTest):
+class TestExcludeFilelistTest(IncludeExcludeFunctionalTest):
     """
-    Test --exclude-globbing-filelist using duplicity binary.
+    Test --exclude-filelist using duplicity binary.
     """
 
-    def test_exclude_globbing_filelist(self):
-        """Test that exclude globbing filelist works in the basic case """
+    def test_exclude_filelist(self):
+        """Test that exclude filelist works in the basic case """
         # As this is an exclude filelist any lines with no +/- modifier should be treated as if they have a -.
         # Create a filelist
         with open('testfiles/exclude.txt', 'w') as f:
@@ -263,7 +263,50 @@ class TestExcludeGlobbingFilelistTest(IncludeExcludeFunctionalTest):
                     '+ testfiles/select2/3\n'
                     '+ testfiles/select2/1\n'
                     'testfiles/select2/**')
-        self.backup("full", "testfiles/select2", options=["--exclude-globbing-filelist=testfiles/exclude.txt"])
+        self.backup("full", "testfiles/select2", options=["--exclude-filelist=testfiles/exclude.txt"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, self.expected_restored_tree)
+
+    def test_exclude_filelist_combined_imperfections(self):
+        """Test that exclude filelist works with imperfections in the input file"""
+        # This is a combined test for speed reasons. The individual imperfections are tested as unittests in
+        # unit/test_selection.
+        # Imperfections tested are;
+        # * Leading space/spaces before the modifier
+        # * Trailing space/spaces after the filename (but before the newline)
+        # * Blank lines (newline character only)
+        # * Line only containing spaces
+        # * Full-line comments with # as the first character and with leading/trailing spaces
+        # * Unnecessarily quoted filenames with/without modifier (both " and ')
+
+        # Create a filelist
+        with open('testfiles/exclude.txt', 'w') as f:
+            f.write('+ testfiles/select2/3/3sub3/3sub3sub2/3sub3sub2_file.txt\n'
+                    'testfiles/select2/3/3sub3/3sub3sub2\n'
+                    '+ testfiles/select2/3/3sub2/3sub2sub2\n'
+                    ' + testfiles/select2/3/3sub3\n'  # Note leading space added here
+                    '- testfiles/select2/3/3sub1\n'
+                    '  testfiles/select2/2/2sub1/2sub1sub3\n'  # Note leading spaces added here
+                    '\n'
+                    'testfiles/select2/2/2sub1/2sub1sub2\n'
+                    ' + testfiles/select2/2/2sub1 \n'  # Note added trailing/leading space here
+                    '- "testfiles/select2/1/1sub3/1sub3sub2"\n'  # Unnecessary quotes
+                    '# Testing a full-line comment\n'
+                    "'testfiles/select2/1/1sub3/1sub3sub1'  \n"  # Note added spaces and quotes here
+                    'testfiles/select2/1/1sub2/1sub2sub3\n'
+                    '    \n'
+                    '+ testfiles/select2/1/1sub2/1sub2sub1\n'
+                    '- testfiles/select2/1/1sub1/1sub1sub3/1sub1sub3_file.txt\n'
+                    'testfiles/select2/1/1sub1/1sub1sub2\n'
+                    '     # Testing a full-line comment with leading and trailing spaces     \n'
+                    'testfiles/select2/1/1sub2  \n'  # Note added spaces here
+                    '+ testfiles/select2/1.py\n'
+                    '+ testfiles/select2/3 \n'  # Note added space here
+                    '+ testfiles/select2/1\n'
+                    '- testfiles/select2/**')
+        self.backup("full", "testfiles/select2", options=["--exclude-filelist=testfiles/exclude.txt"])
         self.restore()
         restore_dir = 'testfiles/restore_out'
         restored = self.directory_tree_to_list_of_lists(restore_dir)
@@ -271,6 +314,8 @@ class TestExcludeGlobbingFilelistTest(IncludeExcludeFunctionalTest):
 
     def test_exclude_globbing_filelist_combined_imperfections(self):
         """Test that exclude globbing filelist works with imperfections in the input file"""
+        # Identical to test_exclude_filelist_combined_imperfections and included to ensure that
+        # the deprecated --exclude-globbing-filelist function works as expected until it is deliberately removed.
         # This is a combined test for speed reasons. The individual imperfections are tested as unittests in
         # unit/test_selection.
         # Imperfections tested are;
@@ -312,7 +357,7 @@ class TestExcludeGlobbingFilelistTest(IncludeExcludeFunctionalTest):
         restored = self.directory_tree_to_list_of_lists(restore_dir)
         self.assertEqual(restored, self.expected_restored_tree)
 
-    def test_exclude_globbing_filelist_trailing_whitespace_folders_work_with_quotes(self):
+    def test_exclude_filelist_trailing_whitespace_folders_work_with_quotes(self):
         """Test that folders with trailing whitespace in the names work correctly if they are enclosed in quotes"""
         # Create a filelist
         with open('testfiles/exclude.txt', 'w') as f:
@@ -338,17 +383,17 @@ class TestExcludeGlobbingFilelistTest(IncludeExcludeFunctionalTest):
                     '+ testfiles/select2/3\n'
                     '+ testfiles/select2/1\n'
                     'testfiles/select2/**')
-        self.backup("full", "testfiles/select2", options=["--exclude-globbing-filelist=testfiles/exclude.txt"])
+        self.backup("full", "testfiles/select2", options=["--exclude-filelist=testfiles/exclude.txt"])
         self.restore()
         restore_dir = 'testfiles/restore_out'
         restored = self.directory_tree_to_list_of_lists(restore_dir)
         self.assertEqual(restored, self.expected_restored_tree_with_trailing_space)
 
     @unittest.expectedFailure
-    def test_exclude_globbing_filelist_progress_option(self):
-        """Test that exclude globbing filelist is unaffected by the --progress option"""
+    def test_exclude_filelist_progress_option(self):
+        """Test that exclude filelist is unaffected by the --progress option"""
         # ToDo - currently fails. Bug #1264744 (https://bugs.launchpad.net/duplicity/+bug/1264744)
-        # Create a filelist identical to that used in test_exclude_globbing_filelist
+        # Create a filelist identical to that used in test_exclude_filelist
         with open('testfiles/exclude.txt', 'w') as f:
             f.write('+ testfiles/select2/3/3sub3/3sub3sub2/3sub3sub2_file.txt\n'
                     'testfiles/select2/3/3sub3/3sub3sub2\n'
@@ -370,23 +415,23 @@ class TestExcludeGlobbingFilelistTest(IncludeExcludeFunctionalTest):
                     '+ testfiles/select2/1\n'
                     'testfiles/select2/**')
 
-        # Backup the files exactly as in test_exclude_globbing_filelist, but with the --progress option
-        self.backup("full", "testfiles/select2", options=["--exclude-globbing-filelist=testfiles/exclude.txt",
+        # Backup the files exactly as in test_exclude_filelist, but with the --progress option
+        self.backup("full", "testfiles/select2", options=["--exclude-filelist=testfiles/exclude.txt",
                                                           "--progress"])
         self.restore()
         restore_dir = 'testfiles/restore_out'
         restored = self.directory_tree_to_list_of_lists(restore_dir)
-        # The restored files should match those restored in test_exclude_globbing_filelist
+        # The restored files should match those restored in test_exclude_filelist
         self.assertEqual(restored, self.expected_restored_tree)
 
-class TestIncludeGlobbingFilelistTest(IncludeExcludeFunctionalTest):
+class TestIncludeFilelistTest(IncludeExcludeFunctionalTest):
     """
-    Test --include-globbing-filelist using duplicity binary.
+    Test --include-filelist using duplicity binary.
     """
 
-    def test_include_globbing_filelist(self):
-        """Test that include globbing filelist works in the basic case"""
-        # See test_exclude_globbing_filelist above for explanation of what is expected. As this is an include filelist
+    def test_include_filelist(self):
+        """Test that include filelist works in the basic case"""
+        # See test_exclude_filelist above for explanation of what is expected. As this is an include filelist
         # any lines with no +/- modifier should be treated as if they have a +.
         # Create a filelist
         with open('testfiles/include.txt', 'w') as f:
@@ -409,7 +454,97 @@ class TestIncludeGlobbingFilelistTest(IncludeExcludeFunctionalTest):
                     'testfiles/select2/3\n'
                     'testfiles/select2/1\n'
                     '- testfiles/select2/**')
-        self.backup("full", "testfiles/select2", options=["--include-globbing-filelist=testfiles/include.txt"])
+        self.backup("full", "testfiles/select2", options=["--include-filelist=testfiles/include.txt"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, self.expected_restored_tree)
+
+    def test_include_filelist_combined_imperfections(self):
+        """Test that include filelist works with imperfections in the input file"""
+        # This is a combined test for speed reasons. The individual imperfections are tested as unittests in
+        # unit/test_selection.
+        # Imperfections tested are;
+        # * Leading space/spaces before the modifier
+        # * Trailing space/spaces after the filename (but before the newline)
+        # * Blank lines (newline character only)
+        # * Line only containing spaces
+        # * Full-line comments with # as the first character and with leading/trailing spaces
+        # * Unnecessarily quoted filenames with/without modifier  (both " and ')
+        # Create a filelist
+        with open('testfiles/include.txt', 'w') as f:
+            f.write('testfiles/select2/3/3sub3/3sub3sub2/3sub3sub2_file.txt\n'
+                    '- testfiles/select2/3/3sub3/3sub3sub2\n'
+                    '"testfiles/select2/3/3sub2/3sub2sub2"\n'
+                    '  + testfiles/select2/3/3sub3\n'  # + added to ensure it makes no difference
+                    '- testfiles/select2/3/3sub1\n'
+                    '- testfiles/select2/2/2sub1/2sub1sub3\n'
+                    ' - "testfiles/select2/2/2sub1/2sub1sub2"\n'
+                    'testfiles/select2/2/2sub1  \n'
+                    '\n'
+                    '- testfiles/select2/1/1sub3/1sub3sub2\n'
+                    '- testfiles/select2/1/1sub3/1sub3sub1 \n'
+                    "- 'testfiles/select2/1/1sub2/1sub2sub3'\n"
+                    '             \n'
+                    ' + testfiles/select2/1/1sub2/1sub2sub1 \n'  # + added to ensure it makes no difference
+                    '- testfiles/select2/1/1sub1/1sub1sub3/1sub1sub3_file.txt\n'
+                    '  - testfiles/select2/1/1sub1/1sub1sub2  \n'
+                    '# Testing full-line comment\n'
+                    '- testfiles/select2/1/1sub2\n'
+                    "'testfiles/select2/1.py'\n"
+                    'testfiles/select2/3\n'
+                    '        #  Testing another full-line comment      \n'
+                    'testfiles/select2/1\n'
+                    '- testfiles/select2/**')
+        self.backup("full", "testfiles/select2", options=["--include-filelist=testfiles/include.txt"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, self.expected_restored_tree)
+
+    def test_include_filelist_workaround_combined_imperfections_no_wildcards(self):
+        """Test that include filelist works with imperfections in the input file"""
+        # This is a modified version of test_include_filelist that passes, despite Bug #1408411
+        # It is still a valid test, it just does not test as many selection features as the above.
+        # This is a combined test for speed reasons. The individual imperfections are tested as unittests in
+        # unit/test_selection.
+        # Imperfections tested are;
+        # * Leading space/spaces before the modifier
+        # * Trailing space/spaces after the filename (but before the newline)
+        # * Blank lines (newline character only)
+        # * Line only containing spaces
+        # * Full-line comments with # as the first character and with leading/trailing spaces
+        # * Unnecessarily quoted filenames with/without modifier  (both " and ')
+        # Create a filelist
+        with open('testfiles/include.txt', 'w') as f:
+            f.write('testfiles/select2/3/3sub3/3sub3sub2/3sub3sub2_file.txt\n'
+                    'testfiles/select2/3/3sub2/3sub2sub2 \n'
+                    '  + testfiles/select2/3/3sub3\n'  # + added to ensure it makes no difference
+                    ' - testfiles/select2/3/3sub1  \n'
+                    '- testfiles/select2/2/2sub1/2sub1sub3\n'
+                    '- testfiles/select2/2/2sub1/2sub1sub2\n'
+                    '"testfiles/select2/2/2sub1"\n'
+                    '   - testfiles/select2/2/2sub3 \n'  # Added because of Bug #1408411
+                    '- testfiles/select2/2/2sub2\n'  # Added because of Bug #1408411
+                    "- 'testfiles/select2/1/1sub3/1sub3sub2'\n"
+                    '\n'
+                    '- testfiles/select2/1/1sub3/1sub3sub1\n'
+                    '- testfiles/select2/1/1sub2/1sub2sub3\n'
+                    '- "testfiles/select2/1/1sub2/1sub2sub2"\n'  # Added because of Bug #1408411
+                    '# This is a full-line comment\n'
+                    '+ testfiles/select2/1/1sub2/1sub2sub1  \n'  # + added to ensure it makes no difference
+                    '- testfiles/select2/1/1sub1/1sub1sub3/1sub1sub3_file.txt\n'
+                    '          \n'
+                    '- testfiles/select2/1/1sub1/1sub1sub2\n'
+                    #  '- testfiles/select2/1/1sub2\n'  # Commented out because of Bug #1408411
+                    "'testfiles/select2/1.py'\n"
+                    '       # This is another full-line comment, with spaces     \n'
+                    'testfiles/select2/3\n'
+                    #  '- testfiles/select2/2\n' # Commented out because of Bug #1408411
+                    'testfiles/select2/1\n'
+                    '- "testfiles/select2/trailing_space "\n'  # es instead of ea as no wildcard - **
+                    '- testfiles/select2/1.doc')  # es instead of ea as no wildcard - **
+        self.backup("full", "testfiles/select2", options=["--include-filelist=testfiles/include.txt"])
         self.restore()
         restore_dir = 'testfiles/restore_out'
         restored = self.directory_tree_to_list_of_lists(restore_dir)
@@ -417,6 +552,8 @@ class TestIncludeGlobbingFilelistTest(IncludeExcludeFunctionalTest):
 
     def test_include_globbing_filelist_combined_imperfections(self):
         """Test that include globbing filelist works with imperfections in the input file"""
+        # Identical to test_include_filelist_combined_imperfections and included to ensure that
+        # the deprecated --include-globbing-filelist function works as expected until it is deliberately removed.
         # This is a combined test for speed reasons. The individual imperfections are tested as unittests in
         # unit/test_selection.
         # Imperfections tested are;
@@ -458,129 +595,6 @@ class TestIncludeGlobbingFilelistTest(IncludeExcludeFunctionalTest):
         self.assertEqual(restored, self.expected_restored_tree)
 
 
-class TestIncludeFilelistTest(IncludeExcludeFunctionalTest):
-    """
-    Test --include-filelist using duplicity binary.
-    """
-    def test_include_filelist(self):
-        """Test that include filelist works in the basic case"""
-        # See test_exclude_globbing_filelist above for explanation of what is expected. As this is an include filelist
-        # any lines with no +/- modifier should be treated as if they have a +.
-        # Regression test for Bug #1408411 (https://bugs.launchpad.net/duplicity/+bug/1408411)
-        # Create a filelist
-        with open('testfiles/include.txt', 'w') as f:
-            f.write('testfiles/select2/3/3sub3/3sub3sub2/3sub3sub2_file.txt\n'
-                    '- testfiles/select2/3/3sub3/3sub3sub2\n'
-                    'testfiles/select2/3/3sub2/3sub2sub2\n'
-                    '+ testfiles/select2/3/3sub3\n'  # + added to ensure it makes no difference
-                    '- testfiles/select2/3/3sub1\n'
-                    '- testfiles/select2/2/2sub1/2sub1sub3\n'
-                    '- testfiles/select2/2/2sub1/2sub1sub2\n'
-                    'testfiles/select2/2/2sub1\n'
-                    '- testfiles/select2/1/1sub3/1sub3sub2\n'
-                    '- testfiles/select2/1/1sub3/1sub3sub1\n'
-                    '- testfiles/select2/1/1sub2/1sub2sub3\n'
-                    '+ testfiles/select2/1/1sub2/1sub2sub1\n'  # + added to ensure it makes no difference
-                    '- testfiles/select2/1/1sub1/1sub1sub3/1sub1sub3_file.txt\n'
-                    '- testfiles/select2/1/1sub1/1sub1sub2\n'
-                    '- testfiles/select2/1/1sub2\n'
-                    'testfiles/select2/1.py\n'
-                    'testfiles/select2/3\n'
-                    '- testfiles/select2/2\n'  # es instead of ea as no globbing - **
-                    'testfiles/select2/1\n'
-                    '- "testfiles/select2/trailing_space "\n'  # es instead of ea as no globbing - **
-                    '- testfiles/select2/1.doc')  # es instead of ea as no globbing - **
-        self.backup("full", "testfiles/select2", options=["--include-filelist=testfiles/include.txt"])
-        self.restore()
-        restore_dir = 'testfiles/restore_out'
-        restored = self.directory_tree_to_list_of_lists(restore_dir)
-        self.assertEqual(restored, self.expected_restored_tree)
-
-    def test_include_filelist_workaround(self):
-        """Test that include filelist works in the basic case"""
-        # This is a modified version of test_include_filelist that passes, despite Bug #1408411
-        # It is still a valid test, it just does not test as many selection features as the above.
-        # Create a filelist
-        with open('testfiles/include.txt', 'w') as f:
-            f.write('testfiles/select2/3/3sub3/3sub3sub2/3sub3sub2_file.txt\n'
-                    #  '- testfiles/select2/3/3sub3/3sub3sub2\n'  # Commented out because of Bug #1408411
-                    'testfiles/select2/3/3sub2/3sub2sub2\n'
-                    '+ testfiles/select2/3/3sub3\n'  # + added to ensure it makes no difference
-                    '- testfiles/select2/3/3sub1\n'
-                    '- testfiles/select2/2/2sub1/2sub1sub3\n'
-                    '- testfiles/select2/2/2sub1/2sub1sub2\n'
-                    'testfiles/select2/2/2sub1\n'
-                    '- testfiles/select2/2/2sub3\n'  # Added because of Bug #1408411
-                    '- testfiles/select2/2/2sub2\n'  # Added because of Bug #1408411
-                    '- testfiles/select2/1/1sub3/1sub3sub2\n'
-                    '- testfiles/select2/1/1sub3/1sub3sub1\n'
-                    '- testfiles/select2/1/1sub2/1sub2sub3\n'
-                    '- testfiles/select2/1/1sub2/1sub2sub2\n'  # Added because of Bug #1408411
-                    '+ testfiles/select2/1/1sub2/1sub2sub1\n'  # + added to ensure it makes no difference
-                    '- testfiles/select2/1/1sub1/1sub1sub3/1sub1sub3_file.txt\n'
-                    '- testfiles/select2/1/1sub1/1sub1sub2\n'
-                    #  '- testfiles/select2/1/1sub2\n'  # Commented out because of Bug #1408411
-                    'testfiles/select2/1.py\n'
-                    'testfiles/select2/3\n'
-                    #  '- testfiles/select2/2\n' # Commented out because of Bug #1408411
-                    'testfiles/select2/1\n'
-                    '- "testfiles/select2/trailing_space "\n'  # es instead of ea as no globbing - **
-                    '- testfiles/select2/1.doc')  # es instead of ea as no globbing - **
-        self.backup("full", "testfiles/select2", options=["--include-filelist=testfiles/include.txt"])
-        self.restore()
-        restore_dir = 'testfiles/restore_out'
-        restored = self.directory_tree_to_list_of_lists(restore_dir)
-        self.assertEqual(restored, self.expected_restored_tree)
-
-    def test_include_filelist_workaround_combined_imperfections(self):
-        """Test that include filelist works with imperfections in the input file"""
-        # This is a modified version of test_include_filelist that passes, despite Bug #1408411
-        # It is still a valid test, it just does not test as many selection features as the above.
-        # This is a combined test for speed reasons. The individual imperfections are tested as unittests in
-        # unit/test_selection.
-        # Imperfections tested are;
-        # * Leading space/spaces before the modifier
-        # * Trailing space/spaces after the filename (but before the newline)
-        # * Blank lines (newline character only)
-        # * Line only containing spaces
-        # * Full-line comments with # as the first character and with leading/trailing spaces
-        # * Unnecessarily quoted filenames with/without modifier  (both " and ')
-        # Create a filelist
-        with open('testfiles/include.txt', 'w') as f:
-            f.write('testfiles/select2/3/3sub3/3sub3sub2/3sub3sub2_file.txt\n'
-                    'testfiles/select2/3/3sub2/3sub2sub2 \n'
-                    '  + testfiles/select2/3/3sub3\n'  # + added to ensure it makes no difference
-                    ' - testfiles/select2/3/3sub1  \n'
-                    '- testfiles/select2/2/2sub1/2sub1sub3\n'
-                    '- testfiles/select2/2/2sub1/2sub1sub2\n'
-                    '"testfiles/select2/2/2sub1"\n'
-                    '   - testfiles/select2/2/2sub3 \n'  # Added because of Bug #1408411
-                    '- testfiles/select2/2/2sub2\n'  # Added because of Bug #1408411
-                    "- 'testfiles/select2/1/1sub3/1sub3sub2'\n"
-                    '\n'
-                    '- testfiles/select2/1/1sub3/1sub3sub1\n'
-                    '- testfiles/select2/1/1sub2/1sub2sub3\n'
-                    '- "testfiles/select2/1/1sub2/1sub2sub2"\n'  # Added because of Bug #1408411
-                    '# This is a full-line comment\n'
-                    '+ testfiles/select2/1/1sub2/1sub2sub1  \n'  # + added to ensure it makes no difference
-                    '- testfiles/select2/1/1sub1/1sub1sub3/1sub1sub3_file.txt\n'
-                    '          \n'
-                    '- testfiles/select2/1/1sub1/1sub1sub2\n'
-                    #  '- testfiles/select2/1/1sub2\n'  # Commented out because of Bug #1408411
-                    "'testfiles/select2/1.py'\n"
-                    '       # This is another full-line comment, with spaces     \n'
-                    'testfiles/select2/3\n'
-                    #  '- testfiles/select2/2\n' # Commented out because of Bug #1408411
-                    'testfiles/select2/1\n'
-                    '- "testfiles/select2/trailing_space "\n'  # es instead of ea as no globbing - **
-                    '- testfiles/select2/1.doc')  # es instead of ea as no globbing - **
-        self.backup("full", "testfiles/select2", options=["--include-filelist=testfiles/include.txt"])
-        self.restore()
-        restore_dir = 'testfiles/restore_out'
-        restored = self.directory_tree_to_list_of_lists(restore_dir)
-        self.assertEqual(restored, self.expected_restored_tree)
-
-
 class TestIncludeExcludedForContents(IncludeExcludeFunctionalTest):
     """ Test to check that folders that are excluded are included if they contain includes of higher priority.
      Exhibits the issue reported in Bug #1408411 (https://bugs.launchpad.net/duplicity/+bug/1408411). """
@@ -612,12 +626,14 @@ class TestIncludeExcludedForContents(IncludeExcludeFunctionalTest):
 
     def test_include_globbing_filelist(self):
         """test an excluded folder is included for included contents with an include-globbing-filelist """
+        # Deprecated, but include for now to ensure it keeps working until it is deliberately removed.
         self.write_filelist("testfiles/include.txt")
         self.backup("full", "testfiles/select/1", options=["--include-globbing-filelist=testfiles/include.txt"])
         self.restore_and_check()
 
     def test_exclude_globbing_filelist(self):
         """test an excluded folder is included for included contents with an exclude-globbing-filelist """
+        # Deprecated, but include for now to ensure it keeps working until it is deliberately removed.
         self.write_filelist("testfiles/exclude.txt")
         self.backup("full", "testfiles/select/1", options=["--exclude-globbing-filelist=testfiles/exclude.txt"])
         self.restore_and_check()
@@ -649,38 +665,38 @@ class TestAsterisks(IncludeExcludeFunctionalTest):
         restored = self.directory_tree_to_list_of_lists(restore_dir)
         self.assertEqual(restored, [['2'], ['1']])
 
-    def test_exclude_globbing_filelist_asterisks_none(self):
-        """Basic exclude globbing filelist."""
+    def test_exclude_filelist_asterisks_none(self):
+        """Basic exclude filelist."""
         with open("testfiles/filelist.txt", 'w') as f:
             f.write("+ testfiles/select/1/2/1\n"
                     "- testfiles/select/1/2\n"
                     "- testfiles/select/1/1\n"
                     "- testfiles/select/1/3")
-        self.backup("full", "testfiles/select/1", options=["--exclude-globbing-filelist=testfiles/filelist.txt"])
+        self.backup("full", "testfiles/select/1", options=["--exclude-filelist=testfiles/filelist.txt"])
         self.restore_and_check()
 
     @unittest.expectedFailure
-    def test_exclude_globbing_filelist_asterisks_single(self):
-        """Exclude globbing filelist with asterisks replacing folders."""
+    def test_exclude_filelist_asterisks_single(self):
+        """Exclude filelist with asterisks replacing folders."""
         # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         with open("testfiles/filelist.txt", 'w') as f:
             f.write("+ */select/1/2/1\n"
                     "- */select/1/2\n"
                     "- testfiles/*/1/1\n"
                     "- */*/1/3")
-        self.backup("full", "testfiles/select/1", options=["--exclude-globbing-filelist=testfiles/filelist.txt"])
+        self.backup("full", "testfiles/select/1", options=["--exclude-filelist=testfiles/filelist.txt"])
         self.restore_and_check()
 
     @unittest.expectedFailure
-    def test_exclude_globbing_filelist_asterisks_double_asterisks(self):
-        """Exclude globbing filelist with double asterisks replacing folders."""
+    def test_exclude_filelist_asterisks_double_asterisks(self):
+        """Exclude filelist with double asterisks replacing folders."""
         # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         with open("testfiles/filelist.txt", 'w') as f:
             f.write("+ **/1/2/1\n"
                     "- **/1/2\n"
                     "- **/select/1/1\n"
                     "- testfiles/select/1/3")
-        self.backup("full", "testfiles/select/1", options=["--exclude-globbing-filelist=testfiles/filelist.txt"])
+        self.backup("full", "testfiles/select/1", options=["--exclude-filelist=testfiles/filelist.txt"])
         self.restore_and_check()
 
     def test_commandline_asterisks_single_excludes_only(self):
@@ -734,43 +750,43 @@ class TestTrailingSlash(IncludeExcludeFunctionalTest):
         restored = self.directory_tree_to_list_of_lists(restore_dir)
         self.assertEqual(restored, [['2'], ['1']])
 
-    def test_exclude_globbing_filelist_trailing_slashes(self):
-        """test_exclude_globbing_filelist_asterisks_none with trailing slashes."""
+    def test_exclude_filelist_trailing_slashes(self):
+        """test_exclude_filelist_asterisks_none with trailing slashes."""
         with open("testfiles/filelist.txt", 'w') as f:
             f.write("+ testfiles/select/1/2/1/\n"
                     "- testfiles/select/1/2/\n"
                     "- testfiles/select/1/1/\n"
                     "- testfiles/select/1/3/")
-        self.backup("full", "testfiles/select/1", options=["--exclude-globbing-filelist=testfiles/filelist.txt"])
+        self.backup("full", "testfiles/select/1", options=["--exclude-filelist=testfiles/filelist.txt"])
         self.restore_and_check()
 
     @unittest.expectedFailure
-    def test_exclude_globbing_filelist_trailing_slashes_single_wildcards_excludes(self):
-        """test_exclude_globbing_filelist_trailing_slashes with single wildcards in excludes."""
+    def test_exclude_filelist_trailing_slashes_single_wildcards_excludes(self):
+        """test_exclude_filelist_trailing_slashes with single wildcards in excludes."""
         # Todo: Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
         with open("testfiles/filelist.txt", 'w') as f:
             f.write("+ testfiles/select/1/2/1/\n"
                     "- */select/1/2/\n"
                     "- testfiles/*/1/1/\n"
                     "- */*/1/3/")
-        self.backup("full", "testfiles/select/1", options=["--exclude-globbing-filelist=testfiles/filelist.txt"])
+        self.backup("full", "testfiles/select/1", options=["--exclude-filelist=testfiles/filelist.txt"])
         self.restore_and_check()
 
     @unittest.expectedFailure
-    def test_exclude_globbing_filelist_trailing_slashes_double_wildcards_excludes(self):
-        """test_exclude_globbing_filelist_trailing_slashes with double wildcards in excludes."""
+    def test_exclude_filelist_trailing_slashes_double_wildcards_excludes(self):
+        """test_exclude_filelist_trailing_slashes with double wildcards in excludes."""
         # Todo: Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
         with open("testfiles/filelist.txt", 'w') as f:
             f.write("+ testfiles/select/1/2/1/\n"
                     "- **/1/2/\n"
                     "- **/1/1/\n"
                     "- **/1/3/")
-        self.backup("full", "testfiles/select/1", options=["--exclude-globbing-filelist=testfiles/filelist.txt"])
+        self.backup("full", "testfiles/select/1", options=["--exclude-filelist=testfiles/filelist.txt"])
         self.restore_and_check()
 
     @unittest.expectedFailure
-    def test_exclude_globbing_filelist_trailing_slashes_double_wildcards_excludes(self):
-        """test_exclude_globbing_filelist_trailing_slashes with double wildcards in excludes."""
+    def test_exclude_filelist_trailing_slashes_double_wildcards_excludes(self):
+        """test_exclude_filelist_trailing_slashes with double wildcards in excludes."""
         # Todo: Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482) and likely
         # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         with open("testfiles/filelist.txt", 'w') as f:
@@ -778,11 +794,11 @@ class TestTrailingSlash(IncludeExcludeFunctionalTest):
                     "- **/1/2/\n"
                     "- **/1/1/\n"
                     "- **/1/3/")
-        self.backup("full", "testfiles/select/1", options=["--exclude-globbing-filelist=testfiles/filelist.txt"])
+        self.backup("full", "testfiles/select/1", options=["--exclude-filelist=testfiles/filelist.txt"])
         self.restore_and_check()
 
     @unittest.expectedFailure
-    def test_exclude_globbing_filelist_trailing_slashes_wildcards(self):
+    def test_exclude_filelist_trailing_slashes_wildcards(self):
         """test_commandline_asterisks_single_excludes_only with trailing slashes."""
          # Todo: Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
         self.backup("full", "testfiles/select/1",
