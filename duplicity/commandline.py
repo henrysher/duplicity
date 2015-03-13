@@ -74,6 +74,24 @@ def old_fn_deprecation(opt):
             log.ERROR, force_print=True)
 
 
+def old_globbing_filelist_deprecation(opt):
+    log.Log(_("Warning: Option %s is pending deprecation and will be removed in a future release.\n"
+              "--include-filelist and --exclude-filelist now accept globbing characters and should "
+              "be used instead.") % opt,
+            log.ERROR, force_print=True)
+
+
+def stdin_deprecation(opt):
+    # See https://bugs.launchpad.net/duplicity/+bug/1423367
+    # In almost all Linux distros stdin is a file represented by /dev/stdin,
+    # so --exclude-file=/dev/stdin will work as a substitute.
+    log.Log(_("Warning: Option %s is pending deprecation and will be removed in a future release.\n"
+              "On many GNU/Linux systems, stdin is represented by /dev/stdin and\n"
+              "--include-filelist=/dev/stdin or --exclude-filelist=/dev/stdin could\n"
+              "be used as a substitute.") % opt,
+            log.ERROR, force_print=True)
+
+
 def expand_fn(filename):
     return os.path.expanduser(os.path.expandvars(filename))
 
@@ -307,10 +325,14 @@ def parse_cmdline_options(arglist):
 
     parser.add_option("--exclude-filelist-stdin", action="callback", dest="",
                       callback=lambda o, s, v, p: (select_opts.append(("--exclude-filelist", "standard input")),
-                                                   select_files.append(sys.stdin)))
+                                                   select_files.append(sys.stdin),
+                                                   stdin_deprecation(o)),
+                      help=optparse.SUPPRESS_HELP)
 
     parser.add_option("--exclude-globbing-filelist", type="file", metavar=_("filename"),
-                      dest="", action="callback", callback=add_filelist)
+                      dest="", action="callback", callback=lambda o, s, v, p: (add_filelist(o, s, v, p),
+                                                                               old_globbing_filelist_deprecation(s)),
+                      help=optparse.SUPPRESS_HELP)
 
     # TRANSL: Used in usage help to represent the name of a file. Example:
     # --log-file <filename>
@@ -409,9 +431,13 @@ def parse_cmdline_options(arglist):
                       dest="", action="callback", callback=add_filelist)
     parser.add_option("--include-filelist-stdin", action="callback", dest="",
                       callback=lambda o, s, v, p: (select_opts.append(("--include-filelist", "standard input")),
-                                                   select_files.append(sys.stdin)))
+                                                   select_files.append(sys.stdin),
+                                                   stdin_deprecation(o)),
+                      help=optparse.SUPPRESS_HELP)
     parser.add_option("--include-globbing-filelist", type="file", metavar=_("filename"),
-                      dest="", action="callback", callback=add_filelist)
+                      dest="", action="callback", callback=lambda o, s, v, p: (add_filelist(o, s, v, p),
+                                                                               old_globbing_filelist_deprecation(s)),
+                      help=optparse.SUPPRESS_HELP)
     parser.add_option("--include-regexp", metavar=_("regular_expression"), dest="",
                       type="string", action="callback", callback=add_selection)
 

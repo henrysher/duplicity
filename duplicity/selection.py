@@ -102,6 +102,7 @@ class Select:
 
     def set_iter(self):
         """Initialize generator, prepare to iterate."""
+        # Externally-accessed method
         self.rootpath.setdata()  # this may have changed since Select init
         self.iter = self.Iterate(self.rootpath)
         self.next = self.iter.next
@@ -117,6 +118,7 @@ class Select:
         scanning" bit.
 
         """
+        # Only called by set_iter. Internal.
         def error_handler(exc, path, filename):
             fullpath = os.path.join(path.name, filename)
             try:
@@ -143,6 +145,7 @@ class Select:
             and should be included iff something inside is included.
 
             """
+            # Only called by Iterate. Internal.
             # todo: get around circular dependency issue by importing here
             from duplicity import robust  # @Reimport
             for filename in robust.listpath(path):
@@ -200,6 +203,7 @@ class Select:
 
     def Select(self, path):
         """Run through the selection functions and return dominant val 0/1/2"""
+        # Only used by diryield and tests. Internal.
         if not self.selection_functions:
             return 1
         scan_pending = False
@@ -227,6 +231,7 @@ class Select:
         (option-string, (additional argument, filelist_fp)).
 
         """
+        # Called by commandline.py set_selection. External.
         filelists_index = 0
         try:
             for opt, arg in argtuples:
@@ -236,11 +241,9 @@ class Select:
                     self.add_selection_func(self.present_get_sf(arg, 0))
                 elif opt == "--exclude-device-files":
                     self.add_selection_func(self.devfiles_get_sf())
-                elif opt == "--exclude-filelist":
-                    self.add_selection_func(self.filelist_get_sf(
-                        filelists[filelists_index], 0, arg))
-                    filelists_index += 1
-                elif opt == "--exclude-globbing-filelist":
+                elif (opt == "--exclude-filelist") or (opt == "--exclude-globbing-filelist"):
+                    # --exclude-globbing-filelist is now deprecated, as all filelists are globbing
+                    # but keep this here for the short term for backwards-compatibility
                     for sf in self.filelist_globbing_get_sfs(filelists[filelists_index], 0, arg):
                         self.add_selection_func(sf)
                     filelists_index += 1
@@ -252,11 +255,9 @@ class Select:
                     self.add_selection_func(self.exclude_older_get_sf(arg))
                 elif opt == "--include":
                     self.add_selection_func(self.glob_get_sf(arg, 1))
-                elif opt == "--include-filelist":
-                    self.add_selection_func(self.filelist_get_sf(
-                        filelists[filelists_index], 1, arg))
-                    filelists_index += 1
-                elif opt == "--include-globbing-filelist":
+                elif (opt == "--include-filelist") or (opt == "--include-globbing-filelist"):
+                    # --include-globbing-filelist is now deprecated, as all filelists are globbing
+                    # but keep this here for the short term for backwards-compatibility
                     for sf in self.filelist_globbing_get_sfs(filelists[filelists_index], 1, arg):
                         self.add_selection_func(sf)
                     filelists_index += 1
@@ -271,6 +272,7 @@ class Select:
 
     def parse_catch_error(self, exc):
         """Deal with selection error exc"""
+        # Internal, used by ParseArgs.
         if isinstance(exc, FilePrefixError):
             log.FatalError(_("""\
 Fatal Error: The file specification
@@ -288,6 +290,7 @@ pattern (such as '**') which matches the base directory.""") %
 
     def parse_last_excludes(self):
         """Exit with error if last selection function isn't an exclude"""
+        # Internal. Used by ParseArgs.
         if (self.selection_functions and
                 not self.selection_functions[-1].exclude):
             log.FatalError(_("""\
@@ -301,76 +304,11 @@ probably isn't what you meant.""") %
 
     def add_selection_func(self, sel_func, add_to_start=None):
         """Add another selection function at the end or beginning"""
+        # Internal. Used by ParseArgs.
         if add_to_start:
             self.selection_functions.insert(0, sel_func)
         else:
             self.selection_functions.append(sel_func)
-
-    def filelist_get_sf(self, filelist_fp, inc_default, filelist_name):
-        """Return selection function by reading list of files
-
-        The format of the filelist is documented in the man page.
-        filelist_fp should be an (open) file object.
-        inc_default should be true if this is an include list,
-        false for an exclude list.
-        filelist_name is just a string used for logging.
-
-        """
-        log.Notice(_("Reading filelist %s") % filelist_name)
-        tuple_list, something_excluded = \
-            self.filelist_read(filelist_fp, inc_default, filelist_name)
-        log.Notice(_("Sorting filelist %s") % filelist_name)
-        tuple_list.sort()
-        i = [0]  # We have to put index in list because of stupid scoping rules
-
-        def selection_function(path):
-            while 1:
-                if i[0] >= len(tuple_list):
-                    return None
-                include, move_on = \
-                    self.filelist_pair_match(path, tuple_list[i[0]])
-                if move_on:
-                    i[0] += 1
-                    if include is None:
-                        continue  # later line may match
-                return include
-
-        selection_function.exclude = something_excluded or inc_default == 0
-        selection_function.name = "Filelist: " + filelist_name
-        return selection_function
-
-    def filelist_read(self, filelist_fp, include, filelist_name):
-        """Read filelist from fp, return (tuplelist, something_excluded)"""
-        prefix_warnings = [0]
-
-        def incr_warnings(exc):
-            """Warn if prefix is incorrect"""
-            prefix_warnings[0] += 1
-            if prefix_warnings[0] < 6:
-                log.Warn(_("Warning: file specification '%s' in filelist %s\n"
-                           "doesn't start with correct prefix %s.  Ignoring.") %
-                         (exc, filelist_name, util.ufn(self.prefix)))
-                if prefix_warnings[0] == 5:
-                    log.Warn(_("Future prefix errors will not be logged."))
-
-        something_excluded, tuple_list = None, []
-        separator = globals.null_separator and "\0" or "\n"
-        for line in filelist_fp.read().split(separator):
-            try:
-                tuple = self.filelist_parse_line(line, include)
-            except FilePrefixError as exc:
-                incr_warnings(exc)
-                continue
-            if not tuple:
-                # Skip blanks/full-line comments
-                continue
-            else:
-                tuple_list.append(tuple)
-            if not tuple[1]:
-                something_excluded = 1
-        if filelist_fp not in (sys.stdin,) and filelist_fp.close():
-            log.Warn(_("Error closing filelist %s") % filelist_name)
-        return (tuple_list, something_excluded)
 
     def filelist_sanitise_line(self, line, include_default):
         """
@@ -379,6 +317,7 @@ probably isn't what you meant.""") %
         The aim is to parse filelists in a consistent way, prior to the interpretation of globbing statements.
         The function removes whitespace, comment lines and processes modifiers (leading +/-) and quotes.
         """
+        # Internal. Used by filelist_globbing_get_sfs
 
         line = line.strip()
         if not line:  # skip blanks
@@ -400,59 +339,6 @@ probably isn't what you meant.""") %
 
         return line, include
 
-    def filelist_parse_line(self, line, include):
-        """Parse a single line of a filelist, returning a pair or None if the line is blank/a comment
-
-        Pair will be of form (index, include), where index is another
-        tuple, and include is 1 if the line specifies that we are
-        including a file.  The default is given as an argument.
-        prefix is the string that the index is relative to.
-
-        """
-
-        line, include = self.filelist_sanitise_line(line, include)
-
-        if not line:
-            # Skip blanks and comments
-            return None
-
-        if not line.startswith(self.prefix):
-            raise FilePrefixError(line)
-        line = line[len(self.prefix):]  # Discard prefix
-        index = tuple(filter(lambda x: x, line.split("/")))  # remove empties
-        return (index, include)
-
-    def filelist_pair_match(self, path, pair):
-        """Matches a filelist tuple against a path
-
-        Returns a pair (include, move_on).  include is None if the
-        tuple doesn't match either way, and 0/1 if the tuple excludes
-        or includes the path.
-
-        move_on is true if the tuple cannot match a later index, and
-        so we should move on to the next tuple in the index.
-
-        """
-        index, include = pair
-        if include == 1:
-            if index < path.index:
-                return (None, True)
-            if index == path.index:
-                return (1, True)
-            elif index[:len(path.index)] == path.index:
-                return (1, False)  # /foo/bar implicitly includes /foo
-            else:
-                return (None, False)  # path greater, not initial sequence
-        elif include == 0:
-            if path.index[:len(index)] == index:
-                return (0, False)  # /foo implicitly excludes /foo/bar
-            elif index < path.index:
-                return (None, True)
-            else:
-                return (None, False)  # path greater, not initial sequence
-        else:
-            assert 0, "Include is %s, should be 0 or 1" % (include,)
-
     def filelist_globbing_get_sfs(self, filelist_fp, inc_default, list_name):
         """Return list of selection functions by reading fileobj
 
@@ -462,6 +348,7 @@ probably isn't what you meant.""") %
         See the man page on --[include/exclude]-globbing-filelist
 
         """
+        # Internal. Used by ParseArgs.
         log.Notice(_("Reading globbing filelist %s") % list_name)
         separator = globals.null_separator and "\0" or "\n"
         for line in filelist_fp.read().split(separator):
@@ -473,6 +360,7 @@ probably isn't what you meant.""") %
 
     def other_filesystems_get_sf(self, include):
         """Return selection function matching files on other filesystems"""
+        # Internal. Used by ParseArgs and unit tests.
         assert include == 0 or include == 1
         root_devloc = self.rootpath.getdevloc()
 
@@ -488,6 +376,7 @@ probably isn't what you meant.""") %
 
     def regexp_get_sf(self, regexp_string, include):
         """Return selection function given by regexp_string"""
+        # Internal. Used by ParseArgs and unit tests.
         assert include == 0 or include == 1
         try:
             regexp = re.compile(regexp_string)
@@ -507,6 +396,7 @@ probably isn't what you meant.""") %
 
     def devfiles_get_sf(self):
         """Return a selection function to exclude all dev files"""
+        # Internal. Used by ParseArgs.
         if self.selection_functions:
             log.Warn(_("Warning: exclude-device-files is not the first "
                        "selector.\nThis may not be what you intended"))
@@ -523,6 +413,7 @@ probably isn't what you meant.""") %
 
     def glob_get_sf(self, glob_str, include):
         """Return selection function given by glob string"""
+        # Internal. Used by ParseArgs, filelist_globbing_get_sfs and unit tests.
         assert include == 0 or include == 1
         if glob_str == "**":
             sel_func = lambda path: include
@@ -539,6 +430,7 @@ probably isn't what you meant.""") %
 
     def present_get_sf(self, filename, include):
         """Return selection function given by existence of a file in a directory"""
+        # Internal. Used by ParseArgs.
         assert include == 0 or include == 1
 
         def exclude_sel_func(path):
@@ -572,6 +464,7 @@ probably isn't what you meant.""") %
         globbing characters are used.
 
         """
+        # Internal. Used by glob_get_sf and unit tests.
         if not filename.startswith(self.prefix):
             raise FilePrefixError(filename)
         index = tuple(filter(lambda x: x,
@@ -580,6 +473,7 @@ probably isn't what you meant.""") %
 
     def glob_get_tuple_sf(self, tuple, include):
         """Return selection function based on tuple"""
+        # Internal. Used by glob_get_filename_sf.
         def include_sel_func(path):
             if (path.index == tuple[:len(path.index)] or
                     path.index[:len(tuple)] == tuple):
@@ -616,6 +510,7 @@ probably isn't what you meant.""") %
         things similar to this.
 
         """
+        # Internal. Used by glob_get_sf and unit tests.
         if glob_str.lower().startswith("ignorecase:"):
             re_comp = lambda r: re.compile(r, re.I | re.S)
             glob_str = glob_str[len("ignorecase:"):]
@@ -656,6 +551,7 @@ probably isn't what you meant.""") %
 
     def exclude_older_get_sf(self, date):
         """Return selection function based on files older than modification date """
+        # Internal. Used by ParseArgs.
 
         def sel_func(path):
             if not path.isreg():
@@ -673,6 +569,7 @@ probably isn't what you meant.""") %
 
     def glob_get_prefix_res(self, glob_str):
         """Return list of regexps equivalent to prefixes of glob_str"""
+        # Internal. Used by glob_get_normal_sf.
         glob_parts = glob_str.split("/")
         if "" in glob_parts[1:-1]:
             # "" OK if comes first or last, as in /foo/
@@ -696,6 +593,7 @@ probably isn't what you meant.""") %
         by Donovan Baarda.
 
         """
+        # Internal. Used by glob_get_normal_sf, glob_get_prefix_res and unit tests.
         i, n, res = 0, len(pat), ''
         while i < n:
             c, s = pat[i], pat[i:i + 2]

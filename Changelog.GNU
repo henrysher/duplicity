@@ -1,3 +1,22 @@
+2015-03-13  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/filelist_combine
+      - Merged globbing and non-globbing filelists to use the same code path
+        and all accept globbing characters. Added deprecation warning to the
+        --exclude-globbing-filelist and include-globbing-filelist options in
+        commandline.py and hid them from help output. Updated the manual
+        (and unit tests) accordingly.
+      - Note that this does trigger a change in behaviour for duplicity.
+        Previously, include patterns in include-filelist did not match files
+        in a directory that was included, so /usr/local in an include file
+        would not have matched /usr/local/doc. Now, this folder would be
+        included, as would occur if --include or the old
+        --include-globbing-filelist was used. Additional lines will therefore
+        need to be added to filelists to unambiguously exclude unwanted
+        subfolders, if this is intended.
+      - Mark --include-filelist-stdin and --exclude-fielist-stdin for
+        deprecation and hide from --help output.
+
 2015-03-11  Kenneth Loafman  <kenneth@loafman.com>
 
     * Prep for 0.7.02.
