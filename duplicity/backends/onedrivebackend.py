@@ -168,7 +168,7 @@ class OneDriveBackend(duplicity.backend.Backend):
         directories as necessary.
         """
         object_id = 'me/skydrive'
-        for component in self.directory.split('/'):
+        for component in [x for x in self.directory.split('/') if x]:
             tried_mkdir = False
             while True:
                 files = self.get_files(object_id)

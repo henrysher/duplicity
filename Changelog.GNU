@@ -1,3 +1,7 @@
+2015-03-18  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fix bug 1432999 with hint from Antoine Afalo.
+
 2015-03-13  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~aaron-whitehouse/duplicity/filelist_combine

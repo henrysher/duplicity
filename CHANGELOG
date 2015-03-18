@@ -16,6 +16,7 @@ New in v0.7.03 (2015/04/??)
     subfolders, if this is intended.
   - Mark --include-filelist-stdin and --exclude-fielist-stdin for
     deprecation and hide from --help output.
+* Fix bug 1432999 with hint from Antoine Afalo.
 
 
 New in v0.7.02 (2015/03/10)
