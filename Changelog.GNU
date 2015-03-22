@@ -1,6 +1,12 @@
+2015-03-22  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fix bug 1434702 with help from Robin Nehls
+      - incorrect response BackendException while downloading signatures file.
+
 2015-03-18  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fix bug 1432999 with hint from Antoine Afalo.
+      - '/'s at end of destination cause problems with onedrivebackend.
 
 2015-03-13  Kenneth Loafman  <kenneth@loafman.com>
 

@@ -299,7 +299,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
             chan.send('\0')  # overall ready indicator
             msg = chan.recv(-1)
             m = re.match(r"C([0-7]{4})\s+(\d+)\s+(\S.*)$", msg)
-            if (m is None or m.group(3) is not remote_filename):
+            if (m is None or m.group(3) != remote_filename):
                 raise BackendException("scp get %s failed: incorrect response '%s'" % (remote_filename, msg))
             chan.recv(1)  # dispose of the newline trailing the C message
 
