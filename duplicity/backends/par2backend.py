@@ -117,8 +117,8 @@ class Par2Backend(backend.Backend):
 
             if returncode:
                 log.Warn("File is corrupt. Try to repair %s" % remote_filename)
-                par2volumes = filter(re.compile((r'%s\.vol[\d+]*\.par2' % remote_filename).match,
-                                     self.wrapped_backend._list()))
+                par2volumes = filter(re.compile(r'%s\.vol[\d+]*\.par2' % remote_filename).match,
+                                     self.wrapped_backend._list())
 
                 for filename in par2volumes:
                     file = par2temp.append(filename)

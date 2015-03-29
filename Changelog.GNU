@@ -1,3 +1,8 @@
+2015-03-29  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fix bug 1437789 with patch from pdf
+      - par2backend.py incorrect syntax in get()
+
 2015-03-22  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fix bug 1434702 with help from Robin Nehls

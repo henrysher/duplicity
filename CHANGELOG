@@ -20,6 +20,8 @@ New in v0.7.03 (2015/04/??)
   - '/'s at end of destination cause problems with onedrivebackend.
 * Fix bug 1434702 with help from Robin Nehls
   - incorrect response BackendException while downloading signatures file.
+* Fix bug 1437789 with patch from pdf
+  - par2backend.py incorrect syntax in get()
 
 
 New in v0.7.02 (2015/03/10)
