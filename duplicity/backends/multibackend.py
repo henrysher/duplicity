@@ -69,14 +69,14 @@ class MultiBackend(duplicity.backend.Backend):
                 if (next > len(self.__stores) -1):
                     next = 0
                 log.Log(_("MultiBackend: _put: write to store #%s (%s)")
-                        % (self.__write_cursor, store),
+                        % (self.__write_cursor, store.backend.parsed_url.url_string),
                         log.DEBUG)
                 store.put(source_path, remote_filename)
                 self.__write_cursor = next
                 break
             except Exception, e:            
                 log.Log(_("MultiBackend: failed to write to store #%s (%s), try #%s, Exception: %s")
-                        % (self.__write_cursor, store, next, e),
+                        % (self.__write_cursor, store.backend.parsed_url.url_string, next, e),
                         log.INFO)
                 self.__write_cursor = next
 
@@ -87,14 +87,20 @@ class MultiBackend(duplicity.backend.Backend):
                     raise BackendException("failed to write");
     
     def _get(self, remote_filename, local_path):
+        # since the backend operations will be retried, we can't
+        # simply try to get from the store, if not found, move to the
+        # next store (since each failure will be retried n times
+        # before finally giving up).  So we need to get the list first
+        # before we try to fetch
+        # ENHANCEME: maintain a cached list for each store
         for s in self.__stores:
-            try:
+            list = s.list()
+            if remote_filename in list:
                 s.get(remote_filename, local_path)
                 return
-            except Exception, e:
-                log.Log(_("MultiBackend: failed to get %s to %s from %s")
-                        % (remote_filename, local_path, s),
-                        log.INFO)
+            log.Log(_("MultiBackend: failed to get %s to %s from %s")
+                    % (remote_filename, local_path, s.backend.parsed_url.url_string),
+                    log.INFO)
         log.Log(_("MultiBackend: failed to get %s. Tried all backing stores and none succeeded")
                 % (remote_filename),
                 log.ERROR)
@@ -103,19 +109,33 @@ class MultiBackend(duplicity.backend.Backend):
     def _list(self):
         lists = []
         for s in self.__stores:
+            l = s.list()
+            log.Log(_("MultiBackend: list from %s: %s")
+                    % (s.backend.parsed_url.url_string, l),
+                    log.DEBUG)
             lists.append(s.list())
         # combine the lists into a single flat list:
-        return [item for sublist in lists for item in sublist]
-
+        result = [item for sublist in lists for item in sublist]
+        log.Log(_("MultiBackend: combined list: %s")
+                % (result),
+                log.DEBUG)
+        return result
+        
     def _delete(self, filename):
+        # since the backend operations will be retried, we can't
+        # simply try to get from the store, if not found, move to the
+        # next store (since each failure will be retried n times
+        # before finally giving up).  So we need to get the list first
+        # before we try to delete
+        # ENHANCEME: maintain a cached list for each store
         for s in self.__stores:
-            try:
+            list = s.list()
+            if filename in list:
                 s.delete(filename)
                 return
-            except Exception, e:
-                log.Log(_("MultiBackend: failed to delete %s from %s")
-                        % (filename, s),
-                        log.INFO)
+            log.Log(_("MultiBackend: failed to delete %s from %s")
+                    % (filename, s.backend.parsed_url.url_string),
+                    log.INFO)
         log.Log(_("MultiBackend: failed to delete %s. Tried all backing stores and none succeeded")
                 % (filename),
                 log.ERROR)
