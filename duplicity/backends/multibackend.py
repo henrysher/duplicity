@@ -53,7 +53,28 @@ class MultiBackend(duplicity.backend.Backend):
         #  'url'  - the URL used for the backend store
         #  'env' - an optional list of enviroment variable values to set
         #      during the intialization of the backend
-        
+        #
+        # Example:
+        #
+        # [
+        #  {
+        #   "url": "abackend://myuser@domain.com/backup",
+        #   "env": [
+        #     {
+        #      "name" : "MYENV",
+        #      "value" : "xyz"
+        #     },
+        #     {
+        #      "name" : "FOO",
+        #      "value" : "bar"
+        #     }
+        #    ]
+        #  },
+        #  {
+        #   "url": "file:///path/to/dir"
+        #  }
+        # ]
+                
         try:
             with open(parsed_url.path) as f:
                 configs = json.load(f)
