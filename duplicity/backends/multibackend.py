@@ -20,39 +20,61 @@
 
 #
 
+import os
 import os.path
 import string
 import urllib
+import json
 
 import duplicity.backend
 from duplicity.errors import BackendException
 from duplicity import log
 
 class MultiBackend(duplicity.backend.Backend):
-    """Store files across multiple remote stores. URL is a path to a local file containing URLs defining the remote store"""
+    """Store files across multiple remote stores. URL is a path to a local file containing URLs/other config defining the remote store"""
 
+        
     # the stores we are managing
     __stores = []
 
-    # when we write, we "stripe" via a simple round-robin across remote
-    # stores.  It's hard to get too much more sophisticated since we
-    # can't rely on the backend to give us any useful meta data
-    # (e.g. sizes of files) to do a better job of balancing load
-    # across stores.
+    # when we write, we "stripe" via a simple round-robin across
+    # remote stores.  It's hard to get too much more sophisticated
+    # since we can't rely on the backend to give us any useful meta
+    # data (e.g. sizes of files, capacity of the store (quotas)) to do
+    # a better job of balancing load across stores.
     __write_cursor = 0
 
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
         
         # Init each of the wrapped stores
-	    filename = parsed_url.path
-        # URL is path to config file, contaning one url per line to describe each remote
-        urls = [line.rstrip('\n') for line in open(filename)]
+        #
+        # config file is a json formatted collection of values
+        #  'url'  - the URL used for the backend store
+        #  'env' - an optional list of enviroment variable values to set
+        #      during the intialization of the backend
+        
+        try:
+            with open(parsed_url.path) as f:
+                configs = json.load(f)
+        except IOError as e:
+            log.Log(_("MutliBackend: Could not load config file %s: %s ")
+                    % (parsed_url.path, e),
+                    log.ERROR)
+            raise BackendException('Could not load config file')
 
-        for url in urls:            
+        for config in configs:
+            url = config['url']
             log.Log(_("MultiBackend: use store %s")
                     % (url),
                     log.INFO)
+            if 'env' in config:
+                for env in config['env']:
+                    log.Log(_("MultiBackend: set env %s = %s")
+                            % (env['name'],env['value']),
+                            log.INFO)
+                    os.environ[env['name']] = env['value'];
+                
             store = duplicity.backend.get_backend(url)
         	self.__stores.append(store)
             store_list = store.list()
