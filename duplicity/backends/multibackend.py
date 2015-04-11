@@ -81,7 +81,7 @@ class MultiBackend(duplicity.backend.Backend):
             with open(parsed_url.path) as f:
                 configs = json.load(f)
         except IOError as e:
-            log.Log(_("MutliBackend: Could not load config file %s: %s ")
+            log.Log(_("MultiBackend: Could not load config file %s: %s ")
                     % (parsed_url.path, e),
                     log.ERROR)
             raise BackendException('Could not load config file')
@@ -100,10 +100,10 @@ class MultiBackend(duplicity.backend.Backend):
                 
             store = duplicity.backend.get_backend(url)
         	self.__stores.append(store)
-            store_list = store.list()
-            log.Log(_("MultiBackend: at init, store %s has %s files")
-                    % (url, len(store_list)),
-                    log.INFO)
+            #store_list = store.list()
+            #log.Log(_("MultiBackend: at init, store %s has %s files")
+            #        % (url, len(store_list)),
+            #        log.INFO)
     
     def _put(self, source_path, remote_filename):
         first = self.__write_cursor
