@@ -174,7 +174,7 @@ class MultiBackend(duplicity.backend.Backend):
         for s in self.__stores:
             list = s.list()
             if filename in list:
-                s.delete(filename)
+                s._do_delete(filename)
                 return
             log.Log(_("MultiBackend: failed to delete %s from %s")
                     % (filename, s.backend.parsed_url.url_string),
@@ -182,7 +182,7 @@ class MultiBackend(duplicity.backend.Backend):
         log.Log(_("MultiBackend: failed to delete %s. Tried all backing stores and none succeeded")
                 % (filename),
                 log.ERROR)
-        raise BackendException("failed to delete")
+#        raise BackendException("failed to delete")
     
 duplicity.backend.register_backend('multi', MultiBackend)
 
