@@ -49,7 +49,9 @@ class MultiBackend(duplicity.backend.Backend):
         
         # Init each of the wrapped stores
         #
-        # config file is a json formatted collection of values
+        # config file is a json formatted collection of values, one for
+        # each backend.  We will 'stripe' data across all the given stores:
+        #
         #  'url'  - the URL used for the backend store
         #  'env' - an optional list of enviroment variable values to set
         #      during the intialization of the backend
