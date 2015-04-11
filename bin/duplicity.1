@@ -157,6 +157,13 @@ for ssl certificate verification of HTTPS connections
 (also see
 .BR "A NOTE ON PYDRIVE BACKEND"
 ) below.
+.TP
+.BR "multi backend"
+.B Multi -- store to more than one backend
+.br
+(also see
+.BR "A NOTE ON MULTI BACKEND"
+) below.
 .br
 .SH DESCRIPTION
 Duplicity incrementally backs up files and folders into
@@ -1272,6 +1279,15 @@ See also
 .B "A NOTE ON PYDRIVE BACKEND"
 below.
 .RE
+.BR "multi"
+.PP
+.RS
+multi:///path/to/config.json
+.PP
+See also
+.B "A NOTE ON MULTI BACKEND"
+below.
+.RE
 
 .SH TIME FORMATS
 duplicity uses time strings in two places.  Firstly, many of the files
@@ -1861,6 +1877,43 @@ openssl pkcs12 -in XXX.p12  -nodes -nocerts > pydriveprivatekey.pem
 The content of .pem file should be passed to
 .BR GOOGLE_DRIVE_ACCOUNT_KEY
 environment variable for authentification.
+
+.SH A NOTE ON MULTI BACKEND
+
+The multi backend allows duplicity to combine the storage available in
+more than one backend store (e.g., you can store across a google drive
+account and a onedrive account to get effectively the combined storage
+available in both).  The URL path specifies a JSON formated config
+file containing a list of the backends it will use. Multibackend then
+round-robins across the given backends.  Each element of the list must
+have a "url" element, and may also contain an optional "description"
+and an optional "env" list of environment variables used to configure
+that backend. 
+.PP
+For example:
+.nf
+.RS
+[
+ {
+  "description": "a comment about the backend
+  "url": "abackend://myuser@domain.com/backup",
+  "env": [
+    {
+     "name" : "MYENV",
+     "value" : "xyz"
+    },
+    {
+     "name" : "FOO",
+     "value" : "bar"
+    }
+   ]
+ },
+ {
+  "url": "file:///path/to/dir"
+ }
+]
+.RE
+.fi
 
 .SH A NOTE ON SYMMETRIC ENCRYPTION AND SIGNING
 Signing and symmetrically encrypt at the same time with the gpg binary on the
