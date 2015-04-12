@@ -48,123 +48,6 @@ target_url
 .I [options] [--force] [--extra-clean]
 target_url
 
-.SH REQUIREMENTS
-Duplicity requires a POSIX-like operating system with a
-.B python
-interpreter version 2.6+ installed.
-It is best used under GNU/Linux.
-
-Some backends also require additional components (probably available as packages for your specific platform):
-.TP
-.BR "azure backend" " (Azure Blob Storage Service)"
-.B Microsoft Azure SDK for Python
-- https://github.com/Azure/azure-sdk-for-python
-.TP
-.BR "boto backend" " (S3 Amazon Web Services, Google Cloud Storage)"
-.B boto version 2.0+
-- http://github.com/boto/boto
-.TP
-.BR "cfpyrax backend" " (Rackspace Cloud) and " "hubic backend" " (hubic.com)"
-.B Rackspace CloudFiles Pyrax API
-- http://docs.rackspace.com/sdks/guide/content/python.html
-.TP
-.BR "dpbx backend" " (Dropbox)"
-.B Dropbox Python SDK
-- https://www.dropbox.com/developers/reference/sdk
-.TP
-.BR "copy backend" " (Copy.com)"
-.B python-urllib3
-- https://github.com/shazow/urllib3
-.TP
-.BR "gdocs backend" " (Google Docs)"
-.B Google Data APIs Python Client Library
-- http://code.google.com/p/gdata-python-client/
-.TP
-.BR "gio backend" " (Gnome VFS API)"
-.B PyGObject
-- http://live.gnome.org/PyGObject
-.br
-.B D-Bus
-(dbus)- http://www.freedesktop.org/wiki/Software/dbus
-.TP
-.BR "lftp backend" " (needed for ftp, ftps, fish [over ssh] - also supports sftp, webdav[s])"
-.B LFTP Client
-- http://lftp.yar.ru/
-.TP
-.BR "mega backend" " (mega.co.nz)"
-.B Python library for mega API
-- https://github.com/ckornacker/mega.py, ubuntu ppa - ppa:ckornacker/backup
-.TP
-.BR "OneDrive backend" " (Microsoft OneDrive)"
-.B python-requests
-- http://python-requests.org
-.br
-.B python-requests-oauthlib
-- https://github.com/requests/requests-oauthlib
-.TP
-.BR "ncftp backend" " (ftp, select via ncftp+ftp://)"
-.B NcFTP
-- http://www.ncftp.com/
-.TP
-.B "Par2 Wrapper Backend"
-.B par2cmdline
-- http://parchive.sourceforge.net/
-.TP
-.B "rsync backend"
-.B rsync client binary
-- http://rsync.samba.org/
-.PP
-There are two
-.B ssh backends
-for scp/sftp/ssh access (also see
-.BR "A NOTE ON SSH BACKENDS" ).
-.TP
-.BR "ssh paramiko backend" " (enabled by default)"
-.B paramiko
-(SSH2 for python)
-- http://pypi.python.org/pypi/paramiko (downloads); http://github.com/paramiko/paramiko (project page)
-.br
-.B pycrypto
-(Python Cryptography Toolkit)
-- http://www.dlitz.net/software/pycrypto/
-.TP
-.B ssh pexpect backend
-.B sftp/scp client binaries
-OpenSSH - http://www.openssh.com/
-.br
-.B Python pexpect module
-- http://pexpect.sourceforge.net/pexpect.html
-.TP
-.BR "swift backend (OpenStack Object Storage)"
-.B Python swiftclient module
-- https://github.com/openstack/python-swiftclient/
-.br
-.B Python keystoneclient module
-- https://github.com/openstack/python-keystoneclient/
-.TP
-.B "webdav backend"
-.B certificate authority database file
-for ssl certificate verification of HTTPS connections
-- http://curl.haxx.se/docs/caextract.html
-.br
-(also see
-.BR "A NOTE ON SSL CERTIFICATE VERIFICATION" ).
-.TP
-.BR "pydrive backend"
-.B PyDrive -- a wrapper library of google-api-python-client
-- https://pypi.python.org/pypi/PyDrive
-.br
-(also see
-.BR "A NOTE ON PYDRIVE BACKEND"
-) below.
-.TP
-.BR "multi backend"
-.B Multi -- store to more than one backend
-.br
-(also see
-.BR "A NOTE ON MULTI BACKEND"
-) below.
-.br
 .SH DESCRIPTION
 Duplicity incrementally backs up files and folders into
 tar-format volumes encrypted with GnuPG and places them to a
@@ -1889,7 +1772,7 @@ file containing a list of the backends it will use. Multibackend then
 round-robins across the given backends.  Each element of the list must
 have a "url" element, and may also contain an optional "description"
 and an optional "env" list of environment variables used to configure
-that backend. 
+that backend.
 .PP
 For example:
 .nf
@@ -2001,6 +1884,124 @@ The remote signatures will be encrypted if encryption is enabled.
 The local signatures will not be encrypted and stored in the archive dir (see
 .B "--archive-dir"
 ).
+
+.SH REQUIREMENTS
+Duplicity requires a POSIX-like operating system with a
+.B python
+interpreter version 2.6+ installed.
+It is best used under GNU/Linux.
+
+Some backends also require additional components (probably available as packages for your specific platform):
+.TP
+.BR "azure backend" " (Azure Blob Storage Service)"
+.B Microsoft Azure SDK for Python
+- https://github.com/Azure/azure-sdk-for-python
+.TP
+.BR "boto backend" " (S3 Amazon Web Services, Google Cloud Storage)"
+.B boto version 2.0+
+- http://github.com/boto/boto
+.TP
+.BR "cfpyrax backend" " (Rackspace Cloud) and " "hubic backend" " (hubic.com)"
+.B Rackspace CloudFiles Pyrax API
+- http://docs.rackspace.com/sdks/guide/content/python.html
+.TP
+.BR "dpbx backend" " (Dropbox)"
+.B Dropbox Python SDK
+- https://www.dropbox.com/developers/reference/sdk
+.TP
+.BR "copy backend" " (Copy.com)"
+.B python-urllib3
+- https://github.com/shazow/urllib3
+.TP
+.BR "gdocs backend" " (Google Docs)"
+.B Google Data APIs Python Client Library
+- http://code.google.com/p/gdata-python-client/
+.TP
+.BR "gio backend" " (Gnome VFS API)"
+.B PyGObject
+- http://live.gnome.org/PyGObject
+.br
+.B D-Bus
+(dbus)- http://www.freedesktop.org/wiki/Software/dbus
+.TP
+.BR "lftp backend" " (needed for ftp, ftps, fish [over ssh] - also supports sftp, webdav[s])"
+.B LFTP Client
+- http://lftp.yar.ru/
+.TP
+.BR "mega backend" " (mega.co.nz)"
+.B Python library for mega API
+- https://github.com/ckornacker/mega.py, ubuntu ppa - ppa:ckornacker/backup
+.TP
+.BR "OneDrive backend" " (Microsoft OneDrive)"
+.B python-requests
+- http://python-requests.org
+.br
+.B python-requests-oauthlib
+- https://github.com/requests/requests-oauthlib
+.TP
+.BR "ncftp backend" " (ftp, select via ncftp+ftp://)"
+.B NcFTP
+- http://www.ncftp.com/
+.TP
+.B "Par2 Wrapper Backend"
+.B par2cmdline
+- http://parchive.sourceforge.net/
+.TP
+.B "rsync backend"
+.B rsync client binary
+- http://rsync.samba.org/
+.PP
+There are two
+.B ssh backends
+for scp/sftp/ssh access (also see
+.BR "A NOTE ON SSH BACKENDS" ).
+.TP
+.BR "ssh paramiko backend" " (enabled by default)"
+.B paramiko
+(SSH2 for python)
+- http://pypi.python.org/pypi/paramiko (downloads); http://github.com/paramiko/paramiko (project page)
+.br
+.B pycrypto
+(Python Cryptography Toolkit)
+- http://www.dlitz.net/software/pycrypto/
+.TP
+.B ssh pexpect backend
+.B sftp/scp client binaries
+OpenSSH - http://www.openssh.com/
+.br
+.B Python pexpect module
+- http://pexpect.sourceforge.net/pexpect.html
+.TP
+.BR "swift backend (OpenStack Object Storage)"
+.B Python swiftclient module
+- https://github.com/openstack/python-swiftclient/
+.br
+.B Python keystoneclient module
+- https://github.com/openstack/python-keystoneclient/
+.TP
+.B "webdav backend"
+.B certificate authority database file
+for ssl certificate verification of HTTPS connections
+- http://curl.haxx.se/docs/caextract.html
+.br
+(also see
+.BR "A NOTE ON SSL CERTIFICATE VERIFICATION" ).
+.TP
+.BR "pydrive backend"
+.B PyDrive -- a wrapper library of google-api-python-client
+- https://pypi.python.org/pypi/PyDrive
+.br
+(also see
+.BR "A NOTE ON PYDRIVE BACKEND"
+) below.
+.TP
+.BR "multi backend"
+.B Multi -- store to more than one backend
+.br
+(also see
+.BR "A NOTE ON MULTI BACKEND"
+) below.
+.br
 
 .SH AUTHOR
 .TP

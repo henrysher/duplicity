@@ -23,9 +23,10 @@ New in v0.7.03 (2015/04/??)
 * Fix bug 1437789 with patch from pdf
   - par2backend.py incorrect syntax in get()
 * Merge in lp:~stynor/duplicity/multi-backend
-  - A new backend that allows use of more than one backend stores (e.g. to 
-    combine the available space from more than one cloud provider to make 
+  - A new backend that allows use of more than one backend stores (e.g. to
+    combine the available space from more than one cloud provider to make
     a larger store available to duplicity).
+* Move requirements section lower in manpage.
 
 
 New in v0.7.02 (2015/03/10)
