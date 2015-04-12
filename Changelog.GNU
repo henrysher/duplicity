@@ -1,3 +1,10 @@
+2015-04-12  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merge in lp:~stynor/duplicity/multi-backend
+      - A new backend that allows use of more than one backend stores (e.g. to
+        combine the available space from more than one cloud provider to make
+        a larger store available to duplicity).
+
 2015-03-29  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fix bug 1437789 with patch from pdf
