@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2015-01-13 16:55+0000\n"
-"PO-Revision-Date: 2015-04-14 15:27+0000\n"
+"PO-Revision-Date: 2015-04-15 13:32+0000\n"
 "Last-Translator: Tobias Bannert <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2015-04-15 05:10+0000\n"
+"X-Launchpad-Export-Date: 2015-04-16 05:11+0000\n"
 "X-Generator: Launchpad (build 17428)\n"
 
 #: ../bin/duplicity:127
@@ -302,13 +302,14 @@ msgstr "Der temporäre Speicherplatz ist belegt."
 #, python-format
 msgid "Temp space has %d available, backup needs approx %d."
 msgstr ""
-"%d temporärer Speicherplatz ist verfügbar, das Backup benötigt ungefähr %d."
+"%d temporärer Speicherplatz ist verfügbar, die Sicherung benötigt ungefähr "
+"%d."
 
 #: ../bin/duplicity:1239
 #, python-format
 msgid "Temp has %d available, backup will use approx %d."
 msgstr ""
-"%d temporärer Speicherplatz ist verfügbar, das Backup wird ungefähr %d "
+"%d temporärer Speicherplatz ist verfügbar, die Sicherung wird ungefähr %d "
 "nutzen."
 
 #: ../bin/duplicity:1247
@@ -377,6 +378,9 @@ msgid ""
 "Duplicity 0.6 series is being deprecated:\n"
 "See http://www.nongnu.org/duplicity/\n"
 msgstr ""
+"\n"
+"Duplicity Version 0.6 ist veraltet:\n"
+"Mehr unter: http://www.nongnu.org/duplicity/\n"
 
 #: ../bin/duplicity:1418
 #, python-format
@@ -532,7 +536,7 @@ msgstr ""
 
 #: ../duplicity/selection.py:354
 msgid "Future prefix errors will not be logged."
-msgstr "Weitere Präfix-Fehler werden nicht protokolliert."
+msgstr "Weitere Präfixfehler werden nicht protokolliert."
 
 #: ../duplicity/selection.py:372
 #, python-format
@@ -639,8 +643,8 @@ msgid ""
 "Running in 'ignore errors' mode due to %s; please re-consider if this was "
 "not intended"
 msgstr ""
-"Laufe im 'Fehler ignorieren'-Modus aufgrund %s; bitte überprüfen wenn dies "
-"nicht beabsichtigt war"
+"»Fehler vernachlässigen«-Modus läuft gerade, aufgrund von %s; bitte "
+"überprüfen wenn das nicht beabsichtigt war"
 
 #. TRANSL: Used in usage help to represent an imap mailbox
 #: ../duplicity/commandline.py:426
@@ -856,9 +860,9 @@ msgid ""
 "Sign key should be an 8 character hex string, like 'AA0E73D2'.\n"
 "Received '%s' instead."
 msgstr ""
-"Signierschlüssel sollte eine 8 Zeichen lange Hexadezimal-Zahl sein, wie "
-"'AA0E73D2'.\n"
-"Stattdessen '%s' empfangen."
+"Signierschlüssel sollte eine 8 Zeichen lange Hexadezimalzahl sein, wie "
+"»AA0E73D2«.\n"
+"Stattdessen wurde »%s« empfangen."
 
 #: ../duplicity/commandline.py:1000
 #, python-format
@@ -921,7 +925,7 @@ msgstr "Hintergrundprogramm konnte nicht initialisiert werden: %s"
 #: ../duplicity/backend.py:320
 #, python-format
 msgid "Attempt %s failed: %s: %s"
-msgstr ""
+msgstr "Versuch %s ist fehlgeschlagen: %s: %s"
 
 #: ../duplicity/backend.py:371
 #, python-format
@@ -947,8 +951,10 @@ msgstr "Ergebnisse von »%s« werden gelesen"
 #, python-format
 msgid "Running '%s' failed with code %d (attempt #%d)"
 msgid_plural "Running '%s' failed with code %d (attempt #%d)"
-msgstr[0] "Ausführung von '%s' ist mit Code %d fehlgeschlagen (Versuch #%d)"
-msgstr[1] "Ausführung von '%s' ist mit Code %d fehlgeschlagen (Versuch #%d)"
+msgstr[0] ""
+"Ausführung von »%s« ist mit Code %d ist fehlgeschlagen (Versuch #%d)"
+msgstr[1] ""
+"Ausführung von »%s« ist mit Code %d ist fehlgeschlagen (Versuch #%d)"
 
 #: ../duplicity/backend.py:589
 #, python-format
@@ -963,25 +969,25 @@ msgstr ""
 #, python-format
 msgid "Giving up trying to execute '%s' after %d attempt"
 msgid_plural "Giving up trying to execute '%s' after %d attempts"
-msgstr[0] "Ausführung von '%s' aufgegeben nach dem %d. Versuch"
-msgstr[1] "Ausführung von '%s' aufgegeben nach %d Versuchen"
+msgstr[0] "Ausführung von »%s« nach dem %d. Versuch aufgegeben"
+msgstr[1] "Ausführung von »%s« nach %d Versuchen aufgegeben"
 
 #: ../duplicity/asyncscheduler.py:67
 #, python-format
 msgid "instantiating at concurrency %d"
-msgstr "instanziere mit Simultanität %d"
+msgstr "Instanz wird mit Gleichzeitigkeit %d erstellt"
 
 #: ../duplicity/asyncscheduler.py:94
 msgid "inserting barrier"
-msgstr "füge Barriere ein"
+msgstr "Sperre wird eingefügt"
 
 #: ../duplicity/asyncscheduler.py:143
 msgid "running task synchronously (asynchronicity disabled)"
-msgstr "führe Aufgabe synchron aus (asynchronität deaktiviert)"
+msgstr "Aufgabe wird synchron ausgeführt (asynchronität deaktiviert)"
 
 #: ../duplicity/asyncscheduler.py:149
 msgid "scheduling task for asynchronous execution"
-msgstr "plane Aufgabe für asynchrone Ausführung"
+msgstr "Aufgabe für asynchrone Ausführung wird geplant"
 
 #: ../duplicity/asyncscheduler.py:178
 msgid "task completed successfully"
@@ -991,13 +997,13 @@ msgstr "Aufgabe erfolgreich abgeschlossen"
 msgid ""
 "a previously scheduled task has failed; propagating the result immediately"
 msgstr ""
-"eine vorgängig geplante Aufgabe ist fehlgeschlagen; verbreite das Resultat "
-"sofort"
+"Eine vorherig geplante Aufgabe ist fehlgeschlagen; Ergebnis wird sofort "
+"verbreitet"
 
 #: ../duplicity/asyncscheduler.py:212 ../duplicity/asyncscheduler.py:233
 #, python-format
 msgid "active workers = %d"
-msgstr "aktive Arbeiter = %d"
+msgstr "Aktive Arbeiter = %d"
 
 #: ../duplicity/asyncscheduler.py:253
 #, python-format
@@ -1007,7 +1013,7 @@ msgstr "Aufgabenausführung abgeschlossen (erfolgreich: %s)"
 #: ../duplicity/patchdir.py:79 ../duplicity/patchdir.py:84
 #, python-format
 msgid "Patching %s"
-msgstr "Repariere %s"
+msgstr "%s wird repariert"
 
 #: ../duplicity/patchdir.py:525
 #, python-format
@@ -1302,7 +1308,7 @@ msgstr "M %s"
 #: ../duplicity/diffdir.py:196
 #, python-format
 msgid "Comparing %s and %s"
-msgstr "Vergleiche %s und %s"
+msgstr "%s und %s werden verglichen"
 
 #: ../duplicity/diffdir.py:204
 #, python-format
@@ -1322,7 +1328,7 @@ msgstr "Fehler »%s« beim Verarbeiten von %s"
 #: ../duplicity/lazy.py:419
 #, python-format
 msgid "Skipping %s because of previous error"
-msgstr "Überspringe %s wegen vorherigem Fehler"
+msgstr "%s wird wegen vorherigem Fehler übersprungen"
 
 #: ../duplicity/backends/sshbackend.py:25
 #, python-format
@@ -1497,7 +1503,7 @@ msgstr "Erstelle oder aktualisiere Zugriffszeit auf %s"
 #: ../duplicity/path.py:598
 #, python-format
 msgid "Deleting tree %s"
-msgstr "Lösche Baumstruktur %s"
+msgstr "Baumstruktur %s wird gelöscht"
 
 #: ../duplicity/gpginterface.py:237
 msgid "Threading not available -- zombie processes may appear"
@@ -1535,15 +1541,17 @@ msgid ""
 "(various combinations are acceptable, but the month always precedes\n"
 "the day)."
 msgstr ""
-"Ungültiger Zeit-String \"%s\"\n"
+"Ungültige Zeitzeichenkette »%s«\n"
 "\n"
-"Gültige Zeit-Strings sind Intervalle (wie \"3D46s\"), w3-Datum-Zeit-\n"
-"Strings, wie \"2002-04-26T04:22:01-07:00\" (Strings wie\n"
-"\"2002-04-26T04:22:01\" sind auch gültig - duplicity wird die \n"
-"aktuelle Zeitzone nutzen, oder gewöhnliche Daten wie 2/4/1997 oder 2001-04-"
-"23\n"
-"(verschiedene Kombinationen sind gültig, aber der Monat kommt immer vor\n"
-"dem Tag)."
+"Gültige Zeitzeichenkette sind Intervalle (wie »3D46s«), w3-Datum-"
+"Zeitzeichenketten,\n"
+"wie »2002-04-26T04:22:01-07:00« (Zeichenketten wie »2002-04-26T04:22:01« "
+"sind\n"
+"auch gültig - duplicity wird die aktuelle Zeitzone nutzen, oder gewöhnliche "
+"Daten\n"
+"wie 2/4/1997 oder 2001-04-23 (verschiedene Kombinationen sind gültig, aber "
+"vor\n"
+"dem Monat kommt immer der Tag)."
 
 #: ../duplicity/tempdir.py:121
 #, python-format
@@ -1606,21 +1614,6 @@ msgstr "Sperrdatei »%s« wird freigegeben"
 #~ msgstr[0] "Alten Sicherungssatz zum folgenden Zeitpunkt gefunden:"
 #~ msgstr[1] "Alte Sicherungssätze zu den folgenden Zeitpunkten gefunden:"
 
-#~ msgid "Unable to load gio module"
-#~ msgstr "Kann gio-Modul nicht laden"
-
-#, python-format
-#~ msgid "Starting to write %s"
-#~ msgstr "Beginne Schreibvorgang von %s"
-
-#, python-format
-#~ msgid ""
-#~ "One only volume required.\n"
-#~ "Renaming %s to %s"
-#~ msgstr ""
-#~ "Es wird nur ein Volumen benötigt.\n"
-#~ "Benenne %s zu %s um."
-
 #~ msgid "Deleting backup set at time:"
 #~ msgid_plural "Deleting backup sets at times:"
 #~ msgstr[0] "Sicherungssatz löschen, zum Zeitpunkt:"
@@ -1631,3 +1624,24 @@ msgstr "Sperrdatei »%s« wird freigegeben"
 #~ msgstr ""
 #~ "Datei %s konnte nicht lokal gefunden werden, nach Erhalt vom "
 #~ "Hintergrundprogramm."
+
+#~ msgid "Unable to load gio module"
+#~ msgstr "gio-Modul kann nicht geladen werden"
+
+#~ msgid "Reuse already set SIGNING_PASSPHRASE as PASSPHRASE"
+#~ msgstr "Eingestellte SIGNING_PASSPHRASE als PASSPHRASE benutzen"
+
+#~ msgid "Reuse already set PASSPHRASE as SIGNING_PASSPHRASE"
+#~ msgstr "Eingestellte PASSPHRASE als SIGNING_PASSPHRASE benutzen"
+
+#, python-format
+#~ msgid "Starting to write %s"
+#~ msgstr "Mit Schreibvorgang von %s wird begonnen"
+
+#, python-format
+#~ msgid ""
+#~ "One only volume required.\n"
+#~ "Renaming %s to %s"
+#~ msgstr ""
+#~ "Es wird nur ein Datenträger benötigt.\n"
+#~ "%s wird zu %s umbenannt."
