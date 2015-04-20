@@ -69,7 +69,8 @@ class CoPyCloud:
             raise CoPyCloud.Error("Got HTTP error " + str(res.status))
 
         try:
-            if 'content-type' in res.headers and res.headers['content-type'] == 'application/json':
+            if 'content-type' in res.headers and res.headers['content-type'] == 'application/json' \
+               or res.data.startswith('{'):
                 jd = json.loads(res.data.decode(self.DEFAULT_ENCODING), self.DEFAULT_ENCODING)
 
                 if jd and 'result' in jd and jd['result'] == 'error':
