@@ -298,7 +298,7 @@ class PathPatcher(ITRBranch):
                 basis_path.deltree()
             else:
                 basis_path.delete()
-        elif not basis_path.isreg():
+        elif not basis_path.isreg() or (basis_path.isreg() and diff_ropath.difftype == "snapshot"):
             if basis_path.isdir():
                 basis_path.deltree()
             else:

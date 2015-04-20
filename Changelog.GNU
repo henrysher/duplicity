@@ -4,6 +4,9 @@
       - Fix bug 1432229 in Copy.com backend:
         Reply header has no content-type for JSON detection. Now, we also check
         whether the content starts with '{'.
+    * Fixed bug 1444404 with patch from Samu Nuutamo
+      - rdiffdir patch crashes if a regular file is changed to a non-regular
+        file (symlink, fifo, ...)
 
 2015-04-12  Kenneth Loafman  <kenneth@loafman.com>
 
