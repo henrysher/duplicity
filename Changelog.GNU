@@ -1,3 +1,10 @@
+2015-04-20  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merge in lp:~cemsbr/duplicity/duplicity
+      - Fix bug 1432229 in Copy.com backend:
+        Reply header has no content-type for JSON detection. Now, we also check
+        whether the content starts with '{'.
+
 2015-04-12  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merge in lp:~stynor/duplicity/multi-backend

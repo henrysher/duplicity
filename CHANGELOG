@@ -27,6 +27,10 @@ New in v0.7.03 (2015/04/??)
     combine the available space from more than one cloud provider to make
     a larger store available to duplicity).
 * Move requirements section lower in manpage.
+* Merge in lp:~cemsbr/duplicity/duplicity
+  - Fix bug 1432229 in Copy.com backend:
+    Reply header has no content-type for JSON detection. Now, we also check
+    whether the content starts with '{'.
 
 
 New in v0.7.02 (2015/03/10)
