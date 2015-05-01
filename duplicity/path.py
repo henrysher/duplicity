@@ -645,9 +645,12 @@ class Path(ROPath):
         """Patch self with diff and then copy attributes over"""
         assert self.isreg() and diff_ropath.isreg()
         temp_path = self.get_temp_in_same_dir()
-        patch_fileobj = librsync.PatchedFile(self.open("rb"),
-                                             diff_ropath.open("rb"))
+        fbase = self.open("rb")
+        fdiff = diff_ropath.open("rb")
+        patch_fileobj = librsync.PatchedFile(fbase, fdiff)
         temp_path.writefileobj(patch_fileobj)
+        assert not fbase.close()
+        assert not fdiff.close()
         diff_ropath.copy_attribs(temp_path)
         temp_path.rename(self)
 

@@ -119,7 +119,7 @@ class MultiBackend(duplicity.backend.Backend):
                 store.put(source_path, remote_filename)
                 self.__write_cursor = next
                 break
-            except Exception, e:
+            except Exception as e:
                 log.Log(_("MultiBackend: failed to write to store #%s (%s), try #%s, Exception: %s")
                         % (self.__write_cursor, store.backend.parsed_url.url_string, next, e),
                         log.INFO)

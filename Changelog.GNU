@@ -1,3 +1,8 @@
+2015-05-01  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug 1448249 and bug 1449151 thanks to David Coppit.
+      - When patching, close base file before renaming
+
 2015-04-20  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merge in lp:~cemsbr/duplicity/duplicity

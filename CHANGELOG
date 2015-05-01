@@ -1,4 +1,4 @@
-New in v0.7.03 (2015/04/??)
+New in v0.7.03 (2015/05/??)
 ---------------------------
 * Merged in lp:~aaron-whitehouse/duplicity/filelist_combine
   - Merged globbing and non-globbing filelists to use the same code path
@@ -34,6 +34,8 @@ New in v0.7.03 (2015/04/??)
 * Fixed bug 1444404 with patch from Samu Nuutamo
   - rdiffdir patch crashes if a regular file is changed to a non-regular
     file (symlink, fifo, ...)
+* Fixed bug 1448249 and bug 1449151 thanks to David Coppit.
+  - When patching, close base file before renaming
 
 
 New in v0.7.02 (2015/03/10)
