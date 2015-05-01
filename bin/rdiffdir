@@ -68,7 +68,7 @@ def parse_cmdline_options(arglist):
                                        "exclude-regexp=", "include=", "include-filelist=",
                                        "include-filelist-stdin", "include-globbing-filelist",
                                        "include-regexp=", "max-blocksize", "null-separator",
-                                       "verbosity=", "write-sig-to="])
+                                       "verbosity=", "write-sig-to=", "ignore-errors"])
     except getopt.error as e:
         command_line_error("Bad command line option: %s" % (str(e),))
 
@@ -103,6 +103,8 @@ def parse_cmdline_options(arglist):
             log.setverbosity(int(arg))
         elif opt == "--write-sig-to" or opt == "--write-signature-to":
             sig_fileobj = get_fileobj(arg, "wb")
+        elif opt == "--ignore-errors":
+            globals.ignore_errors = 1
         else:
             command_line_error("Unknown option %s" % opt)
 

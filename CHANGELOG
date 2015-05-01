@@ -36,7 +36,7 @@ New in v0.7.03 (2015/05/??)
     file (symlink, fifo, ...)
 * Fixed bug 1448249 and bug 1449151 thanks to David Coppit.
   - When patching, close base file before renaming
-
+  - Enable --ignore-errors flag in rdiffdir
 
 New in v0.7.02 (2015/03/10)
 ---------------------------

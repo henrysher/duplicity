@@ -2,6 +2,7 @@
 
     * Fixed bug 1448249 and bug 1449151 thanks to David Coppit.
       - When patching, close base file before renaming
+      - Enable --ignore-errors flag in rdiffdir
 
 2015-04-20  Kenneth Loafman  <kenneth@loafman.com>
 
