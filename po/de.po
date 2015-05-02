@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-01-13 16:55+0000\n"
+"POT-Creation-Date: 2015-05-01 13:02+0000\n"
 "PO-Revision-Date: 2015-04-15 13:32+0000\n"
 "Last-Translator: Tobias Bannert <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2015-04-16 05:11+0000\n"
-"X-Generator: Launchpad (build 17428)\n"
+"X-Launchpad-Export-Date: 2015-05-02 05:10+0000\n"
+"X-Generator: Launchpad (build 17474)\n"
 
 #: ../bin/duplicity:127
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -442,7 +442,7 @@ msgstr "Fehlerdetail des Hintergrundprogramms: %s"
 msgid "Error opening file %s"
 msgstr "Fehler beim Öffnen der Datei »%s«"
 
-#: ../bin/rdiffdir:126
+#: ../bin/rdiffdir:128
 #, python-format
 msgid "File %s already exists, will not overwrite."
 msgstr "Datei »%s« besteht bereits; wird nicht überschrieben."
@@ -515,17 +515,17 @@ msgstr ""
 "alle Dateien einbezogen werden ist der Ausdruck überflüssig.\n"
 "Wird beendet, weil das wahrscheinlich nicht das ist, was Sie beabsichtigten."
 
-#: ../duplicity/selection.py:319
+#: ../duplicity/selection.py:311
 #, python-format
 msgid "Reading filelist %s"
 msgstr "Dateiliste wird gelesen %s"
 
-#: ../duplicity/selection.py:322
+#: ../duplicity/selection.py:314
 #, python-format
 msgid "Sorting filelist %s"
 msgstr "Dateiliste wird sortiert %s"
 
-#: ../duplicity/selection.py:350
+#: ../duplicity/selection.py:341
 #, python-format
 msgid ""
 "Warning: file specification '%s' in filelist %s\n"
@@ -534,11 +534,11 @@ msgstr ""
 "Achtung: Dateiangabe »%s« in Dateiliste %s\n"
 "beginnt nicht mit dem richtigen Präfix %s. Es wird vernachlässigt."
 
-#: ../duplicity/selection.py:354
+#: ../duplicity/selection.py:345
 msgid "Future prefix errors will not be logged."
 msgstr "Weitere Präfixfehler werden nicht protokolliert."
 
-#: ../duplicity/selection.py:372
+#: ../duplicity/selection.py:361
 #, python-format
 msgid "Error closing filelist %s"
 msgstr "Fehler beim Schließen der Dateiliste %s"
