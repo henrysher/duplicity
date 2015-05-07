@@ -458,6 +458,7 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
 
     # Upload the collection summary.
     # bytes_written += write_manifest(mf, backup_type, backend)
+    mf.set_files_changed_info(diffdir.stats.get_delta_entries_file())
 
     return bytes_written
 
@@ -1450,7 +1451,10 @@ def do_backup(action):
     elif action == "list-current":
         list_current(col_stats)
     elif action == "collection-status":
-        log.PrintCollectionStatus(col_stats, True)
+        if not globals.file_changed:
+            log.PrintCollectionStatus(col_stats, True)
+        else:
+            log.PrintCollectionFileChangedStatus(col_stats, globals.file_changed, True)
     elif action == "cleanup":
         cleanup(col_stats)
     elif action == "remove-old":

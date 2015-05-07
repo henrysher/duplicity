@@ -614,6 +614,11 @@ def parse_cmdline_options(arglist):
     parser.add_option("--volsize", type="int", action="callback", metavar=_("number"),
                       callback=lambda o, s, v, p: setattr(p.values, "volsize", v * 1024 * 1024))
 
+    # If set, collect only the file status, not the whole root.
+    parser.add_option("--file-changed", action="callback", type="file",
+                      metavar=_("path"), dest="file_changed",
+                      callback=lambda o, s, v, p: setattr(p.values, "file_changed", v.rstrip('/')))
+
     # parse the options
     (options, args) = parser.parse_args()
 
