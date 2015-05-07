@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-05-01 13:02+0000\n"
+"POT-Creation-Date: 2015-05-06 11:08-0500\n"
 "PO-Revision-Date: 2012-09-12 07:52+0000\n"
 "Last-Translator: abuyop <Unknown>\n"
 "Language-Team: Malay <ms@li.org>\n"
@@ -15,49 +15,49 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2015-05-02 05:10+0000\n"
+"X-Launchpad-Export-Date: 2015-05-07 05:10+0000\n"
 "X-Generator: Launchpad (build 17474)\n"
 
-#: ../bin/duplicity:127
+#: ../bin/duplicity:102
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
 msgstr "Guna semua PASSPHRASE terkonfigur sebagai SIGN_PASSPHRASE"
 
-#: ../bin/duplicity:134
+#: ../bin/duplicity:109
 msgid "Reuse configured SIGN_PASSPHRASE as PASSPHRASE"
 msgstr "Guna semua SIGN_PASSPHRASE terkonfigur sebagai PASSPHRASE"
 
-#: ../bin/duplicity:173
+#: ../bin/duplicity:148
 msgid "PASSPHRASE variable not set, asking user."
 msgstr "Pembolehubah PASSPHRASE tidak ditetapkan, menanya pengguna"
 
-#: ../bin/duplicity:188
+#: ../bin/duplicity:163
 msgid "GnuPG passphrase for signing key:"
 msgstr "Frasa laluan GnuPG untuk menandatangani kunci:"
 
-#: ../bin/duplicity:193
+#: ../bin/duplicity:168
 msgid "GnuPG passphrase:"
 msgstr "Frasa laluan GnuPG:"
 
-#: ../bin/duplicity:198
+#: ../bin/duplicity:173
 msgid "Retype passphrase for signing key to confirm: "
 msgstr "Taip semula frasa laluan untuk menandatangan kunci untuk sahkan: "
 
-#: ../bin/duplicity:200
+#: ../bin/duplicity:175
 msgid "Retype passphrase to confirm: "
 msgstr "Taip semula frasa laluan untuk sahkan: "
 
-#: ../bin/duplicity:203
+#: ../bin/duplicity:178
 msgid "First and second passphrases do not match!  Please try again."
 msgstr "Frasa laluan pertama dan kedua tidak sepadan! Cuba  sekali lagi."
 
-#: ../bin/duplicity:208
+#: ../bin/duplicity:183
 msgid ""
 "Cannot use empty passphrase with symmetric encryption!  Please try again."
 msgstr ""
 "Tidak dapat guna frasa laluan kosong dengan penyulitan simetrik! Cuba sekali "
 "lagi."
 
-#: ../bin/duplicity:264
+#: ../bin/duplicity:239
 #, python-format
 msgid ""
 "File %s complete in backup set.\n"
@@ -66,7 +66,7 @@ msgstr ""
 "Fail %s selesai dalam set sandar.\n"
 "Meneruskan mula semula pada fail %s."
 
-#: ../bin/duplicity:273
+#: ../bin/duplicity:248
 #, python-format
 msgid ""
 "File %s missing in backup set.\n"
@@ -75,12 +75,12 @@ msgstr ""
 "Fail %s hilang dalam set sandar.\n"
 "Meneruskan mula semula pada fail %s."
 
-#: ../bin/duplicity:322
+#: ../bin/duplicity:299
 #, python-format
 msgid "File %s was corrupted during upload."
 msgstr "Fail %s telah rosak semasa muat naik."
 
-#: ../bin/duplicity:355
+#: ../bin/duplicity:333
 msgid ""
 "Restarting backup, but current encryption settings do not match original "
 "settings"
@@ -88,17 +88,17 @@ msgstr ""
 "Memulakan semula sandar, tetapi tetapan penyulitan semasa tidak sepadan "
 "dengan tetapan asal"
 
-#: ../bin/duplicity:378
+#: ../bin/duplicity:356
 #, python-format
 msgid "Restarting after volume %s, file %s, block %s"
 msgstr ""
 
-#: ../bin/duplicity:445
+#: ../bin/duplicity:423
 #, python-format
 msgid "Processed volume %d"
 msgstr ""
 
-#: ../bin/duplicity:594
+#: ../bin/duplicity:572
 msgid ""
 "Fatal Error: Unable to start incremental backup.  Old signatures not found "
 "and incremental specified"
@@ -106,97 +106,97 @@ msgstr ""
 "Ralat Mati: Tidak dapat mulakan sandar bertokokan. Tandatangan lama tidak "
 "ditemui dan tokokan dinyatakan"
 
-#: ../bin/duplicity:598
+#: ../bin/duplicity:576
 msgid "No signatures found, switching to full backup."
 msgstr "Tiada tandatangan ditemui, bertukar ke sandar penuh."
 
-#: ../bin/duplicity:612
+#: ../bin/duplicity:590
 msgid "Backup Statistics"
 msgstr "Statistik Sandar"
 
-#: ../bin/duplicity:717
+#: ../bin/duplicity:695
 #, python-format
 msgid "%s not found in archive, no files restored."
 msgstr "%s tidak ditemui dalam arkib, tiada fail dipulihkan."
 
-#: ../bin/duplicity:721
+#: ../bin/duplicity:699
 msgid "No files found in archive - nothing restored."
 msgstr "Tiada fail ditemui dalam arkib - tiada apa dipulihkan."
 
-#: ../bin/duplicity:754
+#: ../bin/duplicity:732
 #, python-format
 msgid "Processed volume %d of %d"
 msgstr "Memproses volum %d daripada %d"
 
-#: ../bin/duplicity:788
+#: ../bin/duplicity:766
 #, python-format
 msgid "Invalid data - %s hash mismatch for file:"
 msgstr "Data tidak sah - %s cincangan tidak sepadan untuk fail:"
 
-#: ../bin/duplicity:790
+#: ../bin/duplicity:768
 #, python-format
 msgid "Calculated hash: %s"
 msgstr "Cincangan terkira: %s"
 
-#: ../bin/duplicity:791
+#: ../bin/duplicity:769
 #, python-format
 msgid "Manifest hash: %s"
 msgstr "Cincangan jelas: %s"
 
-#: ../bin/duplicity:830
+#: ../bin/duplicity:807
 #, python-format
 msgid "Volume was signed by key %s, not %s"
 msgstr "Volum telah ditandatangan oleh kunci %s, bukan %s"
 
-#: ../bin/duplicity:862
+#: ../bin/duplicity:837
 #, python-format
 msgid "Verify complete: %s, %s."
 msgstr "Pengesahan selesai: %s, %s."
 
-#: ../bin/duplicity:863
+#: ../bin/duplicity:838
 #, python-format
 msgid "%d file compared"
 msgid_plural "%d files compared"
 msgstr[0] "%d fail dibandingkan"
 msgstr[1] "%d fail dibandingkan"
 
-#: ../bin/duplicity:865
+#: ../bin/duplicity:840
 #, python-format
 msgid "%d difference found"
 msgid_plural "%d differences found"
 msgstr[0] "%d perbezaan ditemui"
 msgstr[1] "%d perbezaan ditemui"
 
-#: ../bin/duplicity:884
+#: ../bin/duplicity:859
 msgid "No extraneous files found, nothing deleted in cleanup."
 msgstr "Tiada fail tambahan ditemui, tiada apa dipadam dalam pembersihan."
 
-#: ../bin/duplicity:889
+#: ../bin/duplicity:864
 msgid "Deleting this file from backend:"
 msgid_plural "Deleting these files from backend:"
 msgstr[0] "Memadam fail ini dari bahagian belakang:"
 msgstr[1] "Memadam fail ini dari bahagian belakang:"
 
-#: ../bin/duplicity:901
+#: ../bin/duplicity:876
 msgid "Found the following file to delete:"
 msgid_plural "Found the following files to delete:"
 msgstr[0] "Temui fail berikut untuk dipadamkan:"
 msgstr[1] "Temui fail berikut untuk dipadamkan:"
 
-#: ../bin/duplicity:905
+#: ../bin/duplicity:880
 msgid "Run duplicity again with the --force option to actually delete."
 msgstr ""
 "Jalan duplicity sekali lagi dengan pilihan --force untuk padam sebenarnya."
 
-#: ../bin/duplicity:948
+#: ../bin/duplicity:923
 msgid "There are backup set(s) at time(s):"
 msgstr "Terdapat set sandar pada masa:"
 
-#: ../bin/duplicity:950
+#: ../bin/duplicity:925
 msgid "Which can't be deleted because newer sets depend on them."
 msgstr "Yang tidak dapat dipadam kerana set lebih baru bergantung padanya."
 
-#: ../bin/duplicity:954
+#: ../bin/duplicity:929
 msgid ""
 "Current active backup chain is older than specified time.  However, it will "
 "not be deleted.  To remove all your backups, manually purge the repository."
@@ -205,102 +205,102 @@ msgstr ""
 "Namun, ia tidak akan dipadam. Untuk membuang semua sandar anda, singkirkan "
 "repositori secara manual."
 
-#: ../bin/duplicity:960
+#: ../bin/duplicity:935
 msgid "No old backup sets found, nothing deleted."
 msgstr "Tiada set sandar lama ditemui, tiada apa dipadamkan."
 
-#: ../bin/duplicity:963
+#: ../bin/duplicity:938
 msgid "Deleting backup chain at time:"
 msgid_plural "Deleting backup chains at times:"
 msgstr[0] "Memadam rantaian sandar pada masa:"
 msgstr[1] "Memadam rantaian sandar pada masa:"
 
-#: ../bin/duplicity:974
+#: ../bin/duplicity:949
 #, python-format
 msgid "Deleting incremental signature chain %s"
 msgstr "Memadam rantaian tandatangan menokok %s"
 
-#: ../bin/duplicity:976
+#: ../bin/duplicity:951
 #, python-format
 msgid "Deleting incremental backup chain %s"
 msgstr "Memadam rantaian sandar menokok %s"
 
-#: ../bin/duplicity:979
+#: ../bin/duplicity:954
 #, python-format
 msgid "Deleting complete signature chain %s"
 msgstr "Memadam rantaian tandatangan selesai %s"
 
-#: ../bin/duplicity:981
+#: ../bin/duplicity:956
 #, python-format
 msgid "Deleting complete backup chain %s"
 msgstr "Memadam rantaian sandar selesai %s"
 
-#: ../bin/duplicity:987
+#: ../bin/duplicity:962
 msgid "Found old backup chain at the following time:"
 msgid_plural "Found old backup chains at the following times:"
 msgstr[0] "Temui rantaian sandar lama pada masa berikut:"
 msgstr[1] "Temui rantaian sandar lama pada masa berikut:"
 
-#: ../bin/duplicity:991
+#: ../bin/duplicity:966
 msgid "Rerun command with --force option to actually delete."
 msgstr "Jalan semula perintah dengan pilihan --force untuk padam sebenarnya."
 
-#: ../bin/duplicity:1068
+#: ../bin/duplicity:1043
 #, python-format
 msgid "Deleting local %s (not authoritative at backend)."
 msgstr "Memadam setempat %s (bukan autoriti pada bahagian belakang)."
 
-#: ../bin/duplicity:1072
+#: ../bin/duplicity:1047
 #, python-format
 msgid "Unable to delete %s: %s"
 msgstr "Tidak boleh padam %s: %s"
 
-#: ../bin/duplicity:1100 ../duplicity/dup_temp.py:265
+#: ../bin/duplicity:1075 ../duplicity/dup_temp.py:263
 #, python-format
 msgid "Failed to read %s: %s"
 msgstr "Gagal membaca %s: %s"
 
-#: ../bin/duplicity:1114
+#: ../bin/duplicity:1089
 #, python-format
 msgid "Copying %s to local cache."
 msgstr "Menyalin %s ke cache setempat."
 
-#: ../bin/duplicity:1162
+#: ../bin/duplicity:1137
 msgid "Local and Remote metadata are synchronized, no sync needed."
 msgstr ""
 "Data meta Setempat dan Jauh telah disegerak, tiada segerak diperlukan."
 
-#: ../bin/duplicity:1167
+#: ../bin/duplicity:1142
 msgid "Synchronizing remote metadata to local cache..."
 msgstr "Menyegerak data meta jauh ke cache setempat..."
 
-#: ../bin/duplicity:1182
+#: ../bin/duplicity:1157
 msgid "Sync would copy the following from remote to local:"
 msgstr "Segerak akan salin yang berikut dari jauh ke setempat:"
 
-#: ../bin/duplicity:1185
+#: ../bin/duplicity:1160
 msgid "Sync would remove the following spurious local files:"
 msgstr "Segera akan buang fail setempat yang palsu:"
 
-#: ../bin/duplicity:1228
+#: ../bin/duplicity:1203
 msgid "Unable to get free space on temp."
 msgstr "Tidak boleh dapatkan ruang bebas pada temp."
 
-#: ../bin/duplicity:1236
+#: ../bin/duplicity:1211
 #, python-format
 msgid "Temp space has %d available, backup needs approx %d."
 msgstr "Ruang sementara mempunyai %d, sandar perlu sekurang-kurangnya %d."
 
-#: ../bin/duplicity:1239
+#: ../bin/duplicity:1214
 #, python-format
 msgid "Temp has %d available, backup will use approx %d."
 msgstr "Temp mempunyai %d, sandar akan guna kira-kira %d."
 
-#: ../bin/duplicity:1247
+#: ../bin/duplicity:1222
 msgid "Unable to get max open files."
 msgstr "Tidak boleh dapatkan fail terbuka max."
 
-#: ../bin/duplicity:1251
+#: ../bin/duplicity:1226
 #, python-format
 msgid ""
 "Max open files of %s is too low, should be >= 1024.\n"
@@ -309,7 +309,7 @@ msgstr ""
 "Fail terbuka max %s terlalu rendah, sepatutnya >= 1024.\n"
 "Guna 'ulimit -n 1024' atau lebih tinggi untuk betulkan.\n"
 
-#: ../bin/duplicity:1301
+#: ../bin/duplicity:1275
 msgid ""
 "RESTART: The first volume failed to upload before termination.\n"
 "         Restart is impossible...starting backup from beginning."
@@ -317,7 +317,7 @@ msgstr ""
 "MULA SEMULA: Volum pertama gagal dimuat naik sebelum dihentikan.\n"
 "         Mula semula adalah mustahil...memulakan sandar dari pemulaan."
 
-#: ../bin/duplicity:1307
+#: ../bin/duplicity:1281
 #, python-format
 msgid ""
 "RESTART: Volumes %d to %d failed to upload before termination.\n"
@@ -326,7 +326,7 @@ msgstr ""
 "MULA SEMULA: Volum %d daripada %d gagal dimuat naik sebelum dihentikan.\n"
 "         Mula semula sandar pada volum %d."
 
-#: ../bin/duplicity:1314
+#: ../bin/duplicity:1288
 #, python-format
 msgid ""
 "RESTART: Impossible backup state: manifest has %d vols, remote has %d vols.\n"
@@ -340,7 +340,7 @@ msgstr ""
 "terakhir.\n"
 "         sandar kemudian mula semula sandar dari pemulaan."
 
-#: ../bin/duplicity:1335
+#: ../bin/duplicity:1310
 msgid ""
 "\n"
 "PYTHONOPTIMIZE in the environment causes duplicity to fail to\n"
@@ -357,90 +357,90 @@ msgid ""
 "See http://www.nongnu.org/duplicity/\n"
 msgstr ""
 
-#: ../bin/duplicity:1418
+#: ../bin/duplicity:1408
 #, python-format
 msgid "Last %s backup left a partial set, restarting."
 msgstr "%s sandar terakhir meninggalkan set separa, memulakan semula."
 
-#: ../bin/duplicity:1422
+#: ../bin/duplicity:1412
 #, python-format
 msgid "Cleaning up previous partial %s backup set, restarting."
 msgstr "Membersihkan %s set sandar separa yang terdahulu, memulakan semula."
 
-#: ../bin/duplicity:1433
+#: ../bin/duplicity:1423
 msgid "Last full backup date:"
 msgstr "Tarikh sandar penuh terakhir:"
 
-#: ../bin/duplicity:1435
+#: ../bin/duplicity:1425
 msgid "Last full backup date: none"
 msgstr "Tarikh sandar penuh terakhir: tiada"
 
-#: ../bin/duplicity:1437
+#: ../bin/duplicity:1427
 msgid "Last full backup is too old, forcing full backup"
 msgstr "Sandar penuh terakhir terlalu lama, memaksa sandar penuh"
 
-#: ../bin/duplicity:1480
+#: ../bin/duplicity:1470
 msgid ""
 "When using symmetric encryption, the signing passphrase must equal the "
 "encryption passphrase."
 msgstr ""
 
-#: ../bin/duplicity:1533
+#: ../bin/duplicity:1523
 msgid "INT intercepted...exiting."
 msgstr "INT diganggu...keluar"
 
-#: ../bin/duplicity:1541
+#: ../bin/duplicity:1531
 #, python-format
 msgid "GPG error detail: %s"
 msgstr "Perincian ralat GPG: %s"
 
-#: ../bin/duplicity:1551
+#: ../bin/duplicity:1541
 #, python-format
 msgid "User error detail: %s"
 msgstr "Perincian ralat pengguna: %s"
 
-#: ../bin/duplicity:1561
+#: ../bin/duplicity:1551
 #, python-format
 msgid "Backend error detail: %s"
 msgstr "Perincian ralat bahagian belakang: %s"
 
-#: ../bin/rdiffdir:61 ../duplicity/commandline.py:259
+#: ../bin/rdiffdir:56 ../duplicity/commandline.py:238
 #, python-format
 msgid "Error opening file %s"
 msgstr "Ralat membuka fail %s"
 
-#: ../bin/rdiffdir:128
+#: ../bin/rdiffdir:119
 #, python-format
 msgid "File %s already exists, will not overwrite."
 msgstr ""
 
-#: ../duplicity/selection.py:127
+#: ../duplicity/selection.py:119
 #, python-format
 msgid "Skipping socket %s"
 msgstr "Melangkau soket %s"
 
-#: ../duplicity/selection.py:131
+#: ../duplicity/selection.py:123
 #, python-format
 msgid "Error initializing file %s"
 msgstr "Ralat mengawalkan fail %s"
 
-#: ../duplicity/selection.py:135 ../duplicity/selection.py:157
+#: ../duplicity/selection.py:127 ../duplicity/selection.py:148
 #, python-format
 msgid "Error accessing possibly locked file %s"
 msgstr "Ralat mencapai fail %s yang mungkin terkunci"
 
-#: ../duplicity/selection.py:172
+#: ../duplicity/selection.py:163
 #, python-format
 msgid "Warning: base %s doesn't exist, continuing"
 msgstr "Amaran: pangkalan %s tidak wujud, teruskan"
 
-#: ../duplicity/selection.py:175 ../duplicity/selection.py:193
-#: ../duplicity/selection.py:196
+#: ../duplicity/selection.py:166 ../duplicity/selection.py:184
+#: ../duplicity/selection.py:187
 #, python-format
 msgid "Selecting %s"
 msgstr "Memilih %s"
 
-#: ../duplicity/selection.py:277
+#: ../duplicity/selection.py:268
 #, python-format
 msgid ""
 "Fatal Error: The file specification\n"
@@ -457,7 +457,7 @@ msgstr ""
 "Spesifikasi fail yang berguna bermula dengan direktori dasar atau\n"
 "corak (seperti '**') yang memadani direktori dasar."
 
-#: ../duplicity/selection.py:286
+#: ../duplicity/selection.py:276
 #, python-format
 msgid ""
 "Fatal Error while processing expression\n"
@@ -466,7 +466,7 @@ msgstr ""
 "Ralat Mati semasa memproses ungkapan\n"
 "%s"
 
-#: ../duplicity/selection.py:296
+#: ../duplicity/selection.py:286
 #, python-format
 msgid ""
 "Last selection expression:\n"
@@ -509,17 +509,17 @@ msgstr "Ralat awalan akan datang tidak akan dilog."
 msgid "Error closing filelist %s"
 msgstr "Ralat menutup senarai fail %s"
 
-#: ../duplicity/selection.py:352
+#: ../duplicity/selection.py:428
 #, python-format
 msgid "Reading globbing filelist %s"
 msgstr "Membaca senarai fail %s"
 
-#: ../duplicity/selection.py:384
+#: ../duplicity/selection.py:461
 #, python-format
 msgid "Error compiling regular expression %s"
 msgstr "Ralat mengompil ungkapan nalar %s"
 
-#: ../duplicity/selection.py:401
+#: ../duplicity/selection.py:477
 msgid ""
 "Warning: exclude-device-files is not the first selector.\n"
 "This may not be what you intended"
@@ -527,7 +527,7 @@ msgstr ""
 "Amaran: exclude-device-files bukanlah pemilih pertama.\n"
 "Ia mungkin bukan yang anda kehendaki"
 
-#: ../duplicity/commandline.py:71
+#: ../duplicity/commandline.py:68
 #, python-format
 msgid ""
 "Warning: Option %s is pending deprecation and will be removed in a future "
@@ -543,67 +543,67 @@ msgstr ""
 msgid "Unable to load gio backend: %s"
 msgstr "Tidak dapat muat bahagian belakang gio: %s"
 
-#. TRANSL: Used in usage help to represent a Unix-style path name. Example:
+#. Used in usage help to represent a Unix-style path name. Example:
 #. --archive-dir <path>
-#: ../duplicity/commandline.py:280 ../duplicity/commandline.py:290
-#: ../duplicity/commandline.py:307 ../duplicity/commandline.py:381
-#: ../duplicity/commandline.py:586 ../duplicity/commandline.py:800
+#: ../duplicity/commandline.py:259 ../duplicity/commandline.py:269
+#: ../duplicity/commandline.py:286 ../duplicity/commandline.py:352
+#: ../duplicity/commandline.py:557 ../duplicity/commandline.py:773
 msgid "path"
 msgstr "laluan"
 
-#. TRANSL: Used in usage help to represent an ID for a GnuPG key. Example:
+#. Used in usage help to represent an ID for a GnuPG key. Example:
 #. --encrypt-key <gpg_key_id>
-#. TRANSL: Used in usage help to represent an ID for a hidden GnuPG key. Example:
+#. Used in usage help to represent an ID for a hidden GnuPG key. Example:
 #. --hidden-encrypt-key <gpg_key_id>
-#. TRANSL: Used in usage help to represent an ID for a GnuPG key. Example:
+#. Used in usage help to represent an ID for a GnuPG key. Example:
 #. --encrypt-key <gpg_key_id>
-#: ../duplicity/commandline.py:302 ../duplicity/commandline.py:309
-#: ../duplicity/commandline.py:403 ../duplicity/commandline.py:570
-#: ../duplicity/commandline.py:773
+#: ../duplicity/commandline.py:281 ../duplicity/commandline.py:288
+#: ../duplicity/commandline.py:372 ../duplicity/commandline.py:538
+#: ../duplicity/commandline.py:746
 msgid "gpg-key-id"
 msgstr "gpg-key-id"
 
-#. TRANSL: Used in usage help to represent a "glob" style pattern for
+#. Used in usage help to represent a "glob" style pattern for
 #. matching one or more files, as described in the documentation.
 #. Example:
 #. --exclude <shell_pattern>
-#: ../duplicity/commandline.py:317 ../duplicity/commandline.py:428
-#: ../duplicity/commandline.py:823
+#: ../duplicity/commandline.py:296 ../duplicity/commandline.py:398
+#: ../duplicity/commandline.py:796
 msgid "shell_pattern"
 msgstr "shell_pattern"
 
-#. TRANSL: Used in usage help to represent the name of a file. Example:
+#. Used in usage help to represent the name of a file. Example:
 #. --log-file <filename>
-#: ../duplicity/commandline.py:323 ../duplicity/commandline.py:332
-#: ../duplicity/commandline.py:339 ../duplicity/commandline.py:430
-#: ../duplicity/commandline.py:437 ../duplicity/commandline.py:450
-#: ../duplicity/commandline.py:769
+#: ../duplicity/commandline.py:302 ../duplicity/commandline.py:309
+#: ../duplicity/commandline.py:314 ../duplicity/commandline.py:400
+#: ../duplicity/commandline.py:405 ../duplicity/commandline.py:416
+#: ../duplicity/commandline.py:742
 msgid "filename"
 msgstr "nama fail"
 
-#. TRANSL: Used in usage help to represent a regular expression (regexp).
-#: ../duplicity/commandline.py:346 ../duplicity/commandline.py:441
+#. Used in usage help to represent a regular expression (regexp).
+#: ../duplicity/commandline.py:321 ../duplicity/commandline.py:407
 msgid "regular_expression"
 msgstr "ungkapan_nalar"
 
-#. TRANSL: Used in usage help to represent a time spec for a previous
+#. Used in usage help to represent a time spec for a previous
 #. point in time, as described in the documentation. Example:
 #. duplicity remove-older-than time [options] target_url
-#: ../duplicity/commandline.py:350 ../duplicity/commandline.py:393
-#: ../duplicity/commandline.py:512 ../duplicity/commandline.py:855
+#: ../duplicity/commandline.py:364 ../duplicity/commandline.py:478
+#: ../duplicity/commandline.py:828
 msgid "time"
 msgstr "masa"
 
-#. TRANSL: Used in usage help. (Should be consistent with the "Options:"
+#. Used in usage help. (Should be consistent with the "Options:"
 #. header.) Example:
 #. duplicity [full|incremental] [options] source_dir target_url
-#: ../duplicity/commandline.py:399 ../duplicity/commandline.py:492
-#: ../duplicity/commandline.py:515 ../duplicity/commandline.py:578
-#: ../duplicity/commandline.py:788
+#: ../duplicity/commandline.py:368 ../duplicity/commandline.py:458
+#: ../duplicity/commandline.py:481 ../duplicity/commandline.py:549
+#: ../duplicity/commandline.py:761
 msgid "options"
 msgstr "pilihan"
 
-#: ../duplicity/commandline.py:414
+#: ../duplicity/commandline.py:383
 #, python-format
 msgid ""
 "Running in 'ignore errors' mode due to %s; please re-consider if this was "
@@ -612,38 +612,38 @@ msgstr ""
 "Menjalankan dalam mod 'abai ralat' kerana %s; sila pertimbang semula jika ia "
 "tidak dikehendaki"
 
-#. TRANSL: Used in usage help to represent an imap mailbox
-#: ../duplicity/commandline.py:426
+#. Used in usage help to represent an imap mailbox
+#: ../duplicity/commandline.py:396
 msgid "imap_mailbox"
 msgstr "imap_mailbox"
 
-#: ../duplicity/commandline.py:444
+#: ../duplicity/commandline.py:410
 msgid "file_descriptor"
 msgstr "penerang_fail"
 
-#. TRANSL: Used in usage help to represent a desired number of
+#. Used in usage help to represent a desired number of
 #. something. Example:
 #. --num-retries <number>
-#: ../duplicity/commandline.py:455 ../duplicity/commandline.py:477
-#: ../duplicity/commandline.py:489 ../duplicity/commandline.py:498
-#: ../duplicity/commandline.py:536 ../duplicity/commandline.py:541
-#: ../duplicity/commandline.py:545 ../duplicity/commandline.py:614
-#: ../duplicity/commandline.py:783
+#: ../duplicity/commandline.py:421 ../duplicity/commandline.py:443
+#: ../duplicity/commandline.py:455 ../duplicity/commandline.py:464
+#: ../duplicity/commandline.py:502 ../duplicity/commandline.py:507
+#: ../duplicity/commandline.py:511 ../duplicity/commandline.py:587
+#: ../duplicity/commandline.py:756
 msgid "number"
 msgstr "bilangan"
 
-#. TRANSL: Used in usage help (noun)
-#: ../duplicity/commandline.py:458
+#. Used in usage help (noun)
+#: ../duplicity/commandline.py:424
 msgid "backup name"
 msgstr "nama sandar"
 
-#. TRANSL: noun
-#: ../duplicity/commandline.py:554 ../duplicity/commandline.py:557
-#: ../duplicity/commandline.py:754
+#. noun
+#: ../duplicity/commandline.py:522 ../duplicity/commandline.py:525
+#: ../duplicity/commandline.py:727
 msgid "command"
 msgstr "perintah"
 
-#: ../duplicity/commandline.py:560
+#: ../duplicity/commandline.py:528
 msgid "pyrax|cloudfiles"
 msgstr ""
 
@@ -651,169 +651,169 @@ msgstr ""
 msgid "paramiko|pexpect"
 msgstr "paramiko|pexpect"
 
-#: ../duplicity/commandline.py:581
+#: ../duplicity/commandline.py:552
 msgid "pem formatted bundle of certificate authorities"
 msgstr "berkas terformat pem bagi autoriti sijil"
 
-#. TRANSL: Used in usage help. Example:
+#. Used in usage help. Example:
 #. --timeout <seconds>
-#: ../duplicity/commandline.py:591 ../duplicity/commandline.py:817
+#: ../duplicity/commandline.py:562 ../duplicity/commandline.py:790
 msgid "seconds"
 msgstr "saat"
 
-#. TRANSL: abbreviation for "character" (noun)
-#: ../duplicity/commandline.py:597 ../duplicity/commandline.py:751
+#. abbreviation for "character" (noun)
+#: ../duplicity/commandline.py:568 ../duplicity/commandline.py:724
 msgid "char"
 msgstr "aksara"
 
-#: ../duplicity/commandline.py:717
+#: ../duplicity/commandline.py:690
 #, python-format
 msgid "Using archive dir: %s"
 msgstr "Menggunakan dir arkib: %s"
 
-#: ../duplicity/commandline.py:718
+#: ../duplicity/commandline.py:691
 #, python-format
 msgid "Using backup name: %s"
 msgstr "Menggunakan nama sandar: %s"
 
-#: ../duplicity/commandline.py:725
+#: ../duplicity/commandline.py:698
 #, python-format
 msgid "Command line error: %s"
 msgstr "Ralat baris perintah: %s"
 
-#: ../duplicity/commandline.py:726
+#: ../duplicity/commandline.py:699
 msgid "Enter 'duplicity --help' for help screen."
 msgstr "Masukkan 'duplicity --help' untuk skrin bantuan."
 
-#. TRANSL: Used in usage help to represent a Unix-style path name. Example:
+#. Used in usage help to represent a Unix-style path name. Example:
 #. rsync://user[:password]@other_host[:port]//absolute_path
-#: ../duplicity/commandline.py:739
+#: ../duplicity/commandline.py:712
 msgid "absolute_path"
 msgstr "laluan_mutlak"
 
-#. TRANSL: Used in usage help. Example:
+#. Used in usage help. Example:
 #. tahoe://alias/some_dir
-#: ../duplicity/commandline.py:743
+#: ../duplicity/commandline.py:716
 msgid "alias"
 msgstr "alias"
 
-#. TRANSL: Used in help to represent a "bucket name" for Amazon Web
+#. Used in help to represent a "bucket name" for Amazon Web
 #. Services' Simple Storage Service (S3). Example:
 #. s3://other.host/bucket_name[/prefix]
-#: ../duplicity/commandline.py:748
+#: ../duplicity/commandline.py:721
 msgid "bucket_name"
 msgstr "bucket_name"
 
-#. TRANSL: Used in usage help to represent the name of a container in
+#. Used in usage help to represent the name of a container in
 #. Amazon Web Services' Cloudfront. Example:
 #. cf+http://container_name
-#: ../duplicity/commandline.py:759
+#: ../duplicity/commandline.py:732
 msgid "container_name"
 msgstr "nama_bekas"
 
-#. TRANSL: noun
-#: ../duplicity/commandline.py:762
+#. noun
+#: ../duplicity/commandline.py:735
 msgid "count"
 msgstr "kiraan"
 
-#. TRANSL: Used in usage help to represent the name of a file directory
-#: ../duplicity/commandline.py:765
+#. Used in usage help to represent the name of a file directory
+#: ../duplicity/commandline.py:738
 msgid "directory"
 msgstr "direktori"
 
-#. TRANSL: Used in usage help, e.g. to represent the name of a code
+#. Used in usage help, e.g. to represent the name of a code
 #. module. Example:
 #. rsync://user[:password]@other.host[:port]::/module/some_dir
-#: ../duplicity/commandline.py:778
+#: ../duplicity/commandline.py:751
 msgid "module"
 msgstr "modul"
 
-#. TRANSL: Used in usage help to represent an internet hostname. Example:
+#. Used in usage help to represent an internet hostname. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
-#: ../duplicity/commandline.py:792
+#: ../duplicity/commandline.py:765
 msgid "other.host"
 msgstr "hos.lain"
 
-#. TRANSL: Used in usage help. Example:
+#. Used in usage help. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
-#: ../duplicity/commandline.py:796
+#: ../duplicity/commandline.py:769
 msgid "password"
 msgstr "katalaluan"
 
-#. TRANSL: Used in usage help to represent a TCP port number. Example:
+#. Used in usage help to represent a TCP port number. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
-#: ../duplicity/commandline.py:804
+#: ../duplicity/commandline.py:777
 msgid "port"
 msgstr "port"
 
-#. TRANSL: Used in usage help. This represents a string to be used as a
+#. Used in usage help. This represents a string to be used as a
 #. prefix to names for backup files created by Duplicity. Example:
 #. s3://other.host/bucket_name[/prefix]
-#: ../duplicity/commandline.py:809
+#: ../duplicity/commandline.py:782
 msgid "prefix"
 msgstr "prefiks"
 
-#. TRANSL: Used in usage help to represent a Unix-style path name. Example:
+#. Used in usage help to represent a Unix-style path name. Example:
 #. rsync://user[:password]@other.host[:port]/relative_path
-#: ../duplicity/commandline.py:813
+#: ../duplicity/commandline.py:786
 msgid "relative_path"
 msgstr "laluan_relatif"
 
-#. TRANSL: Used in usage help to represent the name of a single file
+#. Used in usage help to represent the name of a single file
 #. directory or a Unix-style path to a directory. Example:
 #. file:///some_dir
-#: ../duplicity/commandline.py:828
+#: ../duplicity/commandline.py:801
 msgid "some_dir"
 msgstr "beberapa_dir"
 
-#. TRANSL: Used in usage help to represent the name of a single file
+#. Used in usage help to represent the name of a single file
 #. directory or a Unix-style path to a directory where files will be
 #. coming FROM. Example:
 #. duplicity [full|incremental] [options] source_dir target_url
-#: ../duplicity/commandline.py:834
+#: ../duplicity/commandline.py:807
 msgid "source_dir"
 msgstr "dir_sumber"
 
-#. TRANSL: Used in usage help to represent a URL files will be coming
+#. Used in usage help to represent a URL files will be coming
 #. FROM. Example:
 #. duplicity [restore] [options] source_url target_dir
-#: ../duplicity/commandline.py:839
+#: ../duplicity/commandline.py:812
 msgid "source_url"
 msgstr "url_sumber"
 
-#. TRANSL: Used in usage help to represent the name of a single file
+#. Used in usage help to represent the name of a single file
 #. directory or a Unix-style path to a directory. where files will be
 #. going TO. Example:
 #. duplicity [restore] [options] source_url target_dir
-#: ../duplicity/commandline.py:845
+#: ../duplicity/commandline.py:818
 msgid "target_dir"
 msgstr "dir_sasaran"
 
-#. TRANSL: Used in usage help to represent a URL files will be going TO.
+#. Used in usage help to represent a URL files will be going TO.
 #. Example:
 #. duplicity [full|incremental] [options] source_dir target_url
-#: ../duplicity/commandline.py:850
+#: ../duplicity/commandline.py:823
 msgid "target_url"
 msgstr "url_sasaran"
 
-#. TRANSL: Used in usage help to represent a user name (i.e. login).
+#. Used in usage help to represent a user name (i.e. login).
 #. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
-#: ../duplicity/commandline.py:860
+#: ../duplicity/commandline.py:833
 msgid "user"
 msgstr "pengguna"
 
-#. TRANSL: Header in usage help
-#: ../duplicity/commandline.py:878
+#. Header in usage help
+#: ../duplicity/commandline.py:850
 msgid "Backends and their URL formats:"
 msgstr "Bahagian belakang dan format URL mereka:"
 
-#. TRANSL: Header in usage help
-#: ../duplicity/commandline.py:907
+#. Header in usage help
+#: ../duplicity/commandline.py:875
 msgid "Commands:"
 msgstr "Perintah:"
 
-#: ../duplicity/commandline.py:931
+#: ../duplicity/commandline.py:899
 #, python-format
 msgid ""
 "Specified archive directory '%s' does not exist, or is not a directory"
@@ -829,7 +829,7 @@ msgstr ""
 "Kunci tandatangan mestilah rentetan heks 8 aksaran, seperti 'AA0E73D2'.\n"
 "Tetapi menerima '%s'."
 
-#: ../duplicity/commandline.py:1000
+#: ../duplicity/commandline.py:968
 #, python-format
 msgid ""
 "Restore destination directory %s already exists.\n"
@@ -838,22 +838,22 @@ msgstr ""
 "Direktori destinasi pemulihan %s sudah wujud.\n"
 "Tidak akan ditulis-ganti."
 
-#: ../duplicity/commandline.py:1005
+#: ../duplicity/commandline.py:973
 #, python-format
 msgid "Verify directory %s does not exist"
 msgstr "Direktori %s yang disahkan tidak wujud"
 
-#: ../duplicity/commandline.py:1011
+#: ../duplicity/commandline.py:979
 #, python-format
 msgid "Backup source directory %s does not exist."
 msgstr "Direktori sumber sandar %s yang disahkan tidak wujud."
 
-#: ../duplicity/commandline.py:1042
+#: ../duplicity/commandline.py:1008
 #, python-format
 msgid "Command line warning: %s"
 msgstr "Amaran baris perintah: %s"
 
-#: ../duplicity/commandline.py:1042
+#: ../duplicity/commandline.py:1008
 msgid ""
 "Selection options --exclude/--include\n"
 "currently work only when backing up,not restoring."
@@ -861,7 +861,7 @@ msgstr ""
 "Pilihan pemilihan --exclude/--include\n"
 "buat masa ini hanya berfungsi bila menyandar, bukan semasa pemulihan."
 
-#: ../duplicity/commandline.py:1090
+#: ../duplicity/commandline.py:1056
 #, python-format
 msgid ""
 "Bad URL '%s'.\n"
@@ -873,16 +873,16 @@ msgstr ""
 "dan\n"
 "\"file:///usr/local\". Rujuk halaman manual untuk maklumat lanjut."
 
-#: ../duplicity/commandline.py:1115
+#: ../duplicity/commandline.py:1081
 msgid "Main action: "
 msgstr "Tindakan utama: "
 
-#: ../duplicity/backend.py:102
+#: ../duplicity/backend.py:88
 #, python-format
 msgid "Import of %s %s"
 msgstr ""
 
-#: ../duplicity/backend.py:211
+#: ../duplicity/backend.py:165
 #, python-format
 msgid "Could not initialize backend: %s"
 msgstr "Tidak dapat awalkan bahagian belakang: %s"
@@ -892,22 +892,23 @@ msgstr "Tidak dapat awalkan bahagian belakang: %s"
 msgid "Attempt %s failed: %s: %s"
 msgstr ""
 
-#: ../duplicity/backend.py:371
+#: ../duplicity/backend.py:322 ../duplicity/backend.py:352
+#: ../duplicity/backend.py:359
 #, python-format
 msgid "Backtrace of previous error: %s"
 msgstr ""
 
-#: ../duplicity/backend.py:390
+#: ../duplicity/backend.py:350
 #, python-format
 msgid "Attempt %s failed. %s: %s"
 msgstr ""
 
-#: ../duplicity/backend.py:386
+#: ../duplicity/backend.py:361
 #, python-format
 msgid "Giving up after %s attempts. %s: %s"
 msgstr ""
 
-#: ../duplicity/backend.py:473
+#: ../duplicity/backend.py:546 ../duplicity/backend.py:570
 #, python-format
 msgid "Reading results of '%s'"
 msgstr "Membaca keputusan '%s'"
@@ -935,69 +936,69 @@ msgid_plural "Giving up trying to execute '%s' after %d attempts"
 msgstr[0] "Tidak melakukan '%s' selepas %d percubaan"
 msgstr[1] "Tidak melakukan '%s' selepas %d percubaan"
 
-#: ../duplicity/asyncscheduler.py:67
+#: ../duplicity/asyncscheduler.py:66
 #, python-format
 msgid "instantiating at concurrency %d"
 msgstr "disegerakan pada kesetemuan %d"
 
-#: ../duplicity/asyncscheduler.py:94
+#: ../duplicity/asyncscheduler.py:93
 msgid "inserting barrier"
 msgstr "menyisip sawar"
 
-#: ../duplicity/asyncscheduler.py:143
+#: ../duplicity/asyncscheduler.py:142
 msgid "running task synchronously (asynchronicity disabled)"
 msgstr "menjalankan tugas secara segerak (ketaksegerakan dilumpuhkan)"
 
-#: ../duplicity/asyncscheduler.py:149
+#: ../duplicity/asyncscheduler.py:148
 msgid "scheduling task for asynchronous execution"
 msgstr "menjadualkan tugas untuk pelakuan ketaksegerakan"
 
-#: ../duplicity/asyncscheduler.py:178
+#: ../duplicity/asyncscheduler.py:177
 msgid "task completed successfully"
 msgstr "tugas berjaya diselesaikan"
 
-#: ../duplicity/asyncscheduler.py:189
+#: ../duplicity/asyncscheduler.py:188
 msgid ""
 "a previously scheduled task has failed; propagating the result immediately"
 msgstr ""
 "tugas terjadual sebelum ini mengalami kegagalan; menghasilkan keputusan "
 "serta-merta"
 
-#: ../duplicity/asyncscheduler.py:212 ../duplicity/asyncscheduler.py:233
+#: ../duplicity/asyncscheduler.py:211 ../duplicity/asyncscheduler.py:232
 #, python-format
 msgid "active workers = %d"
 msgstr "pekerja aktif = %d"
 
-#: ../duplicity/asyncscheduler.py:253
+#: ../duplicity/asyncscheduler.py:252
 #, python-format
 msgid "task execution done (success: %s)"
 msgstr "pelakuan tugas dibuat (berjaya: %s)"
 
-#: ../duplicity/patchdir.py:79 ../duplicity/patchdir.py:84
+#: ../duplicity/patchdir.py:74 ../duplicity/patchdir.py:79
 #, python-format
 msgid "Patching %s"
 msgstr "Menampal %s"
 
-#: ../duplicity/patchdir.py:525
+#: ../duplicity/patchdir.py:508
 #, python-format
 msgid "Error '%s' patching %s"
 msgstr ""
 
-#: ../duplicity/patchdir.py:600
+#: ../duplicity/patchdir.py:581
 #, python-format
 msgid "Writing %s of type %s"
 msgstr "Menulis %s dari jenis %s"
 
-#: ../duplicity/collections.py:154 ../duplicity/collections.py:165
+#: ../duplicity/collections.py:150 ../duplicity/collections.py:161
 #, python-format
 msgid "BackupSet.delete: missing %s"
 msgstr ""
 
-#: ../duplicity/collections.py:190
+#: ../duplicity/collections.py:186
 msgid "Fatal Error: No manifests found for most recent backup"
 msgstr "Ralat Mati: Tiada manifes ditemui untuk kebanyakan sandar terkini"
 
-#: ../duplicity/collections.py:199
+#: ../duplicity/collections.py:195
 msgid ""
 "Fatal Error: Remote manifest does not match local one.  Either the remote "
 "backup set or the local archive directory has been corrupted."
@@ -1005,106 +1006,106 @@ msgstr ""
 "Ralar Mati: Manifes jauh tidak sepadan dengan yang setempat. Sama ada set "
 "sandar jauh atau direktori setempat telah rosak."
 
-#: ../duplicity/collections.py:207
+#: ../duplicity/collections.py:203
 msgid "Fatal Error: Neither remote nor local manifest is readable."
 msgstr "Ralat Mati: Tiada manifes jauh atau setempat boleh dibaca."
 
-#: ../duplicity/collections.py:317
+#: ../duplicity/collections.py:314
 msgid "Preferring Backupset over previous one!"
 msgstr "Mengutamakan Set Sandar berbanding yang terdahulu!"
 
-#: ../duplicity/collections.py:320
+#: ../duplicity/collections.py:317
 #, python-format
 msgid "Ignoring incremental Backupset (start_time: %s; needed: %s)"
 msgstr "Mengabaikan Set Sandar tokokan (masa_mula: %s; diperlukan: %s)"
 
-#: ../duplicity/collections.py:325
+#: ../duplicity/collections.py:322
 #, python-format
 msgid "Added incremental Backupset (start_time: %s / end_time: %s)"
 msgstr "Set Sandar tokokan ditambah (masa_mula: %s; / masa_akhir: %s)"
 
-#: ../duplicity/collections.py:395
+#: ../duplicity/collections.py:392
 msgid "Chain start time: "
 msgstr "Masa mula rantaian: "
 
-#: ../duplicity/collections.py:396
+#: ../duplicity/collections.py:393
 msgid "Chain end time: "
 msgstr "Masa tamat rantaian: "
 
-#: ../duplicity/collections.py:397
+#: ../duplicity/collections.py:394
 #, python-format
 msgid "Number of contained backup sets: %d"
 msgstr "Bilangan set sandar yang dikandungi: %d"
 
-#: ../duplicity/collections.py:399
+#: ../duplicity/collections.py:396
 #, python-format
 msgid "Total number of contained volumes: %d"
 msgstr "Sejumlah volum yang dikandungi: %d"
 
-#: ../duplicity/collections.py:401
+#: ../duplicity/collections.py:398
 msgid "Type of backup set:"
 msgstr "Jenis set sandar:"
 
-#: ../duplicity/collections.py:401
+#: ../duplicity/collections.py:398
 msgid "Time:"
 msgstr "Masa:"
 
-#: ../duplicity/collections.py:401
+#: ../duplicity/collections.py:398
 msgid "Num volumes:"
 msgstr "Bil volum:"
 
-#: ../duplicity/collections.py:405
+#: ../duplicity/collections.py:402
 msgid "Full"
 msgstr "Penuh"
 
-#: ../duplicity/collections.py:408
+#: ../duplicity/collections.py:405
 msgid "Incremental"
 msgstr "Tokokan"
 
-#: ../duplicity/collections.py:468
+#: ../duplicity/collections.py:465
 msgid "local"
 msgstr "setempat"
 
-#: ../duplicity/collections.py:470
+#: ../duplicity/collections.py:467
 msgid "remote"
 msgstr "jauh"
 
-#: ../duplicity/collections.py:625
+#: ../duplicity/collections.py:622
 msgid "Collection Status"
 msgstr "Status Koleksi"
 
-#: ../duplicity/collections.py:627
+#: ../duplicity/collections.py:624
 #, python-format
 msgid "Connecting with backend: %s"
 msgstr "Menyambung dengan bahagian belakang: %s"
 
-#: ../duplicity/collections.py:629
+#: ../duplicity/collections.py:626
 #, python-format
 msgid "Archive dir: %s"
 msgstr "Dir arkib: %s"
 
-#: ../duplicity/collections.py:632
+#: ../duplicity/collections.py:629
 #, python-format
 msgid "Found %d secondary backup chain."
 msgid_plural "Found %d secondary backup chains."
 msgstr[0] "Temui %d rantaian sandar sekunder."
 msgstr[1] "Temui %d rantaian sandar sekunder."
 
-#: ../duplicity/collections.py:637
+#: ../duplicity/collections.py:634
 #, python-format
 msgid "Secondary chain %d of %d:"
 msgstr "Rantaian kedua %d daripada %d:"
 
-#: ../duplicity/collections.py:643
+#: ../duplicity/collections.py:640
 msgid "Found primary backup chain with matching signature chain:"
 msgstr ""
 "Temui rantaian sandar utama dengan rantaian tandatangan yang sepadan:"
 
-#: ../duplicity/collections.py:647
+#: ../duplicity/collections.py:644
 msgid "No backup chains with active signatures found"
 msgstr "Tiada rantaian sandar dengan tandatangan aktif ditemui"
 
-#: ../duplicity/collections.py:650
+#: ../duplicity/collections.py:647
 #, python-format
 msgid "Also found %d backup set not part of any chain,"
 msgid_plural "Also found %d backup sets not part of any chain,"
@@ -1113,111 +1114,111 @@ msgstr[0] ""
 msgstr[1] ""
 "Juga temui %d set sandar yang bukan sebahagian mana-mana rantaian,"
 
-#: ../duplicity/collections.py:654
+#: ../duplicity/collections.py:651
 #, python-format
 msgid "and %d incomplete backup set."
 msgid_plural "and %d incomplete backup sets."
 msgstr[0] "dan %d set sandar tidak lengkap."
 msgstr[1] "dan %d set sandar tidak lengkap."
 
-#. TRANSL: "cleanup" is a hard-coded command, so do not translate it
-#: ../duplicity/collections.py:659
+#. "cleanup" is a hard-coded command, so do not translate it
+#: ../duplicity/collections.py:656
 msgid ""
 "These may be deleted by running duplicity with the \"cleanup\" command."
 msgstr ""
 "Ia mungkin telah dipadam dengan menjalankan duplicity bersama perintah "
 "\"cleanup\"."
 
-#: ../duplicity/collections.py:662
+#: ../duplicity/collections.py:659
 msgid "No orphaned or incomplete backup sets found."
 msgstr "Tiada set sandar yatim atau tidak lengkap ditemui."
 
-#: ../duplicity/collections.py:678
+#: ../duplicity/collections.py:675
 #, python-format
 msgid "%d file exists on backend"
 msgid_plural "%d files exist on backend"
 msgstr[0] "%d fail wujud dibahagian belakang"
 msgstr[1] "%d fail wujud dibahagian belakang"
 
-#: ../duplicity/collections.py:685
+#: ../duplicity/collections.py:682
 #, python-format
 msgid "%d file exists in cache"
 msgid_plural "%d files exist in cache"
 msgstr[0] "%d fail wujud dalam cache"
 msgstr[1] "%d fail wujud dalam cache"
 
-#: ../duplicity/collections.py:737
+#: ../duplicity/collections.py:734
 msgid ""
 "Warning, discarding last backup set, because of missing signature file."
 msgstr ""
 "Amaran, menyingkirkan set sandar terakhir, keranan fail tandatangan hilang."
 
-#: ../duplicity/collections.py:760
+#: ../duplicity/collections.py:757
 msgid "Warning, found the following local orphaned signature file:"
 msgid_plural "Warning, found the following local orphaned signature files:"
 msgstr[0] "Amaran, temui fail tandatangan yatim setempat berikut:"
 msgstr[1] "Amaran, temui fail tandatangan yatim setempat berikut:"
 
-#: ../duplicity/collections.py:769
+#: ../duplicity/collections.py:766
 msgid "Warning, found the following remote orphaned signature file:"
 msgid_plural "Warning, found the following remote orphaned signature files:"
 msgstr[0] "Amaran, temui fail tandatangan yatim jauh berikut:"
 msgstr[1] "Amaran, temui fail tandatangan yatim jauh berikut:"
 
-#: ../duplicity/collections.py:778
+#: ../duplicity/collections.py:775
 msgid "Warning, found signatures but no corresponding backup files"
 msgstr "Amaran, temui tandatangan tetapi tiada fail sandar berkaitan"
 
-#: ../duplicity/collections.py:782
+#: ../duplicity/collections.py:779
 msgid ""
 "Warning, found incomplete backup sets, probably left from aborted session"
 msgstr ""
 "Amaran, temui set sandar tidak lengkap, berkemungkinan baki dari sesi yang "
 "dihenti paksa"
 
-#: ../duplicity/collections.py:786
+#: ../duplicity/collections.py:783
 msgid "Warning, found the following orphaned backup file:"
 msgid_plural "Warning, found the following orphaned backup files:"
 msgstr[0] "Amaran, temui fail sandar yatim berikut:"
 msgstr[1] "Amaran, temui fail sandar yatim berikut:"
 
-#: ../duplicity/collections.py:803
+#: ../duplicity/collections.py:800
 #, python-format
 msgid "Extracting backup chains from list of files: %s"
 msgstr "Mengekstrak rantaian sandar dari senarai fail: %s"
 
-#: ../duplicity/collections.py:814
+#: ../duplicity/collections.py:810
 #, python-format
 msgid "File %s is part of known set"
 msgstr "Fail %s adalah sebahagian dari set yang diketahui"
 
-#: ../duplicity/collections.py:817
+#: ../duplicity/collections.py:813
 #, python-format
 msgid "File %s is not part of a known set; creating new set"
 msgstr ""
 "Fail %s bukanlah sebahagian dari set yang diketahui; mencipta set baru"
 
-#: ../duplicity/collections.py:822
+#: ../duplicity/collections.py:818
 #, python-format
 msgid "Ignoring file (rejected by backup set) '%s'"
 msgstr "Mengabaikan fail (ditolak oleh set sandar) '%s'"
 
-#: ../duplicity/collections.py:838
+#: ../duplicity/collections.py:831
 #, python-format
 msgid "Found backup chain %s"
 msgstr "Temui rantaian sandar %s"
 
-#: ../duplicity/collections.py:843
+#: ../duplicity/collections.py:836
 #, python-format
 msgid "Added set %s to pre-existing chain %s"
 msgstr "Tambah set %s ke rantaian pra-wujud %s"
 
-#: ../duplicity/collections.py:847
+#: ../duplicity/collections.py:840
 #, python-format
 msgid "Found orphaned set %s"
 msgstr "Temui set yatim %s"
 
-#: ../duplicity/collections.py:998
+#: ../duplicity/collections.py:992
 #, python-format
 msgid ""
 "No signature chain for the requested time.  Using oldest available chain, "
@@ -1226,52 +1227,52 @@ msgstr ""
 "Tiada rantaian tandatangan unutk masa yang dipinta. Menggunakan rantaian "
 "sedia ada yang paling lama, memulakan pada masa %s."
 
-#: ../duplicity/robust.py:61
+#: ../duplicity/robust.py:59
 #, python-format
 msgid "Error listing directory %s"
 msgstr "Ralat menyenaraikan direktori %s"
 
-#: ../duplicity/diffdir.py:108 ../duplicity/diffdir.py:398
+#: ../duplicity/diffdir.py:103 ../duplicity/diffdir.py:394
 #, python-format
 msgid "Error %s getting delta for %s"
 msgstr "Ralat %s mendapatkan delta untuk %s"
 
-#: ../duplicity/diffdir.py:122
+#: ../duplicity/diffdir.py:117
 #, python-format
 msgid "Getting delta of %s and %s"
 msgstr "Mendapatkan delta bagi %sdan %s"
 
-#: ../duplicity/diffdir.py:167
+#: ../duplicity/diffdir.py:162
 #, python-format
 msgid "A %s"
 msgstr "A %s"
 
-#: ../duplicity/diffdir.py:174
+#: ../duplicity/diffdir.py:169
 #, python-format
 msgid "M %s"
 msgstr "M %s"
 
-#: ../duplicity/diffdir.py:196
+#: ../duplicity/diffdir.py:191
 #, python-format
 msgid "Comparing %s and %s"
 msgstr "Membandingkan %s dengan %s"
 
-#: ../duplicity/diffdir.py:204
+#: ../duplicity/diffdir.py:199
 #, python-format
 msgid "D %s"
 msgstr "D %s"
 
-#: ../duplicity/lazy.py:334
+#: ../duplicity/lazy.py:325
 #, python-format
 msgid "Warning: oldindex %s >= newindex %s"
 msgstr "Amaran: indeks lama %s >= indeks baru %s"
 
-#: ../duplicity/lazy.py:409
+#: ../duplicity/lazy.py:400
 #, python-format
 msgid "Error '%s' processing %s"
 msgstr "Ralat '%s' memproses %s"
 
-#: ../duplicity/lazy.py:419
+#: ../duplicity/lazy.py:410
 #, python-format
 msgid "Skipping %s because of previous error"
 msgstr "Melangkau %s kerana ralat terdahulu"
@@ -1294,17 +1295,17 @@ msgstr ""
 "Amaran: Bahagian belakang pexpect ssh '%s' bukanlah 'paramiko ataupun "
 "'pexpect'. Akan guna paramiko lalai sahaja."
 
-#: ../duplicity/backends/giobackend.py:108
+#: ../duplicity/backends/giobackend.py:106
 #, python-format
 msgid "Connection failed, please check your password: %s"
 msgstr "Sambungan gagal, sila semak kata laluan anda: %s"
 
-#: ../duplicity/backend.py:500
+#: ../duplicity/backends/giobackend.py:130
 #, python-format
 msgid "Writing %s"
 msgstr "Menulis %s"
 
-#: ../duplicity/manifest.py:90
+#: ../duplicity/manifest.py:87
 #, python-format
 msgid ""
 "Fatal Error: Backup source host has changed.\n"
@@ -1315,7 +1316,7 @@ msgstr ""
 "Nama hos semasa: %s\n"
 "Nama hos terdahulu: %s"
 
-#: ../duplicity/manifest.py:97
+#: ../duplicity/manifest.py:94
 #, python-format
 msgid ""
 "Fatal Error: Backup source directory has changed.\n"
@@ -1326,7 +1327,7 @@ msgstr ""
 "Direktori semasa: %s\n"
 "Direktori terdahulu: %s"
 
-#: ../duplicity/manifest.py:106
+#: ../duplicity/manifest.py:103
 msgid ""
 "Aborting because you may have accidentally tried to backup two different "
 "data sets to the same remote location, or using the same archive directory.  "
@@ -1338,112 +1339,112 @@ msgstr ""
 "sama. Jika ini bukanlah kesilapan, guna  --allow-source-mismatch untuk "
 "hindari daripada melihat mesej ini"
 
-#: ../duplicity/manifest.py:213
+#: ../duplicity/manifest.py:209
 msgid "Manifests not equal because different volume numbers"
 msgstr "Manifes tidak sama kerana terdapat perbezaan bilangan volum"
 
-#: ../duplicity/manifest.py:218
+#: ../duplicity/manifest.py:214
 msgid "Manifests not equal because volume lists differ"
 msgstr "Manifes tidak sama kerana senarai volum berbeza"
 
-#: ../duplicity/manifest.py:223
+#: ../duplicity/manifest.py:219
 msgid "Manifests not equal because hosts or directories differ"
 msgstr "Manifes tidak sama kerana hos atau direktori berbeza"
 
-#: ../duplicity/manifest.py:370
+#: ../duplicity/manifest.py:366
 msgid "Warning, found extra Volume identifier"
 msgstr "Amaran, temui pengenalpasti Volum tambahan"
 
-#: ../duplicity/manifest.py:396
+#: ../duplicity/manifest.py:392
 msgid "Other is not VolumeInfo"
 msgstr "Yang lain bukanlah Maklumat Volum"
 
-#: ../duplicity/manifest.py:399
+#: ../duplicity/manifest.py:395
 msgid "Volume numbers don't match"
 msgstr "Bilangan volum tidak  sepadan"
 
-#: ../duplicity/manifest.py:402
+#: ../duplicity/manifest.py:398
 msgid "start_indicies don't match"
 msgstr "start_indicies tidak sepadan"
 
-#: ../duplicity/manifest.py:405
+#: ../duplicity/manifest.py:401
 msgid "end_index don't match"
 msgstr "end_index tidak sepadan"
 
-#: ../duplicity/manifest.py:412
+#: ../duplicity/manifest.py:408
 msgid "Hashes don't match"
 msgstr "Cincangan tidak sepadan"
 
-#: ../duplicity/path.py:109
+#: ../duplicity/path.py:100
 #, python-format
 msgid "Warning: %s invalid devnums (0x%X), treating as (0, 0)."
 msgstr ""
 
-#: ../duplicity/path.py:236 ../duplicity/path.py:295
+#: ../duplicity/path.py:227 ../duplicity/path.py:286
 #, python-format
 msgid "Warning: %s has negative mtime, treating as 0."
 msgstr "Amaran: %s mempunyai mtime negatif, anggap sebagai 0."
 
-#: ../duplicity/path.py:359
+#: ../duplicity/path.py:351
 msgid "Difference found:"
 msgstr "Perbezaan ditemui:"
 
-#: ../duplicity/path.py:368
+#: ../duplicity/path.py:357
 #, python-format
 msgid "New file %s"
 msgstr "Fail baru %s"
 
-#: ../duplicity/path.py:371
+#: ../duplicity/path.py:360
 #, python-format
 msgid "File %s is missing"
 msgstr "Fail %s hilang"
 
-#: ../duplicity/path.py:374
+#: ../duplicity/path.py:363
 #, python-format
 msgid "File %%s has type %s, expected %s"
 msgstr "Fail %%s mempunyai jenis %s, dijangka %s"
 
-#: ../duplicity/path.py:380 ../duplicity/path.py:406
+#: ../duplicity/path.py:369 ../duplicity/path.py:395
 #, python-format
 msgid "File %%s has permissions %s, expected %s"
 msgstr "Fail %%s mempunyai keizinan %s, dijangka %s"
 
-#: ../duplicity/path.py:385
+#: ../duplicity/path.py:374
 #, python-format
 msgid "File %%s has mtime %s, expected %s"
 msgstr "Fail %%s mempunyai mtime %s, dijangka %s"
 
-#: ../duplicity/path.py:393
+#: ../duplicity/path.py:382
 #, python-format
 msgid "Data for file %s is different"
 msgstr "Data untuk fail %s adalah berbeza"
 
-#: ../duplicity/path.py:401
+#: ../duplicity/path.py:390
 #, python-format
 msgid "Symlink %%s points to %s, expected %s"
 msgstr "Pautan simbolik %%s menuju ke %s, dijangka %s"
 
-#: ../duplicity/path.py:410
+#: ../duplicity/path.py:399
 #, python-format
 msgid "Device file %%s has numbers %s, expected %s"
 msgstr "Peranti fail %%s mempunyai bilangan %s, dijangka %s"
 
-#: ../duplicity/path.py:572
+#: ../duplicity/path.py:559
 #, python-format
 msgid "Making directory %s"
 msgstr "Membuat direktori %s"
 
-#: ../duplicity/path.py:582
+#: ../duplicity/path.py:569
 #, python-format
 msgid "Deleting %s"
 msgstr "Memadam %s"
 
-#: ../duplicity/path.py:591
+#: ../duplicity/path.py:578
 #, python-format
 msgid "Touching %s"
 msgstr "Menyentuh %s"
 
-#: ../duplicity/path.py:598
+#: ../duplicity/path.py:585
 #, python-format
 msgid "Deleting tree %s"
 msgstr "Memadam pepohon %s"
@@ -1452,12 +1453,12 @@ msgstr "Memadam pepohon %s"
 msgid "Threading not available -- zombie processes may appear"
 msgstr ""
 
-#: ../duplicity/gpginterface.py:701
+#: ../duplicity/gpginterface.py:677
 #, python-format
 msgid "GPG process %d terminated before wait()"
 msgstr ""
 
-#: ../duplicity/dup_time.py:52
+#: ../duplicity/dup_time.py:47
 #, python-format
 msgid ""
 "Bad interval string \"%s\"\n"
@@ -1472,7 +1473,7 @@ msgstr ""
 "aksara khas yang dibenarkan adalah s, m, h, D, W, M, dan Y. Rujuk\n"
 "halaman manual untuk maklumat lanjut."
 
-#: ../duplicity/dup_time.py:58
+#: ../duplicity/dup_time.py:53
 #, python-format
 msgid ""
 "Bad time string \"%s\"\n"
@@ -1492,57 +1493,57 @@ msgstr ""
 "waktu semasa), atau tarikh biasa seperti 2/4/1997 atau 2001-04-23\n"
 "(gabungan pelbagai diterima, tetapi bulan sentiasa mendahului hari)."
 
-#: ../duplicity/tempdir.py:121
+#: ../duplicity/tempdir.py:119
 #, python-format
 msgid "Using temporary directory %s"
 msgstr "Menggunakan direktori sementara %s"
 
-#: ../duplicity/tempdir.py:165
+#: ../duplicity/tempdir.py:163
 #, python-format
 msgid "Registering (mktemp) temporary file %s"
 msgstr "Mendaftar fail sementara %s (mktemp)"
 
-#: ../duplicity/tempdir.py:187
+#: ../duplicity/tempdir.py:185
 #, python-format
 msgid "Registering (mkstemp) temporary file %s"
 msgstr "Mendaftar fail sementara %s (mkstemp)"
 
-#: ../duplicity/tempdir.py:219
+#: ../duplicity/tempdir.py:217
 #, python-format
 msgid "Forgetting temporary file %s"
 msgstr "Melupakan fail sementara %s"
 
-#: ../duplicity/tempdir.py:222
+#: ../duplicity/tempdir.py:220
 #, python-format
 msgid "Attempt to forget unknown tempfile %s - this is probably a bug."
 msgstr ""
 "Cuba melupakan fail sementara %s yang tidak diketahui - ia berkemungkinan "
 "pepijat."
 
-#: ../duplicity/tempdir.py:241
+#: ../duplicity/tempdir.py:239
 #, python-format
 msgid "Removing still remembered temporary file %s"
 msgstr "Membuang fail sementara %s yang masih diingati"
 
-#: ../duplicity/tempdir.py:244
+#: ../duplicity/tempdir.py:242
 #, python-format
 msgid "Cleanup of temporary file %s failed"
 msgstr "Pembersihan fail sementara %s mengalami kegagalan"
 
-#: ../duplicity/tempdir.py:249
+#: ../duplicity/tempdir.py:247
 #, python-format
 msgid "Cleanup of temporary directory %s failed - this is probably a bug."
 msgstr ""
 "Pembersihan direktori sementara %s mengalami kegagalan - ia berkemungkinan "
 "pepijat."
 
-#: ../duplicity/util.py:99
+#: ../duplicity/util.py:91
 #, python-format
 msgid "IGNORED_ERROR: Warning: ignoring error as requested: %s: %s"
 msgstr ""
 "RALAT_DIABAIKAN: Amaran: mengabaikan ralat seperti yang dipinta: %s: %s"
 
-#: ../duplicity/util.py:164
+#: ../duplicity/util.py:148
 #, python-format
 msgid "Releasing lockfile %s"
 msgstr ""
