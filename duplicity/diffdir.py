@@ -209,7 +209,7 @@ def get_delta_iter(new_iter, sig_iter, sig_fileobj=None):
                     ti = ROPath(sig_path.index).get_tarinfo()
                     ti.name = "deleted/" + "/".join(sig_path.index)
                     sigTarFile.addfile(ti)
-                stats.add_deleted_file()
+                stats.add_deleted_file(sig_path)
                 yield ROPath(sig_path.index)
         elif not sig_path or new_path != sig_path:
             # Must calculate new signature and create delta
