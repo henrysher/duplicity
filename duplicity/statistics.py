@@ -316,7 +316,7 @@ class StatsDeltaProcess(StatsObj):
         self.NewFiles += 1
         self.NewFileSize += filesize
         self.DeltaEntries += 1
-        self.add_delta_entries_file(path)
+        self.add_delta_entries_file(path, 'new')
 
     def add_changed_file(self, path):
         """Add stats of file that has changed since last backup"""
@@ -326,13 +326,13 @@ class StatsDeltaProcess(StatsObj):
         self.ChangedFiles += 1
         self.ChangedFileSize += filesize
         self.DeltaEntries += 1
-        self.add_delta_entries_file(path)
+        self.add_delta_entries_file(path, 'changed')
 
     def add_deleted_file(self, path):
         """Add stats of file no longer in source directory"""
         self.DeletedFiles += 1  # can't add size since not available
         self.DeltaEntries += 1
-        self.add_delta_entries_file(path)
+        self.add_delta_entries_file(path, 'deleted')
 
     def add_unchanged_file(self, path):
         """Add stats of file that hasn't changed since last backup"""
@@ -344,9 +344,9 @@ class StatsDeltaProcess(StatsObj):
         """End collection of data, set EndTime"""
         self.EndTime = time.time()
 
-    def add_delta_entries_file(self, path):
+    def add_delta_entries_file(self, path, action_type):
         if path.isreg():
-            self.files_changed.append(path.get_relative_path())
+            self.files_changed.append((path.get_relative_path(), action_type))
 
     def get_delta_entries_file(self):
         return self.files_changed

@@ -117,8 +117,9 @@ class Manifest:
 
         if self.fh:
             self.fh.write("Filelist %d\n" % len(self.files_changed))
-            for filepath in self.files_changed:
-                self.fh.write("    %s\n" % Quote(filepath))
+            for fileinfo in self.files_changed:
+                print fileinfo
+                self.fh.write("    %-7s  %s\n" % (fileinfo[1], Quote(fileinfo[0])))
 
     def add_volume_info(self, vi):
         """
@@ -162,8 +163,8 @@ class Manifest:
             result += "Localdir %s\n" % Quote(self.local_dirname)
 
         result += "Filelist %d\n" % len(self.files_changed)
-        for filepath in self.files_changed:
-            result += "    %s\n" % Quote(filepath)
+        for fileinfo in self.files_changed:
+            result += "    %-7s  %s\n" % (fileinfo[1], Quote(fileinfo[0]))
 
         vol_num_list = self.volume_info_dict.keys()
         vol_num_list.sort()
@@ -199,7 +200,11 @@ class Manifest:
         if match:
             filecount = int(match.group(2))
         if filecount > 0:
-            self.files_changed = [filepath.strip() for filepath in match.group(3).split('\n')]
+            def parse_fileinfo(line):
+                fileinfo = line.strip().split()
+                return (fileinfo[0], ''.join(fileinfo[1:]))
+
+            self.files_changed = list(map(parse_fileinfo, match.group(3).split('\n')))
         assert filecount == len(self.files_changed)
 
         next_vi_string_regexp = re.compile("(^|\\n)(volume\\s.*?)"

@@ -1172,32 +1172,39 @@ class CollectionsStatus:
             return ""
 
         all_backup_set = self.matched_chain_pair[1].get_all_sets()
-        specified_backup_set = []
-        for bs in all_backup_set:
-            if filepath in bs.get_files_changed():
-                specified_backup_set.append(bs)
+        specified_file_backup_set = []
+        specified_file_backup_type = []
 
-        return FileChangedStatus(filepath, specified_backup_set)
+        for bs in all_backup_set:
+            filelist = [fileinfo[1] for fileinfo in bs.get_files_changed()]
+            if filepath in filelist:
+                specified_file_backup_set.append(bs)
+                index = filelist.index(filepath)
+                specified_file_backup_type.append(bs.get_files_changed()[index][0])
+
+        return FileChangedStatus(filepath, list(zip(specified_file_backup_type, specified_file_backup_set)))
 
 
 class FileChangedStatus:
-    def __init__(self, filepath, backup_set_list):
+    def __init__(self, filepath, fileinfo_list):
         self.filepath = filepath
-        self.file_changed_backups = backup_set_list
+        self.fileinfo_list = fileinfo_list
 
     def __unicode__(self):
-        set_schema = "%20s   %30s"
+        set_schema = "%20s   %30s  %20s"
         l = ["-------------------------",
-             _("File path: %s") % (self.filepath),
-             _("Total number of backup: %d") % (len(self.file_changed_backups)),
-             set_schema % (_("Type of backup set:"), _("Time:"))]
+             _("File: %s") % (self.filepath),
+             _("Total number of backup: %d") % len(self.fileinfo_list),
+             set_schema % (_("Type of backup set:"), _("Time:"), _("Type of file change:"))]
 
-        for s in self.file_changed_backups:
-            if s.time:
+        for s in self.fileinfo_list:
+            backup_type = s[0]
+            backup_set = s[1]
+            if backup_set.time:
                 type = _("Full")
             else:
                 type = _("Incremental")
-            l.append(set_schema % (type, dup_time.timetopretty(s.get_time())))
+            l.append(set_schema % (type, dup_time.timetopretty(backup_set.get_time()), backup_type.title()))
 
         l.append("-------------------------")
         return "\n".join(l)
