@@ -288,6 +288,7 @@ class BackupSet:
         """
         return len(self.volume_name_dict.keys())
 
+
 class BackupChain:
     """
     BackupChain - a number of linked BackupSets

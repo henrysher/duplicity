@@ -219,6 +219,7 @@ def PrintCollectionStatus(col_stats, force_print=False):
     Log(unicode(col_stats), 8, InfoCode.collection_status,
         '\n' + '\n'.join(col_stats.to_log_info()), force_print)
 
+
 def PrintCollectionFileChangedStatus(col_stats, filepath, force_print=False):
     """Prints a collection status to the log"""
     Log(unicode(col_stats.get_file_changed_record(filepath)), 8, InfoCode.collection_status, None, force_print)

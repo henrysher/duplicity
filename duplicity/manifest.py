@@ -112,7 +112,9 @@ class Manifest:
                          "message"), code, code_extra)
 
     def set_files_changed_info(self, files_changed):
-        self.files_changed = files_changed
+        if files_changed:
+            self.files_changed = files_changed
+
         if self.fh:
             self.fh.write("Filelist %d\n" % len(self.files_changed))
             for filepath in self.files_changed:
@@ -158,10 +160,10 @@ class Manifest:
             result += "Hostname %s\n" % self.hostname
         if self.local_dirname:
             result += "Localdir %s\n" % Quote(self.local_dirname)
-        if self.files_changed:
-            result += "Filelist %d\n" % len(self.files_changed)
-            for filepath in self.files_changed:
-                result += "    %s\n" % Quote(filepath)
+
+        result += "Filelist %d\n" % len(self.files_changed)
+        for filepath in self.files_changed:
+            result += "    %s\n" % Quote(filepath)
 
         vol_num_list = self.volume_info_dict.keys()
         vol_num_list.sort()
@@ -190,12 +192,15 @@ class Manifest:
         self.hostname = get_field("hostname")
         self.local_dirname = get_field("localdir")
 
-        #Get file changed list
+        # Get file changed list
         filelist_regexp = re.compile("(^|\\n)filelist\\s([0-9]+)\\n(.*?)(\\nvolume\\s|$)", re.I | re.S)
         match = filelist_regexp.search(s)
-        filecount = int(match.group(2))
-        self.files_changed = [filepath.strip() for filepath in match.group(3).split('\n')]
-        #assert filecount == len(self.files_changed)
+        filecount = 0
+        if match:
+            filecount = int(match.group(2))
+        if filecount > 0:
+            self.files_changed = [filepath.strip() for filepath in match.group(3).split('\n')]
+        assert filecount == len(self.files_changed)
 
         next_vi_string_regexp = re.compile("(^|\\n)(volume\\s.*?)"
                                            "(\\nvolume\\s|$)", re.I | re.S)
