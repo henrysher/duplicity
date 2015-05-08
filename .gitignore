@@ -1,0 +1,15 @@
+*.egg
+*.log
+.project
+.pydevproject
+.settings
+.tox
+*.pyc
+*.so
+*.tar.gz
+build
+config.py
+duplicity.egg-info
+duplicity.spec
+random_seed
+testfiles
