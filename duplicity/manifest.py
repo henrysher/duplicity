@@ -118,7 +118,6 @@ class Manifest:
         if self.fh:
             self.fh.write("Filelist %d\n" % len(self.files_changed))
             for fileinfo in self.files_changed:
-                print fileinfo
                 self.fh.write("    %-7s  %s\n" % (fileinfo[1], Quote(fileinfo[0])))
 
     def add_volume_info(self, vi):
