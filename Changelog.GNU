@@ -1,3 +1,9 @@
+2015-05-08  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Added ability to get single file status from collection-status with
+      patch from jitao (bug 1044715), like so:
+      $ duplicity collection-status --file-changed c1 file://./foo
+
 2015-05-01  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug 1448249 and bug 1449151 thanks to David Coppit.

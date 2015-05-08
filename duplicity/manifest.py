@@ -55,6 +55,7 @@ class Manifest:
         self.local_dirname = None
         self.volume_info_dict = {}  # dictionary vol numbers -> vol infos
         self.fh = fh
+        self.files_changed = []
 
     def set_dirinfo(self):
         """
@@ -110,6 +111,15 @@ class Manifest:
                          "--allow-source-mismatch switch to avoid seeing this "
                          "message"), code, code_extra)
 
+    def set_files_changed_info(self, files_changed):
+        if files_changed:
+            self.files_changed = files_changed
+
+        if self.fh:
+            self.fh.write("Filelist %d\n" % len(self.files_changed))
+            for fileinfo in self.files_changed:
+                self.fh.write("    %-7s  %s\n" % (fileinfo[1], Quote(fileinfo[0])))
+
     def add_volume_info(self, vi):
         """
         Add volume info vi to manifest and write to manifest
@@ -151,6 +161,10 @@ class Manifest:
         if self.local_dirname:
             result += "Localdir %s\n" % Quote(self.local_dirname)
 
+        result += "Filelist %d\n" % len(self.files_changed)
+        for fileinfo in self.files_changed:
+            result += "    %-7s  %s\n" % (fileinfo[1], Quote(fileinfo[0]))
+
         vol_num_list = self.volume_info_dict.keys()
         vol_num_list.sort()
 
@@ -178,6 +192,20 @@ class Manifest:
         self.hostname = get_field("hostname")
         self.local_dirname = get_field("localdir")
 
+        # Get file changed list
+        filelist_regexp = re.compile("(^|\\n)filelist\\s([0-9]+)\\n(.*?)(\\nvolume\\s|$)", re.I | re.S)
+        match = filelist_regexp.search(s)
+        filecount = 0
+        if match:
+            filecount = int(match.group(2))
+        if filecount > 0:
+            def parse_fileinfo(line):
+                fileinfo = line.strip().split()
+                return (fileinfo[0], ''.join(fileinfo[1:]))
+
+            self.files_changed = list(map(parse_fileinfo, match.group(3).split('\n')))
+        assert filecount == len(self.files_changed)
+
         next_vi_string_regexp = re.compile("(^|\\n)(volume\\s.*?)"
                                            "(\\nvolume\\s|$)", re.I | re.S)
         starting_s_index = 0
@@ -199,6 +227,9 @@ class Manifest:
         for i in range(latest_vol + 1, highest_vol + 1):
             self.del_volume_info(i)
         return self
+
+    def get_files_changed(self):
+        return self.files_changed
 
     def __eq__(self, other):
         """

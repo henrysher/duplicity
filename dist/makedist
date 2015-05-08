@@ -60,6 +60,10 @@ def MakeTar():
     os.mkdir(tardir)
     bzr = subprocess.Popen(["bzr", "ls", "-RV", "."], stdout=subprocess.PIPE)
     testfiles = bzr.communicate()[0].split()
+    if len(testfiles) == 0:
+        git = subprocess.Popen(["git", "ls-files"], stdout=subprocess.PIPE)
+        testfiles = git.communicate()[0].split()
+
     for filename in testfiles:
         if os.path.isdir(filename):
             os.mkdir(os.path.join(tardir, filename))
