@@ -25,12 +25,6 @@ import time
 import json
 import os
 import sys
-# On debian (and derivatives), get these dependencies using:
-# apt-get install python-requests python-requests-oauthlib
-# On fedora (and derivatives), get these dependencies using:
-# yum install python-requests python-requests-oauthlib
-import requests
-from requests_oauthlib import OAuth2Session
 
 import duplicity.backend
 from duplicity.errors import BackendException
@@ -65,6 +59,23 @@ class OneDriveBackend(duplicity.backend.Backend):
 
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
+
+        # Import requests and requests-oauthlib
+        try:
+            # On debian (and derivatives), get these dependencies using:
+            # apt-get install python-requests python-requests-oauthlib
+            # On fedora (and derivatives), get these dependencies using:
+            # yum install python-requests python-requests-oauthlib
+            global requests
+            global OAuth2Session
+            import requests
+            from requests_oauthlib import OAuth2Session
+        except ImportError:
+            raise BackendException((
+                'OneDrive backend requires python-requests and '
+                'python-requests-oauthlib to be installed. Please install '
+                'them and try again.'))
+
         self.names_to_ids = None
         self.user_id = None
         self.directory = parsed_url.path.lstrip('/')

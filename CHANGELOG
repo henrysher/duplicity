@@ -40,6 +40,9 @@ New in v0.7.03 (2015/05/??)
 * Added ability to get single file status from collection-status with
   patch from jitao (bug 1044715), like so:
   $ duplicity collection-status --file-changed c1 file://./foo
+* Merge in lp:~sjakthol/duplicity/onedrive-error-message
+  - Add proper error message for OneDrive backend when python-requests or
+    python-requests-oauthlib is not installed (bug 1453355).
 
 
 New in v0.7.02 (2015/03/10)

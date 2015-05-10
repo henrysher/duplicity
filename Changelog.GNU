@@ -1,3 +1,9 @@
+2015-05-10  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merge in lp:~sjakthol/duplicity/onedrive-error-message
+      - Add proper error message for OneDrive backend when python-requests or
+        python-requests-oauthlib is not installed (bug 1453355).
+
 2015-05-08  Kenneth Loafman  <kenneth@loafman.com>
 
     * Added ability to get single file status from collection-status with
