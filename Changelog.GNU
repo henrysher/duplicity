@@ -1,3 +1,7 @@
+2015-05-11  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Prep for 0.7.03
+
 2015-05-10  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merge in lp:~sjakthol/duplicity/onedrive-error-message

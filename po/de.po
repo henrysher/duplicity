@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-01-13 16:55+0000\n"
-"PO-Revision-Date: 2015-01-24 16:19+0000\n"
+"POT-Creation-Date: 2015-05-06 11:08-0500\n"
+"PO-Revision-Date: 2015-04-15 13:32+0000\n"
 "Last-Translator: Tobias Bannert <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2015-01-25 05:27+0000\n"
-"X-Generator: Launchpad (build 17306)\n"
+"X-Launchpad-Export-Date: 2015-05-07 05:10+0000\n"
+"X-Generator: Launchpad (build 17474)\n"
 
 #: ../bin/duplicity:102
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -77,12 +77,12 @@ msgstr ""
 "Datei %s fehlt im Sicherungssatz.\n"
 "Beim Neustart wird fortgefahren mit Datei %s."
 
-#: ../bin/duplicity:297
+#: ../bin/duplicity:299
 #, python-format
 msgid "File %s was corrupted during upload."
 msgstr "Datei %s während des Hochladens beschädigt."
 
-#: ../bin/duplicity:331
+#: ../bin/duplicity:333
 msgid ""
 "Restarting backup, but current encryption settings do not match original "
 "settings"
@@ -90,17 +90,17 @@ msgstr ""
 "Datensicherung wird neu gestartet, jedoch entsprechen die aktuellen "
 "Verschlüsselungseinstellungen nicht den ursprünglichen Einstellungen"
 
-#: ../bin/duplicity:354
+#: ../bin/duplicity:356
 #, python-format
 msgid "Restarting after volume %s, file %s, block %s"
 msgstr "Neustart nach Datenträger %s, Datei %s, Block %s"
 
-#: ../bin/duplicity:421
+#: ../bin/duplicity:423
 #, python-format
 msgid "Processed volume %d"
-msgstr "Datenträger %d verarbeitet"
+msgstr "Datenträger %d wird verarbeitet"
 
-#: ../bin/duplicity:570
+#: ../bin/duplicity:572
 msgid ""
 "Fatal Error: Unable to start incremental backup.  Old signatures not found "
 "and incremental specified"
@@ -108,212 +108,215 @@ msgstr ""
 "Schwerwiegender Fehler: Schrittweise Sicherung konnte nicht gestartet "
 "werden. Alte Signaturen nicht gefunden und schrittweise  Sicherung ausgewählt"
 
-#: ../bin/duplicity:574
+#: ../bin/duplicity:576
 msgid "No signatures found, switching to full backup."
-msgstr "Keine Signaturen gefunden, führe vollständiges Backup durch."
+msgstr ""
+"Keine Signaturen gefunden, zu vollständiger Sicherung wird gewechselt."
 
-#: ../bin/duplicity:588
+#: ../bin/duplicity:590
 msgid "Backup Statistics"
 msgstr "Sicherungsstatistiken"
 
-#: ../bin/duplicity:693
+#: ../bin/duplicity:695
 #, python-format
 msgid "%s not found in archive, no files restored."
 msgstr "%s im Archiv nicht gefunden, keine Dateien wiederhergestellt."
 
-#: ../bin/duplicity:697
+#: ../bin/duplicity:699
 msgid "No files found in archive - nothing restored."
 msgstr "Keine Dateien im Archiv - nichts wiederhergestellt."
 
-#: ../bin/duplicity:730
+#: ../bin/duplicity:732
 #, python-format
 msgid "Processed volume %d of %d"
-msgstr "Volumen %d von %d verarbeitet"
+msgstr "Datenträger %d von %d wird verarbeitet"
 
-#: ../bin/duplicity:764
+#: ../bin/duplicity:766
 #, python-format
 msgid "Invalid data - %s hash mismatch for file:"
 msgstr "Ungültige Daten – %s-Hash stimmt nicht für die Datei:"
 
-#: ../bin/duplicity:766
+#: ../bin/duplicity:768
 #, python-format
 msgid "Calculated hash: %s"
 msgstr "Erstellter Hash: %s"
 
-#: ../bin/duplicity:767
+#: ../bin/duplicity:769
 #, python-format
 msgid "Manifest hash: %s"
 msgstr "Manifest-Hashcode: %s"
 
-#: ../bin/duplicity:805
+#: ../bin/duplicity:807
 #, python-format
 msgid "Volume was signed by key %s, not %s"
-msgstr "Volume wurde von Schlüssel %s, anstatt von %s unterschrieben"
+msgstr "Datenträger wurde von Schlüssel %s, anstatt von %s unterschrieben"
 
-#: ../bin/duplicity:835
+#: ../bin/duplicity:837
 #, python-format
 msgid "Verify complete: %s, %s."
 msgstr "Überprüfung vollständig: %s, %s."
 
-#: ../bin/duplicity:836
+#: ../bin/duplicity:838
 #, python-format
 msgid "%d file compared"
 msgid_plural "%d files compared"
 msgstr[0] "%d Datei vergleichen"
 msgstr[1] "%d Dateien vergleichen"
 
-#: ../bin/duplicity:838
+#: ../bin/duplicity:840
 #, python-format
 msgid "%d difference found"
 msgid_plural "%d differences found"
 msgstr[0] "%d Unterschied gefunden"
 msgstr[1] "%d Unterschiede gefunden"
 
-#: ../bin/duplicity:857
+#: ../bin/duplicity:859
 msgid "No extraneous files found, nothing deleted in cleanup."
 msgstr "Keine überflüssigen Dateien gefunden, es wurde nichts gelöscht."
 
-#: ../bin/duplicity:862
+#: ../bin/duplicity:864
 msgid "Deleting this file from backend:"
 msgid_plural "Deleting these files from backend:"
 msgstr[0] "Diese Datei vom Hintergrundprogramm löschen:"
 msgstr[1] "Diese Dateien vom Hintergrundprogramm löschen:"
 
-#: ../bin/duplicity:874
+#: ../bin/duplicity:876
 msgid "Found the following file to delete:"
 msgid_plural "Found the following files to delete:"
 msgstr[0] "Folgende Datei zum Löschen gefunden:"
 msgstr[1] "Folgende Dateien zum Löschen gefunden:"
 
-#: ../bin/duplicity:878
+#: ../bin/duplicity:880
 msgid "Run duplicity again with the --force option to actually delete."
 msgstr ""
-"Führe duplicity noch einmal mit der \"--force\"-Option aus, um tatsächlich "
-"zu löschen."
+"Bitte duplicity noch einmal mit der »--force«-Option ausführen, um "
+"tatsächlich zu löschen."
 
-#: ../bin/duplicity:919
+#: ../bin/duplicity:923
 msgid "There are backup set(s) at time(s):"
-msgstr "Es existieren Sicherungssätze zu den Zeitpunkten:"
+msgstr "Es bestehen Sicherungssätze zu folgenden Zeitpunkten:"
 
-#: ../bin/duplicity:921
+#: ../bin/duplicity:925
 msgid "Which can't be deleted because newer sets depend on them."
 msgstr ""
 "Welche nicht gelöscht werden können, weil neuere Sicherungssätze davon "
 "abhängen."
 
-#: ../bin/duplicity:925
+#: ../bin/duplicity:929
 msgid ""
 "Current active backup chain is older than specified time.  However, it will "
 "not be deleted.  To remove all your backups, manually purge the repository."
 msgstr ""
 "Aktuell aktive Sicherungskette ist älter als der angegebene Zeitpunkt. Sie "
-"wird nicht gelöscht. Um alle Backups zu entfernen, löschen Sie das "
-"Repository manuell."
+"wird nicht gelöscht. Um alle Sicherungen zu entfernen, bitte die Paketquelle "
+"manuell löschen."
 
-#: ../bin/duplicity:931
+#: ../bin/duplicity:935
 msgid "No old backup sets found, nothing deleted."
 msgstr "Keine alten Sicherungssätze gefunden, nichts gelöscht."
 
-#: ../bin/duplicity:934
+#: ../bin/duplicity:938
 msgid "Deleting backup chain at time:"
 msgid_plural "Deleting backup chains at times:"
 msgstr[0] "Sicherungskette dieses Zeitpunkts wird gelöscht:"
 msgstr[1] "Sicherungskette dieser Zeitpunkte wird gelöscht:"
 
-#: ../bin/duplicity:945
+#: ../bin/duplicity:949
 #, python-format
 msgid "Deleting incremental signature chain %s"
 msgstr "Schrittweise Signaturkette wird gelöscht: %s"
 
-#: ../bin/duplicity:947
+#: ../bin/duplicity:951
 #, python-format
 msgid "Deleting incremental backup chain %s"
 msgstr "Schrittweise Sicherungskette wird gelöscht: %s"
 
-#: ../bin/duplicity:950
+#: ../bin/duplicity:954
 #, python-format
 msgid "Deleting complete signature chain %s"
 msgstr "Vollständige Signaturkette wird gelöscht: %s"
 
-#: ../bin/duplicity:952
+#: ../bin/duplicity:956
 #, python-format
 msgid "Deleting complete backup chain %s"
 msgstr "Vollständige Sicherungskette wird gelöscht: %s"
 
-#: ../bin/duplicity:958
+#: ../bin/duplicity:962
 msgid "Found old backup chain at the following time:"
 msgid_plural "Found old backup chains at the following times:"
 msgstr[0] "Alte Sicherungskette zu folgendem Zeitpunkt gefunden:"
 msgstr[1] "Alte Sicherungeketten zu folgenden Zeitpunkten gefunden:"
 
-#: ../bin/duplicity:962
+#: ../bin/duplicity:966
 msgid "Rerun command with --force option to actually delete."
 msgstr ""
-"Befehl erneut mit \"--force\"-Option ausführen, um tatsächlich zu löschen."
+"Bitte Befehl erneut mit »--force«-Option ausführen, um tatsächlich zu "
+"löschen."
 
-#: ../bin/duplicity:1039
+#: ../bin/duplicity:1043
 #, python-format
 msgid "Deleting local %s (not authoritative at backend)."
 msgstr "Lokal %s wird gelöscht (keine Auswirkungen am Hintergrundprogramm)."
 
-#: ../bin/duplicity:1043
+#: ../bin/duplicity:1047
 #, python-format
 msgid "Unable to delete %s: %s"
-msgstr "Kann %s nicht löschen: %s"
+msgstr "%s kann nicht gelöscht werden: %s"
 
-#: ../bin/duplicity:1071 ../duplicity/dup_temp.py:263
+#: ../bin/duplicity:1075 ../duplicity/dup_temp.py:263
 #, python-format
 msgid "Failed to read %s: %s"
-msgstr "Konnte %s nicht lesen: %s"
+msgstr "%s konnte nicht gelesen werden: %s"
 
-#: ../bin/duplicity:1085
+#: ../bin/duplicity:1089
 #, python-format
 msgid "Copying %s to local cache."
-msgstr "Kopiere %s zum lokalen Zwischenspeicher."
+msgstr "%s wird zum lokalen Puffer kopiert."
 
-#: ../bin/duplicity:1133
+#: ../bin/duplicity:1137
 msgid "Local and Remote metadata are synchronized, no sync needed."
 msgstr ""
 "Lokale und entfernte Metadaten sind bereits synchron, keine Synchronisierung "
 "benötigt."
 
-#: ../bin/duplicity:1138
+#: ../bin/duplicity:1142
 msgid "Synchronizing remote metadata to local cache..."
-msgstr "Synchronisiere entfernte Metadaten zum lokalen Cache..."
+msgstr "Entfernte Metadaten werden zum lokalen Puffer synchronisiert …"
 
-#: ../bin/duplicity:1153
+#: ../bin/duplicity:1157
 msgid "Sync would copy the following from remote to local:"
 msgstr ""
 "Synchronisation würde die folgenden Daten vom entfernten Rechner hierher "
 "kopieren:"
 
-#: ../bin/duplicity:1156
+#: ../bin/duplicity:1160
 msgid "Sync would remove the following spurious local files:"
 msgstr ""
 "Synchronisation würde die folgenden überflüssigen lokalen Dateien löschen:"
 
-#: ../bin/duplicity:1199
+#: ../bin/duplicity:1203
 msgid "Unable to get free space on temp."
 msgstr "Der temporäre Speicherplatz ist belegt."
 
-#: ../bin/duplicity:1207
+#: ../bin/duplicity:1211
 #, python-format
 msgid "Temp space has %d available, backup needs approx %d."
 msgstr ""
-"%d temporärer Speicherplatz ist verfügbar, das Backup benötigt ungefähr %d."
+"%d temporärer Speicherplatz ist verfügbar, die Sicherung benötigt ungefähr "
+"%d."
 
-#: ../bin/duplicity:1210
+#: ../bin/duplicity:1214
 #, python-format
 msgid "Temp has %d available, backup will use approx %d."
 msgstr ""
-"%d temporärer Speicherplatz ist verfügbar, das Backup wird ungefähr %d "
+"%d temporärer Speicherplatz ist verfügbar, die Sicherung wird ungefähr %d "
 "nutzen."
 
-#: ../bin/duplicity:1218
-msgid "Unable to get max open files."
-msgstr "Konnte den Maximalwert für offene Dateien nicht feststellen."
-
 #: ../bin/duplicity:1222
+msgid "Unable to get max open files."
+msgstr "Der Höchstwert für offene Dateien konnte nicht festgestellt werden."
+
+#: ../bin/duplicity:1226
 #, python-format
 msgid ""
 "Max open files of %s is too low, should be >= 1024.\n"
@@ -321,26 +324,26 @@ msgid ""
 msgstr ""
 "Limit für gleichzeitig offene Dateien von %s ist zu niedrig, sollte >=1024 "
 "sein.\n"
-"Führen Sie  'ulimit -n 1024' aus, um dies zu korrigieren.\n"
+"Bitte »ulimit -n 1024« ausführen, um dieses zu berichtigen.\n"
 
-#: ../bin/duplicity:1271
+#: ../bin/duplicity:1275
 msgid ""
 "RESTART: The first volume failed to upload before termination.\n"
 "         Restart is impossible...starting backup from beginning."
 msgstr ""
-"NEUSTART: Der Upload des ersten Volumens ist fehlgeschlagen.\n"
+"NEUSTART: Das Hochladen des ersten Datenträgers ist fehlgeschlagen.\n"
 "         Neustart nicht möglich, Sicherung wird vom Anfang wiederaufgenommen."
 
-#: ../bin/duplicity:1277
+#: ../bin/duplicity:1281
 #, python-format
 msgid ""
 "RESTART: Volumes %d to %d failed to upload before termination.\n"
 "         Restarting backup at volume %d."
 msgstr ""
-"NEUSTART: Der Upload der Volumen %d bis %d ist fehlgeschlagen.\n"
-"        Sicherung wird mit Volumen %d wiederaufgenommen."
+"NEUSTART: Das Hochladen der Datenträger %d bis %d ist fehlgeschlagen.\n"
+"        Sicherung wird mit Datenträger %d wiederaufgenommen."
 
-#: ../bin/duplicity:1284
+#: ../bin/duplicity:1288
 #, python-format
 msgid ""
 "RESTART: Impossible backup state: manifest has %d vols, remote has %d vols.\n"
@@ -353,7 +356,7 @@ msgstr ""
 "        Neustart nicht möglich … duplicity wird die letzte unvollständige\n"
 "        Sicherung entfernen und von Vorne anfangen."
 
-#: ../bin/duplicity:1305
+#: ../bin/duplicity:1310
 msgid ""
 "\n"
 "PYTHONOPTIMIZE in the environment causes duplicity to fail to\n"
@@ -375,62 +378,66 @@ msgid ""
 "Duplicity 0.6 series is being deprecated:\n"
 "See http://www.nongnu.org/duplicity/\n"
 msgstr ""
+"\n"
+"Duplicity Version 0.6 ist veraltet:\n"
+"Mehr unter: http://www.nongnu.org/duplicity/\n"
 
-#: ../bin/duplicity:1396
+#: ../bin/duplicity:1408
 #, python-format
 msgid "Last %s backup left a partial set, restarting."
 msgstr ""
 "Das letzte %s-Sicherung hinterließ einen Teil eines Sicherungssatzes, "
 "Neustart wird durchgeführt."
 
-#: ../bin/duplicity:1400
+#: ../bin/duplicity:1412
 #, python-format
 msgid "Cleaning up previous partial %s backup set, restarting."
 msgstr ""
 "Der letzte unvollständige %s-Sicherungssatzes wird entfernt, Neustart wird "
 "durchgeführt."
 
-#: ../bin/duplicity:1411
+#: ../bin/duplicity:1423
 msgid "Last full backup date:"
 msgstr "Letzte vollständige Sicherung:"
 
-#: ../bin/duplicity:1413
+#: ../bin/duplicity:1425
 msgid "Last full backup date: none"
-msgstr "Letzte vollständige Sicherung: keine"
+msgstr "Letzte vollständige Sicherung: Keine"
 
-#: ../bin/duplicity:1415
+#: ../bin/duplicity:1427
 msgid "Last full backup is too old, forcing full backup"
 msgstr ""
-"Letzte vollständige Sicherung ist zu alt, erzwinge vollständige Sicherung"
+"Letzte vollständige Sicherung ist zu alt, vollständige Sicherung wird "
+"erzwungen"
 
-#: ../bin/duplicity:1458
+#: ../bin/duplicity:1470
 msgid ""
 "When using symmetric encryption, the signing passphrase must equal the "
 "encryption passphrase."
 msgstr ""
-"Bei symmetrischer Verschlüsselung müssen die Passphrases für Signatur und "
+"Bei symmetrischer Verschlüsselung müssen die Passphrasen für Signatur und "
 "Verschlüsselung übereinstimmen."
 
-#: ../bin/duplicity:1511
+#: ../bin/duplicity:1523
 msgid "INT intercepted...exiting."
-msgstr "INT abgefangen...beende."
+msgstr "INT abgefangen … wird beendet."
 
-#: ../bin/duplicity:1519
+#: ../bin/duplicity:1531
 #, python-format
 msgid "GPG error detail: %s"
-msgstr "GPG Fehler-Detail: %s"
+msgstr "GPG-Fehlerdetail: %s"
 
-#: ../bin/duplicity:1529
+#: ../bin/duplicity:1541
 #, python-format
 msgid "User error detail: %s"
-msgstr "Benutzer Fehler-Detail: %s"
+msgstr "Benutzerfehlerdetail: %s"
 
-#: ../bin/duplicity:1539
+#: ../bin/duplicity:1551
 #, python-format
 msgid "Backend error detail: %s"
 msgstr "Fehlerdetail des Hintergrundprogramms: %s"
 
-#: ../bin/rdiffdir:56 ../duplicity/commandline.py:233
+#: ../bin/rdiffdir:56 ../duplicity/commandline.py:238
 #, python-format
 msgid "Error opening file %s"
 msgstr "Fehler beim Öffnen der Datei »%s«"
@@ -438,35 +445,35 @@ msgstr "Fehler beim Öffnen der Datei »%s«"
 #: ../bin/rdiffdir:119
 #, python-format
 msgid "File %s already exists, will not overwrite."
-msgstr "Datei '%s' existiert bereits; wird nicht überschrieben."
+msgstr "Datei »%s« besteht bereits; wird nicht überschrieben."
 
-#: ../duplicity/selection.py:122
+#: ../duplicity/selection.py:119
 #, python-format
 msgid "Skipping socket %s"
-msgstr "Überspringe Socket %s"
+msgstr "Socket %s wird übersprungen"
 
-#: ../duplicity/selection.py:126
+#: ../duplicity/selection.py:123
 #, python-format
 msgid "Error initializing file %s"
 msgstr "Fehler beim initialisieren der Datei %s"
 
-#: ../duplicity/selection.py:130 ../duplicity/selection.py:151
+#: ../duplicity/selection.py:127 ../duplicity/selection.py:148
 #, python-format
 msgid "Error accessing possibly locked file %s"
 msgstr "Fehler beim Zugriff auf möglicherweise reservierte Datei %s"
 
-#: ../duplicity/selection.py:166
+#: ../duplicity/selection.py:163
 #, python-format
 msgid "Warning: base %s doesn't exist, continuing"
-msgstr "Warnung: Basis %s existiert nicht, fahre fort"
+msgstr "Achtung: Basis %s besteht nicht, es wird fortgefahren"
 
-#: ../duplicity/selection.py:169 ../duplicity/selection.py:187
-#: ../duplicity/selection.py:190
+#: ../duplicity/selection.py:166 ../duplicity/selection.py:184
+#: ../duplicity/selection.py:187
 #, python-format
 msgid "Selecting %s"
-msgstr "Wähle %s"
+msgstr "%s wird ausgewählt"
 
-#: ../duplicity/selection.py:270
+#: ../duplicity/selection.py:268
 #, python-format
 msgid ""
 "Fatal Error: The file specification\n"
@@ -484,7 +491,7 @@ msgstr ""
 "oder einem\n"
 "Muster (wie »**«), welches mit dem Basisverzeichnis übereinstimmt."
 
-#: ../duplicity/selection.py:279
+#: ../duplicity/selection.py:276
 #, python-format
 msgid ""
 "Fatal Error while processing expression\n"
@@ -493,7 +500,7 @@ msgstr ""
 "Kritischer Fehler beim Verarbeiten des Ausdrucks\n"
 "%s"
 
-#: ../duplicity/selection.py:288
+#: ../duplicity/selection.py:286
 #, python-format
 msgid ""
 "Last selection expression:\n"
@@ -502,67 +509,66 @@ msgid ""
 "include all files, the expression is redundant.  Exiting because this\n"
 "probably isn't what you meant."
 msgstr ""
-"Letzter Auswahl-Ausdruck:\n"
+"Letzter Auswahlausdruck:\n"
 "    %s\n"
-"Gibt nur Dateien an, die einbezieht werden. Weil standardmässig\n"
-"alle Dateien einbezieht werden ist der Ausdruck überflüssig. Beende, weil "
-"dies\n"
-"wahrscheinlich nicht das ist, was Sie beabsichtigten."
+"Gibt nur Dateien an, die einbezogen werden. Weil standardmäßig\n"
+"alle Dateien einbezogen werden ist der Ausdruck überflüssig.\n"
+"Wird beendet, weil das wahrscheinlich nicht das ist, was Sie beabsichtigten."
+
+#: ../duplicity/selection.py:311
+#, python-format
+msgid "Reading filelist %s"
+msgstr "Dateiliste wird gelesen %s"
 
 #: ../duplicity/selection.py:314
 #, python-format
-msgid "Reading filelist %s"
-msgstr "Lese Dateiliste %s"
-
-#: ../duplicity/selection.py:317
-#, python-format
 msgid "Sorting filelist %s"
-msgstr "Sortiere Dateiliste %s"
+msgstr "Dateiliste wird sortiert %s"
 
-#: ../duplicity/selection.py:344
+#: ../duplicity/selection.py:341
 #, python-format
 msgid ""
 "Warning: file specification '%s' in filelist %s\n"
 "doesn't start with correct prefix %s.  Ignoring."
 msgstr ""
-"Warnung: Dateiangabe '%s' in Dateiliste %s\n"
-"beginnt nicht mit dem korrekten Präfix %s. Ignoriere."
+"Achtung: Dateiangabe »%s« in Dateiliste %s\n"
+"beginnt nicht mit dem richtigen Präfix %s. Es wird vernachlässigt."
 
-#: ../duplicity/selection.py:348
+#: ../duplicity/selection.py:345
 msgid "Future prefix errors will not be logged."
-msgstr "Weitere Präfix-Fehler werden nicht protokolliert."
+msgstr "Weitere Präfixfehler werden nicht protokolliert."
 
-#: ../duplicity/selection.py:366
+#: ../duplicity/selection.py:361
 #, python-format
 msgid "Error closing filelist %s"
 msgstr "Fehler beim Schließen der Dateiliste %s"
 
-#: ../duplicity/selection.py:459
+#: ../duplicity/selection.py:428
 #, python-format
 msgid "Reading globbing filelist %s"
-msgstr "Lese ausdruckbasierte Dateiliste %s"
+msgstr "Ausdruckbasierte Dateiliste wird gelesen %s"
 
-#: ../duplicity/selection.py:487
+#: ../duplicity/selection.py:461
 #, python-format
 msgid "Error compiling regular expression %s"
 msgstr "Fehler beim Auswerten des regulären Ausdrucks %s"
 
-#: ../duplicity/selection.py:503
+#: ../duplicity/selection.py:477
 msgid ""
 "Warning: exclude-device-files is not the first selector.\n"
 "This may not be what you intended"
 msgstr ""
-"Warnung: 'exclude-device-files' ist nicht der erste Selektor.\n"
-"Dies ist möglicherweise nicht, was sie beabsichtigen."
+"Achtung: »exclude-device-files« ist nicht die erste Auswahl.\n"
+"Das ist möglicherweise nicht, was sie beabsichtigen."
 
-#: ../duplicity/commandline.py:70
+#: ../duplicity/commandline.py:68
 #, python-format
 msgid ""
 "Warning: Option %s is pending deprecation and will be removed in a future "
 "release.\n"
 "Use of default filenames is strongly suggested."
 msgstr ""
-"Warnung: Parameter %s ist veraltet und wird in einer der nächsten Versionen "
+"Achtung: Parameter %s ist veraltet und wird in einer der nächsten Versionen "
 "entfernt.\n"
 "Bitte verwenden Sie Standarddateinamen."
 
@@ -573,9 +579,9 @@ msgstr "gio‐Hintergrundprogramm konnte nicht geladen werden: %s"
 
 #. Used in usage help to represent a Unix-style path name. Example:
 #. --archive-dir <path>
-#: ../duplicity/commandline.py:254 ../duplicity/commandline.py:264
-#: ../duplicity/commandline.py:281 ../duplicity/commandline.py:347
-#: ../duplicity/commandline.py:549 ../duplicity/commandline.py:763
+#: ../duplicity/commandline.py:259 ../duplicity/commandline.py:269
+#: ../duplicity/commandline.py:286 ../duplicity/commandline.py:352
+#: ../duplicity/commandline.py:557 ../duplicity/commandline.py:773
 msgid "path"
 msgstr "Pfad"
 
@@ -585,9 +591,9 @@ msgstr "Pfad"
 #. --hidden-encrypt-key <gpg_key_id>
 #. Used in usage help to represent an ID for a GnuPG key. Example:
 #. --encrypt-key <gpg_key_id>
-#: ../duplicity/commandline.py:276 ../duplicity/commandline.py:283
-#: ../duplicity/commandline.py:369 ../duplicity/commandline.py:533
-#: ../duplicity/commandline.py:736
+#: ../duplicity/commandline.py:281 ../duplicity/commandline.py:288
+#: ../duplicity/commandline.py:372 ../duplicity/commandline.py:538
+#: ../duplicity/commandline.py:746
 msgid "gpg-key-id"
 msgstr "GPG-Schlüsselkennung"
 
@@ -595,204 +601,202 @@ msgstr "GPG-Schlüsselkennung"
 #. matching one or more files, as described in the documentation.
 #. Example:
 #. --exclude <shell_pattern>
-#: ../duplicity/commandline.py:291 ../duplicity/commandline.py:395
-#: ../duplicity/commandline.py:786
+#: ../duplicity/commandline.py:296 ../duplicity/commandline.py:398
+#: ../duplicity/commandline.py:796
 msgid "shell_pattern"
-msgstr "Shell_Ausdruck"
+msgstr "Shell-Ausdruck"
 
 #. Used in usage help to represent the name of a file. Example:
 #. --log-file <filename>
-#: ../duplicity/commandline.py:297 ../duplicity/commandline.py:304
-#: ../duplicity/commandline.py:309 ../duplicity/commandline.py:397
-#: ../duplicity/commandline.py:402 ../duplicity/commandline.py:413
-#: ../duplicity/commandline.py:732
+#: ../duplicity/commandline.py:302 ../duplicity/commandline.py:309
+#: ../duplicity/commandline.py:314 ../duplicity/commandline.py:400
+#: ../duplicity/commandline.py:405 ../duplicity/commandline.py:416
+#: ../duplicity/commandline.py:742
 msgid "filename"
 msgstr "Dateiname"
 
 #. Used in usage help to represent a regular expression (regexp).
-#: ../duplicity/commandline.py:316 ../duplicity/commandline.py:404
+#: ../duplicity/commandline.py:321 ../duplicity/commandline.py:407
 msgid "regular_expression"
-msgstr "regulärer_Ausdruck"
+msgstr "regulärer Ausdruck"
 
 #. Used in usage help to represent a time spec for a previous
 #. point in time, as described in the documentation. Example:
 #. duplicity remove-older-than time [options] target_url
-#: ../duplicity/commandline.py:359 ../duplicity/commandline.py:475
-#: ../duplicity/commandline.py:818
+#: ../duplicity/commandline.py:364 ../duplicity/commandline.py:478
+#: ../duplicity/commandline.py:828
 msgid "time"
 msgstr "Zeit"
 
 #. Used in usage help. (Should be consistent with the "Options:"
 #. header.) Example:
 #. duplicity [full|incremental] [options] source_dir target_url
-#: ../duplicity/commandline.py:365 ../duplicity/commandline.py:455
-#: ../duplicity/commandline.py:478 ../duplicity/commandline.py:541
-#: ../duplicity/commandline.py:751
+#: ../duplicity/commandline.py:368 ../duplicity/commandline.py:458
+#: ../duplicity/commandline.py:481 ../duplicity/commandline.py:549
+#: ../duplicity/commandline.py:761
 msgid "options"
 msgstr "Optionen"
 
-#: ../duplicity/commandline.py:380
+#: ../duplicity/commandline.py:383
 #, python-format
 msgid ""
 "Running in 'ignore errors' mode due to %s; please re-consider if this was "
 "not intended"
 msgstr ""
-"Laufe im 'Fehler ignorieren'-Modus aufgrund %s; bitte überprüfen wenn dies "
-"nicht beabsichtigt war"
+"»Fehler vernachlässigen«-Modus läuft gerade, aufgrund von %s; bitte "
+"überprüfen wenn das nicht beabsichtigt war"
 
 #. Used in usage help to represent an imap mailbox
-#: ../duplicity/commandline.py:393
+#: ../duplicity/commandline.py:396
 msgid "imap_mailbox"
-msgstr "imap_Postfach"
+msgstr "IMAP-Postfach"
 
-#: ../duplicity/commandline.py:407
+#: ../duplicity/commandline.py:410
 msgid "file_descriptor"
 msgstr "Datei_Deskriptor"
 
 #. Used in usage help to represent a desired number of
 #. something. Example:
 #. --num-retries <number>
-#: ../duplicity/commandline.py:418 ../duplicity/commandline.py:440
-#: ../duplicity/commandline.py:452 ../duplicity/commandline.py:461
-#: ../duplicity/commandline.py:499 ../duplicity/commandline.py:504
-#: ../duplicity/commandline.py:508 ../duplicity/commandline.py:577
-#: ../duplicity/commandline.py:746
+#: ../duplicity/commandline.py:421 ../duplicity/commandline.py:443
+#: ../duplicity/commandline.py:455 ../duplicity/commandline.py:464
+#: ../duplicity/commandline.py:502 ../duplicity/commandline.py:507
+#: ../duplicity/commandline.py:511 ../duplicity/commandline.py:587
+#: ../duplicity/commandline.py:756
 msgid "number"
 msgstr "Nummer"
 
 #. Used in usage help (noun)
-#: ../duplicity/commandline.py:421
+#: ../duplicity/commandline.py:424
 msgid "backup name"
 msgstr "Sicherungsname"
 
 #. noun
-#: ../duplicity/commandline.py:517 ../duplicity/commandline.py:520
-#: ../duplicity/commandline.py:717
+#: ../duplicity/commandline.py:522 ../duplicity/commandline.py:525
+#: ../duplicity/commandline.py:727
 msgid "command"
 msgstr "Befehl"
 
-#: ../duplicity/commandline.py:523
+#: ../duplicity/commandline.py:528
 msgid "pyrax|cloudfiles"
-msgstr ""
+msgstr "pyrax|cloudfiles"
 
 #: ../duplicity/commandline.py:546
 msgid "paramiko|pexpect"
 msgstr "paramiko|pexpect"
 
-#: ../duplicity/commandline.py:544
+#: ../duplicity/commandline.py:552
 msgid "pem formatted bundle of certificate authorities"
 msgstr "PEM-formatiertes Paket von Zertifizierungsstellen"
 
 #. Used in usage help. Example:
 #. --timeout <seconds>
-#: ../duplicity/commandline.py:554 ../duplicity/commandline.py:780
+#: ../duplicity/commandline.py:562 ../duplicity/commandline.py:790
 msgid "seconds"
 msgstr "Sekunden"
 
 #. abbreviation for "character" (noun)
-#: ../duplicity/commandline.py:560 ../duplicity/commandline.py:714
+#: ../duplicity/commandline.py:568 ../duplicity/commandline.py:724
 msgid "char"
 msgstr "Zeichen"
 
-#: ../duplicity/commandline.py:680
+#: ../duplicity/commandline.py:690
 #, python-format
 msgid "Using archive dir: %s"
 msgstr "Folgendes Archivverzeichnis wird benutzt: %s"
 
-#: ../duplicity/commandline.py:681
+#: ../duplicity/commandline.py:691
 #, python-format
 msgid "Using backup name: %s"
 msgstr "Folgender Sicherungsname wird benutzt: %s"
 
-#: ../duplicity/commandline.py:688
+#: ../duplicity/commandline.py:698
 #, python-format
 msgid "Command line error: %s"
-msgstr "Kommandozeilen-Fehler: %s"
+msgstr "Befehlszeilenfehler: %s"
 
-#: ../duplicity/commandline.py:689
+#: ../duplicity/commandline.py:699
 msgid "Enter 'duplicity --help' for help screen."
-msgstr ""
-"Rufen Sie duplicity mit der Option '--help' auf, um eine Hilfeseite zu "
-"erhalten."
+msgstr "Bitte »--help« aufrufen, um eine Hilfeseite zu erhalten."
 
 #. Used in usage help to represent a Unix-style path name. Example:
 #. rsync://user[:password]@other_host[:port]//absolute_path
-#: ../duplicity/commandline.py:702
+#: ../duplicity/commandline.py:712
 msgid "absolute_path"
 msgstr "absoluter_pfad"
 
 #. Used in usage help. Example:
 #. tahoe://alias/some_dir
-#: ../duplicity/commandline.py:706
+#: ../duplicity/commandline.py:716
 msgid "alias"
 msgstr "alias"
 
 #. Used in help to represent a "bucket name" for Amazon Web
 #. Services' Simple Storage Service (S3). Example:
 #. s3://other.host/bucket_name[/prefix]
-#: ../duplicity/commandline.py:711
+#: ../duplicity/commandline.py:721
 msgid "bucket_name"
 msgstr "Bucket_Name"
 
 #. Used in usage help to represent the name of a container in
 #. Amazon Web Services' Cloudfront. Example:
 #. cf+http://container_name
-#: ../duplicity/commandline.py:722
+#: ../duplicity/commandline.py:732
 msgid "container_name"
 msgstr "Container_Name"
 
 #. noun
-#: ../duplicity/commandline.py:725
+#: ../duplicity/commandline.py:735
 msgid "count"
 msgstr "Anzahl"
 
 #. Used in usage help to represent the name of a file directory
-#: ../duplicity/commandline.py:728
+#: ../duplicity/commandline.py:738
 msgid "directory"
 msgstr "Verzeichnis"
 
 #. Used in usage help, e.g. to represent the name of a code
 #. module. Example:
 #. rsync://user[:password]@other.host[:port]::/module/some_dir
-#: ../duplicity/commandline.py:741
+#: ../duplicity/commandline.py:751
 msgid "module"
 msgstr "modul"
 
 #. Used in usage help to represent an internet hostname. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
-#: ../duplicity/commandline.py:755
+#: ../duplicity/commandline.py:765
 msgid "other.host"
 msgstr "anderer.Rechner"
 
 #. Used in usage help. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
-#: ../duplicity/commandline.py:759
+#: ../duplicity/commandline.py:769
 msgid "password"
 msgstr "passwort"
 
 #. Used in usage help to represent a TCP port number. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
-#: ../duplicity/commandline.py:767
+#: ../duplicity/commandline.py:777
 msgid "port"
 msgstr "Port"
 
 #. Used in usage help. This represents a string to be used as a
 #. prefix to names for backup files created by Duplicity. Example:
 #. s3://other.host/bucket_name[/prefix]
-#: ../duplicity/commandline.py:772
+#: ../duplicity/commandline.py:782
 msgid "prefix"
 msgstr "Präfix"
 
 #. Used in usage help to represent a Unix-style path name. Example:
 #. rsync://user[:password]@other.host[:port]/relative_path
-#: ../duplicity/commandline.py:776
+#: ../duplicity/commandline.py:786
 msgid "relative_path"
 msgstr "relativer_Pfad"
 
 #. Used in usage help to represent the name of a single file
 #. directory or a Unix-style path to a directory. Example:
 #. file:///some_dir
-#: ../duplicity/commandline.py:791
+#: ../duplicity/commandline.py:801
 msgid "some_dir"
 msgstr "irgendein_Verzeichnis"
 
@@ -800,14 +804,14 @@ msgstr "irgendein_Verzeichnis"
 #. directory or a Unix-style path to a directory where files will be
 #. coming FROM. Example:
 #. duplicity [full|incremental] [options] source_dir target_url
-#: ../duplicity/commandline.py:797
+#: ../duplicity/commandline.py:807
 msgid "source_dir"
-msgstr "quell_verzeichnis"
+msgstr "quellverzeichnis"
 
 #. Used in usage help to represent a URL files will be coming
 #. FROM. Example:
 #. duplicity [restore] [options] source_url target_dir
-#: ../duplicity/commandline.py:802
+#: ../duplicity/commandline.py:812
 msgid "source_url"
 msgstr "Quelladresse"
 
@@ -815,35 +819,35 @@ msgstr "Quelladresse"
 #. directory or a Unix-style path to a directory. where files will be
 #. going TO. Example:
 #. duplicity [restore] [options] source_url target_dir
-#: ../duplicity/commandline.py:808
+#: ../duplicity/commandline.py:818
 msgid "target_dir"
-msgstr "ziel_verzeichnis"
+msgstr "zielverzeichnis"
 
 #. Used in usage help to represent a URL files will be going TO.
 #. Example:
 #. duplicity [full|incremental] [options] source_dir target_url
-#: ../duplicity/commandline.py:813
+#: ../duplicity/commandline.py:823
 msgid "target_url"
 msgstr "Zieladresse"
 
 #. Used in usage help to represent a user name (i.e. login).
 #. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
-#: ../duplicity/commandline.py:823
+#: ../duplicity/commandline.py:833
 msgid "user"
 msgstr "benutzer"
 
 #. Header in usage help
-#: ../duplicity/commandline.py:841
+#: ../duplicity/commandline.py:850
 msgid "Backends and their URL formats:"
 msgstr "Hintergrundprogramme und deren Adressformate:"
 
 #. Header in usage help
-#: ../duplicity/commandline.py:870
+#: ../duplicity/commandline.py:875
 msgid "Commands:"
 msgstr "Befehle:"
 
-#: ../duplicity/commandline.py:894
+#: ../duplicity/commandline.py:899
 #, python-format
 msgid ""
 "Specified archive directory '%s' does not exist, or is not a directory"
@@ -856,35 +860,35 @@ msgid ""
 "Sign key should be an 8 character hex string, like 'AA0E73D2'.\n"
 "Received '%s' instead."
 msgstr ""
-"Signierschlüssel sollte eine 8 Zeichen lange Hexadezimal-Zahl sein, wie "
-"'AA0E73D2'.\n"
-"Stattdessen '%s' empfangen."
+"Signierschlüssel sollte eine 8 Zeichen lange Hexadezimalzahl sein, wie "
+"»AA0E73D2«.\n"
+"Stattdessen wurde »%s« empfangen."
 
-#: ../duplicity/commandline.py:963
+#: ../duplicity/commandline.py:968
 #, python-format
 msgid ""
 "Restore destination directory %s already exists.\n"
 "Will not overwrite."
 msgstr ""
-"Wiederherstellungs-Zeilverzeichnis %s existiert bereits.\n"
+"Wiederherstellungszielverzeichnis %s besteht bereits.\n"
 "Wird nicht überschrieben."
 
-#: ../duplicity/commandline.py:968
+#: ../duplicity/commandline.py:973
 #, python-format
 msgid "Verify directory %s does not exist"
 msgstr "Prüfverzeichnis %s besteht nicht"
 
-#: ../duplicity/commandline.py:974
+#: ../duplicity/commandline.py:979
 #, python-format
 msgid "Backup source directory %s does not exist."
 msgstr "Sicherungsquellverzeichnis %s existiert nicht."
 
-#: ../duplicity/commandline.py:1003
+#: ../duplicity/commandline.py:1008
 #, python-format
 msgid "Command line warning: %s"
-msgstr "Befehlszeilen-Warnung: %s"
+msgstr "Befehlszeilenwarnung: %s"
 
-#: ../duplicity/commandline.py:1003
+#: ../duplicity/commandline.py:1008
 msgid ""
 "Selection options --exclude/--include\n"
 "currently work only when backing up,not restoring."
@@ -892,7 +896,7 @@ msgstr ""
 "Die Optionen --exclude/--include funktionieren\n"
 "im Moment nur bei der Sicherung, nicht bei der Wiederherstellung."
 
-#: ../duplicity/commandline.py:1051
+#: ../duplicity/commandline.py:1056
 #, python-format
 msgid ""
 "Bad URL '%s'.\n"
@@ -904,16 +908,16 @@ msgstr ""
 "und\n"
 "»file:///usr/local«. Für mehr Informationen bitte die man-Seite aufrufen."
 
-#: ../duplicity/commandline.py:1076
+#: ../duplicity/commandline.py:1081
 msgid "Main action: "
 msgstr "Hauptaufgabe: "
 
-#: ../duplicity/backend.py:102
+#: ../duplicity/backend.py:88
 #, python-format
 msgid "Import of %s %s"
-msgstr "Importieren von %s %s"
+msgstr "Import von %s %s"
 
-#: ../duplicity/backend.py:209
+#: ../duplicity/backend.py:165
 #, python-format
 msgid "Could not initialize backend: %s"
 msgstr "Hintergrundprogramm konnte nicht initialisiert werden: %s"
@@ -921,34 +925,37 @@ msgstr "Hintergrundprogramm konnte nicht initialisiert werden: %s"
 #: ../duplicity/backend.py:320
 #, python-format
 msgid "Attempt %s failed: %s: %s"
-msgstr ""
+msgstr "Versuch %s ist fehlgeschlagen: %s: %s"
 
-#: ../duplicity/backend.py:367
+#: ../duplicity/backend.py:322 ../duplicity/backend.py:352
+#: ../duplicity/backend.py:359
 #, python-format
 msgid "Backtrace of previous error: %s"
-msgstr "Backtrace des vorangegangenen Fehlers: %s"
+msgstr "Rückverfolgung des vorangegangenen Fehlers: %s"
 
-#: ../duplicity/backend.py:386
+#: ../duplicity/backend.py:350
 #, python-format
 msgid "Attempt %s failed. %s: %s"
 msgstr "Versuch %s fehlgeschlagen. %s: %s"
 
-#: ../duplicity/backend.py:382
+#: ../duplicity/backend.py:361
 #, python-format
 msgid "Giving up after %s attempts. %s: %s"
 msgstr "Nach %s Versuchen wird aufgegeben. %s: %s"
 
-#: ../duplicity/backend.py:469
+#: ../duplicity/backend.py:546 ../duplicity/backend.py:570
 #, python-format
 msgid "Reading results of '%s'"
-msgstr "Lese Ergebnisse von '%s'"
+msgstr "Ergebnisse von »%s« werden gelesen"
 
 #: ../duplicity/backend.py:585
 #, python-format
 msgid "Running '%s' failed with code %d (attempt #%d)"
 msgid_plural "Running '%s' failed with code %d (attempt #%d)"
-msgstr[0] "Ausführung von '%s' ist mit Code %d fehlgeschlagen (Versuch #%d)"
-msgstr[1] "Ausführung von '%s' ist mit Code %d fehlgeschlagen (Versuch #%d)"
+msgstr[0] ""
+"Ausführung von »%s« ist mit Code %d ist fehlgeschlagen (Versuch #%d)"
+msgstr[1] ""
+"Ausführung von »%s« ist mit Code %d ist fehlgeschlagen (Versuch #%d)"
 
 #: ../duplicity/backend.py:589
 #, python-format
@@ -963,25 +970,25 @@ msgstr ""
 #, python-format
 msgid "Giving up trying to execute '%s' after %d attempt"
 msgid_plural "Giving up trying to execute '%s' after %d attempts"
-msgstr[0] "Ausführung von '%s' aufgegeben nach dem %d. Versuch"
-msgstr[1] "Ausführung von '%s' aufgegeben nach %d Versuchen"
+msgstr[0] "Ausführung von »%s« nach dem %d. Versuch aufgegeben"
+msgstr[1] "Ausführung von »%s« nach %d Versuchen aufgegeben"
 
 #: ../duplicity/asyncscheduler.py:66
 #, python-format
 msgid "instantiating at concurrency %d"
-msgstr "instanziere mit Simultanität %d"
+msgstr "Instanz wird mit Gleichzeitigkeit %d erstellt"
 
 #: ../duplicity/asyncscheduler.py:93
 msgid "inserting barrier"
-msgstr "füge Barriere ein"
+msgstr "Sperre wird eingefügt"
 
 #: ../duplicity/asyncscheduler.py:142
 msgid "running task synchronously (asynchronicity disabled)"
-msgstr "führe Aufgabe synchron aus (asynchronität deaktiviert)"
+msgstr "Aufgabe wird synchron ausgeführt (asynchronität deaktiviert)"
 
 #: ../duplicity/asyncscheduler.py:148
 msgid "scheduling task for asynchronous execution"
-msgstr "plane Aufgabe für asynchrone Ausführung"
+msgstr "Aufgabe für asynchrone Ausführung wird geplant"
 
 #: ../duplicity/asyncscheduler.py:177
 msgid "task completed successfully"
@@ -991,44 +998,44 @@ msgstr "Aufgabe erfolgreich abgeschlossen"
 msgid ""
 "a previously scheduled task has failed; propagating the result immediately"
 msgstr ""
-"eine vorgängig geplante Aufgabe ist fehlgeschlagen; verbreite das Resultat "
-"sofort"
+"Eine vorherig geplante Aufgabe ist fehlgeschlagen; Ergebnis wird sofort "
+"verbreitet"
 
 #: ../duplicity/asyncscheduler.py:211 ../duplicity/asyncscheduler.py:232
 #, python-format
 msgid "active workers = %d"
-msgstr "aktive Arbeiter = %d"
+msgstr "Aktive Arbeiter = %d"
 
 #: ../duplicity/asyncscheduler.py:252
 #, python-format
 msgid "task execution done (success: %s)"
 msgstr "Aufgabenausführung abgeschlossen (erfolgreich: %s)"
 
-#: ../duplicity/patchdir.py:76 ../duplicity/patchdir.py:81
+#: ../duplicity/patchdir.py:74 ../duplicity/patchdir.py:79
 #, python-format
 msgid "Patching %s"
-msgstr "Repariere %s"
+msgstr "%s wird repariert"
 
-#: ../duplicity/patchdir.py:510
+#: ../duplicity/patchdir.py:508
 #, python-format
 msgid "Error '%s' patching %s"
-msgstr ""
+msgstr "Fehler »%s« beim Reparieren von %s"
 
-#: ../duplicity/patchdir.py:582
+#: ../duplicity/patchdir.py:581
 #, python-format
 msgid "Writing %s of type %s"
 msgstr "Schreibvorgang von %s des Typs %s"
 
-#: ../duplicity/collections.py:152 ../duplicity/collections.py:163
+#: ../duplicity/collections.py:150 ../duplicity/collections.py:161
 #, python-format
 msgid "BackupSet.delete: missing %s"
-msgstr ""
+msgstr "Sicherungssatz löschen: %s fehlt"
 
-#: ../duplicity/collections.py:188
+#: ../duplicity/collections.py:186
 msgid "Fatal Error: No manifests found for most recent backup"
-msgstr "Kritischer Fehler: Kein Manifest gefunden zur letzten Sicherung"
+msgstr "Kritischer Fehler: Kein Manifest zur letzten Sicherung gefunden"
 
-#: ../duplicity/collections.py:197
+#: ../duplicity/collections.py:195
 msgid ""
 "Fatal Error: Remote manifest does not match local one.  Either the remote "
 "backup set or the local archive directory has been corrupted."
@@ -1037,107 +1044,109 @@ msgstr ""
 "lokalen Version überein. Entweder der entfernte Sicherungssatz oder das "
 "lokale Archivverzeichnis ist fehlerhaft."
 
-#: ../duplicity/collections.py:205
+#: ../duplicity/collections.py:203
 msgid "Fatal Error: Neither remote nor local manifest is readable."
 msgstr ""
-"Kritischer Fehler: Weder es entfernte noch das lokale Manifest sind lesbar."
+"Kritischer Fehler: Weder das entfernte noch das lokale Manifest ist lesbar."
 
-#: ../duplicity/collections.py:315
+#: ../duplicity/collections.py:314
 msgid "Preferring Backupset over previous one!"
 msgstr "Sicherungssatz wird dem Vorherigen vorgezogen!"
 
-#: ../duplicity/collections.py:318
+#: ../duplicity/collections.py:317
 #, python-format
 msgid "Ignoring incremental Backupset (start_time: %s; needed: %s)"
-msgstr "Ignoriere inkrementelles Backup-Set (start_zeit: %s; benötigt: %s)"
+msgstr ""
+"Schrittweiser Sicherungssatz wird vernachlässigt (Startzeit: %s; benötigt: "
+"%s)"
 
-#: ../duplicity/collections.py:323
+#: ../duplicity/collections.py:322
 #, python-format
 msgid "Added incremental Backupset (start_time: %s / end_time: %s)"
 msgstr ""
-"Inkrementelles Backup-Set hinzugefügt (start_zeit: %s / end_zeit: %s)"
+"Schrittweiser Sicherungssatz wurde hinzugefügt (Startzeit: %s; Endzeit: %s)"
 
-#: ../duplicity/collections.py:393
+#: ../duplicity/collections.py:392
 msgid "Chain start time: "
 msgstr "Erste Sicherung in dieser Kette: "
 
-#: ../duplicity/collections.py:394
+#: ../duplicity/collections.py:393
 msgid "Chain end time: "
 msgstr "Letzte Sicherung in dieser Kette: "
 
-#: ../duplicity/collections.py:395
+#: ../duplicity/collections.py:394
 #, python-format
 msgid "Number of contained backup sets: %d"
 msgstr "Anzahl der enthaltenen Sicherungssätze: %d"
 
-#: ../duplicity/collections.py:397
+#: ../duplicity/collections.py:396
 #, python-format
 msgid "Total number of contained volumes: %d"
-msgstr "Gesamtanzahl der enthaltenen Volumen: %d"
+msgstr "Gesamtanzahl der enthaltenen Datenträger: %d"
 
-#: ../duplicity/collections.py:399
+#: ../duplicity/collections.py:398
 msgid "Type of backup set:"
 msgstr "Typ des Sicherungssatzes:"
 
-#: ../duplicity/collections.py:399
+#: ../duplicity/collections.py:398
 msgid "Time:"
 msgstr "Zeit:"
 
-#: ../duplicity/collections.py:399
+#: ../duplicity/collections.py:398
 msgid "Num volumes:"
-msgstr "Anz. Volumen:"
+msgstr "Datenträgeranz.:"
 
-#: ../duplicity/collections.py:403
+#: ../duplicity/collections.py:402
 msgid "Full"
 msgstr "Vollständig"
 
-#: ../duplicity/collections.py:406
+#: ../duplicity/collections.py:405
 msgid "Incremental"
 msgstr "Schrittweise"
 
-#: ../duplicity/collections.py:466
+#: ../duplicity/collections.py:465
 msgid "local"
 msgstr "Lokal"
 
-#: ../duplicity/collections.py:468
+#: ../duplicity/collections.py:467
 msgid "remote"
 msgstr "Entfernt"
 
-#: ../duplicity/collections.py:623
+#: ../duplicity/collections.py:622
 msgid "Collection Status"
 msgstr "Sammlungszustand"
 
-#: ../duplicity/collections.py:625
+#: ../duplicity/collections.py:624
 #, python-format
 msgid "Connecting with backend: %s"
 msgstr "Mit Hintergrundprogramm wird verbunden: %s"
 
-#: ../duplicity/collections.py:627
+#: ../duplicity/collections.py:626
 #, python-format
 msgid "Archive dir: %s"
 msgstr "Archivverzeichnis: %s"
 
-#: ../duplicity/collections.py:630
+#: ../duplicity/collections.py:629
 #, python-format
 msgid "Found %d secondary backup chain."
 msgid_plural "Found %d secondary backup chains."
 msgstr[0] "%d zusätzliche Sicherungskette gefunden."
 msgstr[1] "%d zusätzliche Sicherungsketten gefunden."
 
-#: ../duplicity/collections.py:635
+#: ../duplicity/collections.py:634
 #, python-format
 msgid "Secondary chain %d of %d:"
 msgstr "Zusätzliche Kette %d von %d:"
 
-#: ../duplicity/collections.py:641
+#: ../duplicity/collections.py:640
 msgid "Found primary backup chain with matching signature chain:"
 msgstr "Primäre Sicherungskette mit passender Signaturkette gefunden:"
 
-#: ../duplicity/collections.py:645
+#: ../duplicity/collections.py:644
 msgid "No backup chains with active signatures found"
 msgstr "Keine Sicherungsketten mit aktiven Signaturen gefunden"
 
-#: ../duplicity/collections.py:648
+#: ../duplicity/collections.py:647
 #, python-format
 msgid "Also found %d backup set not part of any chain,"
 msgid_plural "Also found %d backup sets not part of any chain,"
@@ -1148,7 +1157,7 @@ msgstr[1] ""
 "Zusätzlich wurden %d Sicherungssätze gefunden, der Teil keiner "
 "Sicherungskette sind,"
 
-#: ../duplicity/collections.py:652
+#: ../duplicity/collections.py:651
 #, python-format
 msgid "and %d incomplete backup set."
 msgid_plural "and %d incomplete backup sets."
@@ -1156,114 +1165,114 @@ msgstr[0] "und %d unvollständigen Sicherungssatz."
 msgstr[1] "und %d unvollständige Sicherungssätze."
 
 #. "cleanup" is a hard-coded command, so do not translate it
-#: ../duplicity/collections.py:657
+#: ../duplicity/collections.py:656
 msgid ""
 "These may be deleted by running duplicity with the \"cleanup\" command."
 msgstr ""
-"Sie können diese entfernen, indem sie duplicity mit dem »cleanup«-Kommando "
+"Sie können diese entfernen, indem sie duplicity mit dem »cleanup«-Befehl "
 "starten."
 
-#: ../duplicity/collections.py:660
+#: ../duplicity/collections.py:659
 msgid "No orphaned or incomplete backup sets found."
 msgstr "Keine verwaisten oder unvollständigen Sicherungssätze gefunden."
 
-#: ../duplicity/collections.py:676
+#: ../duplicity/collections.py:675
 #, python-format
 msgid "%d file exists on backend"
 msgid_plural "%d files exist on backend"
 msgstr[0] "%d Datei besteht im Hintergrundprogramm"
 msgstr[1] "%d Dateien besteht im Hintergrundprogramm"
 
-#: ../duplicity/collections.py:683
+#: ../duplicity/collections.py:682
 #, python-format
 msgid "%d file exists in cache"
 msgid_plural "%d files exist in cache"
-msgstr[0] "%d Datei existiert im Zwischenspeicher"
-msgstr[1] "%d Dateien existieren im Zwischenspeicher"
+msgstr[0] "%d Datei besteht im Puffer"
+msgstr[1] "%d Dateien besteht im Puffer"
 
-#: ../duplicity/collections.py:735
+#: ../duplicity/collections.py:734
 msgid ""
 "Warning, discarding last backup set, because of missing signature file."
 msgstr ""
-"Warnung, der letzte Sicherungssatz wird verworfen, weil die Signaturdatei "
+"Achtung, der letzte Sicherungssatz wird verworfen, weil die Signaturdatei "
 "fehlt."
 
-#: ../duplicity/collections.py:758
+#: ../duplicity/collections.py:757
 msgid "Warning, found the following local orphaned signature file:"
 msgid_plural "Warning, found the following local orphaned signature files:"
 msgstr[0] ""
-"Warnung, die folgende verwaiste Signaturdatei wurde im Archivverzeichnis "
+"Achtung, die folgende verwaiste Signaturdatei wurde im Archivverzeichnis "
 "gefunden:"
 msgstr[1] ""
-"Warnung, die folgenden verwaisten Signaturdateien wurden im "
+"Achtung, die folgenden verwaisten Signaturdateien wurden im "
 "Archivverzeichnis gefunden:"
 
-#: ../duplicity/collections.py:767
+#: ../duplicity/collections.py:766
 msgid "Warning, found the following remote orphaned signature file:"
 msgid_plural "Warning, found the following remote orphaned signature files:"
 msgstr[0] ""
-"Warnung, die folgende verwaiste Signaturdatei wurde im Hintergrundprogramm "
+"Achtung, die folgende verwaiste Signaturdatei wurde im Hintergrundprogramm "
 "gefunden:"
 msgstr[1] ""
-"Warnung, die folgenden verwaisten Signaturdateien wurden im "
+"Achtung, die folgenden verwaisten Signaturdateien wurden im "
 "Hintergrundprogramm gefunden:"
 
-#: ../duplicity/collections.py:776
+#: ../duplicity/collections.py:775
 msgid "Warning, found signatures but no corresponding backup files"
 msgstr ""
-"Warnung, es wurden Signaturen ohne dazugehörige Sicherungsdaten gefunden"
+"Achtung, es wurden Signaturen ohne dazugehörige Sicherungsdaten gefunden"
 
-#: ../duplicity/collections.py:780
+#: ../duplicity/collections.py:779
 msgid ""
 "Warning, found incomplete backup sets, probably left from aborted session"
 msgstr ""
-"Warnung, unvollständige Sicherungssätze gefunden, wahrscheinlich von einer "
-"abgebrochenen Sitzung zurückgelassen"
+"Achtung, es wurden unvollständige Sicherungssätze gefunden, wahrscheinlich "
+"von einer abgebrochenen Sitzung zurückgelassen"
 
-#: ../duplicity/collections.py:784
+#: ../duplicity/collections.py:783
 msgid "Warning, found the following orphaned backup file:"
 msgid_plural "Warning, found the following orphaned backup files:"
-msgstr[0] "Warnung, die folgende Sicherungsdatei ist verwaist:"
-msgstr[1] "Warnung, die folgenden Sicherungsdateien sind verwaist:"
+msgstr[0] "Achtung, die folgende Sicherungsdatei ist verwaist:"
+msgstr[1] "Achtung, die folgenden Sicherungsdateien sind verwaist:"
 
-#: ../duplicity/collections.py:801
+#: ../duplicity/collections.py:800
 #, python-format
 msgid "Extracting backup chains from list of files: %s"
-msgstr "Extrahiere Sicherungsketten aus der Liste der Dateien: %s"
+msgstr "Sicherungsketten aus der Liste der Dateien werden entnommen: %s"
 
-#: ../duplicity/collections.py:811
+#: ../duplicity/collections.py:810
 #, python-format
 msgid "File %s is part of known set"
 msgstr "Datei %s ist Teil eines bekannten Satzes"
 
-#: ../duplicity/collections.py:814
+#: ../duplicity/collections.py:813
 #, python-format
 msgid "File %s is not part of a known set; creating new set"
 msgstr ""
 "Datei %s ist nicht Teil eines bekannten Sicherungssatzes; neuer Satz wird "
 "erstellt"
 
-#: ../duplicity/collections.py:819
+#: ../duplicity/collections.py:818
 #, python-format
 msgid "Ignoring file (rejected by backup set) '%s'"
 msgstr "Datei »%s« wird vernachlässigt (vom Sicherungssatz abgelehnt)"
 
-#: ../duplicity/collections.py:833
+#: ../duplicity/collections.py:831
 #, python-format
 msgid "Found backup chain %s"
 msgstr "Sicherungskette %s gefunden"
 
-#: ../duplicity/collections.py:838
+#: ../duplicity/collections.py:836
 #, python-format
 msgid "Added set %s to pre-existing chain %s"
-msgstr "Satz %s zur existierenden Sicherungskette %s hinzugefügt"
+msgstr "Satz %s zur bestehenden Sicherungskette %s hinzugefügt"
 
-#: ../duplicity/collections.py:842
+#: ../duplicity/collections.py:840
 #, python-format
 msgid "Found orphaned set %s"
-msgstr "Verwaisten Satz %s gefunden"
+msgstr "Verwaister Satz %s gefunden"
 
-#: ../duplicity/collections.py:993
+#: ../duplicity/collections.py:992
 #, python-format
 msgid ""
 "No signature chain for the requested time.  Using oldest available chain, "
@@ -1277,50 +1286,50 @@ msgstr ""
 msgid "Error listing directory %s"
 msgstr "Fehler beim Auflisten des Verzeichnisses %s"
 
-#: ../duplicity/diffdir.py:105 ../duplicity/diffdir.py:395
+#: ../duplicity/diffdir.py:103 ../duplicity/diffdir.py:394
 #, python-format
 msgid "Error %s getting delta for %s"
 msgstr "Fehler %s beim Berechnen des Delta für %s"
 
-#: ../duplicity/diffdir.py:119
+#: ../duplicity/diffdir.py:117
 #, python-format
 msgid "Getting delta of %s and %s"
 msgstr "Berechne Delta von %s und %s"
 
-#: ../duplicity/diffdir.py:164
+#: ../duplicity/diffdir.py:162
 #, python-format
 msgid "A %s"
 msgstr "Ein %s"
 
-#: ../duplicity/diffdir.py:171
+#: ../duplicity/diffdir.py:169
 #, python-format
 msgid "M %s"
 msgstr "M %s"
 
-#: ../duplicity/diffdir.py:193
+#: ../duplicity/diffdir.py:191
 #, python-format
 msgid "Comparing %s and %s"
-msgstr "Vergleiche %s und %s"
+msgstr "%s und %s werden verglichen"
 
-#: ../duplicity/diffdir.py:201
+#: ../duplicity/diffdir.py:199
 #, python-format
 msgid "D %s"
 msgstr "D %s"
 
-#: ../duplicity/lazy.py:334
+#: ../duplicity/lazy.py:325
 #, python-format
 msgid "Warning: oldindex %s >= newindex %s"
-msgstr "Warnung: Alt-Index %s >= Neu-Index %s"
+msgstr "Achtung: Alt-Index %s >= Neu-Index %s"
 
-#: ../duplicity/lazy.py:409
+#: ../duplicity/lazy.py:400
 #, python-format
 msgid "Error '%s' processing %s"
-msgstr "Fehler '%s' beim Verarbeiten von %s"
+msgstr "Fehler »%s« beim Verarbeiten von %s"
 
-#: ../duplicity/lazy.py:419
+#: ../duplicity/lazy.py:410
 #, python-format
 msgid "Skipping %s because of previous error"
-msgstr "Überspringe %s wegen vorherigem Fehler"
+msgstr "%s wird wegen vorherigem Fehler übersprungen"
 
 #: ../duplicity/backends/sshbackend.py:25
 #, python-format
@@ -1345,12 +1354,12 @@ msgstr ""
 msgid "Connection failed, please check your password: %s"
 msgstr "Verbindung fehlgeschlagen, bitte Passwort prüfen: %s"
 
-#: ../duplicity/backend.py:496
+#: ../duplicity/backends/giobackend.py:130
 #, python-format
 msgid "Writing %s"
-msgstr "Schreibe %s"
+msgstr "%s wird geschrieben"
 
-#: ../duplicity/manifest.py:89
+#: ../duplicity/manifest.py:87
 #, python-format
 msgid ""
 "Fatal Error: Backup source host has changed.\n"
@@ -1361,7 +1370,7 @@ msgstr ""
 "Aktueller Rechnername: %s\n"
 "Vorheriger Rechnername: %s"
 
-#: ../duplicity/manifest.py:96
+#: ../duplicity/manifest.py:94
 #, python-format
 msgid ""
 "Fatal Error: Backup source directory has changed.\n"
@@ -1372,7 +1381,7 @@ msgstr ""
 "Aktueller Verzeichnis: %s\n"
 "Vorheriges Verzeichnis: %s"
 
-#: ../duplicity/manifest.py:105
+#: ../duplicity/manifest.py:103
 msgid ""
 "Aborting because you may have accidentally tried to backup two different "
 "data sets to the same remote location, or using the same archive directory.  "
@@ -1384,129 +1393,129 @@ msgstr ""
 "selben Archivverzeichnis. Wenn dieses kein Fehler ist, verwenden Sie den "
 "»allow-source-mismatch«-Parameter, um diese Meldung auszuschalten."
 
-#: ../duplicity/manifest.py:211
+#: ../duplicity/manifest.py:209
 msgid "Manifests not equal because different volume numbers"
-msgstr "Manifests sind ungleich aufgrund verschiedener Volumen-Zahlen"
+msgstr "Manifests sind ungleich aufgrund verschiedener Datenträgerzahlen"
 
-#: ../duplicity/manifest.py:216
+#: ../duplicity/manifest.py:214
 msgid "Manifests not equal because volume lists differ"
-msgstr "Manifests sind ungleich aufgrund verschiedenen Volumen-Listen"
+msgstr "Manifests sind ungleich aufgrund verschiedenen Datenträgerlisten"
 
-#: ../duplicity/manifest.py:221
+#: ../duplicity/manifest.py:219
 msgid "Manifests not equal because hosts or directories differ"
 msgstr ""
 "Manifests sind ungleich aufgrund Rechner- oder Verzeichnisunterschieden"
 
-#: ../duplicity/manifest.py:368
+#: ../duplicity/manifest.py:366
 msgid "Warning, found extra Volume identifier"
-msgstr "Warnung, zusätzlicher Volumen-Identifikator gefunden"
+msgstr "Achtung, zusätzliche Datenträgerbezeichnung gefunden"
 
-#: ../duplicity/manifest.py:394
+#: ../duplicity/manifest.py:392
 msgid "Other is not VolumeInfo"
-msgstr "Anderes ist kein Volumeinfo"
+msgstr "Anderes ist keine Datenträgerinfo"
 
-#: ../duplicity/manifest.py:397
+#: ../duplicity/manifest.py:395
 msgid "Volume numbers don't match"
-msgstr "Volumenzahlen stimmen nicht überein"
+msgstr "Datenträgerzahlen stimmen nicht überein"
 
-#: ../duplicity/manifest.py:400
+#: ../duplicity/manifest.py:398
 msgid "start_indicies don't match"
 msgstr "start_indexe stimmen nicht überein"
 
-#: ../duplicity/manifest.py:403
+#: ../duplicity/manifest.py:401
 msgid "end_index don't match"
 msgstr "end_indexe stimmen nicht überein"
 
-#: ../duplicity/manifest.py:410
+#: ../duplicity/manifest.py:408
 msgid "Hashes don't match"
 msgstr "Prüfsummen stimmen nicht überein"
 
-#: ../duplicity/path.py:102
+#: ../duplicity/path.py:100
 #, python-format
 msgid "Warning: %s invalid devnums (0x%X), treating as (0, 0)."
 msgstr ""
-"Warnung: %s ungültige Gerätenummern (0x%X), diese werden wie (0, 0) "
+"Achtung: %s ungültige Gerätenummern (0x%X), diese werden wie (0, 0) "
 "behandelt."
 
-#: ../duplicity/path.py:229 ../duplicity/path.py:288
+#: ../duplicity/path.py:227 ../duplicity/path.py:286
 #, python-format
 msgid "Warning: %s has negative mtime, treating as 0."
-msgstr "Warnung: %s hat eine negative mtime, behandle wie 0."
+msgstr "Achtung: %s hat eine negative mtime, diese wird wie 0 behandelt."
 
-#: ../duplicity/path.py:352
+#: ../duplicity/path.py:351
 msgid "Difference found:"
 msgstr "Unterschiede gefunden:"
 
-#: ../duplicity/path.py:361
+#: ../duplicity/path.py:357
 #, python-format
 msgid "New file %s"
 msgstr "Neue Datei %s"
 
-#: ../duplicity/path.py:364
+#: ../duplicity/path.py:360
 #, python-format
 msgid "File %s is missing"
 msgstr "Datei %s fehlt"
 
-#: ../duplicity/path.py:367
+#: ../duplicity/path.py:363
 #, python-format
 msgid "File %%s has type %s, expected %s"
 msgstr "Datei %%s ist vom Typ %s, erwartet %s"
 
-#: ../duplicity/path.py:373 ../duplicity/path.py:399
+#: ../duplicity/path.py:369 ../duplicity/path.py:395
 #, python-format
 msgid "File %%s has permissions %s, expected %s"
 msgstr "Datei %%s hat die Zugriffsrechte %s, erwartet wurde %s"
 
-#: ../duplicity/path.py:378
+#: ../duplicity/path.py:374
 #, python-format
 msgid "File %%s has mtime %s, expected %s"
 msgstr "Datei %%s hat mtime %s, erwartet %s"
 
-#: ../duplicity/path.py:386
+#: ../duplicity/path.py:382
 #, python-format
 msgid "Data for file %s is different"
 msgstr "Daten für Datei %s sind unterschiedlich"
 
-#: ../duplicity/path.py:394
+#: ../duplicity/path.py:390
 #, python-format
 msgid "Symlink %%s points to %s, expected %s"
-msgstr "Symbolischer Link %%s zeigt auf %s, erwartet %s"
+msgstr "Symbolischer Verweis %%s zeigt auf %s, erwartet wurde %s"
 
-#: ../duplicity/path.py:403
+#: ../duplicity/path.py:399
 #, python-format
 msgid "Device file %%s has numbers %s, expected %s"
-msgstr "Gerätedatei %%s hat Nummern %s, erwartet %s"
+msgstr "Gerätedatei %%s hat Nummern %s, erwartet wurde %s"
 
-#: ../duplicity/path.py:563
+#: ../duplicity/path.py:559
 #, python-format
 msgid "Making directory %s"
-msgstr "Erstelle Verzeichnis %s"
+msgstr "Verzeichnis %s wird erstellt"
 
-#: ../duplicity/path.py:573
+#: ../duplicity/path.py:569
 #, python-format
 msgid "Deleting %s"
 msgstr "»%s« wird gelöscht"
 
-#: ../duplicity/path.py:582
+#: ../duplicity/path.py:578
 #, python-format
 msgid "Touching %s"
 msgstr "Erstelle oder aktualisiere Zugriffszeit auf %s"
 
-#: ../duplicity/path.py:589
+#: ../duplicity/path.py:585
 #, python-format
 msgid "Deleting tree %s"
-msgstr "Lösche Baumstruktur %s"
+msgstr "Baumstruktur %s wird gelöscht"
 
 #: ../duplicity/gpginterface.py:237
 msgid "Threading not available -- zombie processes may appear"
 msgstr "Einfädelung ist nicht verfügbar – Zombieprozesse können auftreten."
 
-#: ../duplicity/gpginterface.py:674
+#: ../duplicity/gpginterface.py:677
 #, python-format
 msgid "GPG process %d terminated before wait()"
-msgstr ""
+msgstr "GPG-Prozess %d beendet vor »wait()«."
 
-#: ../duplicity/dup_time.py:49
+#: ../duplicity/dup_time.py:47
 #, python-format
 msgid ""
 "Bad interval string \"%s\"\n"
@@ -1515,14 +1524,13 @@ msgid ""
 "allowed special characters are s, m, h, D, W, M, and Y.  See the man\n"
 "page for more information."
 msgstr ""
-"Ungültiger Intervall-String \"%s\"\n"
+"Ungültige Intervallzeichenkette »%s«\n"
 "\n"
-"Intervalle sind angegeben wie 2Y (2 Jahre) oder 2h30m (2.5 Stunden). Die\n"
-"erlaubten Spezialzeichen sind s, m, h, D, W, M, und Y. Eine Konsultation der "
-"Man-\n"
-"Seite für weitere Informationen wird empfohlen."
+"Intervalle sind angegeben wie 2Y (2 Jahre) oder 2h30m (2,5 Stunden).\n"
+"Die erlaubten Spezialzeichen sind s, m, h, D, W, M, und Y.\n"
+"Weitere Informationen sind im Handbuch zu finden."
 
-#: ../duplicity/dup_time.py:55
+#: ../duplicity/dup_time.py:53
 #, python-format
 msgid ""
 "Bad time string \"%s\"\n"
@@ -1534,35 +1542,37 @@ msgid ""
 "(various combinations are acceptable, but the month always precedes\n"
 "the day)."
 msgstr ""
-"Ungültiger Zeit-String \"%s\"\n"
+"Ungültige Zeitzeichenkette »%s«\n"
 "\n"
-"Gültige Zeit-Strings sind Intervalle (wie \"3D46s\"), w3-Datum-Zeit-\n"
-"Strings, wie \"2002-04-26T04:22:01-07:00\" (Strings wie\n"
-"\"2002-04-26T04:22:01\" sind auch gültig - duplicity wird die \n"
-"aktuelle Zeitzone nutzen, oder gewöhnliche Daten wie 2/4/1997 oder 2001-04-"
-"23\n"
-"(verschiedene Kombinationen sind gültig, aber der Monat kommt immer vor\n"
-"dem Tag)."
+"Gültige Zeitzeichenkette sind Intervalle (wie »3D46s«), w3-Datum-"
+"Zeitzeichenketten,\n"
+"wie »2002-04-26T04:22:01-07:00« (Zeichenketten wie »2002-04-26T04:22:01« "
+"sind\n"
+"auch gültig - duplicity wird die aktuelle Zeitzone nutzen, oder gewöhnliche "
+"Daten\n"
+"wie 2/4/1997 oder 2001-04-23 (verschiedene Kombinationen sind gültig, aber "
+"vor\n"
+"dem Monat kommt immer der Tag)."
 
 #: ../duplicity/tempdir.py:119
 #, python-format
 msgid "Using temporary directory %s"
-msgstr "Benutze temporäres Verzeichnis %s"
+msgstr "Temporäres Verzeichnis %s wird benutzt"
 
 #: ../duplicity/tempdir.py:163
 #, python-format
 msgid "Registering (mktemp) temporary file %s"
-msgstr "Registriere (mktemp) temporäre Datei %s"
+msgstr "(mktemp) temporäre Datei %s wird registriert"
 
 #: ../duplicity/tempdir.py:185
 #, python-format
 msgid "Registering (mkstemp) temporary file %s"
-msgstr "Registriere (mkstemp) temporäre Datei %s"
+msgstr "(mkstemp) temporäre Datei %s wird registriert"
 
 #: ../duplicity/tempdir.py:217
 #, python-format
 msgid "Forgetting temporary file %s"
-msgstr "Vergesse temporäre Datei %s"
+msgstr "Temporäre Datei %s wird vergessen"
 
 #: ../duplicity/tempdir.py:220
 #, python-format
@@ -1574,7 +1584,7 @@ msgstr ""
 #: ../duplicity/tempdir.py:239
 #, python-format
 msgid "Removing still remembered temporary file %s"
-msgstr "Entferne temporäre Datei %s"
+msgstr "Bereits gemerkte temporäre Datei %s wird entfernt"
 
 #: ../duplicity/tempdir.py:242
 #, python-format
@@ -1588,12 +1598,14 @@ msgstr ""
 "Aufräumen des temporären Verzeichnisses %s fehlgeschlagen - das ist "
 "wahrscheinlich ein Fehler."
 
-#: ../duplicity/util.py:93
+#: ../duplicity/util.py:91
 #, python-format
 msgid "IGNORED_ERROR: Warning: ignoring error as requested: %s: %s"
-msgstr "IGNORIERTER_FEHLER: Warnung: ignoriere Fehler wie verlangt: %s: %s"
+msgstr ""
+"VERNACHLÄSSIGTER FEHLER: Achtung: Fehler wird wie verlangt vernachlässigt: "
+"%s: %s"
 
-#: ../duplicity/util.py:150
+#: ../duplicity/util.py:148
 #, python-format
 msgid "Releasing lockfile %s"
 msgstr "Sperrdatei »%s« wird freigegeben"
@@ -1603,22 +1615,34 @@ msgstr "Sperrdatei »%s« wird freigegeben"
 #~ msgstr[0] "Alten Sicherungssatz zum folgenden Zeitpunkt gefunden:"
 #~ msgstr[1] "Alte Sicherungssätze zu den folgenden Zeitpunkten gefunden:"
 
+#~ msgid "Deleting backup set at time:"
+#~ msgid_plural "Deleting backup sets at times:"
+#~ msgstr[0] "Sicherungssatz löschen, zum Zeitpunkt:"
+#~ msgstr[1] "Sicherungssatz löschen, zu den Zeitpunkten:"
+
+#, python-format
+#~ msgid "File %s not found locally after get from backend"
+#~ msgstr ""
+#~ "Datei %s konnte nicht lokal gefunden werden, nach Erhalt vom "
+#~ "Hintergrundprogramm."
+
 #~ msgid "Unable to load gio module"
-#~ msgstr "Kann gio-Modul nicht laden"
+#~ msgstr "gio-Modul kann nicht geladen werden"
+
+#~ msgid "Reuse already set SIGNING_PASSPHRASE as PASSPHRASE"
+#~ msgstr "Eingestellte SIGNING_PASSPHRASE als PASSPHRASE benutzen"
+
+#~ msgid "Reuse already set PASSPHRASE as SIGNING_PASSPHRASE"
+#~ msgstr "Eingestellte PASSPHRASE als SIGNING_PASSPHRASE benutzen"
 
 #, python-format
 #~ msgid "Starting to write %s"
-#~ msgstr "Beginne Schreibvorgang von %s"
+#~ msgstr "Mit Schreibvorgang von %s wird begonnen"
 
 #, python-format
 #~ msgid ""
 #~ "One only volume required.\n"
 #~ "Renaming %s to %s"
 #~ msgstr ""
-#~ "Es wird nur ein Volumen benötigt.\n"
-#~ "Benenne %s zu %s um."
-
-#~ msgid "Deleting backup set at time:"
-#~ msgid_plural "Deleting backup sets at times:"
-#~ msgstr[0] "Sicherungssatz löschen, zum Zeitpunkt:"
-#~ msgstr[1] "Sicherungssatz löschen, zu den Zeitpunkten:"
+#~ "Es wird nur ein Datenträger benötigt.\n"
+#~ "%s wird zu %s umbenannt."
