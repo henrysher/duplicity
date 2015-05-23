@@ -351,7 +351,10 @@ probably isn't what you meant.""") %
         # Internal. Used by ParseArgs.
         log.Notice(_("Reading globbing filelist %s") % list_name)
         separator = globals.null_separator and "\0" or "\n"
-        for line in filelist_fp.read().split(separator):
+        filelist = filelist_fp.read()
+        # reset file pointer in case we need to read again
+        filelist_fp.seek(0)
+        for line in filelist.split(separator):
             line, include = self.filelist_sanitise_line(line, inc_default)
             if not line:
                 # Skip blanks and comment lines
