@@ -1,3 +1,15 @@
+2015-05-27  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~noizyland/duplicity/fix-progress
+      - Fixes bug 1264744.  selection.filelist_globbing_get_sfs leaves the
+        filelist file object's position at the end of the file. When the
+        --progress option is used the filelists need to be read twice. On
+        the second read nothing is read from the file because file has
+        already been read and the position is EOF.  This patch calls seek(0)
+        on the filelist to reset the position to BOF so that subsequent
+        read() calls will return data.
+    * Added pylint ignore error in webdavbackend.py.
+
 2015-05-11  Kenneth Loafman  <kenneth@loafman.com>
 
     * Prep for 0.7.03

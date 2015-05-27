@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2015-05-11 07:33-0500\n"
+"POT-Creation-Date: 2015-05-27 05:56-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -440,12 +440,12 @@ msgstr ""
 msgid "Reading globbing filelist %s"
 msgstr ""
 
-#: ../duplicity/selection.py:384
+#: ../duplicity/selection.py:385
 #, python-format
 msgid "Error compiling regular expression %s"
 msgstr ""
 
-#: ../duplicity/selection.py:401
+#: ../duplicity/selection.py:402
 msgid ""
 "Warning: exclude-device-files is not the first selector.\n"
 "This may not be what you intended"

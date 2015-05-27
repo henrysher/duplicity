@@ -98,7 +98,7 @@ Hints:
                                         ca_certs=self.cacert_file,
                                         )
 
-        def request(self, *args, **kwargs):
+        def request(self, *args, **kwargs):  # pylint: disable=method-hidden
             try:
                 return httplib.HTTPSConnection.request(self, *args, **kwargs)
             except ssl.SSLError as e:
