@@ -1755,13 +1755,17 @@ The pydrive backend requires Python PyDrive package to be installed on the syste
 .B REQUIREMENTS
 above.
 
-You need to create a service account in "Google developers console" at https://console.developers.google.com
+There are two ways to use PyDrive: with a regular account or with a
+"service account". With a service account, a separate account is
+created, that is only accessible with Google APIs and not a web login.
+With a regular account, you can store backups in your normal Google
+Drive.
 
-Make sure Drive API is enabled.
-
-The email address of the account will be used as part of URL. See
-.B URL FORMAT
-above.
+To use a service account, go to the Google developers
+console at https://console.developers.google.com. Create a project,
+and make sure Drive API is enabled for the project. Under "APIs and
+auth", click Create New Client ID, then select Service Account with P12
+key.
 
 Download the .p12 key file of the account and convert it to the .pem format:
 .br
@@ -1770,6 +1774,37 @@ openssl pkcs12 -in XXX.p12  -nodes -nocerts > pydriveprivatekey.pem
 The content of .pem file should be passed to
 .BR GOOGLE_DRIVE_ACCOUNT_KEY
 environment variable for authentification.
+
+The email address of the account will be used as part of URL. See
+.B URL FORMAT
+above.
+
+The alternative is to use a regular account. To do this, start as above,
+but when creating a new Client ID, select "Installed application" of
+type "Other". Create a file with the following content, and pass its
+filename in the
+.BR GOOGLE_DRIVE_SETTINGS
+environment variable:
+.PP
+.nf
+.RS
+client_config_backend: settings
+client_config:
+    client_id: <Client ID from developers' console>
+    client_secret: <Client secret from developers' console>
+save_credentials: True
+save_credentials_backend: file
+save_credentials_file: <filename to cache credentials>
+get_refresh_token: True
+.RE
+.fi
+
+In this scenario, the username and host parts of the URL play no role;
+only the path matters. During the first run, you will be prompted to
+visit an URL in your browser to grant access to your drive. Once
+granted, you will receive a verification code to paste back into
+Duplicity. The credentials are then cached in the file references above
+for future use.
 
 .SH A NOTE ON MULTI BACKEND
 
