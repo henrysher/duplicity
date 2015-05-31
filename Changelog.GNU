@@ -8,6 +8,9 @@
         seamlessly from the gdocs backend. It's set up so that a service account
         can still be used, depending on which environment variable is set.
         The man page is updated to describe how to use the new functionality.
+    * Merged in lp:~ed.so/duplicity/gdocs.pydrive
+      - make pydrive new gdocs default backend
+      - keep gdata backend as gdata+gdocs://
 
 2015-05-27  Kenneth Loafman  <kenneth@loafman.com>
 
