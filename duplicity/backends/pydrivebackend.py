@@ -113,4 +113,4 @@ duplicity.backend.register_backend('pydrive+gdocs', PyDriveBackend)
 """ register pydrive as the default way to access gdocs """
 duplicity.backend.register_backend('gdocs', PyDriveBackend)
 
-duplicity.backend.uses_netloc.extend(['pydrive','pydrive+gdocs','gdocs'])
+duplicity.backend.uses_netloc.extend(['pydrive', 'pydrive+gdocs', 'gdocs'])

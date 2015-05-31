@@ -11,6 +11,7 @@
     * Merged in lp:~ed.so/duplicity/gdocs.pydrive
       - make pydrive new gdocs default backend
       - keep gdata backend as gdata+gdocs://
+    * Fix a couple of PEP8 glitches.
 
 2015-05-27  Kenneth Loafman  <kenneth@loafman.com>
 
