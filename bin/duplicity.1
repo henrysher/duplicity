@@ -1617,6 +1617,43 @@ the
 .B from_address_prefix
 will distinguish between different backups.
 
+.SH A NOTE ON MULTI BACKEND
+
+The multi backend allows duplicity to combine the storage available in
+more than one backend store (e.g., you can store across a google drive
+account and a onedrive account to get effectively the combined storage
+available in both).  The URL path specifies a JSON formated config
+file containing a list of the backends it will use. Multibackend then
+round-robins across the given backends.  Each element of the list must
+have a "url" element, and may also contain an optional "description"
+and an optional "env" list of environment variables used to configure
+that backend.
+.PP
+For example:
+.nf
+.RS
+[
+ {
+  "description": "a comment about the backend"
+  "url": "abackend://myuser@domain.com/backup",
+  "env": [
+    {
+     "name" : "MYENV",
+     "value" : "xyz"
+    },
+    {
+     "name" : "FOO",
+     "value" : "bar"
+    }
+   ]
+ },
+ {
+  "url": "file:///path/to/dir"
+ }
+]
+.RE
+.fi
+
 .SH A NOTE ON PAR2 WRAPPER BACKEND
 Par2 Wrapper Backend can be used in combination with all other backends to
 create recovery files. Just add
@@ -1635,6 +1672,62 @@ Use
 to adjust the size (and redundancy) of recovery files in
 .I percent.
 
+.SH A NOTE ON PYDRIVE BACKEND
+The pydrive backend requires Python PyDrive package to be installed on the system. See
+.B REQUIREMENTS
+above.
+
+There are two ways to use PyDrive: with a regular account or with a
+"service account". With a service account, a separate account is
+created, that is only accessible with Google APIs and not a web login.
+With a regular account, you can store backups in your normal Google
+Drive.
+
+To use a service account, go to the Google developers
+console at https://console.developers.google.com. Create a project,
+and make sure Drive API is enabled for the project. Under "APIs and
+auth", click Create New Client ID, then select Service Account with P12
+key.
+
+Download the .p12 key file of the account and convert it to the .pem format:
+.br
+openssl pkcs12 -in XXX.p12  -nodes -nocerts > pydriveprivatekey.pem
+
+The content of .pem file should be passed to
+.BR GOOGLE_DRIVE_ACCOUNT_KEY
+environment variable for authentification.
+
+The email address of the account will be used as part of URL. See
+.B URL FORMAT
+above.
+
+The alternative is to use a regular account. To do this, start as above,
+but when creating a new Client ID, select "Installed application" of
+type "Other". Create a file with the following content, and pass its
+filename in the
+.BR GOOGLE_DRIVE_SETTINGS
+environment variable:
+.PP
+.nf
+.RS
+client_config_backend: settings
+client_config:
+    client_id: <Client ID from developers' console>
+    client_secret: <Client secret from developers' console>
+save_credentials: True
+save_credentials_backend: file
+save_credentials_file: <filename to cache credentials>
+get_refresh_token: True
+.RE
+.fi
+
+In this scenario, the username and host parts of the URL play no role;
+only the path matters. During the first run, you will be prompted to
+visit an URL in your browser to grant access to your drive. Once
+granted, you will receive a verification code to paste back into
+Duplicity. The credentials are then cached in the file references above
+for future use.
+
 .SH A NOTE ON SSH BACKENDS
 The
 .I ssh backends
@@ -1649,10 +1742,10 @@ about the requirements for a server to support
 .IR sftp " or"
 .I scp/ssh
 access.
-To make it even more confusing the user can choose between two ssh backends via
-.BR --ssh-backend " option."
+To make it even more confusing the user can choose between several ssh backends via a scheme prefix:
+paramiko+ (default), pexpect+, lftp+... . 
 .br
-Both support
+paramiko & pexpect support
 .BR --use-scp ,
 .BR --ssh-askpass " and"
 .BR --ssh-options "."
@@ -1662,7 +1755,7 @@ backend allows to define
 .BR --scp-command " and"
 .BR --sftp-command .
 .PP
-.BR "SSH paramiko backend " "(selected by default)"
+.BR "SSH paramiko backend " "(default)"
 is a complete reimplementation of ssh protocols natively in python. Advantages
 are speed and maintainability. Minor disadvantage is that extra packages are
 needed as listed in
@@ -1688,6 +1781,10 @@ for all four supported
 operations, unless the
 .I --use-scp
 option is used to revert to old behavior.
+.PP
+.B SSH lftp backend
+is simply there because lftp can interact with the ssh cmd line binaries.
+It is meant as a last resort in case the above options fail for some reason.
 .PP
 .B Why use sftp instead of scp?
 The change to sftp was made in order to allow the remote system to chroot the backup,
@@ -1752,99 +1849,6 @@ variables can be used instead:
 If
 .B SWIFT_AUTHVERSION
 is unspecified, it will default to version 1.
-
-.SH A NOTE ON PYDRIVE BACKEND
-The pydrive backend requires Python PyDrive package to be installed on the system. See
-.B REQUIREMENTS
-above.
-
-There are two ways to use PyDrive: with a regular account or with a
-"service account". With a service account, a separate account is
-created, that is only accessible with Google APIs and not a web login.
-With a regular account, you can store backups in your normal Google
-Drive.
-
-To use a service account, go to the Google developers
-console at https://console.developers.google.com. Create a project,
-and make sure Drive API is enabled for the project. Under "APIs and
-auth", click Create New Client ID, then select Service Account with P12
-key.
-
-Download the .p12 key file of the account and convert it to the .pem format:
-.br
-openssl pkcs12 -in XXX.p12  -nodes -nocerts > pydriveprivatekey.pem
-
-The content of .pem file should be passed to
-.BR GOOGLE_DRIVE_ACCOUNT_KEY
-environment variable for authentification.
-
-The email address of the account will be used as part of URL. See
-.B URL FORMAT
-above.
-
-The alternative is to use a regular account. To do this, start as above,
-but when creating a new Client ID, select "Installed application" of
-type "Other". Create a file with the following content, and pass its
-filename in the
-.BR GOOGLE_DRIVE_SETTINGS
-environment variable:
-.PP
-.nf
-.RS
-client_config_backend: settings
-client_config:
-    client_id: <Client ID from developers' console>
-    client_secret: <Client secret from developers' console>
-save_credentials: True
-save_credentials_backend: file
-save_credentials_file: <filename to cache credentials>
-get_refresh_token: True
-.RE
-.fi
-
-In this scenario, the username and host parts of the URL play no role;
-only the path matters. During the first run, you will be prompted to
-visit an URL in your browser to grant access to your drive. Once
-granted, you will receive a verification code to paste back into
-Duplicity. The credentials are then cached in the file references above
-for future use.
-
-.SH A NOTE ON MULTI BACKEND
-
-The multi backend allows duplicity to combine the storage available in
-more than one backend store (e.g., you can store across a google drive
-account and a onedrive account to get effectively the combined storage
-available in both).  The URL path specifies a JSON formated config
-file containing a list of the backends it will use. Multibackend then
-round-robins across the given backends.  Each element of the list must
-have a "url" element, and may also contain an optional "description"
-and an optional "env" list of environment variables used to configure
-that backend.
-.PP
-For example:
-.nf
-.RS
-[
- {
-  "description": "a comment about the backend"
-  "url": "abackend://myuser@domain.com/backup",
-  "env": [
-    {
-     "name" : "MYENV",
-     "value" : "xyz"
-    },
-    {
-     "name" : "FOO",
-     "value" : "bar"
-    }
-   ]
- },
- {
-  "url": "file:///path/to/dir"
- }
-]
-.RE
-.fi
 
 .SH A NOTE ON SYMMETRIC ENCRYPTION AND SIGNING
 Signing and symmetrically encrypt at the same time with the gpg binary on the
