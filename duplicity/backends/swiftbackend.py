@@ -110,7 +110,7 @@ class SwiftBackend(duplicity.backend.Backend):
                 f.write(chunk)
 
     def _list(self):
-        headers, objs = self.conn.get_container(self.container)
+        headers, objs = self.conn.get_container(self.container, full_listing=True)
         return [o['name'] for o in objs]
 
     def _delete(self, filename):
