@@ -108,4 +108,9 @@ class PyDriveBackend(duplicity.backend.Backend):
         return {'size': size}
 
 duplicity.backend.register_backend('pydrive', PyDriveBackend)
-duplicity.backend.uses_netloc.extend(['pydrive'])
+""" pydrive is an alternate way to access gdocs """
+duplicity.backend.register_backend('pydrive+gdocs', PyDriveBackend)
+""" register pydrive as the default way to access gdocs """
+duplicity.backend.register_backend('gdocs', PyDriveBackend)
+
+duplicity.backend.uses_netloc.extend(['pydrive','pydrive+gdocs','gdocs'])

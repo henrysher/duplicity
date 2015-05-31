@@ -1037,13 +1037,16 @@ fish://user[:password]@other.host[:port]/[relative|/absolute]_path
 ftp[s]://user[:password]@other.host[:port]/some_dir
 .PP
 .B NOTE:
-use lftp+, ncftp+ prefixes to enforce a specific backend, e.g. ncftp+ftp://...
+use lftp+, ncftp+ prefixes to enforce a specific backend, default is lftp+ftp://...
 .RE
 .PP
 .B "Google Docs"
 .PP
 .RS
 gdocs://user[:password]@other.host/some_dir
+.PP
+.B NOTE:
+use pydrive+, gdata+ prefixes to enforce a specific backend, default is pydrive+gdocs://...
 .RE
 .PP
 .B "Google Cloud Storage"
@@ -1957,9 +1960,12 @@ Some backends also require additional components (probably available as packages
 .B python-urllib3
 - https://github.com/shazow/urllib3
 .TP
-.BR "gdocs backend" " (Google Docs)"
+.BR "gdocs gdata backend" " (legacy Google Docs backend)"
 .B Google Data APIs Python Client Library
 - http://code.google.com/p/gdata-python-client/
+.TP
+.BR "gdocs pydrive backend" "(default)"
+see pydrive backend
 .TP
 .BR "gio backend" " (Gnome VFS API)"
 .B PyGObject
@@ -1976,6 +1982,17 @@ Some backends also require additional components (probably available as packages
 .B Python library for mega API
 - https://github.com/ckornacker/mega.py, ubuntu ppa - ppa:ckornacker/backup
 .TP
+.BR "multi backend"
+.B Multi -- store to more than one backend
+.br
+(also see
+.BR "A NOTE ON MULTI BACKEND"
+) below.
+.TP
+.BR "ncftp backend" " (ftp, select via ncftp+ftp://)"
+.B NcFTP
+- http://www.ncftp.com/
+.TP
 .BR "OneDrive backend" " (Microsoft OneDrive)"
 .B python-requests
 - http://python-requests.org
@@ -1983,24 +2000,23 @@ Some backends also require additional components (probably available as packages
 .B python-requests-oauthlib
 - https://github.com/requests/requests-oauthlib
 .TP
-.BR "ncftp backend" " (ftp, select via ncftp+ftp://)"
-.B NcFTP
-- http://www.ncftp.com/
-.TP
 .B "Par2 Wrapper Backend"
 .B par2cmdline
 - http://parchive.sourceforge.net/
 .TP
+.BR "pydrive backend"
+.B PyDrive -- a wrapper library of google-api-python-client
+- https://pypi.python.org/pypi/PyDrive
+.br
+(also see
+.BR "A NOTE ON PYDRIVE BACKEND"
+) below.
+.TP
 .B "rsync backend"
 .B rsync client binary
 - http://rsync.samba.org/
-.PP
-There are two
-.B ssh backends
-for scp/sftp/ssh access (also see
-.BR "A NOTE ON SSH BACKENDS" ).
 .TP
-.BR "ssh paramiko backend" " (enabled by default)"
+.BR "ssh paramiko backend" " (default)"
 .B paramiko
 (SSH2 for python)
 - http://pypi.python.org/pypi/paramiko (downloads); http://github.com/paramiko/paramiko (project page)
@@ -2030,22 +2046,6 @@ for ssl certificate verification of HTTPS connections
 .br
 (also see
 .BR "A NOTE ON SSL CERTIFICATE VERIFICATION" ).
-.TP
-.BR "pydrive backend"
-.B PyDrive -- a wrapper library of google-api-python-client
-- https://pypi.python.org/pypi/PyDrive
-.br
-(also see
-.BR "A NOTE ON PYDRIVE BACKEND"
-) below.
-.TP
-.BR "multi backend"
-.B Multi -- store to more than one backend
-.br
-(also see
-.BR "A NOTE ON MULTI BACKEND"
-) below.
-.br
 
 .SH AUTHOR
 .TP
