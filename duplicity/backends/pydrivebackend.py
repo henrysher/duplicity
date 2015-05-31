@@ -39,14 +39,17 @@ class PyDriveBackend(duplicity.backend.Backend):
             raise BackendException('PyDrive backend requires PyDrive installation'
                                    'Please read the manpage to fix.')
 
-        if 'GOOGLE_DRIVE_ACCOUNT_KEY' not in os.environ:
-            raise BackendException('GOOGLE_DRIVE_ACCOUNT_KEY environment variable not set. Please read the manpage to fix.')
-        account_key = os.environ['GOOGLE_DRIVE_ACCOUNT_KEY']
-
-        credentials = SignedJwtAssertionCredentials(parsed_url.username + '@' + parsed_url.hostname, account_key, scope='https://www.googleapis.com/auth/drive')
-        credentials.authorize(httplib2.Http())
-        gauth = GoogleAuth()
-        gauth.credentials = credentials
+        if 'GOOGLE_DRIVE_ACCOUNT_KEY' in os.environ:
+            account_key = os.environ['GOOGLE_DRIVE_ACCOUNT_KEY']
+            credentials = SignedJwtAssertionCredentials(parsed_url.username + '@' + parsed_url.hostname, account_key, scope='https://www.googleapis.com/auth/drive')
+            credentials.authorize(httplib2.Http())
+            gauth = GoogleAuth()
+            gauth.credentials = credentials
+        elif 'GOOGLE_DRIVE_SETTINGS' in os.environ:
+            gauth = GoogleAuth(settings_file=os.environ['GOOGLE_DRIVE_SETTINGS'])
+            gauth.CommandLineAuth()
+        else:
+            raise BackendException('GOOGLE_DRIVE_ACCOUNT_KEY or GOOGLE_DRIVE_SETTINGS environment variable not set. Please read the manpage to fix.')
         self.drive = GoogleDrive(gauth)
 
         # Dirty way to find root folder id

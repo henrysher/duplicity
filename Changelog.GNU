@@ -1,3 +1,14 @@
+2015-05-31  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~bmerry/duplicity/pydrive-regular
+      - This implements the proposal made by somebody else
+        (http://lists.gnu.org/archive/html/duplicity-talk/2015-02/msg00037.html)
+        to allow the pydrive backend to work with a normal drive account instead
+        of a service account. It seems to be working for me: I was able to migrate
+        seamlessly from the gdocs backend. It's set up so that a service account
+        can still be used, depending on which environment variable is set.
+        The man page is updated to describe how to use the new functionality.
+
 2015-05-27  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~noizyland/duplicity/fix-progress
