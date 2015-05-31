@@ -20,6 +20,11 @@ New in v0.7.04 (2015/??/??)
 * Merged in lp:~ed.so/duplicity/gdocs.pydrive
   - make pydrive new gdocs default backend
   - keep gdata backend as gdata+gdocs://
+* Merged in lp:~raymii/duplicity/fix-swiftbackend-max-10000-files-in-list
+  - Swiftclient by default returns at max 10000 files. By adding 
+    full_listing=True we make sure all objects are returned. 
+    Ref: https://lists.nongnu.org/archive/html/duplicity-talk/2015-05/msg00060.html 
+    and http://docs.openstack.org/developer/python-swiftclient/swiftclient.html#swiftclient.client.get_container
 
 
 New in v0.7.03 (2015/05/11)
