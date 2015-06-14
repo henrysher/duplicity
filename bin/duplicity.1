@@ -526,7 +526,7 @@ Other languages may require a different mailbox than the default.
 .BI "--gpg-options " options
 Allows you to pass options to gpg encryption.  The
 .I options
-list should be of the form "opt1=parm1 opt2=parm2" where the string is
+list should be of the form "--opt1 --opt2=parm" where the string is
 quoted and the only spaces allowed are between options.
 
 .TP
@@ -1743,7 +1743,7 @@ about the requirements for a server to support
 .I scp/ssh
 access.
 To make it even more confusing the user can choose between several ssh backends via a scheme prefix:
-paramiko+ (default), pexpect+, lftp+... . 
+paramiko+ (default), pexpect+, lftp+... .
 .br
 paramiko & pexpect support
 .BR --use-scp ,

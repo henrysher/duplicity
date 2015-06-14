@@ -26,6 +26,8 @@ New in v0.7.04 (2015/??/??)
     Ref: https://lists.nongnu.org/archive/html/duplicity-talk/2015-05/msg00060.html
     and http://docs.openstack.org/developer/python-swiftclient/swiftclient.html#swiftclient.client.get_container
 * Fix a couple of PEP8 glitches.
+* Fixed bug 791794 - description of --gpg-options is misleading, Simply
+  needed to add the '--' before the options as in "--opt1 --opt2=parm".
 
 
 New in v0.7.03 (2015/05/11)

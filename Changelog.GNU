@@ -1,3 +1,8 @@
+2015-06-14  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug 791794 - description of --gpg-options is misleading, Simply
+      needed to add the '--' before the options as in "--opt1 --opt2=parm".
+
 2015-05-31  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~bmerry/duplicity/pydrive-regular
