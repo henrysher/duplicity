@@ -30,6 +30,8 @@ New in v0.7.04 (2015/??/??)
   needed to add the '--' before the options as in "--opt1 --opt2=parm".
 * Fixed bug 1465335 - pydrive still use files in trash can - with patch
   from Kuang-che Wu to ignore trashed files.
+* Fixed bug 1452263 - par2 option not working on small processors - with patch
+  from Kuang-che Wu to ignore default 30 second timeout.
 
 
 New in v0.7.03 (2015/05/11)

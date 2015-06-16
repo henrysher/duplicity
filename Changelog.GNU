@@ -2,6 +2,8 @@
 
     * Fixed bug 1465335 - pydrive still use files in trash can - with patch
       from Kuang-che Wu to ignore trashed files.
+    * Fixed bug 1452263 - par2 option not working on small processors - with patch
+      from Kuang-che Wu to ignore default 30 second timeout.
 
 2015-06-14  Kenneth Loafman  <kenneth@loafman.com>
 
