@@ -1,3 +1,8 @@
+2015-06-16  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug 1465335 - pydrive still use files in trash can - with patch
+      from Kuang-che Wu to ignore trashed files.
+
 2015-06-14  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug 791794 - description of --gpg-options is misleading, Simply

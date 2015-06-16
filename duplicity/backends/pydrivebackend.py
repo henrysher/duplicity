@@ -53,7 +53,7 @@ class PyDriveBackend(duplicity.backend.Backend):
         self.drive = GoogleDrive(gauth)
 
         # Dirty way to find root folder id
-        file_list = self.drive.ListFile({'q': "'Root' in parents"}).GetList()
+        file_list = self.drive.ListFile({'q': "'Root' in parents and trashed=false"}).GetList()
         if file_list:
             parent_folder_id = file_list[0]['parents'][0]['id']
         else:
@@ -66,7 +66,7 @@ class PyDriveBackend(duplicity.backend.Backend):
         for folder_name in folder_names:
             if not folder_name:
                 continue
-            file_list = self.drive.ListFile({'q': "'" + parent_folder_id + "' in parents"}).GetList()
+            file_list = self.drive.ListFile({'q': "'" + parent_folder_id + "' in parents and trashed=false"}).GetList()
             folder = next((item for item in file_list if item['title'] == folder_name and item['mimeType'] == 'application/vnd.google-apps.folder'), None)
             if folder is None:
                 folder = self.drive.CreateFile({'title': folder_name, 'mimeType': "application/vnd.google-apps.folder", 'parents': [{'id': parent_folder_id}]})
@@ -75,7 +75,7 @@ class PyDriveBackend(duplicity.backend.Backend):
         self.folder = parent_folder_id
 
     def FilesList(self):
-        return self.drive.ListFile({'q': "'" + self.folder + "' in parents"}).GetList()
+        return self.drive.ListFile({'q': "'" + self.folder + "' in parents and trashed=false"}).GetList()
 
     def id_by_name(self, filename):
         try:

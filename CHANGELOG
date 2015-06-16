@@ -28,6 +28,8 @@ New in v0.7.04 (2015/??/??)
 * Fix a couple of PEP8 glitches.
 * Fixed bug 791794 - description of --gpg-options is misleading, Simply
   needed to add the '--' before the options as in "--opt1 --opt2=parm".
+* Fixed bug 1465335 - pydrive still use files in trash can - with patch
+  from Kuang-che Wu to ignore trashed files.
 
 
 New in v0.7.03 (2015/05/11)
