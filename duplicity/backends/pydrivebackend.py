@@ -100,6 +100,15 @@ class PyDriveBackend(duplicity.backend.Backend):
         drive_file = self.drive.CreateFile({'id': file_id})
         drive_file.auth.service.files().delete(fileId=drive_file['id']).execute()
 
+    def _delete_list(self, filename_list):
+        to_remove = set(filename_list)
+        for item in self.FilesList():
+            if item['title'] not in to_remove:
+                continue
+            file_id = item['id']
+            drive_file = self.drive.CreateFile({'id': file_id})
+            drive_file.auth.service.files().delete(fileId=drive_file['id']).execute()
+
     def _query(self, filename):
         try:
             size = int((item for item in self.FilesList() if item['title'] == filename).next()['fileSize'])

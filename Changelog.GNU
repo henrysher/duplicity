@@ -1,3 +1,8 @@
+2015-06-17  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug 1466160 - pydrive backend is slow to remove old backup set - with
+      patch from Kuang-che Wu to implement _delete_list().
+
 2015-06-16  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug 1465335 - pydrive still use files in trash can - with patch
