@@ -160,7 +160,7 @@ class PyDriveBackend(duplicity.backend.Backend):
             size = int(drive_file['fileSize'])
         return {'size': size}
 
-    def _error_code(self, error):
+    def _error_code(self, operation, error):
         from pydrive.files import ApiRequestError, FileNotUploadedError
         if isinstance(error, FileNotUploadedError):
             return log.ErrorCode.backend_not_found
