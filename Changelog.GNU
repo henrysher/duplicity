@@ -1,3 +1,8 @@
+2015-06-20  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug 1466582 - reduce unnecessary syscall with --exclude-if-present - with
+      patch from Kuang-che Wu to make sure resulting path is a directory.
+
 2015-06-17  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug 1466160 - pydrive backend is slow to remove old backup set - with
