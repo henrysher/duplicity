@@ -396,6 +396,8 @@ def parse_cmdline_options(arglist):
                       callback=lambda o, s, v, p: (setattr(p.values, o.dest, True),
                                                    old_fn_deprecation(s)))
 
+    parser.add_option("--gpg-binary", type="file", metavar=_("path"))
+
     parser.add_option("--gpg-options", action="extend", metavar=_("options"))
 
     # TRANSL: Used in usage help to represent an ID for a hidden GnuPG key. Example:
