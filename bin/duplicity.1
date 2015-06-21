@@ -523,6 +523,13 @@ Allows you to specify a different mailbox.  The default is
 Other languages may require a different mailbox than the default.
 
 .TP
+.BI "--gpg-binary " file_path
+Allows you to force duplicity to use 
+.I file_path
+as gpg command line binary. Can be an absolute or relative file path or a file name.
+Default value is 'gpg'. The binary will be localized via the PATH environment variable.
+
+.TP
 .BI "--gpg-options " options
 Allows you to pass options to gpg encryption.  The
 .I options

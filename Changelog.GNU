@@ -1,3 +1,9 @@
+2015-06-21  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~ed.so/duplicity/gpg.binary
+      - new parameter --gpg-binary allows user to point to a different gpg binary,
+        not necessarily in path
+
 2015-06-20  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug 1466582 - reduce unnecessary syscall with --exclude-if-present - with

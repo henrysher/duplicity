@@ -36,6 +36,9 @@ New in v0.7.04 (2015/??/??)
   patch from Kuang-che Wu to implement _delete_list().
 * Fixed bug 1466582 - reduce unnecessary syscall with --exclude-if-present - with
   patch from Kuang-che Wu to make sure resulting path is a directory.
+* Merged in lp:~ed.so/duplicity/gpg.binary
+  - new parameter --gpg-binary allows user to point to a different gpg binary,
+    not necessarily in path
 
 
 New in v0.7.03 (2015/05/11)
