@@ -389,10 +389,9 @@ class TestExcludeFilelistTest(IncludeExcludeFunctionalTest):
         restored = self.directory_tree_to_list_of_lists(restore_dir)
         self.assertEqual(restored, self.expected_restored_tree_with_trailing_space)
 
-    @unittest.expectedFailure
     def test_exclude_filelist_progress_option(self):
         """Test that exclude filelist is unaffected by the --progress option"""
-        # ToDo - currently fails. Bug #1264744 (https://bugs.launchpad.net/duplicity/+bug/1264744)
+        # Regression test for Bug #1264744 (https://bugs.launchpad.net/duplicity/+bug/1264744)
         # Create a filelist identical to that used in test_exclude_filelist
         with open('testfiles/exclude.txt', 'w') as f:
             f.write('+ testfiles/select2/3/3sub3/3sub3sub2/3sub3sub2_file.txt\n'
