@@ -1,5 +1,5 @@
-bin/duplicity.py
-bin/rdiffdir.py
+bin/duplicity
+bin/rdiffdir
 duplicity/cached_ops.py
 duplicity/statistics.py
 duplicity/selection.py
