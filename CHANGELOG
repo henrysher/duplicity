@@ -39,6 +39,10 @@ New in v0.7.04 (2015/??/??)
 * Merged in lp:~ed.so/duplicity/gpg.binary
   - new parameter --gpg-binary allows user to point to a different gpg binary,
     not necessarily in path
+* Merged in lp:~aaron-whitehouse/duplicity/fix_POTFILES.in_and_run-tests
+  - Fixed two filename references in po/POTFILES.in, a mistake which crept in in
+    rev 1093 and caused testing/run-tests to fail with "IndexError: list index
+    out of range".
 
 
 New in v0.7.03 (2015/05/11)

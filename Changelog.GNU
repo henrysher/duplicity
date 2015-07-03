@@ -1,3 +1,10 @@
+2015-07-03  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/fix_POTFILES.in_and_run-tests
+      - Fixed two filename references in po/POTFILES.in, a mistake which crept in in
+        rev 1093 and caused testing/run-tests to fail with "IndexError: list index
+        out of range".
+
 2015-06-21  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~ed.so/duplicity/gpg.binary
