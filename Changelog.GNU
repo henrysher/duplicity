@@ -4,6 +4,10 @@
       - Fixed two filename references in po/POTFILES.in, a mistake which crept in in
         rev 1093 and caused testing/run-tests to fail with "IndexError: list index
         out of range".
+    * Merged in lp:~aaron-whitehouse/duplicity/reactivate_progress_test
+      - Re-enable the test of the --progress option (test_exclude_filelist_progress_option),
+        which was marked as an expected failure. The issue causing this test to fail was
+        fixed in revision 1095 and the test now passes.
 
 2015-06-21  Kenneth Loafman  <kenneth@loafman.com>
 
