@@ -31,6 +31,8 @@ class PyraxBackend(duplicity.backend.Backend):
     Backend for Rackspace's CloudFiles using Pyrax
     """
     def __init__(self, parsed_url):
+        duplicity.backend.Backend.__init__(self, parsed_url)
+
         try:
             import pyrax
         except ImportError:

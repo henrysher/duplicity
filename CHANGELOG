@@ -47,6 +47,8 @@ New in v0.7.04 (2015/??/??)
   - Re-enable the test of the --progress option (test_exclude_filelist_progress_option),
     which was marked as an expected failure. The issue causing this test to fail was
     fixed in revision 1095 and the test now passes.
+* Fixed bug 1471348 Multi back-end doesn't work with hubiC
+   - added init of appropriate superclass in both cases.
 
 
 New in v0.7.03 (2015/05/11)

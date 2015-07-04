@@ -32,6 +32,8 @@ class HubicBackend(PyraxBackend):
     Backend for Hubic using Pyrax
     """
     def __init__(self, parsed_url):
+        PyraxBackend.__init__(self, parsed_url)
+
         try:
             import pyrax
         except ImportError:

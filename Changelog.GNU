@@ -1,3 +1,8 @@
+2015-07-04  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug 1471348 Multi back-end doesn't work with hubiC
+      - added init of superclass in both cases.
+
 2015-07-03  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~aaron-whitehouse/duplicity/fix_POTFILES.in_and_run-tests
