@@ -32,7 +32,7 @@ class HubicBackend(PyraxBackend):
     Backend for Hubic using Pyrax
     """
     def __init__(self, parsed_url):
-        PyraxBackend.__init__(self, parsed_url)
+        duplicity.backend.Backend.__init__(self, parsed_url)
 
         try:
             import pyrax

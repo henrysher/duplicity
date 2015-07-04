@@ -2,6 +2,8 @@
 
     * Fixed bug 1471348 Multi back-end doesn't work with hubiC
       - added init of superclass in both cases.
+    * Fixed bug 1471348 Multi back-end doesn't work with hubiC (again)
+       - hubiC should reach up to duplicity.backend.__init__
 
 2015-07-03  Kenneth Loafman  <kenneth@loafman.com>
 
