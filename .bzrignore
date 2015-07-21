@@ -10,3 +10,5 @@ duplicity.egg-info
 duplicity.spec
 random_seed
 testfiles
+./.eggs
+./.idea

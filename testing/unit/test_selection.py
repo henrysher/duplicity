@@ -837,6 +837,30 @@ class TestGlobGetNormalSf(UnitTestCase):
         self.assertEqual(self.exclude_glob_tester("/testfiles/select2/3", "/testfiles/*2/3"), 0)
         self.assertEqual(self.include_glob_tester("/testfiles/select2/1", "**/select2/1"), 1)
 
+    def test_glob_get_normal_sf_negative_square_brackets_specified(self):
+        """Test negative square bracket (specified) [!a,b,c] replacement in get_normal_sf."""
+        # As in a normal shell, [!...] expands to any single character but those specified
+        self.assertEqual(self.include_glob_tester("/test/hello1.txt", "/test/hello[!2,3,4].txt"), 1)
+        self.assertEqual(self.include_glob_tester("/test/hello.txt", "/t[!w,f,h]st/hello.txt"), 1)
+        self.assertEqual(self.exclude_glob_tester("/long/example/path/hello.txt",
+                                                  "/lon[!w,e,f]/e[!p]ample/path/hello.txt"), 0)
+        self.assertEqual(self.include_glob_tester("/test/hello1.txt", "/test/hello[!2,1,3,4].txt"), None)
+        self.assertEqual(self.include_glob_tester("/test/hello.txt", "/t[!e,f,h]st/hello.txt"), None)
+        self.assertEqual(self.exclude_glob_tester("/long/example/path/hello.txt",
+                                                  "/lon[!w,e,g,f]/e[!p,x]ample/path/hello.txt"), None)
+
+    def test_glob_get_normal_sf_negative_square_brackets_range(self):
+        """Test negative square bracket (range) [!a,b,c] replacement in get_normal_sf."""
+        # As in a normal shell, [!1-5] or [!a-f] expands to any single character not in the range specified
+        self.assertEqual(self.include_glob_tester("/test/hello1.txt", "/test/hello[!2-4].txt"), 1)
+        self.assertEqual(self.include_glob_tester("/test/hello.txt", "/t[!f-h]st/hello.txt"), 1)
+        self.assertEqual(self.exclude_glob_tester("/long/example/path/hello.txt",
+                                                  "/lon[!w,e,f]/e[!p-s]ample/path/hello.txt"), 0)
+        self.assertEqual(self.include_glob_tester("/test/hello1.txt", "/test/hello[!1-4].txt"), None)
+        self.assertEqual(self.include_glob_tester("/test/hello.txt", "/t[!b-h]st/hello.txt"), None)
+        self.assertEqual(self.exclude_glob_tester("/long/example/path/hello.txt",
+                                                  "/lon[!f-p]/e[!p]ample/path/hello.txt"), None)
+
     def test_glob_get_normal_sf_2_ignorecase(self):
         """Test same behaviour as the functional test test_globbing_replacement, ignorecase tests."""
         self.assertEqual(self.include_glob_tester("testfiles/select2/2/2sub1",
