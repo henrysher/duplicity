@@ -541,10 +541,9 @@ class ParseArgsTest(UnitTestCase):
                         "- testfiles/select/1/\n"
                         "- **"])
 
-    @unittest.expectedFailure
     def test_include_filelist_trailing_slashes_and_single_asterisks(self):
         """Filelist glob test similar to globbing filelist, but with trailing slashes and single asterisks"""
-        # Todo: Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
+        # Regression test for Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
         self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
@@ -553,10 +552,9 @@ class ParseArgsTest(UnitTestCase):
                         "- testfiles/*/1/\n"
                         "- **"])
 
-    @unittest.expectedFailure
     def test_include_filelist_trailing_slashes_and_double_asterisks(self):
         """Filelist glob test similar to globbing filelist, but with trailing slashes and double asterisks"""
-        # Todo: Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
+        # Regression test for Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
         self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
@@ -564,7 +562,6 @@ class ParseArgsTest(UnitTestCase):
                         "testfiles/select/1/1/\n"
                         "- **t/1/\n"
                         "- **"])
-
 
     def test_filelist_null_separator(self):
         """test_filelist, but with null_separator set"""
@@ -814,8 +811,6 @@ testfiles/select**/2
 
     def test_globbing_replacement(self):
         """Test functional test test_globbing_replacement as a unittest"""
-        # ToDo: Fails. Problem is that under existing approach an exclude trumped a scan. Under new approach, an
-        # ToDo: earlier scan holds things for
         self.root = Path("testfiles/select2")
         self.ParseTest([("--include", "testfiles/select2/**/3sub3sub2/3sub3su?2_file.txt"),
                         ("--exclude", "testfiles/select2/*/3s*1"),

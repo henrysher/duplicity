@@ -340,7 +340,7 @@ probably isn't what you meant.""") %
 
         include = include_default
         if line[:2] == "+ ":
-            # Check for "+ "/"- " syntax
+            # Check for "+ " or "- " syntax
             include = 1
             line = line[2:]
         elif line[:2] == "- ":
@@ -521,6 +521,10 @@ probably isn't what you meant.""") %
 
         """
         # Internal. Used by glob_get_sf and unit tests.
+        if glob_str != "/" and glob_str[-1] == "/":
+            # Remove trailing / from directory name (unless that is the entire string)
+            glob_str = glob_str[:-1]
+
         if glob_str.lower().startswith("ignorecase:"):
             re_comp = lambda r: re.compile(r, re.I | re.S)
             glob_str = glob_str[len("ignorecase:"):]

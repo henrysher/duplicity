@@ -24,6 +24,7 @@ import unittest
 
 from . import FunctionalTestCase
 
+
 class IncludeExcludeFunctionalTest(FunctionalTestCase):
     """
     This contains methods used in the tests below for testing the include, exclude and various filelist features.
@@ -423,6 +424,7 @@ class TestExcludeFilelistTest(IncludeExcludeFunctionalTest):
         # The restored files should match those restored in test_exclude_filelist
         self.assertEqual(restored, self.expected_restored_tree)
 
+
 class TestIncludeFilelistTest(IncludeExcludeFunctionalTest):
     """
     Test --include-filelist using duplicity binary.
@@ -790,10 +792,9 @@ class TestTrailingSlash(IncludeExcludeFunctionalTest):
         self.backup("full", "testfiles/select/1", options=["--exclude-filelist=testfiles/filelist.txt"])
         self.restore_and_check()
 
-    @unittest.expectedFailure
     def test_exclude_filelist_trailing_slashes_single_wildcards_excludes(self):
         """test_exclude_filelist_trailing_slashes with single wildcards in excludes."""
-        # Todo: Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
+        # Regression test for Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
         with open("testfiles/filelist.txt", 'w') as f:
             f.write("+ testfiles/select/1/2/1/\n"
                     "- */select/1/2/\n"
@@ -802,10 +803,9 @@ class TestTrailingSlash(IncludeExcludeFunctionalTest):
         self.backup("full", "testfiles/select/1", options=["--exclude-filelist=testfiles/filelist.txt"])
         self.restore_and_check()
 
-    @unittest.expectedFailure
     def test_exclude_filelist_trailing_slashes_double_wildcards_excludes(self):
         """test_exclude_filelist_trailing_slashes with double wildcards in excludes."""
-        # Todo: Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
+        # Regression test for Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
         with open("testfiles/filelist.txt", 'w') as f:
             f.write("+ testfiles/select/1/2/1/\n"
                     "- **/1/2/\n"
@@ -814,10 +814,9 @@ class TestTrailingSlash(IncludeExcludeFunctionalTest):
         self.backup("full", "testfiles/select/1", options=["--exclude-filelist=testfiles/filelist.txt"])
         self.restore_and_check()
 
-    @unittest.expectedFailure
     def test_exclude_filelist_trailing_slashes_double_wildcards_excludes_2(self):
         """second test_exclude_filelist_trailing_slashes with double wildcards in excludes."""
-        # Todo: Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482) and likely
+        # Regression test for Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482) and
         # Regression test for Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         with open("testfiles/filelist.txt", 'w') as f:
             f.write("+ **/1/2/1/\n"
@@ -827,10 +826,9 @@ class TestTrailingSlash(IncludeExcludeFunctionalTest):
         self.backup("full", "testfiles/select/1", options=["--exclude-filelist=testfiles/filelist.txt"])
         self.restore_and_check()
 
-    @unittest.expectedFailure
     def test_exclude_filelist_trailing_slashes_wildcards(self):
         """test_commandline_asterisks_single_excludes_only with trailing slashes."""
-         # Todo: Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
+        # Regression test for Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
         self.backup("full", "testfiles/select/1",
                     options=["--include", "testfiles/select/1/2/1/",
                              "--exclude", "testfiles/*/1/2/",
@@ -863,7 +861,7 @@ class TestGlobbingReplacement(IncludeExcludeFunctionalTest):
                              # ? added
                              "--exclude", "testfiles/select2/1/1sub3/1s[w,u,p,q]b3sub2",  # Note [] added
                              "--exclude", "testfiles/select2/1/1sub[1-4]/1sub3sub1",  # Note [range] added
-                             "--include", "testfiles/select2/*/1sub2/1s[w,u,p,q]b2sub1",  # Note * and [] added ToDo
+                             "--include", "testfiles/select2/*/1sub2/1s[w,u,p,q]b2sub1",  # Note * and [] added
                              "--exclude", "testfiles/select2/1/1sub1/1sub1sub3/1su?1sub3_file.txt",  # Note ? added
                              "--exclude", "testfiles/select2/1/1*1/1sub1sub2",  # Note * added
                              "--exclude", "testfiles/select2/1/1sub2",
