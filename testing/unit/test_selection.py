@@ -203,6 +203,15 @@ class ParseArgsTest(UnitTestCase):
         super(ParseArgsTest, self).setUp()
         self.unpack_testfiles()
         self.root = None
+        self.expected_restored_tree = [(), ('1',), ('1', '1sub1'), ('1', '1sub1', '1sub1sub1'),
+                                       ('1', '1sub1', '1sub1sub1', '1sub1sub1_file.txt'), ('1', '1sub1', '1sub1sub3'),
+                                       ('1', '1sub2'), ('1', '1sub2', '1sub2sub1'), ('1', '1sub3'),
+                                       ('1', '1sub3', '1sub3sub3'), ('1.py',), ('2',), ('2', '2sub1'),
+                                       ('2', '2sub1', '2sub1sub1'), ('2', '2sub1', '2sub1sub1', '2sub1sub1_file.txt'),
+                                       ('3',), ('3', '3sub2'), ('3', '3sub2', '3sub2sub1'),
+                                       ('3', '3sub2', '3sub2sub2'), ('3', '3sub2', '3sub2sub3'), ('3', '3sub3'),
+                                       ('3', '3sub3', '3sub3sub1'), ('3', '3sub3', '3sub3sub2'),
+                                       ('3', '3sub3', '3sub3sub2', '3sub3sub2_file.txt'), ('3', '3sub3', '3sub3sub3')]
 
     def ParseTest(self, tuplelist, indicies, filelists=[]):
         """No error if running select on tuple goes over indicies"""
@@ -211,8 +220,9 @@ class ParseArgsTest(UnitTestCase):
         self.Select = Select(self.root)
         self.Select.ParseArgs(tuplelist, self.remake_filelists(filelists))
         self.Select.set_iter()
-        assert Iter.equal(Iter.map(lambda path: path.index, self.Select),
-                          iter(indicies), verbose=1)
+        results_as_list = list(Iter.map(lambda path: path.index, self.Select))
+        # print(results_as_list)
+        self.assertEqual(indicies, results_as_list)
 
     def remake_filelists(self, filelist):
         """Turn strings in filelist into fileobjs"""
@@ -778,6 +788,62 @@ testfiles/select**/2
                         ("--include", "/home"),
                         ("--exclude", "/")],
                        [(), ("home",)])
+
+    def test_exclude_after_scan(self):
+        """Test select with an exclude after a pattern that would return a scan for that file"""
+        self.root = Path("testfiles/select2/3/")
+        self.ParseTest([("--include", "testfiles/select2/3/**file.txt"),
+                        ("--exclude", "testfiles/select2/3/3sub2"),
+                        ("--include", "testfiles/select2/3/3sub1"),
+                        ("--exclude", "**")],
+                       [(), ('3sub1',), ('3sub1', '3sub1sub1'), ('3sub1', '3sub1sub2'), ('3sub1', '3sub1sub3'),
+                        ('3sub3',), ('3sub3', '3sub3sub2'), ('3sub3', '3sub3sub2', '3sub3sub2_file.txt')])
+
+    def test_include_exclude_basic(self):
+        """Test functional test test_include_exclude_basic as a unittest"""
+        self.root = Path("testfiles/select2")
+        self.ParseTest([("--include", "testfiles/select2/3/3sub3/3sub3sub2/3sub3sub2_file.txt"),
+                        ("--exclude", "testfiles/select2/3/3sub3/3sub3sub2"),
+                        ("--include", "testfiles/select2/3/3sub2/3sub2sub2"),
+                        ("--include", "testfiles/select2/3/3sub3"),
+                        ("--exclude", "testfiles/select2/3/3sub1"),
+                        ("--exclude", "testfiles/select2/2/2sub1/2sub1sub3"),
+                        ("--exclude", "testfiles/select2/2/2sub1/2sub1sub2"),
+                        ("--include", "testfiles/select2/2/2sub1"),
+                        ("--exclude", "testfiles/select2/1/1sub3/1sub3sub2"),
+                        ("--exclude", "testfiles/select2/1/1sub3/1sub3sub1"),
+                        ("--exclude", "testfiles/select2/1/1sub2/1sub2sub3"),
+                        ("--include", "testfiles/select2/1/1sub2/1sub2sub1"),
+                        ("--exclude", "testfiles/select2/1/1sub1/1sub1sub3/1sub1sub3_file.txt"),
+                        ("--exclude", "testfiles/select2/1/1sub1/1sub1sub2"),
+                        ("--exclude", "testfiles/select2/1/1sub2"),
+                        ("--include", "testfiles/select2/1.py"),
+                        ("--include", "testfiles/select2/3"),
+                        ("--include", "testfiles/select2/1"),
+                        ("--exclude", "testfiles/select2/**")],
+                       self.expected_restored_tree)
+
+    def test_globbing_replacement(self):
+        """Test functional test test_globbing_replacement as a unittest"""
+        # ToDo: Fails. Problem is that under existing approach an exclude trumped a scan. Under new approach, an
+        # ToDo: earlier scan holds things for
+        self.root = Path("testfiles/select2")
+        self.ParseTest([("--include", "testfiles/select2/**/3sub3sub2/3sub3su?2_file.txt"),
+                        ("--exclude", "testfiles/select2/*/3s*1"),
+                        ("--exclude", "testfiles/select2/**/2sub1sub3"),
+                        ("--exclude", "ignorecase:testfiles/select2/2/2sub1/2Sub1Sub2"),
+                        ("--include", "ignorecase:testfiles/sel[w,u,e,q]ct2/2/2S?b1"),
+                        ("--exclude", "testfiles/select2/1/1sub3/1s[w,u,p,q]b3sub2"),
+                        ("--exclude", "testfiles/select2/1/1sub[1-4]/1sub3sub1"),
+                        ("--include", "testfiles/select2/1/1sub2/1sub2sub1"),
+                        ("--exclude", "testfiles/select2/1/1sub1/1sub1sub3/1su?1sub3_file.txt"),
+                        ("--exclude", "testfiles/select2/1/1*1/1sub1sub2"),
+                        ("--exclude", "testfiles/select2/1/1sub2"),
+                        ("--include", "testfiles/select[2-4]/*.py"),
+                        ("--include", "testfiles/*2/3"),
+                        ("--include", "**/select2/1"),
+                        ("--exclude", "testfiles/select2/**")],
+                       self.expected_restored_tree)
 
 
 class TestGlobGetNormalSf(UnitTestCase):
