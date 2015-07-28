@@ -424,10 +424,9 @@ class ParseArgsTest(UnitTestCase):
                         "- testfiles/select/1\n"
                         "- **"])
 
-    @unittest.expectedFailure
     def test_include_filelist_asterisk_3(self):
         """Identical to test_filelist, but with the auto-include 'select' replaced with '*'"""
-        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        # Regression test for Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
@@ -436,10 +435,9 @@ class ParseArgsTest(UnitTestCase):
                         "- testfiles/select/1\n"
                         "- **"])
 
-    @unittest.expectedFailure
     def test_include_filelist_asterisk_4(self):
         """Identical to test_filelist, but with a specific include 'select' replaced with '*'"""
-        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        # Regression test for Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
@@ -448,10 +446,9 @@ class ParseArgsTest(UnitTestCase):
                         "- testfiles/select/1\n"
                         "- **"])
 
-    @unittest.expectedFailure
     def test_include_filelist_asterisk_5(self):
         """Identical to test_filelist, but with all 'select's replaced with '*'"""
-        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        # Regression test for Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
@@ -470,10 +467,9 @@ class ParseArgsTest(UnitTestCase):
                         "- */*/1\n"
                         "- **"])
 
-    @unittest.expectedFailure
     def test_include_filelist_asterisk_7(self):
         """Identical to test_filelist, but with numerous included/excluded folders replaced with '*'"""
-        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        # Regression test for Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
@@ -492,10 +488,9 @@ class ParseArgsTest(UnitTestCase):
                         "- testfiles/select/1\n"
                         "- **"])
 
-    @unittest.expectedFailure
     def test_include_filelist_double_asterisk_2(self):
         """Identical to test_filelist, but with the include 'select' replaced with '**'"""
-        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        # Regression test for Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
@@ -514,10 +509,9 @@ class ParseArgsTest(UnitTestCase):
                         "- testfiles/select/1\n"
                         "- **"])
 
-    @unittest.expectedFailure
     def test_include_filelist_double_asterisk_4(self):
         """Identical to test_filelist, but with the include 'testfiles/select' replaced with '**'"""
-        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        # Regression test for Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
@@ -526,10 +520,9 @@ class ParseArgsTest(UnitTestCase):
                         "- testfiles/select/1\n"
                         "- **"])
 
-    @unittest.expectedFailure
     def test_include_filelist_double_asterisk_5(self):
         """Identical to test_filelist, but with all 'testfiles/select's replaced with '**'"""
-        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        # Regression test for Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         self.ParseTest([("--include-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
@@ -609,10 +602,9 @@ class ParseArgsTest(UnitTestCase):
                         "testfiles/select/1\n"
                         "- **"])
 
-    @unittest.expectedFailure
     def test_exclude_filelist_asterisk_3(self):
         """Identical to test_exclude_filelist, but with the include 'select' replaced with '*'"""
-        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        # Regression test for Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         self.ParseTest([("--exclude-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
@@ -631,10 +623,9 @@ class ParseArgsTest(UnitTestCase):
                         "*/*/1\n"
                         "- **"])
 
-    @unittest.expectedFailure
     def test_exclude_filelist_asterisk_5(self):
         """Identical to test_exclude_filelist, but with numerous included/excluded folders replaced with '*'"""
-        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        # Regression test for Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         self.ParseTest([("--exclude-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
@@ -643,21 +634,20 @@ class ParseArgsTest(UnitTestCase):
                         "*/*/1\n"
                         "- **"])
 
-    @unittest.expectedFailure
     def test_exclude_filelist_double_asterisk(self):
         """Identical to test_exclude_filelist, but with all included/excluded folders replaced with '**'"""
-        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        # Regression test for Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         self.ParseTest([("--exclude-filelist", "file")],
                        [(), ('1',), ('1', '1'), ('1', '1', '2'),
                         ('1', '1', '3')],
                        ["**/1/1/1\n"
-                        "+ **/1/1\n"
-                        "**/1\n"
+                        "+ **t/1/1\n"
+                        "**t/1\n"
                         "- **"])
-    @unittest.expectedFailure
+
     def test_exclude_filelist_single_asterisk_at_beginning(self):
         """Exclude filelist testing limited functionality of functional test"""
-        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        # Regression test for Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         self.root = Path("testfiles/select/1")
         self.ParseTest([("--exclude-filelist", "file")],
                        [(), ('2',), ('2', '1')],
@@ -666,7 +656,6 @@ class ParseArgsTest(UnitTestCase):
                         "- testfiles/*/1/1\n"
                         "- testfiles/select/1/3"])
 
-    @unittest.expectedFailure
     def test_commandline_asterisks_double_both(self):
         """Unit test the functional test TestAsterisks.test_commandline_asterisks_double_both"""
         self.root = Path("testfiles/select/1")

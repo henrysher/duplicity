@@ -210,10 +210,23 @@ class Select:
         for sf in self.selection_functions[:-1]:
             result = sf(path)
             if result is 2:
+                # Selection function says that the path should be scanned for matching files, but keep going
+                # through the selection functions looking for a real match (0 or 1).
                 scan_pending = True
-            if result in [0, 1]:
+            elif result == 1:
+                # Selection function says file should be included.
                 return result
+            elif result == 0:
+                # Selection function says file should be excluded.
+                if scan_pending is False:
+                    return result
+                else:
+                    # scan_pending is True, meaning that a higher-priority selection function has said that this
+                    # folder should be scanned. We therefore return the scan value. We return here, rather than
+                    # below, because we don't want the exclude to be trumped by a lower-priority include.
+                    return 2
         if scan_pending:
+            # A selection function returned 2 and no other selection functions returned 0 or 1.
             return 2
         sf = self.selection_functions[-1]
         result = sf(path)

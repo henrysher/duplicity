@@ -674,10 +674,9 @@ class TestAsterisks(IncludeExcludeFunctionalTest):
         self.backup("full", "testfiles/select/1", options=["--exclude-filelist=testfiles/filelist.txt"])
         self.restore_and_check()
 
-    @unittest.expectedFailure
     def test_exclude_filelist_asterisks_single(self):
         """Exclude filelist with asterisks replacing folders."""
-        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        # Regression test for Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         with open("testfiles/filelist.txt", 'w') as f:
             f.write("+ */select/1/2/1\n"
                     "- */select/1/2\n"
@@ -686,10 +685,9 @@ class TestAsterisks(IncludeExcludeFunctionalTest):
         self.backup("full", "testfiles/select/1", options=["--exclude-filelist=testfiles/filelist.txt"])
         self.restore_and_check()
 
-    @unittest.expectedFailure
     def test_exclude_filelist_asterisks_double_asterisks(self):
         """Exclude filelist with double asterisks replacing folders."""
-        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        # Regression test for Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         with open("testfiles/filelist.txt", 'w') as f:
             f.write("+ **/1/2/1\n"
                     "- **/1/2\n"
@@ -707,10 +705,9 @@ class TestAsterisks(IncludeExcludeFunctionalTest):
                              "--exclude", "*/select/1/3"])
         self.restore_and_check()
 
-    @unittest.expectedFailure
     def test_commandline_asterisks_single_both(self):
         """test_commandline_include_exclude with single asterisks on both exclude and include lines."""
-        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        # Regression test for Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         self.backup("full", "testfiles/select/1",
                     options=["--include", "*/select/1/2/1",
                              "--exclude", "testfiles/*/1/2",
@@ -727,10 +724,9 @@ class TestAsterisks(IncludeExcludeFunctionalTest):
                              "--exclude", "**/1/3"])
         self.restore_and_check()
 
-    @unittest.expectedFailure
     def test_commandline_asterisks_double_both(self):
         """test_commandline_include_exclude with double asterisks on both exclude and include lines."""
-        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        # Regression test for Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         self.backup("full", "testfiles/select/1",
                     options=["--include", "**/1/2/1",
                              "--exclude", "**/1/2",
@@ -819,10 +815,10 @@ class TestTrailingSlash(IncludeExcludeFunctionalTest):
         self.restore_and_check()
 
     @unittest.expectedFailure
-    def test_exclude_filelist_trailing_slashes_double_wildcards_excludes(self):
-        """test_exclude_filelist_trailing_slashes with double wildcards in excludes."""
+    def test_exclude_filelist_trailing_slashes_double_wildcards_excludes_2(self):
+        """second test_exclude_filelist_trailing_slashes with double wildcards in excludes."""
         # Todo: Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482) and likely
-        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        # Regression test for Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         with open("testfiles/filelist.txt", 'w') as f:
             f.write("+ **/1/2/1/\n"
                     "- **/1/2/\n"
@@ -853,34 +849,6 @@ class TestGlobbingReplacement(IncludeExcludeFunctionalTest):
     # Furthermore, if the pattern starts with "ignorecase:" (case insensitive), then this prefix will be
     # removed and any character in the string can be replaced with an upper- or lowercase version of itself.
 
-    def test_globbing_replacement(self):
-        """ Test behaviour of the extended shell globbing pattern replacement functions"""
-        # Identical to test_include_exclude_basic with all non-essential lines removed and globbing characters added
-        # TODO: Delete this test when the below passes
-        self.backup("full", "testfiles/select2",
-                    options=["--include", "testfiles/select2/**/3sub3sub2/3sub3su?2_file.txt",  # Note ** and ? added
-                             "--exclude", "testfiles/select2/*/3s*1",  # Note * added in both directory and filename
-                             "--exclude", "testfiles/select2/**/2sub1sub3",  # Note ** added
-                             "--exclude", "ignorecase:testfiles/select2/2/2sub1/2Sub1Sub2",  # Note ignorecase added
-                             "--include", "ignorecase:testfiles/sel[w,u,e,q]ct2/2/2S?b1",    # Note ignorecase, [] and
-                             # ? added
-                             "--exclude", "testfiles/select2/1/1sub3/1s[w,u,p,q]b3sub2",  # Note [] added
-                             "--exclude", "testfiles/select2/1/1sub[1-4]/1sub3sub1",  # Note [range] added
-                             "--include", "testfiles/select2/1/1sub2/1sub2sub1",
-                             #  "--include", "testfiles/select2/*/1sub2/1s[w,u,p,q]b2sub1",  # Note * and [] added
-                             "--exclude", "testfiles/select2/1/1sub1/1sub1sub3/1su?1sub3_file.txt",  # Note ? added
-                             "--exclude", "testfiles/select2/1/1*1/1sub1sub2",  # Note * added
-                             "--exclude", "testfiles/select2/1/1sub2",
-                             "--include", "testfiles/select[2-4]/*.py",  # Note * and [range] added
-                             "--include", "testfiles/*2/3",  # Note * added
-                             "--include", "**/select2/1",  # Note ** added
-                             "--exclude", "testfiles/select2/**"])
-        self.restore()
-        restore_dir = 'testfiles/restore_out'
-        restored = self.directory_tree_to_list_of_lists(restore_dir)
-        self.assertEqual(restored, self.expected_restored_tree)
-
-    @unittest.expectedFailure
     def test_globbing_replacement_in_includes(self):
         """ Test behaviour of the extended shell globbing pattern replacement functions in both include and exclude"""
         # Identical to test_include_exclude_basic with globbing characters added to both include and exclude lines
