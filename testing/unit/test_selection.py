@@ -100,6 +100,18 @@ class MatchingTest(UnitTestCase):
         assert sf2(self.makeext("what/ever.py")) == 0
         assert sf2(self.makeext("what/ever.py/foo")) == 0
 
+    def test_glob_re(self):
+        """test_glob_re - test translation of shell pattern to regular exp"""
+        assert self.Select.glob_to_re("hello") == "hello"
+        assert self.Select.glob_to_re(".e?ll**o") == "\\.e[^/]ll.*o"
+        r = self.Select.glob_to_re("[abc]el[^de][!fg]h")
+        assert r == "[abc]el[^de][^fg]h", r
+        r = self.Select.glob_to_re("/usr/*/bin/")
+        assert r == "\\/usr\\/[^/]*\\/bin\\/", r
+        assert self.Select.glob_to_re("[a.b/c]") == "[a.b/c]"
+        r = self.Select.glob_to_re("[a*b-c]e[!]]")
+        assert r == "[a*b-c]e[^]]", r
+
     def test_simple_glob_double_asterisk(self):
         """test_simple_glob_double_asterisk - primarily to check that the defaults used by the error tests work"""
         assert self.Select.glob_get_normal_sf("**", 1)
