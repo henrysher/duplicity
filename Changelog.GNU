@@ -6,6 +6,8 @@
         as without it files that are specified to be included are not being backed up as expected.
       - Fixed Bug #932482 - a trailing slash at the end of globs no longer prevents them working
         as expected.
+    * Merged in lp:~aaron-whitehouse/duplicity/reenable_tests
+      - Re-enable unit.test_selection tests that had been temporarily commented out.
 
 2015-07-04  Kenneth Loafman  <kenneth@loafman.com>
 
