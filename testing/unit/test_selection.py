@@ -54,7 +54,6 @@ class MatchingTest(UnitTestCase):
 
     def test_tuple_include(self):
         """Test include selection function made from a regular filename"""
-        # Tests never worked with get_normal_sf
         self.assertRaises(FilePrefixError, self.Select.glob_get_normal_sf, "foo", 1)
 
         sf2 = self.Select.glob_get_sf("testfiles/select/usr/local/bin/", 1)
@@ -159,15 +158,15 @@ class MatchingTest(UnitTestCase):
         select = Select(root)
 
         assert select.glob_get_sf("/", 1)(root) == 1
-        # assert select.glob_get_sf("/foo", 1)(root) == 1
-        # assert select.glob_get_sf("/foo/bar", 1)(root) == 1
+        assert select.glob_get_sf("/foo", 1)(root) == 1
+        assert select.glob_get_sf("/foo/bar", 1)(root) == 1
         assert select.glob_get_sf("/", 0)(root) == 0
         assert select.glob_get_sf("/foo", 0)(root) is None
 
         assert select.glob_get_sf("**.py", 1)(root) == 2
         assert select.glob_get_sf("**", 1)(root) == 1
         assert select.glob_get_sf("ignorecase:/", 1)(root) == 1
-        # assert select.glob_get_sf("**.py", 0)(root) is None
+        assert select.glob_get_sf("**.py", 0)(root) is None
         assert select.glob_get_sf("**", 0)(root) == 0
         assert select.glob_get_sf("/foo/*", 0)(root) is None
 
