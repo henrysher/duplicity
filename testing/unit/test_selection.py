@@ -27,7 +27,6 @@ import unittest
 from duplicity.selection import *  # @UnusedWildImport
 from duplicity.lazy import *  # @UnusedWildImport
 from . import UnitTestCase
-from mock import patch
 
 
 class MatchingTest(UnitTestCase):
@@ -56,32 +55,27 @@ class MatchingTest(UnitTestCase):
     def test_tuple_include(self):
         """Test include selection function made from a regular filename"""
         # Tests never worked with get_normal_sf
-        with patch('os.path.isdir', return_value=True):
-            with patch('os.path.lexists', return_value=True):
-                self.assertRaises(FilePrefixError,
-                                  self.Select.glob_get_normal_sf, "foo", 1)
+        self.assertRaises(FilePrefixError, self.Select.glob_get_normal_sf, "foo", 1)
 
-                sf2 = self.Select.glob_get_sf("testfiles/select/usr/local/bin/", 1)
-                assert sf2(self.makeext("usr")) == 1
-                assert sf2(self.makeext("usr/local")) == 1
-                assert sf2(self.makeext("usr/local/bin")) == 1
-                assert sf2(self.makeext("usr/local/doc")) is None
-                assert sf2(self.makeext("usr/local/bin/gzip")) == 1
-                assert sf2(self.makeext("usr/local/bingzip")) is None
+        sf2 = self.Select.glob_get_sf("testfiles/select/usr/local/bin/", 1)
+        assert sf2(self.makeext("usr")) == 1
+        assert sf2(self.makeext("usr/local")) == 1
+        assert sf2(self.makeext("usr/local/bin")) == 1
+        assert sf2(self.makeext("usr/local/doc")) is None
+        assert sf2(self.makeext("usr/local/bin/gzip")) == 1
+        assert sf2(self.makeext("usr/local/bingzip")) is None
 
     def test_tuple_exclude(self):
         """Test exclude selection function made from a regular filename"""
-        with patch('os.path.isdir', return_value=True):
-            with patch('os.path.lexists', return_value=True):
-                self.assertRaises(FilePrefixError, self.Select.glob_get_normal_sf, "foo", 0)
+        self.assertRaises(FilePrefixError, self.Select.glob_get_normal_sf, "foo", 0)
 
-                sf2 = self.Select.glob_get_sf("testfiles/select/usr/local/bin/", 0)
-                assert sf2(self.makeext("usr")) is None
-                assert sf2(self.makeext("usr/local")) is None
-                assert sf2(self.makeext("usr/local/bin")) == 0
-                assert sf2(self.makeext("usr/local/doc")) is None
-                assert sf2(self.makeext("usr/local/bin/gzip")) == 0
-                assert sf2(self.makeext("usr/local/bingzip")) is None
+        sf2 = self.Select.glob_get_sf("testfiles/select/usr/local/bin/", 0)
+        assert sf2(self.makeext("usr")) is None
+        assert sf2(self.makeext("usr/local")) is None
+        assert sf2(self.makeext("usr/local/bin")) == 0
+        assert sf2(self.makeext("usr/local/doc")) is None
+        assert sf2(self.makeext("usr/local/bin/gzip")) == 0
+        assert sf2(self.makeext("usr/local/bingzip")) is None
 
     def test_glob_star_include(self):
         """Test a few globbing patterns, including **"""
@@ -90,9 +84,8 @@ class MatchingTest(UnitTestCase):
         assert sf1(self.makeext("")) == 1
 
         sf2 = self.Select.glob_get_sf("**.py", 1)
-        with patch('os.path.isdir', return_value=True):
-            assert sf2(self.makeext("foo")) == 2
-            assert sf2(self.makeext("usr/local/bin")) == 2
+        assert sf2(self.makeext("foo")) == 2
+        assert sf2(self.makeext("usr/local/bin")) == 2
         assert sf2(self.makeext("what/ever.py")) == 1
         assert sf2(self.makeext("what/ever.py/foo")) == 1
 
@@ -128,30 +121,25 @@ class MatchingTest(UnitTestCase):
         """Tests what is returned for selection tests regarding directory scanning"""
         select = Select(Path("/"))
 
-        with patch('os.path.isdir', return_value=True):
-            with patch('os.path.lexists', return_value=True):
-                assert select.glob_get_sf("**.py", 1)(Path("/")) == 2
-                assert select.glob_get_sf("**.py", 1)(Path("foo")) == 2
-                assert select.glob_get_sf("**.py", 1)(Path("usr/local/bin")) == 2
-                assert select.glob_get_sf("/testfiles/select/**.py", 1)(Path("/testfiles/select/")) == 2
-                assert select.glob_get_sf("/testfiles/select/test.py", 1)(Path("/testfiles/select/")) == 1
-                assert select.glob_get_sf("/testfiles/select/test.py", 0)(Path("/testfiles/select/")) is None
-                # assert select.glob_get_normal_sf("/testfiles/se?ect/test.py", 1)(Path("/testfiles/select/")) is None
-                # ToDo: Not sure that the above is sensible behaviour (at least that it differs from a non-globbing
-                # include)
-                assert select.glob_get_normal_sf("/testfiles/select/test.py", 0)(Path("/testfiles/select/")) is None
+        assert select.glob_get_sf("**.py", 1)(Path("/")) == 2
+        assert select.glob_get_sf("**.py", 1)(Path("foo")) == 2
+        assert select.glob_get_sf("**.py", 1)(Path("usr/local/bin")) == 2
+        assert select.glob_get_sf("/testfiles/select/**.py", 1)(Path("/testfiles/select/")) == 2
+        assert select.glob_get_sf("/testfiles/select/test.py", 1)(Path("/testfiles/select/")) == 1
+        assert select.glob_get_sf("/testfiles/select/test.py", 0)(Path("/testfiles/select/")) is None
+        # assert select.glob_get_normal_sf("/testfiles/se?ect/test.py", 1)(Path("/testfiles/select/")) is None
+        # ToDo: Not sure that the above is sensible behaviour (at least that it differs from a non-globbing
+        # include)
+        assert select.glob_get_normal_sf("/testfiles/select/test.py", 0)(Path("/testfiles/select/")) is None
 
     def test_ignore_case(self):
         """test_ignore_case - try a few expressions with ignorecase:"""
 
-        with patch('os.path.isdir', return_value=True):
-            with patch('os.path.lexists', return_value=True):
-                sf = self.Select.glob_get_sf("ignorecase:testfiles/SeLect/foo/bar", 1)
-                assert sf(self.makeext("FOO/BAR")) == 1
-                assert sf(self.makeext("foo/bar")) == 1
-                assert sf(self.makeext("fOo/BaR")) == 1
-                self.assertRaises(FilePrefixError, self.Select.glob_get_sf,
-                                  "ignorecase:tesfiles/sect/foo/bar", 1)
+        sf = self.Select.glob_get_sf("ignorecase:testfiles/SeLect/foo/bar", 1)
+        assert sf(self.makeext("FOO/BAR")) == 1
+        assert sf(self.makeext("foo/bar")) == 1
+        assert sf(self.makeext("fOo/BaR")) == 1
+        self.assertRaises(FilePrefixError, self.Select.glob_get_sf, "ignorecase:tesfiles/sect/foo/bar", 1)
 
     def test_root(self):
         """test_root - / may be a counterexample to several of these.."""
@@ -860,8 +848,7 @@ class TestGlobGetNormalSf(UnitTestCase):
 
     def test_glob_get_normal_sf_exclude_root(self):
         """Test simple exclude with / as the glob."""
-        with patch('os.path.isdir', return_value=True):
-            self.assertEqual(self.exclude_glob_tester("/.git", "/"), None)
+        self.assertEqual(self.exclude_glob_tester("/.git", "/"), None)
 
     def test_glob_get_normal_sf_2(self):
         """Test same behaviour as the functional test test_globbing_replacement."""
@@ -923,9 +910,8 @@ class TestGlobGetNormalSf(UnitTestCase):
     def test_glob_get_normal_sf_3_double_asterisks_dirs_to_scan(self):
         """Test double asterisk (**) replacement in glob_get_normal_sf with directories that should be scanned"""
         # The new special pattern, **, expands to any string of characters whether or not it contains "/".
-        with patch('os.path.isdir', return_value=True):
-            self.assertEqual(self.include_glob_tester("/long/example/path/", "/**/hello.txt"), 2)
-            self.assertEqual(self.include_glob_tester("/long/example/path", "/**/hello.txt"), 2)
+        self.assertEqual(self.include_glob_tester("/long/example/path/", "/**/hello.txt"), 2)
+        self.assertEqual(self.include_glob_tester("/long/example/path", "/**/hello.txt"), 2)
 
     def test_glob_get_normal_sf_3_ignorecase(self):
         """Test ignorecase in glob_get_normal_sf"""
