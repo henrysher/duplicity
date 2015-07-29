@@ -207,7 +207,7 @@ class Select:
         if not self.selection_functions:
             return 1
         scan_pending = False
-        for sf in self.selection_functions[:-1]:
+        for sf in self.selection_functions:
             result = sf(path)
             if result is 2:
                 # Selection function says that the path should be scanned for matching files, but keep going
@@ -228,8 +228,6 @@ class Select:
         if scan_pending:
             # A selection function returned 2 and no other selection functions returned 0 or 1.
             return 2
-        sf = self.selection_functions[-1]
-        result = sf(path)
         if result is not None:
             return result
         else:
