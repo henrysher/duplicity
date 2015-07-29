@@ -1,3 +1,12 @@
+2015-07-29  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/bug_884371
+      - Fixed Bug #884371 - Stopped an exclude glob trumping an earlier scan glob, but also
+        ensured that an exclude glob is not trumped by a later include. This fix is important,
+        as without it files that are specified to be included are not being backed up as expected.
+      - Fixed Bug #932482 - a trailing slash at the end of globs no longer prevents them working
+        as expected.
+
 2015-07-04  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug 1471348 Multi back-end doesn't work with hubiC

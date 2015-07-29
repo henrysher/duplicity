@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2015-07-04 09:50-0500\n"
+"POT-Creation-Date: 2015-07-29 10:46+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -407,7 +407,7 @@ msgstr ""
 msgid "Selecting %s"
 msgstr ""
 
-#: ../duplicity/selection.py:277
+#: ../duplicity/selection.py:288
 #, python-format
 msgid ""
 "Fatal Error: The file specification\n"
@@ -418,14 +418,14 @@ msgid ""
 "pattern (such as '**') which matches the base directory."
 msgstr ""
 
-#: ../duplicity/selection.py:286
+#: ../duplicity/selection.py:297
 #, python-format
 msgid ""
 "Fatal Error while processing expression\n"
 "%s"
 msgstr ""
 
-#: ../duplicity/selection.py:296
+#: ../duplicity/selection.py:307
 #, python-format
 msgid ""
 "Last selection expression:\n"
@@ -435,17 +435,17 @@ msgid ""
 "probably isn't what you meant."
 msgstr ""
 
-#: ../duplicity/selection.py:352
+#: ../duplicity/selection.py:363
 #, python-format
 msgid "Reading globbing filelist %s"
 msgstr ""
 
-#: ../duplicity/selection.py:385
+#: ../duplicity/selection.py:396
 #, python-format
 msgid "Error compiling regular expression %s"
 msgstr ""
 
-#: ../duplicity/selection.py:402
+#: ../duplicity/selection.py:413
 msgid ""
 "Warning: exclude-device-files is not the first selector.\n"
 "This may not be what you intended"

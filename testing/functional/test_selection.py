@@ -24,6 +24,7 @@ import unittest
 
 from . import FunctionalTestCase
 
+
 class IncludeExcludeFunctionalTest(FunctionalTestCase):
     """
     This contains methods used in the tests below for testing the include, exclude and various filelist features.
@@ -423,6 +424,7 @@ class TestExcludeFilelistTest(IncludeExcludeFunctionalTest):
         # The restored files should match those restored in test_exclude_filelist
         self.assertEqual(restored, self.expected_restored_tree)
 
+
 class TestIncludeFilelistTest(IncludeExcludeFunctionalTest):
     """
     Test --include-filelist using duplicity binary.
@@ -674,10 +676,9 @@ class TestAsterisks(IncludeExcludeFunctionalTest):
         self.backup("full", "testfiles/select/1", options=["--exclude-filelist=testfiles/filelist.txt"])
         self.restore_and_check()
 
-    @unittest.expectedFailure
     def test_exclude_filelist_asterisks_single(self):
         """Exclude filelist with asterisks replacing folders."""
-        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        # Regression test for Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         with open("testfiles/filelist.txt", 'w') as f:
             f.write("+ */select/1/2/1\n"
                     "- */select/1/2\n"
@@ -686,10 +687,9 @@ class TestAsterisks(IncludeExcludeFunctionalTest):
         self.backup("full", "testfiles/select/1", options=["--exclude-filelist=testfiles/filelist.txt"])
         self.restore_and_check()
 
-    @unittest.expectedFailure
     def test_exclude_filelist_asterisks_double_asterisks(self):
         """Exclude filelist with double asterisks replacing folders."""
-        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        # Regression test for Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         with open("testfiles/filelist.txt", 'w') as f:
             f.write("+ **/1/2/1\n"
                     "- **/1/2\n"
@@ -707,10 +707,9 @@ class TestAsterisks(IncludeExcludeFunctionalTest):
                              "--exclude", "*/select/1/3"])
         self.restore_and_check()
 
-    @unittest.expectedFailure
     def test_commandline_asterisks_single_both(self):
         """test_commandline_include_exclude with single asterisks on both exclude and include lines."""
-        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        # Regression test for Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         self.backup("full", "testfiles/select/1",
                     options=["--include", "*/select/1/2/1",
                              "--exclude", "testfiles/*/1/2",
@@ -727,16 +726,50 @@ class TestAsterisks(IncludeExcludeFunctionalTest):
                              "--exclude", "**/1/3"])
         self.restore_and_check()
 
-    @unittest.expectedFailure
     def test_commandline_asterisks_double_both(self):
         """test_commandline_include_exclude with double asterisks on both exclude and include lines."""
-        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+        # Regression test for Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         self.backup("full", "testfiles/select/1",
                     options=["--include", "**/1/2/1",
                              "--exclude", "**/1/2",
                              "--exclude", "**/1/1",
                              "--exclude", "**/1/3"])
         self.restore_and_check()
+
+    def test_single_and_double_asterisks(self):
+        """This compares a backup using --include-globbing-filelist with a single and double *."""
+        with open("testfiles/filelist.txt", 'w') as f:
+            f.write("+ testfiles/select2/*\n"
+                    "- testfiles/select")
+        self.backup("full", "testfiles/", options=["--include-globbing-filelist=testfiles/filelist.txt"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir + "/select2")
+        with open("testfiles/filelist2.txt", 'w') as f:
+            f.write("+ testfiles/select2/**\n"
+                    "- testfiles/select")
+        self.backup("full", "testfiles/", options=["--include-globbing-filelist=testfiles/filelist2.txt"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored2 = self.directory_tree_to_list_of_lists(restore_dir + "/select2")
+        self.assertEqual(restored, restored2)
+
+    def test_single_and_double_asterisks_includes_excludes(self):
+        """This compares a backup using --includes/--excludes with a single and double *."""
+        self.backup("full", "testfiles/",
+                    options=["--include", "testfiles/select2/*",
+                             "--exclude", "testfiles/select"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir + "/select2")
+        self.backup("full", "testfiles/",
+                    options=["--include", "testfiles/select2/**",
+                             "--exclude", "testfiles/select"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored2 = self.directory_tree_to_list_of_lists(restore_dir + "/select2")
+        self.assertEqual(restored, restored2)
+
 
 class TestTrailingSlash(IncludeExcludeFunctionalTest):
     """ Test to check that a trailing slash works as expected
@@ -759,10 +792,9 @@ class TestTrailingSlash(IncludeExcludeFunctionalTest):
         self.backup("full", "testfiles/select/1", options=["--exclude-filelist=testfiles/filelist.txt"])
         self.restore_and_check()
 
-    @unittest.expectedFailure
     def test_exclude_filelist_trailing_slashes_single_wildcards_excludes(self):
         """test_exclude_filelist_trailing_slashes with single wildcards in excludes."""
-        # Todo: Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
+        # Regression test for Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
         with open("testfiles/filelist.txt", 'w') as f:
             f.write("+ testfiles/select/1/2/1/\n"
                     "- */select/1/2/\n"
@@ -771,10 +803,9 @@ class TestTrailingSlash(IncludeExcludeFunctionalTest):
         self.backup("full", "testfiles/select/1", options=["--exclude-filelist=testfiles/filelist.txt"])
         self.restore_and_check()
 
-    @unittest.expectedFailure
     def test_exclude_filelist_trailing_slashes_double_wildcards_excludes(self):
         """test_exclude_filelist_trailing_slashes with double wildcards in excludes."""
-        # Todo: Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
+        # Regression test for Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
         with open("testfiles/filelist.txt", 'w') as f:
             f.write("+ testfiles/select/1/2/1/\n"
                     "- **/1/2/\n"
@@ -783,11 +814,10 @@ class TestTrailingSlash(IncludeExcludeFunctionalTest):
         self.backup("full", "testfiles/select/1", options=["--exclude-filelist=testfiles/filelist.txt"])
         self.restore_and_check()
 
-    @unittest.expectedFailure
-    def test_exclude_filelist_trailing_slashes_double_wildcards_excludes(self):
-        """test_exclude_filelist_trailing_slashes with double wildcards in excludes."""
-        # Todo: Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482) and likely
-        # Todo: Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
+    def test_exclude_filelist_trailing_slashes_double_wildcards_excludes_2(self):
+        """second test_exclude_filelist_trailing_slashes with double wildcards in excludes."""
+        # Regression test for Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482) and
+        # Regression test for Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371)
         with open("testfiles/filelist.txt", 'w') as f:
             f.write("+ **/1/2/1/\n"
                     "- **/1/2/\n"
@@ -796,16 +826,53 @@ class TestTrailingSlash(IncludeExcludeFunctionalTest):
         self.backup("full", "testfiles/select/1", options=["--exclude-filelist=testfiles/filelist.txt"])
         self.restore_and_check()
 
-    @unittest.expectedFailure
     def test_exclude_filelist_trailing_slashes_wildcards(self):
         """test_commandline_asterisks_single_excludes_only with trailing slashes."""
-         # Todo: Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
+        # Regression test for Bug #932482 (https://bugs.launchpad.net/duplicity/+bug/932482)
         self.backup("full", "testfiles/select/1",
                     options=["--include", "testfiles/select/1/2/1/",
                              "--exclude", "testfiles/*/1/2/",
                              "--exclude", "*/select/1/1/",
                              "--exclude", "*/select/1/3/"])
         self.restore_and_check()
+
+
+class TestGlobbingReplacement(IncludeExcludeFunctionalTest):
+    """ This tests the behaviour of the extended shell globbing pattern replacement functions."""
+    # See the manual for a description of behaviours, but in summary:
+    # * can be expanded to any string of characters not containing "/"
+    # ? expands to any character except "/" and
+    # [...] expands to a single character of those characters specified (ranges are acceptable).
+    # The new special pattern, **, expands to any string of characters whether or not it contains "/".
+    # Furthermore, if the pattern starts with "ignorecase:" (case insensitive), then this prefix will be
+    # removed and any character in the string can be replaced with an upper- or lowercase version of itself.
+
+    def test_globbing_replacement_in_includes(self):
+        """ Test behaviour of the extended shell globbing pattern replacement functions in both include and exclude"""
+        # Identical to test_include_exclude_basic with globbing characters added to both include and exclude lines
+        # Exhibits the issue reported in Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371).
+        # See above and the unit tests for more granularity on the issue.
+        self.backup("full", "testfiles/select2",
+                    options=["--include", "testfiles/select2/**/3sub3sub2/3sub3su?2_file.txt",  # Note ** and ? added
+                             "--exclude", "testfiles/select2/*/3s*1",  # Note * added in both directory and filename
+                             "--exclude", "testfiles/select2/**/2sub1sub3",  # Note ** added
+                             "--exclude", "ignorecase:testfiles/select2/2/2sub1/2Sub1Sub2",  # Note ignorecase added
+                             "--include", "ignorecase:testfiles/sel[w,u,e,q]ct2/2/2S?b1",    # Note ignorecase, [] and
+                             # ? added
+                             "--exclude", "testfiles/select2/1/1sub3/1s[w,u,p,q]b3sub2",  # Note [] added
+                             "--exclude", "testfiles/select2/1/1sub[1-4]/1sub3sub1",  # Note [range] added
+                             "--include", "testfiles/select2/*/1sub2/1s[w,u,p,q]b2sub1",  # Note * and [] added
+                             "--exclude", "testfiles/select2/1/1sub1/1sub1sub3/1su?1sub3_file.txt",  # Note ? added
+                             "--exclude", "testfiles/select2/1/1*1/1sub1sub2",  # Note * added
+                             "--exclude", "testfiles/select2/1/1sub2",
+                             "--include", "testfiles/select[2-4]/*.py",  # Note * and [range] added
+                             "--include", "testfiles/*2/3",  # Note * added
+                             "--include", "**/select2/1",  # Note ** added
+                             "--exclude", "testfiles/select2/**"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, self.expected_restored_tree)
 
 if __name__ == "__main__":
     unittest.main()

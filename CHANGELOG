@@ -51,6 +51,12 @@ New in v0.7.04 (2015/??/??)
    - added init of appropriate superclass in both cases.
 * Fixed bug 1471348 Multi back-end doesn't work with hubiC (again)
    - hubiC should reach up to duplicity.backend.__init__
+* Merged in lp:~aaron-whitehouse/duplicity/bug_884371
+  - Fixed Bug #884371 - Stopped an exclude glob trumping an earlier scan glob, but also
+    ensured that an exclude glob is not trumped by a later include. This fix is important,
+    as without it files that are specified to be included are not being backed up as expected.
+  - Fixed Bug #932482 - a trailing slash at the end of globs no longer prevents them working
+    as expected.
 
 
 New in v0.7.03 (2015/05/11)

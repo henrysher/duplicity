@@ -207,16 +207,27 @@ class Select:
         if not self.selection_functions:
             return 1
         scan_pending = False
-        for sf in self.selection_functions[:-1]:
+        for sf in self.selection_functions:
             result = sf(path)
             if result is 2:
+                # Selection function says that the path should be scanned for matching files, but keep going
+                # through the selection functions looking for a real match (0 or 1).
                 scan_pending = True
-            if result in [0, 1]:
+            elif result == 1:
+                # Selection function says file should be included.
                 return result
+            elif result == 0:
+                # Selection function says file should be excluded.
+                if scan_pending is False:
+                    return result
+                else:
+                    # scan_pending is True, meaning that a higher-priority selection function has said that this
+                    # folder should be scanned. We therefore return the scan value. We return here, rather than
+                    # below, because we don't want the exclude to be trumped by a lower-priority include.
+                    return 2
         if scan_pending:
+            # A selection function returned 2 and no other selection functions returned 0 or 1.
             return 2
-        sf = self.selection_functions[-1]
-        result = sf(path)
         if result is not None:
             return result
         else:
@@ -327,7 +338,7 @@ probably isn't what you meant.""") %
 
         include = include_default
         if line[:2] == "+ ":
-            # Check for "+ "/"- " syntax
+            # Check for "+ " or "- " syntax
             include = 1
             line = line[2:]
         elif line[:2] == "- ":
@@ -508,6 +519,10 @@ probably isn't what you meant.""") %
 
         """
         # Internal. Used by glob_get_sf and unit tests.
+        if glob_str != "/" and glob_str[-1] == "/":
+            # Remove trailing / from directory name (unless that is the entire string)
+            glob_str = glob_str[:-1]
+
         if glob_str.lower().startswith("ignorecase:"):
             re_comp = lambda r: re.compile(r, re.I | re.S)
             glob_str = glob_str[len("ignorecase:"):]
