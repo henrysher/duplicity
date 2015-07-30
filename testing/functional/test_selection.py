@@ -874,5 +874,59 @@ class TestGlobbingReplacement(IncludeExcludeFunctionalTest):
         restored = self.directory_tree_to_list_of_lists(restore_dir)
         self.assertEqual(restored, self.expected_restored_tree)
 
+
+class TestTrailingSlash(IncludeExcludeFunctionalTest):
+    """ This tests the behaviour of globbing strings with a trailing slash"""
+    # See Bug #1479545 (https://bugs.launchpad.net/duplicity/+bug/1479545)
+
+    def test_no_trailing_slash(self):
+        """ Test that including 1.py works as expected"""
+        self.backup("full", "testfiles/select2",
+                    options=["--include", "testfiles/select2/1.py",
+                             "--exclude", "**"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, [['1.py']])
+
+    @unittest.expectedFailure
+    def test_trailing_slash(self):
+        """ Test that globs with a trailing slash only match directories"""
+        # ToDo: Bug #1479545
+        # (https://bugs.launchpad.net/duplicity/+bug/1479545)
+        self.backup("full", "testfiles/select2",
+                    options=["--include", "testfiles/select2/1.py/",
+                             "--exclude", "**"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, [])
+
+    @unittest.expectedFailure
+    def test_include_files_not_subdirectories(self):
+        """ Test that a trailing slash glob followed by a * glob only matches
+        files and not subdirectories"""
+        self.backup("full", "testfiles/select2",
+                    options=["--exclude", "testfiles/select2/*/",
+                             "--include", "testfiles/select2/*",
+                             "--exclude", "**"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, [['1.py', '1.doc']])
+
+    @unittest.expectedFailure
+    def test_include_subdirectories_not_files(self):
+        """ Test that a trailing slash glob only matches directories"""
+        self.backup("full", "testfiles/select2",
+                    options=["--include", "testfiles/select2/1/1sub1/**/",
+                             "--exclude", "testfiles/select2/1/1sub1/**",
+                             "--exclude", "**"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, [['1'], ['1sub1'],
+                                     ['1sub1sub1', '1sub1sub2', '1sub1sub3']])
+
 if __name__ == "__main__":
     unittest.main()
