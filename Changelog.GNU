@@ -1,3 +1,8 @@
+2015-07-31  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/trailing_slash_match_dirs
+      - Made globs with trailing slashes only match directories, not files, fixing Bug #1479545.
+
 2015-07-29  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~aaron-whitehouse/duplicity/bug_884371
@@ -14,7 +19,7 @@
     * Fixed bug 1471348 Multi back-end doesn't work with hubiC
       - added init of superclass in both cases.
     * Fixed bug 1471348 Multi back-end doesn't work with hubiC (again)
-       - hubiC should reach up to duplicity.backend.__init__
+      - hubiC should reach up to duplicity.backend.__init__
 
 2015-07-03  Kenneth Loafman  <kenneth@loafman.com>
 

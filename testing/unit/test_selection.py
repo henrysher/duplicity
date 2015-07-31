@@ -23,10 +23,12 @@
 import types
 import StringIO
 import unittest
+import duplicity.path
 
 from duplicity.selection import *  # @UnusedWildImport
 from duplicity.lazy import *  # @UnusedWildImport
 from . import UnitTestCase
+from mock import patch
 
 
 class MatchingTest(UnitTestCase):
@@ -57,24 +59,28 @@ class MatchingTest(UnitTestCase):
         self.assertRaises(FilePrefixError, self.Select.glob_get_normal_sf, "foo", 1)
 
         sf2 = self.Select.glob_get_sf("testfiles/select/usr/local/bin/", 1)
-        assert sf2(self.makeext("usr")) == 1
-        assert sf2(self.makeext("usr/local")) == 1
-        assert sf2(self.makeext("usr/local/bin")) == 1
-        assert sf2(self.makeext("usr/local/doc")) is None
-        assert sf2(self.makeext("usr/local/bin/gzip")) == 1
-        assert sf2(self.makeext("usr/local/bingzip")) is None
+
+        with patch('duplicity.path.ROPath.isdir', return_value=True):
+            assert sf2(self.makeext("usr")) == 1
+            assert sf2(self.makeext("usr/local")) == 1
+            assert sf2(self.makeext("usr/local/bin")) == 1
+            assert sf2(self.makeext("usr/local/doc")) is None
+            assert sf2(self.makeext("usr/local/bin/gzip")) == 1
+            assert sf2(self.makeext("usr/local/bingzip")) is None
 
     def test_tuple_exclude(self):
         """Test exclude selection function made from a regular filename"""
         self.assertRaises(FilePrefixError, self.Select.glob_get_normal_sf, "foo", 0)
 
         sf2 = self.Select.glob_get_sf("testfiles/select/usr/local/bin/", 0)
-        assert sf2(self.makeext("usr")) is None
-        assert sf2(self.makeext("usr/local")) is None
-        assert sf2(self.makeext("usr/local/bin")) == 0
-        assert sf2(self.makeext("usr/local/doc")) is None
-        assert sf2(self.makeext("usr/local/bin/gzip")) == 0
-        assert sf2(self.makeext("usr/local/bingzip")) is None
+
+        with patch('duplicity.path.ROPath.isdir', return_value=True):
+            assert sf2(self.makeext("usr")) is None
+            assert sf2(self.makeext("usr/local")) is None
+            assert sf2(self.makeext("usr/local/bin")) == 0
+            assert sf2(self.makeext("usr/local/doc")) is None
+            assert sf2(self.makeext("usr/local/bin/gzip")) == 0
+            assert sf2(self.makeext("usr/local/bingzip")) is None
 
     def test_glob_star_include(self):
         """Test a few globbing patterns, including **"""
