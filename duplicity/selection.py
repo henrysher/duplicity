@@ -473,24 +473,39 @@ probably isn't what you meant.""") %
 
         """
         # Internal. Used by glob_get_sf and unit tests.
+        match_only_dirs = False
+
+        if filename != "/" and filename[-1] == "/":
+            match_only_dirs = True
+            # Remove trailing / from directory name (unless that is the entire
+            # string)
+            filename = filename[:-1]
+
         if not filename.startswith(self.prefix):
             raise FilePrefixError(filename)
         index = tuple(filter(lambda x: x,
                              filename[len(self.prefix):].split("/")))
-        return self.glob_get_tuple_sf(index, include)
+        return self.glob_get_tuple_sf(index, include, match_only_dirs)
 
-    def glob_get_tuple_sf(self, tuple, include):
+    def glob_get_tuple_sf(self, tuple, include, match_only_dirs=False):
         """Return selection function based on tuple"""
         # Internal. Used by glob_get_filename_sf.
+
         def include_sel_func(path):
-            if (path.index == tuple[:len(path.index)] or
+            if match_only_dirs and not path.isdir():
+                # If the glob ended with a /, only match directories
+                return None
+            elif (path.index == tuple[:len(path.index)] or
                     path.index[:len(tuple)] == tuple):
                 return 1  # /foo/bar implicitly matches /foo, vice-versa
             else:
                 return None
 
         def exclude_sel_func(path):
-            if path.index[:len(tuple)] == tuple:
+            if match_only_dirs and not path.isdir():
+                # If the glob ended with a /, only match directories
+                return None
+            elif path.index[:len(tuple)] == tuple:
                 return 0  # /foo excludes /foo/bar, not vice-versa
             else:
                 return None
@@ -519,8 +534,13 @@ probably isn't what you meant.""") %
 
         """
         # Internal. Used by glob_get_sf and unit tests.
+
+        match_only_dirs = False
+
         if glob_str != "/" and glob_str[-1] == "/":
-            # Remove trailing / from directory name (unless that is the entire string)
+            match_only_dirs = True
+            # Remove trailing / from directory name (unless that is the entire
+            # string)
             glob_str = glob_str[:-1]
 
         if glob_str.lower().startswith("ignorecase:"):
@@ -539,7 +559,10 @@ probably isn't what you meant.""") %
                                "|".join(self.glob_get_prefix_res(glob_str)))
 
         def include_sel_func(path):
-            if glob_comp_re.match(path.name):
+            if match_only_dirs and not path.isdir():
+                # If the glob ended with a /, only match directories
+                return None
+            elif glob_comp_re.match(path.name):
                 return 1
             elif scan_comp_re.match(path.name):
                 return 2
@@ -547,7 +570,10 @@ probably isn't what you meant.""") %
                 return None
 
         def exclude_sel_func(path):
-            if glob_comp_re.match(path.name):
+            if match_only_dirs and not path.isdir():
+                # If the glob ended with a /, only match directories
+                return None
+            elif glob_comp_re.match(path.name):
                 return 0
             else:
                 return None
