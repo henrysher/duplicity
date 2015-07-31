@@ -61,6 +61,10 @@ As of october 2012 we pull the handbrake and refactor our code and rename
 the class to gpginterface in the hope that package maintainers will stumble
 over it and stop this problematic behaviour for good.
 
+DEVELOPMENT
+
+For more information on downloading duplicity's source code from the
+code repository and developing for duplicity, see README-REPO.
 
 HELP:
 
