@@ -2,6 +2,12 @@
 
     * Merged in lp:~aaron-whitehouse/duplicity/trailing_slash_match_dirs
       - Made globs with trailing slashes only match directories, not files, fixing Bug #1479545.
+    * Merged in lp:~aaron-whitehouse/duplicity/improve_tox_and_python2-6_testing
+      - Testing improvements, particularly in relation to testing against Python version 2.6:
+        * tox.ini fixed so that it is possible to run individual tests against both Python 2.6 and 2.7;
+        * updated test_code.py to use unittest2 for Python versions < 2.7 (instead of failing);
+        * ./run-tests now correctly runs all tests against both Python 2.6 and 2.7; and
+        * improved testing directions in README-REPO.
 
 2015-07-29  Kenneth Loafman  <kenneth@loafman.com>
 

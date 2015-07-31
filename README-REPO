@@ -1,14 +1,17 @@
 REPO README - Notes for people checking out of Launchpad (bzr)
 --------------------------------------------------------------
 
+-------------------------
 Getting duplicity to run:
 -------------------------
 
 By the numbers:
 1) Do the checkout to a location called $DUP_ROOT:
-   bzr branch lp:duplicity $DUP_ROOT   		                  [for the dev branch]
-   or 
-   bzr branch lp:~duplicity-team/duplicity/0.6-releases $DUP_ROOT [for the stable branch]
+   [for the dev branch]
+   bzr branch lp:duplicity $DUP_ROOT
+   or
+   [for the stable branch]
+   bzr branch lp:~duplicity-team/duplicity/0.6-releases $DUP_ROOT
 2) cd $DUP_ROOT/duplicity
 3) Run "python compilec.py" to create _librsync.so
 4) cd ..
@@ -24,7 +27,32 @@ or
 
 PYTHONPATH=$DUP_ROOT bin/rdiffdir
 
+-----------------------
 Running the unit tests:
 -----------------------
 
 cd testing; ./run-tests
+
+Please run the tests on your branch before proposing a merge, to ensure that
+you have not broken any tests that previously worked.
+
+You can run specific tests using:
+tox -- -s [folder].[folder].[file].[class].[test]
+For example:
+tox -- -s testing.unit.test_selection
+or:
+tox -- -s testing.unit.test_selection.MatchingTest.test_tuple_include
+
+-----------------------------------------
+Testing against multiple Python versions:
+-----------------------------------------
+
+Duplicity currently supports Python versions v2.6 or later. Duplicity uses tox
+to make it easy to test your code against multiple Python versions. Running
+tests using the commands above will automatically test code against
+both Python v2.6 and v2.7, if you have both installed on your system.
+
+For instructions on installing Python v2.6 on newer versions of Ubuntu, see
+https://launchpad.net/~fkrull/+archive/ubuntu/deadsnakes
+
+
