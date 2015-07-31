@@ -48,9 +48,9 @@ New in v0.7.04 (2015/??/??)
     which was marked as an expected failure. The issue causing this test to fail was
     fixed in revision 1095 and the test now passes.
 * Fixed bug 1471348 Multi back-end doesn't work with hubiC
-   - added init of appropriate superclass in both cases.
+  - added init of appropriate superclass in both cases.
 * Fixed bug 1471348 Multi back-end doesn't work with hubiC (again)
-   - hubiC should reach up to duplicity.backend.__init__
+  - hubiC should reach up to duplicity.backend.__init__
 * Merged in lp:~aaron-whitehouse/duplicity/bug_884371
   - Fixed Bug #884371 - Stopped an exclude glob trumping an earlier scan glob, but also
     ensured that an exclude glob is not trumped by a later include. This fix is important,
@@ -59,6 +59,8 @@ New in v0.7.04 (2015/??/??)
     as expected.
 * Merged in lp:~aaron-whitehouse/duplicity/reenable_tests
   - Re-enable unit.test_selection tests that had been temporarily commented out.
+* Merged in lp:~aaron-whitehouse/duplicity/trailing_slash_match_dirs
+  - Made globs with trailing slashes only match directories, not files, fixing Bug #1479545.
 
 
 New in v0.7.03 (2015/05/11)
