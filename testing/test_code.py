@@ -65,6 +65,7 @@ class CodeTest(DuplicityTestCase):
     @unittest.skipUnless(os.getenv('RUN_CODE_TESTS', None) == '1',
                          'Must set environment var RUN_CODE_TESTS=1')
     def test_pylint(self):
+        """Pylint test (requires pylint to be installed to pass)"""
         self.run_checker([
             "pylint",
             "-E",

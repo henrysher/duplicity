@@ -130,7 +130,8 @@ class DDTest(UnitTestCase):
                                    + "\n".join(changed_files))
 
     def test_diff2(self):
-        """Another diff test - this one involves multivol support"""
+        """Another diff test - this one involves multivol support
+        (requires rdiff to be installed to pass)"""
         sel1 = selection.Select(Path("testfiles/dir2"))
         diffdir.write_block_iter(diffdir.SigTarBlockIter(sel1.set_iter()),
                                  "testfiles/output/dir2.sigtar")
