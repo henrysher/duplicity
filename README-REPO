@@ -31,10 +31,8 @@ PYTHONPATH=$DUP_ROOT bin/rdiffdir
 Running the unit tests:
 -----------------------
 
+To run all tests:
 cd testing; ./run-tests
-
-Please run the tests on your branch before proposing a merge, to ensure that
-you have not broken any tests that previously worked.
 
 You can run specific tests using:
 tox -- -s [folder].[folder].[file].[class].[test]
@@ -42,6 +40,28 @@ For example:
 tox -- -s testing.unit.test_selection
 or:
 tox -- -s testing.unit.test_selection.MatchingTest.test_tuple_include
+
+Note: some tests require rdiff and pylint to be installed on the system for
+them to pass.
+
+Please run all tests on your branch (run-tests) before proposing a merge, to
+ensure that all tests pass. The decorator @unittest.expectedFailure can be used
+to commit a known-failing test case without breaking the test suite, for
+example to exhibit the behaviour in a bug report before it has been fixed:
+
+if sys.version_info < (2, 7):
+    import unittest2 as unittest
+else:
+    import unittest
+
+
+class TestClass(unittest.TestCase):
+    """Test class to show expectedFailure"""
+
+    @unittest.expectedFailure
+    def test_expected_failure(self):
+        """Test behaviour of expectedFailure"""
+        self.assertEqual(1, 2)
 
 -----------------------------------------
 Testing against multiple Python versions:

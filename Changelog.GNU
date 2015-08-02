@@ -2,6 +2,10 @@
 
     * Merged in lp:~dag-stenstad/duplicity/swift_authversion_3_support
       - Added support for Openstack Identity v3 in the Swift backend.
+    * Merged in lp:~aaron-whitehouse/duplicity/fix_2to3_issues
+      - Fixed 2to3 issues. Updated README-REPO with more test information. Updated pylint and
+        test_diff2 descriptions to make it clear these require packages to be installed on the
+        sytem to pass. All tests pass on Python 2.6 and Python 2.7 as at this revision.
 
 2015-07-31  Kenneth Loafman  <kenneth@loafman.com>
 

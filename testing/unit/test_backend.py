@@ -256,7 +256,7 @@ class BackendWrapperTest(UnitTestCase):
         self.mock._move.return_value = True
         self.backend.move(self.local, self.remote)
         self.mock._move.assert_called_once_with(self.local, self.remote)
-        self.assertEquals(self.mock._put.call_count, 0)
+        self.assertEqual(self.mock._put.call_count, 0)
 
     def test_move_fallback_false(self):
         self.mock._move.return_value = False
