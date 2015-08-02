@@ -1,4 +1,4 @@
-New in v0.7.04 (2015/??/??)
+New in v0.7.04 (2015/08/02)
 ---------------------------
 * Merged in lp:~noizyland/duplicity/fix-progress
   - Fixes bug 1264744.  selection.filelist_globbing_get_sfs leaves the
