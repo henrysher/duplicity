@@ -67,6 +67,8 @@ New in v0.7.04 (2015/??/??)
     * updated test_code.py to use unittest2 for Python versions < 2.7 (instead of failing);
     * ./run-tests now correctly runs all tests against both Python 2.6 and 2.7; and
     * improved testing directions in README-REPO.
+* Merged in lp:~dag-stenstad/duplicity/swift_authversion_3_support
+  - Added support for Openstack Identity v3 in the Swift backend.
 
 
 New in v0.7.03 (2015/05/11)

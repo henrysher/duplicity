@@ -1,3 +1,8 @@
+2015-08-02  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~dag-stenstad/duplicity/swift_authversion_3_support
+      - Added support for Openstack Identity v3 in the Swift backend.
+
 2015-07-31  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~aaron-whitehouse/duplicity/trailing_slash_match_dirs
