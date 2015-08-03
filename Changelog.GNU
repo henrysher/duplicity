@@ -1,3 +1,9 @@
+2015-08-03  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/fix_patch_error
+      - Change use of mock.patch in unit tests to accommodate the obsolete
+        version of python-mock on the build server.
+
 2015-08-02  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~dag-stenstad/duplicity/swift_authversion_3_support

@@ -56,11 +56,17 @@ class MatchingTest(UnitTestCase):
 
     def test_tuple_include(self):
         """Test include selection function made from a regular filename"""
-        self.assertRaises(FilePrefixError, self.Select.glob_get_normal_sf, "foo", 1)
+        self.assertRaises(FilePrefixError, self.Select.glob_get_normal_sf,
+                          "foo", 1)
 
         sf2 = self.Select.glob_get_sf("testfiles/select/usr/local/bin/", 1)
 
-        with patch('duplicity.path.ROPath.isdir', return_value=True):
+        with patch('duplicity.path.ROPath.isdir') as mock_isdir:
+            mock_isdir.return_value = True
+            # Can't pass the return_value as an argument to patch, i.e.:
+            # with patch('duplicity.path.ROPath.isdir', return_value=True):
+            # as build system's mock is too old to support it.
+
             assert sf2(self.makeext("usr")) == 1
             assert sf2(self.makeext("usr/local")) == 1
             assert sf2(self.makeext("usr/local/bin")) == 1
@@ -70,11 +76,16 @@ class MatchingTest(UnitTestCase):
 
     def test_tuple_exclude(self):
         """Test exclude selection function made from a regular filename"""
-        self.assertRaises(FilePrefixError, self.Select.glob_get_normal_sf, "foo", 0)
+        self.assertRaises(FilePrefixError, self.Select.glob_get_normal_sf,
+                          "foo", 0)
 
         sf2 = self.Select.glob_get_sf("testfiles/select/usr/local/bin/", 0)
 
-        with patch('duplicity.path.ROPath.isdir', return_value=True):
+        with patch('duplicity.path.ROPath.isdir') as mock_isdir:
+            mock_isdir.return_value = True
+            # Can't pass the return_value as an argument to patch, as build
+            # system's mock is too old to support it.
+
             assert sf2(self.makeext("usr")) is None
             assert sf2(self.makeext("usr/local")) is None
             assert sf2(self.makeext("usr/local/bin")) == 0
