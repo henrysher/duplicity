@@ -182,9 +182,16 @@ class BotoBackend(duplicity.backend.Backend):
         self.storage_uri = boto.storage_uri(self.boto_uri_str)
         self.conn = get_connection(self.scheme, self.parsed_url, self.storage_uri)
         try:
-            self.bucket = self.conn.get_bucket(self.bucket_name)
-        except Exception as err:
-            raise BackendException(err.message)
+            self.bucket = self.conn.get_bucket(self.bucket_name, validate=True)
+        except Exception, e:
+            if "NoSuchBucket" in e.error_code:
+                if globals.s3_european_buckets:
+                    self.bucket = self.conn.create_bucket(self.bucket_name,
+                                                          location=Location.EU)
+                else:
+                    self.bucket = self.conn.create_bucket(self.bucket_name)
+            else:
+                raise e
 
     def _retry_cleanup(self):
         self.resetConnection()
