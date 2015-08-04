@@ -69,10 +69,13 @@ Testing against multiple Python versions:
 
 Duplicity currently supports Python versions v2.6 or later. Duplicity uses tox
 to make it easy to test your code against multiple Python versions. Running
-tests using the commands above will automatically test code against
-both Python v2.6 and v2.7, if you have both installed on your system.
+tests using the commands above will automatically test code against both
+Python v2.6 and v2.7, if you have both installed on your system. It will also
+test against the versions of dependencies used by the Launchpad build system.
+You can test against a single environment, e.g.
+tox -e py26
+for example if you are working on fixing a bug, but please do a full run-tests
+before submitting a merge request.
 
 For instructions on installing Python v2.6 on newer versions of Ubuntu, see
 https://launchpad.net/~fkrull/+archive/ubuntu/deadsnakes
-
-
