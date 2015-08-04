@@ -1,3 +1,8 @@
+2015-08-04  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed Bug 1476019 S3 storage bucket not being automatically created
+      with patch from abeverley
+
 2015-08-03  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~aaron-whitehouse/duplicity/fix_patch_error
