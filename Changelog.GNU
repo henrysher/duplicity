@@ -7,6 +7,11 @@
         Launchpad build server, to reduce the likelihood of tests passing
         our test suite, but failing on the build server (e.g. because of
         the out-of-date mock version).
+    * Merged in lp:~aaron-whitehouse/duplicity/disable_code_tests_for_lpbuildd
+      - Set RUN_CODE_TESTS to 0 for lpbuildd tox profile, reflecting its value
+        on the Launchpad build server (and therefore skipping PEP8, 2to3 and
+        pylint). More accurately reflects the system we are mimicking and saves
+        approximately 1 minute per test run.
 
 2015-08-03  Kenneth Loafman  <kenneth@loafman.com>
 
