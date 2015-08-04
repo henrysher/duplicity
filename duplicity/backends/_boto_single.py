@@ -183,7 +183,7 @@ class BotoBackend(duplicity.backend.Backend):
         self.conn = get_connection(self.scheme, self.parsed_url, self.storage_uri)
         try:
             self.bucket = self.conn.get_bucket(self.bucket_name, validate=True)
-        except Exception, e:
+        except Exception as e:
             if "NoSuchBucket" in e.error_code:
                 if globals.s3_european_buckets:
                     self.bucket = self.conn.create_bucket(self.bucket_name,

@@ -2,6 +2,11 @@
 
     * Fixed Bug 1476019 S3 storage bucket not being automatically created
       with patch from abeverley
+    * Merged in lp:~aaron-whitehouse/duplicity/launchpad_tox_profile
+      - Add tox testing profile that mimics the packages installed on the
+        Launchpad build server, to reduce the likelihood of tests passing
+        our test suite, but failing on the build server (e.g. because of
+        the out-of-date mock version).
 
 2015-08-03  Kenneth Loafman  <kenneth@loafman.com>
 
