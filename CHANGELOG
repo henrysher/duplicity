@@ -15,6 +15,9 @@ New in v0.7.05 (2015/08/??)
     on the Launchpad build server (and therefore skipping PEP8, 2to3 and
     pylint). More accurately reflects the system we are mimicking and saves
     approximately 1 minute per test run.
+* Fixed Bug 1438170 duplicity crashes on resume when using gpg-agent with
+  patch from Artur Bodera (abodera).  Applied the same patch to incremental
+  resumes as well.
 
 
 New in v0.7.04 (2015/08/02)

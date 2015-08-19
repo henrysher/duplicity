@@ -1,3 +1,9 @@
+2015-08-19  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed Bug 1438170 duplicity crashes on resume when using gpg-agent with
+      patch from Artur Bodera (abodera).  Applied the same patch to incremental
+      resumes as well.
+
 2015-08-04  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed Bug 1476019 S3 storage bucket not being automatically created
