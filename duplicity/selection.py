@@ -213,25 +213,18 @@ class Select:
                 # Selection function says that the path should be scanned for matching files, but keep going
                 # through the selection functions looking for a real match (0 or 1).
                 scan_pending = True
-            elif result == 1:
-                # Selection function says file should be included.
-                return result
-            elif result == 0:
-                # Selection function says file should be excluded.
-                if scan_pending is False:
-                    return result
-                else:
-                    # scan_pending is True, meaning that a higher-priority selection function has said that this
-                    # folder should be scanned. We therefore return the scan value. We return here, rather than
-                    # below, because we don't want the exclude to be trumped by a lower-priority include.
-                    return 2
-        if scan_pending:
-            # A selection function returned 2 and no other selection functions returned 0 or 1.
-            return 2
-        if result is not None:
-            return result
-        else:
-            return 1
+            elif result == 0 or result == 1:
+                # A real match found, no need to try other functions.
+                break
+        
+        if scan_pending and result != 1:
+            # A selection function returned 2 and either no real match was
+            # found or the highest-priority match was 0
+            result = 2
+        if result is None:
+            result = 1
+
+        return result
 
     def ParseArgs(self, argtuples, filelists):
         """Create selection functions based on list of tuples
