@@ -204,11 +204,15 @@ class Select:
     def Select(self, path):
         """Run through the selection functions and return dominant val 0/1/2"""
         # Only used by diryield and tests. Internal.
+        log.Debug("Selection: examining path %s" % util.ufn(path.name))
         if not self.selection_functions:
+            log.Debug("Selection:     + no selection functions found. Including")
             return 1
         scan_pending = False
         for sf in self.selection_functions:
             result = sf(path)
+            log.Debug("Selection:     result: %4s from function: %s" %
+                      (str(result), sf.name))
             if result is 2:
                 # Selection function says that the path should be scanned for matching files, but keep going
                 # through the selection functions looking for a real match (0 or 1).
@@ -223,6 +227,14 @@ class Select:
             result = 2
         if result is None:
             result = 1
+
+        if result == 0:
+            log.Debug("Selection:     - excluding file")
+        elif result == 1:
+            log.Debug("Selection:     + including file")
+        else:
+            assert result == 2
+            log.Debug("Selection:     ? scanning directory for matches")
 
         return result
 
