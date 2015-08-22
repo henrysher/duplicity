@@ -1,3 +1,9 @@
+2015-08-22  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~w.baranowski/duplicity/selection_debug
+      - This little patch logs debug messages concerning path selection process,
+        and so allows users to debug their include/exclude configuration.
+
 2015-08-19  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed Bug 1438170 duplicity crashes on resume when using gpg-agent with

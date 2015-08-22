@@ -204,34 +204,39 @@ class Select:
     def Select(self, path):
         """Run through the selection functions and return dominant val 0/1/2"""
         # Only used by diryield and tests. Internal.
+        log.Debug("Selection: examining path %s" % util.ufn(path.name))
         if not self.selection_functions:
+            log.Debug("Selection:     + no selection functions found. Including")
             return 1
         scan_pending = False
         for sf in self.selection_functions:
             result = sf(path)
+            log.Debug("Selection:     result: %4s from function: %s" %
+                      (str(result), sf.name))
             if result is 2:
                 # Selection function says that the path should be scanned for matching files, but keep going
                 # through the selection functions looking for a real match (0 or 1).
                 scan_pending = True
-            elif result == 1:
-                # Selection function says file should be included.
-                return result
-            elif result == 0:
-                # Selection function says file should be excluded.
-                if scan_pending is False:
-                    return result
-                else:
-                    # scan_pending is True, meaning that a higher-priority selection function has said that this
-                    # folder should be scanned. We therefore return the scan value. We return here, rather than
-                    # below, because we don't want the exclude to be trumped by a lower-priority include.
-                    return 2
-        if scan_pending:
-            # A selection function returned 2 and no other selection functions returned 0 or 1.
-            return 2
-        if result is not None:
-            return result
+            elif result == 0 or result == 1:
+                # A real match found, no need to try other functions.
+                break
+
+        if scan_pending and result != 1:
+            # A selection function returned 2 and either no real match was
+            # found or the highest-priority match was 0
+            result = 2
+        if result is None:
+            result = 1
+
+        if result == 0:
+            log.Debug("Selection:     - excluding file")
+        elif result == 1:
+            log.Debug("Selection:     + including file")
         else:
-            return 1
+            assert result == 2
+            log.Debug("Selection:     ? scanning directory for matches")
+
+        return result
 
     def ParseArgs(self, argtuples, filelists):
         """Create selection functions based on list of tuples
