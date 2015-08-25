@@ -21,6 +21,12 @@ New in v0.7.05 (2015/08/??)
 * Merged in lp:~w.baranowski/duplicity/selection_debug
   - This little patch logs debug messages concerning path selection process,
     and so allows users to debug their include/exclude configuration.
+* Merged in lp:~germar/duplicity/par2removefix
+  - After reorganisation in revision 981 and the fix for bug #1406173 the
+    par2backend does not remove .par2 files anymore when removing
+    duplicity-*.gpg files.
+  - This banch adds an unfiltered_list() method which is used in
+    delete() and delete_list()
 
 
 New in v0.7.04 (2015/08/02)

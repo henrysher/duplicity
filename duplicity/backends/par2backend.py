@@ -144,8 +144,8 @@ class Par2Backend(backend.Backend):
         """
         self.wrapped_backend._delete(filename)
 
-        remote_list = self.list()
-        filename_list = [filename]
+        remote_list = self.unfiltered_list()
+
         c = re.compile(r'%s(?:\.vol[\d+]*)?\.par2' % filename)
         for remote_filename in remote_list:
             if c.match(remote_filename):
@@ -154,7 +154,7 @@ class Par2Backend(backend.Backend):
     def delete_list(self, filename_list):
         """delete given filename_list and all .par2 files that belong to them
         """
-        remote_list = self.list()
+        remote_list = self.unfiltered_list()
 
         for filename in filename_list[:]:
             c = re.compile(r'%s(?:\.vol[\d+]*)?\.par2' % filename)
@@ -178,6 +178,9 @@ class Par2Backend(backend.Backend):
             if c.match(filename):
                 filtered_list.append(filename)
         return filtered_list
+
+    def unfiltered_list(self):
+        return self.wrapped_backend._list()
 
     def retry_cleanup(self):
         self.wrapped_backend._retry_cleanup()

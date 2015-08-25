@@ -1,3 +1,12 @@
+2015-08-25  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~germar/duplicity/par2removefix
+      - After reorganisation in revision 981 and the fix for bug #1406173 the
+        par2backend does not remove .par2 files anymore when removing
+        duplicity-*.gpg files.
+      - This banch adds an unfiltered_list() method which is used in
+        delete() and delete_list()
+
 2015-08-22  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~w.baranowski/duplicity/selection_debug
