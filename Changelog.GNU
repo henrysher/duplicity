@@ -1,3 +1,7 @@
+2015-09-06  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Updated man pages to reflect more contributors.
+
 2015-08-25  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~germar/duplicity/par2removefix

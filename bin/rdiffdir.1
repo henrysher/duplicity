@@ -1,4 +1,10 @@
 .TH RDIFFDIR 1 "$reldate" "Version $version" "User Manuals" \"  -*- nroff -*-
+.\" disable justification (adjust text to left margin only)
+.\" command line examples stay readable through that
+.ad l
+.\" disable hyphenation
+.nh
+
 .SH NAME
 rdiffdir \- compute and apply signatures and diffs to directories
 .SH SYNOPSIS
@@ -92,7 +98,7 @@ and
 .B delta
 modes, rdiffdir accepts
 .BR duplicity -like
-selection options including --exclude, --exclude-filelist-stdin, etc.
+selection options including --exclude, --exclude-filelist, etc.
 See the
 .BR duplicity (1)
 manual page for more information.
@@ -105,7 +111,22 @@ Bad signatures will be treated as empty instead of logging appropriate
 error message.
 
 .SH AUTHOR
-Ben Escoto <bescoto@stanford.edu>
+.TP
+.BR "Original Author" " - Ben Escoto <bescoto@stanford.edu>"
+.TP
+.BR "Current Maintainer" " - Kenneth Loafman <kenneth@loafman.com>"
+.TP
+.B "Continuous Contributors"
+Edgar Soldin, Mike Terry
+.PP
+Also we'd like to thank everybody posting issues to the mailing list or on
+launchpad, sending in patches or contributing otherwise. Duplicity wouldn't
+be as stable and useful if it weren't for you.
+.PP
+A special thanks goes to rsync.net, a Cloud Storage provider with explicit
+support for duplicity, for several monetary donations and for providing a
+special "duplicity friends" rate for their offsite backup service.  Email
+info@rsync.net for details.
 
 .SH SEE ALSO
 .BR duplicity (1),

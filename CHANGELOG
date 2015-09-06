@@ -1,4 +1,4 @@
-New in v0.7.05 (2015/08/??)
+New in v0.7.05 (2015/09/??)
 ---------------------------
 * Merged in lp:~aaron-whitehouse/duplicity/fix_patch_error
   - Change use of mock.patch in unit tests to accommodate the obsolete
@@ -27,6 +27,7 @@ New in v0.7.05 (2015/08/??)
     duplicity-*.gpg files.
   - This banch adds an unfiltered_list() method which is used in
     delete() and delete_list()
+* Updated man pages to reflect more contributors.
 
 
 New in v0.7.04 (2015/08/02)
