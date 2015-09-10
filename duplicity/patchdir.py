@@ -24,6 +24,7 @@ from future_builtins import filter, map
 import re  # @UnusedImport
 import types
 import os
+import sys
 import tempfile
 
 from duplicity import tarfile  # @UnusedImport
@@ -491,8 +492,14 @@ def patch_seq2ropath(patch_seq):
             """
             librsync insists on a real file object, which we create manually
             by using the duplicity.tempdir to tell us where.
+
+            See https://bugs.launchpad.net/duplicity/+bug/670891 for discussion
+            of os.tmpfile() vs tempfile.TemporaryFile() w.r.t. Windows / Linux.
             """
-            tempfp = tempfile.TemporaryFile(dir=tempdir.default().dir())
+            if sys.platform.startswith(('cygwin', 'windows')):
+                tempfp = os.tmpfile()
+            else:
+                tempfp = tempfile.TemporaryFile(dir=tempdir.default().dir())
             util.copyfileobj(current_file, tempfp)
             assert not current_file.close()
             tempfp.seek(0)
