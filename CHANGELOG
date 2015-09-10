@@ -28,6 +28,7 @@ New in v0.7.05 (2015/09/??)
   - This banch adds an unfiltered_list() method which is used in
     delete() and delete_list()
 * Updated man pages to reflect more contributors.
+* Fix bug #1493573.  Correct option typo in man page.
 
 
 New in v0.7.04 (2015/08/02)
