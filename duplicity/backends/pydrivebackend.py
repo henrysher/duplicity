@@ -108,7 +108,9 @@ class PyDriveBackend(duplicity.backend.Backend):
         elif flist:
             file_id = flist[0]['id']
             self.id_cache[filename] = flist[0]['id']
+            log.Info("PyDrive backend: found file '%s' with id %s on server, adding to cache" % (filename, file_id))
             return flist[0]
+        log.Info("PyDrive backend: file '%s' not found in cache or on server" % (filename,))
         return None
 
     def id_by_name(self, filename):
@@ -123,6 +125,10 @@ class PyDriveBackend(duplicity.backend.Backend):
         if drive_file is None:
             # No existing file, make a new one
             drive_file = self.drive.CreateFile({'title': remote_filename, 'parents': [{"kind": "drive#fileLink", "id": self.folder}]})
+            log.Info("PyDrive backend: creating new file '%s'" % (remote_filename,))
+        else:
+            log.Info("PyDrive backend: replacing existing file '%s' with id '%s'" % (
+                remote_filename, drive_file['id']))
         drive_file.SetContentFile(source_path.name)
         drive_file.Upload()
         self.id_cache[remote_filename] = drive_file['id']
