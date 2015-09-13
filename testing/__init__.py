@@ -21,7 +21,11 @@
 import os
 import sys
 import time
-import unittest
+
+if sys.version_info < (2, 7):
+    import unittest2 as unittest
+else:
+    import unittest
 
 from duplicity import backend
 from duplicity import globals

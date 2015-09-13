@@ -21,7 +21,11 @@
 import os
 import sys
 import subprocess
-import unittest
+
+if sys.version_info < (2, 7):
+    import unittest2 as unittest
+else:
+    import unittest
 
 from . import _top_dir, DuplicityTestCase
 
@@ -61,6 +65,7 @@ class CodeTest(DuplicityTestCase):
     @unittest.skipUnless(os.getenv('RUN_CODE_TESTS', None) == '1',
                          'Must set environment var RUN_CODE_TESTS=1')
     def test_pylint(self):
+        """Pylint test (requires pylint to be installed to pass)"""
         self.run_checker([
             "pylint",
             "-E",

@@ -30,7 +30,7 @@ class TempDirTest(UnitTestCase):
     def test_all(self):
         td = tempdir.default()
 
-        self.assert_(td.mktemp() != td.mktemp())
+        self.assertTrue(td.mktemp() != td.mktemp())
 
         dir = td.mktemp()
         os.mkdir(dir)

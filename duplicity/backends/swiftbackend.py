@@ -63,14 +63,30 @@ class SwiftBackend(duplicity.backend.Backend):
             conn_kwargs['key'] = os.environ['SWIFT_PASSWORD']
             conn_kwargs['authurl'] = os.environ['SWIFT_AUTHURL']
 
+        os_options = {}
+
         if 'SWIFT_AUTHVERSION' in os.environ:
             conn_kwargs['auth_version'] = os.environ['SWIFT_AUTHVERSION']
+            if os.environ['SWIFT_AUTHVERSION'] == '3':
+                if 'SWIFT_USER_DOMAIN_NAME' in os.environ:
+                    os_options.update({'user_domain_name': os.environ['SWIFT_USER_DOMAIN_NAME']})
+                if 'SWIFT_USER_DOMAIN_ID' in os.environ:
+                    os_options.update({'user_domain_id': os.environ['SWIFT_USER_DOMAIN_ID']})
+                if 'SWIFT_PROJECT_DOMAIN_NAME' in os.environ:
+                    os_options.update({'project_domain_name': os.environ['SWIFT_PROJECT_DOMAIN_NAME']})
+                if 'SWIFT_PROJECT_DOMAIN_ID' in os.environ:
+                    os_options.update({'project_domain_id': os.environ['SWIFT_PROJECT_DOMAIN_ID']})
+                if 'SWIFT_TENANTNAME' in os.environ:
+                    os_options.update({'tenant_name': os.environ['SWIFT_TENANTNAME']})
+
         else:
             conn_kwargs['auth_version'] = '1'
         if 'SWIFT_TENANTNAME' in os.environ:
             conn_kwargs['tenant_name'] = os.environ['SWIFT_TENANTNAME']
         if 'SWIFT_REGIONNAME' in os.environ:
-            conn_kwargs['os_options'] = {'region_name': os.environ['SWIFT_REGIONNAME']}
+            os_options.update({'region_name': os.environ['SWIFT_REGIONNAME']})
+
+        conn_kwargs['os_options'] = os_options
 
         self.container = parsed_url.path.lstrip('/')
 

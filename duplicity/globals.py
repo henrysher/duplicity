@@ -79,6 +79,8 @@ backend = None
 # source directory.
 select = None
 
+gpg_binary = None
+
 # Set to GPGProfile that will be used to compress/uncompress encrypted
 # files.  Replaces encryption_keys, sign_key, and passphrase settings.
 gpg_profile = None

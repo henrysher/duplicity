@@ -204,23 +204,39 @@ class Select:
     def Select(self, path):
         """Run through the selection functions and return dominant val 0/1/2"""
         # Only used by diryield and tests. Internal.
+        log.Debug("Selection: examining path %s" % util.ufn(path.name))
         if not self.selection_functions:
+            log.Debug("Selection:     + no selection functions found. Including")
             return 1
         scan_pending = False
-        for sf in self.selection_functions[:-1]:
+        for sf in self.selection_functions:
             result = sf(path)
+            log.Debug("Selection:     result: %4s from function: %s" %
+                      (str(result), sf.name))
             if result is 2:
+                # Selection function says that the path should be scanned for matching files, but keep going
+                # through the selection functions looking for a real match (0 or 1).
                 scan_pending = True
-            if result in [0, 1]:
-                return result
-        if scan_pending:
-            return 2
-        sf = self.selection_functions[-1]
-        result = sf(path)
-        if result is not None:
-            return result
+            elif result == 0 or result == 1:
+                # A real match found, no need to try other functions.
+                break
+
+        if scan_pending and result != 1:
+            # A selection function returned 2 and either no real match was
+            # found or the highest-priority match was 0
+            result = 2
+        if result is None:
+            result = 1
+
+        if result == 0:
+            log.Debug("Selection:     - excluding file")
+        elif result == 1:
+            log.Debug("Selection:     + including file")
         else:
-            return 1
+            assert result == 2
+            log.Debug("Selection:     ? scanning directory for matches")
+
+        return result
 
     def ParseArgs(self, argtuples, filelists):
         """Create selection functions based on list of tuples
@@ -327,7 +343,7 @@ probably isn't what you meant.""") %
 
         include = include_default
         if line[:2] == "+ ":
-            # Check for "+ "/"- " syntax
+            # Check for "+ " or "- " syntax
             include = 1
             line = line[2:]
         elif line[:2] == "- ":
@@ -436,11 +452,7 @@ probably isn't what you meant.""") %
 
         def exclude_sel_func(path):
             # do not follow symbolic links when checking for file existence!
-            # path.append creates a new path object, which in turn uses setdata
-            # which in turn follows symbolic links...
-            if path.issym():
-                return None
-            if path.append(filename).exists():
+            if path.isdir() and path.append(filename).exists():
                 return 0
             else:
                 return None
@@ -466,24 +478,39 @@ probably isn't what you meant.""") %
 
         """
         # Internal. Used by glob_get_sf and unit tests.
+        match_only_dirs = False
+
+        if filename != "/" and filename[-1] == "/":
+            match_only_dirs = True
+            # Remove trailing / from directory name (unless that is the entire
+            # string)
+            filename = filename[:-1]
+
         if not filename.startswith(self.prefix):
             raise FilePrefixError(filename)
         index = tuple(filter(lambda x: x,
                              filename[len(self.prefix):].split("/")))
-        return self.glob_get_tuple_sf(index, include)
+        return self.glob_get_tuple_sf(index, include, match_only_dirs)
 
-    def glob_get_tuple_sf(self, tuple, include):
+    def glob_get_tuple_sf(self, tuple, include, match_only_dirs=False):
         """Return selection function based on tuple"""
         # Internal. Used by glob_get_filename_sf.
+
         def include_sel_func(path):
-            if (path.index == tuple[:len(path.index)] or
+            if match_only_dirs and not path.isdir():
+                # If the glob ended with a /, only match directories
+                return None
+            elif (path.index == tuple[:len(path.index)] or
                     path.index[:len(tuple)] == tuple):
                 return 1  # /foo/bar implicitly matches /foo, vice-versa
             else:
                 return None
 
         def exclude_sel_func(path):
-            if path.index[:len(tuple)] == tuple:
+            if match_only_dirs and not path.isdir():
+                # If the glob ended with a /, only match directories
+                return None
+            elif path.index[:len(tuple)] == tuple:
                 return 0  # /foo excludes /foo/bar, not vice-versa
             else:
                 return None
@@ -512,6 +539,15 @@ probably isn't what you meant.""") %
 
         """
         # Internal. Used by glob_get_sf and unit tests.
+
+        match_only_dirs = False
+
+        if glob_str != "/" and glob_str[-1] == "/":
+            match_only_dirs = True
+            # Remove trailing / from directory name (unless that is the entire
+            # string)
+            glob_str = glob_str[:-1]
+
         if glob_str.lower().startswith("ignorecase:"):
             re_comp = lambda r: re.compile(r, re.I | re.S)
             glob_str = glob_str[len("ignorecase:"):]
@@ -528,7 +564,10 @@ probably isn't what you meant.""") %
                                "|".join(self.glob_get_prefix_res(glob_str)))
 
         def include_sel_func(path):
-            if glob_comp_re.match(path.name):
+            if match_only_dirs and not path.isdir():
+                # If the glob ended with a /, only match directories
+                return None
+            elif glob_comp_re.match(path.name):
                 return 1
             elif scan_comp_re.match(path.name):
                 return 2
@@ -536,7 +575,10 @@ probably isn't what you meant.""") %
                 return None
 
         def exclude_sel_func(path):
-            if glob_comp_re.match(path.name):
+            if match_only_dirs and not path.isdir():
+                # If the glob ended with a /, only match directories
+                return None
+            elif glob_comp_re.match(path.name):
                 return 0
             else:
                 return None

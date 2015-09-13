@@ -1,5 +1,7 @@
 *.egg
 *.log
+.eggs
+.idea
 .project
 .pydevproject
 .settings

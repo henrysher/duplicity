@@ -1,3 +1,133 @@
+2015-09-06  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fix bug #1493573.  Correct option name in man page.
+    * Fix bug #1494228 CygWin: TypeError: basis_file must be a (true) file
+      - The problem that caused the change to tempfile.TemporaryFile was due
+        to the fact that os.tmpfile always creates its file in the system
+        temp directory, not in the directory specified.  The fix applied was
+        to use os.tmpfile in cygwin/windows and tempfile.TemporaryFile in all
+        the rest.  This means that cygwin is now broken with respect to temp
+        file placement of this one file (deleted automatically on close).
+
+2015-09-06  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Updated man pages to reflect more contributors.
+
+2015-08-25  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~germar/duplicity/par2removefix
+      - After reorganisation in revision 981 and the fix for bug #1406173 the
+        par2backend does not remove .par2 files anymore when removing
+        duplicity-*.gpg files.
+      - This banch adds an unfiltered_list() method which is used in
+        delete() and delete_list()
+
+2015-08-22  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~w.baranowski/duplicity/selection_debug
+      - This little patch logs debug messages concerning path selection process,
+        and so allows users to debug their include/exclude configuration.
+
+2015-08-19  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed Bug 1438170 duplicity crashes on resume when using gpg-agent with
+      patch from Artur Bodera (abodera).  Applied the same patch to incremental
+      resumes as well.
+
+2015-08-04  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed Bug 1476019 S3 storage bucket not being automatically created
+      with patch from abeverley
+    * Merged in lp:~aaron-whitehouse/duplicity/launchpad_tox_profile
+      - Add tox testing profile that mimics the packages installed on the
+        Launchpad build server, to reduce the likelihood of tests passing
+        our test suite, but failing on the build server (e.g. because of
+        the out-of-date mock version).
+    * Merged in lp:~aaron-whitehouse/duplicity/disable_code_tests_for_lpbuildd
+      - Set RUN_CODE_TESTS to 0 for lpbuildd tox profile, reflecting its value
+        on the Launchpad build server (and therefore skipping PEP8, 2to3 and
+        pylint). More accurately reflects the system we are mimicking and saves
+        approximately 1 minute per test run.
+
+2015-08-03  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/fix_patch_error
+      - Change use of mock.patch in unit tests to accommodate the obsolete
+        version of python-mock on the build server.
+
+2015-08-02  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~dag-stenstad/duplicity/swift_authversion_3_support
+      - Added support for Openstack Identity v3 in the Swift backend.
+    * Merged in lp:~aaron-whitehouse/duplicity/fix_2to3_issues
+      - Fixed 2to3 issues. Updated README-REPO with more test information. Updated pylint and
+        test_diff2 descriptions to make it clear these require packages to be installed on the
+        sytem to pass. All tests pass on Python 2.6 and Python 2.7 as at this revision.
+    * Prep for 0.7.04
+
+2015-07-31  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/trailing_slash_match_dirs
+      - Made globs with trailing slashes only match directories, not files, fixing Bug #1479545.
+    * Merged in lp:~aaron-whitehouse/duplicity/improve_tox_and_python2-6_testing
+      - Testing improvements, particularly in relation to testing against Python version 2.6:
+        * tox.ini fixed so that it is possible to run individual tests against both Python 2.6 and 2.7;
+        * updated test_code.py to use unittest2 for Python versions < 2.7 (instead of failing);
+        * ./run-tests now correctly runs all tests against both Python 2.6 and 2.7; and
+        * improved testing directions in README-REPO.
+
+2015-07-29  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/bug_884371
+      - Fixed Bug #884371 - Stopped an exclude glob trumping an earlier scan glob, but also
+        ensured that an exclude glob is not trumped by a later include. This fix is important,
+        as without it files that are specified to be included are not being backed up as expected.
+      - Fixed Bug #932482 - a trailing slash at the end of globs no longer prevents them working
+        as expected.
+    * Merged in lp:~aaron-whitehouse/duplicity/reenable_tests
+      - Re-enable unit.test_selection tests that had been temporarily commented out.
+
+2015-07-04  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug 1471348 Multi back-end doesn't work with hubiC
+      - added init of superclass in both cases.
+    * Fixed bug 1471348 Multi back-end doesn't work with hubiC (again)
+      - hubiC should reach up to duplicity.backend.__init__
+
+2015-07-03  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/fix_POTFILES.in_and_run-tests
+      - Fixed two filename references in po/POTFILES.in, a mistake which crept in in
+        rev 1093 and caused testing/run-tests to fail with "IndexError: list index
+        out of range".
+    * Merged in lp:~aaron-whitehouse/duplicity/reactivate_progress_test
+      - Re-enable the test of the --progress option (test_exclude_filelist_progress_option),
+        which was marked as an expected failure. The issue causing this test to fail was
+        fixed in revision 1095 and the test now passes.
+
+2015-06-21  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~ed.so/duplicity/gpg.binary
+      - new parameter --gpg-binary allows user to point to a different gpg binary,
+        not necessarily in path
+
+2015-06-20  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug 1466582 - reduce unnecessary syscall with --exclude-if-present - with
+      patch from Kuang-che Wu to make sure resulting path is a directory.
+
+2015-06-17  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug 1466160 - pydrive backend is slow to remove old backup set - with
+      patch from Kuang-che Wu to implement _delete_list().
+
+2015-06-16  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug 1465335 - pydrive still use files in trash can - with patch
+      from Kuang-che Wu to ignore trashed files.
+    * Fixed bug 1452263 - par2 option not working on small processors - with patch
+      from Kuang-che Wu to ignore default 30 second timeout.
+
 2015-06-14  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug 791794 - description of --gpg-options is misleading, Simply

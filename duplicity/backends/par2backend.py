@@ -74,7 +74,8 @@ class Par2Backend(backend.Backend):
 
         log.Info("Create Par2 recovery files")
         par2create = 'par2 c -r%d -n1 %s %s' % (self.redundancy, self.common_options, source_symlink.get_canonical())
-        out, returncode = pexpect.run(par2create, -1, True)
+        out, returncode = pexpect.run(par2create, None, True)
+
         source_symlink.delete()
         files_to_transfer = []
         if not returncode:
@@ -113,7 +114,7 @@ class Par2Backend(backend.Backend):
             self.wrapped_backend._get(par2file.get_filename(), par2file)
 
             par2verify = 'par2 v %s %s %s' % (self.common_options, par2file.get_canonical(), local_path_temp.get_canonical())
-            out, returncode = pexpect.run(par2verify, -1, True)
+            out, returncode = pexpect.run(par2verify, None, True)
 
             if returncode:
                 log.Warn("File is corrupt. Try to repair %s" % remote_filename)
@@ -125,7 +126,7 @@ class Par2Backend(backend.Backend):
                     self.wrapped_backend._get(filename, file)
 
                 par2repair = 'par2 r %s %s %s' % (self.common_options, par2file.get_canonical(), local_path_temp.get_canonical())
-                out, returncode = pexpect.run(par2repair, -1, True)
+                out, returncode = pexpect.run(par2repair, None, True)
 
                 if returncode:
                     log.Error("Failed to repair %s" % remote_filename)
@@ -143,8 +144,8 @@ class Par2Backend(backend.Backend):
         """
         self.wrapped_backend._delete(filename)
 
-        remote_list = self.list()
-        filename_list = [filename]
+        remote_list = self.unfiltered_list()
+
         c = re.compile(r'%s(?:\.vol[\d+]*)?\.par2' % filename)
         for remote_filename in remote_list:
             if c.match(remote_filename):
@@ -153,7 +154,7 @@ class Par2Backend(backend.Backend):
     def delete_list(self, filename_list):
         """delete given filename_list and all .par2 files that belong to them
         """
-        remote_list = self.list()
+        remote_list = self.unfiltered_list()
 
         for filename in filename_list[:]:
             c = re.compile(r'%s(?:\.vol[\d+]*)?\.par2' % filename)
@@ -177,6 +178,9 @@ class Par2Backend(backend.Backend):
             if c.match(filename):
                 filtered_list.append(filename)
         return filtered_list
+
+    def unfiltered_list(self):
+        return self.wrapped_backend._list()
 
     def retry_cleanup(self):
         self.wrapped_backend._retry_cleanup()

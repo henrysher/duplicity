@@ -1,14 +1,17 @@
 REPO README - Notes for people checking out of Launchpad (bzr)
 --------------------------------------------------------------
 
+-------------------------
 Getting duplicity to run:
 -------------------------
 
 By the numbers:
 1) Do the checkout to a location called $DUP_ROOT:
-   bzr branch lp:duplicity $DUP_ROOT   		                  [for the dev branch]
-   or 
-   bzr branch lp:~duplicity-team/duplicity/0.6-releases $DUP_ROOT [for the stable branch]
+   [for the dev branch]
+   bzr branch lp:duplicity $DUP_ROOT
+   or
+   [for the stable branch]
+   bzr branch lp:~duplicity-team/duplicity/0.6-releases $DUP_ROOT
 2) cd $DUP_ROOT/duplicity
 3) Run "python compilec.py" to create _librsync.so
 4) cd ..
@@ -24,7 +27,55 @@ or
 
 PYTHONPATH=$DUP_ROOT bin/rdiffdir
 
+-----------------------
 Running the unit tests:
 -----------------------
 
+To run all tests:
 cd testing; ./run-tests
+
+You can run specific tests using:
+tox -- -s [folder].[folder].[file].[class].[test]
+For example:
+tox -- -s testing.unit.test_selection
+or:
+tox -- -s testing.unit.test_selection.MatchingTest.test_tuple_include
+
+Note: some tests require rdiff and pylint to be installed on the system for
+them to pass.
+
+Please run all tests on your branch (run-tests) before proposing a merge, to
+ensure that all tests pass. The decorator @unittest.expectedFailure can be used
+to commit a known-failing test case without breaking the test suite, for
+example to exhibit the behaviour in a bug report before it has been fixed:
+
+if sys.version_info < (2, 7):
+    import unittest2 as unittest
+else:
+    import unittest
+
+
+class TestClass(unittest.TestCase):
+    """Test class to show expectedFailure"""
+
+    @unittest.expectedFailure
+    def test_expected_failure(self):
+        """Test behaviour of expectedFailure"""
+        self.assertEqual(1, 2)
+
+-----------------------------------------
+Testing against multiple Python versions:
+-----------------------------------------
+
+Duplicity currently supports Python versions v2.6 or later. Duplicity uses tox
+to make it easy to test your code against multiple Python versions. Running
+tests using the commands above will automatically test code against both
+Python v2.6 and v2.7, if you have both installed on your system. It will also
+test against the versions of dependencies used by the Launchpad build system.
+You can test against a single environment, e.g.
+tox -e py26
+for example if you are working on fixing a bug, but please do a full run-tests
+before submitting a merge request.
+
+For instructions on installing Python v2.6 on newer versions of Ubuntu, see
+https://launchpad.net/~fkrull/+archive/ubuntu/deadsnakes

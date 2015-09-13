@@ -114,6 +114,9 @@ class GPGFile:
 
         # Start GPG process - copied from GnuPGInterface docstring.
         gnupg = gpginterface.GnuPG()
+        # overrides default gpg binary 'gpg'
+        if globals.gpg_binary is not None:
+            gnupg.call = globals.gpg_binary
         gnupg.options.meta_interactive = 0
         gnupg.options.extra_args.append('--no-secmem-warning')
         if globals.use_agent:

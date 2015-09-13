@@ -158,14 +158,16 @@ def get_passphrase(n, action, for_signing=False):
     # there is no sign_key and there are recipients
     elif (action == "full"
           and (globals.gpg_profile.recipients or globals.gpg_profile.hidden_recipients)
-          and not globals.gpg_profile.sign_key):
+          and not globals.gpg_profile.sign_key
+          and not globals.restart):
         return ""
 
     # for an inc backup, we don't need a password if
     # there is no sign_key and there are recipients
     elif (action == "inc"
           and (globals.gpg_profile.recipients or globals.gpg_profile.hidden_recipients)
-          and not globals.gpg_profile.sign_key):
+          and not globals.gpg_profile.sign_key
+          and not globals.restart):
         return ""
 
     # Finally, ask the user for the passphrase
