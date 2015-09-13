@@ -20,6 +20,7 @@ import string
 import os
 
 import duplicity.backend
+from duplicity import log
 from duplicity.errors import BackendException
 
 
@@ -35,6 +36,7 @@ class PyDriveBackend(duplicity.backend.Backend):
             from oauth2client.client import SignedJwtAssertionCredentials
             from pydrive.auth import GoogleAuth
             from pydrive.drive import GoogleDrive
+            from pydrive.files import FileNotUploadedError
         except ImportError:
             raise BackendException('PyDrive backend requires PyDrive installation'
                                    'Please read the manpage to fix.')
@@ -112,10 +114,11 @@ class PyDriveBackend(duplicity.backend.Backend):
         return None
 
     def id_by_name(self, filename):
-        try:
-            return next(item for item in self.FilesList() if item['title'] == filename)['id']
-        except:
+        drive_file = self.file_by_name(filename)
+        if drive_file is None:
             return ''
+        else:
+            return drive_file['id']
 
     def _put(self, source_path, remote_filename):
         drive_file = self.file_by_name(remote_filename)
@@ -128,25 +131,52 @@ class PyDriveBackend(duplicity.backend.Backend):
                 remote_filename, drive_file['id']))
         drive_file.SetContentFile(source_path.name)
         drive_file.Upload()
+        self.id_cache[remote_filename] = drive_file['id']
 
     def _get(self, remote_filename, local_path):
-        drive_file = self.drive.CreateFile({'id': self.id_by_name(remote_filename)})
+        drive_file = self.file_by_name(remote_filename)
         drive_file.GetContentFile(local_path.name)
 
     def _list(self):
-        return [item['title'] for item in self.FilesList()]
+        drive_files = self.drive.ListFile({
+            'q': "'" + self.folder + "' in parents and trashed=false",
+            'fields': 'items(title,id),nextPageToken'}).GetList()
+        filenames = set(item['title'] for item in drive_files)
+        # Check the cache as well. A file might have just been uploaded but
+        # not yet appear in the listing.
+        # Note: do not use iterkeys() here, because file_by_name will modify
+        # the cache if it finds invalid entries.
+        for filename in self.id_cache.keys():
+            if (filename not in filenames) and (self.file_by_name(filename) is not None):
+                filenames.add(filename)
+        return list(filenames)
 
     def _delete(self, filename):
         file_id = self.id_by_name(filename)
-        drive_file = self.drive.CreateFile({'id': file_id})
-        drive_file.auth.service.files().delete(fileId=drive_file['id']).execute()
+        if file_id != '':
+            self.drive.auth.service.files().delete(fileId=file_id).execute()
+        else:
+            log.Warn("File '%s' does not exist while trying to delete it" % (filename,))
 
     def _query(self, filename):
-        try:
-            size = int((item for item in self.FilesList() if item['title'] == filename).next()['fileSize'])
-        except:
+        drive_file = self.file_by_name(filename)
+        if drive_file is None:
             size = -1
+        else:
+            size = int(drive_file['fileSize'])
         return {'size': size}
+
+    def _error_code(self, operation, error):
+        from pydrive.files import ApiRequestError, FileNotUploadedError
+        if isinstance(error, FileNotUploadedError):
+            return log.ErrorCode.backend_not_found
+        elif isinstance(error, ApiRequestError):
+            http_status = error.args[0].resp.status
+            if http_status == 404:
+                return log.ErrorCode.backend_not_found
+            elif http_status == 403:
+                return log.ErrorCode.backend_permission_denied
+        return log.ErrorCode.backend_error
 
 duplicity.backend.register_backend('pydrive', PyDriveBackend)
 """ pydrive is an alternate way to access gdocs """
