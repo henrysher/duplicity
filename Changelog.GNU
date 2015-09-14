@@ -1,3 +1,12 @@
+2015-09-14  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~bmerry/duplicity/pydrive-id-cache
+      - This fixes the issue a number of users (including myself) have been
+        having with duplicity creating files with duplicate filenames on
+        Google Drive. It keeps a runtime cache of filename to object ID
+        mappings, so that once it has uploaded an object it won't be fooled
+        by weakly consistent directory listings.
+
 2015-09-06  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fix bug #1493573.  Correct option name in man page.

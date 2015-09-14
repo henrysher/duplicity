@@ -36,6 +36,12 @@ New in v0.7.05 (2015/09/??)
     to use os.tmpfile in cygwin/windows and tempfile.TemporaryFile in all
     the rest.  This means that cygwin is now broken with respect to temp
     file placement of this one file (deleted automatically on close).
+* Merged in lp:~bmerry/duplicity/pydrive-id-cache
+  - This fixes the issue a number of users (including myself) have been
+    having with duplicity creating files with duplicate filenames on
+    Google Drive. It keeps a runtime cache of filename to object ID
+    mappings, so that once it has uploaded an object it won't be fooled
+    by weakly consistent directory listings.
 
 
 New in v0.7.04 (2015/08/02)
