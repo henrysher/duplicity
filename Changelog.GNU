@@ -1,3 +1,8 @@
+2015-09-15  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~duplicity-team/duplicity/po-updates
+    * Prep for 0.7.05
+
 2015-09-14  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~bmerry/duplicity/pydrive-id-cache

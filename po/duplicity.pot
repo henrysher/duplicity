@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2015-08-22 05:52-0500\n"
+"POT-Creation-Date: 2015-09-15 08:44-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -871,17 +871,17 @@ msgstr ""
 msgid "task execution done (success: %s)"
 msgstr ""
 
-#: ../duplicity/patchdir.py:79 ../duplicity/patchdir.py:84
+#: ../duplicity/patchdir.py:80 ../duplicity/patchdir.py:85
 #, python-format
 msgid "Patching %s"
 msgstr ""
 
-#: ../duplicity/patchdir.py:525
+#: ../duplicity/patchdir.py:532
 #, python-format
 msgid "Error '%s' patching %s"
 msgstr ""
 
-#: ../duplicity/patchdir.py:600
+#: ../duplicity/patchdir.py:607
 #, python-format
 msgid "Writing %s of type %s"
 msgstr ""
@@ -1171,6 +1171,11 @@ msgstr ""
 #: ../duplicity/lazy.py:419
 #, python-format
 msgid "Skipping %s because of previous error"
+msgstr ""
+
+#: ../duplicity/backends/pydrivebackend.py:107
+#, python-format
+msgid "PyDrive backend: multiple files called '%s'."
 msgstr ""
 
 #: ../duplicity/backends/multibackend.py:84
