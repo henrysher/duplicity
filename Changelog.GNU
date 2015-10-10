@@ -1,4 +1,4 @@
-2015-09-15  Kenneth Loafman  <kenneth@loafman.com>
+2015-10-10  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~mnjul/duplicity/s3-infreq-access
       - This adds support for AWS S3's newly announced Infrequent Access 
