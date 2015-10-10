@@ -13,6 +13,9 @@
         option. Its wording derives from Amazon's official announcement: 
         https://aws.amazon.com/about-aws/whats-new/2015/09/announcing-new-\
         amazon-s3-storage-class-and-lower-glacier-prices/
+    * The ptyprocess module no longer supports Python 2.6, so fix tox.ini to
+      use an older version.  Make explicit environs for all tests.
+
 
 2015-09-15  Kenneth Loafman  <kenneth@loafman.com>
 
