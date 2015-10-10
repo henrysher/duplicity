@@ -726,6 +726,14 @@ volumes to 99.99% instead the 99.999999999% durability offered by Standard
 Storage on S3.
 
 .TP
+.BI "--s3-use-ia"
+Store volumes using Standard - Infrequent Access when uploading to Amazon S3.
+This storage class has a lower storage cost but a higher per-request cost, and
+the storage cost is calculated against a 30-day storage minimum. According to
+Amazon, this storage is ideal for long-term file storage, backups, and disaster
+recovery.
+
+.TP
 .BI "--s3-use-multiprocessing"
 Allow multipart volumne uploads to S3 through multiprocessing. This option
 requires Python 2.6 and can be used to make uploads to S3 more efficient.

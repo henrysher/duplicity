@@ -191,6 +191,9 @@ s3_unencrypted_connection = False
 # Whether to use S3 Reduced Redudancy Storage
 s3_use_rrs = False
 
+# Whether to use S3 Infrequent Access Storage
+s3_use_ia = False
+
 # True if we should use boto multiprocessing version
 s3_use_multiprocessing = False
 

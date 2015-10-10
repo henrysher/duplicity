@@ -1,5 +1,21 @@
 2015-09-15  Kenneth Loafman  <kenneth@loafman.com>
 
+    * Merged in lp:~mnjul/duplicity/s3-infreq-access
+      - This adds support for AWS S3's newly announced Infrequent Access 
+        storage class and is intended to implement Blueprint: 
+        https://blueprints.launchpad.net/duplicity/+spec/aws-s3-std-ia-class .
+      - A new command line option, --s3-use-ia, is added, and boto backend 
+        will automatically use the correct storage class value depending on 
+        whether --s3-use-rrs and --s3-use-ia is set. Command line parser will 
+        prompt error if both --s3-use-ia and --s3-use-rrs are used together, 
+        as they conflict with each other.
+      - The manpage has been updated giving a short explanation on the new 
+        option. Its wording derives from Amazon's official announcement: 
+        https://aws.amazon.com/about-aws/whats-new/2015/09/announcing-new-\
+        amazon-s3-storage-class-and-lower-glacier-prices/
+
+2015-09-15  Kenneth Loafman  <kenneth@loafman.com>
+
     * Merged in lp:~duplicity-team/duplicity/po-updates
     * Prep for 0.7.05
 

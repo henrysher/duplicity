@@ -523,6 +523,9 @@ def parse_cmdline_options(arglist):
     # Whether to use S3 Reduced Redudancy Storage
     parser.add_option("--s3-use-rrs", action="store_true")
 
+    # Whether to use S3 Infrequent Access Storage
+    parser.add_option("--s3-use-ia", action="store_true")
+
     # Whether to use "new-style" subdomain addressing for S3 buckets. Such
     # use is not backwards-compatible with upper-case buckets, or buckets
     # that are otherwise not expressable in a valid hostname.
@@ -1057,6 +1060,8 @@ def check_consistency(action):
         if globals.restore_dir:
             command_line_error("restore option incompatible with %s backup"
                                % (action,))
+        if globals.s3_use_rrs and globals.s3_use_ia:
+            command_line_error("--s3-use-rrs and --s3-use-ia cannot be used together")
 
 
 def ProcessCommandLine(cmdline_list):
