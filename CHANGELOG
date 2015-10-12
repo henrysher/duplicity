@@ -15,6 +15,9 @@ New in v0.7.06 (2015/10/??)
     amazon-s3-storage-class-and-lower-glacier-prices/
 * The ptyprocess module no longer supports Python 2.6, so fix tox.ini to
   use an older version.  Make explicit environs for all tests.
+* Upgrade to newest version of pep8 and pylint.   Add three ignores 
+  to test_pep8 and one to test_pylint to get the rest to pass.  They 
+  are all valid in our case.
 
 
 New in v0.7.05 (2015/09/15)

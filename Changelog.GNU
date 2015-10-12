@@ -1,3 +1,9 @@
+2015-10-12  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Upgrade to newest version of pep8 and pylint.   Add three ignores 
+      to test_pep8 and one to test_pylint to get the rest to pass.  They 
+      are all valid in our case.
+
 2015-10-10  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~mnjul/duplicity/s3-infreq-access
