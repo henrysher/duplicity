@@ -6,6 +6,7 @@
 .pydevproject
 .settings
 .tox
+__pycache__
 build
 config.py
 duplicity.egg-info
