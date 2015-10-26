@@ -67,6 +67,7 @@ New in v0.7.05 (2015/09/15)
 * Merged in lp:~duplicity-team/duplicity/po-updates
 * Applied patch from Alexander Zangerl to update to changes in lockfile
   API 0.9 and later.  Updated README to notify users.
+* Modded tox.ini to use the latest lockfile.
 
 
 New in v0.7.04 (2015/08/02)

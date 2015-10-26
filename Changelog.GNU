@@ -2,6 +2,7 @@
 
     * Applied patch from Alexander Zangerl to update to changes in lockfile
       API 0.9 and later.  Updated README to notify users.
+    * Modded tox.ini to use the latest lockfile.
 
 2015-10-12  Kenneth Loafman  <kenneth@loafman.com>
 
