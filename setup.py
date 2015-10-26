@@ -30,8 +30,8 @@ from distutils.command.build_scripts import build_scripts
 
 version_string = "$version"
 
-if sys.version_info[:2] < (2, 6):
-    print("Sorry, duplicity requires version 2.6 or later of python")
+if sys.version_info[:2] < (2, 6) or sys.version_info[:2] > (2, 7):
+    print("Sorry, duplicity requires version 2.6 or 2.7 of python.")
     sys.exit(1)
 
 incdir_list = libdir_list = None
