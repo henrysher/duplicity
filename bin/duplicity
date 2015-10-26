@@ -39,7 +39,7 @@ import resource
 import re
 import threading
 from datetime import datetime
-from lockfile import FileLock
+from lockfile import LockFile
 
 if '--pydevd' in sys.argv:
     # The following is for starting remote debugging in Eclipse with Pydev.
@@ -1356,7 +1356,7 @@ See https://bugs.launchpad.net/duplicity/+bug/931175
     # determine what action we're performing and process command line
     action = commandline.ProcessCommandLine(sys.argv[1:])
 
-    globals.lockfile = FileLock(os.path.join(globals.archive_dir.name, "lockfile"), threaded=False)
+    globals.lockfile = LockFile(os.path.join(globals.archive_dir.name, "lockfile"), threaded=False)
     if globals.lockfile.is_locked():
         log.FatalError(
             "Another instance is already running with this archive directory\n"

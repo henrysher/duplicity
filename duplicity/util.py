@@ -31,7 +31,7 @@ import sys
 import string
 import traceback
 
-from lockfile import FileLock, UnlockError
+from lockfile import LockFile, UnlockError
 
 from duplicity import tarfile
 

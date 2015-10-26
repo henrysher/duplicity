@@ -65,6 +65,8 @@ New in v0.7.05 (2015/09/15)
     mappings, so that once it has uploaded an object it won't be fooled
     by weakly consistent directory listings.
 * Merged in lp:~duplicity-team/duplicity/po-updates
+* Applied patch from Alexander Zangerl to update to changes in lockfile
+  API 0.9 and later.  Updated README to notify users.
 
 
 New in v0.7.04 (2015/08/02)

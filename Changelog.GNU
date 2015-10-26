@@ -1,3 +1,8 @@
+2015-10-26  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Applied patch from Alexander Zangerl to update to changes in lockfile
+      API 0.9 and later.  Updated README to notify users.
+
 2015-10-12  Kenneth Loafman  <kenneth@loafman.com>
 
     * Upgrade to newest version of pep8 and pylint.   Add three ignores 
