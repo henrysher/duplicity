@@ -3,6 +3,10 @@
     * Applied patch from Alexander Zangerl to update to changes in lockfile
       API 0.9 and later.  Updated README to notify users.
     * Modded tox.ini to use the latest lockfile.
+    * Merged in lp:~ed.so/duplicity/setup.shebang
+      - Having the python interpreter searched in the PATH is much more 
+        flexible than the /usr/bin/python inserted into our scripts shebang 
+        by setuptools.  This patch prevents that. don't touch my shebang! :)
 
 2015-10-12  Kenneth Loafman  <kenneth@loafman.com>
 
