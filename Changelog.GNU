@@ -1,3 +1,7 @@
+2015-10-27  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Cleanup issues around Launchpad build, mainly lockfile >= 0.9.
+
 2015-10-26  Kenneth Loafman  <kenneth@loafman.com>
 
     * Applied patch from Alexander Zangerl to update to changes in lockfile

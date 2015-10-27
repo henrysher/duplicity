@@ -123,6 +123,7 @@ class SDistCommand(sdist):
         os.system("mkdir -p " + self.dist_dir)
         os.system("mv duplicity-" + version + ".tar.gz " + self.dist_dir)
 
+
 # don't touch my shebang
 class BSCommand (build_scripts):
     def run(self):
@@ -162,6 +163,7 @@ class BSCommand (build_scripts):
                                  file, oldmode, newmode)
                         os.chmod(file, newmode)
 
+
 setup(name="duplicity",
       version=version_string,
       description="Encrypted backup using rsync algorithm",
@@ -171,12 +173,12 @@ setup(name="duplicity",
       maintainer_email="kenneth@loafman.com",
       url="http://duplicity.nongnu.org/index.html",
       packages=['duplicity',
-                  'duplicity.backends',
-                  'duplicity.backends.pyrax_identity',
-                  'testing',
-                  'testing.functional',
-                  'testing.overrides',
-                  'testing.unit'],
+                'duplicity.backends',
+                'duplicity.backends.pyrax_identity',
+                'testing',
+                'testing.functional',
+                'testing.overrides',
+                'testing.unit'],
       package_dir={"duplicity": "duplicity",
                    "duplicity.backends": "duplicity/backends", },
       ext_modules=[Extension("duplicity._librsync",
@@ -186,7 +188,8 @@ setup(name="duplicity",
                              libraries=["rsync"])],
       scripts=['bin/rdiffdir', 'bin/duplicity'],
       data_files=data_files,
-      tests_require=['lockfile', 'mock', 'pexpect'],
+      install_requires=['lockfile>=0.9'],
+      tests_require=['lockfile>=0.9', 'mock', 'pexpect'],
       test_suite='testing',
       cmdclass={'test': TestCommand,
                 'install': InstallCommand,
