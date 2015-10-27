@@ -1,6 +1,9 @@
 2015-10-27  Kenneth Loafman  <kenneth@loafman.com>
 
     * Cleanup issues around Launchpad build, mainly lockfile >= 0.9.
+    * Merged in lp:~michal-s/duplicity/duplicity
+      - WindowsAzureMissingResourceError and WindowsAzureConflictError 
+        changed due to SDK changes.
 
 2015-10-26  Kenneth Loafman  <kenneth@loafman.com>
 

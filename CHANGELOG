@@ -73,6 +73,9 @@ New in v0.7.05 (2015/09/15)
     flexible than the /usr/bin/python inserted into our scripts shebang 
     by setuptools.  This patch prevents that. don't touch my shebang! :)
 * Cleanup issues around Launchpad build, mainly lockfile >= 0.9.
+* Merged in lp:~michal-s/duplicity/duplicity
+  - WindowsAzureMissingResourceError and WindowsAzureConflictError 
+    changed due to SDK changes.
 
 
 New in v0.7.04 (2015/08/02)
