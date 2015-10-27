@@ -49,13 +49,13 @@ class AzureBackend(duplicity.backend.Backend):
 
         account_name = os.environ['AZURE_ACCOUNT_NAME']
         account_key = os.environ['AZURE_ACCOUNT_KEY']
-        self.WindowsAzureMissingResourceError = azure.WindowsAzureMissingResourceError
+        self.WindowsAzureMissingResourceError = azure.common.AzureMissingResourceHttpError
         self.blob_service = BlobService(account_name=account_name, account_key=account_key)
         # TODO: validate container name
         self.container = parsed_url.path.lstrip('/')
         try:
             self.blob_service.create_container(self.container, fail_on_exist=True)
-        except azure.WindowsAzureConflictError:
+        except azure.common.AzureConflictHttpError:
             # Indicates that the resource could not be created because it already exists.
             pass
         except Exception as e:
