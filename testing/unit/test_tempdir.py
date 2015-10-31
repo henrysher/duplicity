@@ -20,6 +20,7 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import os
+import tempfile
 import unittest
 
 from duplicity import tempdir
@@ -30,20 +31,57 @@ class TempDirTest(UnitTestCase):
     def test_all(self):
         td = tempdir.default()
 
+        # are generated temp files unique?
         self.assertTrue(td.mktemp() != td.mktemp())
 
+        # create and remove a temp dir 
         dir = td.mktemp()
         os.mkdir(dir)
         os.rmdir(dir)
 
+        # test mkstemp()
         fd, fname = td.mkstemp()
         os.close(fd)
         os.unlink(fname)
         td.forget(fname)
 
+        # test mkstemp_file()
         fo, fname = td.mkstemp_file()
         fo.close()  # don't forget, leave to cleanup()
 
+        # cleanup
+        td.cleanup()
+
+    def test_dirname(self):
+        """
+        test if we generated a dirname
+        """ 
+        td = tempdir.default()
+        dirname = td.dir()
+        self.assertTrue( dirname is not None )
+        
+        """
+        test if duplicity's temp files are created in our temp dir
+        """ 
+        f1d, f1_name = tempdir.default().mkstemp()
+        f1_dirname = os.path.dirname( f1_name )
+        
+        self.assertTrue( dirname == f1_dirname )
+        
+        """
+        test if tempfile creates in our temp dir now as well by default
+        """ 
+        f2 = tempfile.NamedTemporaryFile()
+        f2_dirname = os.path.dirname( f2.name )
+        
+        self.assertTrue( dirname == f2_dirname )
+        
+        # cleanup
+        os.close(f1d)
+        os.unlink(f1_name)
+        td.forget(f1_name)
+        f2.close()
+        
         td.cleanup()
 
 if __name__ == "__main__":
