@@ -71,6 +71,7 @@ for root, dirs, files in os.walk(os.path.join(top_dir, "po")):
 
 
 class TestCommand(test):
+
     def run(self):
         # Make sure all modules are ready
         build_cmd = self.get_finalized_command("build_py")
@@ -97,6 +98,7 @@ class TestCommand(test):
 
 
 class InstallCommand(install):
+
     def run(self):
         # Normally, install will call build().  But we want to delete the
         # testing dir between building and installing.  So we manually build
@@ -114,6 +116,7 @@ class InstallCommand(install):
 
 # TODO: move logic from dist/makedist inline
 class SDistCommand(sdist):
+
     def run(self):
         version = version_string
         if version[0] == '$':
@@ -126,6 +129,7 @@ class SDistCommand(sdist):
 
 # don't touch my shebang
 class BSCommand (build_scripts):
+
     def run(self):
         """
         Copy, chmod each script listed in 'self.scripts'
@@ -148,7 +152,7 @@ class BSCommand (build_scripts):
                 continue
 
             log.info("copying and NOT adjusting %s -> %s", script,
-                         self.build_dir)
+                     self.build_dir)
             self.copy_file(script, outfile)
 
         if os.name == 'posix':
@@ -188,8 +192,8 @@ setup(name="duplicity",
                              libraries=["rsync"])],
       scripts=['bin/rdiffdir', 'bin/duplicity'],
       data_files=data_files,
-      install_requires=['lockfile>=0.11.0'],
-      tests_require=['lockfile>=0.11.0', 'mock', 'pexpect'],
+      install_requires=['lockfile >= 0.11.0'],
+      tests_require=['lockfile >= 0.11.0', 'mock', 'pexpect'],
       test_suite='testing',
       cmdclass={'test': TestCommand,
                 'install': InstallCommand,
