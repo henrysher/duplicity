@@ -1,3 +1,8 @@
+2015-10-31  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Reversed previous changes to lockfile.  Now it will take any version
+      extant in the LP build repository.  (PyPi is not avail in LP build).
+
 2015-10-27  Kenneth Loafman  <kenneth@loafman.com>
 
     * Cleanup issues around Launchpad build, mainly lockfile >= 0.9.

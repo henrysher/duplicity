@@ -17,7 +17,20 @@ New in v0.7.06 (2015/10/??)
   use an older version.  Make explicit environs for all tests.
 * Upgrade to newest version of pep8 and pylint.   Add three ignores 
   to test_pep8 and one to test_pylint to get the rest to pass.  They 
+* Applied patch from Alexander Zangerl to update to changes in lockfile
+  API 0.9 and later.  Updated README to notify users.
+* Modded tox.ini to use the latest lockfile.
+* Merged in lp:~ed.so/duplicity/setup.shebang
+  - Having the python interpreter searched in the PATH is much more 
+    flexible than the /usr/bin/python inserted into our scripts shebang 
+    by setuptools.  This patch prevents that. don't touch my shebang! :)
+* Cleanup issues around Launchpad build, mainly lockfile >= 0.9.
+* Merged in lp:~michal-s/duplicity/duplicity
+  - WindowsAzureMissingResourceError and WindowsAzureConflictError 
+    changed due to SDK changes.
   are all valid in our case.
+* Reversed previous changes to lockfile.  Now it will take any version
+  extant in the LP build repository.  (PyPi is not avail in LP build).
 
 
 New in v0.7.05 (2015/09/15)
@@ -65,17 +78,6 @@ New in v0.7.05 (2015/09/15)
     mappings, so that once it has uploaded an object it won't be fooled
     by weakly consistent directory listings.
 * Merged in lp:~duplicity-team/duplicity/po-updates
-* Applied patch from Alexander Zangerl to update to changes in lockfile
-  API 0.9 and later.  Updated README to notify users.
-* Modded tox.ini to use the latest lockfile.
-* Merged in lp:~ed.so/duplicity/setup.shebang
-  - Having the python interpreter searched in the PATH is much more 
-    flexible than the /usr/bin/python inserted into our scripts shebang 
-    by setuptools.  This patch prevents that. don't touch my shebang! :)
-* Cleanup issues around Launchpad build, mainly lockfile >= 0.9.
-* Merged in lp:~michal-s/duplicity/duplicity
-  - WindowsAzureMissingResourceError and WindowsAzureConflictError 
-    changed due to SDK changes.
 
 
 New in v0.7.04 (2015/08/02)

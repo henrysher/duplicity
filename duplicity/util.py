@@ -31,7 +31,7 @@ import sys
 import string
 import traceback
 
-from lockfile import LockFile, UnlockError
+from lockfile import UnlockError
 
 from duplicity import tarfile
 
@@ -104,6 +104,7 @@ def maybe_ignore_errors(fn):
 
 
 class BlackHoleList(list):
+
     def append(self, x):
         pass
 
@@ -161,7 +162,7 @@ def ignore_missing(fn, filename):
 
 def release_lockfile():
     if globals.lockfile and globals.lockfile.is_locked():
-        log.Debug(_("Releasing lockfile %s") % globals.lockfile)
+        log.Debug(_("Releasing lockfile %s") % globals.lockfile.lock_file)
         try:
             globals.lockfile.release()
         except UnlockError:
