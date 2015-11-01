@@ -31,6 +31,9 @@ New in v0.7.06 (2015/10/??)
   are all valid in our case.
 * Reversed previous changes to lockfile.  Now it will take any version
   extant in the LP build repository.  (PyPi is not avail in LP build).
+* Merged in lp:~ed.so/duplicity/tempfile.tempdir
+  - make sure packages using python's tempfile create temp files in 
+    duplicity's temp dir
 
 
 New in v0.7.05 (2015/09/15)

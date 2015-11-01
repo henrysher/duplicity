@@ -38,6 +38,9 @@ from duplicity import globals
 # instance
 _defaultLock = threading.Lock()
 _defaultInstance = None
+# backup the initial tmp dir path because we will force tempfile
+# later to use our generated _defaultInstance.dir() as temproot
+_initialSystemTempRoot = tempfile.gettempdir()
 
 
 def default():
@@ -57,6 +60,8 @@ def default():
     try:
         if _defaultInstance is None or _defaultInstance.dir() is None:
             _defaultInstance = TemporaryDirectory(temproot=globals.temproot)
+            # set the temp dir to be the default in tempfile module from now on
+            tempfile.tempdir = _defaultInstance.dir()
         return _defaultInstance
     finally:
         _defaultLock.release()
@@ -116,6 +121,12 @@ class TemporaryDirectory:
         tempbase - The temp root directory, or None to use system
         default (recommended).
         """
+        if temproot is None:
+            if globals.temproot:
+                temproot = globals.temproot
+            else:
+                global _initialSystemTempRoot
+                temproot = _initialSystemTempRoot
         self.__dir = tempfile.mkdtemp("-tempdir", "duplicity-", temproot)
 
         log.Info(_("Using temporary directory %s") % util.ufn(self.__dir))

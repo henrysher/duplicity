@@ -1,3 +1,9 @@
+2015-11-01  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~ed.so/duplicity/tempfile.tempdir
+      - make sure packages using python's tempfile create temp files in 
+          duplicity's temp dir
+
 2015-10-31  Kenneth Loafman  <kenneth@loafman.com>
 
     * Reversed previous changes to lockfile.  Now it will take any version
