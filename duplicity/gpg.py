@@ -357,9 +357,7 @@ def GPGWriteFile(block_iter, filename, profile,
         raise
 
 
-def GzipWriteFile(block_iter, filename,
-                  size=200 * 1024 * 1024,
-                  max_footer_size=16 * 1024):
+def GzipWriteFile(block_iter, filename, size=200 * 1024 * 1024, gzipped=True):
     """
     Write gzipped compressed file of given size
 
@@ -388,7 +386,12 @@ def GzipWriteFile(block_iter, filename,
             return self.fileobj.close()
 
     file_counted = FileCounted(open(filename, "wb"))
-    gzip_file = gzip.GzipFile(None, "wb", 6, file_counted)
+
+    # if gzipped wrap with GzipFile else plain file out
+    if gzipped:
+        outfile = gzip.GzipFile(None, "wb", 6, file_counted)
+    else:
+        outfile = file_counted
     at_end_of_blockiter = 0
     while True:
         bytes_to_go = size - file_counted.byte_count
@@ -399,10 +402,25 @@ def GzipWriteFile(block_iter, filename,
         except StopIteration:
             at_end_of_blockiter = 1
             break
-        gzip_file.write(new_block.data)
+        outfile.write(new_block.data)
 
-    assert not gzip_file.close() and not file_counted.close()
+    assert not outfile.close() and not file_counted.close()
     return at_end_of_blockiter
+
+
+def PlainWriteFile(block_iter, filename, size=200 * 1024 * 1024, gzipped=False):
+    """
+    Write plain uncompressed file of given size
+
+    This is like the earlier GPGWriteFile except it writes a gzipped
+    file instead of a gpg'd file.  This function is somewhat out of
+    place, because it doesn't deal with GPG at all, but it is very
+    similar to GPGWriteFile so they might as well be defined together.
+
+    The input requirements on block_iter and the output is the same as
+    GPGWriteFile (returns true if wrote until end of block_iter).
+    """
+    return GzipWriteFile(block_iter, filename, size, gzipped)
 
 
 def get_hash(hash, path, hex=1):

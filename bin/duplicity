@@ -44,7 +44,7 @@ try:
 except:
     from lockfile import LockFile as FileLock
 
-if '--pydevd' in sys.argv:
+if '--pydevd' in sys.argv or os.getenv('PYDEVD', None):
     # The following is for starting remote debugging in Eclipse with Pydev.
     # Adjust the path to your location and version of Eclipse and Pydev.
     pysrc = "/opt/liclipse/plugins/org.python.pydev_4.4.0.201510052047/pysrc"
@@ -422,10 +422,11 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
 
         # write volume
         if globals.encryption:
-            at_end = gpg.GPGWriteFile(tarblock_iter, tdp.name,
-                                      globals.gpg_profile, globals.volsize)
-        else:
+            at_end = gpg.GPGWriteFile(tarblock_iter, tdp.name, globals.gpg_profile, globals.volsize)
+        elif globals.compression:
             at_end = gpg.GzipWriteFile(tarblock_iter, tdp.name, globals.volsize)
+        else:
+            at_end = gpg.PlainWriteFile(tarblock_iter, tdp.name, globals.volsize)
         tdp.setdata()
 
         # Add volume information to manifest

@@ -1,7 +1,13 @@
+2015-11-05  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1511308 - Cannot restore no-encryption, no-compression backup
+      - Corrected code to include plain file in write_multivolume()
+      - Added PlainWriteFile() to gpg.py
+
 2015-11-01  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~ed.so/duplicity/tempfile.tempdir
-      - make sure packages using python's tempfile create temp files in 
+      - make sure packages using python's tempfile create temp files in
           duplicity's temp dir
 
 2015-10-31  Kenneth Loafman  <kenneth@loafman.com>
@@ -13,7 +19,7 @@
 
     * Cleanup issues around Launchpad build, mainly lockfile >= 0.9.
     * Merged in lp:~michal-s/duplicity/duplicity
-      - WindowsAzureMissingResourceError and WindowsAzureConflictError 
+      - WindowsAzureMissingResourceError and WindowsAzureConflictError
         changed due to SDK changes.
 
 2015-10-26  Kenneth Loafman  <kenneth@loafman.com>
@@ -22,29 +28,29 @@
       API 0.9 and later.  Updated README to notify users.
     * Modded tox.ini to use the latest lockfile.
     * Merged in lp:~ed.so/duplicity/setup.shebang
-      - Having the python interpreter searched in the PATH is much more 
-        flexible than the /usr/bin/python inserted into our scripts shebang 
+      - Having the python interpreter searched in the PATH is much more
+        flexible than the /usr/bin/python inserted into our scripts shebang
         by setuptools.  This patch prevents that. don't touch my shebang! :)
 
 2015-10-12  Kenneth Loafman  <kenneth@loafman.com>
 
-    * Upgrade to newest version of pep8 and pylint.   Add three ignores 
-      to test_pep8 and one to test_pylint to get the rest to pass.  They 
+    * Upgrade to newest version of pep8 and pylint.   Add three ignores
+      to test_pep8 and one to test_pylint to get the rest to pass.  They
       are all valid in our case.
 
 2015-10-10  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~mnjul/duplicity/s3-infreq-access
-      - This adds support for AWS S3's newly announced Infrequent Access 
-        storage class and is intended to implement Blueprint: 
+      - This adds support for AWS S3's newly announced Infrequent Access
+        storage class and is intended to implement Blueprint:
         https://blueprints.launchpad.net/duplicity/+spec/aws-s3-std-ia-class .
-      - A new command line option, --s3-use-ia, is added, and boto backend 
-        will automatically use the correct storage class value depending on 
-        whether --s3-use-rrs and --s3-use-ia is set. Command line parser will 
-        prompt error if both --s3-use-ia and --s3-use-rrs are used together, 
+      - A new command line option, --s3-use-ia, is added, and boto backend
+        will automatically use the correct storage class value depending on
+        whether --s3-use-rrs and --s3-use-ia is set. Command line parser will
+        prompt error if both --s3-use-ia and --s3-use-rrs are used together,
         as they conflict with each other.
-      - The manpage has been updated giving a short explanation on the new 
-        option. Its wording derives from Amazon's official announcement: 
+      - The manpage has been updated giving a short explanation on the new
+        option. Its wording derives from Amazon's official announcement:
         https://aws.amazon.com/about-aws/whats-new/2015/09/announcing-new-\
         amazon-s3-storage-class-and-lower-glacier-prices/
     * The ptyprocess module no longer supports Python 2.6, so fix tox.ini to
