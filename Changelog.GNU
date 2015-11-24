@@ -1,3 +1,8 @@
+2015-11-24  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~michal-s/duplicity/duplicity
+      - Fix azurebackend storage class import
+
 2015-11-05  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1511308 - Cannot restore no-encryption, no-compression backup

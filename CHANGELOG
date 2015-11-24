@@ -37,6 +37,8 @@ New in v0.7.06 (2015/10/??)
 * Fixed bug #1511308 - Cannot restore no-encryption, no-compression backup
   - Corrected code to include plain file in write_multivolume()
   - Added PlainWriteFile() to gpg.py
+* Merged in lp:~michal-s/duplicity/duplicity
+  - Fix azurebackend storage class import
 
 
 New in v0.7.05 (2015/09/15)
