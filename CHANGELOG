@@ -39,6 +39,8 @@ New in v0.7.06 (2015/10/??)
   - Added PlainWriteFile() to gpg.py
 * Merged in lp:~michal-s/duplicity/duplicity
   - Fix azurebackend storage class import
+* Merged in lp:~feraudet/duplicity/fix
+  - Fix missing SWIFT_ENDPOINT_TYPE env var, bug 1519694.
 
 
 New in v0.7.05 (2015/09/15)

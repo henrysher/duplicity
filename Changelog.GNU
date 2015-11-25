@@ -1,3 +1,8 @@
+2015-11-25  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~feraudet/duplicity/fix
+      - Fix missing SWIFT_ENDPOINT_TYPE env var, bug 1519694.
+
 2015-11-24  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~michal-s/duplicity/duplicity
