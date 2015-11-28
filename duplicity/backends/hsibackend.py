@@ -45,7 +45,7 @@ class HSIBackend(duplicity.backend.Backend):
 
     def _list(self):
         commandline = '%s "ls -l %s"' % (hsi_command, self.remote_dir)
-        l = os.popen3(commandline)[2].readlines()[3:]
+        l = subprocess_popen(commandline)[2].readlines()[3:]
         for i in range(0, len(l)):
             l[i] = l[i].split()[-1]
         return [x for x in l if x]

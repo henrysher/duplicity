@@ -1,3 +1,8 @@
+2015-11-28  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fix bug #1520691 - Shell Code Injection in hsi backend
+      - Replace use of os.popen3() with subprocess equivalent.
+
 2015-11-25  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~feraudet/duplicity/fix

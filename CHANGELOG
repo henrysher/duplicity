@@ -1,4 +1,4 @@
-New in v0.7.06 (2015/10/??)
+New in v0.7.06 (2015/12/??)
 ---------------------------
 * Merged in lp:~mnjul/duplicity/s3-infreq-access
   - This adds support for AWS S3's newly announced Infrequent Access
@@ -41,6 +41,8 @@ New in v0.7.06 (2015/10/??)
   - Fix azurebackend storage class import
 * Merged in lp:~feraudet/duplicity/fix
   - Fix missing SWIFT_ENDPOINT_TYPE env var, bug 1519694.
+* Fix bug #1520691 - Shell Code Injection in hsi backend
+  - Replace use of os.popen3() with subprocess equivalent.
 
 
 New in v0.7.05 (2015/09/15)
