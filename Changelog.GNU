@@ -1,3 +1,9 @@
+2015-11-30  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fix bug #1520691 - Shell Code Injection in hsi backend (2)
+      - Added code to expand relative program path to full path.
+      - Fix hisbackend where it expected a list not a string.
+
 2015-11-28  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fix bug #1520691 - Shell Code Injection in hsi backend

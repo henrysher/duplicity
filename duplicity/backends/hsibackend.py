@@ -44,10 +44,15 @@ class HSIBackend(duplicity.backend.Backend):
         self.subprocess_popen(commandline)
 
     def _list(self):
+        import sys
         commandline = '%s "ls -l %s"' % (hsi_command, self.remote_dir)
-        l = self.subprocess_popen(commandline)[2].readlines()[3:]
+        l = (self.subprocess_popen(commandline)[2])
+        print >>sys.stderr, 'l before:', l
+        l = l.split(os.linesep)[3:]
+        print >>sys.stderr, 'l after:', l
         for i in range(0, len(l)):
-            l[i] = l[i].split()[-1]
+            if l[i]:
+                l[i] = l[i].split()[-1]
         return [x for x in l if x]
 
     def _delete(self, filename):

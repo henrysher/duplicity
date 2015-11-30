@@ -452,8 +452,11 @@ class Backend(object):
         Execute the given command line, interpreted as a shell command.
         Returns int Exitcode, string StdOut, string StdErr
         """
+        import shlex
         from subprocess import Popen, PIPE
-        p = Popen(commandline, shell=True, stdout=PIPE, stderr=PIPE)
+        args = shlex.split(commandline)
+        args[0] = self.which(args[0])
+        p = Popen(args, stdout=PIPE, stderr=PIPE)
         stdout, stderr = p.communicate()
 
         return p.returncode, stdout, stderr
@@ -484,6 +487,24 @@ class Backend(object):
                 raise BackendException("Error running '%s': returned %d, with output:\n%s" %
                                        (private, result, stdout + '\n' + stderr))
         return result, stdout, stderr
+
+    def which(self, program):
+
+        def is_exe(fpath):
+            return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+        fpath, fname = os.path.split(program)
+        if fpath:
+            if is_exe(program):
+                return program
+        else:
+            for path in os.getenv("PATH").split(os.pathsep):
+                path = path.strip('"')
+                exe_file = os.path.join(path, program)
+                if is_exe(exe_file):
+                    return exe_file
+
+        return None
 
 
 class BackendWrapper(object):
