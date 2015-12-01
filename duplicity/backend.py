@@ -489,9 +489,13 @@ class Backend(object):
         return result, stdout, stderr
 
     def which(self, program):
+        """
+        Return absolute path for program name.
+        Returns None if program not found.
+        """
 
         def is_exe(fpath):
-            return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+            return os.path.isfile(fpath) and os.path.isabs(fpath) and os.access(fpath, os.X_OK)
 
         fpath, fname = os.path.split(program)
         if fpath:
@@ -500,7 +504,7 @@ class Backend(object):
         else:
             for path in os.getenv("PATH").split(os.pathsep):
                 path = path.strip('"')
-                exe_file = os.path.join(path, program)
+                exe_file = os.path.abspath(os.path.join(path, program))
                 if is_exe(exe_file):
                     return exe_file
 
