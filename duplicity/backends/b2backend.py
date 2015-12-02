@@ -175,7 +175,13 @@ class B2Backend(duplicity.backend.Backend):
         return {'size': info['size']}
 
     def _error_code(self, operation, e):
-        print("ERROR wither operation %s: %s" % (operation, e))
+        if isinstance(e, urllib2.HTTPError):
+            if e.code == 400:
+                return log.ErrorCode.bad_request
+            if e.code == 500:
+                return log.ErrorCode.backed_error
+            if e.code == 403:
+                return log.ErrorCode.backed_permission_denied
 
     def find_or_create_bucket(self, bucket_name):
         """

@@ -307,6 +307,8 @@ class ErrorCode:
 
     dpbx_nologin = 47
 
+    bad_request = 48
+
     # 50->69 reserved for backend errors
     backend_error = 50
     backend_permission_denied = 51
