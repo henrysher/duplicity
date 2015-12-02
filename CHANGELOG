@@ -43,6 +43,8 @@ New in v0.7.06 (2015/12/??)
   - Fix missing SWIFT_ENDPOINT_TYPE env var, bug 1519694.
 * Fix bug #1520691 - Shell Code Injection in hsi backend
   - Replace use of os.popen3() with subprocess equivalent.
+  - Added code to expand relative program path to full path.
+  - Fix hisbackend where it expected a list not a string.
 
 
 New in v0.7.05 (2015/09/15)
