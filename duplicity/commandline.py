@@ -910,6 +910,7 @@ def usage():
   dpbx:///%(some_dir)s
   onedrive://%(some_dir)s
   azure://%(container_name)s
+  b2://%(user)s@%(bucket_name)s/[%(some_dir)s/]
 
 """ % dict
 
