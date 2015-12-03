@@ -1,3 +1,9 @@
+2015-12-03  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~noizyland/duplicity/azurebackend-fixes
+      - Support new version of Azure Storage SDK
+      - Refactor _list method to support containers with >5000 blobs
+
 2015-11-30  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fix bug #1520691 - Shell Code Injection in hsi backend (2)

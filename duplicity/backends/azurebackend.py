@@ -33,29 +33,36 @@ class AzureBackend(duplicity.backend.Backend):
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
 
-        # Import Microsoft Azure SDK for Python library.
+        # Import Microsoft Azure Storage SDK for Python library.
         try:
             import azure
-            from azure.storage.blob import BlobService
+            import azure.storage
+            if hasattr(azure.storage, 'BlobService'):
+                # v0.11.1 and below
+                from azure.storage import BlobService
+                self.AzureMissingResourceError = azure.WindowsAzureMissingResourceError
+                self.AzureConflictError = azure.WindowsAzureConflictError
+            else:
+                # v1.0.0 and above
+                from azure.storage.blob import BlobService
+                self.AzureMissingResourceError = azure.common.AzureMissingResourceHttpError
+                self.AzureConflictError = azure.common.AzureConflictHttpError
         except ImportError:
-            raise BackendException('Azure backend requires Microsoft Azure SDK for Python '
-                                   '(https://github.com/Azure/azure-sdk-for-python).')
+            raise BackendException('Azure backend requires Microsoft Azure Storage SDK for Python '
+                                   '(https://pypi.python.org/pypi/azure-storage/).')
 
         if 'AZURE_ACCOUNT_NAME' not in os.environ:
             raise BackendException('AZURE_ACCOUNT_NAME environment variable not set.')
-
         if 'AZURE_ACCOUNT_KEY' not in os.environ:
             raise BackendException('AZURE_ACCOUNT_KEY environment variable not set.')
+        self.blob_service = BlobService(account_name=os.environ['AZURE_ACCOUNT_NAME'],
+                                        account_key=os.environ['AZURE_ACCOUNT_KEY'])
 
-        account_name = os.environ['AZURE_ACCOUNT_NAME']
-        account_key = os.environ['AZURE_ACCOUNT_KEY']
-        self.WindowsAzureMissingResourceError = azure.common.AzureMissingResourceHttpError
-        self.blob_service = BlobService(account_name=account_name, account_key=account_key)
         # TODO: validate container name
         self.container = parsed_url.path.lstrip('/')
         try:
             self.blob_service.create_container(self.container, fail_on_exist=True)
-        except azure.common.AzureConflictHttpError:
+        except self.AzureConflictError:
             # Indicates that the resource could not be created because it already exists.
             pass
         except Exception as e:
@@ -64,16 +71,23 @@ class AzureBackend(duplicity.backend.Backend):
                            log.ErrorCode.connection_failed)
 
     def _put(self, source_path, remote_filename):
-        # http://azure.microsoft.com/en-us/documentation/articles/storage-python-how-to-use-blob-storage/#upload-blob
+        # https://azure.microsoft.com/en-us/documentation/articles/storage-python-how-to-use-blob-storage/#upload-a-blob-into-a-container
         self.blob_service.put_block_blob_from_path(self.container, remote_filename, source_path.name)
 
     def _get(self, remote_filename, local_path):
-        # http://azure.microsoft.com/en-us/documentation/articles/storage-python-how-to-use-blob-storage/#download-blobs
+        # https://azure.microsoft.com/en-us/documentation/articles/storage-python-how-to-use-blob-storage/#download-blobs
         self.blob_service.get_blob_to_path(self.container, remote_filename, local_path.name)
 
     def _list(self):
-        # http://azure.microsoft.com/en-us/documentation/articles/storage-python-how-to-use-blob-storage/#list-blob
-        blobs = self.blob_service.list_blobs(self.container)
+        # https://azure.microsoft.com/en-us/documentation/articles/storage-python-how-to-use-blob-storage/#list-the-blobs-in-a-container
+        blobs = []
+        marker = None
+        while True:
+            batch = self.blob_service.list_blobs(self.container, marker=marker)
+            blobs.extend(batch)
+            if not batch.next_marker:
+                break
+            marker = batch.next_marker
         return [blob.name for blob in blobs]
 
     def _delete(self, filename):
