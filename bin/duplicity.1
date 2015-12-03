@@ -1010,6 +1010,12 @@ See also
 .B "A NOTE ON AZURE ACCESS"
 .RE
 .PP
+.BR "B2"
+.PP
+.RS
+b2://account_id[:application_key]@bucket_name/[folder/]
+.RE
+.PP
 .BR "Cloud Files" " (Rackspace)"
 .PP
 .RS
@@ -1962,6 +1968,9 @@ Some backends also require additional components (probably available as packages
 .BR "azure backend" " (Azure Blob Storage Service)"
 .B Microsoft Azure SDK for Python
 - https://github.com/Azure/azure-sdk-for-python
+.TP
+.BR "B2 backend" " (BackBlaze B2 Storage Service)"
+.B python-urllib2
 .TP
 .BR "boto backend" " (S3 Amazon Web Services, Google Cloud Storage)"
 .B boto version 2.0+

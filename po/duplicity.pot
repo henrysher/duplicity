@@ -733,6 +733,16 @@ msgstr ""
 msgid "user"
 msgstr ""
 
+#. Account id
+#: ../duplicity/commandline.py:873
+msgid "account_id"
+msgstr ""
+
+#. Account key
+#: ../duplicity/commandline.py:877
+msgid "application_key"
+msgstr ""
+
 #. Header in usage help
 #: ../duplicity/commandline.py:888
 msgid "Backends and their URL formats:"
