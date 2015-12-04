@@ -122,8 +122,8 @@ class B2Backend(duplicity.backend.Backend):
         endpoint = 'b2_list_file_names'
         url = self.formatted_url(endpoint)
         params = {
-                'bucketId': self.bucket_id,
-                'maxFileCount': 1000,
+            'bucketId': self.bucket_id,
+            'maxFileCount': 1000,
         }
         try:
             resp = self.get_or_post(url, params)
@@ -215,7 +215,7 @@ class B2Backend(duplicity.backend.Backend):
             'accountId': self.account_id,
             'bucketName': bucket_name,
             'bucketType': 'allPrivate'
-            }
+        }
         resp = self.get_or_post(url, params)
 
         self.bucket_id = resp['bucketId']

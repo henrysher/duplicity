@@ -45,6 +45,14 @@ New in v0.7.06 (2015/12/??)
   - Replace use of os.popen3() with subprocess equivalent.
   - Added code to expand relative program path to full path.
   - Fix hisbackend where it expected a list not a string.
+* Merged in lp:~noizyland/duplicity/azurebackend-fixes
+  - Support new version of Azure Storage SDK
+  - Refactor _list method to support containers with >5000 blobs
+* Merged in lp:~matthew-t-bentley/duplicity/b2
+  - Adds a backed for BackBlaze's (currently beta) B2 backup service.
+  - This adds backends/b2backend.py, modifies log.py to add an
+    error code and modifies commandline.py to add the b2://
+    example to the help text.
 
 
 New in v0.7.05 (2015/09/15)
