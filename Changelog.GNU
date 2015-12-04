@@ -1,3 +1,11 @@
+2015-12-04  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~matthew-t-bentley/duplicity/b2
+      - Adds a backed for BackBlaze's (currently beta) B2 backup service.
+      - This adds backends/b2backend.py, modifies log.py to add an
+        error code and modifies commandline.py to add the b2://
+        example to the help text.
+
 2015-12-03  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~noizyland/duplicity/azurebackend-fixes

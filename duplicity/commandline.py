@@ -867,7 +867,14 @@ def usage():
         # TRANSL: Used in usage help to represent a user name (i.e. login).
         # Example:
         # ftp://user[:password]@other.host[:port]/some_dir
-        'user': _("user")
+        'user': _("user"),
+
+        # TRANSL: account id for b2. Example: b2://account_id@bucket/
+        'account_id': _("account_id"),
+
+        # TRANSL: application_key for b2.
+        # Example: b2://account_id:application_key@bucket/
+        'application_key': _("application_key"),
     }
 
     # TRANSL: Header in usage help
@@ -910,6 +917,7 @@ def usage():
   dpbx:///%(some_dir)s
   onedrive://%(some_dir)s
   azure://%(container_name)s
+  b2://%(account_id)s[:%(application_key)s]@%(bucket_name)s/[%(some_dir)s/]
 
 """ % dict
 
