@@ -1,3 +1,9 @@
+New in v0.7.07 (2015/12/??)
+---------------------------
+* Merged in lp:~matthew-t-bentley/duplicity/b2
+  - Fix import and error typos.
+
+
 New in v0.7.06 (2015/12/07)
 ---------------------------
 * Merged in lp:~mnjul/duplicity/s3-infreq-access

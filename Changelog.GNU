@@ -1,3 +1,8 @@
+2015-12-09  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~matthew-t-bentley/duplicity/b2
+      - Fix import and error typos.
+
 2015-12-07  Kenneth Loafman  <kenneth@loafman.com>
 
     * Prep for 0.7.06

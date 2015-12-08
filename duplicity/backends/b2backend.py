@@ -27,6 +27,7 @@ import hashlib
 
 import duplicity.backend
 from duplicity.errors import BackendException, FatalBackendException
+from duplicity import log
 
 import json
 import urllib2
@@ -179,9 +180,9 @@ class B2Backend(duplicity.backend.Backend):
             if e.code == 400:
                 return log.ErrorCode.bad_request
             if e.code == 500:
-                return log.ErrorCode.backed_error
+                return log.ErrorCode.backend_error
             if e.code == 403:
-                return log.ErrorCode.backed_permission_denied
+                return log.ErrorCode.backend_permission_denied
 
     def find_or_create_bucket(self, bucket_name):
         """
