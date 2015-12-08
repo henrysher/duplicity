@@ -1,3 +1,7 @@
+2015-12-07  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Prep for 0.7.06
+
 2015-12-04  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~matthew-t-bentley/duplicity/b2

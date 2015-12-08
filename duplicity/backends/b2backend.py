@@ -177,6 +177,8 @@ class B2Backend(duplicity.backend.Backend):
 
     def _error_code(self, operation, e):
         if isinstance(e, urllib2.HTTPError):
+            if e.code == 400:
+                return log.ErrorCode.bad_request
             if e.code == 500:
                 return log.ErrorCode.backend_error
             if e.code == 403:
