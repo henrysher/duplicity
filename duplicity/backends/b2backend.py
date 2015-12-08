@@ -27,6 +27,7 @@ import hashlib
 
 import duplicity.backend
 from duplicity.errors import BackendException, FatalBackendException
+from duplicity import log
 
 import json
 import urllib2
@@ -122,8 +123,8 @@ class B2Backend(duplicity.backend.Backend):
         endpoint = 'b2_list_file_names'
         url = self.formatted_url(endpoint)
         params = {
-            'bucketId': self.bucket_id,
-            'maxFileCount': 1000,
+                'bucketId': self.bucket_id,
+                'maxFileCount': 1000,
         }
         try:
             resp = self.get_or_post(url, params)
@@ -176,12 +177,10 @@ class B2Backend(duplicity.backend.Backend):
 
     def _error_code(self, operation, e):
         if isinstance(e, urllib2.HTTPError):
-            if e.code == 400:
-                return log.ErrorCode.bad_request
             if e.code == 500:
-                return log.ErrorCode.backed_error
+                return log.ErrorCode.backend_error
             if e.code == 403:
-                return log.ErrorCode.backed_permission_denied
+                return log.ErrorCode.backend_permission_denied
 
     def find_or_create_bucket(self, bucket_name):
         """
@@ -215,7 +214,7 @@ class B2Backend(duplicity.backend.Backend):
             'accountId': self.account_id,
             'bucketName': bucket_name,
             'bucketType': 'allPrivate'
-        }
+            }
         resp = self.get_or_post(url, params)
 
         self.bucket_id = resp['bucketId']
