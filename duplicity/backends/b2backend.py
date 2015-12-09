@@ -131,7 +131,8 @@ class B2Backend(duplicity.backend.Backend):
         except urllib2.HTTPError:
             return []
 
-        files = [x['fileName'].split('/')[-1] for x in resp['files']]
+        files = [x['fileName'].split('/')[-1] for x in resp['files']
+                 if x['fileName'].startswith(self.path)]
 
         next_file = resp['nextFileName']
         while next_file:
@@ -141,7 +142,8 @@ class B2Backend(duplicity.backend.Backend):
             except urllib2.HTTPError:
                 return files
 
-            files += [x['fileName'].split('/')[-1] for x in resp['files']]
+            files += [x['fileName'].split('/')[-1] for x in resp['files']
+                      if x['fileName'].startswith(self.path)]
             next_file = resp['nextFileName']
 
         return files

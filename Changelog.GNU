@@ -2,6 +2,8 @@
 
     * Merged in lp:~matthew-t-bentley/duplicity/b2
       - Fix import and error typos.
+      - Allow multiple backups in the same bucket.
+      - Fixes #1523498.
 
 2015-12-07  Kenneth Loafman  <kenneth@loafman.com>
 
