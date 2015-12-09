@@ -138,7 +138,7 @@ class B2Backend(duplicity.backend.Backend):
             return []
 
         files = [x['fileName'].split('/')[-1] for x in resp['files']
-                 if x['fileName'].startswith(self.path)]
+                 if os.path.dirname(x['fileName']) == self.path]
 
         next_file = resp['nextFileName']
         while next_file:
@@ -150,7 +150,7 @@ class B2Backend(duplicity.backend.Backend):
                 return files
 
             files += [x['fileName'].split('/')[-1] for x in resp['files']
-                      if x['fileName'].startswith(self.path)]
+                      if os.path.dirname(x['fileName']) == self.path]
             next_file = resp['nextFileName']
 
         return files
