@@ -45,6 +45,9 @@ class B2Backend(duplicity.backend.Backend):
         """
         duplicity.backend.Backend.__init__(self, parsed_url)
 
+        # for prettier password prompt only
+        self.parsed_url.hostname = 'B2'
+
         self.account_id = parsed_url.username
         account_key = self.get_password()
 
