@@ -1,4 +1,4 @@
-2015-12-09  Kenneth Loafman  <kenneth@loafman.com>
+2015-12-11  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~matthew-t-bentley/duplicity/b2
       - A couple fixes allowing multiple backups to be hosted in different 
