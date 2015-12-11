@@ -1,6 +1,12 @@
 2015-12-09  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~matthew-t-bentley/duplicity/b2
+      - A couple fixes allowing multiple backups to be hosted in different 
+        folders in the same bucket as well as some logging for -v9.
+
+2015-12-09  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~matthew-t-bentley/duplicity/b2
       - Fix import and error typos.
       - Allow multiple backups in the same bucket.
       - Fixes #1523498.

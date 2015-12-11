@@ -45,6 +45,9 @@ class B2Backend(duplicity.backend.Backend):
         """
         duplicity.backend.Backend.__init__(self, parsed_url)
 
+        # for prettier password prompt only
+        self.parsed_url.hostname = 'B2'
+
         self.account_id = parsed_url.username
         account_key = self.get_password()
 
@@ -84,6 +87,7 @@ class B2Backend(duplicity.backend.Backend):
         """
         Download remote_filename to local_path
         """
+        log.Log("Getting file %s" % remote_filename, 9)
         remote_filename = self.full_filename(remote_filename)
         url = self.download_url + \
             '/file/' + self.bucket_name + '/' + \
@@ -98,6 +102,7 @@ class B2Backend(duplicity.backend.Backend):
         """
         Copy source_path to remote_filename
         """
+        log.Log("Putting file to %s" % remote_filename, 9)
         self._delete(remote_filename)
         digest = self.hex_sha1_of_file(source_path)
         content_type = 'application/pgp-encrypted'
@@ -120,6 +125,7 @@ class B2Backend(duplicity.backend.Backend):
         """
         List files on remote server
         """
+        log.Log("Listing files", 9)
         endpoint = 'b2_list_file_names'
         url = self.formatted_url(endpoint)
         params = {
@@ -132,10 +138,11 @@ class B2Backend(duplicity.backend.Backend):
             return []
 
         files = [x['fileName'].split('/')[-1] for x in resp['files']
-                 if x['fileName'].startswith(self.path)]
+                 if os.path.dirname(x['fileName']) == self.path]
 
         next_file = resp['nextFileName']
         while next_file:
+            log.Log("There are still files, getting next list", 9)
             params['startFileName'] = next_file
             try:
                 resp = self.get_or_post(url, params)
@@ -143,7 +150,7 @@ class B2Backend(duplicity.backend.Backend):
                 return files
 
             files += [x['fileName'].split('/')[-1] for x in resp['files']
-                      if x['fileName'].startswith(self.path)]
+                      if os.path.dirname(x['fileName']) == self.path]
             next_file = resp['nextFileName']
 
         return files
@@ -152,6 +159,7 @@ class B2Backend(duplicity.backend.Backend):
         """
         Delete filename from remote server
         """
+        log.Log("Deleting file %s" % filename, 9)
         endpoint = 'b2_delete_file_version'
         url = self.formatted_url(endpoint)
         fileid = self.get_file_id(filename)
@@ -171,6 +179,7 @@ class B2Backend(duplicity.backend.Backend):
         """
         Get size info of filename
         """
+        log.Log("Querying file %s" % filename, 9)
         info = self.get_file_info(filename)
         if not info:
             return {'size': -1}
@@ -325,6 +334,7 @@ class OpenUrl(object):
     """
 
     def __init__(self, url, data, headers):
+        log.Log("Getting %s" % url, 9)
         self.url = url
         self.data = data
         self.headers = headers
@@ -333,6 +343,11 @@ class OpenUrl(object):
     def __enter__(self):
         request = urllib2.Request(self.url, self.data, self.headers)
         self.file = urllib2.urlopen(request)
+        log.Log(
+                "Request of %s returned with status %s" % (
+                    self.url, self.file.code
+                    ), 9
+                )
         return self.file
 
     def __exit__(self, exception_type, exception, traceback):
