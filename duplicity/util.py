@@ -23,8 +23,6 @@
 Miscellaneous utilities.
 """
 
-from future_builtins import map
-
 import errno
 import os
 import sys
@@ -70,7 +68,7 @@ def ufn(filename):
 def uindex(index):
     "Convert an index (a tuple of path parts) to unicode for printing"
     if index:
-        return os.path.join(*map(ufn, index))
+        return os.path.join(*list(map(ufn, index)))
     else:
         return u'.'
 
