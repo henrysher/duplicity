@@ -343,11 +343,8 @@ class OpenUrl(object):
     def __enter__(self):
         request = urllib2.Request(self.url, self.data, self.headers)
         self.file = urllib2.urlopen(request)
-        log.Log(
-                "Request of %s returned with status %s" % (
-                    self.url, self.file.code
-                    ), 9
-                )
+        log.Log("Request of %s returned with status %s" %
+                (self.url, self.file.code), 9)
         return self.file
 
     def __exit__(self, exception_type, exception, traceback):
