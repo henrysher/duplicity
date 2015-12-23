@@ -23,11 +23,11 @@ import sys
 import subprocess
 
 if sys.version_info < (2, 7):
-    import unittest2 as unittest
+    import unittest2 as unittest  # @UnresolvedImport @UnusedImport
 else:
-    import unittest
+    import unittest  # @Reimport
 
-from . import _top_dir, DuplicityTestCase
+from . import _top_dir, DuplicityTestCase  # @IgnorePep8
 
 
 class CodeTest(DuplicityTestCase):

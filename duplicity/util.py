@@ -25,14 +25,13 @@ Miscellaneous utilities.
 
 import errno
 import os
-import sys
 import string
+import sys
 import traceback
 
 from lockfile import UnlockError
 
 from duplicity import tarfile
-
 import duplicity.globals as globals
 import duplicity.log as log
 
@@ -95,7 +94,7 @@ def maybe_ignore_errors(fn):
     except Exception as e:
         if globals.ignore_errors:
             log.Warn(_("IGNORED_ERROR: Warning: ignoring error as requested: %s: %s")
-                     % (e.__class__.__name__, uexc(e)))
+                     % (e.__class__.__name__, util.uexc(e)))
             return None
         else:
             raise
@@ -194,3 +193,26 @@ def copyfileobj(infp, outfp, byte_count=-1):
         bytes_written += len(buf)
         outfp.write(buf)
     return bytes_written
+
+
+def which(program):
+    """
+    Return absolute path for program name.
+    Returns None if program not found.
+    """
+
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.path.isabs(fpath) and os.access(fpath, os.X_OK)
+
+    fpath, fname = os.path.split(program)  # @UnusedVariable
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.getenv("PATH").split(os.pathsep):
+            path = path.strip('"')
+            exe_file = os.path.abspath(os.path.join(path, program))
+            if is_exe(exe_file):
+                return exe_file
+
+    return None

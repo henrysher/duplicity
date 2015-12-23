@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2015-12-08 17:04-0600\n"
+"POT-Creation-Date: 2015-12-23 06:10-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -836,12 +836,12 @@ msgstr ""
 msgid "Reading results of '%s'"
 msgstr ""
 
-#: ../duplicity/backend.py:525
+#: ../duplicity/backend.py:503
 #, python-format
 msgid "Writing %s"
 msgstr ""
 
-#: ../duplicity/backend.py:566
+#: ../duplicity/backend.py:544
 #, python-format
 msgid "File %s not found locally after get from backend"
 msgstr ""
@@ -1464,12 +1464,12 @@ msgstr ""
 msgid "Cleanup of temporary directory %s failed - this is probably a bug."
 msgstr ""
 
-#: ../duplicity/util.py:99
+#: ../duplicity/util.py:96
 #, python-format
 msgid "IGNORED_ERROR: Warning: ignoring error as requested: %s: %s"
 msgstr ""
 
-#: ../duplicity/util.py:165
+#: ../duplicity/util.py:162
 #, python-format
 msgid "Releasing lockfile %s"
 msgstr ""

@@ -20,13 +20,18 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-import os, re, shutil, time, sys, subprocess
+import os
+import re
+import shutil
+import time
+import sys
+from subprocess import Popen, PIPE, STDOUT
+sys.path.insert(0, os.path.abspath("./"))
+
+from duplicity import util
 
 SourceDir = "duplicity"
 
-# Various details about the files must also be specified by the rpm
-# spec template.
-spec_template = "dist/duplicity.spec.template"
 
 def VersionedCopy(source, dest):
     """
@@ -47,29 +52,31 @@ def VersionedCopy(source, dest):
     fout.write(outbuf)
     assert not fout.close()
 
+
 def MakeTar():
     """Create duplicity tar file"""
     tardir = "duplicity-%s" % Version
     tarfile = "duplicity-%s.tar.gz" % Version
     try:
-        os.lstat(tardir)
-        os.system("rm -rf " + tardir)
-    except OSError: pass
+        prog = util.which('rm')
+        p = Popen([prog, "-r", "-f", tardir],  # @UnusedVariable
+                  stdout=PIPE, stderr=STDOUT)
+    except Exception as e:  # @UnusedVariable
+        pass
 
-    # tarball contains the entire versioned release
-    os.mkdir(tardir)
-    bzr = subprocess.Popen(["bzr", "ls", "-RV", "."], stdout=subprocess.PIPE)
-    testfiles = bzr.communicate()[0].split()
-    if len(testfiles) == 0:
-        git = subprocess.Popen(["git", "ls-files"], stdout=subprocess.PIPE)
-        testfiles = git.communicate()[0].split()
-
-    for filename in testfiles:
-        if os.path.isdir(filename):
-            os.mkdir(os.path.join(tardir, filename))
-        else:
-            assert not os.system("cp --parents %s %s" %
-                                 (filename, tardir)), filename
+    # tardir contains the entire versioned release
+    prog = util.which('bzr')
+    p = Popen([prog, "export", tardir],
+              stdout=PIPE, stderr=STDOUT)
+    if p.returncode:
+        prog = util.which('git')
+        p1 = Popen([prog, "archive", "master"],
+                   stdout=PIPE, stderr=STDOUT)
+        prog = util.which('tar')
+        p2 = Popen([prog, "-x", "-C", tardir],
+                   stdin=p1.stdout, stdout=PIPE, stderr=STDOUT)
+        p1.stdout.close()
+        assert p2.returncode == 0, "git archive failed"
 
     # msgfmt the translation files that we have for release
     assert not os.system("cd po && ./update-pot")
@@ -78,8 +85,10 @@ def MakeTar():
         langs = line.split()
         for lang in langs:
             assert not os.mkdir(os.path.join(tardir, "po", lang)), lang
-            assert not os.system("cp po/%s.po %s/po/%s" % (lang, tardir, lang)), lang
-            assert not os.system("msgfmt po/%s.po -o %s/po/%s/duplicity.mo" % (lang, tardir, lang)), lang
+            assert not os.system("mv %s/po/%s.po %s/po/%s" %
+                                 (tardir, lang, tardir, lang)), lang
+            assert not os.system("msgfmt %s/po/%s/%s.po -o %s/po/%s/duplicity.mo" %
+                                 (tardir, lang, lang, tardir, lang)), lang
 
     # recopy the versioned files and add correct version
     VersionedCopy(os.path.join(SourceDir, "globals.py"),
@@ -103,18 +112,10 @@ def MakeTar():
     shutil.rmtree(tardir)
     return tarfile
 
-def MakeSpecFile():
-    """Create spec file using spec template"""
-    specfile = "duplicity.spec"
-    VersionedCopy(spec_template, specfile)
-    return specfile
-
 def Main():
     print "Processing version " + Version
     tarfile = MakeTar()
     print "Made tar file " + tarfile
-    specfile = MakeSpecFile()
-    print "Made specfile " + specfile
 
 if __name__ == "__main__" and not globals().has_key('__no_execute__'):
     if len(sys.argv) != 2:

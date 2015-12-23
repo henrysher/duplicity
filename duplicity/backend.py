@@ -455,7 +455,7 @@ class Backend(object):
         import shlex
         from subprocess import Popen, PIPE
         args = shlex.split(commandline)
-        args[0] = self.which(args[0])
+        args[0] = util.which(args[0])
         p = Popen(args, stdout=PIPE, stderr=PIPE)
         stdout, stderr = p.communicate()
 
@@ -487,28 +487,6 @@ class Backend(object):
                 raise BackendException("Error running '%s': returned %d, with output:\n%s" %
                                        (private, result, stdout + '\n' + stderr))
         return result, stdout, stderr
-
-    def which(self, program):
-        """
-        Return absolute path for program name.
-        Returns None if program not found.
-        """
-
-        def is_exe(fpath):
-            return os.path.isfile(fpath) and os.path.isabs(fpath) and os.access(fpath, os.X_OK)
-
-        fpath, fname = os.path.split(program)
-        if fpath:
-            if is_exe(program):
-                return program
-        else:
-            for path in os.getenv("PATH").split(os.pathsep):
-                path = path.strip('"')
-                exe_file = os.path.abspath(os.path.join(path, program))
-                if is_exe(exe_file):
-                    return exe_file
-
-        return None
 
 
 class BackendWrapper(object):
