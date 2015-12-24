@@ -1,7 +1,16 @@
+2015-12-23  Kenneth Loafman  <kenneth@loafman.com>
+
+    Random stuff:
+      - remove RPM stuff from makedist
+      - have makedist pull directly from VCS, not local dir
+      - update po translation directory and build process
+      - clean up some odd error messages
+      - move Pep8 ignores to tox.ini
+
 2015-12-11  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~matthew-t-bentley/duplicity/b2
-      - A couple fixes allowing multiple backups to be hosted in different 
+      - A couple fixes allowing multiple backups to be hosted in different
         folders in the same bucket as well as some logging for -v9.
 
 2015-12-09  Kenneth Loafman  <kenneth@loafman.com>
