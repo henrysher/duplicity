@@ -22,6 +22,7 @@ from future_builtins import map
 
 import os
 import pexpect
+import platform
 import time
 import unittest
 
@@ -63,7 +64,11 @@ class FunctionalTestCase(DuplicityTestCase):
         # We run under setsid and take input from /dev/null (below) because
         # this way we force a failure if duplicity tries to read from the
         # console unexpectedly (like for gpg password or such).
-        cmd_list = ["setsid", "duplicity"]
+        if platform.platform().startswith('Linux'):
+            cmd_list = ['setsid']
+        else:
+            cmd_list = []
+        cmd_list.extend(["../bin/duplicity"])
         cmd_list.extend(options)
         cmd_list.extend(["-v0"])
         cmd_list.extend(["--no-print-statistics"])
@@ -82,13 +87,20 @@ class FunctionalTestCase(DuplicityTestCase):
         for passphrase in passphrase_input:
             child.expect('passphrase.*:')
             child.sendline(passphrase)
-        child.wait()
 
+        # if the command fails, we need to clear its output
+        # so it will terminate cleanly.
+        lines = []
+        while child.isalive():
+            lines.append(child.readline())
         return_val = child.exitstatus
-#         output = child.read()
-#         print "\nduplicity command: ", cmdline, \
-#               "\n with return_val: ", return_val, \
-#               "\n and output:\n", output
+
+#         print "duplicity command:", cmdline
+#         print "current dir:", os.getcwd()
+#         print "....output:"
+#         for line in lines:
+#             print line,
+#         print "....return_val:", return_val
 
         if fail:
             self.assertEqual(30, return_val)

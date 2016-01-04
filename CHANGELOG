@@ -12,6 +12,8 @@ New in v0.7.07 (2015/12/??)
   - update po translation directory and build process
   - clean up some odd error messages
   - move Pep8 ignores to tox.ini
+  - supply correct path for pydevd under Mac
+  - fix some tests to run under Linux and Mac
 
 
 New in v0.7.06 (2015/12/07)

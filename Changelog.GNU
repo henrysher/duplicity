@@ -1,3 +1,9 @@
+2016-01-04  Kenneth Loafman  <kenneth@loafman.com>
+
+    Random stuff:
+      - supply correct path for pydevd under Mac
+      - fix some tests to run under Mac as well
+
 2015-12-23  Kenneth Loafman  <kenneth@loafman.com>
 
     Random stuff:
