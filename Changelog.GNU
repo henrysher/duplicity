@@ -1,5 +1,10 @@
 2016-01-04  Kenneth Loafman  <kenneth@loafman.com>
 
+    * Partial fix for bug #1529606 - shell code injection in lftpbackend
+      - still need to fix the other backends that spawn shell commands
+
+2016-01-04  Kenneth Loafman  <kenneth@loafman.com>
+
     Random stuff:
       - supply correct path for pydevd under Mac
       - fix some tests to run under Mac as well

@@ -28,6 +28,10 @@ import os
 import os.path
 import re
 import urllib
+try:
+    from shlex import quote as cmd_quote
+except ImportError:
+    from pipes import quote as cmd_quote
 
 import duplicity.backend
 from duplicity import globals
@@ -57,10 +61,6 @@ class LFTPBackend(duplicity.backend.Backend):
         log.Notice("LFTP version is %s" % version)
 
         self.parsed_url = parsed_url
-
-#        self.url_string = duplicity.backend.strip_auth_from_url(self.parsed_url)
-#        # strip lftp+ prefix
-#        self.url_string = duplicity.backend.strip_prefix(self.url_string, 'lftp')
 
         self.scheme = duplicity.backend.strip_prefix(parsed_url.scheme, 'lftp').lower()
         self.scheme = re.sub('^webdav', 'http', self.scheme)
@@ -126,10 +126,6 @@ Hints:
         if log.getverbosity() >= log.DEBUG:
             os.write(self.tempfile, "debug\n")
         os.write(self.tempfile, "open %s %s\n" % (self.authflag, self.url_string))
-#        os.write(self.tempfile, "open %s %s\n" % (self.portflag, self.parsed_url.hostname))
-        # allow .netrc auth by only setting user/pass when user was actually given
-#        if self.parsed_url.username:
-#            os.write(self.tempfile, "user %s %s\n" % (self.parsed_url.username, self.password))
         os.close(self.tempfile)
         if log.getverbosity() >= log.DEBUG:
             f = open(self.tempname, 'r')
@@ -137,9 +133,12 @@ Hints:
                       "%s" % f.readlines())
 
     def _put(self, source_path, remote_filename):
-        # remote_path = os.path.join(urllib.unquote(self.parsed_url.path.lstrip('/')), remote_filename).rstrip()
-        commandline = "lftp -c 'source \'%s\'; mkdir -p %s; put \'%s\' -o \'%s\''" % \
-            (self.tempname, self.remote_path, source_path.name, self.remote_path + remote_filename)
+        commandline = "lftp -c 'source %s; mkdir -p %s; put %s -o %s'" % (
+            self.tempname,
+            cmd_quote(self.remote_path),
+            cmd_quote(source_path.name),
+            cmd_quote(self.remote_path) + remote_filename
+        )
         log.Debug("CMD: %s" % commandline)
         s, l, e = self.subprocess_popen(commandline)
         log.Debug("STATUS: %s" % s)
@@ -149,9 +148,11 @@ Hints:
                   "%s" % (l))
 
     def _get(self, remote_filename, local_path):
-        # remote_path = os.path.join(urllib.unquote(self.parsed_url.path), remote_filename).rstrip()
-        commandline = "lftp -c 'source \'%s\'; get \'%s\' -o \'%s\''" % \
-            (self.tempname, self.remote_path + remote_filename, local_path.name)
+        commandline = "lftp -c 'source %s; get %s -o %s'" % (
+            self.tempname,
+            cmd_quote(self.remote_path) + remote_filename,
+            cmd_quote(local_path.name)
+        )
         log.Debug("CMD: %s" % commandline)
         _, l, e = self.subprocess_popen(commandline)
         log.Debug("STDERR:\n"
@@ -164,7 +165,10 @@ Hints:
         # remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
         remote_dir = urllib.unquote(self.parsed_url.path)
         # print remote_dir
-        commandline = "lftp -c 'source \'%s\'; cd \'%s\' || exit 0; ls'" % (self.tempname, self.remote_path)
+        commandline = "lftp -c 'source %s; cd %s || exit 0; ls'" % (
+            self.tempname,
+            cmd_quote(self.remote_path)
+        )
         log.Debug("CMD: %s" % commandline)
         _, l, e = self.subprocess_popen(commandline)
         log.Debug("STDERR:\n"
@@ -176,8 +180,11 @@ Hints:
         return [x.split()[-1] for x in l.split('\n') if x]
 
     def _delete(self, filename):
-        # remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
-        commandline = "lftp -c 'source \'%s\'; cd \'%s\'; rm \'%s\''" % (self.tempname, self.remote_path, filename)
+        commandline = "lftp -c 'source %s; cd %s; rm %s'" % (
+            self.tempname,
+            cmd_quote(self.remote_path),
+            filename
+        )
         log.Debug("CMD: %s" % commandline)
         _, l, e = self.subprocess_popen(commandline)
         log.Debug("STDERR:\n"

@@ -1,5 +1,6 @@
 *.egg
 *.log
+.DS_Store
 .eggs
 .idea
 .project
@@ -11,5 +12,6 @@ build
 config.py
 duplicity.egg-info
 duplicity.spec
+po/duplicity.pot-e
 random_seed
 testfiles

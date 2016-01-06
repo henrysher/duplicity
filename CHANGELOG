@@ -14,7 +14,8 @@ New in v0.7.07 (2015/12/??)
   - move Pep8 ignores to tox.ini
   - supply correct path for pydevd under Mac
   - fix some tests to run under Linux and Mac
-
+* Partial fix for bug #1529606 - shell code injection in lftpbackend
+  - still need to fix the other backends that spawn shell commands
 
 New in v0.7.06 (2015/12/07)
 ---------------------------
