@@ -1,6 +1,7 @@
 *.egg
 *.log
 .DS_Store
+._.DS_Store
 .eggs
 .idea
 .project

@@ -68,7 +68,7 @@ class FunctionalTestCase(DuplicityTestCase):
             cmd_list = ['setsid']
         else:
             cmd_list = []
-        cmd_list.extend(["../bin/duplicity"])
+        cmd_list.extend(["duplicity"])
         cmd_list.extend(options)
         cmd_list.extend(["-v0"])
         cmd_list.extend(["--no-print-statistics"])

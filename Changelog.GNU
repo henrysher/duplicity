@@ -3,6 +3,7 @@
     * Partial fix for bug #1529606 - shell code injection in lftpbackend
       - still need to fix the other backends that spawn shell commands
     * Make test_restart compatible with both GNUtar and BSDtar
+    * Fix stupid issue with functional test path for duplicity
 
 2016-01-04  Kenneth Loafman  <kenneth@loafman.com>
 
