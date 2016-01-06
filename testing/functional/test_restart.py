@@ -310,7 +310,7 @@ class RestartTestWithoutEncryption(RestartTest):
         sigtars = glob.glob("testfiles/output/duplicity-full*.sigtar.gz")
         self.assertEqual(1, len(sigtars))
         sigtar = sigtars[0]
-        output = subprocess.Popen(["tar", "t", "--file=%s" % sigtar], stdout=subprocess.PIPE).communicate()[0]
+        output = subprocess.Popen(["tar", "-t", "--file=%s" % sigtar], stdout=subprocess.PIPE).communicate()[0]
         self.assertEqual(1, output.split("\n").count("snapshot/"))
 
     def test_ignore_double_snapshot(self):

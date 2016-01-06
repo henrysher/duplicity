@@ -1,7 +1,8 @@
-2016-01-04  Kenneth Loafman  <kenneth@loafman.com>
+2016-01-06  Kenneth Loafman  <kenneth@loafman.com>
 
     * Partial fix for bug #1529606 - shell code injection in lftpbackend
       - still need to fix the other backends that spawn shell commands
+    * Make test_restart compatible with both GNUtar and BSDtar
 
 2016-01-04  Kenneth Loafman  <kenneth@loafman.com>
 
