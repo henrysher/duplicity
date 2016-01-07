@@ -1168,6 +1168,11 @@ class CollectionsStatus:
         """
         Returns time line of specified file changed
         """
+        #quick fix to spaces in filepath
+        modified_filepath = ""
+        if (" " in filepath) == True:
+            modified_filepath = '"' + filepath.replace(" ", r"\x20") + '"'
+
         if not self.matched_chain_pair:
             return ""
 
@@ -1177,9 +1182,9 @@ class CollectionsStatus:
 
         for bs in all_backup_set:
             filelist = [fileinfo[1] for fileinfo in bs.get_files_changed()]
-            if filepath in filelist:
+            if modified_filepath in filelist:
                 specified_file_backup_set.append(bs)
-                index = filelist.index(filepath)
+                index = filelist.index(modified_filepath)
                 specified_file_backup_type.append(bs.get_files_changed()[index][0])
 
         return FileChangedStatus(filepath, list(zip(specified_file_backup_type, specified_file_backup_set)))

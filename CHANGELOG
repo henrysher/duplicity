@@ -18,6 +18,8 @@ New in v0.7.07 (2016/01/??)
   - still need to fix the other backends that spawn shell commands
 * Make test_restart compatible with both GNUtar and BSDtar
 * Fix stupid issue with functional test path for duplicity
+* Applied patch from shaochun to fix bug #1531154,
+  - --file-changed failed when file contains spaces
 
 
 New in v0.7.06 (2015/12/07)

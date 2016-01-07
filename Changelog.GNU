@@ -1,3 +1,8 @@
+2016-01-07  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Applied patch from shaochun to fix bug #1531154,
+      - --file-changed failed when file contains spaces
+
 2016-01-06  Kenneth Loafman  <kenneth@loafman.com>
 
     * Partial fix for bug #1529606 - shell code injection in lftpbackend
