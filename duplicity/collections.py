@@ -1168,7 +1168,7 @@ class CollectionsStatus:
         """
         Returns time line of specified file changed
         """
-        #quick fix to spaces in filepath
+        # quick fix to spaces in filepath
         modified_filepath = ""
         if (" " in filepath) == True:
             modified_filepath = '"' + filepath.replace(" ", r"\x20") + '"'

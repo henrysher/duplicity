@@ -3,6 +3,8 @@
     * Applied patch from abeverly to fix bug #1475890
       - allow port to be specified along with hostname on S3
       - adjusted help text and man page to reflect the change
+    * Undo changes to test_restart.py.  GNU tar is needed.
+    * Fix minor pep8 nit in collections.py
 
 2016-01-07  Kenneth Loafman  <kenneth@loafman.com>
 
