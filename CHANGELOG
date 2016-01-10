@@ -20,6 +20,9 @@ New in v0.7.07 (2016/01/??)
 * Fix stupid issue with functional test path for duplicity
 * Applied patch from shaochun to fix bug #1531154,
   - --file-changed failed when file contains spaces
+* Applied patch from abeverly to fix bug #1475890
+  - allow port to be specified along with hostname on S3
+  - adjusted help text and man page to reflect the change
 
 
 New in v0.7.06 (2015/12/07)

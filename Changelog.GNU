@@ -1,3 +1,9 @@
+2016-01-10  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Applied patch from abeverly to fix bug #1475890
+      - allow port to be specified along with hostname on S3
+      - adjusted help text and man page to reflect the change
+
 2016-01-07  Kenneth Loafman  <kenneth@loafman.com>
 
     * Applied patch from shaochun to fix bug #1531154,

@@ -1136,7 +1136,7 @@ rsync://user@host.com[:port]/[relative|/absolute]_path
 .BR "S3 storage" " (Amazon)"
 .PP
 .RS
-s3://host/bucket_name[/prefix]
+s3://host[:port]/bucket_name[/prefix]
 .br
 s3+http://bucket_name[/prefix]
 .PP
@@ -1471,7 +1471,7 @@ which aren't followed by 'foo'.  However, it wouldn't match /home even
 if /home/ben/1234567 existed.
 
 .SH A NOTE ON AZURE ACCESS
-The Azure backend requires the Microsoft Azure Storage SDK for Python to be 
+The Azure backend requires the Microsoft Azure Storage SDK for Python to be
 installed on the system.
 See
 .B REQUIREMENTS

@@ -95,7 +95,7 @@ def get_connection(scheme, parsed_url, storage_uri):
         conn = storage_uri.connect(is_secure=(not globals.s3_unencrypted_connection))
     else:
         assert scheme == 's3'
-        conn = storage_uri.connect(host=parsed_url.hostname,
+        conn = storage_uri.connect(host=parsed_url.hostname, port=parsed_url.port,
                                    is_secure=(not globals.s3_unencrypted_connection))
 
     if hasattr(conn, 'calling_format'):
