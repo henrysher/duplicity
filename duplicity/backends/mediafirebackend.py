@@ -28,7 +28,6 @@ import duplicity.backend
 import duplicity.log
 
 from duplicity.errors import BackendException
-from mediafire.client import MediaFireClient
 
 
 DUPLICITY_APP_ID = '45593'
@@ -55,6 +54,11 @@ class MediafireBackend(duplicity.backend.Backend):
             raise BackendException("MEDIAFIRE_PASSWORD environment variable "
                                    "is not set")
 
+        self._file_res = mediafire.client.File
+        self._folder_res = mediafire.client.Folder
+        self._downloaderror_exc = mediafire.client.DownloadError
+        self._notfound_exc = mediafire.client.ResourceNotFoundError
+
         mediafire_email = os.environ["MEDIAFIRE_EMAIL"]
         mediafire_password = os.environ["MEDIAFIRE_PASSWORD"]
 
@@ -67,7 +71,7 @@ class MediafireBackend(duplicity.backend.Backend):
 
         duplicity.backend.Backend.__init__(self, parsed_url)
 
-        self.client = MediaFireClient()
+        self.client = mediafire.client.MediaFireClient()
         self.client.login(app_id=DUPLICITY_APP_ID,
                           email=mediafire_email,
                           password=mediafire_password)
@@ -79,7 +83,7 @@ class MediafireBackend(duplicity.backend.Backend):
         # to set "Inherit from parent folder"
         try:
             folder = self.client.get_resource_by_uri(uri)
-            if not isinstance(folder, mediafire.client.Folder):
+            if not isinstance(folder, self._folder_res):
                 raise BackendException("target_url already exists "
                                        "and is not a folder")
         except mediafire.client.ResourceNotFoundError:
@@ -103,7 +107,7 @@ class MediafireBackend(duplicity.backend.Backend):
         uri = self._build_uri(filename)
         try:
             self.client.download_file(uri, local_path.open('wb'))
-        except mediafire.client.DownloadError as ex:
+        except self._downloaderror_exc as ex:
             raise BackendException(ex)
 
     def _list(self):
@@ -111,7 +115,7 @@ class MediafireBackend(duplicity.backend.Backend):
         uri = self._build_uri()
         filenames = []
         for item in self.client.get_folder_contents_iter(uri):
-            if not isinstance(item, mediafire.client.File):
+            if not isinstance(item, self._file_res):
                 continue
 
             filenames.append(item['filename'].encode('utf-8'))
@@ -135,7 +139,7 @@ class MediafireBackend(duplicity.backend.Backend):
         try:
             resource = self.client.get_resource_by_uri(uri)
             size = int(resource['size'])
-        except mediafire.client.ResourceNotFoundError:
+        except self._notfound_exc:
             size = -1
 
         return {'size': size}
