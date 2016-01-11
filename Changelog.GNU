@@ -1,3 +1,8 @@
+2016-01-11  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Applied changes from ralle-ubuntu to fix bug 1072130.
+      - duplicity does not support ftpes://
+
 2016-01-10  Kenneth Loafman  <kenneth@loafman.com>
 
     * Applied patch from abeverly to fix bug #1475890
