@@ -100,7 +100,9 @@ class MediafireBackend(duplicity.backend.Backend):
             remote_filename = os.path.basename(source_path.name)
 
         uri = self._build_uri(remote_filename)
-        self.client.upload_file(source_path.open('rb'), uri)
+        
+        with self.client.upload_session():
+            self.client.upload_file(source_path.open('rb'), uri)
 
     def _get(self, filename, local_path):
         """Download file"""
