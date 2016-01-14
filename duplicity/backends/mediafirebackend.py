@@ -88,7 +88,7 @@ class MediafireBackend(duplicity.backend.Backend):
                                        "and is not a folder")
         except mediafire.client.ResourceNotFoundError:
             # force folder to be private
-            folder = self.client.create_folder(uri)
+            folder = self.client.create_folder(uri, recursive=True)
             self.client.update_folder_metadata(uri, privacy='private')
 
         self.folder = folder
@@ -100,7 +100,7 @@ class MediafireBackend(duplicity.backend.Backend):
             remote_filename = os.path.basename(source_path.name)
 
         uri = self._build_uri(remote_filename)
-        
+
         with self.client.upload_session():
             self.client.upload_file(source_path.open('rb'), uri)
 
