@@ -1,3 +1,10 @@
+2016-01-23  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1296793 - Failed to create bucket
+      - use S3Connection.lookup() to check bucket exists
+      - skips Boto's Exception processing for this check
+      - dupe of bug #1507109 and bug #1537185
+
 2016-01-11  Kenneth Loafman  <kenneth@loafman.com>
 
     * Applied changes from ralle-ubuntu to fix bug 1072130.
@@ -49,7 +56,7 @@
     * Merged in lp:~matthew-t-bentley/duplicity/b2
       - Fix import and error typos.
       - Allow multiple backups in the same bucket.
-      - Fixes #1523498.
+      - Fixes bug #1523498.
 
 2015-12-07  Kenneth Loafman  <kenneth@loafman.com>
 
