@@ -5,6 +5,7 @@
       delete before passing to backend.
     * Fixed bug #1369243 by adjusting messages to be more readable.
     * Fixed bug #1375019 with patch from Eric Bavier (home to tmp).
+    * Fixed bug #1379575 with patch from Tim Ruffling (shorten webdav response).
 
 2016-01-23  Kenneth Loafman  <kenneth@loafman.com>
 

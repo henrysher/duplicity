@@ -119,7 +119,7 @@ class WebDAVBackend(duplicity.backend.Backend):
        request body MUST be treated as if it were an 'allprop' request.  "
     it was retired because e.g. box.net didn't support <D:allprop/>
     """
-    listbody = ""
+    listbody = '<?xml version="1.0"?><D:propfind xmlns:D="DAV:"><D:prop><D:resourcetype/></D:prop></D:propfind>'
 
     """Connect to remote store using WebDAV Protocol"""
     def __init__(self, parsed_url):
