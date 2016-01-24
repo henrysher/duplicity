@@ -1,3 +1,9 @@
+2016-01-24  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Pep8 corrections for recently released code.
+    * Fixed bug #1260666 universally by splitting the
+      filelist for delete before passing to backend.
+
 2016-01-23  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1296793 - Failed to create bucket
@@ -6,7 +12,6 @@
       - dupe of bug #1507109 and bug #1537185
     * Merged in lp:~mifchip/duplicity/duplicity
       - fix bug #1313964, absolute path doesn't work for FTP
-    * Pep8 corrections for recently released code.
 
 2016-01-11  Kenneth Loafman  <kenneth@loafman.com>
 
