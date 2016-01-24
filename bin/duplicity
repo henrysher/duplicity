@@ -983,9 +983,9 @@ def remove_old(col_stats):
             # if remove_all_inc_of_but_n_full_mode mode, remove only incrementals one and not full
             if globals.remove_all_inc_of_but_n_full_mode:
                 if isinstance(chain, collections.SignatureChain):
-                    chain_desc = _("Deleting incremental signature chain %s")
+                    chain_desc = _("Deleting any incremental signature chain rooted at %s")
                 else:
-                    chain_desc = _("Deleting incremental backup chain %s")
+                    chain_desc = _("Deleting any incremental backup chain rooted at %s")
             else:
                 if isinstance(chain, collections.SignatureChain):
                     chain_desc = _("Deleting complete signature chain %s")

@@ -1,8 +1,9 @@
 2016-01-24  Kenneth Loafman  <kenneth@loafman.com>
 
     * Pep8 corrections for recently released code.
-    * Fixed bug #1260666 universally by splitting the
-      filelist for delete before passing to backend.
+    * Fixed bug #1260666 universally by splitting the filelist for
+      delete before passing to backend.
+    * Fixed bug #1369243 by adjusting messages to be more readable.
 
 2016-01-23  Kenneth Loafman  <kenneth@loafman.com>
 
