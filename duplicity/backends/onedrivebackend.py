@@ -122,6 +122,10 @@ class OneDriveBackend(duplicity.backend.Backend):
             auto_refresh_url=self.OAUTH_TOKEN_URI,
             token_updater=token_updater)
 
+        # We have to refresh token manually because it's not working "under the covers"
+        if token is not None:
+            self.http_client.refresh_token(self.OAUTH_TOKEN_URI)
+
         # Send a request to make sure the token is valid (or could at least be
         # refreshed successfully, which will happen under the covers). In case
         # this request fails, the provided token was too old (i.e. expired),
