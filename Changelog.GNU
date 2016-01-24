@@ -4,6 +4,8 @@
       - use S3Connection.lookup() to check bucket exists
       - skips Boto's Exception processing for this check
       - dupe of bug #1507109 and bug #1537185
+    * Merged in lp:~mifchip/duplicity/duplicity
+      - fix bug #1313964, absolute path doesn't work for FTP
 
 2016-01-11  Kenneth Loafman  <kenneth@loafman.com>
 
