@@ -181,7 +181,7 @@ class BotoBackend(duplicity.backend.Backend):
         del self.storage_uri
         self.storage_uri = boto.storage_uri(self.boto_uri_str)
         self.conn = get_connection(self.scheme, self.parsed_url, self.storage_uri)
-        if self.conn.lookup(self.bucket_name) == None:
+        if not self.conn.lookup(self.bucket_name):
             if globals.s3_european_buckets:
                 self.bucket = self.conn.create_bucket(self.bucket_name,
                                                       location=Location.EU)

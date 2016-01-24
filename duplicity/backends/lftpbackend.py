@@ -130,7 +130,7 @@ Hints:
         if log.getverbosity() >= log.DEBUG:
             os.write(self.tempfile, "debug\n")
         if self.parsed_url.scheme == 'ftpes':
-            os.write(self.tempfile, "open %s %s\n" % (self.authflag, self.url_string.replace('ftpes','ftp')))
+            os.write(self.tempfile, "open %s %s\n" % (self.authflag, self.url_string.replace('ftpes', 'ftp')))
         else:
             os.write(self.tempfile, "open %s %s\n" % (self.authflag, self.url_string))
         os.close(self.tempfile)

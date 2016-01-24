@@ -6,6 +6,7 @@
       - dupe of bug #1507109 and bug #1537185
     * Merged in lp:~mifchip/duplicity/duplicity
       - fix bug #1313964, absolute path doesn't work for FTP
+    * Pep8 corrections for recently released code.
 
 2016-01-11  Kenneth Loafman  <kenneth@loafman.com>
 
