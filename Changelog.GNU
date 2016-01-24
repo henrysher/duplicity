@@ -4,6 +4,7 @@
     * Fixed bug #1260666 universally by splitting the filelist for
       delete before passing to backend.
     * Fixed bug #1369243 by adjusting messages to be more readable.
+    * Fixed bug #1375019 with patch from Eric Bavier (home to tmp).
 
 2016-01-23  Kenneth Loafman  <kenneth@loafman.com>
 

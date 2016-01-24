@@ -786,10 +786,10 @@ testfiles/select**/2
                        [(), ('1',), ('1', '1'), ('1', '2'), ('1', '3')])
 
         self.root = Path("/")
-        self.ParseTest([("--exclude", "/home/*"),
-                        ("--include", "/home"),
+        self.ParseTest([("--exclude", "/tmp/*"),
+                        ("--include", "/tmp"),
                         ("--exclude", "/")],
-                       [(), ("home",)])
+                       [(), ("tmp",)])
 
     def test_exclude_after_scan(self):
         """Test select with an exclude after a pattern that would return a scan for that file"""
