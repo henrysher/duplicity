@@ -1,3 +1,8 @@
+2016-01-28  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~fpytloun/duplicity/webdav-gssapi
+      - support GSSAPI authentication in webdav backend
+
 2016-01-24  Kenneth Loafman  <kenneth@loafman.com>
 
     * Pep8 corrections for recently released code.
