@@ -37,6 +37,9 @@ New in v0.7.07 (2016/01/??)
   - support GSSAPI authentication in webdav backend
 * Add more pylint ignore warnings tags
 * Adjust so test_restart.py can run on Mac as well
+* Fix for bug #1538333 - assert filecount == len(self.files_changed)
+  - added flush after every write for all FileobjHooked files which
+    should prevent some errors when duplicity is forcibly closed.
 
 
 New in v0.7.06 (2015/12/07)

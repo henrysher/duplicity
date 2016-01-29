@@ -2,6 +2,9 @@
 
     * Add more pylint ignore warnings tags
     * Adjust so test_restart.py can run on Mac as well
+    * Fix for bug #1538333 - assert filecount == len(self.files_changed)
+      - added flush after every write for all FileobjHooked files which
+        should prevent some errors when duplicity is forcibly closed.
 
 2016-01-28  Kenneth Loafman  <kenneth@loafman.com>
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2016-01-28 10:13-0600\n"
+"POT-Creation-Date: 2016-01-29 06:11-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -241,7 +241,7 @@ msgstr ""
 msgid "Unable to delete %s: %s"
 msgstr ""
 
-#: ../bin/duplicity:1114 ../duplicity/dup_temp.py:265
+#: ../bin/duplicity:1114 ../duplicity/dup_temp.py:267
 #, python-format
 msgid "Failed to read %s: %s"
 msgstr ""
@@ -1184,7 +1184,7 @@ msgstr ""
 msgid "Skipping %s because of previous error"
 msgstr ""
 
-#: ../duplicity/backends/giobackend.py:108
+#: ../duplicity/backends/giobackend.py:110
 #, python-format
 msgid "Connection failed, please check your password: %s"
 msgstr ""
