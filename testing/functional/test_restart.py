@@ -21,6 +21,7 @@
 
 import glob
 import os
+import platform
 import subprocess
 import unittest
 
@@ -321,6 +322,14 @@ class RestartTestWithoutEncryption(RestartTest):
         duplicity accidentally created such files as a result of a restart.
         https://launchpad.net/bugs/929067
         """
+
+        if platform.platform().startswith('Linux'):
+            tarcmd = "tar"
+        elif platform.platform().startswith('Darwin'):
+            tarcmd = "gtar"
+        else:
+            raise Exception("Platform %s not supported by tar/gtar." % platform.platform())
+
         # Intial normal backup
         self.backup("full", "testfiles/blocktartest")
         # Create an exact clone of the snapshot folder in the sigtar already.
@@ -332,9 +341,9 @@ class RestartTestWithoutEncryption(RestartTest):
         sigtars = glob.glob("testfiles/output/duplicity-full*.sigtar.gz")
         self.assertEqual(1, len(sigtars))
         sigtar = sigtars[0]
-        self.assertEqual(0, os.system("tar c --file=testfiles/snapshot.sigtar -C testfiles snapshot"))
+        self.assertEqual(0, os.system("%s c --file=testfiles/snapshot.sigtar -C testfiles snapshot" % (tarcmd,)))
         self.assertEqual(0, os.system("gunzip -c %s > testfiles/full.sigtar" % sigtar))
-        self.assertEqual(0, os.system("tar A --file=testfiles/snapshot.sigtar testfiles/full.sigtar"))
+        self.assertEqual(0, os.system("%s A --file=testfiles/snapshot.sigtar testfiles/full.sigtar" % (tarcmd,)))
         self.assertEqual(0, os.system("gzip testfiles/snapshot.sigtar"))
         os.remove(sigtar)
         os.rename("testfiles/snapshot.sigtar.gz", sigtar)

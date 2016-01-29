@@ -35,6 +35,8 @@ New in v0.7.07 (2016/01/??)
   - fix bug #1313964, absolute path doesn't work for FTP
 * Merged in lp:~fpytloun/duplicity/webdav-gssapi
   - support GSSAPI authentication in webdav backend
+* Add more pylint ignore warnings tags
+* Adjust so test_restart.py can run on Mac as well
 
 
 New in v0.7.06 (2015/12/07)

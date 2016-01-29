@@ -1,3 +1,8 @@
+2016-01-29  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Add more pylint ignore warnings tags
+    * Adjust so test_restart.py can run on Mac as well
+
 2016-01-28  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~fpytloun/duplicity/webdav-gssapi

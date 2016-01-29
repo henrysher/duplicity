@@ -218,7 +218,7 @@ class ImapBackend(duplicity.backend.Backend):
         for msg in list:
             if (len(msg) == 1):
                 continue
-            io = StringIO.StringIO(msg[1])
+            io = StringIO.StringIO(msg[1])  # pylint: disable=unsubscriptable-object
             m = rfc822.Message(io)
             subj = m.getheader("subject")
             header_from = m.getheader("from")

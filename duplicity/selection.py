@@ -302,7 +302,7 @@ pattern (such as '**') which matches the base directory.""") %
             log.FatalError(_("Fatal Error while processing expression\n"
                              "%s") % exc, log.ErrorCode.globbing_error)
         else:
-            raise
+            raise  # pylint: disable=misplaced-bare-raise
 
     def parse_last_excludes(self):
         """Exit with error if last selection function isn't an exclude"""
