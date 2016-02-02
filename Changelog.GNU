@@ -1,3 +1,7 @@
+2016-02-02  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fix bug #1540279 - mistake in --help
+
 2016-01-29  Kenneth Loafman  <kenneth@loafman.com>
 
     * Add more pylint ignore warnings tags

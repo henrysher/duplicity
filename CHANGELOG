@@ -40,6 +40,7 @@ New in v0.7.07 (2016/01/??)
 * Fix for bug #1538333 - assert filecount == len(self.files_changed)
   - added flush after every write for all FileobjHooked files which
     should prevent some errors when duplicity is forcibly closed.
+* Fix bug #1540279 - mistake in --help
 
 
 New in v0.7.06 (2015/12/07)
