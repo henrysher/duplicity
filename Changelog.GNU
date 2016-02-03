@@ -1,3 +1,8 @@
+2016-02-03  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Applied patch from kay-diam to fix error handling in ssh pexpect,
+      fixes bug #1541314
+
 2016-02-02  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fix bug #1540279 - mistake in --help

@@ -159,7 +159,8 @@ class SSHPExpectBackend(duplicity.backend.Backend):
                      "(?i)no such file or directory",
                      "Couldn't delete file: No such file or directory",
                      "Couldn't delete file",
-                     "open(.*): Failure"]
+                     "open\(.*\): Failure",
+                     "Can't change directory: .* is not a directory"]
         max_response_len = max([len(p) for p in responses[1:]])
         log.Info("Running '%s'" % (commandline))
         child = pexpect.spawn(commandline, timeout=None, maxread=maxread)
@@ -215,6 +216,9 @@ class SSHPExpectBackend(duplicity.backend.Backend):
         if child.exitstatus == 0:
             return res
         else:
+                elif match == 10:
+                    msg = "Could not change directory (is not a directory) in command='%s'" % (commandline,)
+                    break
             raise BackendException("Error running '%s': %s" % (commandline, msg))
 
     def _put(self, source_path, remote_filename):
