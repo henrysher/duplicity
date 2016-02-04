@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2016-01-09 13:23+0000\n"
+"POT-Creation-Date: 2016-02-03 16:33+0000\n"
 "PO-Revision-Date: 2016-01-27 12:24+0000\n"
 "Last-Translator: Andi Chandler <Unknown>\n"
 "Language-Team: English (United Kingdom) <en_GB@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2016-01-28 05:11+0000\n"
-"X-Generator: Launchpad (build 17902)\n"
+"X-Launchpad-Export-Date: 2016-02-04 05:30+0000\n"
+"X-Generator: Launchpad (build 17908)\n"
 
 #: ../bin/duplicity:135
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
@@ -212,12 +212,12 @@ msgid_plural "Deleting backup chains at times:"
 msgstr[0] "Deleting backup chain at time:"
 msgstr[1] "Deleting backup chains at times:"
 
-#: ../bin/duplicity:986
+#: ../bin/duplicity:949
 #, python-format
 msgid "Deleting incremental signature chain %s"
 msgstr "Deleting incremental signature chain %s"
 
-#: ../bin/duplicity:988
+#: ../bin/duplicity:951
 #, python-format
 msgid "Deleting incremental backup chain %s"
 msgstr "Deleting incremental backup chain %s"
@@ -252,7 +252,7 @@ msgstr "Deleting local %s (not authoritative at backend)."
 msgid "Unable to delete %s: %s"
 msgstr "Unable to delete %s: %s"
 
-#: ../bin/duplicity:1114 ../duplicity/dup_temp.py:265
+#: ../bin/duplicity:1114 ../duplicity/dup_temp.py:267
 #, python-format
 msgid "Failed to read %s: %s"
 msgstr "Failed to read %s: %s"
@@ -1293,7 +1293,7 @@ msgstr ""
 "Warning: Selected ssh backend '%s' is neither 'paramiko nor 'pexpect'. Will "
 "use default paramiko instead."
 
-#: ../duplicity/backends/giobackend.py:108
+#: ../duplicity/backends/giobackend.py:110
 #, python-format
 msgid "Connection failed, please check your password: %s"
 msgstr "Connection failed, please check your password: %s"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2016-01-09 13:23+0000\n"
+"POT-Creation-Date: 2016-02-03 16:33+0000\n"
 "PO-Revision-Date: 2016-02-01 08:50+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Norwegian Bokmal <nb@li.org>\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2016-02-02 05:12+0000\n"
+"X-Launchpad-Export-Date: 2016-02-04 05:29+0000\n"
 "X-Generator: Launchpad (build 17908)\n"
 
 #: ../bin/duplicity:135
@@ -116,7 +116,7 @@ msgstr "Sikkerhetskopi-statistikk"
 #: ../bin/duplicity:695
 #, python-format
 msgid "%s not found in archive, no files restored."
-msgstr ""
+msgstr "fant ikke %s i arkivet. Ingen filer ble gjenopprettet."
 
 #: ../bin/duplicity:733
 msgid "No files found in archive - nothing restored."
@@ -213,17 +213,17 @@ msgstr "Fant ingen gamle sikkerhetskopi-sett. Ingenting ble slettet."
 msgid "Deleting backup chain at time:"
 msgid_plural "Deleting backup chains at times:"
 msgstr[0] "Sletter sikkerhetskopi-kjede ved følgende tidspunkt:"
-msgstr[1] "Sletter sikkerhetskopi-kjede ved følgende tidspunkter:"
+msgstr[1] "Sletter sikkerhetskopi-kjeder ved følgende tidspunkter:"
 
-#: ../bin/duplicity:986
+#: ../bin/duplicity:949
 #, python-format
 msgid "Deleting incremental signature chain %s"
-msgstr ""
+msgstr "Sletter inkrementelt signaturkjede %s"
 
-#: ../bin/duplicity:988
+#: ../bin/duplicity:951
 #, python-format
 msgid "Deleting incremental backup chain %s"
-msgstr ""
+msgstr "Sletter inkrementelt sikkerhetskopi-kjede %s"
 
 #: ../bin/duplicity:991
 #, python-format
@@ -238,8 +238,8 @@ msgstr "Sletter fullstendig sikkerhetskopi-kjede %s"
 #: ../bin/duplicity:999
 msgid "Found old backup chain at the following time:"
 msgid_plural "Found old backup chains at the following times:"
-msgstr[0] "Fant gammel sikkerhetskopi-kjede ved følgende tidspunkt:"
-msgstr[1] "Fant gammel sikkerhetskopi-kjede ved følgende tidspunkter:"
+msgstr[0] "Fant gammelt sikkerhetskopi-kjede ved følgende tidspunkt:"
+msgstr[1] "Fant gamle sikkerhetskopi-kjeder ved følgende tidspunkter:"
 
 #: ../bin/duplicity:1003
 msgid "Rerun command with --force option to actually delete."
@@ -552,7 +552,7 @@ msgstr ""
 msgid "Unable to load gio backend: %s"
 msgstr ""
 
-#. Used in usage help to represent a Unix-style path name. Example:
+#. TRANSL: Used in usage help to represent a Unix-style path name. Example:
 #. --archive-dir <path>
 #: ../duplicity/commandline.py:280 ../duplicity/commandline.py:290
 #: ../duplicity/commandline.py:307 ../duplicity/commandline.py:381
@@ -561,11 +561,11 @@ msgstr ""
 msgid "path"
 msgstr "sti"
 
-#. Used in usage help to represent an ID for a GnuPG key. Example:
+#. TRANSL: Used in usage help to represent an ID for a GnuPG key. Example:
 #. --encrypt-key <gpg_key_id>
-#. Used in usage help to represent an ID for a hidden GnuPG key. Example:
+#. TRANSL: Used in usage help to represent an ID for a hidden GnuPG key. Example:
 #. --hidden-encrypt-key <gpg_key_id>
-#. Used in usage help to represent an ID for a GnuPG key. Example:
+#. TRANSL: Used in usage help to represent an ID for a GnuPG key. Example:
 #. --encrypt-key <gpg_key_id>
 #: ../duplicity/commandline.py:302 ../duplicity/commandline.py:309
 #: ../duplicity/commandline.py:405 ../duplicity/commandline.py:575
@@ -573,7 +573,7 @@ msgstr "sti"
 msgid "gpg-key-id"
 msgstr "gpg-nøkkel-id"
 
-#. Used in usage help to represent a "glob" style pattern for
+#. TRANSL: Used in usage help to represent a "glob" style pattern for
 #. matching one or more files, as described in the documentation.
 #. Example:
 #. --exclude <shell_pattern>
@@ -582,7 +582,7 @@ msgstr "gpg-nøkkel-id"
 msgid "shell_pattern"
 msgstr "skall-mønster"
 
-#. Used in usage help to represent the name of a file. Example:
+#. TRANSL: Used in usage help to represent the name of a file. Example:
 #. --log-file <filename>
 #: ../duplicity/commandline.py:323 ../duplicity/commandline.py:332
 #: ../duplicity/commandline.py:339 ../duplicity/commandline.py:432
@@ -591,12 +591,12 @@ msgstr "skall-mønster"
 msgid "filename"
 msgstr "filnavn"
 
-#. Used in usage help to represent a regular expression (regexp).
+#. TRANSL: Used in usage help to represent a regular expression (regexp).
 #: ../duplicity/commandline.py:346 ../duplicity/commandline.py:443
 msgid "regular_expression"
 msgstr "regulært_uttrykk"
 
-#. Used in usage help to represent a time spec for a previous
+#. TRANSL: Used in usage help to represent a time spec for a previous
 #. point in time, as described in the documentation. Example:
 #. duplicity remove-older-than time [options] target_url
 #: ../duplicity/commandline.py:350 ../duplicity/commandline.py:393
@@ -604,7 +604,7 @@ msgstr "regulært_uttrykk"
 msgid "time"
 msgstr "tid"
 
-#. Used in usage help. (Should be consistent with the "Options:"
+#. TRANSL: Used in usage help. (Should be consistent with the "Options:"
 #. header.) Example:
 #. duplicity [full|incremental] [options] source_dir target_url
 #: ../duplicity/commandline.py:401 ../duplicity/commandline.py:494
@@ -622,7 +622,7 @@ msgstr ""
 "Kjører i «ignorer feil»-modus pga. %s. Kontroller at det var dette du ville "
 "gjøre"
 
-#. Used in usage help to represent an imap mailbox
+#. TRANSL: Used in usage help to represent an imap mailbox
 #: ../duplicity/commandline.py:428
 msgid "imap_mailbox"
 msgstr "imap-postboks"
@@ -631,7 +631,7 @@ msgstr "imap-postboks"
 msgid "file_descriptor"
 msgstr "fildeskriptor"
 
-#. Used in usage help to represent a desired number of
+#. TRANSL: Used in usage help to represent a desired number of
 #. something. Example:
 #. --num-retries <number>
 #: ../duplicity/commandline.py:457 ../duplicity/commandline.py:479
@@ -642,12 +642,12 @@ msgstr "fildeskriptor"
 msgid "number"
 msgstr "antall"
 
-#. Used in usage help (noun)
+#. TRANSL: Used in usage help (noun)
 #: ../duplicity/commandline.py:460
 msgid "backup name"
 msgstr "sikkerhetskopi-navn"
 
-#. noun
+#. TRANSL: noun
 #: ../duplicity/commandline.py:559 ../duplicity/commandline.py:562
 #: ../duplicity/commandline.py:764
 msgid "command"
@@ -665,13 +665,13 @@ msgstr ""
 msgid "pem formatted bundle of certificate authorities"
 msgstr "pem-formatert samling av sertifikat-autoriteter"
 
-#. Used in usage help. Example:
+#. TRANSL: Used in usage help. Example:
 #. --timeout <seconds>
 #: ../duplicity/commandline.py:596 ../duplicity/commandline.py:827
 msgid "seconds"
 msgstr "sekunder"
 
-#. abbreviation for "character" (noun)
+#. TRANSL: abbreviation for "character" (noun)
 #: ../duplicity/commandline.py:602 ../duplicity/commandline.py:761
 msgid "char"
 msgstr "tegn"
@@ -695,88 +695,88 @@ msgstr "Kommandolinje-feil: %s"
 msgid "Enter 'duplicity --help' for help screen."
 msgstr "Skriv «duplicity --help» for å vise hjelpetekst."
 
-#. Used in usage help to represent a Unix-style path name. Example:
+#. TRANSL: Used in usage help to represent a Unix-style path name. Example:
 #. rsync://user[:password]@other_host[:port]//absolute_path
 #: ../duplicity/commandline.py:749
 msgid "absolute_path"
 msgstr "fullstendig_filsti"
 
-#. Used in usage help. Example:
+#. TRANSL: Used in usage help. Example:
 #. tahoe://alias/some_dir
 #: ../duplicity/commandline.py:753
 msgid "alias"
 msgstr "alias"
 
-#. Used in help to represent a "bucket name" for Amazon Web
+#. TRANSL: Used in help to represent a "bucket name" for Amazon Web
 #. Services' Simple Storage Service (S3). Example:
 #. s3://other.host/bucket_name[/prefix]
 #: ../duplicity/commandline.py:758
 msgid "bucket_name"
 msgstr "s3-bøttenavn"
 
-#. Used in usage help to represent the name of a container in
+#. TRANSL: Used in usage help to represent the name of a container in
 #. Amazon Web Services' Cloudfront. Example:
 #. cf+http://container_name
 #: ../duplicity/commandline.py:769
 msgid "container_name"
 msgstr "s3-beholdernavn"
 
-#. noun
+#. TRANSL: noun
 #: ../duplicity/commandline.py:772
 msgid "count"
 msgstr "antall"
 
-#. Used in usage help to represent the name of a file directory
+#. TRANSL: Used in usage help to represent the name of a file directory
 #: ../duplicity/commandline.py:775
 msgid "directory"
 msgstr "mappe"
 
-#. Used in usage help, e.g. to represent the name of a code
+#. TRANSL: Used in usage help, e.g. to represent the name of a code
 #. module. Example:
 #. rsync://user[:password]@other.host[:port]::/module/some_dir
 #: ../duplicity/commandline.py:788
 msgid "module"
 msgstr "modul"
 
-#. Used in usage help to represent an internet hostname. Example:
+#. TRANSL: Used in usage help to represent an internet hostname. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:802
 msgid "other.host"
 msgstr "annen.vert"
 
-#. Used in usage help. Example:
+#. TRANSL: Used in usage help. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:806
 msgid "password"
 msgstr "passord"
 
-#. Used in usage help to represent a TCP port number. Example:
+#. TRANSL: Used in usage help to represent a TCP port number. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:814
 msgid "port"
 msgstr "port"
 
-#. Used in usage help. This represents a string to be used as a
+#. TRANSL: Used in usage help. This represents a string to be used as a
 #. prefix to names for backup files created by Duplicity. Example:
 #. s3://other.host/bucket_name[/prefix]
 #: ../duplicity/commandline.py:819
 msgid "prefix"
 msgstr "prefiks"
 
-#. Used in usage help to represent a Unix-style path name. Example:
+#. TRANSL: Used in usage help to represent a Unix-style path name. Example:
 #. rsync://user[:password]@other.host[:port]/relative_path
 #: ../duplicity/commandline.py:823
 msgid "relative_path"
 msgstr "relativ_filsti"
 
-#. Used in usage help to represent the name of a single file
+#. TRANSL: Used in usage help to represent the name of a single file
 #. directory or a Unix-style path to a directory. Example:
 #. file:///some_dir
 #: ../duplicity/commandline.py:838
 msgid "some_dir"
 msgstr "en_mappe"
 
-#. Used in usage help to represent the name of a single file
+#. TRANSL: Used in usage help to represent the name of a single file
 #. directory or a Unix-style path to a directory where files will be
 #. coming FROM. Example:
 #. duplicity [full|incremental] [options] source_dir target_url
@@ -784,14 +784,14 @@ msgstr "en_mappe"
 msgid "source_dir"
 msgstr "kildemappe"
 
-#. Used in usage help to represent a URL files will be coming
+#. TRANSL: Used in usage help to represent a URL files will be coming
 #. FROM. Example:
 #. duplicity [restore] [options] source_url target_dir
 #: ../duplicity/commandline.py:849
 msgid "source_url"
 msgstr "kildeadresse"
 
-#. Used in usage help to represent the name of a single file
+#. TRANSL: Used in usage help to represent the name of a single file
 #. directory or a Unix-style path to a directory. where files will be
 #. going TO. Example:
 #. duplicity [restore] [options] source_url target_dir
@@ -799,26 +799,26 @@ msgstr "kildeadresse"
 msgid "target_dir"
 msgstr "målmappe"
 
-#. Used in usage help to represent a URL files will be going TO.
+#. TRANSL: Used in usage help to represent a URL files will be going TO.
 #. Example:
 #. duplicity [full|incremental] [options] source_dir target_url
 #: ../duplicity/commandline.py:860
 msgid "target_url"
 msgstr "måladresse"
 
-#. Used in usage help to represent a user name (i.e. login).
+#. TRANSL: Used in usage help to represent a user name (i.e. login).
 #. Example:
 #. ftp://user[:password]@other.host[:port]/some_dir
 #: ../duplicity/commandline.py:870
 msgid "user"
 msgstr "bruker"
 
-#. Header in usage help
+#. TRANSL: Header in usage help
 #: ../duplicity/commandline.py:895
 msgid "Backends and their URL formats:"
 msgstr "Bakstykker og nettadresse-formater:"
 
-#. Header in usage help
+#. TRANSL: Header in usage help
 #: ../duplicity/commandline.py:925
 msgid "Commands:"
 msgstr "Kommandoer:"
@@ -958,255 +958,263 @@ msgstr "planlegger oppgave for asynkron kjøring"
 
 #: ../duplicity/asyncscheduler.py:178
 msgid "task completed successfully"
-msgstr ""
+msgstr "oppgave utført uten problemer"
 
 #: ../duplicity/asyncscheduler.py:189
 msgid ""
 "a previously scheduled task has failed; propagating the result immediately"
 msgstr ""
+"en tidligere planlagt oppgave mislyktes. Iverksetter resultat umiddelbart"
 
 #: ../duplicity/asyncscheduler.py:212 ../duplicity/asyncscheduler.py:233
 #, python-format
 msgid "active workers = %d"
-msgstr ""
+msgstr "aktive arbeidere = %d"
 
 #: ../duplicity/asyncscheduler.py:253
 #, python-format
 msgid "task execution done (success: %s)"
-msgstr ""
+msgstr "oppgaver er utført (vellykket: %s)"
 
 #: ../duplicity/patchdir.py:80 ../duplicity/patchdir.py:85
 #, python-format
 msgid "Patching %s"
-msgstr ""
+msgstr "Retter %s"
 
 #: ../duplicity/patchdir.py:532
 #, python-format
 msgid "Error '%s' patching %s"
-msgstr ""
+msgstr "Feil «%s» under retting av %s"
 
 #: ../duplicity/patchdir.py:607
 #, python-format
 msgid "Writing %s of type %s"
-msgstr ""
+msgstr "Skriver %s av type %s"
 
 #: ../duplicity/collections.py:161 ../duplicity/collections.py:172
 #, python-format
 msgid "BackupSet.delete: missing %s"
-msgstr ""
+msgstr "BackupSet.delete: %s mangler"
 
 #: ../duplicity/collections.py:197
 msgid "Fatal Error: No manifests found for most recent backup"
-msgstr ""
+msgstr "Kritisk feil: fant ingen manifester av nyeste sikkerhetskopi"
 
 #: ../duplicity/collections.py:206
 msgid ""
 "Fatal Error: Remote manifest does not match local one.  Either the remote "
 "backup set or the local archive directory has been corrupted."
 msgstr ""
+"Kritisk feil: eksternt manifest samsvarer ikke med lokalt manifest. Ekstern "
+"sikkerhetskopi eller lokal arkivmappe er korrupt."
 
 #: ../duplicity/collections.py:214
 msgid "Fatal Error: Neither remote nor local manifest is readable."
-msgstr ""
+msgstr "Kritisk feil: hverken eksternt eller lokalt manifest kan leses."
 
 #: ../duplicity/collections.py:327
 msgid "Preferring Backupset over previous one!"
-msgstr ""
+msgstr "Foretrekker sikkerhetskopi fremfor tidligere tifelle"
 
 #: ../duplicity/collections.py:330
 #, python-format
 msgid "Ignoring incremental Backupset (start_time: %s; needed: %s)"
 msgstr ""
+"Ignorerer inkrementelt sikkerhetskopi-sett (start_time: %s; nødvendig: %s)"
 
 #: ../duplicity/collections.py:335
 #, python-format
 msgid "Added incremental Backupset (start_time: %s / end_time: %s)"
 msgstr ""
+"Lagt til inkrementelt sikkerhetskopi-sett (start_time: %s / end_time: %s)"
 
 #: ../duplicity/collections.py:405
 msgid "Chain start time: "
-msgstr ""
+msgstr "Kjede-starttid: "
 
 #: ../duplicity/collections.py:406
 msgid "Chain end time: "
-msgstr ""
+msgstr "Kjede-sluttid: "
 
 #: ../duplicity/collections.py:407
 #, python-format
 msgid "Number of contained backup sets: %d"
-msgstr ""
+msgstr "Antall sikkerhetskopi-sett i behold: %d"
 
 #: ../duplicity/collections.py:409
 #, python-format
 msgid "Total number of contained volumes: %d"
-msgstr ""
+msgstr "Antall volum: %d"
 
 #: ../duplicity/collections.py:411 ../duplicity/collections.py:1203
 msgid "Type of backup set:"
-msgstr ""
+msgstr "Type sikkerhetskopi-sett:"
 
 #: ../duplicity/collections.py:411 ../duplicity/collections.py:1203
 msgid "Time:"
-msgstr ""
+msgstr "Tid:"
 
 #: ../duplicity/collections.py:411
 msgid "Num volumes:"
-msgstr ""
+msgstr "Antall volum:"
 
 #: ../duplicity/collections.py:415 ../duplicity/collections.py:1209
 msgid "Full"
-msgstr ""
+msgstr "Fullstendig"
 
 #: ../duplicity/collections.py:418 ../duplicity/collections.py:1211
 msgid "Incremental"
-msgstr ""
+msgstr "Inkrementell"
 
 #: ../duplicity/collections.py:478
 msgid "local"
-msgstr ""
+msgstr "lokal"
 
 #: ../duplicity/collections.py:480
 msgid "remote"
-msgstr ""
+msgstr "ekstern"
 
 #: ../duplicity/collections.py:635
 msgid "Collection Status"
-msgstr ""
+msgstr "Samlingsstatus"
 
 #: ../duplicity/collections.py:637
 #, python-format
 msgid "Connecting with backend: %s"
-msgstr ""
+msgstr "Kobler til med bakstykke: %s"
 
 #: ../duplicity/collections.py:639
 #, python-format
 msgid "Archive dir: %s"
-msgstr ""
+msgstr "Arkivmappe: %s"
 
 #: ../duplicity/collections.py:642
 #, python-format
 msgid "Found %d secondary backup chain."
 msgid_plural "Found %d secondary backup chains."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Fant %d sekundært sikkerhetskopi-kjede."
+msgstr[1] "Fant %d sekundære sikkerhetskopi-kjeder."
 
 #: ../duplicity/collections.py:647
 #, python-format
 msgid "Secondary chain %d of %d:"
-msgstr ""
+msgstr "Sekundærkjede %d av %d:"
 
 #: ../duplicity/collections.py:653
 msgid "Found primary backup chain with matching signature chain:"
-msgstr ""
+msgstr "Fant primært sikkerhetskopi-kjede med samsvarende signaturkjede:"
 
 #: ../duplicity/collections.py:657
 msgid "No backup chains with active signatures found"
-msgstr ""
+msgstr "Fant ingen sikkerhetskopi-kjeder med gyldige signaturer"
 
 #: ../duplicity/collections.py:660
 #, python-format
 msgid "Also found %d backup set not part of any chain,"
 msgid_plural "Also found %d backup sets not part of any chain,"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Fant også %d sikkerhetskopi-sett som ikke inngår i et kjede,"
+msgstr[1] "Fant også %d sikkerhetskopi-sett som ikke inngår i et kjede,"
 
 #: ../duplicity/collections.py:664
 #, python-format
 msgid "and %d incomplete backup set."
 msgid_plural "and %d incomplete backup sets."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "og %d ufullstendig sikkerhtskopi-sett."
+msgstr[1] "og %d ufullstendige sikkerhtskopi-sett."
 
-#. "cleanup" is a hard-coded command, so do not translate it
+#. TRANSL: "cleanup" is a hard-coded command, so do not translate it
 #: ../duplicity/collections.py:669
 msgid ""
 "These may be deleted by running duplicity with the \"cleanup\" command."
-msgstr ""
+msgstr "Disse kan slettes ved å kjøre duplicity med kommandoen «cleanup»"
 
 #: ../duplicity/collections.py:672
 msgid "No orphaned or incomplete backup sets found."
-msgstr ""
+msgstr "Fant ingen foreldreløse eller ufullstendige sikkerhetskopi-sett."
 
 #: ../duplicity/collections.py:688
 #, python-format
 msgid "%d file exists on backend"
 msgid_plural "%d files exist on backend"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d fil finnes på bakstykke"
+msgstr[1] "%d filer finnes på bakstykke"
 
 #: ../duplicity/collections.py:695
 #, python-format
 msgid "%d file exists in cache"
 msgid_plural "%d files exist in cache"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d fil finnes i hurtiglager"
+msgstr[1] "%d filer finnes i hurtiglager"
 
 #: ../duplicity/collections.py:747
 msgid ""
 "Warning, discarding last backup set, because of missing signature file."
 msgstr ""
+"Advarsel: forkaster forrige sikkerhetskopi-sett, fordi signaturfil mangler."
 
 #: ../duplicity/collections.py:770
 msgid "Warning, found the following local orphaned signature file:"
 msgid_plural "Warning, found the following local orphaned signature files:"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Advarsel: fant følgende lokal foreldreløs signaturfil:"
+msgstr[1] "Advarsel: fant følgende lokale foreldreløse signaturfiler:"
 
 #: ../duplicity/collections.py:779
 msgid "Warning, found the following remote orphaned signature file:"
 msgid_plural "Warning, found the following remote orphaned signature files:"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Advarsel: fant følgende ekstern foreldreløs signaturfil:"
+msgstr[1] "Advarsel: fant følgende eksterne foreldreløse signaturfiler:"
 
 #: ../duplicity/collections.py:788
 msgid "Warning, found signatures but no corresponding backup files"
-msgstr ""
+msgstr "Advarsel: fant signaturer, men ingen tilhørende sikkerhetskopi-filer"
 
 #: ../duplicity/collections.py:792
 msgid ""
 "Warning, found incomplete backup sets, probably left from aborted session"
 msgstr ""
+"Advarsel: fant ufullstendige sikkerhetskopi-sett. De ligger sannsynligvis "
+"igjen fra en avbrutt økt"
 
 #: ../duplicity/collections.py:796
 msgid "Warning, found the following orphaned backup file:"
 msgid_plural "Warning, found the following orphaned backup files:"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Advarsel: fant følgende foreldreløs sikkerhetskopi-fil:"
+msgstr[1] "Advarsel: fant følgende foreldreløse sikkerhetskopi-filer:"
 
 #: ../duplicity/collections.py:813
 #, python-format
 msgid "Extracting backup chains from list of files: %s"
-msgstr ""
+msgstr "Pakker ut sikkerhetskopi-kjeder fra lister over filer: %s"
 
 #: ../duplicity/collections.py:824
 #, python-format
 msgid "File %s is part of known set"
-msgstr ""
+msgstr "Fila %s inngår i et kjent sett"
 
 #: ../duplicity/collections.py:827
 #, python-format
 msgid "File %s is not part of a known set; creating new set"
-msgstr ""
+msgstr "Fila %s inngår ikke i et delt sett. Lager nytt sett"
 
 #: ../duplicity/collections.py:832
 #, python-format
 msgid "Ignoring file (rejected by backup set) '%s'"
-msgstr ""
+msgstr "Ignorerer fila «%s» (avvist av sikkerhetskopi-sett)"
 
 #: ../duplicity/collections.py:848
 #, python-format
 msgid "Found backup chain %s"
-msgstr ""
+msgstr "Fant sikkerhetskopi-kjede %s"
 
 #: ../duplicity/collections.py:853
 #, python-format
 msgid "Added set %s to pre-existing chain %s"
-msgstr ""
+msgstr "Lagt til sett %s i kjede %s"
 
 #: ../duplicity/collections.py:857
 #, python-format
 msgid "Found orphaned set %s"
-msgstr ""
+msgstr "Fant foreldreløst sett %s"
 
 #: ../duplicity/collections.py:1008
 #, python-format
@@ -1214,56 +1222,58 @@ msgid ""
 "No signature chain for the requested time.  Using oldest available chain, "
 "starting at time %s."
 msgstr ""
+"Ingen signaturkjede for forespurt tid. Bruker eldst tilgjengelig kjede, som "
+"starter ved %s."
 
 #: ../duplicity/robust.py:61
 #, python-format
 msgid "Error listing directory %s"
-msgstr ""
+msgstr "Feil under visning av mappa %s"
 
 #: ../duplicity/diffdir.py:108 ../duplicity/diffdir.py:398
 #, python-format
 msgid "Error %s getting delta for %s"
-msgstr ""
+msgstr "Feil %s under henting av delta for %s"
 
 #: ../duplicity/diffdir.py:122
 #, python-format
 msgid "Getting delta of %s and %s"
-msgstr ""
+msgstr "Henter delta for %s og %s"
 
 #: ../duplicity/diffdir.py:167
 #, python-format
 msgid "A %s"
-msgstr ""
+msgstr "A %s"
 
 #: ../duplicity/diffdir.py:174
 #, python-format
 msgid "M %s"
-msgstr ""
+msgstr "M %s"
 
 #: ../duplicity/diffdir.py:196
 #, python-format
 msgid "Comparing %s and %s"
-msgstr ""
+msgstr "Sammenlikner %s og %s"
 
 #: ../duplicity/diffdir.py:204
 #, python-format
 msgid "D %s"
-msgstr ""
+msgstr "D %s"
 
 #: ../duplicity/lazy.py:334
 #, python-format
 msgid "Warning: oldindex %s >= newindex %s"
-msgstr ""
+msgstr "Advarsel: oldindex %s >= newindex %s"
 
 #: ../duplicity/lazy.py:409
 #, python-format
 msgid "Error '%s' processing %s"
-msgstr ""
+msgstr "Feil «%s» under behandling av %s"
 
 #: ../duplicity/lazy.py:419
 #, python-format
 msgid "Skipping %s because of previous error"
-msgstr ""
+msgstr "Hopper over %s på grunn av tidligere feil"
 
 #: ../duplicity/backends/sshbackend.py:25
 #, python-format
@@ -1282,7 +1292,7 @@ msgstr ""
 #: ../duplicity/backends/giobackend.py:110
 #, python-format
 msgid "Connection failed, please check your password: %s"
-msgstr ""
+msgstr "Tilkobling mislyktes. Kontroller passordet. %s"
 
 #: ../duplicity/backend.py:503
 #, python-format
@@ -1296,6 +1306,9 @@ msgid ""
 "Current hostname: %s\n"
 "Previous hostname: %s"
 msgstr ""
+"Kritisk feil: Kildevert for sikkerhetskopi er endret\n"
+"Gjeldende vertsnavn: %s\n"
+"Tidligere vertsnavn: %s"
 
 #: ../duplicity/manifest.py:98
 #, python-format
@@ -1304,6 +1317,9 @@ msgid ""
 "Current directory: %s\n"
 "Previous directory: %s"
 msgstr ""
+"Kritisk feil: Kildemappe for sikkerhetskopier er endret.\n"
+"Gjeldende mappe: %s\n"
+"Tidligere mappe: %s"
 
 #: ../duplicity/manifest.py:107
 msgid ""
@@ -1312,125 +1328,131 @@ msgid ""
 "If this is not a mistake, use the --allow-source-mismatch switch to avoid "
 "seeing this message"
 msgstr ""
+"Prosessen avbrytes fordi du ved uhell kan ha forsøkt å sikkerhetskopiere to "
+"ulike datasett til samme ekstern plassering, eller du bruker samme "
+"arkivmappe. Kjør på nytt med valget «--allow-source-mismatch» hvis dette "
+"ikke er et uhell."
 
 #: ../duplicity/manifest.py:244
 msgid "Manifests not equal because different volume numbers"
-msgstr ""
+msgstr "Manifester er ulike fordi volumnumre er ulike"
 
 #: ../duplicity/manifest.py:249
 msgid "Manifests not equal because volume lists differ"
-msgstr ""
+msgstr "Manifester er ulike fordi volumlister er ulike"
 
 #: ../duplicity/manifest.py:254
 msgid "Manifests not equal because hosts or directories differ"
-msgstr ""
+msgstr "Manifester er ulike fordi vertsnavn eller mapper er ulike"
 
 #: ../duplicity/manifest.py:401
 msgid "Warning, found extra Volume identifier"
-msgstr ""
+msgstr "Advarsel: fant ekstra volum-id"
 
 #: ../duplicity/manifest.py:427
 msgid "Other is not VolumeInfo"
-msgstr ""
+msgstr "Annen er ikke VolumeInfo"
 
 #: ../duplicity/manifest.py:430
 msgid "Volume numbers don't match"
-msgstr ""
+msgstr "Volum-numre samsvarer ikke"
 
 #: ../duplicity/manifest.py:433
 msgid "start_indicies don't match"
-msgstr ""
+msgstr "start_indicies samsvarer ikke"
 
 #: ../duplicity/manifest.py:436
 msgid "end_index don't match"
-msgstr ""
+msgstr "end_index samsvarer ikke"
 
 #: ../duplicity/manifest.py:443
 msgid "Hashes don't match"
-msgstr ""
+msgstr "Kontrollsummer samsvarer ikke"
 
 #: ../duplicity/path.py:109
 #, python-format
 msgid "Warning: %s invalid devnums (0x%X), treating as (0, 0)."
 msgstr ""
+"Advarsel: %s ugyldige enhetsnumre (0x%X). Behandler disse som (0, 0)."
 
 #: ../duplicity/path.py:236 ../duplicity/path.py:295
 #, python-format
 msgid "Warning: %s has negative mtime, treating as 0."
-msgstr ""
+msgstr "Advarsel: %s har negativ mtime. Behandles som 0."
 
 #: ../duplicity/path.py:359
 msgid "Difference found:"
-msgstr ""
+msgstr "Fant ulikhet:"
 
 #: ../duplicity/path.py:368
 #, python-format
 msgid "New file %s"
-msgstr ""
+msgstr "Ny fil %s"
 
 #: ../duplicity/path.py:371
 #, python-format
 msgid "File %s is missing"
-msgstr ""
+msgstr "Fila %s mangler"
 
 #: ../duplicity/path.py:374
 #, python-format
 msgid "File %%s has type %s, expected %s"
-msgstr ""
+msgstr "Fil %%s er av type %s. Forventet %s"
 
 #: ../duplicity/path.py:380 ../duplicity/path.py:406
 #, python-format
 msgid "File %%s has permissions %s, expected %s"
-msgstr ""
+msgstr "Fil %%s har tillatelser %s. Forventet %s"
 
 #: ../duplicity/path.py:385
 #, python-format
 msgid "File %%s has mtime %s, expected %s"
-msgstr ""
+msgstr "Fil %%s har mtime %s. Forventet %s"
 
 #: ../duplicity/path.py:393
 #, python-format
 msgid "Data for file %s is different"
-msgstr ""
+msgstr "Data for fil %s er uike"
 
 #: ../duplicity/path.py:401
 #, python-format
 msgid "Symlink %%s points to %s, expected %s"
-msgstr ""
+msgstr "Symbolsk lenke %%s peker på %s. Forventet %s"
 
 #: ../duplicity/path.py:410
 #, python-format
 msgid "Device file %%s has numbers %s, expected %s"
-msgstr ""
+msgstr "Enhetsfil %%s har tallene %s. Forventet %s"
 
 #: ../duplicity/path.py:572
 #, python-format
 msgid "Making directory %s"
-msgstr ""
+msgstr "Lager mappe %s"
 
 #: ../duplicity/path.py:582
 #, python-format
 msgid "Deleting %s"
-msgstr ""
+msgstr "Sletter %s"
 
 #: ../duplicity/path.py:591
 #, python-format
 msgid "Touching %s"
-msgstr ""
+msgstr "Trykker %s"
 
 #: ../duplicity/path.py:598
 #, python-format
 msgid "Deleting tree %s"
-msgstr ""
+msgstr "Deleting tree %s"
 
 #: ../duplicity/gpginterface.py:237
 msgid "Threading not available -- zombie processes may appear"
 msgstr ""
+"Trådbehandling ikke tilgjengelig -- det kan dukke opp zombie-prosesser"
 
 #: ../duplicity/gpginterface.py:701
 #, python-format
 msgid "GPG process %d terminated before wait()"
-msgstr ""
+msgstr "GPG-prosess %d avsluttet før wait()"
 
 #: ../duplicity/dup_time.py:52
 #, python-format
@@ -1441,6 +1463,11 @@ msgid ""
 "allowed special characters are s, m, h, D, W, M, and Y.  See the man\n"
 "page for more information."
 msgstr ""
+"«%s» er en ugyldig intervallstreng\n"
+"\n"
+"Intervaller skal oppgis som f.eks. 2Y (2 år) eller 2h30m (2.5 timer). \n"
+"Tillatte spesialtegn er s, m, h, D, W, M og Y.  Se bruksanvisning\n"
+"(man page) for mer informasjon."
 
 #: ../duplicity/dup_time.py:58
 #, python-format
@@ -1454,56 +1481,68 @@ msgid ""
 "(various combinations are acceptable, but the month always precedes\n"
 "the day)."
 msgstr ""
+"«%s» er en ugyldig tidsstreng\n"
+"\n"
+"Tidsstrenger må skrives i form av intervaller (som «3D64s»), w3-datetime-"
+"strenger\n"
+"som «2002-04-26T04:22:01-07:00» (evt. «2002-04-26T04:22:01» - duplicity "
+"bruker\n"
+"gjeldende tidssone), eller ordinære datoer som «2/4/1997» og «2001-04-23»\n"
+"(du kan bruke ulike datoformater, men måneden kommer alltid før dagen)."
 
 #: ../duplicity/tempdir.py:132
 #, python-format
 msgid "Using temporary directory %s"
-msgstr ""
+msgstr "Bruker %s som midlertidig mappe"
 
 #: ../duplicity/tempdir.py:176
 #, python-format
 msgid "Registering (mktemp) temporary file %s"
-msgstr ""
+msgstr "Registrerer (mktemp) midlertidig fil %s"
 
 #: ../duplicity/tempdir.py:198
 #, python-format
 msgid "Registering (mkstemp) temporary file %s"
-msgstr ""
+msgstr "Registrerer (mkstemp) midlertidig fil %s"
 
 #: ../duplicity/tempdir.py:230
 #, python-format
 msgid "Forgetting temporary file %s"
-msgstr ""
+msgstr "Glemmer midlertidig fil %s"
 
 #: ../duplicity/tempdir.py:233
 #, python-format
 msgid "Attempt to forget unknown tempfile %s - this is probably a bug."
 msgstr ""
+"Prøver å glemme ukjent midlertidig fil %s (dette er sannsynligvis en "
+"programfeil)."
 
 #: ../duplicity/tempdir.py:252
 #, python-format
 msgid "Removing still remembered temporary file %s"
-msgstr ""
+msgstr "Fjerner midlertidig fil %s som fremdeles huskes"
 
 #: ../duplicity/tempdir.py:255
 #, python-format
 msgid "Cleanup of temporary file %s failed"
-msgstr ""
+msgstr "Opprydding av midlertidig fil %s mislyktes"
 
 #: ../duplicity/tempdir.py:260
 #, python-format
 msgid "Cleanup of temporary directory %s failed - this is probably a bug."
 msgstr ""
+"Opprydding av midlertidig mappe %s mislyktes. Dette er sannsynligvis en "
+"programfeil."
 
 #: ../duplicity/util.py:96
 #, python-format
 msgid "IGNORED_ERROR: Warning: ignoring error as requested: %s: %s"
-msgstr ""
+msgstr "IGNORED_ERROR: Advarsel: ignorerer feil som forespurt: %s. %s"
 
 #: ../duplicity/util.py:162
 #, python-format
 msgid "Releasing lockfile %s"
-msgstr ""
+msgstr "Slipper låsefil %s"
 
 #, python-format
 #~ msgid "File %s not found locally after get from backend"
