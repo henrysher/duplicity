@@ -1,3 +1,9 @@
+2016-02-05  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed a patching error in ssh_pexpect_backend.py
+    * Merged in lp:~fpytloun/duplicity/webdav-gssapi-fix
+      - Make kerberos optional for webdav backend
+
 2016-02-03  Kenneth Loafman  <kenneth@loafman.com>
 
     * Applied patch from kay-diam to fix error handling in ssh pexpect,

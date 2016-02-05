@@ -43,6 +43,9 @@ New in v0.7.07 (2016/01/??)
 * Fix bug #1540279 - mistake in --help
 * Applied patch from kay-diam to fix error handling in ssh pexpect,
   fixes bug #1541314
+* Fixed a patching error in ssh_pexpect_backend.py
+* Merged in lp:~fpytloun/duplicity/webdav-gssapi-fix
+  - Make kerberos optional for webdav backend
 
 
 New in v0.7.06 (2015/12/07)

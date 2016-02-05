@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2016-01-29 06:11-0600\n"
+"POT-Creation-Date: 2016-02-05 08:28-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1256,6 +1256,19 @@ msgstr ""
 #: ../duplicity/backends/pydrivebackend.py:107
 #, python-format
 msgid "PyDrive backend: multiple files called '%s'."
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:239
+msgid ""
+"python-kerberos needed to use kerberos                           "
+"authorization, falling back to basic auth."
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:243
+#, python-format
+msgid ""
+"Kerberos authorization failed: %s.                          Falling back to "
+"basic auth."
 msgstr ""
 
 #: ../duplicity/manifest.py:91

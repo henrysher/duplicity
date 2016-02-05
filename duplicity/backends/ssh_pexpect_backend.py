@@ -212,13 +212,13 @@ class SSHPExpectBackend(duplicity.backend.Backend):
             elif match == 9:
                 msg = "Could not open file in command='%s'" % (commandline,)
                 break
+            elif match == 10:
+                msg = "Could not change directory (is not a directory) in command='%s'" % (commandline,)
+                break
         child.close(force=True)
         if child.exitstatus == 0:
             return res
         else:
-                elif match == 10:
-                    msg = "Could not change directory (is not a directory) in command='%s'" % (commandline,)
-                    break
             raise BackendException("Error running '%s': %s" % (commandline, msg))
 
     def _put(self, source_path, remote_filename):
