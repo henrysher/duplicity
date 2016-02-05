@@ -28,7 +28,6 @@ import re
 import urllib
 import urllib2
 import urlparse
-import kerberos
 import xml.dom.minidom
 
 import duplicity.backend
@@ -236,8 +235,13 @@ class WebDAVBackend(duplicity.backend.Backend):
         if token.split(',')[0].lower() == 'negotiate':
             try:
                 return self.get_kerberos_authorization()
-            except kerberos.GSSError:
-                # Fallback to basic auth
+            except ImportError:
+                log.warn(_("python-kerberos needed to use kerberos \
+                          authorization, falling back to basic auth."))
+                return self.get_basic_authorization()
+            except Exception as e:
+                log.warn(_("Kerberos authorization failed: %s.\
+                          Falling back to basic auth.") % e)
                 return self.get_basic_authorization()
         elif token.lower() == 'basic':
             return self.get_basic_authorization()
@@ -249,6 +253,7 @@ class WebDAVBackend(duplicity.backend.Backend):
         return urllib2.parse_keqv_list(urllib2.parse_http_list(challenge_string))
 
     def get_kerberos_authorization(self):
+        import kerberos
         _, ctx = kerberos.authGSSClientInit("HTTP@%s" % self.conn.host)
         kerberos.authGSSClientStep(ctx, "")
         tgt = kerberos.authGSSClientResponse(ctx)
