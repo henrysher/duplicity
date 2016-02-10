@@ -1205,6 +1205,16 @@ See also
 .B "A NOTE ON MULTI BACKEND"
 below.
 .RE
+.PP
+.BR "MediaFire"
+.PP
+.RS
+mf:///some_dir
+.PP
+See also
+.B "A NOTE ON MEDIAFIRE BACKEND"
+below.
+.RE
 
 .SH TIME FORMATS
 duplicity uses time strings in two places.  Firstly, many of the files
@@ -1871,6 +1881,20 @@ If
 .B SWIFT_AUTHVERSION
 is unspecified, it will default to version 1.
 
+.SH A NOTE ON MEDIAFIRE BACKEND
+This backend requires
+.B mediafire
+python library to be installed on the system. See
+.BR REQUIREMENTS .
+
+It uses the following environment variables for authentication:
+.B MEDIAFIRE_EMAIL
+- account email,
+.B MEDIAFIRE_PASSWORD
+- account password.
+
+The destination folder will be created for you if it does not exist.
+
 .SH A NOTE ON SYMMETRIC ENCRYPTION AND SIGNING
 Signing and symmetrically encrypt at the same time with the gpg binary on the
 command line, as used within duplicity, is a specifically challenging issue.
@@ -2075,6 +2099,10 @@ for ssl certificate verification of HTTPS connections
 .B Python kerberos module
 for kerberos authentication
 - https://github.com/02strich/pykerberos
+.TP
+.BR "MediaFire backend"
+.B MediaFire Python Open SDK
+- https://pypi.python.org/pypi/mediafire/
 
 .SH AUTHOR
 .TP

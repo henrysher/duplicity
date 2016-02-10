@@ -20,19 +20,13 @@
 
 """MediaFire Duplicity Backend"""
 
-import logging
 import os
-import sys
 
 import duplicity.backend
-import duplicity.log
 
 from duplicity.errors import BackendException
 
-
 DUPLICITY_APP_ID = '45593'
-
-LOG_FORMAT = "MediaFireBackend:%(asctime)s:%(name)s:%(message)s"
 
 
 class MediafireBackend(duplicity.backend.Backend):
@@ -61,13 +55,6 @@ class MediafireBackend(duplicity.backend.Backend):
 
         mediafire_email = os.environ["MEDIAFIRE_EMAIL"]
         mediafire_password = os.environ["MEDIAFIRE_PASSWORD"]
-
-        if duplicity.log.getverbosity() >= duplicity.log.DEBUG:
-            logger = logging.getLogger("mediafire")
-            handler = logging.StreamHandler(stream=sys.stderr)
-            handler.setFormatter(logging.Formatter(LOG_FORMAT))
-            logger.addHandler(handler)
-            logger.setLevel(logging.DEBUG)
 
         duplicity.backend.Backend.__init__(self, parsed_url)
 
