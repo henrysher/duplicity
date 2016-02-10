@@ -3,7 +3,7 @@ New in v0.7.07 (2016/01/??)
 * Merged in lp:~matthew-t-bentley/duplicity/b2
   - Fix import and error typos.
   - Allow multiple backups in the same bucket.
-  - Fixes #1523498.
+  - Fixes bug #1523498.
   - A couple fixes allowing multiple backups to be hosted in different
     folders in the same bucket as well as some logging for -v9.
 * Random stuff:
@@ -25,6 +25,27 @@ New in v0.7.07 (2016/01/??)
   - adjusted help text and man page to reflect the change
 * Undo changes to test_restart.py.  GNU tar is needed.
 * Fix minor pep8 nit in collections.py
+* Applied changes from ralle-ubuntu to fix bug 1072130.
+  - duplicity does not support ftpes://
+* Fixed bug #1296793 - Failed to create bucket
+  - use S3Connection.lookup() to check bucket exists
+  - skips Boto's Exception processing for this check
+  - dupe of bug #1507109 and bug #1537185
+* Merged in lp:~mifchip/duplicity/duplicity
+  - fix bug #1313964, absolute path doesn't work for FTP
+* Merged in lp:~fpytloun/duplicity/webdav-gssapi
+  - support GSSAPI authentication in webdav backend
+* Add more pylint ignore warnings tags
+* Adjust so test_restart.py can run on Mac as well
+* Fix for bug #1538333 - assert filecount == len(self.files_changed)
+  - added flush after every write for all FileobjHooked files which
+    should prevent some errors when duplicity is forcibly closed.
+* Fix bug #1540279 - mistake in --help
+* Applied patch from kay-diam to fix error handling in ssh pexpect,
+  fixes bug #1541314
+* Fixed a patching error in ssh_pexpect_backend.py
+* Merged in lp:~fpytloun/duplicity/webdav-gssapi-fix
+  - Make kerberos optional for webdav backend
 
 
 New in v0.7.06 (2015/12/07)
@@ -82,6 +103,13 @@ New in v0.7.06 (2015/12/07)
   - This adds backends/b2backend.py, modifies log.py to add an
     error code and modifies commandline.py to add the b2://
     example to the help text.
+* Pep8 corrections for recently released code.
+* Fixed bug #1260666 universally by splitting the filelist for
+  delete before passing to backend.
+* Fixed bug #1369243 by adjusting messages to be more readable.
+* Fixed bug #1375019 with patch from Eric Bavier (home to tmp).
+* Fixed bug #1379575 with patch from Tim Ruffing (shorten webdav response).
+* Fixed bug #1492301 with patch from askretov (manually refresh oauth).
 
 
 New in v0.7.05 (2015/09/15)

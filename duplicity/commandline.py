@@ -928,7 +928,7 @@ def usage():
   full <%(source_dir)s> <%(target_url)s>
   incr <%(source_dir)s> <%(target_url)s>
   list-current-files <%(target_url)s>
-  restore <%(target_url)s> <%(source_dir)s>
+  restore <%(source_url)s> <%(target_dir)s>
   remove-older-than <%(time)s> <%(target_url)s>
   remove-all-but-n-full <%(count)s> <%(target_url)s>
   remove-all-inc-of-but-n-full <%(count)s> <%(target_url)s>

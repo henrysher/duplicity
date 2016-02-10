@@ -403,7 +403,7 @@ class ITRBranch:
         if args and args[0] and isinstance(args[0], tuple):
             filename = os.path.join(*args[0])
         elif self.index:
-            filename = os.path.join(*self.index)
+            filename = os.path.join(*self.index)  # pylint: disable=not-an-iterable
         else:
             filename = "."
         log.Warn(_("Error '%s' processing %s") % (exc, util.ufn(filename)),

@@ -21,6 +21,7 @@
 
 import os.path
 import urllib
+import re
 
 import duplicity.backend
 from duplicity import globals
@@ -92,13 +93,13 @@ class NCFTPBackend(duplicity.backend.Backend):
             self.flags += " -P '%s'" % (parsed_url.port)
 
     def _put(self, source_path, remote_filename):
-        remote_path = os.path.join(urllib.unquote(self.parsed_url.path.lstrip('/')), remote_filename).rstrip()
+        remote_path = os.path.join(urllib.unquote(re.sub('^/', '', self.parsed_url.path)), remote_filename).rstrip()
         commandline = "ncftpput %s -m -V -C '%s' '%s'" % \
             (self.flags, source_path.name, remote_path)
         self.subprocess_popen(commandline)
 
     def _get(self, remote_filename, local_path):
-        remote_path = os.path.join(urllib.unquote(self.parsed_url.path), remote_filename).rstrip()
+        remote_path = os.path.join(urllib.unquote(re.sub('^/', '', self.parsed_url.path)), remote_filename).rstrip()
         commandline = "ncftpget %s -V -C '%s' '%s' '%s'" % \
             (self.flags, self.parsed_url.hostname, remote_path.lstrip('/'), local_path.name)
         self.subprocess_popen(commandline)

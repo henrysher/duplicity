@@ -1,3 +1,55 @@
+2016-02-05  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed a patching error in ssh_pexpect_backend.py
+    * Merged in lp:~fpytloun/duplicity/webdav-gssapi-fix
+      - Make kerberos optional for webdav backend
+
+2016-02-03  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Applied patch from kay-diam to fix error handling in ssh pexpect,
+      fixes bug #1541314
+
+2016-02-02  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fix bug #1540279 - mistake in --help
+
+2016-01-29  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Add more pylint ignore warnings tags
+    * Adjust so test_restart.py can run on Mac as well
+    * Fix for bug #1538333 - assert filecount == len(self.files_changed)
+      - added flush after every write for all FileobjHooked files which
+        should prevent some errors when duplicity is forcibly closed.
+
+2016-01-28  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~fpytloun/duplicity/webdav-gssapi
+      - support GSSAPI authentication in webdav backend
+
+2016-01-24  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Pep8 corrections for recently released code.
+    * Fixed bug #1260666 universally by splitting the filelist for
+      delete before passing to backend.
+    * Fixed bug #1369243 by adjusting messages to be more readable.
+    * Fixed bug #1375019 with patch from Eric Bavier (home to tmp).
+    * Fixed bug #1379575 with patch from Tim Ruffing (shorten webdav response).
+    * Fixed bug #1492301 with patch from askretov (manually refresh oauth).
+
+2016-01-23  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1296793 - Failed to create bucket
+      - use S3Connection.lookup() to check bucket exists
+      - skips Boto's Exception processing for this check
+      - dupe of bug #1507109 and bug #1537185
+    * Merged in lp:~mifchip/duplicity/duplicity
+      - fix bug #1313964, absolute path doesn't work for FTP
+
+2016-01-11  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Applied changes from ralle-ubuntu to fix bug 1072130.
+      - duplicity does not support ftpes://
+
 2016-01-10  Kenneth Loafman  <kenneth@loafman.com>
 
     * Applied patch from abeverly to fix bug #1475890
@@ -44,7 +96,7 @@
     * Merged in lp:~matthew-t-bentley/duplicity/b2
       - Fix import and error typos.
       - Allow multiple backups in the same bucket.
-      - Fixes #1523498.
+      - Fixes bug #1523498.
 
 2015-12-07  Kenneth Loafman  <kenneth@loafman.com>
 

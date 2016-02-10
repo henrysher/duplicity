@@ -583,7 +583,10 @@ class BackendWrapper(object):
 
     @retry('delete', fatal=False)
     def _do_delete_list(self, filename_list):
-        self.backend._delete_list(filename_list)
+        while filename_list:
+            sublist = filename_list[:100]
+            self.backend._delete_list(sublist)
+            filename_list = filename_list[100:]
 
     @retry('delete', fatal=False)
     def _do_delete(self, filename):

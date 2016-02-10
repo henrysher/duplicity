@@ -34,7 +34,7 @@ class TempDirTest(UnitTestCase):
         # are generated temp files unique?
         self.assertTrue(td.mktemp() != td.mktemp())
 
-        # create and remove a temp dir 
+        # create and remove a temp dir
         dir = td.mktemp()
         os.mkdir(dir)
         os.rmdir(dir)
@@ -55,33 +55,33 @@ class TempDirTest(UnitTestCase):
     def test_dirname(self):
         """
         test if we generated a dirname
-        """ 
+        """
         td = tempdir.default()
         dirname = td.dir()
         self.assertTrue( dirname is not None )
-        
+
         """
         test if duplicity's temp files are created in our temp dir
-        """ 
+        """
         f1d, f1_name = tempdir.default().mkstemp()
         f1_dirname = os.path.dirname( f1_name )
-        
+
         self.assertTrue( dirname == f1_dirname )
-        
+
         """
         test if tempfile creates in our temp dir now as well by default
-        """ 
+        """
         f2 = tempfile.NamedTemporaryFile()
         f2_dirname = os.path.dirname( f2.name )
-        
+
         self.assertTrue( dirname == f2_dirname )
-        
+
         # cleanup
         os.close(f1d)
         os.unlink(f1_name)
         td.forget(f1_name)
         f2.close()
-        
+
         td.cleanup()
 
 if __name__ == "__main__":

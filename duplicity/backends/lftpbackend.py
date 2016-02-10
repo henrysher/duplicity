@@ -117,6 +117,10 @@ Hints:
             os.write(self.tempfile, "set ftp:ssl-allow true\n")
             os.write(self.tempfile, "set ftp:ssl-protect-data true\n")
             os.write(self.tempfile, "set ftp:ssl-protect-list true\n")
+        elif self.parsed_url.scheme == 'ftpes':
+            os.write(self.tempfile, "set ftp:ssl-force on\n")
+            os.write(self.tempfile, "set ftp:ssl-protect-data on\n")
+            os.write(self.tempfile, "set ftp:ssl-protect-list on\n")
         else:
             os.write(self.tempfile, "set ftp:ssl-allow false\n")
         os.write(self.tempfile, "set http:use-propfind true\n")
@@ -125,7 +129,10 @@ Hints:
         os.write(self.tempfile, "set ftp:passive-mode %s\n" % self.conn_opt)
         if log.getverbosity() >= log.DEBUG:
             os.write(self.tempfile, "debug\n")
-        os.write(self.tempfile, "open %s %s\n" % (self.authflag, self.url_string))
+        if self.parsed_url.scheme == 'ftpes':
+            os.write(self.tempfile, "open %s %s\n" % (self.authflag, self.url_string.replace('ftpes', 'ftp')))
+        else:
+            os.write(self.tempfile, "open %s %s\n" % (self.authflag, self.url_string))
         os.close(self.tempfile)
         if log.getverbosity() >= log.DEBUG:
             f = open(self.tempname, 'r')
@@ -195,6 +202,8 @@ Hints:
 duplicity.backend.register_backend("ftp", LFTPBackend)
 duplicity.backend.register_backend("ftps", LFTPBackend)
 duplicity.backend.register_backend("fish", LFTPBackend)
+duplicity.backend.register_backend("ftpes", LFTPBackend)
+
 
 duplicity.backend.register_backend("lftp+ftp", LFTPBackend)
 duplicity.backend.register_backend("lftp+ftps", LFTPBackend)
@@ -205,7 +214,7 @@ duplicity.backend.register_backend("lftp+webdavs", LFTPBackend)
 duplicity.backend.register_backend("lftp+http", LFTPBackend)
 duplicity.backend.register_backend("lftp+https", LFTPBackend)
 
-duplicity.backend.uses_netloc.extend(['ftp', 'ftps', 'fish',
+duplicity.backend.uses_netloc.extend(['ftp', 'ftps', 'fish', 'ftpes',
                                       'lftp+ftp', 'lftp+ftps',
                                       'lftp+fish', 'lftp+sftp',
                                       'lftp+webdav', 'lftp+webdavs',
