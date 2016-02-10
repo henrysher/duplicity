@@ -1209,7 +1209,7 @@ below.
 .BR "MediaFire"
 .PP
 .RS
-mf:///some_dir
+mf://user[:password]@mediafire.com/some_dir
 .PP
 See also
 .B "A NOTE ON MEDIAFIRE BACKEND"
@@ -1887,11 +1887,13 @@ This backend requires
 python library to be installed on the system. See
 .BR REQUIREMENTS .
 
-It uses the following environment variables for authentication:
-.B MEDIAFIRE_EMAIL
-- account email,
-.B MEDIAFIRE_PASSWORD
-- account password.
+Use URL escaping for username (and password, if provided via command line):
+
+.PP
+.RS
+mf://duplicity%40example.com@mediafire.com/some_folder
+.PP
+.RE
 
 The destination folder will be created for you if it does not exist.
 

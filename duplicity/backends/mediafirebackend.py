@@ -41,29 +41,23 @@ class MediafireBackend(duplicity.backend.Backend):
             raise BackendException("This backend requires "
                                    "the mediafire library")
 
-        if "MEDIAFIRE_EMAIL" not in os.environ:
-            raise BackendException("MEDIAFIRE_EMAIL environment variable "
-                                   "is not set")
-        if "MEDIAFIRE_PASSWORD" not in os.environ:
-            raise BackendException("MEDIAFIRE_PASSWORD environment variable "
-                                   "is not set")
+        duplicity.backend.Backend.__init__(self, parsed_url)
+
+        mediafire_email = parsed_url.username
+        mediafire_password = self.get_password()
 
         self._file_res = mediafire.client.File
         self._folder_res = mediafire.client.Folder
         self._downloaderror_exc = mediafire.client.DownloadError
         self._notfound_exc = mediafire.client.ResourceNotFoundError
 
-        mediafire_email = os.environ["MEDIAFIRE_EMAIL"]
-        mediafire_password = os.environ["MEDIAFIRE_PASSWORD"]
-
-        duplicity.backend.Backend.__init__(self, parsed_url)
-
         self.client = mediafire.client.MediaFireClient()
         self.client.login(app_id=DUPLICITY_APP_ID,
                           email=mediafire_email,
                           password=mediafire_password)
 
-        uri = 'mf:' + parsed_url.path
+        # //username:password@host/path/to/folder -> path/to/folder
+        uri = 'mf:///' + parsed_url.path.split('/', 3)[3]
 
         # Create folder if it does not exist and make sure it is private
         # See MediaFire Account Settings /Security and Privacy / Share Link
