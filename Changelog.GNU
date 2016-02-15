@@ -1,3 +1,13 @@
+2016-02-15  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~harningt/duplicity/multibackend-mirror
+      - This changeset addresses multibackend handling to permit a
+        mirroring option in addition to its "stripe" mode to make it
+        a redundancy tool vs space-expansion tool. To do this without
+        changing the configuration too much, I used the query string
+        that would generally go unused for files to specify behavior
+        that applies to all items inside the configuration file.
+
 2016-02-05  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed a patching error in ssh_pexpect_backend.py
