@@ -3,6 +3,8 @@
     * Added acdclibackend.py from Stefan Breunig and Malay Shah
       - renamed from amazoncloudbackend to stress use of acd_cli
     * Fixed some 2to3 and Pep8 issues that had crept in
+    * Backed out changes made by patching for bug #1541314.  These
+      patches should not have been applied to the 0.7 series.
 
 2016-02-15  Kenneth Loafman  <kenneth@loafman.com>
 
