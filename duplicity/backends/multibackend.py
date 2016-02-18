@@ -45,7 +45,7 @@ class MultiBackend(duplicity.backend.Backend):
     __knownQueryParameters = frozenset([
         'mode',
         'onfail',
-        ])
+    ])
 
     # the mode of operation to follow
     # can be one of 'stripe' or 'mirror' currently
@@ -79,7 +79,7 @@ class MultiBackend(duplicity.backend.Backend):
         if len(reparsed_url.query) == 0:
             return dict()
         try:
-            queryMultiDict = urlparse.parse_qs(reparsed_url.query, strict_parsing = True)
+            queryMultiDict = urlparse.parse_qs(reparsed_url.query, strict_parsing=True)
         except ValueError as e:
             log.Log(_("MultiBackend: Could not parse query string %s: %s ")
                     % (reparsed_url.query, e),
@@ -144,12 +144,12 @@ class MultiBackend(duplicity.backend.Backend):
         if 'onfail' in queryParams:
             self.__onfail_mode = queryParams['onfail']
 
-        if not self.__mode in MultiBackend.__mode_allowedSet:
+        if self.__mode not in MultiBackend.__mode_allowedSet:
             log.Log(_("MultiBackend: illegal value for %s: %s")
                     % ('mode', self.__mode), log.ERROR)
             raise BackendException("MultiBackend: invalid mode value")
 
-        if not self.__onfail_mode in MultiBackend.__onfail_mode_allowedSet:
+        if self.__onfail_mode not in MultiBackend.__onfail_mode_allowedSet:
             log.Log(_("MultiBackend: illegal value for %s: %s")
                     % ('onfail', self.__onfail_mode), log.ERROR)
             raise BackendException("MultiBackend: invalid onfail value")
@@ -263,7 +263,7 @@ class MultiBackend(duplicity.backend.Backend):
                     log.DEBUG)
             lists.append(s.list())
         # combine the lists into a single flat list w/o duplicates via set:
-        result = list({ item for sublist in lists for item in sublist })
+        result = list({item for sublist in lists for item in sublist})
         log.Log(_("MultiBackend: combined list: %s")
                 % (result),
                 log.DEBUG)

@@ -53,6 +53,9 @@ New in v0.7.07 (2016/01/??)
     changing the configuration too much, I used the query string
     that would generally go unused for files to specify behavior
     that applies to all items inside the configuration file.
+* Added acdclibackend.py from Stefan Breunig and Malay Shah
+  - renamed from amazoncloudbackend to stress use of acd_cli
+* Fixed some 2to3 and Pep8 issues that had crept in
 
 
 New in v0.7.06 (2015/12/07)

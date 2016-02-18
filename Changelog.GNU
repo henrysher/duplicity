@@ -1,5 +1,11 @@
 2016-02-15  Kenneth Loafman  <kenneth@loafman.com>
 
+    * Added acdclibackend.py from Stefan Breunig and Malay Shah
+      - renamed from amazoncloudbackend to stress use of acd_cli
+    * Fixed some 2to3 and Pep8 issues that had crept in
+
+2016-02-15  Kenneth Loafman  <kenneth@loafman.com>
+
     * Merged in lp:~harningt/duplicity/multibackend-mirror
       - This changeset addresses multibackend handling to permit a
         mirroring option in addition to its "stripe" mode to make it
