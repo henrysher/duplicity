@@ -5,6 +5,9 @@
     * Fixed some 2to3 and Pep8 issues that had crept in
     * Backed out changes made by patching for bug #1541314.  These
       patches should not have been applied to the 0.7 series.
+    * Merged in lp:~rye/duplicity/mediafire
+      - Backend for https://www.mediafire.com
+      - Requires https://pypi.python.org/pypi/mediafire/ installed.
 
 2016-02-15  Kenneth Loafman  <kenneth@loafman.com>
 

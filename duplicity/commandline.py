@@ -918,6 +918,7 @@ def usage():
   onedrive://%(some_dir)s
   azure://%(container_name)s
   b2://%(account_id)s[:%(application_key)s]@%(bucket_name)s/[%(some_dir)s/]
+  mf://%(user)s[:%(password)s]@%(other_host)s/%(some_dir)s
 
 """ % dict
 
