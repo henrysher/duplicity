@@ -23,7 +23,6 @@
 from future_builtins import filter, map
 
 import os  # @UnusedImport
-import re  # @UnusedImport
 import stat  # @UnusedImport
 import sys
 
@@ -32,6 +31,7 @@ from duplicity import log  # @Reimport
 from duplicity import globals  # @Reimport
 from duplicity import diffdir
 from duplicity import util  # @Reimport
+from duplicity.globmatch import glob_to_regex
 
 """Iterate exactly the requested files in a directory
 
@@ -626,45 +626,6 @@ probably isn't what you meant.""") %
         return map(self.glob_to_re, prefixes)
 
     def glob_to_re(self, pat):
-        """Returned regular expression equivalent to shell glob pat
+        """Returns regular expression equivalent to shell glob pat"""
 
-        Currently only the ?, *, [], and ** expressions are supported.
-        Ranges like [a-z] are also currently unsupported.  There is no
-        way to quote these special characters.
-
-        This function taken with minor modifications from efnmatch.py
-        by Donovan Baarda.
-
-        """
-        # Internal. Used by glob_get_normal_sf, glob_get_prefix_res and unit tests.
-        i, n, res = 0, len(pat), ''
-        while i < n:
-            c, s = pat[i], pat[i:i + 2]
-            i = i + 1
-            if s == '**':
-                res = res + '.*'
-                i = i + 1
-            elif c == '*':
-                res = res + '[^/]*'
-            elif c == '?':
-                res = res + '[^/]'
-            elif c == '[':
-                j = i
-                if j < n and pat[j] in '!^':
-                    j = j + 1
-                if j < n and pat[j] == ']':
-                    j = j + 1
-                while j < n and pat[j] != ']':
-                    j = j + 1
-                if j >= n:
-                    res = res + '\\['  # interpret the [ literally
-                else:
-                    # Deal with inside of [..]
-                    stuff = pat[i:j].replace('\\', '\\\\')
-                    i = j + 1
-                    if stuff[0] in '!^':
-                        stuff = '^' + stuff[1:]
-                    res = res + '[' + stuff + ']'
-            else:
-                res = res + re.escape(c)
-        return res
+        return glob_to_regex(pat)
