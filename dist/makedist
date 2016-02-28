@@ -58,25 +58,23 @@ def MakeTar():
     tardir = "duplicity-%s" % Version
     tarfile = "duplicity-%s.tar.gz" % Version
     try:
-        prog = util.which('rm')
-        p = Popen([prog, "-r", "-f", tardir],  # @UnusedVariable
-                  stdout=PIPE, stderr=STDOUT)
-    except Exception as e:  # @UnusedVariable
-        pass
+        os.system("rm -r -f " + tardir)
+    except OSError: pass
 
-    # tardir contains the entire versioned release
-    prog = util.which('bzr')
-    p = Popen([prog, "export", tardir],
-              stdout=PIPE, stderr=STDOUT)
-    if p.returncode:
-        prog = util.which('git')
-        p1 = Popen([prog, "archive", "master"],
-                   stdout=PIPE, stderr=STDOUT)
-        prog = util.which('tar')
-        p2 = Popen([prog, "-x", "-C", tardir],
-                   stdin=p1.stdout, stdout=PIPE, stderr=STDOUT)
-        p1.stdout.close()
-        assert p2.returncode == 0, "git archive failed"
+    # tarball contains the entire versioned release
+    os.mkdir(tardir)
+    bzr = subprocess.Popen(["bzr", "ls", "-RV", "."], stdout=subprocess.PIPE)
+    testfiles = bzr.communicate()[0].split()
+    if len(testfiles) == 0:
+        git = subprocess.Popen(["git", "ls-files"], stdout=subprocess.PIPE)
+        testfiles = git.communicate()[0].split()
+
+    for filename in testfiles:
+        if os.path.isdir(filename):
+            os.mkdir(os.path.join(tardir, filename))
+        else:
+            assert not os.system("cp --parents %s %s" %
+                                 (filename, tardir)), filename
 
     # msgfmt the translation files that we have for release
     assert not os.system("cd po && ./update-pot")

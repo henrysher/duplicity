@@ -1,3 +1,8 @@
+2016-02-28  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Reverted changes made in rev 1164 w.r.t. getting the source from
+      VCS rather than local directory.  Fixes bug #1548080.
+
 2016-02-15  Kenneth Loafman  <kenneth@loafman.com>
 
     * Added acdclibackend.py from Stefan Breunig and Malay Shah
