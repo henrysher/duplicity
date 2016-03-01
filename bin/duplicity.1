@@ -854,15 +854,23 @@ setting. If needed provide more host specific options via ssh_config file.
 
 .TP
 .BI "--ssl-cacert-file " file
-.B (only webdav backend)
+.B (only webdav & lftp backend)
 Provide a cacert file for ssl certificate verification.
 .br
 See also
 .BR "A NOTE ON SSL CERTIFICATE VERIFICATION" .
 
 .TP
+.BI "--ssl-cacert-path " path/to/certs/
+.B (only webdav backend and python 2.7.9+ OR lftp+webdavs and a recent lftp)
+Provide a path to a folder containing cacert files for ssl certificate verification.
+.br
+See also
+.BR "A NOTE ON SSL CERTIFICATE VERIFICATION" .
+
+.TP
 .BI --ssl-no-check-certificate
-.B (only webdav backend)
+.B (only webdav & lftp backend)
 Disable ssl certificate verification.
 .br
 See also
@@ -1873,8 +1881,16 @@ in addition for this backend mode to work properly. Sftp does not have these lim
 an sftp service running on the backend server, which is sometimes not an option.
 
 .SH A NOTE ON SSL CERTIFICATE VERIFICATION
-Certificate verification as implemented right now [01.2013] only in the webdav backend needs a file
-based database of certification authority certificates (cacert file). It has to be a
+Certificate verification as implemented right now [02.2016] only in the webdav
+and lftp backends. older pythons 2.7.8- and older lftp binaries need a file
+based database of certification authority certificates (cacert file). 
+.br
+Newer python 2.7.9+ and recent lftp versions however support the system default
+certificates (usually in /etc/ssl/certs) and also giving an alternative ca cert
+folder via
+.BR --ssl-cacert-path .
+.PP
+The cacert file has to be a
 .B PEM
 formatted text file as currently provided by the
 .B CURL

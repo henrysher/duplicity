@@ -58,31 +58,25 @@ class VerifiedHTTPSConnection(httplib.HTTPSConnection):
                 import socket
                 import ssl
             except ImportError:
-                raise FatalBackendException("Missing socket or ssl libraries.")
+                raise FatalBackendException(_("Missing socket or ssl python modules."))
 
             httplib.HTTPSConnection.__init__(self, *args, **kwargs)
 
             self.cacert_file = globals.ssl_cacert_file
-            cacert_candidates = ["~/.duplicity/cacert.pem",
+            self.cacert_candidates = ["~/.duplicity/cacert.pem",
                                  "~/duplicity_cacert.pem",
                                  "/etc/duplicity/cacert.pem"]
-            #
+            # if no cacert file was given search default locations
             if not self.cacert_file:
-                for path in cacert_candidates:
+                for path in self.cacert_candidates:
                     path = os.path.expanduser(path)
                     if (os.path.isfile(path)):
                         self.cacert_file = path
                         break
-            # still no cacert file, inform user
-            if not self.cacert_file:
-                raise FatalBackendException("""\
-For certificate verification a cacert database file is needed in one of these locations: %s
-Hints:
-  Consult the man page, chapter 'SSL Certificate Verification'.
-  Consider using the options --ssl-cacert-file, --ssl-no-check-certificate .""" % ", ".join(cacert_candidates))
+
             # check if file is accessible (libssl errors are not very detailed)
-            if not os.access(self.cacert_file, os.R_OK):
-                raise FatalBackendException("Cacert database file '%s' is not readable." % self.cacert_file)
+            if self.cacert_file and not os.access(self.cacert_file, os.R_OK):
+                raise FatalBackendException(_("Cacert database file '%s' is not readable.") % self.cacert_file)
 
         def connect(self):
             # create new socket
@@ -92,8 +86,24 @@ Hints:
                 self.sock = sock
                 self.tunnel()
 
-            # wrap the socket in ssl using verification
-            self.sock = ssl.wrap_socket(sock,
+            # python 2.7.9+ supports default system certs now
+            if "create_default_context" in dir(ssl):
+                context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH, cafile=self.cacert_file, capath=globals.ssl_cacert_path)
+                self.sock = context.wrap_socket(sock, server_hostname=self.host)
+            # the legacy way needing a cert file
+            else:
+                if globals.ssl_cacert_path:
+                    raise FatalBackendException(_("Option '--ssl-cacert-path' is not supported with python 2.7.8 and below."))
+                    
+                if not self.cacert_file:
+                    raise FatalBackendException(_("""\
+For certificate verification with python 2.7.8 or earlier a cacert database file is needed in one of these locations: %s
+Hints:
+  Consult the man page, chapter 'SSL Certificate Verification'.
+  Consider using the options --ssl-cacert-file, --ssl-no-check-certificate .""") % ", ".join(self.cacert_candidates))
+
+                # wrap the socket in ssl using verification
+                self.sock = ssl.wrap_socket(sock,
                                         cert_reqs=ssl.CERT_REQUIRED,
                                         ca_certs=self.cacert_file,
                                         )
@@ -129,9 +139,9 @@ class WebDAVBackend(duplicity.backend.Backend):
         self.password = self.get_password()
         self.directory = self.sanitize_path(parsed_url.path)
 
-        log.Info("Using WebDAV protocol %s" % (globals.webdav_proto,))
-        log.Info("Using WebDAV host %s port %s" % (parsed_url.hostname, parsed_url.port))
-        log.Info("Using WebDAV directory %s" % (self.directory,))
+        log.Info(_("Using WebDAV protocol %s") % (globals.webdav_proto,))
+        log.Info(_("Using WebDAV host %s port %s") % (parsed_url.hostname, parsed_url.port))
+        log.Info(_("Using WebDAV directory %s") % (self.directory,))
 
         self.conn = None
 
@@ -162,7 +172,7 @@ class WebDAVBackend(duplicity.backend.Backend):
                 and self.conn.host == self.parsed_url.hostname:
             return
 
-        log.Info("WebDAV create connection on '%s'" % (self.parsed_url.hostname))
+        log.Info(_("WebDAV create connection on '%s'") % (self.parsed_url.hostname))
         self._close()
         # http schemes needed for redirect urls from servers
         if self.parsed_url.scheme in ['webdav', 'http']:
@@ -173,7 +183,7 @@ class WebDAVBackend(duplicity.backend.Backend):
             else:
                 self.conn = VerifiedHTTPSConnection(self.parsed_url.hostname, self.parsed_url.port)
         else:
-            raise FatalBackendException("WebDAV Unknown URI scheme: %s" % (self.parsed_url.scheme))
+            raise FatalBackendException(_("WebDAV Unknown URI scheme: %s") % (self.parsed_url.scheme))
 
     def _close(self):
         if self.conn:
@@ -192,34 +202,34 @@ class WebDAVBackend(duplicity.backend.Backend):
         if self.digest_challenge is not None:
             self.headers['Authorization'] = self.get_digest_authorization(path)
 
-        log.Info("WebDAV %s %s request with headers: %s " % (method, quoted_path, self.headers))
-        log.Info("WebDAV data length: %s " % len(str(data)))
+        log.Info(_("WebDAV %s %s request with headers: %s ") % (method, quoted_path, self.headers))
+        log.Info(_("WebDAV data length: %s ") % len(str(data)))
         self.conn.request(method, quoted_path, data, self.headers)
         response = self.conn.getresponse()
-        log.Info("WebDAV response status %s with reason '%s'." % (response.status, response.reason))
+        log.Info(_("WebDAV response status %s with reason '%s'.") % (response.status, response.reason))
         # resolve redirects and reset url on listing requests (they usually come before everything else)
         if response.status in [301, 302] and method == 'PROPFIND':
             redirect_url = response.getheader('location', None)
             response.close()
             if redirect_url:
-                log.Notice("WebDAV redirect to: %s " % urllib.unquote(redirect_url))
+                log.Notice(_("WebDAV redirect to: %s ") % urllib.unquote(redirect_url))
                 if redirected > 10:
-                    raise FatalBackendException("WebDAV redirected 10 times. Giving up.")
+                    raise FatalBackendException(_("WebDAV redirected 10 times. Giving up."))
                 self.parsed_url = duplicity.backend.ParsedUrl(redirect_url)
                 self.directory = self.sanitize_path(self.parsed_url.path)
                 return self.request(method, self.directory, data, redirected + 1)
             else:
-                raise FatalBackendException("WebDAV missing location header in redirect response.")
+                raise FatalBackendException(_("WebDAV missing location header in redirect response."))
         elif response.status == 401:
             response.read()
             response.close()
             self.headers['Authorization'] = self.get_authorization(response, quoted_path)
-            log.Info("WebDAV retry request with authentification headers.")
-            log.Info("WebDAV %s %s request2 with headers: %s " % (method, quoted_path, self.headers))
-            log.Info("WebDAV data length: %s " % len(str(data)))
+            log.Info(_("WebDAV retry request with authentification headers."))
+            log.Info(_("WebDAV %s %s request2 with headers: %s ") % (method, quoted_path, self.headers))
+            log.Info(_("WebDAV data length: %s ") % len(str(data)))
             self.conn.request(method, quoted_path, data, self.headers)
             response = self.conn.getresponse()
-            log.Info("WebDAV response2 status %s with reason '%s'." % (response.status, response.reason))
+            log.Info(_("WebDAV response2 status %s with reason '%s'.") % (response.status, response.reason))
 
         return response
 
@@ -337,11 +347,11 @@ class WebDAVBackend(duplicity.backend.Backend):
             log.Info("Checking existence dir %s: %d" % (d, response.status))
 
             if response.status == 404:
-                log.Info("Creating missing directory %s" % d)
+                log.Info(_("Creating missing directory %s") % d)
 
                 res = self.request("MKCOL", d)
                 if res.status != 201:
-                    raise BackendException("WebDAV MKCOL %s failed: %s %s" % (d, res.status, res.reason))
+                    raise BackendException(_("WebDAV MKCOL %s failed: %s %s") % (d, res.status, res.reason))
 
     def taste_href(self, href):
         """
@@ -353,8 +363,8 @@ class WebDAVBackend(duplicity.backend.Backend):
         raw_filename = self.getText(href.childNodes).strip()
         parsed_url = urlparse.urlparse(urllib.unquote(raw_filename))
         filename = parsed_url.path
-        log.Debug("webdav path decoding and translation: "
-                  "%s -> %s" % (raw_filename, filename))
+        log.Debug(_("WebDAV path decoding and translation: "
+                  "%s -> %s") % (raw_filename, filename))
 
         # at least one WebDAV server returns files in the form
         # of full URL:s. this may or may not be
@@ -397,7 +407,7 @@ class WebDAVBackend(duplicity.backend.Backend):
                 status = response.status
                 reason = response.reason
                 response.close()
-                raise BackendException("Bad status code %s reason %s." % (status, reason))
+                raise BackendException(_("WebDAV GET Bad status code %s reason %s.") % (status, reason))
         except Exception as e:
             raise e
         finally:
@@ -418,7 +428,7 @@ class WebDAVBackend(duplicity.backend.Backend):
                 status = response.status
                 reason = response.reason
                 response.close()
-                raise BackendException("Bad status code %s reason %s." % (status, reason))
+                raise BackendException(_("WebDAV PUT Bad status code %s reason %s.") % (status, reason))
         except Exception as e:
             raise e
         finally:
@@ -437,7 +447,7 @@ class WebDAVBackend(duplicity.backend.Backend):
                 status = response.status
                 reason = response.reason
                 response.close()
-                raise BackendException("Bad status code %s reason %s." % (status, reason))
+                raise BackendException(_("WebDAV DEL Bad status code %s reason %s.") % (status, reason))
         except Exception as e:
             raise e
         finally:
