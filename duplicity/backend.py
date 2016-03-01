@@ -265,7 +265,9 @@ class ParsedUrl:
             raise InvalidBackendURL("Syntax error (netloc) in: %s" % url_string)
 
         try:
-            self.path = urllib.unquote(pu.path)
+            self.path = pu.path
+            if self.path:
+                self.path = urllib.unquote(self.path)
         except Exception:
             raise InvalidBackendURL("Syntax error (path) in: %s" % url_string)
 
