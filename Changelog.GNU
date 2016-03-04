@@ -18,6 +18,9 @@
         - added ssl_cacert_path support for python 2.7.9+
         - gettext wrapped all log messages
         - minor refinements
+    * Applied patch from Dmitry Nezhevenko to upgrade dropbox backend:
+      - update to SDK v2
+      - use chunked upload
 
 2016-02-28  Kenneth Loafman  <kenneth@loafman.com>
 
