@@ -266,6 +266,8 @@ class ParsedUrl:
 
         try:
             self.path = pu.path
+            if self.path:
+                self.path = urllib.unquote(self.path)
         except Exception:
             raise InvalidBackendURL("Syntax error (path) in: %s" % url_string)
 

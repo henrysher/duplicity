@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2016-02-05 08:28-0600\n"
+"POT-Creation-Date: 2016-03-04 03:50-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -585,6 +585,10 @@ msgstr ""
 msgid "pem formatted bundle of certificate authorities"
 msgstr ""
 
+#: ../duplicity/commandline.py:587
+msgid "path to a folder with certificate authority files"
+msgstr ""
+
 #. Used in usage help. Example:
 #. --timeout <seconds>
 #: ../duplicity/commandline.py:596 ../duplicity/commandline.py:827
@@ -750,51 +754,51 @@ msgid "Backends and their URL formats:"
 msgstr ""
 
 #. Header in usage help
-#: ../duplicity/commandline.py:925
+#: ../duplicity/commandline.py:926
 msgid "Commands:"
 msgstr ""
 
-#: ../duplicity/commandline.py:949
+#: ../duplicity/commandline.py:950
 #, python-format
 msgid "Specified archive directory '%s' does not exist, or is not a directory"
 msgstr ""
 
-#: ../duplicity/commandline.py:958
+#: ../duplicity/commandline.py:959
 #, python-format
 msgid ""
 "Sign key should be an 8, 16 alt. 40 character hex string, like 'AA0E73D2'.\n"
 "Received '%s' instead."
 msgstr ""
 
-#: ../duplicity/commandline.py:1018
+#: ../duplicity/commandline.py:1019
 #, python-format
 msgid ""
 "Restore destination directory %s already exists.\n"
 "Will not overwrite."
 msgstr ""
 
-#: ../duplicity/commandline.py:1023
+#: ../duplicity/commandline.py:1024
 #, python-format
 msgid "Verify directory %s does not exist"
 msgstr ""
 
-#: ../duplicity/commandline.py:1029
+#: ../duplicity/commandline.py:1030
 #, python-format
 msgid "Backup source directory %s does not exist."
 msgstr ""
 
-#: ../duplicity/commandline.py:1060
+#: ../duplicity/commandline.py:1061
 #, python-format
 msgid "Command line warning: %s"
 msgstr ""
 
-#: ../duplicity/commandline.py:1060
+#: ../duplicity/commandline.py:1061
 msgid ""
 "Selection options --exclude/--include\n"
 "currently work only when backing up,not restoring."
 msgstr ""
 
-#: ../duplicity/commandline.py:1110
+#: ../duplicity/commandline.py:1111
 #, python-format
 msgid ""
 "Bad URL '%s'.\n"
@@ -802,7 +806,7 @@ msgid ""
 "\"file:///usr/local\".  See the man page for more information."
 msgstr ""
 
-#: ../duplicity/commandline.py:1135
+#: ../duplicity/commandline.py:1136
 msgid "Main action: "
 msgstr ""
 
@@ -816,32 +820,32 @@ msgstr ""
 msgid "Could not initialize backend: %s"
 msgstr ""
 
-#: ../duplicity/backend.py:371
+#: ../duplicity/backend.py:373
 #, python-format
 msgid "Backtrace of previous error: %s"
 msgstr ""
 
-#: ../duplicity/backend.py:386
+#: ../duplicity/backend.py:388
 #, python-format
 msgid "Giving up after %s attempts. %s: %s"
 msgstr ""
 
-#: ../duplicity/backend.py:390
+#: ../duplicity/backend.py:392
 #, python-format
 msgid "Attempt %s failed. %s: %s"
 msgstr ""
 
-#: ../duplicity/backend.py:476
+#: ../duplicity/backend.py:478
 #, python-format
 msgid "Reading results of '%s'"
 msgstr ""
 
-#: ../duplicity/backend.py:503
+#: ../duplicity/backend.py:505
 #, python-format
 msgid "Writing %s"
 msgstr ""
 
-#: ../duplicity/backend.py:544
+#: ../duplicity/backend.py:546
 #, python-format
 msgid "File %s not found locally after get from backend"
 msgstr ""
@@ -1191,62 +1195,93 @@ msgstr ""
 
 #: ../duplicity/backends/multibackend.py:84
 #, python-format
+msgid "MultiBackend: Could not parse query string %s: %s "
+msgstr ""
+
+#: ../duplicity/backends/multibackend.py:93
+#, python-format
+msgid "MultiBackend: Invalid query string %s: more than one value for %s"
+msgstr ""
+
+#: ../duplicity/backends/multibackend.py:98
+#, python-format
+msgid "MultiBackend: Invalid query string %s: unknown parameter %s"
+msgstr ""
+
+#: ../duplicity/backends/multibackend.py:148
+#: ../duplicity/backends/multibackend.py:153
+#, python-format
+msgid "MultiBackend: illegal value for %s: %s"
+msgstr ""
+
+#: ../duplicity/backends/multibackend.py:161
+#, python-format
+msgid "MultiBackend: Url %s"
+msgstr ""
+
+#: ../duplicity/backends/multibackend.py:165
+#, python-format
 msgid "MultiBackend: Could not load config file %s: %s "
 msgstr ""
 
-#: ../duplicity/backends/multibackend.py:91
+#: ../duplicity/backends/multibackend.py:174
 #, python-format
 msgid "MultiBackend: use store %s"
 msgstr ""
 
-#: ../duplicity/backends/multibackend.py:96
+#: ../duplicity/backends/multibackend.py:179
 #, python-format
 msgid "MultiBackend: set env %s = %s"
 msgstr ""
 
-#: ../duplicity/backends/multibackend.py:116
+#: ../duplicity/backends/multibackend.py:205
 #, python-format
 msgid "MultiBackend: _put: write to store #%s (%s)"
 msgstr ""
 
-#: ../duplicity/backends/multibackend.py:123
+#: ../duplicity/backends/multibackend.py:218
 #, python-format
 msgid "MultiBackend: failed to write to store #%s (%s), try #%s, Exception: %s"
 msgstr ""
 
-#: ../duplicity/backends/multibackend.py:129
+#: ../duplicity/backends/multibackend.py:225
+#, python-format
+msgid "MultiBackend: failed to write %s. Aborting process."
+msgstr ""
+
+#: ../duplicity/backends/multibackend.py:232
 #, python-format
 msgid ""
 "MultiBackend: failed to write %s. Tried all backing stores and none succeeded"
 msgstr ""
 
-#: ../duplicity/backends/multibackend.py:146
+#: ../duplicity/backends/multibackend.py:249
 #, python-format
 msgid "MultiBackend: failed to get %s to %s from %s"
 msgstr ""
 
-#: ../duplicity/backends/multibackend.py:149
+#: ../duplicity/backends/multibackend.py:252
 #, python-format
 msgid ""
 "MultiBackend: failed to get %s. Tried all backing stores and none succeeded"
 msgstr ""
 
-#: ../duplicity/backends/multibackend.py:158
+#: ../duplicity/backends/multibackend.py:261
 #, python-format
 msgid "MultiBackend: list from %s: %s"
 msgstr ""
 
-#: ../duplicity/backends/multibackend.py:164
+#: ../duplicity/backends/multibackend.py:267
 #, python-format
 msgid "MultiBackend: combined list: %s"
 msgstr ""
 
-#: ../duplicity/backends/multibackend.py:181
+#: ../duplicity/backends/multibackend.py:289
 #, python-format
 msgid "MultiBackend: failed to delete %s from %s"
 msgstr ""
 
-#: ../duplicity/backends/multibackend.py:184
+#: ../duplicity/backends/multibackend.py:293
 #, python-format
 msgid ""
 "MultiBackend: failed to delete %s. Tried all backing stores and none "
@@ -1258,17 +1293,139 @@ msgstr ""
 msgid "PyDrive backend: multiple files called '%s'."
 msgstr ""
 
-#: ../duplicity/backends/webdavbackend.py:239
+#: ../duplicity/backends/webdavbackend.py:61
+msgid "Missing socket or ssl python modules."
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:79
+#, python-format
+msgid "Cacert database file '%s' is not readable."
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:96
+msgid ""
+"Option '--ssl-cacert-path' is not supported with python 2.7.8 and below."
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:99
+#, python-format
+msgid ""
+"For certificate verification with python 2.7.8 or earlier a cacert database "
+"file is needed in one of these locations: %s\n"
+"Hints:\n"
+"  Consult the man page, chapter 'SSL Certificate Verification'.\n"
+"  Consider using the options --ssl-cacert-file, --ssl-no-check-certificate ."
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:142
+#, python-format
+msgid "Using WebDAV protocol %s"
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:143
+#, python-format
+msgid "Using WebDAV host %s port %s"
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:144
+#, python-format
+msgid "Using WebDAV directory %s"
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:175
+#, python-format
+msgid "WebDAV create connection on '%s'"
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:186
+#, python-format
+msgid "WebDAV Unknown URI scheme: %s"
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:205
+#, python-format
+msgid "WebDAV %s %s request with headers: %s "
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:206
+#: ../duplicity/backends/webdavbackend.py:229
+#, python-format
+msgid "WebDAV data length: %s "
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:209
+#, python-format
+msgid "WebDAV response status %s with reason '%s'."
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:215
+#, python-format
+msgid "WebDAV redirect to: %s "
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:217
+msgid "WebDAV redirected 10 times. Giving up."
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:222
+msgid "WebDAV missing location header in redirect response."
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:227
+msgid "WebDAV retry request with authentification headers."
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:228
+#, python-format
+msgid "WebDAV %s %s request2 with headers: %s "
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:232
+#, python-format
+msgid "WebDAV response2 status %s with reason '%s'."
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:249
 msgid ""
 "python-kerberos needed to use kerberos                           "
 "authorization, falling back to basic auth."
 msgstr ""
 
-#: ../duplicity/backends/webdavbackend.py:243
+#: ../duplicity/backends/webdavbackend.py:253
 #, python-format
 msgid ""
 "Kerberos authorization failed: %s.                          Falling back to "
 "basic auth."
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:350
+#, python-format
+msgid "Creating missing directory %s"
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:354
+#, python-format
+msgid "WebDAV MKCOL %s failed: %s %s"
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:366
+#, python-format
+msgid "WebDAV path decoding and translation: %s -> %s"
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:410
+#, python-format
+msgid "WebDAV GET Bad status code %s reason %s."
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:431
+#, python-format
+msgid "WebDAV PUT Bad status code %s reason %s."
+msgstr ""
+
+#: ../duplicity/backends/webdavbackend.py:450
+#, python-format
+msgid "WebDAV DEL Bad status code %s reason %s."
 msgstr ""
 
 #: ../duplicity/manifest.py:91

@@ -120,9 +120,8 @@ class SDistCommand(sdist):
     def run(self):
         version = version_string
         if version[0] == '$':
-            version = "0"
+            version = "0.0dev"
         os.system(os.path.join(top_dir, "dist", "makedist") + " " + version)
-        os.system("rm -f duplicity.spec")
         os.system("mkdir -p " + self.dist_dir)
         os.system("mv duplicity-" + version + ".tar.gz " + self.dist_dir)
 
@@ -133,7 +132,7 @@ class BSCommand (build_scripts):
     def run(self):
         """
         Copy, chmod each script listed in 'self.scripts'
-        essentially this is the stripped 
+        essentially this is the stripped
          distutils.command.build_scripts.copy_scripts()
         routine
         """

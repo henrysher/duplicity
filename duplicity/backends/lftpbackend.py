@@ -95,24 +95,21 @@ class LFTPBackend(duplicity.backend.Backend):
             cacert_candidates = ["~/.duplicity/cacert.pem",
                                  "~/duplicity_cacert.pem",
                                  "/etc/duplicity/cacert.pem"]
-            #
+            # look for a default cacert file
             if not self.cacert_file:
                 for path in cacert_candidates:
                     path = os.path.expanduser(path)
                     if (os.path.isfile(path)):
                         self.cacert_file = path
                         break
-            # still no cacert file, inform user
-            if not self.cacert_file:
-                raise duplicity.errors.FatalBackendException("""For certificate verification a cacert database file is needed in one of these locations: %s
-Hints:
-  Consult the man page, chapter 'SSL Certificate Verification'.
-  Consider using the options --ssl-cacert-file, --ssl-no-check-certificate .""" % ", ".join(cacert_candidates))
 
+        # save config into a reusable temp file
         self.tempfile, self.tempname = tempdir.default().mkstemp()
         os.write(self.tempfile, "set ssl:verify-certificate " + ("false" if globals.ssl_no_check_certificate else "true") + "\n")
-        if globals.ssl_cacert_file:
-            os.write(self.tempfile, "set ssl:ca-file '" + globals.ssl_cacert_file + "'\n")
+        if self.cacert_file:
+            os.write(self.tempfile, "set ssl:ca-file " + cmd_quote(self.cacert_file) + "\n")
+        if globals.ssl_cacert_path:
+            os.write(self.tempfile, "set ssl:ca-path " + cmd_quote(globals.ssl_cacert_path) + "\n")
         if self.parsed_url.scheme == 'ftps':
             os.write(self.tempfile, "set ftp:ssl-allow true\n")
             os.write(self.tempfile, "set ftp:ssl-protect-data true\n")
@@ -134,13 +131,14 @@ Hints:
         else:
             os.write(self.tempfile, "open %s %s\n" % (self.authflag, self.url_string))
         os.close(self.tempfile)
+        # print settings in debug mode
         if log.getverbosity() >= log.DEBUG:
             f = open(self.tempname, 'r')
             log.Debug("SETTINGS: \n"
-                      "%s" % f.readlines())
+                      "%s" % f.read())
 
     def _put(self, source_path, remote_filename):
-        commandline = "lftp -c 'source %s; mkdir -p %s; put %s -o %s'" % (
+        commandline = "lftp -c \"source %s; mkdir -p %s; put %s -o %s\"" % (
             self.tempname,
             cmd_quote(self.remote_path),
             cmd_quote(source_path.name),
@@ -155,8 +153,8 @@ Hints:
                   "%s" % (l))
 
     def _get(self, remote_filename, local_path):
-        commandline = "lftp -c 'source %s; get %s -o %s'" % (
-            self.tempname,
+        commandline = "lftp -c \"source %s; get %s -o %s\"" % (
+            cmd_quote(self.tempname),
             cmd_quote(self.remote_path) + remote_filename,
             cmd_quote(local_path.name)
         )
@@ -172,9 +170,11 @@ Hints:
         # remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
         remote_dir = urllib.unquote(self.parsed_url.path)
         # print remote_dir
-        commandline = "lftp -c 'source %s; cd %s || exit 0; ls'" % (
-            self.tempname,
-            cmd_quote(self.remote_path)
+        quoted_path = cmd_quote(self.remote_path)
+        # failing to cd into the folder might be because it was not created already
+        commandline = "lftp -c \"source %s; ( cd %s && ls ) || ( mkdir -p %s && cd %s && ls )\"" % (
+            cmd_quote(self.tempname),
+            quoted_path, quoted_path, quoted_path
         )
         log.Debug("CMD: %s" % commandline)
         _, l, e = self.subprocess_popen(commandline)
@@ -187,10 +187,10 @@ Hints:
         return [x.split()[-1] for x in l.split('\n') if x]
 
     def _delete(self, filename):
-        commandline = "lftp -c 'source %s; cd %s; rm %s'" % (
-            self.tempname,
+        commandline = "lftp -c \"source %s; cd %s; rm %s\"" % (
+            cmd_quote(self.tempname),
             cmd_quote(self.remote_path),
-            filename
+            cmd_quote(filename)
         )
         log.Debug("CMD: %s" % commandline)
         _, l, e = self.subprocess_popen(commandline)
@@ -204,10 +204,10 @@ duplicity.backend.register_backend("ftps", LFTPBackend)
 duplicity.backend.register_backend("fish", LFTPBackend)
 duplicity.backend.register_backend("ftpes", LFTPBackend)
 
-
 duplicity.backend.register_backend("lftp+ftp", LFTPBackend)
 duplicity.backend.register_backend("lftp+ftps", LFTPBackend)
 duplicity.backend.register_backend("lftp+fish", LFTPBackend)
+duplicity.backend.register_backend("lftp+ftpes", LFTPBackend)
 duplicity.backend.register_backend("lftp+sftp", LFTPBackend)
 duplicity.backend.register_backend("lftp+webdav", LFTPBackend)
 duplicity.backend.register_backend("lftp+webdavs", LFTPBackend)
@@ -216,7 +216,8 @@ duplicity.backend.register_backend("lftp+https", LFTPBackend)
 
 duplicity.backend.uses_netloc.extend(['ftp', 'ftps', 'fish', 'ftpes',
                                       'lftp+ftp', 'lftp+ftps',
-                                      'lftp+fish', 'lftp+sftp',
+                                      'lftp+fish', 'lftp+ftpes',
+                                      'lftp+sftp',
                                       'lftp+webdav', 'lftp+webdavs',
                                       'lftp+http', 'lftp+https']
                                      )
