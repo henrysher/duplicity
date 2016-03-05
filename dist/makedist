@@ -58,25 +58,25 @@ def MakeTar():
     tardir = "duplicity-%s" % Version
     tarfile = "duplicity-%s.tar.gz" % Version
     try:
-        prog = util.which('rm')
-        p = Popen([prog, "-r", "-f", tardir],  # @UnusedVariable
-                  stdout=PIPE, stderr=STDOUT)
-    except Exception as e:  # @UnusedVariable
+        os.system("rm -rf " + tardir)
+    except OSError:
         pass
 
-    # tardir contains the entire versioned release
-    prog = util.which('bzr')
-    p = Popen([prog, "export", tardir],
-              stdout=PIPE, stderr=STDOUT)
-    if p.returncode:
-        prog = util.which('git')
-        p1 = Popen([prog, "archive", "master"],
-                   stdout=PIPE, stderr=STDOUT)
-        prog = util.which('tar')
-        p2 = Popen([prog, "-x", "-C", tardir],
-                   stdin=p1.stdout, stdout=PIPE, stderr=STDOUT)
-        p1.stdout.close()
-        assert p2.returncode == 0, "git archive failed"
+    # tarball contains the entire versioned release
+    os.mkdir(tardir)
+    bzr = Popen(["bzr", "ls", "-RV", "."], stdout=PIPE)
+    testfiles = bzr.communicate()[0].split()
+    if len(testfiles) == 0:
+        git = Popen(["git", "ls-files"], stdout=PIPE)
+        testfiles = git.communicate()[0].split()
+
+    for filename in testfiles:
+        pname, fname = os.path.split(filename)
+        pathname = os.path.join(tardir, pname)
+        if not os.path.exists(pathname):
+            os.makedirs(pathname)
+        if fname:
+            assert not os.system("cp -p %s %s" % (filename, pathname)), fname + " to " + pathname
 
     # msgfmt the translation files that we have for release
     assert not os.system("cd po && ./update-pot")
@@ -85,10 +85,8 @@ def MakeTar():
         langs = line.split()
         for lang in langs:
             assert not os.mkdir(os.path.join(tardir, "po", lang)), lang
-            assert not os.system("mv %s/po/%s.po %s/po/%s" %
-                                 (tardir, lang, tardir, lang)), lang
-            assert not os.system("msgfmt %s/po/%s/%s.po -o %s/po/%s/duplicity.mo" %
-                                 (tardir, lang, lang, tardir, lang)), lang
+            assert not os.system("cp po/%s.po %s/po/%s" % (lang, tardir, lang)), lang
+            assert not os.system("msgfmt po/%s.po -o %s/po/%s/duplicity.mo" % (lang, tardir, lang)), lang
 
     # recopy the versioned files and add correct version
     VersionedCopy(os.path.join(SourceDir, "globals.py"),

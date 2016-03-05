@@ -1,3 +1,32 @@
+2016-03-04  Kenneth Loafman  <kenneth@loafman.com>
+
+    * More fixes to dist/makedist to make it more OS agnostic.
+    * Merged in lp:~ed.so/duplicity/webdav.lftp.ssl-overhaul
+        duplicity.1, commandline.py, globals.py
+        - added --ssl-cacert-path parameter
+        backend.py
+        - make sure url path component is properly url decoded,
+          in case it contains special chars (eg. @ or space)
+        lftpbackend.py
+        - quote _all_ cmd line params
+        - added missing lftp+ftpes protocol
+        - fix empty list result when chdir failed silently
+        - added ssl_cacert_path support
+        webdavbackend.py
+        - add ssl default context support for python 2.7.9+
+          (using system certs eg. in /etc/ssl/certs)
+        - added ssl_cacert_path support for python 2.7.9+
+        - gettext wrapped all log messages
+        - minor refinements
+    * Applied patch from Dmitry Nezhevenko to upgrade dropbox backend:
+      - update to SDK v2
+      - use chunked upload
+
+2016-02-28  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Reverted changes made in rev 1164 w.r.t. getting the source from
+      VCS rather than local directory.  Fixes bug #1548080.
+
 2016-02-15  Kenneth Loafman  <kenneth@loafman.com>
 
     * Added acdclibackend.py from Stefan Breunig and Malay Shah

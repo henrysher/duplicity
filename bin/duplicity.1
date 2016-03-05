@@ -854,15 +854,23 @@ setting. If needed provide more host specific options via ssh_config file.
 
 .TP
 .BI "--ssl-cacert-file " file
-.B (only webdav backend)
+.B (only webdav & lftp backend)
 Provide a cacert file for ssl certificate verification.
 .br
 See also
 .BR "A NOTE ON SSL CERTIFICATE VERIFICATION" .
 
 .TP
+.BI "--ssl-cacert-path " path/to/certs/
+.B (only webdav backend and python 2.7.9+ OR lftp+webdavs and a recent lftp)
+Provide a path to a folder containing cacert files for ssl certificate verification.
+.br
+See also
+.BR "A NOTE ON SSL CERTIFICATE VERIFICATION" .
+
+.TP
 .BI --ssl-no-check-certificate
-.B (only webdav backend)
+.B (only webdav & lftp backend)
 Disable ssl certificate verification.
 .br
 See also
@@ -1542,18 +1550,51 @@ be set in order to use other cloud files providers.
 
 .SH A NOTE ON DROPBOX ACCESS
 .IP 1.
-"some_dir" must already exist in the Dropbox Application folder for
-this application, like "Apps/Duplicity/some_dir".
-.IP 2.
-The first run of the backend must be ineractive!
+First of all Dropbox backend requires valid authentication token. It
+should be passed via
+. B DPBX_ACCESS_TOKEN
+environment variable.
+.br
+To obtain it please create 'Dropbox API' application at:
+https://www.dropbox.com/developers/apps/create
+.br
+Then visit app settings and just use 'Generated access token' under
+OAuth2 section.
+.br
+Alternatively you can let duplicity generate access token itself. In such 
+case temporary export 
+.B DPBX_APP_KEY ","
+.B DPBX_APP_SECRET
+using values from app settings page and run duplicity interactively.
+.br
 It will print the URL that you need to open in the browser to obtain
-OAuth token for the application. The token will be saved in the file
-$HOME/.dropbox.token_store.txt and used in the future runs.
+OAuth2 token for the application. Just follow on-screen instructions and
+then put generated token to
+. B DPBX_ACCESS_TOKEN
+variable. Once done, feel free to unset
+.B DPBX_APP_KEY "and"
+.B DPBX_APP_SECRET
+
+.IP 2.
+"some_dir" must already exist in the Dropbox folder. Depending on access
+token kind it may be:
+.RS
+.RS
+. B Full Dropbox:
+path is absolute and starts from 'Dropbox' root folder.
+.br
+. B App Folder: 
+path is related to application folder. Dropbox client will show it in
+. B ~/Dropbox/Apps/<app-name>
+.RE
+.RE
+
 .IP 3.
 When using Dropbox for storage, be aware that all files, including the
-ones in the Apps folder, will be synced to all connected computers.
-You may prefer to use a separate Dropbox account specially for the
-backups, and not connect any computers to that account.
+ones in the Apps folder, will be synced to all connected computers.  You
+may prefer to use a separate Dropbox account specially for the backups,
+and not connect any computers to that account. Alternatively you can
+configure selective sync on all computers to avoid syncing of backup files
 
 .SH A NOTE ON EUROPEAN S3 BUCKETS
 Amazon S3 provides the ability to choose the location of a bucket upon
@@ -1873,8 +1914,16 @@ in addition for this backend mode to work properly. Sftp does not have these lim
 an sftp service running on the backend server, which is sometimes not an option.
 
 .SH A NOTE ON SSL CERTIFICATE VERIFICATION
-Certificate verification as implemented right now [01.2013] only in the webdav backend needs a file
-based database of certification authority certificates (cacert file). It has to be a
+Certificate verification as implemented right now [02.2016] only in the webdav
+and lftp backends. older pythons 2.7.8- and older lftp binaries need a file
+based database of certification authority certificates (cacert file). 
+.br
+Newer python 2.7.9+ and recent lftp versions however support the system default
+certificates (usually in /etc/ssl/certs) and also giving an alternative ca cert
+folder via
+.BR --ssl-cacert-path .
+.PP
+The cacert file has to be a
 .B PEM
 formatted text file as currently provided by the
 .B CURL

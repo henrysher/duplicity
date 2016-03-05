@@ -242,8 +242,9 @@ ssh_options = ""
 # default cf backend is pyrax
 cf_backend = "pyrax"
 
-# HTTPS ssl optons (currently only webdav)
+# HTTPS ssl options (currently only webdav, lftp)
 ssl_cacert_file = None
+ssl_cacert_path = None
 ssl_no_check_certificate = False
 
 # user added rsync options
