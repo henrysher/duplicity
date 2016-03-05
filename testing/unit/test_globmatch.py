@@ -22,18 +22,20 @@
 
 import unittest
 from duplicity.globmatch import *
+from . import UnitTestCase
+
 
 class MatchingTest(UnitTestCase):
     """Test matching of file names against various selection functions"""
 
     def test_glob_re(self):
         """test_glob_re - test translation of shell pattern to regular exp"""
-        assert self.Select.glob_to_re("hello") == "hello"
-        assert self.Select.glob_to_re(".e?ll**o") == "\\.e[^/]ll.*o"
-        r = self.Select.glob_to_re("[abc]el[^de][!fg]h")
+        assert glob_to_regex("hello") == "hello"
+        assert glob_to_regex(".e?ll**o") == "\\.e[^/]ll.*o"
+        r = glob_to_regex("[abc]el[^de][!fg]h")
         assert r == "[abc]el[^de][^fg]h", r
-        r = self.Select.glob_to_re("/usr/*/bin/")
+        r = glob_to_regex("/usr/*/bin/")
         assert r == "\\/usr\\/[^/]*\\/bin\\/", r
-        assert self.Select.glob_to_re("[a.b/c]") == "[a.b/c]"
-        r = self.Select.glob_to_re("[a*b-c]e[!]]")
+        assert glob_to_regex("[a.b/c]") == "[a.b/c]"
+        r = glob_to_regex("[a*b-c]e[!]]")
         assert r == "[a*b-c]e[^]]", r
