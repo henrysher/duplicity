@@ -84,6 +84,8 @@ New in v0.7.07 (2016/03/??)
 * Applied patch from Dmitry Nezhevenko to upgrade dropbox backend:
   - update to SDK v2
   - use chunked upload
+* Merged in lp:~aaron-whitehouse/duplicity/improve_present_get_sf_man_page
+  - Improve man page entry for --exclude-if-present
 
 
 New in v0.7.06 (2015/12/07)

@@ -1,3 +1,8 @@
+2016-03-05  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/improve_present_get_sf_man_page
+      - Improve man page entry for --exclude-if-present
+
 2016-03-04  Kenneth Loafman  <kenneth@loafman.com>
 
     * More fixes to dist/makedist to make it more OS agnostic.

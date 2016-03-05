@@ -383,8 +383,10 @@ section for more information.
 
 .TP
 .BR "--exclude-if-present " filename
-Exclude directories if filename is present. This option needs to
-come before any other include or exclude options.
+Exclude directories if filename is present. Allows the user to specify folders
+that they do not wish to backup by adding a specified file (e.g. ".nobackup")
+instead of maintaining a comprehensive exclude/include list. This option needs
+to come before any other include or exclude options.
 
 .TP
 .BR "--exclude-older-than " time
