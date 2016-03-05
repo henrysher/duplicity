@@ -31,7 +31,8 @@ from duplicity import log  # @Reimport
 from duplicity import globals  # @Reimport
 from duplicity import diffdir
 from duplicity import util  # @Reimport
-from duplicity.globmatch import glob_to_regex
+from duplicity.globmatch import glob_to_regex, glob_get_prefix_regexs, \
+    GlobbingError, FilePrefixError
 
 """Iterate exactly the requested files in a directory
 
@@ -43,16 +44,6 @@ documentation on what this code does can be found on the man page.
 
 class SelectError(Exception):
     """Some error dealing with the Select class"""
-    pass
-
-
-class FilePrefixError(SelectError):
-    """Signals that a specified file doesn't start with correct prefix"""
-    pass
-
-
-class GlobbingError(SelectError):
-    """Something has gone wrong when parsing a glob string"""
     pass
 
 
@@ -561,7 +552,7 @@ probably isn't what you meant.""") %
             glob_str = glob_str[:glob_str.find("**") + 2]  # truncate after **
 
         scan_comp_re = re_comp("^(%s)$" %
-                               "|".join(self.glob_get_prefix_res(glob_str)))
+                               "|".join(glob_get_prefix_regexs(glob_str)))
 
         def include_sel_func(path):
             if match_only_dirs and not path.isdir():
@@ -613,14 +604,4 @@ probably isn't what you meant.""") %
     def glob_get_prefix_res(self, glob_str):
         """Return list of regexps equivalent to prefixes of glob_str"""
         # Internal. Used by glob_get_normal_sf.
-        glob_parts = glob_str.split("/")
-        if "" in glob_parts[1:-1]:
-            # "" OK if comes first or last, as in /foo/
-            raise GlobbingError("Consecutive '/'s found in globbing string "
-                                + glob_str)
-
-        prefixes = ["/".join(glob_parts[:i + 1]) for i in range(len(glob_parts))]
-        # we must make exception for root "/", only dir to end in slash
-        if prefixes[0] == "":
-            prefixes[0] = "/"
-        return map(glob_to_regex, prefixes)
+        glob_get_prefix_regexs(glob_str)

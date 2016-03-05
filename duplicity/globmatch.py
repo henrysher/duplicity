@@ -23,6 +23,32 @@
 import re
 
 
+class GlobbingError(Exception):
+    """Something has gone wrong when parsing a glob string"""
+    pass
+
+
+class FilePrefixError(GlobbingError):
+    """Signals that a specified file doesn't start with correct prefix"""
+    pass
+
+
+def glob_get_prefix_regexs(glob_str):
+    """Return list of regexps equivalent to prefixes of glob_str"""
+    # Internal. Used by glob_get_normal_sf.
+    glob_parts = glob_str.split("/")
+    if "" in glob_parts[1:-1]:
+        # "" OK if comes first or last, as in /foo/
+        raise GlobbingError("Consecutive '/'s found in globbing string "
+                            + glob_str)
+
+    prefixes = ["/".join(glob_parts[:i + 1]) for i in range(len(glob_parts))]
+    # we must make exception for root "/", only dir to end in slash
+    if prefixes[0] == "":
+        prefixes[0] = "/"
+    return map(glob_to_regex, prefixes)
+
+
 def glob_to_regex(pat):
     """Returned regular expression equivalent to shell glob pat
 
