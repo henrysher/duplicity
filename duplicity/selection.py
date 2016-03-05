@@ -600,8 +600,3 @@ probably isn't what you meant.""") %
         sel_func.exclude = True
         sel_func.name = "Select older than %s" % (date,)
         return sel_func
-
-    def glob_get_prefix_res(self, glob_str):
-        """Return list of regexps equivalent to prefixes of glob_str"""
-        # Internal. Used by glob_get_normal_sf.
-        glob_get_prefix_regexs(glob_str)
