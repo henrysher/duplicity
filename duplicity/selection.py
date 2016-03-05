@@ -555,7 +555,7 @@ probably isn't what you meant.""") %
             re_comp = lambda r: re.compile(r, re.S)
 
         # matches what glob matches and any files in directory
-        glob_comp_re = re_comp("^%s($|/)" % self.glob_to_re(glob_str))
+        glob_comp_re = re_comp("^%s($|/)" % glob_to_regex(glob_str))
 
         if glob_str.find("**") != -1:
             glob_str = glob_str[:glob_str.find("**") + 2]  # truncate after **
@@ -623,9 +623,4 @@ probably isn't what you meant.""") %
         # we must make exception for root "/", only dir to end in slash
         if prefixes[0] == "":
             prefixes[0] = "/"
-        return map(self.glob_to_re, prefixes)
-
-    def glob_to_re(self, pat):
-        """Returns regular expression equivalent to shell glob pat"""
-
-        return glob_to_regex(pat)
+        return map(glob_to_regex, prefixes)
