@@ -25,6 +25,7 @@ from future_builtins import filter, map
 import os  # @UnusedImport
 import stat  # @UnusedImport
 import sys
+import re
 
 from duplicity.path import *  # @UnusedWildImport
 from duplicity import log  # @Reimport
