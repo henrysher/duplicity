@@ -33,7 +33,7 @@ class FilePrefixError(GlobbingError):
     pass
 
 
-def glob_get_prefix_regexs(glob_str):
+def _glob_get_prefix_regexs(glob_str):
     """Return list of regexps equivalent to prefixes of glob_str"""
     # Internal. Used by glob_get_normal_sf.
     glob_parts = glob_str.split("/")
@@ -46,7 +46,48 @@ def glob_get_prefix_regexs(glob_str):
     # we must make exception for root "/", only dir to end in slash
     if prefixes[0] == "":
         prefixes[0] = "/"
-    return map(glob_to_regex, prefixes)
+    return list(map(glob_to_regex, prefixes))
+
+
+def path_matches_glob(path, glob_str, include):
+    """Tests whether path matches glob, as per the Unix shell rules, taking as
+    arguments a path, a glob string and include (0 indicating that the glob
+    string is an exclude glob and 1 indicating that it is an include glob,
+    returning:
+    0 - if the file should be excluded
+    1 - if the file should be included
+    2 - if the folder should be scanned for any included/excluded files
+    None - if the selection function has nothing to say about the file
+    """
+    match_only_dirs = False
+
+    # ToDo: Test behaviour of "/" on its own - should always match
+    if glob_str != "/" and glob_str[-1] == "/":
+        match_only_dirs = True
+        # Remove trailing / from directory name (unless that is the entire
+        # string)
+        glob_str = glob_str[:-1]
+
+    re_comp = lambda r: re.compile(r, re.S)
+
+    # matches what glob matches and any files in directory
+    glob_comp_re = re_comp("^%s($|/)" % glob_to_regex(glob_str))
+
+    if glob_str.find("**") != -1:
+        glob_str = glob_str[:glob_str.find("**") + 2]  # truncate after **
+
+    scan_comp_re = re_comp("^(%s)$" %
+                           "|".join(_glob_get_prefix_regexs(glob_str)))
+
+    if match_only_dirs and not path.isdir():
+        # If the glob ended with a /, only match directories
+        return None
+    elif glob_comp_re.match(path.name):
+        return include
+    elif include == 1 and scan_comp_re.match(path.name):
+        return 2
+    else:
+        return None
 
 
 def glob_to_regex(pat):

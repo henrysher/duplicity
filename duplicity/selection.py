@@ -31,8 +31,8 @@ from duplicity import log  # @Reimport
 from duplicity import globals  # @Reimport
 from duplicity import diffdir
 from duplicity import util  # @Reimport
-from duplicity.globmatch import glob_to_regex, glob_get_prefix_regexs, \
-    GlobbingError, FilePrefixError
+from duplicity.globmatch import GlobbingError, FilePrefixError, \
+    path_matches_glob
 
 """Iterate exactly the requested files in a directory
 
@@ -531,63 +531,24 @@ probably isn't what you meant.""") %
         """
         # Internal. Used by glob_get_sf and unit tests.
 
-        match_only_dirs = False
-
-        if glob_str != "/" and glob_str[-1] == "/":
-            match_only_dirs = True
-            # Remove trailing / from directory name (unless that is the entire
-            # string)
-            glob_str = glob_str[:-1]
-
         ignore_case = False
 
         if glob_str.lower().startswith("ignorecase:"):
+            # Glob string starts with ignorecase, so remove that from the
+            # string and change it to lowercase.
             glob_str = glob_str[len("ignorecase:"):].lower()
             ignore_case = True
 
-        re_comp = lambda r: re.compile(r, re.S)
-
-        # matches what glob matches and any files in directory
-        glob_comp_re = re_comp("^%s($|/)" % glob_to_regex(glob_str))
-
-        if glob_str.find("**") != -1:
-            glob_str = glob_str[:glob_str.find("**") + 2]  # truncate after **
-
-        scan_comp_re = re_comp("^(%s)$" %
-                               "|".join(glob_get_prefix_regexs(glob_str)))
-
-        def include_sel_func(path):
-            if ignore_case:
-                path.name = path.name.lower()
-            if match_only_dirs and not path.isdir():
-                # If the glob ended with a /, only match directories
-                return None
-            elif glob_comp_re.match(path.name):
-                return 1
-            elif scan_comp_re.match(path.name):
-                return 2
-            else:
-                return None
-
-        def exclude_sel_func(path):
-            if ignore_case:
-                path.name = path.name.lower()
-            if match_only_dirs and not path.isdir():
-                # If the glob ended with a /, only match directories
-                return None
-            elif glob_comp_re.match(path.name):
-                return 0
-            else:
-                return None
-
         # Check to make sure prefix is ok
-        if not include_sel_func(self.rootpath):
+        if not path_matches_glob(self.rootpath, glob_str, include=1):
             raise FilePrefixError(glob_str)
 
-        if include:
-            return include_sel_func
-        else:
-            return exclude_sel_func
+        def sel_func(path):
+            if ignore_case:
+                path.name = path.name.lower()
+            return path_matches_glob(path, glob_str, include)
+
+        return sel_func
 
     def exclude_older_get_sf(self, date):
         """Return selection function based on files older than modification date """
