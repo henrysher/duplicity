@@ -539,11 +539,13 @@ probably isn't what you meant.""") %
             # string)
             glob_str = glob_str[:-1]
 
+        ignore_case = False
+
         if glob_str.lower().startswith("ignorecase:"):
-            re_comp = lambda r: re.compile(r, re.I | re.S)
-            glob_str = glob_str[len("ignorecase:"):]
-        else:
-            re_comp = lambda r: re.compile(r, re.S)
+            glob_str = glob_str[len("ignorecase:"):].lower()
+            ignore_case = True
+
+        re_comp = lambda r: re.compile(r, re.S)
 
         # matches what glob matches and any files in directory
         glob_comp_re = re_comp("^%s($|/)" % glob_to_regex(glob_str))
@@ -555,6 +557,8 @@ probably isn't what you meant.""") %
                                "|".join(glob_get_prefix_regexs(glob_str)))
 
         def include_sel_func(path):
+            if ignore_case:
+                path.name = path.name.lower()
             if match_only_dirs and not path.isdir():
                 # If the glob ended with a /, only match directories
                 return None
@@ -566,6 +570,8 @@ probably isn't what you meant.""") %
                 return None
 
         def exclude_sel_func(path):
+            if ignore_case:
+                path.name = path.name.lower()
             if match_only_dirs and not path.isdir():
                 # If the glob ended with a /, only match directories
                 return None
