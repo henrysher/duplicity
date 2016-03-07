@@ -1,3 +1,9 @@
+2016-03-07  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/split_glob_matching_from_select
+      - Move glob matching code out of selection.py's Select function and
+        into globmatch.py.
+
 2016-03-05  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~aaron-whitehouse/duplicity/improve_present_get_sf_man_page

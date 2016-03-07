@@ -86,6 +86,9 @@ New in v0.7.07 (2016/03/??)
   - use chunked upload
 * Merged in lp:~aaron-whitehouse/duplicity/improve_present_get_sf_man_page
   - Improve man page entry for --exclude-if-present
+* Merged in lp:~aaron-whitehouse/duplicity/split_glob_matching_from_select
+  - Move glob matching code out of selection.py's Select function and
+    into globmatch.py.
 
 
 New in v0.7.06 (2015/12/07)

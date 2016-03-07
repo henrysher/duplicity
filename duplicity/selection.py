@@ -23,15 +23,17 @@
 from future_builtins import filter, map
 
 import os  # @UnusedImport
-import re  # @UnusedImport
 import stat  # @UnusedImport
 import sys
+import re
 
 from duplicity.path import *  # @UnusedWildImport
 from duplicity import log  # @Reimport
 from duplicity import globals  # @Reimport
 from duplicity import diffdir
 from duplicity import util  # @Reimport
+from duplicity.globmatch import GlobbingError, FilePrefixError, \
+    path_matches_glob
 
 """Iterate exactly the requested files in a directory
 
@@ -43,16 +45,6 @@ documentation on what this code does can be found on the man page.
 
 class SelectError(Exception):
     """Some error dealing with the Select class"""
-    pass
-
-
-class FilePrefixError(SelectError):
-    """Signals that a specified file doesn't start with correct prefix"""
-    pass
-
-
-class GlobbingError(SelectError):
-    """Something has gone wrong when parsing a glob string"""
     pass
 
 
@@ -540,57 +532,24 @@ probably isn't what you meant.""") %
         """
         # Internal. Used by glob_get_sf and unit tests.
 
-        match_only_dirs = False
-
-        if glob_str != "/" and glob_str[-1] == "/":
-            match_only_dirs = True
-            # Remove trailing / from directory name (unless that is the entire
-            # string)
-            glob_str = glob_str[:-1]
+        ignore_case = False
 
         if glob_str.lower().startswith("ignorecase:"):
-            re_comp = lambda r: re.compile(r, re.I | re.S)
-            glob_str = glob_str[len("ignorecase:"):]
-        else:
-            re_comp = lambda r: re.compile(r, re.S)
-
-        # matches what glob matches and any files in directory
-        glob_comp_re = re_comp("^%s($|/)" % self.glob_to_re(glob_str))
-
-        if glob_str.find("**") != -1:
-            glob_str = glob_str[:glob_str.find("**") + 2]  # truncate after **
-
-        scan_comp_re = re_comp("^(%s)$" %
-                               "|".join(self.glob_get_prefix_res(glob_str)))
-
-        def include_sel_func(path):
-            if match_only_dirs and not path.isdir():
-                # If the glob ended with a /, only match directories
-                return None
-            elif glob_comp_re.match(path.name):
-                return 1
-            elif scan_comp_re.match(path.name):
-                return 2
-            else:
-                return None
-
-        def exclude_sel_func(path):
-            if match_only_dirs and not path.isdir():
-                # If the glob ended with a /, only match directories
-                return None
-            elif glob_comp_re.match(path.name):
-                return 0
-            else:
-                return None
+            # Glob string starts with ignorecase, so remove that from the
+            # string and change it to lowercase.
+            glob_str = glob_str[len("ignorecase:"):].lower()
+            ignore_case = True
 
         # Check to make sure prefix is ok
-        if not include_sel_func(self.rootpath):
+        if not path_matches_glob(self.rootpath, glob_str, include=1):
             raise FilePrefixError(glob_str)
 
-        if include:
-            return include_sel_func
-        else:
-            return exclude_sel_func
+        def sel_func(path):
+            if ignore_case:
+                path.name = path.name.lower()
+            return path_matches_glob(path, glob_str, include)
+
+        return sel_func
 
     def exclude_older_get_sf(self, date):
         """Return selection function based on files older than modification date """
@@ -609,62 +568,3 @@ probably isn't what you meant.""") %
         sel_func.exclude = True
         sel_func.name = "Select older than %s" % (date,)
         return sel_func
-
-    def glob_get_prefix_res(self, glob_str):
-        """Return list of regexps equivalent to prefixes of glob_str"""
-        # Internal. Used by glob_get_normal_sf.
-        glob_parts = glob_str.split("/")
-        if "" in glob_parts[1:-1]:
-            # "" OK if comes first or last, as in /foo/
-            raise GlobbingError("Consecutive '/'s found in globbing string "
-                                + glob_str)
-
-        prefixes = ["/".join(glob_parts[:i + 1]) for i in range(len(glob_parts))]
-        # we must make exception for root "/", only dir to end in slash
-        if prefixes[0] == "":
-            prefixes[0] = "/"
-        return map(self.glob_to_re, prefixes)
-
-    def glob_to_re(self, pat):
-        """Returned regular expression equivalent to shell glob pat
-
-        Currently only the ?, *, [], and ** expressions are supported.
-        Ranges like [a-z] are also currently unsupported.  There is no
-        way to quote these special characters.
-
-        This function taken with minor modifications from efnmatch.py
-        by Donovan Baarda.
-
-        """
-        # Internal. Used by glob_get_normal_sf, glob_get_prefix_res and unit tests.
-        i, n, res = 0, len(pat), ''
-        while i < n:
-            c, s = pat[i], pat[i:i + 2]
-            i = i + 1
-            if s == '**':
-                res = res + '.*'
-                i = i + 1
-            elif c == '*':
-                res = res + '[^/]*'
-            elif c == '?':
-                res = res + '[^/]'
-            elif c == '[':
-                j = i
-                if j < n and pat[j] in '!^':
-                    j = j + 1
-                if j < n and pat[j] == ']':
-                    j = j + 1
-                while j < n and pat[j] != ']':
-                    j = j + 1
-                if j >= n:
-                    res = res + '\\['  # interpret the [ literally
-                else:
-                    # Deal with inside of [..]
-                    stuff = pat[i:j].replace('\\', '\\\\')
-                    i = j + 1
-                    if stuff[0] in '!^':
-                        stuff = '^' + stuff[1:]
-                    res = res + '[' + stuff + ']'
-            else:
-                res = res + re.escape(c)
-        return res

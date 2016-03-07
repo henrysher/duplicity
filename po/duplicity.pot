@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2016-03-04 03:50-0600\n"
+"POT-Creation-Date: 2016-03-07 15:47-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -381,33 +381,33 @@ msgstr ""
 msgid "File %s already exists, will not overwrite."
 msgstr ""
 
-#: ../duplicity/selection.py:127
+#: ../duplicity/selection.py:119
 #, python-format
 msgid "Skipping socket %s"
 msgstr ""
 
-#: ../duplicity/selection.py:131
+#: ../duplicity/selection.py:123
 #, python-format
 msgid "Error initializing file %s"
 msgstr ""
 
-#: ../duplicity/selection.py:135 ../duplicity/selection.py:157
+#: ../duplicity/selection.py:127 ../duplicity/selection.py:149
 #, python-format
 msgid "Error accessing possibly locked file %s"
 msgstr ""
 
-#: ../duplicity/selection.py:172
+#: ../duplicity/selection.py:164
 #, python-format
 msgid "Warning: base %s doesn't exist, continuing"
 msgstr ""
 
-#: ../duplicity/selection.py:175 ../duplicity/selection.py:193
-#: ../duplicity/selection.py:196
+#: ../duplicity/selection.py:167 ../duplicity/selection.py:185
+#: ../duplicity/selection.py:188
 #, python-format
 msgid "Selecting %s"
 msgstr ""
 
-#: ../duplicity/selection.py:293
+#: ../duplicity/selection.py:285
 #, python-format
 msgid ""
 "Fatal Error: The file specification\n"
@@ -418,14 +418,14 @@ msgid ""
 "pattern (such as '**') which matches the base directory."
 msgstr ""
 
-#: ../duplicity/selection.py:302
+#: ../duplicity/selection.py:294
 #, python-format
 msgid ""
 "Fatal Error while processing expression\n"
 "%s"
 msgstr ""
 
-#: ../duplicity/selection.py:312
+#: ../duplicity/selection.py:304
 #, python-format
 msgid ""
 "Last selection expression:\n"
@@ -435,17 +435,17 @@ msgid ""
 "probably isn't what you meant."
 msgstr ""
 
-#: ../duplicity/selection.py:368
+#: ../duplicity/selection.py:360
 #, python-format
 msgid "Reading globbing filelist %s"
 msgstr ""
 
-#: ../duplicity/selection.py:401
+#: ../duplicity/selection.py:393
 #, python-format
 msgid "Error compiling regular expression %s"
 msgstr ""
 
-#: ../duplicity/selection.py:418
+#: ../duplicity/selection.py:410
 msgid ""
 "Warning: exclude-device-files is not the first selector.\n"
 "This may not be what you intended"
