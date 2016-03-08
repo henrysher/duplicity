@@ -1,5 +1,12 @@
 2016-03-07  Kenneth Loafman  <kenneth@loafman.com>
 
+    * Fix bug reported on the mailing list from Mark Grandi (assertion error
+      while backing up).  In file_naming.parse() the filename was being lower
+      cased prior to parsing.  If you had used a prefix with mixed case, we
+      were writing the file properly, but could not find it in the backend.
+
+2016-03-07  Kenneth Loafman  <kenneth@loafman.com>
+
     * Merged in lp:~aaron-whitehouse/duplicity/split_glob_matching_from_select
       - Move glob matching code out of selection.py's Select function and
         into globmatch.py.

@@ -277,8 +277,6 @@ def parse(filename):
     """
     Parse duplicity filename, return None or ParseResults object
     """
-    filename = filename.lower()
-
     def str2time(timestr, short):
         """
         Return time in seconds if string can be converted, None otherwise
