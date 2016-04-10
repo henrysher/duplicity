@@ -1,3 +1,8 @@
+2016-04-10  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~duplicity-team/duplicity/po-updates
+    * Prep for 0.7.07
+
 2016-03-07  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fix bug reported on the mailing list from Mark Grandi (assertion error

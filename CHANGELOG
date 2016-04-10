@@ -1,4 +1,4 @@
-New in v0.7.07 (2016/03/??)
+New in v0.7.07 (2016/04/10)
 ---------------------------
 * Merged in lp:~matthew-t-bentley/duplicity/b2
   - Fix import and error typos.
@@ -93,6 +93,7 @@ New in v0.7.07 (2016/03/??)
   while backing up).  In file_naming.parse() the filename was being lower
   cased prior to parsing.  If you had used a prefix with mixed case, we
   were writing the file properly, but could not find it in the backend.
+* Merged in lp:~duplicity-team/duplicity/po-updates
 
 
 New in v0.7.06 (2015/12/07)
