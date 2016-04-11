@@ -1,3 +1,8 @@
+2016-04-11  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug 1568677 with suggestions from Florian Kruse
+      - bug introduced by incomplete fix of bug 1296793
+
 2016-04-10  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~duplicity-team/duplicity/po-updates

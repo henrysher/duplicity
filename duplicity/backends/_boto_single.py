@@ -187,6 +187,8 @@ class BotoBackend(duplicity.backend.Backend):
                                                       location=Location.EU)
             else:
                 self.bucket = self.conn.create_bucket(self.bucket_name)
+        else:
+            self.bucket = self.conn.get_bucket(self.bucket_name)
 
     def _retry_cleanup(self):
         self.resetConnection()
