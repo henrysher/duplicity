@@ -1,3 +1,9 @@
+2016-04-12  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1568677
+      - bug introduced by incomplete fix of bug 1296793
+      - simplified setting of bucket locations
+
 2016-04-11  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug 1568677 with suggestions from Florian Kruse

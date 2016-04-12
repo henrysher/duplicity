@@ -158,6 +158,10 @@ class BotoBackend(duplicity.backend.Backend):
         # boto uses scheme://bucket[/name] and specifies hostname on connect()
         self.boto_uri_str = '://'.join((parsed_url.scheme[:2],
                                         parsed_url.path.lstrip('/')))
+        if globals.s3_european_buckets:
+            self.my_location = Location.EU
+        else:
+            self.my_location = ''
         self.resetConnection()
         self._listed_keys = {}
 
@@ -182,13 +186,11 @@ class BotoBackend(duplicity.backend.Backend):
         self.storage_uri = boto.storage_uri(self.boto_uri_str)
         self.conn = get_connection(self.scheme, self.parsed_url, self.storage_uri)
         if not self.conn.lookup(self.bucket_name):
-            if globals.s3_european_buckets:
-                self.bucket = self.conn.create_bucket(self.bucket_name,
-                                                      location=Location.EU)
-            else:
-                self.bucket = self.conn.create_bucket(self.bucket_name)
+            self.bucket = self.conn.create_bucket(self.bucket_name,
+                                                  location=my_location)
         else:
-            self.bucket = self.conn.get_bucket(self.bucket_name)
+            self.bucket = self.conn.get_bucket(self.bucket_name,
+                                               location=my_location)
 
     def _retry_cleanup(self):
         self.resetConnection()
@@ -206,11 +208,8 @@ class BotoBackend(duplicity.backend.Backend):
                 self.bucket = self.conn.get_bucket(self.bucket_name, validate=True)
             except Exception as e:
                 if "NoSuchBucket" in str(e):
-                    if globals.s3_european_buckets:
-                        self.bucket = self.conn.create_bucket(self.bucket_name,
-                                                              location=Location.EU)
-                    else:
-                        self.bucket = self.conn.create_bucket(self.bucket_name)
+                    self.bucket = self.conn.create_bucket(self.bucket_name,
+                                                          location=self.my_location)
                 else:
                     raise
 
