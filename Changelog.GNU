@@ -1,8 +1,11 @@
 2016-04-12  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1568677
-      - bug introduced by incomplete fix of bug 1296793
+      - bug introduced by incomplete fix of bug #1296793
       - simplified setting of bucket locations
+    * Fixed bug #1569523
+      - bug introduced in improper fix of bug #1568677
+      - gotta love those inconsistent APIs
 
 2016-04-11  Kenneth Loafman  <kenneth@loafman.com>
 
