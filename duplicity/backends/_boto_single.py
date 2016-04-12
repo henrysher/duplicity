@@ -128,6 +128,7 @@ class BotoBackend(duplicity.backend.Backend):
 
     def __init__(self, parsed_url):
         import boto
+        from boto.s3.connection import Location
         duplicity.backend.Backend.__init__(self, parsed_url)
 
         assert boto.Version >= BOTO_MIN_VERSION
@@ -196,7 +197,6 @@ class BotoBackend(duplicity.backend.Backend):
         self.resetConnection()
 
     def _put(self, source_path, remote_filename):
-        from boto.s3.connection import Location
         if globals.s3_european_buckets:
             if not globals.s3_use_new_style:
                 raise FatalBackendException("European bucket creation was requested, but not new-style "
