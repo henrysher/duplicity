@@ -204,7 +204,7 @@ class BotoBackend(duplicity.backend.Backend):
 
         if self.bucket is None:
             try:
-                self.bucket = self.conn.get_bucket(self.bucket_name, validate=True)
+                self.bucket = self.conn.get_bucket(self.bucket_name)
             except Exception as e:
                 if "NoSuchBucket" in str(e):
                     self.bucket = self.conn.create_bucket(self.bucket_name,
