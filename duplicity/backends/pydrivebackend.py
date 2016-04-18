@@ -33,7 +33,6 @@ class PyDriveBackend(duplicity.backend.Backend):
             global pydrive
             import httplib2
             from apiclient.discovery import build
-            from oauth2client.client import SignedJwtAssertionCredentials
             from pydrive.auth import GoogleAuth
             from pydrive.drive import GoogleDrive
             from pydrive.files import FileNotUploadedError
@@ -41,9 +40,24 @@ class PyDriveBackend(duplicity.backend.Backend):
             raise BackendException('PyDrive backend requires PyDrive installation'
                                    'Please read the manpage to fix.')
 
+        # let user get by with old client while he can
+        try:
+            from oauth2client.client import SignedJwtAssertionCredentials
+            self.oldClient = True
+        except:
+            from oauth2client.service_account import ServiceAccountCredentials
+            from oauth2client import crypt
+            self.oldClient = False
+
         if 'GOOGLE_DRIVE_ACCOUNT_KEY' in os.environ:
             account_key = os.environ['GOOGLE_DRIVE_ACCOUNT_KEY']
-            credentials = SignedJwtAssertionCredentials(parsed_url.username + '@' + parsed_url.hostname, account_key, scope='https://www.googleapis.com/auth/drive')
+            if self.oldClient:
+                credentials = SignedJwtAssertionCredentials(parsed_url.username + '@' + parsed_url.hostname, account_key,
+                                                            scopes='https://www.googleapis.com/auth/drive')
+            else:
+                signer = crypt.Signer.from_string(account_key)
+                credentials = ServiceAccountCredentials(parsed_url.username + '@' + parsed_url.hostname, signer,
+                                                        scopes='https://www.googleapis.com/auth/drive')
             credentials.authorize(httplib2.Http())
             gauth = GoogleAuth()
             gauth.credentials = credentials

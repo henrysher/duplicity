@@ -1,3 +1,9 @@
+2016-04-18  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1571134 and #1558155
+      - used patch from https://bugs.debian.org/820725 but made changes
+        to allow the user to continue using the old version
+
 2016-04-12  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1568677

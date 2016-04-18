@@ -6,7 +6,9 @@ New in v0.7.07 (2016/04/??)
 * Fixed bug #1569523
   - bug introduced in improper fix of bug #1568677
   - gotta love those inconsistent APIs
-
+* Fixed bug #1571134 and #1558155
+  - used patch from https://bugs.debian.org/820725 but made changes
+    to allow the user to continue using the old version
 
 New in v0.7.07 (2016/04/10)
 ---------------------------
