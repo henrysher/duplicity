@@ -150,11 +150,9 @@ class FileobjHooked:
 
     def write(self, buf):
         """
-        Write fileobj, flush, return result of write()
+        Write fileobj, return result of write()
         """
-        res = self.fileobj.write(buf)
-        self.flush()
-        return res
+        return self.fileobj.write(buf)
 
     def flush(self):
         """

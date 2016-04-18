@@ -3,6 +3,9 @@
     * Fixed bug #1571134 and #1558155
       - used patch from https://bugs.debian.org/820725 but made changes
         to allow the user to continue using the old version
+    * Fixed bug #1570293
+      - removed flush() after write.
+      - revert to previous version
 
 2016-04-12  Kenneth Loafman  <kenneth@loafman.com>
 

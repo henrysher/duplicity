@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2016-04-10 09:59-0500\n"
+"POT-Creation-Date: 2016-04-18 16:32-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -241,7 +241,7 @@ msgstr ""
 msgid "Unable to delete %s: %s"
 msgstr ""
 
-#: ../bin/duplicity:1114 ../duplicity/dup_temp.py:267
+#: ../bin/duplicity:1114 ../duplicity/dup_temp.py:258
 #, python-format
 msgid "Failed to read %s: %s"
 msgstr ""
@@ -1288,7 +1288,7 @@ msgid ""
 "succeeded"
 msgstr ""
 
-#: ../duplicity/backends/pydrivebackend.py:107
+#: ../duplicity/backends/pydrivebackend.py:121
 #, python-format
 msgid "PyDrive backend: multiple files called '%s'."
 msgstr ""
