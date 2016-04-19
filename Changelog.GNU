@@ -1,18 +1,23 @@
+2016-04-19  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Prep for 0.7.07.1 critical bug fixes
+
 2016-04-18  Kenneth Loafman  <kenneth@loafman.com>
 
-    * Fixed bug #1571134 and #1558155
+    * Fixed bug #1571134 incompatible with python-oauth2client version 2.x
+      and #1558155 PyDrive backend broken, needs update to oauth2client library
       - used patch from https://bugs.debian.org/820725 but made changes
         to allow the user to continue using the old version
-    * Fixed bug #1570293
+    * Fixed bug #1570293 duplicity is very slow due to excessive fsync
       - removed flush() after write.
       - revert to previous version
 
 2016-04-12  Kenneth Loafman  <kenneth@loafman.com>
 
-    * Fixed bug #1568677
+    * Fixed bug #1568677 duplicity fails to use existing S3 bucket in boto backend
       - bug introduced by incomplete fix of bug #1296793
       - simplified setting of bucket locations
-    * Fixed bug #1569523
+    * Fixed bug #1569523 get_bucket unknown keyword location and my_location name error
       - bug introduced in improper fix of bug #1568677
       - gotta love those inconsistent APIs
 
