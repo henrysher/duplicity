@@ -13,6 +13,7 @@ Build-Depends: debhelper (>= 7),
                python-lockfile,
                python-mock,
                python-pexpect,
+               python-setuptools,
                rdiff,
                rsync,
 Homepage: https://launchpad.net/duplicity
