@@ -99,7 +99,7 @@ class AzureBackend(duplicity.backend.Backend):
         return {'size': int(prop['content-length'])}
 
     def _error_code(self, operation, e):
-        if isinstance(e, self.WindowsAzureMissingResourceError):
+        if isinstance(e, self.AzureMissingResourceError):
             return log.ErrorCode.backend_not_found
 
 duplicity.backend.register_backend('azure', AzureBackend)

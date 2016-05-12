@@ -1,3 +1,8 @@
+2016-05-12  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~noizyland/duplicity/fix_azurebackend_typo
+      - Fix typo in error handling code
+
 2016-04-19  Kenneth Loafman  <kenneth@loafman.com>
 
     * Prep for 0.7.07.1 critical bug fixes
