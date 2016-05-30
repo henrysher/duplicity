@@ -6,6 +6,8 @@
     * Fixed bug #1573957 with patches from Dmitry Nezhevenko
       - upload last chunk with files_upload_session_finish to avoid extra request
       - upload small files using non-chunked api
+    * Fixed bug #1586934 with patches from Dmitry Nezhevenko
+      - fixes error handling in wrapper
 
 2016-05-12  Kenneth Loafman  <kenneth@loafman.com>
 

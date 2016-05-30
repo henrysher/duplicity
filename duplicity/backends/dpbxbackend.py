@@ -74,9 +74,9 @@ def command(login_required=True):
         def wrapper(self, *args):
             try:
                 return f(self, *args)
-            except TypeError as e:
+            except ApiError as e:
                 log_exception(e)
-                raise BackendException('dpbx type error "%s"' % (e,))
+                raise BackendException('dpbx api error "%s"' % (e,))
             except Exception as e:
                 log_exception(e)
                 log.Error('dpbx code error "%s"' % (e,), log.ErrorCode.backend_code_error)
