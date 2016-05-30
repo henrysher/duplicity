@@ -5,6 +5,9 @@ New in v0.7.08 (2016/0?/??)
 * Merged in lp:~ghoz/duplicity/swift-prefix
   - adds the abiliy to use path in the swift backend, in order to have multiple
     backups to the same container neatly organized.
+* Fixed bug #1573957 with patches from Dmitry Nezhevenko
+  - upload last chunk with files_upload_session_finish to avoid extra request
+  - upload small files using non-chunked api
 
 
 New in v0.7.07.1 (2016/04/19)

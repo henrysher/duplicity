@@ -175,9 +175,36 @@ class DPBXBackend(duplicity.backend.Backend):
         remote_path = '/' + os.path.join(remote_dir, remote_filename).rstrip()
 
         file_size = os.path.getsize(source_path.name)
+        progress.report_transfer(0, file_size)
+
+        if file_size < DPBX_UPLOAD_CHUNK_SIZE:
+            # Upload whole file at once to avoid extra server request
+            res_metadata = self.put_file_small(source_path, remote_path)
+        else:
+            res_metadata = self.put_file_chunked(source_path, remote_path)
+
+        # A few sanity checks
+        if res_metadata.path_display != remote_path:
+            raise BackendException('dpbx: result path mismatch: %s (expected: %s)' % (res_metadata.path_display, remote_path))
+        if res_metadata.size != file_size:
+            raise BackendException('dpbx: result size mismatch: %s (expected: %s)' % (res_metadata.size, file_size))
+
+    def put_file_small(self, source_path, remote_path):
+        file_size = os.path.getsize(source_path.name)
         f = source_path.open('rb')
         try:
-            progress.report_transfer(0, file_size)
+            log.Debug('dpbx,files_upload(%s, [%d bytes])' % (remote_path, file_size))
+            res_metadata = self.api_client.files_upload(f, remote_path, mode=WriteMode.overwrite, autorename=False, client_modified=None, mute=True)
+            log.Debug('dpbx,files_upload(): %s' % res_metadata)
+            progress.report_transfer(file_size, file_size)
+            return res_metadata
+        finally:
+            f.close()
+
+    def put_file_chunked(self, source_path, remote_path):
+        file_size = os.path.getsize(source_path.name)
+        f = source_path.open('rb')
+        try:
             buf = f.read(DPBX_UPLOAD_CHUNK_SIZE)
             log.Debug('dpbx,files_upload_session_start([%d bytes]), total: %d' % (len(buf), file_size))
             upload_sid = self.api_client.files_upload_session_start(buf)
@@ -190,10 +217,11 @@ class DPBXBackend(duplicity.backend.Backend):
             requested_offset = None
             current_chunk_size = DPBX_UPLOAD_CHUNK_SIZE
             retry_number = globals.num_retries
+            is_eof = False
 
             # We're doing our own error handling and retrying logic because
             # we can benefit from Dpbx chunked upload and retry only failed chunk
-            while (f.tell() < file_size) or not res_metadata:
+            while not is_eof or not res_metadata:
                 try:
                     if requested_offset is not None:
                         upload_cursor.offset = requested_offset
@@ -202,12 +230,17 @@ class DPBXBackend(duplicity.backend.Backend):
                         f.seek(upload_cursor.offset)
                     buf = f.read(current_chunk_size)
 
+                    is_eof = f.tell() >= file_size
+                    if not is_eof and len(buf) == 0:
+                        continue
+
                     # reset temporary status variables
                     requested_offset = None
                     current_chunk_size = DPBX_UPLOAD_CHUNK_SIZE
                     retry_number = globals.num_retries
 
-                    if len(buf) != 0:
+                    if not is_eof:
+                        assert len(buf) != 0
                         log.Debug('dpbx,files_upload_sesssion_append([%d bytes], offset=%d)' % (len(buf), upload_cursor.offset))
                         self.api_client.files_upload_session_append(buf, upload_cursor.session_id, upload_cursor.offset)
                     else:
@@ -253,11 +286,7 @@ class DPBXBackend(duplicity.backend.Backend):
             log.Debug('dpbx,files_upload_sesssion_finish(): %s' % res_metadata)
             progress.report_transfer(f.tell(), file_size)
 
-            # A few sanity checks
-            if res_metadata.path_display != remote_path:
-                raise BackendException('dpbx: result path mismatch: %s (expected: %s)' % (res_metadata.path_display, remote_path))
-            if res_metadata.size != file_size:
-                raise BackendException('dpbx: result size mismatch: %s (expected: %s)' % (res_metadata.size, file_size))
+            return res_metadata
 
         finally:
             f.close()
