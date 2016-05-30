@@ -2,6 +2,9 @@ New in v0.7.08 (2016/0?/??)
 ---------------------------
 * Merged in lp:~noizyland/duplicity/fix_azurebackend_typo
   - Fix typo in error handling code
+* Merged in lp:~ghoz/duplicity/swift-prefix
+  - adds the abiliy to use path in the swift backend, in order to have multiple
+    backups to the same container neatly organized.
 
 
 New in v0.7.07.1 (2016/04/19)

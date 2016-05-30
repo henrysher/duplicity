@@ -90,7 +90,16 @@ class SwiftBackend(duplicity.backend.Backend):
 
         conn_kwargs['os_options'] = os_options
 
-        self.container = parsed_url.path.lstrip('/')
+        # This folds the null prefix and all null parts, which means that:
+        #  //MyContainer/ and //MyContainer are equivalent.
+        #  //MyContainer//My/Prefix/ and //MyContainer/My/Prefix are equivalent.
+        url_parts = [x for x in parsed_url.path.split('/') if x != '']
+
+        self.container = url_parts.pop(0)
+        if url_parts:
+            self.prefix = '%s/' % '/'.join(url_parts)
+        else:
+            self.prefix = ''
 
         container_metadata = None
         try:
@@ -118,24 +127,25 @@ class SwiftBackend(duplicity.backend.Backend):
                 return log.ErrorCode.backend_not_found
 
     def _put(self, source_path, remote_filename):
-        self.conn.put_object(self.container, remote_filename,
+        self.conn.put_object(self.container, self.prefix + remote_filename,
                              file(source_path.name))
 
     def _get(self, remote_filename, local_path):
-        headers, body = self.conn.get_object(self.container, remote_filename)
+        headers, body = self.conn.get_object(self.container, self.prefix + remote_filename)
         with open(local_path.name, 'wb') as f:
             for chunk in body:
                 f.write(chunk)
 
     def _list(self):
-        headers, objs = self.conn.get_container(self.container, full_listing=True)
-        return [o['name'] for o in objs]
+        headers, objs = self.conn.get_container(self.container, full_listing=True, path=self.prefix)
+        # removes prefix from return values. should check for the prefix ?
+        return [o['name'][len(self.prefix):] for o in objs]
 
     def _delete(self, filename):
-        self.conn.delete_object(self.container, filename)
+        self.conn.delete_object(self.container, self.prefix + filename)
 
     def _query(self, filename):
-        sobject = self.conn.head_object(self.container, filename)
+        sobject = self.conn.head_object(self.container, self.prefix + filename)
         return {'size': int(sobject['content-length'])}
 
 duplicity.backend.register_backend("swift", SwiftBackend)

@@ -1,3 +1,9 @@
+2016-05-30  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~ghoz/duplicity/swift-prefix
+      - adds the abiliy to use path in the swift backend, in order to have multiple
+        backups to the same container neatly organized.
+
 2016-05-12  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~noizyland/duplicity/fix_azurebackend_typo
