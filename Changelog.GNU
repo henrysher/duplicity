@@ -1,3 +1,9 @@
+2016-06-01  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1586992 with patches from Dmitry Nezhevenko
+      - Patch adds _delete_list to Par2Backend. And _delete_list fallbacks to
+        _delete calls if wrapped backend has no _delete_list.
+
 2016-05-30  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~ghoz/duplicity/swift-prefix
