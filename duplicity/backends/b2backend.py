@@ -281,7 +281,7 @@ class B2Backend(duplicity.backend.Backend):
         except urllib2.HTTPError as e:
             if e.code == 401:
                 self.auth_token = None;
-                log.Log("Authtoken expired, will reauthenticate with next attempt", 8)
+                log.Warn("Authtoken expired, will reauthenticate with next attempt")
             raise e
 
     def get_file_info(self, filename):
