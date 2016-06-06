@@ -2,6 +2,8 @@
 
     * Fixed bug #1589038 with patches from Malte Schröder
       - Added ignore_case option to selection functions
+    * Merged in lp:~mstoll-de/duplicity/b2-reauth
+      - Fixes bug #1588503 b2: large uploads fail due to expired auth token
 
 2016-06-01  Kenneth Loafman  <kenneth@loafman.com>
 

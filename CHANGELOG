@@ -15,6 +15,8 @@ New in v0.7.08 (2016/0?/??)
     _delete calls if wrapped backend has no _delete_list.
 * Fixed bug #1589038 with patches from Malte Schröder
   - Added ignore_case option to selection functions
+* Merged in lp:~mstoll-de/duplicity/b2-reauth
+  - Fixes bug #1588503 b2: large uploads fail due to expired auth token
 
 
 New in v0.7.07.1 (2016/04/19)

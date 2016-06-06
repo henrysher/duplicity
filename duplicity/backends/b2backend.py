@@ -61,8 +61,16 @@ class B2Backend(duplicity.backend.Backend):
             raise BackendException("B2 requires a bucket name")
         self.path = "/".join(self.url_parts)
 
-        id_and_key = self.account_id + ":" + account_key
-        basic_auth_string = 'Basic ' + base64.b64encode(id_and_key)
+        self.id_and_key = self.account_id + ":" + account_key
+        self._authorize();
+
+        try:
+            self.find_or_create_bucket(self.bucket_name)
+        except urllib2.HTTPError:
+            raise FatalBackendException("Bucket cannot be created")
+
+    def _authorize(self):
+        basic_auth_string = 'Basic ' + base64.b64encode(self.id_and_key)
         headers = {'Authorization': basic_auth_string}
 
         request = urllib2.Request(
@@ -78,10 +86,6 @@ class B2Backend(duplicity.backend.Backend):
         self.api_url = response_data['apiUrl']
         self.download_url = response_data['downloadUrl']
 
-        try:
-            self.find_or_create_bucket(self.bucket_name)
-        except urllib2.HTTPError:
-            raise FatalBackendException("Bucket cannot be created")
 
     def _get(self, remote_filename, local_path):
         """
@@ -254,6 +258,8 @@ class B2Backend(duplicity.backend.Backend):
         If headers are not supplied, just send with an auth key
         """
         if headers is None:
+            if self.auth_token is None:
+                self._authorize();
             headers = {'Authorization': self.auth_token}
         if data_file is not None:
             data = data_file
@@ -265,12 +271,18 @@ class B2Backend(duplicity.backend.Backend):
             for (k, v) in headers.iteritems()
         )
 
-        with OpenUrl(url, data, encoded_headers) as resp:
-            out = resp.read()
+        try:
+            with OpenUrl(url, data, encoded_headers) as resp:
+                out = resp.read()
             try:
                 return json.loads(out)
             except ValueError:
                 return out
+        except urllib2.HTTPError as e:
+            if e.code == 401:
+                self.auth_token = None;
+                log.Warn("Authtoken expired, will reauthenticate with next attempt")
+            raise e
 
     def get_file_info(self, filename):
         """
