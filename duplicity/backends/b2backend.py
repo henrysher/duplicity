@@ -62,7 +62,7 @@ class B2Backend(duplicity.backend.Backend):
         self.path = "/".join(self.url_parts)
 
         self.id_and_key = self.account_id + ":" + account_key
-        self._authorize();
+        self._authorize()
 
         try:
             self.find_or_create_bucket(self.bucket_name)
@@ -85,7 +85,6 @@ class B2Backend(duplicity.backend.Backend):
         self.auth_token = response_data['authorizationToken']
         self.api_url = response_data['apiUrl']
         self.download_url = response_data['downloadUrl']
-
 
     def _get(self, remote_filename, local_path):
         """
@@ -259,7 +258,7 @@ class B2Backend(duplicity.backend.Backend):
         """
         if headers is None:
             if self.auth_token is None:
-                self._authorize();
+                self._authorize()
             headers = {'Authorization': self.auth_token}
         if data_file is not None:
             data = data_file
@@ -280,7 +279,7 @@ class B2Backend(duplicity.backend.Backend):
                 return out
         except urllib2.HTTPError as e:
             if e.code == 401:
-                self.auth_token = None;
+                self.auth_token = None
                 log.Warn("Authtoken expired, will reauthenticate with next attempt")
             raise e
 
