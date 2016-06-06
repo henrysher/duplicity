@@ -1,3 +1,8 @@
+2016-06-06  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1589038 with patches from Malte Schröder
+      - Added ignore_case option to selection functions
+
 2016-06-01  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1586992 with patches from Dmitry Nezhevenko

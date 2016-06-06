@@ -49,7 +49,7 @@ def _glob_get_prefix_regexs(glob_str):
     return list(map(glob_to_regex, prefixes))
 
 
-def path_matches_glob(path, glob_str, include):
+def path_matches_glob(path, glob_str, include, ignore_case = False):
     """Tests whether path matches glob, as per the Unix shell rules, taking as
     arguments a path, a glob string and include (0 indicating that the glob
     string is an exclude glob and 1 indicating that it is an include glob,
@@ -68,7 +68,11 @@ def path_matches_glob(path, glob_str, include):
         # string)
         glob_str = glob_str[:-1]
 
-    re_comp = lambda r: re.compile(r, re.S)
+    flags = 0
+    if ignore_case:
+        flags = re.IGNORECASE
+
+    re_comp = lambda r: re.compile(r, re.S | flags)
 
     # matches what glob matches and any files in directory
     glob_comp_re = re_comp("^%s($|/)" % glob_to_regex(glob_str))

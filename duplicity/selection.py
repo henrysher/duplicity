@@ -545,9 +545,7 @@ probably isn't what you meant.""") %
             raise FilePrefixError(glob_str)
 
         def sel_func(path):
-            if ignore_case:
-                path.name = path.name.lower()
-            return path_matches_glob(path, glob_str, include)
+            return path_matches_glob(path, glob_str, include, ignore_case)
 
         return sel_func
 

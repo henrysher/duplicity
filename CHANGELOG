@@ -13,6 +13,8 @@ New in v0.7.08 (2016/0?/??)
 * Fixed bug #1586992 with patches from Dmitry Nezhevenko
   - Patch adds _delete_list to Par2Backend. And _delete_list fallbacks to
     _delete calls if wrapped backend has no _delete_list.
+* Fixed bug #1589038 with patches from Malte Schröder
+  - Added ignore_case option to selection functions
 
 
 New in v0.7.07.1 (2016/04/19)
