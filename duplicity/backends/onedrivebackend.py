@@ -143,11 +143,11 @@ class OneDriveBackend(duplicity.backend.Backend):
             authorization_url, state = self.http_client.authorization_url(
                 self.OAUTH_AUTHORIZE_URI, display='touch')
 
-            print ''
-            print ('In order to authorize duplicity to access your OneDrive, '
-                   'please open %s in a browser and copy the URL of the blank '
-                   'page the dialog leads to.' % authorization_url)
-            print ''
+            print()
+            print('In order to authorize duplicity to access your OneDrive, '
+                  'please open %s in a browser and copy the URL of the blank '
+                  'page the dialog leads to.' % authorization_url)
+            print()
 
             redirected_to = raw_input('URL of the blank page: ')
 
