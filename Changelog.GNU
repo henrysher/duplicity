@@ -1,3 +1,8 @@
+2016-06-11  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/fix_pep8
+      - Fix PEP8 error in onedrivebackend.py (space before bracket)
+
 2016-06-06  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1589038 with patches from Malte Schröder

@@ -17,6 +17,8 @@ New in v0.7.08 (2016/0?/??)
   - Added ignore_case option to selection functions
 * Merged in lp:~mstoll-de/duplicity/b2-reauth
   - Fixes bug #1588503 b2: large uploads fail due to expired auth token
+* Merged in lp:~aaron-whitehouse/duplicity/fix_pep8
+  - Fix PEP8 error in onedrivebackend.py (space before bracket)
 
 
 New in v0.7.07.1 (2016/04/19)
