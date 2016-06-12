@@ -1,3 +1,9 @@
+2016-06-12  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #822697 ssh-options not passed in rsync over ssh
+      - Added globals.ssh_options to rsync command line
+    * Increased default volume size to 200M, was 25M
+
 2016-06-11  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~aaron-whitehouse/duplicity/fix_pep8

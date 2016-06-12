@@ -153,8 +153,8 @@ encryption = True
 # If set to false, then do not compress files on remote system
 compression = True
 
-# volume size. default 25M
-volsize = 25 * 1024 * 1024
+# volume size. default 200M
+volsize = 200 * 1024 * 1024
 
 # Working directory for the tempfile module. Defaults to /tmp on most systems.
 temproot = None

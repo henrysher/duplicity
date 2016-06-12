@@ -68,7 +68,7 @@ class RsyncBackend(duplicity.backend.Backend):
                 # its a relative path
                 self.url_string = "%s%s" % (host_string, parsed_url.path.lstrip('/'))
             if parsed_url.port:
-                port = " -p %s" % parsed_url.port
+                port = "-p %s" % parsed_url.port
         # add trailing slash if missing
         if self.url_string[-1] != '/':
             self.url_string += '/'
@@ -86,12 +86,10 @@ class RsyncBackend(duplicity.backend.Backend):
         if self.over_rsyncd():
             portOption = port
         else:
-            portOption = " -e 'ssh -oBatchMode=yes%s'" % port
+            portOption = "-e 'ssh %s -oBatchMode=yes %s'" % (port, globals.ssh_options)
         rsyncOptions = globals.rsync_options
-        if rsyncOptions:
-            rsyncOptions = " " + rsyncOptions
         # build cmd
-        self.cmd = "rsync%s%s" % (portOption, rsyncOptions)
+        self.cmd = "rsync %s %s" % (portOption, rsyncOptions)
 
     def over_rsyncd(self):
         url = self.parsed_url.url_string
