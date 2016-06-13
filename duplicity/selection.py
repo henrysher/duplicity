@@ -125,8 +125,7 @@ class Select:
                              util.escape(fullpath))
             except OSError:
                 log.Warn(_("Error accessing possibly locked file %s") % util.ufn(fullpath),
-                         log.WarningCode.cannot_stat,
-                         util.escape(fullpath))
+                         log.WarningCode.cannot_stat, util.escape(fullpath))
             return None
 
         def diryield(path):
@@ -143,20 +142,24 @@ class Select:
             for filename in robust.listpath(path):
                 new_path = robust.check_common_error(
                     error_handler, Path.append, (path, filename))
-                # make sure file is read accessible
-                if (new_path and new_path.type in ["reg", "dir"]
-                        and not os.access(new_path.name, os.R_OK)):
-                    log.Warn(_("Error accessing possibly locked file %s") % util.ufn(new_path.name),
-                             log.WarningCode.cannot_read,
-                             util.escape(new_path.name))
-                    if diffdir.stats:
-                        diffdir.stats.Errors += 1
-                    new_path = None
-                elif new_path:
+                if new_path:
                     s = self.Select(new_path)
-                    if s == 1:
+                    if (new_path.type in ["reg", "dir"] and
+                        not os.access(new_path.name, os.R_OK)) and \
+                            (s == 1 or s == 2):
+                        # Path is a file or folder that cannot be read, but
+                        # should be included or scanned.
+                        log.Error(_("Error accessing possibly locked file %s") %
+                                  util.ufn(new_path.name),
+                                  log.WarningCode.cannot_read,
+                                  util.escape(new_path.name))
+                        if diffdir.stats:
+                            diffdir.stats.Errors += 1
+                    elif s == 1:
+                        # Should be included
                         yield (new_path, 0)
                     elif s == 2 and new_path.isdir():
+                        # Is a directory that should be scanned
                         yield (new_path, 1)
 
         if not path.type:

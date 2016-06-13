@@ -1,6 +1,10 @@
 2016-06-13  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed README-REPO to no longer mention 0.6-series
+    * Merged in lp:~aaron-whitehouse/duplicity/fix_stat_errors
+      - Only give an error about not being able to access possibly locked file if
+        that file is supposed to be included or scanned (i.e. not excluded).
+        Fixes Bug #1089131
 
 2016-06-12  Kenneth Loafman  <kenneth@loafman.com>
 

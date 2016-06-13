@@ -23,6 +23,10 @@ New in v0.7.08 (2016/0?/??)
   - Added globals.ssh_options to rsync command line
 * Increased default volume size to 200M, was 25M
 * Fixed README-REPO to no longer mention 0.6-series
+* Merged in lp:~aaron-whitehouse/duplicity/fix_stat_errors
+  - Only give an error about not being able to access possibly locked file if
+    that file is supposed to be included or scanned (i.e. not excluded).
+    Fixes Bug #1089131
 
 
 New in v0.7.07.1 (2016/04/19)

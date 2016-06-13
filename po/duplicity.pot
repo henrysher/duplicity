@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2016-06-12 07:58-0500\n"
+"POT-Creation-Date: 2016-06-13 06:34-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -391,23 +391,23 @@ msgstr ""
 msgid "Error initializing file %s"
 msgstr ""
 
-#: ../duplicity/selection.py:127 ../duplicity/selection.py:149
+#: ../duplicity/selection.py:127 ../duplicity/selection.py:152
 #, python-format
 msgid "Error accessing possibly locked file %s"
 msgstr ""
 
-#: ../duplicity/selection.py:164
+#: ../duplicity/selection.py:167
 #, python-format
 msgid "Warning: base %s doesn't exist, continuing"
 msgstr ""
 
-#: ../duplicity/selection.py:167 ../duplicity/selection.py:185
-#: ../duplicity/selection.py:188
+#: ../duplicity/selection.py:170 ../duplicity/selection.py:188
+#: ../duplicity/selection.py:191
 #, python-format
 msgid "Selecting %s"
 msgstr ""
 
-#: ../duplicity/selection.py:285
+#: ../duplicity/selection.py:288
 #, python-format
 msgid ""
 "Fatal Error: The file specification\n"
@@ -418,14 +418,14 @@ msgid ""
 "pattern (such as '**') which matches the base directory."
 msgstr ""
 
-#: ../duplicity/selection.py:294
+#: ../duplicity/selection.py:297
 #, python-format
 msgid ""
 "Fatal Error while processing expression\n"
 "%s"
 msgstr ""
 
-#: ../duplicity/selection.py:304
+#: ../duplicity/selection.py:307
 #, python-format
 msgid ""
 "Last selection expression:\n"
@@ -435,17 +435,17 @@ msgid ""
 "probably isn't what you meant."
 msgstr ""
 
-#: ../duplicity/selection.py:360
+#: ../duplicity/selection.py:363
 #, python-format
 msgid "Reading globbing filelist %s"
 msgstr ""
 
-#: ../duplicity/selection.py:393
+#: ../duplicity/selection.py:396
 #, python-format
 msgid "Error compiling regular expression %s"
 msgstr ""
 
-#: ../duplicity/selection.py:410
+#: ../duplicity/selection.py:413
 msgid ""
 "Warning: exclude-device-files is not the first selector.\n"
 "This may not be what you intended"
