@@ -1,3 +1,7 @@
+2016-06-13  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed README-REPO to no longer mention 0.6-series
+
 2016-06-12  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #822697 ssh-options not passed in rsync over ssh

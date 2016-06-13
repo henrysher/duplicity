@@ -22,6 +22,7 @@ New in v0.7.08 (2016/0?/??)
 * Fixed bug #822697 ssh-options not passed in rsync over ssh
   - Added globals.ssh_options to rsync command line
 * Increased default volume size to 200M, was 25M
+* Fixed README-REPO to no longer mention 0.6-series
 
 
 New in v0.7.07.1 (2016/04/19)
