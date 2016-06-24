@@ -1,3 +1,8 @@
+2016-06-24  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1594780 with patches from B. Reitsma
+      - Use re.finditer() to speed processing
+
 2016-06-13  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed README-REPO to no longer mention 0.6-series

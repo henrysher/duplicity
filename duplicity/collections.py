@@ -222,6 +222,7 @@ class BackupSet:
         """
         assert self.local_manifest_path
         manifest_buffer = self.local_manifest_path.get_data()
+        log.Info(_("Processing local manifest %s (%s)") % (self.local_manifest_path.name, len(manifest_buffer)))
         return manifest.Manifest().from_string(manifest_buffer)
 
     def get_remote_manifest(self):
@@ -240,6 +241,7 @@ class BackupSet:
                 return None
             else:
                 raise
+        log.Info(_("Processing remote manifest %s (%s)") % (self.remote_manifest_name, len(manifest_buffer)))
         return manifest.Manifest().from_string(manifest_buffer)
 
     def get_manifest(self):

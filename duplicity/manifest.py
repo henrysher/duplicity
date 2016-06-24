@@ -206,26 +206,23 @@ class Manifest:
             self.files_changed = list(map(parse_fileinfo, match.group(3).split('\n')))
         assert filecount == len(self.files_changed)
 
-        next_vi_string_regexp = re.compile("(^|\\n)(volume\\s.*?)"
-                                           "(\\nvolume\\s|$)", re.I | re.S)
-        starting_s_index = 0
         highest_vol = 0
         latest_vol = 0
-        while 1:
-            match = next_vi_string_regexp.search(s[starting_s_index:])
-            if not match:
-                break
-            vi = VolumeInfo().from_string(match.group(2))
+        vi_regexp = re.compile("(?:^|\\n)(volume\\s.*(?:\\n.*)*?)(?=\\nvolume\\s|$)", re.I)
+        vi_iterator = vi_regexp.finditer(s)
+        for match in vi_iterator:
+            vi = VolumeInfo().from_string(match.group(1))
             self.add_volume_info(vi)
-            highest_vol = max(highest_vol, vi.volume_number)
             latest_vol = vi.volume_number
-            starting_s_index += match.end(2)
+            highest_vol = max(highest_vol, latest_vol)
+            log.Debug(_("Found manifest volume %s") % latest_vol)
         # If we restarted after losing some remote volumes, the highest volume
         # seen may be higher than the last volume recorded.  That is, the
         # manifest could contain "vol1, vol2, vol3, vol2."  If so, we don't
         # want to keep vol3's info.
         for i in range(latest_vol + 1, highest_vol + 1):
             self.del_volume_info(i)
+        log.Info(_("Found %s volumes in manifest") % latest_vol)
         return self
 
     def get_files_changed(self):

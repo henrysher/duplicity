@@ -27,6 +27,8 @@ New in v0.7.08 (2016/0?/??)
   - Only give an error about not being able to access possibly locked file if
     that file is supposed to be included or scanned (i.e. not excluded).
     Fixes Bug #1089131
+* Fixed bug #1594780 with patches from B. Reitsma
+  - Use re.finditer() to speed processing
 
 
 New in v0.7.07.1 (2016/04/19)
