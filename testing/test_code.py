@@ -92,7 +92,6 @@ class CodeTest(DuplicityTestCase):
             "E402",  # module level import not at top of file
             "E501",  # line too long
             "E731",  # do not assign a lambda expression, use a def
-            "W503",  # line break before binary operator
         ]
         self.run_checker(["pep8",
                           "--ignore=" + ','.join(ignores),

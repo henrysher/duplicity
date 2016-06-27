@@ -128,17 +128,17 @@ def get_passphrase(n, action, for_signing=False):
 
     # check if we can reuse an already set (signing_)passphrase
     # if signing key is also an encryption key assume that the passphrase is identical
-    if (for_signing
-        and (globals.gpg_profile.sign_key in globals.gpg_profile.recipients
-             or globals.gpg_profile.sign_key in globals.gpg_profile.hidden_recipients)
-        and 'PASSPHRASE' in os.environ):  # noqa
+    if (for_signing and
+            (globals.gpg_profile.sign_key in globals.gpg_profile.recipients or
+             globals.gpg_profile.sign_key in globals.gpg_profile.hidden_recipients) and
+             'PASSPHRASE' in os.environ):  # noqa
         log.Notice(_("Reuse configured PASSPHRASE as SIGN_PASSPHRASE"))
         return os.environ['PASSPHRASE']
     # if one encryption key is also the signing key assume that the passphrase is identical
-    if (not for_signing
-        and (globals.gpg_profile.sign_key in globals.gpg_profile.recipients
-             or globals.gpg_profile.sign_key in globals.gpg_profile.hidden_recipients)
-        and 'SIGN_PASSPHRASE' in os.environ):  # noqa
+    if (not for_signing and
+            (globals.gpg_profile.sign_key in globals.gpg_profile.recipients or
+             globals.gpg_profile.sign_key in globals.gpg_profile.hidden_recipients) and
+             'SIGN_PASSPHRASE' in os.environ):  # noqa
         log.Notice(_("Reuse configured SIGN_PASSPHRASE as PASSPHRASE"))
         return os.environ['SIGN_PASSPHRASE']
 
@@ -164,18 +164,16 @@ def get_passphrase(n, action, for_signing=False):
 
     # for a full backup, we don't need a password if
     # there is no sign_key and there are recipients
-    elif (action == "full"
-          and (globals.gpg_profile.recipients or globals.gpg_profile.hidden_recipients)
-          and not globals.gpg_profile.sign_key
-          and not globals.restart):
+    elif (action == "full" and
+          (globals.gpg_profile.recipients or globals.gpg_profile.hidden_recipients) and not
+          globals.gpg_profile.sign_key and not globals.restart):
         return ""
 
     # for an inc backup, we don't need a password if
     # there is no sign_key and there are recipients
-    elif (action == "inc"
-          and (globals.gpg_profile.recipients or globals.gpg_profile.hidden_recipients)
-          and not globals.gpg_profile.sign_key
-          and not globals.restart):
+    elif (action == "inc" and
+          (globals.gpg_profile.recipients or globals.gpg_profile.hidden_recipients) and not
+          globals.gpg_profile.sign_key and not globals.restart):
         return ""
 
     # Finally, ask the user for the passphrase
@@ -900,8 +898,7 @@ def cleanup(col_stats):
     if globals.force:
         log.Notice(ngettext("Deleting this file from backend:",
                             "Deleting these files from backend:",
-                            len(extraneous))
-                   + u"\n" + filestr)
+                            len(extraneous)) + u"\n" + filestr)
         if not globals.dry_run:
             col_stats.backend.delete(ext_remote)
             for fn in ext_local:
@@ -912,9 +909,8 @@ def cleanup(col_stats):
     else:
         log.Notice(ngettext("Found the following file to delete:",
                             "Found the following files to delete:",
-                            len(extraneous))
-                   + u"\n" + filestr + u"\n"
-                   + _("Run duplicity again with the --force option to actually delete."))
+                            len(extraneous)) + u"\n" + filestr + u"\n" +
+                   _("Run duplicity again with the --force option to actually delete."))
 
 
 def remove_all_but_n_full(col_stats):
@@ -1193,11 +1189,11 @@ def sync_archive(decrypt):
                 copy_to_local(fn)
         else:
             if local_missing:
-                log.Notice(_("Sync would copy the following from remote to local:")
-                           + u"\n" + u"\n".join(map(util.ufn, local_missing)))
+                log.Notice(_("Sync would copy the following from remote to local:") +
+                           u"\n" + u"\n".join(map(util.ufn, local_missing)))
             if local_spurious:
-                log.Notice(_("Sync would remove the following spurious local files:")
-                           + u"\n" + u"\n".join(map(util.ufn, local_spurious)))
+                log.Notice(_("Sync would remove the following spurious local files:") +
+                           u"\n" + u"\n".join(map(util.ufn, local_spurious)))
 
 
 def check_last_manifest(col_stats):
@@ -1244,8 +1240,8 @@ def check_resources(action):
         # Calculate space we need for at least 2 volumes of full or inc
         # plus about 30% of one volume for the signature files.
         freespace = stats[statvfs.F_FRSIZE] * stats[statvfs.F_BAVAIL]
-        needspace = (((globals.async_concurrency + 1) * globals.volsize)
-                     + int(0.30 * globals.volsize))
+        needspace = (((globals.async_concurrency + 1) * globals.volsize) +
+                     int(0.30 * globals.volsize))
         if freespace < needspace:
             log.FatalError(_("Temp space has %d available, backup needs approx %d.") %
                            (freespace, needspace), log.ErrorCode.not_enough_freespace)

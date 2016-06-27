@@ -138,11 +138,10 @@ class BackupSet:
 
         for local_filename in globals.archive_dir.listdir():
             pr = file_naming.parse(local_filename)
-            if (pr and pr.manifest
-                    and pr.type == self.type
-                    and pr.time == self.time
-                    and pr.start_time == self.start_time
-                    and pr.end_time == self.end_time):
+            if (pr and pr.manifest and pr.type == self.type and
+                    pr.time == self.time and
+                    pr.start_time == self.start_time and
+                    pr.end_time == self.end_time):
                 self.local_manifest_path = \
                     globals.archive_dir.append(local_filename)
 
@@ -162,10 +161,9 @@ class BackupSet:
             pass
         for lfn in globals.archive_dir.listdir():
             pr = file_naming.parse(lfn)
-            if (pr
-                    and pr.time == self.time
-                    and pr.start_time == self.start_time
-                    and pr.end_time == self.end_time):
+            if (pr and pr.time == self.time and
+                    pr.start_time == self.start_time and
+                    pr.end_time == self.end_time):
                 try:
                     globals.archive_dir.append(lfn).delete()
                 except Exception:
@@ -323,9 +321,9 @@ class BackupChain:
         if self.end_time == incset.start_time:
             self.incset_list.append(incset)
         else:
-            if (self.incset_list
-                    and incset.start_time == self.incset_list[-1].start_time
-                    and incset.end_time > self.incset_list[-1]):
+            if (self.incset_list and
+                    incset.start_time == self.incset_list[-1].start_time and
+                    incset.end_time > self.incset_list[-1]):
                 log.Info(_("Preferring Backupset over previous one!"))
                 self.incset_list[-1] = incset
             else:
@@ -773,8 +771,8 @@ class CollectionsStatus:
                               "signature file:",
                               "Warning, found the following local orphaned "
                               "signature files:",
-                              len(self.local_orphaned_sig_names))
-                     + u"\n" + u"\n".join(map(util.ufn, self.local_orphaned_sig_names)),
+                              len(self.local_orphaned_sig_names)) + u"\n" +
+                     u"\n".join(map(util.ufn, self.local_orphaned_sig_names)),
                      log.WarningCode.orphaned_sig)
 
         if self.remote_orphaned_sig_names:
@@ -782,8 +780,8 @@ class CollectionsStatus:
                               "signature file:",
                               "Warning, found the following remote orphaned "
                               "signature files:",
-                              len(self.remote_orphaned_sig_names))
-                     + u"\n" + u"\n".join(map(util.ufn, self.remote_orphaned_sig_names)),
+                              len(self.remote_orphaned_sig_names)) + u"\n" +
+                     u"\n".join(map(util.ufn, self.remote_orphaned_sig_names)),
                      log.WarningCode.orphaned_sig)
 
         if self.all_sig_chains and sig_chain_warning and not self.matched_chain_pair:
@@ -799,8 +797,8 @@ class CollectionsStatus:
                               "backup file:",
                               "Warning, found the following orphaned "
                               "backup files:",
-                              len(self.orphaned_backup_sets))
-                     + u"\n" + u"\n".join(map(unicode, self.orphaned_backup_sets)),
+                              len(self.orphaned_backup_sets)) + u"\n" +
+                     u"\n".join(map(unicode, self.orphaned_backup_sets)),
                      log.WarningCode.orphaned_backup)
 
     def get_backup_chains(self, filename_list):
