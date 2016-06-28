@@ -105,7 +105,8 @@ class LFTPBackend(duplicity.backend.Backend):
 
         # save config into a reusable temp file
         self.tempfile, self.tempname = tempdir.default().mkstemp()
-        os.write(self.tempfile, "set ssl:verify-certificate " + ("false" if globals.ssl_no_check_certificate else "true") + "\n")
+        os.write(self.tempfile, "set ssl:verify-certificate " +
+                 ("false" if globals.ssl_no_check_certificate else "true") + "\n")
         if self.cacert_file:
             os.write(self.tempfile, "set ssl:ca-file " + cmd_quote(self.cacert_file) + "\n")
         if globals.ssl_cacert_path:

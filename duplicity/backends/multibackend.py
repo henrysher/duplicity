@@ -36,7 +36,8 @@ from duplicity import log
 
 
 class MultiBackend(duplicity.backend.Backend):
-    """Store files across multiple remote stores. URL is a path to a local file containing URLs/other config defining the remote store"""
+    """Store files across multiple remote stores. URL is a path to a local file
+    containing URLs/other config defining the remote store"""
 
     # the stores we are managing
     __stores = []

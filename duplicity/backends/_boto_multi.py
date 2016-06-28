@@ -157,7 +157,8 @@ class BotoBackend(BotoSingleBackend):
                 else:
                     raise multiprocessing.TimeoutError
             except multiprocessing.TimeoutError:
-                log.Debug("%s tasks did not finish by the specified timeout, aborting multipart upload and resetting pool." % len(tasks))
+                log.Debug("%s tasks did not finish by the specified timeout,"
+                          "aborting multipart upload and resetting pool." % len(tasks))
                 self._setup_pool()
                 break
 
@@ -204,7 +205,10 @@ def multipart_upload_worker(scheme, parsed_url, storage_uri, bucket_name, multip
                                                  num_cb=max(2, 8 * bytes / (1024 * 1024))
                                                  )  # Max num of callbacks = 8 times x megabyte
                         end = time.time()
-                        log.Debug("{name}: Uploaded chunk {chunk} at roughly {speed} bytes/second".format(name=worker_name, chunk=offset + 1, speed=(bytes / max(1, abs(end - start)))))
+                        log.Debug(("{name}: Uploaded chunk {chunk}"
+                                  "at roughly {speed} bytes/second").format(name=worker_name,
+                                                                            chunk=offset + 1,
+                                                                            speed=(bytes / max(1, abs(end - start)))))
                     break
             conn.close()
             conn = None

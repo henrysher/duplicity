@@ -103,7 +103,8 @@ class DPBXBackend(duplicity.backend.Backend):
         return os.environ.get('DPBX_ACCESS_TOKEN', None)
 
     def save_access_token(self, access_token):
-        raise BackendException('dpbx: Please set DPBX_ACCESS_TOKEN=\"%s\" environment variable' % access_token)
+        raise BackendException('dpbx: Please set DPBX_ACCESS_TOKEN=\"%s\" environment variable' %
+                               access_token)
 
     def obtain_access_token(self):
         log.Info("dpbx: trying to obtain access token")
@@ -115,7 +116,8 @@ class DPBXBackend(duplicity.backend.Backend):
         app_secret = os.environ['DPBX_APP_SECRET']
 
         if not sys.stdout.isatty() or not sys.stdin.isatty():
-            log.FatalError('dpbx error: cannot interact, but need human attention', log.ErrorCode.backend_command_error)
+            log.FatalError('dpbx error: cannot interact, but need human attention',
+                           log.ErrorCode.backend_command_error)
 
         auth_flow = DropboxOAuth2FlowNoRedirect(app_key, app_secret)
         log.Debug('dpbx,auth_flow.start()')
@@ -152,10 +154,12 @@ class DPBXBackend(duplicity.backend.Backend):
 
             self.obtain_access_token()
 
-            # We're assuming obtain_access_token will throw exception. So this line should not be reached
+            # We're assuming obtain_access_token will throw exception.
+            # So this line should not be reached
             raise BackendException("dpbx: Please update DPBX_ACCESS_TOKEN and try again")
 
-        log.Info("dpbx: Successfully authenticated as %s" % self.api_account.name.display_name)
+        log.Info("dpbx: Successfully authenticated as %s" %
+                 self.api_account.name.display_name)
 
     def _error_code(self, operation, e):
         if isinstance(e, ApiError):
@@ -185,16 +189,22 @@ class DPBXBackend(duplicity.backend.Backend):
 
         # A few sanity checks
         if res_metadata.path_display != remote_path:
-            raise BackendException('dpbx: result path mismatch: %s (expected: %s)' % (res_metadata.path_display, remote_path))
+            raise BackendException('dpbx: result path mismatch: %s (expected: %s)' %
+                                   (res_metadata.path_display, remote_path))
         if res_metadata.size != file_size:
-            raise BackendException('dpbx: result size mismatch: %s (expected: %s)' % (res_metadata.size, file_size))
+            raise BackendException('dpbx: result size mismatch: %s (expected: %s)' %
+                                   (res_metadata.size, file_size))
 
     def put_file_small(self, source_path, remote_path):
         file_size = os.path.getsize(source_path.name)
         f = source_path.open('rb')
         try:
             log.Debug('dpbx,files_upload(%s, [%d bytes])' % (remote_path, file_size))
-            res_metadata = self.api_client.files_upload(f, remote_path, mode=WriteMode.overwrite, autorename=False, client_modified=None, mute=True)
+            res_metadata = self.api_client.files_upload(f, remote_path,
+                                                        mode=WriteMode.overwrite,
+                                                        autorename=False,
+                                                        client_modified=None,
+                                                        mute=True)
             log.Debug('dpbx,files_upload(): %s' % res_metadata)
             progress.report_transfer(file_size, file_size)
             return res_metadata
@@ -206,11 +216,14 @@ class DPBXBackend(duplicity.backend.Backend):
         f = source_path.open('rb')
         try:
             buf = f.read(DPBX_UPLOAD_CHUNK_SIZE)
-            log.Debug('dpbx,files_upload_session_start([%d bytes]), total: %d' % (len(buf), file_size))
+            log.Debug('dpbx,files_upload_session_start([%d bytes]), total: %d' %
+                      (len(buf), file_size))
             upload_sid = self.api_client.files_upload_session_start(buf)
             log.Debug('dpbx,files_upload_session_start(): %s' % upload_sid)
             upload_cursor = UploadSessionCursor(upload_sid.session_id, f.tell())
-            commit_info = CommitInfo(remote_path, mode=WriteMode.overwrite, autorename=False, client_modified=None, mute=True)
+            commit_info = CommitInfo(remote_path, mode=WriteMode.overwrite,
+                                     autorename=False, client_modified=None,
+                                     mute=True)
             res_metadata = None
             progress.report_transfer(f.tell(), file_size)
 
@@ -220,7 +233,8 @@ class DPBXBackend(duplicity.backend.Backend):
             is_eof = False
 
             # We're doing our own error handling and retrying logic because
-            # we can benefit from Dpbx chunked upload and retry only failed chunk
+            # we can benefit from Dpbx chunked upload and retry only failed
+            # chunk
             while not is_eof or not res_metadata:
                 try:
                     if requested_offset is not None:
@@ -241,25 +255,36 @@ class DPBXBackend(duplicity.backend.Backend):
 
                     if not is_eof:
                         assert len(buf) != 0
-                        log.Debug('dpbx,files_upload_sesssion_append([%d bytes], offset=%d)' % (len(buf), upload_cursor.offset))
-                        self.api_client.files_upload_session_append(buf, upload_cursor.session_id, upload_cursor.offset)
+                        log.Debug('dpbx,files_upload_sesssion_append([%d bytes], offset=%d)' %
+                                  (len(buf), upload_cursor.offset))
+                        self.api_client.files_upload_session_append(buf,
+                                                                    upload_cursor.session_id,
+                                                                    upload_cursor.offset)
                     else:
-                        log.Debug('dpbx,files_upload_sesssion_finish([%d bytes], offset=%d)' % (len(buf), upload_cursor.offset))
-                        res_metadata = self.api_client.files_upload_session_finish(buf, upload_cursor, commit_info)
+                        log.Debug('dpbx,files_upload_sesssion_finish([%d bytes], offset=%d)' %
+                                  (len(buf), upload_cursor.offset))
+                        res_metadata = self.api_client.files_upload_session_finish(buf,
+                                                                                   upload_cursor,
+                                                                                   commit_info)
 
                     upload_cursor.offset = f.tell()
-                    log.Debug('progress: %d of %d' % (upload_cursor.offset, file_size))
+                    log.Debug('progress: %d of %d' % (upload_cursor.offset,
+                                                      file_size))
                     progress.report_transfer(upload_cursor.offset, file_size)
                 except ApiError as e:
                     error = e.error
                     if isinstance(error, UploadSessionLookupError) and error.is_incorrect_offset():
-                        # Server reports that we should send another chunk. Most likely this is caused by
-                        # network error during previous upload attempt. In such case we'll get expected offset
-                        # from server and it's enough to just seek() and retry again
+                        # Server reports that we should send another chunk.
+                        # Most likely this is caused by network error during
+                        # previous upload attempt. In such case we'll get
+                        # expected offset from server and it's enough to just
+                        # seek() and retry again
                         new_offset = error.get_incorrect_offset().correct_offset
-                        log.Debug('dpbx,files_upload_session_append: incorrect offset: %d (expected: %s)' % (upload_cursor.offset, new_offset))
+                        log.Debug('dpbx,files_upload_session_append: incorrect offset: %d (expected: %s)' %
+                                  (upload_cursor.offset, new_offset))
                         if requested_offset is not None:
-                            # chunk failed even after seek attempt. Something strange and no safe way to recover
+                            # chunk failed even after seek attempt. Something
+                            # strange and no safe way to recover
                             raise BackendException("dpbx: unable to chunk upload")
                         else:
                             # will seek and retry
@@ -273,7 +298,9 @@ class DPBXBackend(duplicity.backend.Backend):
                     if retry_number == 0:
                         raise
 
-                    # We don't know for sure, was partial upload successfull or not. So it's better to retry smaller amount to avoid extra reupload
+                    # We don't know for sure, was partial upload successful or
+                    # not. So it's better to retry smaller amount to avoid extra
+                    # reupload
                     log.Info('dpbx: sleeping a bit before chunk retry')
                     time.sleep(30)
                     current_chunk_size = DPBX_UPLOAD_CHUNK_SIZE / 5
@@ -298,7 +325,8 @@ class DPBXBackend(duplicity.backend.Backend):
 
         log.Debug('dpbx,files_download(%s)' % remote_path)
         res_metadata, http_fd = self.api_client.files_download(remote_path)
-        log.Debug('dpbx,files_download(%s): %s, %s' % (remote_path, res_metadata, http_fd))
+        log.Debug('dpbx,files_download(%s): %s, %s' % (remote_path, res_metadata,
+                                                       http_fd))
         file_size = res_metadata.size
         to_fd = None
         progress.report_transfer(0, file_size)
@@ -313,11 +341,12 @@ class DPBXBackend(duplicity.backend.Backend):
                 to_fd.close()
             http_fd.close()
 
-        # It's different from _query() check because we're not querying metadata again.
-        # Since this check is free, it's better to have it here
+        # It's different from _query() check because we're not querying metadata
+        # again. Since this check is free, it's better to have it here
         local_size = os.path.getsize(local_path.name)
         if local_size != file_size:
-            raise BackendException("dpbx: wrong file size: %d (expected: %d)" % (local_size, file_size))
+            raise BackendException("dpbx: wrong file size: %d (expected: %d)" %
+                                   (local_size, file_size))
 
         local_path.setdata()
 

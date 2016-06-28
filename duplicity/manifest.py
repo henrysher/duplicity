@@ -99,7 +99,8 @@ class Manifest:
                        "Current directory: %s\n"
                        "Previous directory: %s") % (globals.local_path.name, self.local_dirname)  # @UndefinedVariable
             code = log.ErrorCode.source_dir_mismatch
-            code_extra = "%s %s" % (util.escape(globals.local_path.name), util.escape(self.local_dirname))  # @UndefinedVariable
+            code_extra = "%s %s" % (util.escape(globals.local_path.name),
+                                    util.escape(self.local_dirname))  # @UndefinedVariable
         else:
             return
 

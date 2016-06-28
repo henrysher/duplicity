@@ -713,7 +713,8 @@ class CollectionsStatus:
         backup_chains = self.get_sorted_chains(backup_chains)
         self.all_backup_chains = backup_chains
 
-        assert len(backup_chains) == len(self.all_backup_chains), "get_sorted_chains() did something more than re-ordering"
+        assert len(backup_chains) == len(self.all_backup_chains), \
+            "get_sorted_chains() did something more than re-ordering"
 
         local_sig_chains, self.local_orphaned_sig_names = \
             self.get_signature_chains(True)
@@ -1007,7 +1008,11 @@ class CollectionsStatus:
             # no chains are old enough, give oldest and warn user
             oldest = self.all_sig_chains[0]
             if time < oldest.start_time:
-                log.Warn(_("No signature chain for the requested time.  Using oldest available chain, starting at time %s.") % dup_time.timetopretty(oldest.start_time), log.WarningCode.no_sig_for_time, dup_time.timetostring(oldest.start_time))
+                log.Warn(_("No signature chain for the requested time. "
+                           "Using oldest available chain, starting at time %s.") %
+                         dup_time.timetopretty(oldest.start_time),
+                         log.WarningCode.no_sig_for_time,
+                         dup_time.timetostring(oldest.start_time))
             return oldest
 
     def get_extraneous(self, extra_clean):

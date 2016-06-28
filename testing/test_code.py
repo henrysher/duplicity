@@ -90,12 +90,13 @@ class CodeTest(DuplicityTestCase):
     def test_pep8(self):
         ignores = [
             "E402",  # module level import not at top of file
-            "E501",  # line too long
+            # "E501",  # line too long
             "E731",  # do not assign a lambda expression, use a def
             "W503",  # line break before binary operator
         ]
         self.run_checker(["pep8",
                           "--ignore=" + ','.join(ignores),
+                          "--max-line-length=120",
                           os.path.join(_top_dir, 'duplicity'),
                           os.path.join(_top_dir, 'bin/duplicity'),
                           os.path.join(_top_dir, 'bin/rdiffdir')])
