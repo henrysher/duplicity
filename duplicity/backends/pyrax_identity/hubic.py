@@ -83,7 +83,8 @@ class HubicIdentity(BaseIdentity):
                 err = {}
 
             raise exc.AuthenticationFailed("Unable to get oauth access token, "
-                                           "wrong client_id or client_secret ? (%s)" % str(err))
+                                           "wrong client_id or client_secret ? (%s)" %
+                                           str(err))
 
         oauth_token = r.json()
 
@@ -98,7 +99,9 @@ class HubicIdentity(BaseIdentity):
             with open(TOKENS_FILE, 'wb') as configfile:
                 config.write(configfile)
         else:
-            raise exc.AuthenticationFailed("Unable to get oauth access token, wrong client_id or client_secret ? (%s)" % str(err))
+            raise exc.AuthenticationFailed(
+                "Unable to get oauth access token, wrong client_id or client_secret ? (%s)" %
+                str(err))
 
         if oauth_token['refresh_token'] is not None:
             config.set("hubic", "refresh_token", oauth_token['refresh_token'])
@@ -160,12 +163,16 @@ class HubicIdentity(BaseIdentity):
                     except:
                         err = {}
 
-                    raise exc.AuthenticationFailed("Unable to get oauth access token, wrong client_id or client_secret ? (%s)" % str(err))
+                    raise exc.AuthenticationFailed(
+                        "Unable to get oauth access token, wrong client_id or client_secret ? (%s)" %
+                        str(err))
             else:
                 success = True
 
         if not success:
-            raise exc.AuthenticationFailed("All the attempts failed to get the refresh token: status_code = 509: Bandwidth Limit Exceeded")
+            raise exc.AuthenticationFailed(
+                "All the attempts failed to get the refresh token: "
+                "status_code = 509: Bandwidth Limit Exceeded")
 
         oauth_token = r.json()
 
@@ -203,14 +210,17 @@ class HubicIdentity(BaseIdentity):
                 oauth = lxml_html.document_fromstring(r.content).xpath('//input[@name="oauth"]')
                 oauth = oauth[0].value if oauth else None
             else:
-                oauth = re.search(r'<input\s+[^>]*name=[\'"]?oauth[\'"]?\s+[^>]*value=[\'"]?(\d+)[\'"]?>', r.content)
+                oauth = re.search(
+                    r'<input\s+[^>]*name=[\'"]?oauth[\'"]?\s+[^>]*value=[\'"]?(\d+)[\'"]?>',
+                    r.content)
                 oauth = oauth.group(1) if oauth else None
 
             if not oauth:
                 raise exc.AuthenticationFailed("Unable to get oauth_id from authorization page")
 
             if self._email is None or self._password is None:
-                raise exc.AuthenticationFailed("Cannot retrieve email and/or password. Please run expresslane-hubic-setup.sh")
+                raise exc.AuthenticationFailed("Cannot retrieve email and/or password. "
+                                               "Please run expresslane-hubic-setup.sh")
 
             r = requests.post(
                 OAUTH_ENDPOINT + 'auth/',
@@ -230,7 +240,8 @@ class HubicIdentity(BaseIdentity):
                 query = urlparse.urlsplit(r.headers['location']).query
                 code = dict(urlparse.parse_qsl(query))['code']
             except:
-                raise exc.AuthenticationFailed("Unable to authorize client_id, invalid login/password ?")
+                raise exc.AuthenticationFailed("Unable to authorize client_id, "
+                                               "invalid login/password ?")
 
             oauth_token = self._get_access_token(code)
 

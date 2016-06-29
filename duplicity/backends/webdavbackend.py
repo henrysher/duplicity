@@ -76,7 +76,8 @@ class VerifiedHTTPSConnection(httplib.HTTPSConnection):
 
             # check if file is accessible (libssl errors are not very detailed)
             if self.cacert_file and not os.access(self.cacert_file, os.R_OK):
-                raise FatalBackendException(_("Cacert database file '%s' is not readable.") % self.cacert_file)
+                raise FatalBackendException(_("Cacert database file '%s' is not readable.") %
+                                            self.cacert_file)
 
         def connect(self):
             # create new socket
@@ -88,19 +89,25 @@ class VerifiedHTTPSConnection(httplib.HTTPSConnection):
 
             # python 2.7.9+ supports default system certs now
             if "create_default_context" in dir(ssl):
-                context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH, cafile=self.cacert_file, capath=globals.ssl_cacert_path)
+                context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH,
+                                                     cafile=self.cacert_file,
+                                                     capath=globals.ssl_cacert_path)
                 self.sock = context.wrap_socket(sock, server_hostname=self.host)
             # the legacy way needing a cert file
             else:
                 if globals.ssl_cacert_path:
-                    raise FatalBackendException(_("Option '--ssl-cacert-path' is not supported with python 2.7.8 and below."))
+                    raise FatalBackendException(
+                        _("Option '--ssl-cacert-path' is not supported "
+                          "with python 2.7.8 and below."))
 
                 if not self.cacert_file:
                     raise FatalBackendException(_("""\
-For certificate verification with python 2.7.8 or earlier a cacert database file is needed in one of these locations: %s
+For certificate verification with python 2.7.8 or earlier a cacert database
+file is needed in one of these locations: %s
 Hints:
   Consult the man page, chapter 'SSL Certificate Verification'.
-  Consider using the options --ssl-cacert-file, --ssl-no-check-certificate .""") % ", ".join(self.cacert_candidates))
+  Consider using the options --ssl-cacert-file, --ssl-no-check-certificate .""") %
+                                                ", ".join(self.cacert_candidates))
 
                 # wrap the socket in ssl using verification
                 self.sock = ssl.wrap_socket(sock,
@@ -113,7 +120,8 @@ Hints:
                 return httplib.HTTPSConnection.request(self, *args, **kwargs)
             except ssl.SSLError as e:
                 # encapsulate ssl errors
-                raise BackendException("SSL failed: %s" % util.uexc(e), log.ErrorCode.backend_error)
+                raise BackendException("SSL failed: %s" % util.uexc(e),
+                                       log.ErrorCode.backend_error)
 
 
 class WebDAVBackend(duplicity.backend.Backend):
@@ -140,7 +148,8 @@ class WebDAVBackend(duplicity.backend.Backend):
         self.directory = self.sanitize_path(parsed_url.path)
 
         log.Info(_("Using WebDAV protocol %s") % (globals.webdav_proto,))
-        log.Info(_("Using WebDAV host %s port %s") % (parsed_url.hostname, parsed_url.port))
+        log.Info(_("Using WebDAV host %s port %s") % (parsed_url.hostname,
+                                                      parsed_url.port))
         log.Info(_("Using WebDAV directory %s") % (self.directory,))
 
         self.conn = None
@@ -292,7 +301,8 @@ class WebDAVBackend(duplicity.backend.Backend):
         hostname = u.port and "%s:%s" % (u.hostname, u.port) or u.hostname
         dummy_url = "%s://%s%s" % (scheme, hostname, path)
         dummy_req = CustomMethodRequest(self.conn._method, dummy_url)
-        auth_string = self.digest_auth_handler.get_authorization(dummy_req, self.digest_challenge)
+        auth_string = self.digest_auth_handler.get_authorization(dummy_req,
+                                                                 self.digest_challenge)
         return 'Digest %s' % auth_string
 
     def _list(self):
@@ -351,7 +361,8 @@ class WebDAVBackend(duplicity.backend.Backend):
 
                 res = self.request("MKCOL", d)
                 if res.status != 201:
-                    raise BackendException(_("WebDAV MKCOL %s failed: %s %s") % (d, res.status, res.reason))
+                    raise BackendException(_("WebDAV MKCOL %s failed: %s %s") %
+                                           (d, res.status, res.reason))
 
     def taste_href(self, href):
         """
@@ -400,14 +411,16 @@ class WebDAVBackend(duplicity.backend.Backend):
                 # data=response.read()
                 target_file.write(response.read())
                 # import hashlib
-                # log.Info("WebDAV GOT %s bytes with md5=%s" % (len(data),hashlib.md5(data).hexdigest()) )
+                # log.Info("WebDAV GOT %s bytes with md5=%s" %
+                # (len(data),hashlib.md5(data).hexdigest()) )
                 assert not target_file.close()
                 response.close()
             else:
                 status = response.status
                 reason = response.reason
                 response.close()
-                raise BackendException(_("WebDAV GET Bad status code %s reason %s.") % (status, reason))
+                raise BackendException(_("WebDAV GET Bad status code %s reason %s.") %
+                                       (status, reason))
         except Exception as e:
             raise e
         finally:
@@ -428,7 +441,8 @@ class WebDAVBackend(duplicity.backend.Backend):
                 status = response.status
                 reason = response.reason
                 response.close()
-                raise BackendException(_("WebDAV PUT Bad status code %s reason %s.") % (status, reason))
+                raise BackendException(_("WebDAV PUT Bad status code %s reason %s.") %
+                                       (status, reason))
         except Exception as e:
             raise e
         finally:
@@ -447,7 +461,8 @@ class WebDAVBackend(duplicity.backend.Backend):
                 status = response.status
                 reason = response.reason
                 response.close()
-                raise BackendException(_("WebDAV DEL Bad status code %s reason %s.") % (status, reason))
+                raise BackendException(_("WebDAV DEL Bad status code %s reason %s.") %
+                                       (status, reason))
         except Exception as e:
             raise e
         finally:

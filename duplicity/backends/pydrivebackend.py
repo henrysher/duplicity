@@ -52,7 +52,9 @@ class PyDriveBackend(duplicity.backend.Backend):
         if 'GOOGLE_DRIVE_ACCOUNT_KEY' in os.environ:
             account_key = os.environ['GOOGLE_DRIVE_ACCOUNT_KEY']
             if self.oldClient:
-                credentials = SignedJwtAssertionCredentials(parsed_url.username + '@' + parsed_url.hostname, account_key,
+                credentials = SignedJwtAssertionCredentials(parsed_url.username +
+                                                            '@' + parsed_url.hostname,
+                                                            account_key,
                                                             scopes='https://www.googleapis.com/auth/drive')
             else:
                 signer = crypt.Signer.from_string(account_key)
@@ -65,7 +67,9 @@ class PyDriveBackend(duplicity.backend.Backend):
             gauth = GoogleAuth(settings_file=os.environ['GOOGLE_DRIVE_SETTINGS'])
             gauth.CommandLineAuth()
         else:
-            raise BackendException('GOOGLE_DRIVE_ACCOUNT_KEY or GOOGLE_DRIVE_SETTINGS environment variable not set. Please read the manpage to fix.')
+            raise BackendException(
+                'GOOGLE_DRIVE_ACCOUNT_KEY or GOOGLE_DRIVE_SETTINGS environment '
+                'variable not set. Please read the manpage to fix.')
         self.drive = GoogleDrive(gauth)
 
         # Dirty way to find root folder id
@@ -82,10 +86,14 @@ class PyDriveBackend(duplicity.backend.Backend):
         for folder_name in folder_names:
             if not folder_name:
                 continue
-            file_list = self.drive.ListFile({'q': "'" + parent_folder_id + "' in parents and trashed=false"}).GetList()
-            folder = next((item for item in file_list if item['title'] == folder_name and item['mimeType'] == 'application/vnd.google-apps.folder'), None)
+            file_list = self.drive.ListFile({'q': "'" + parent_folder_id +
+                                                  "' in parents and trashed=false"}).GetList()
+            folder = next((item for item in file_list if item['title'] == folder_name and
+                           item['mimeType'] == 'application/vnd.google-apps.folder'), None)
             if folder is None:
-                folder = self.drive.CreateFile({'title': folder_name, 'mimeType': "application/vnd.google-apps.folder", 'parents': [{'id': parent_folder_id}]})
+                folder = self.drive.CreateFile({'title': folder_name,
+                                                'mimeType': "application/vnd.google-apps.folder",
+                                                'parents': [{'id': parent_folder_id}]})
                 folder.Upload()
             parent_folder_id = folder['id']
         self.folder = parent_folder_id
@@ -102,14 +110,16 @@ class PyDriveBackend(duplicity.backend.Backend):
                 if drive_file['title'] == filename and not drive_file['labels']['trashed']:
                     for parent in drive_file['parents']:
                         if parent['id'] == self.folder:
-                            log.Info("PyDrive backend: found file '%s' with id %s in ID cache" % (filename, file_id))
+                            log.Info("PyDrive backend: found file '%s' with id %s in ID cache" %
+                                     (filename, file_id))
                             return drive_file
             except ApiRequestError as error:
                 # A 404 occurs if the ID is no longer valid
                 if error.args[0].resp.status != 404:
                     raise
             # If we get here, the cache entry is invalid
-            log.Info("PyDrive backend: invalidating '%s' (previously ID %s) from ID cache" % (filename, file_id))
+            log.Info("PyDrive backend: invalidating '%s' (previously ID %s) from ID cache" %
+                     (filename, file_id))
             del self.id_cache[filename]
 
         # Not found in the cache, so use directory listing. This is less
@@ -122,9 +132,11 @@ class PyDriveBackend(duplicity.backend.Backend):
         elif flist:
             file_id = flist[0]['id']
             self.id_cache[filename] = flist[0]['id']
-            log.Info("PyDrive backend: found file '%s' with id %s on server, adding to cache" % (filename, file_id))
+            log.Info("PyDrive backend: found file '%s' with id %s on server, "
+                     "adding to cache" % (filename, file_id))
             return flist[0]
-        log.Info("PyDrive backend: file '%s' not found in cache or on server" % (filename,))
+        log.Info("PyDrive backend: file '%s' not found in cache or on server" %
+                 (filename,))
         return None
 
     def id_by_name(self, filename):
@@ -138,7 +150,9 @@ class PyDriveBackend(duplicity.backend.Backend):
         drive_file = self.file_by_name(remote_filename)
         if drive_file is None:
             # No existing file, make a new one
-            drive_file = self.drive.CreateFile({'title': remote_filename, 'parents': [{"kind": "drive#fileLink", "id": self.folder}]})
+            drive_file = self.drive.CreateFile({'title': remote_filename,
+                                                'parents': [{"kind": "drive#fileLink",
+                                                             "id": self.folder}]})
             log.Info("PyDrive backend: creating new file '%s'" % (remote_filename,))
         else:
             log.Info("PyDrive backend: replacing existing file '%s' with id '%s'" % (

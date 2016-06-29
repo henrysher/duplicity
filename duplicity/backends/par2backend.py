@@ -117,7 +117,9 @@ class Par2Backend(backend.Backend):
             par2file = par2temp.append(remote_filename + '.par2')
             self.wrapped_backend._get(par2file.get_filename(), par2file)
 
-            par2verify = 'par2 v %s %s %s' % (self.common_options, par2file.get_canonical(), local_path_temp.get_canonical())
+            par2verify = 'par2 v %s %s %s' % (self.common_options,
+                                              par2file.get_canonical(),
+                                              local_path_temp.get_canonical())
             out, returncode = pexpect.run(par2verify, None, True)
 
             if returncode:
@@ -129,7 +131,9 @@ class Par2Backend(backend.Backend):
                     file = par2temp.append(filename)
                     self.wrapped_backend._get(filename, file)
 
-                par2repair = 'par2 r %s %s %s' % (self.common_options, par2file.get_canonical(), local_path_temp.get_canonical())
+                par2repair = 'par2 r %s %s %s' % (self.common_options,
+                                                  par2file.get_canonical(),
+                                                  local_path_temp.get_canonical())
                 out, returncode = pexpect.run(par2repair, None, True)
 
                 if returncode:

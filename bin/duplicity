@@ -210,12 +210,15 @@ def get_passphrase(n, action, for_signing=False):
                 pass2 = getpass_safe(_("Retype passphrase to confirm: "))
 
             if not pass1 == pass2:
-                log.Log(_("First and second passphrases do not match!  Please try again."), log.WARNING, force_print=True)
+                log.Log(_("First and second passphrases do not match!  Please try again."),
+                        log.WARNING, force_print=True)
                 use_cache = False
                 continue
 
-            if not pass1 and not (globals.gpg_profile.recipients or globals.gpg_profile.hidden_recipients) and not for_signing:
-                log.Log(_("Cannot use empty passphrase with symmetric encryption!  Please try again."), log.WARNING, force_print=True)
+            if not pass1 and not (globals.gpg_profile.recipients or
+                                  globals.gpg_profile.hidden_recipients) and not for_signing:
+                log.Log(_("Cannot use empty passphrase with symmetric encryption!  Please try again."),
+                        log.WARNING, force_print=True)
                 use_cache = False
                 continue
 
@@ -427,7 +430,8 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
 
         # write volume
         if globals.encryption:
-            at_end = gpg.GPGWriteFile(tarblock_iter, tdp.name, globals.gpg_profile, globals.volsize)
+            at_end = gpg.GPGWriteFile(tarblock_iter, tdp.name, globals.gpg_profile,
+                                      globals.volsize)
         elif globals.compression:
             at_end = gpg.GzipWriteFile(tarblock_iter, tdp.name, globals.volsize)
         else:
@@ -449,13 +453,14 @@ def write_multivol(backup_type, tarblock_iter, man_outfp, sig_outfp, backend):
             sig_outfp.flush()
             man_outfp.flush()
 
-        async_waiters.append(io_scheduler.schedule_task(lambda tdp, dest_filename, vol_num: put(tdp, dest_filename, vol_num),
+        async_waiters.append(io_scheduler.schedule_task(lambda tdp, dest_filename,
+                                                        vol_num: put(tdp, dest_filename, vol_num),
                                                         (tdp, dest_filename, vol_num)))
 
         # Log human-readable version as well as raw numbers for machine consumers
         log.Progress(_('Processed volume %d') % vol_num, diffdir.stats.SourceFileSize)
-        # Snapshot (serialize) progress now as a Volume has been completed. This is always the last restore point
-        # when it comes to restart a failed backup
+        # Snapshot (serialize) progress now as a Volume has been completed.
+        # This is always the last restore point when it comes to restart a failed backup
         if globals.progress:
             progress.tracker.snapshot_progress(vol_num)
 
@@ -637,7 +642,8 @@ def incremental_backup(sig_chain):
         if dup_time.curtime == dup_time.prevtime:
             time.sleep(2)
             dup_time.setcurtime()
-            assert dup_time.curtime != dup_time.prevtime, "time not moving forward at appropriate pace - system clock issues?"
+            assert dup_time.curtime != dup_time.prevtime, \
+                "time not moving forward at appropriate pace - system clock issues?"
 
     if globals.progress:
         progress.tracker = progress.ProgressTracker()
@@ -797,7 +803,8 @@ def restore_get_enc_fileobj(backend, filename, volume_info):
     verified, hash_pair, calculated_hash = restore_check_hash(volume_info, tdp)
     if not verified:
         log.FatalError("%s\n %s\n %s\n %s\n" %
-                       (_("Invalid data - %s hash mismatch for file:") % hash_pair[0],
+                       (_("Invalid data - %s hash mismatch for file:") %
+                        hash_pair[0],
                         util.ufn(filename),
                         _("Calculated hash: %s") % calculated_hash,
                         _("Manifest hash: %s") % hash_pair[1]),
@@ -980,7 +987,8 @@ def remove_old(col_stats):
         chainlist += col_stats.get_signature_chains_older_than(globals.remove_time)
         chainlist.reverse()  # save oldest for last
         for chain in chainlist:
-            # if remove_all_inc_of_but_n_full_mode mode, remove only incrementals one and not full
+            # if remove_all_inc_of_but_n_full_mode mode, remove only
+            # incrementals one and not full
             if globals.remove_all_inc_of_but_n_full_mode:
                 if isinstance(chain, collections.SignatureChain):
                     chain_desc = _("Deleting any incremental signature chain rooted at %s")
@@ -1077,11 +1085,13 @@ def sync_archive(decrypt):
     def remove_local(fn):
         del_name = globals.archive_dir.append(fn).name
 
-        log.Notice(_("Deleting local %s (not authoritative at backend).") % util.ufn(del_name))
+        log.Notice(_("Deleting local %s (not authoritative at backend).") %
+                   util.ufn(del_name))
         try:
             util.ignore_missing(os.unlink, del_name)
         except Exception as e:
-            log.Warn(_("Unable to delete %s: %s") % (util.ufn(del_name), util.uexc(e)))
+            log.Warn(_("Unable to delete %s: %s") % (util.ufn(del_name),
+                                                     util.uexc(e)))
 
     def copy_to_local(fn):
         """
@@ -1495,7 +1505,10 @@ def do_backup(action):
             # symmetric key
             if (globals.gpg_profile.signing_passphrase and
                     globals.gpg_profile.passphrase != globals.gpg_profile.signing_passphrase):
-                log.FatalError(_("When using symmetric encryption, the signing passphrase must equal the encryption passphrase."), log.ErrorCode.user_error)
+                log.FatalError(_(
+                    "When using symmetric encryption, the signing passphrase "
+                    "must equal the encryption passphrase."),
+                    log.ErrorCode.user_error)
 
         if action == "full":
             full_backup(col_stats)
