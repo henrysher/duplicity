@@ -22,10 +22,7 @@ import os
 import sys
 import subprocess
 
-if sys.version_info < (2, 7):
-    import unittest2 as unittest  # @UnresolvedImport @UnusedImport
-else:
-    import unittest  # @Reimport
+import unittest
 
 from . import _top_dir, DuplicityTestCase  # @IgnorePep8
 
