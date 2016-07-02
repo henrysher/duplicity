@@ -139,11 +139,12 @@ class GDocsBackend(duplicity.backend.Backend):
                 answer = raw_input('Answer to the challenge? ')
             self._authorize(email, password, challenge.captcha_token, answer)
         except gdata.client.BadAuthentication:
-            raise BackendException('Invalid user credentials given. Be aware that accounts '
-                                   'that use 2-step verification require creating an application specific '
-                                   'access code for using this Duplicity backend. Follow the instruction in '
-                                   'http://www.google.com/support/accounts/bin/static.py?page=guide.cs&guide=1056283&topic=1056286 '
-                                   'and create your application-specific password to run duplicity backups.')
+            raise BackendException(
+                'Invalid user credentials given. Be aware that accounts '
+                'that use 2-step verification require creating an application specific '
+                'access code for using this Duplicity backend. Follow the instruction in '
+                'http://www.google.com/support/accounts/bin/static.py?page=guide.cs&guide=1056283&topic=1056286 '
+                'and create your application-specific password to run duplicity backups.')
 
     def _fetch_entries(self, folder_id, type, title=None):
         # Build URI.

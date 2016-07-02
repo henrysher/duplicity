@@ -42,18 +42,22 @@ read_blocksize = 65635  # for doing scp retrievals, where we need to read oursel
 
 class SSHParamikoBackend(duplicity.backend.Backend):
     """This backend accesses files using the sftp or scp protocols.
-    It does not need any local client programs, but an ssh server and the sftp program must be installed on the remote
-    side (or with scp, the programs scp, ls, mkdir, rm and a POSIX-compliant shell).
+    It does not need any local client programs, but an ssh server and the sftp
+    program must be installed on the remote side (or with scp, the programs
+    scp, ls, mkdir, rm and a POSIX-compliant shell).
 
-    Authentication keys are requested from an ssh agent if present, then ~/.ssh/id_rsa/dsa are tried.
-    If -oIdentityFile=path is present in --ssh-options, then that file is also tried.
-    The passphrase for any of these keys is taken from the URI or FTP_PASSWORD.
-    If none of the above are available, password authentication is attempted (using the URI or FTP_PASSWORD).
+    Authentication keys are requested from an ssh agent if present, then
+    ~/.ssh/id_rsa/dsa are tried. If -oIdentityFile=path is present in
+    --ssh-options, then that file is also tried. The passphrase for any of
+    these keys is taken from the URI or FTP_PASSWORD. If none of the above are
+    available, password authentication is attempted (using the URI or
+    FTP_PASSWORD).
 
     Missing directories on the remote side will be created.
 
-    If scp is active then all operations on the remote side require passing arguments through a shell,
-    which introduces unavoidable quoting issues: directory and file names that contain single quotes will not work.
+    If scp is active then all operations on the remote side require passing
+    arguments through a shell, which introduces unavoidable quoting issues:
+    directory and file names that contain single quotes will not work.
     This problem does not exist with sftp.
     """
     def __init__(self, parsed_url):
@@ -68,8 +72,9 @@ class SSHParamikoBackend(duplicity.backend.Backend):
             self.remote_dir = '.'
 
         # lazily import paramiko when we need it
-        # debian squeeze's paramiko is a bit old, so we silence randompool depreciation warning
-        # note also: passphrased private keys work with squeeze's paramiko only if done with DES, not AES
+        # debian squeeze's paramiko is a bit old, so we silence randompool
+        # depreciation warning note also: passphrased private keys work with
+        # squeeze's paramiko only if done with DES, not AES
         import warnings
         warnings.simplefilter("ignore")
         import paramiko
@@ -80,19 +85,23 @@ class SSHParamikoBackend(duplicity.backend.Backend):
             Policy for showing a yes/no prompt and adding the hostname and new
             host key to the known host file accordingly.
 
-            This class simply extends the AutoAddPolicy class with a yes/no prompt.
+            This class simply extends the AutoAddPolicy class with a yes/no
+            prompt.
             """
             def missing_host_key(self, client, hostname, key):
                 fp = hexlify(key.get_fingerprint())
                 fingerprint = ':'.join(a + b for a, b in zip(fp[::2], fp[1::2]))
                 question = """The authenticity of host '%s' can't be established.
 %s key fingerprint is %s.
-Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_name().upper(), fingerprint)
+Are you sure you want to continue connecting (yes/no)? """ % (hostname,
+                                                              key.get_name().upper(),
+                                                              fingerprint)
                 while True:
                     sys.stdout.write(question)
                     choice = raw_input().lower()
                     if choice in ['yes', 'y']:
-                        paramiko.AutoAddPolicy.missing_host_key(self, client, hostname, key)
+                        paramiko.AutoAddPolicy.missing_host_key(self, client,
+                                                                hostname, key)
                         return
                     elif choice in ['no', 'n']:
                         raise AuthenticityException(hostname)
@@ -101,7 +110,9 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
 
         class AuthenticityException (paramiko.SSHException):
             def __init__(self, hostname):
-                paramiko.SSHException.__init__(self, 'Host key verification for server %s failed.' % hostname)
+                paramiko.SSHException.__init__(self,
+                                               'Host key verification for server %s failed.' %
+                                               hostname)
 
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(AgreedAddPolicy())
@@ -115,7 +126,8 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         ours.addHandler(dest)
 
         # ..and the duplicity levels are neither linear,
-        # nor are the names compatible with python logging, eg. 'NOTICE'...WAAAAAH!
+        # nor are the names compatible with python logging,
+        # eg. 'NOTICE'...WAAAAAH!
         plevel = logging.getLogger("duplicity").getEffectiveLevel()
         if plevel <= 1:
             wanted = logging.DEBUG
@@ -135,7 +147,8 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
             if os.path.isfile("/etc/ssh/ssh_known_hosts"):
                 self.client.load_system_host_keys("/etc/ssh/ssh_known_hosts")
         except Exception as e:
-            raise BackendException("could not load /etc/ssh/ssh_known_hosts, maybe corrupt?")
+            raise BackendException("could not load /etc/ssh/ssh_known_hosts, "
+                                   "maybe corrupt?")
         try:
             # use load_host_keys() to signal it's writable to paramiko
             # load if file exists or add filename to create it if needed
@@ -145,7 +158,8 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
             else:
                 self.client._host_keys_filename = file
         except Exception as e:
-            raise BackendException("could not load ~/.ssh/known_hosts, maybe corrupt?")
+            raise BackendException("could not load ~/.ssh/known_hosts, "
+                                   "maybe corrupt?")
 
         """ the next block reorganizes all host parameters into a
         dictionary like SSHConfig does. this dictionary 'self.config'
@@ -155,9 +169,11 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         """
         self.config = {'hostname': parsed_url.hostname}
         # get system host config entries
-        self.config.update(self.gethostconfig('/etc/ssh/ssh_config', parsed_url.hostname))
+        self.config.update(self.gethostconfig('/etc/ssh/ssh_config',
+                                              parsed_url.hostname))
         # update with user's config file
-        self.config.update(self.gethostconfig('~/.ssh/config', parsed_url.hostname))
+        self.config.update(self.gethostconfig('~/.ssh/config',
+                                              parsed_url.hostname))
         # update with url values
         # username from url
         if parsed_url.username:
@@ -174,7 +190,8 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         else:
             self.config.update({'port': 22})
         # parse ssh options for alternative ssh private key, identity file
-        m = re.search("^(?:.+\s+)?(?:-oIdentityFile=|-i\s+)(([\"'])([^\\2]+)\\2|[\S]+).*", globals.ssh_options)
+        m = re.search("^(?:.+\s+)?(?:-oIdentityFile=|-i\s+)(([\"'])([^\\2]+)\\2|[\S]+).*",
+                      globals.ssh_options)
         if (m is not None):
             keyfilename = m.group(3) if m.group(3) else m.group(1)
             self.config['identityfile'] = keyfilename
@@ -218,7 +235,8 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                 self.config['port'], e))
         self.client.get_transport().set_keepalive((int)(globals.timeout / 2))
 
-        self.scheme = duplicity.backend.strip_prefix(parsed_url.scheme, 'paramiko')
+        self.scheme = duplicity.backend.strip_prefix(parsed_url.scheme,
+                                                     'paramiko')
         self.use_scp = (self.scheme == 'scp')
 
         # scp or sftp?
@@ -251,13 +269,16 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
                             try:
                                 self.sftp.mkdir(d)
                             except Exception as e:
-                                raise BackendException("sftp mkdir %s failed: %s" % (self.sftp.normalize(".") + "/" + d, e))
+                                raise BackendException("sftp mkdir %s failed: %s" %
+                                                       (self.sftp.normalize(".") + "/" + d, e))
                         else:
-                            raise BackendException("sftp stat %s failed: %s" % (self.sftp.normalize(".") + "/" + d, e))
+                            raise BackendException("sftp stat %s failed: %s" %
+                                                   (self.sftp.normalize(".") + "/" + d, e))
                     try:
                         self.sftp.chdir(d)
                     except Exception as e:
-                        raise BackendException("sftp chdir to %s failed: %s" % (self.sftp.normalize(".") + "/" + d, e))
+                        raise BackendException("sftp chdir to %s failed: %s" %
+                                               (self.sftp.normalize(".") + "/" + d, e))
 
     def _put(self, source_path, remote_filename):
         if self.use_scp:
@@ -265,16 +286,19 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
             try:
                 chan = self.client.get_transport().open_session()
                 chan.settimeout(globals.timeout)
-                chan.exec_command("scp -t '%s'" % self.remote_dir)  # scp in sink mode uses the arg as base directory
+                # scp in sink mode uses the arg as base directory
+                chan.exec_command("scp -t '%s'" % self.remote_dir)
             except Exception as e:
                 raise BackendException("scp execution failed: %s" % e)
-            # scp protocol: one 0x0 after startup, one after the Create meta, one after saving
-            # if there's a problem: 0x1 or 0x02 and some error text
+            # scp protocol: one 0x0 after startup, one after the Create meta,
+            # one after saving if there's a problem: 0x1 or 0x02 and some error
+            # text
             response = chan.recv(1)
             if (response != "\0"):
                 raise BackendException("scp remote error: %s" % chan.recv(-1))
             fstat = os.stat(source_path.name)
-            chan.send('C%s %d %s\n' % (oct(fstat.st_mode)[-4:], fstat.st_size, remote_filename))
+            chan.send('C%s %d %s\n' % (oct(fstat.st_mode)[-4:], fstat.st_size,
+                                       remote_filename))
             response = chan.recv(1)
             if (response != "\0"):
                 raise BackendException("scp remote error: %s" % chan.recv(-1))
@@ -292,7 +316,8 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
             try:
                 chan = self.client.get_transport().open_session()
                 chan.settimeout(globals.timeout)
-                chan.exec_command("scp -f '%s/%s'" % (self.remote_dir, remote_filename))
+                chan.exec_command("scp -f '%s/%s'" % (self.remote_dir,
+                                                      remote_filename))
             except Exception as e:
                 raise BackendException("scp execution failed: %s" % e)
 
@@ -300,7 +325,8 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
             msg = chan.recv(-1)
             m = re.match(r"C([0-7]{4})\s+(\d+)\s+(\S.*)$", msg)
             if (m is None or m.group(3) != remote_filename):
-                raise BackendException("scp get %s failed: incorrect response '%s'" % (remote_filename, msg))
+                raise BackendException("scp get %s failed: incorrect response '%s'" %
+                                       (remote_filename, msg))
             chan.recv(1)  # dispose of the newline trailing the C message
 
             size = int(m.group(2))
@@ -321,7 +347,8 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
 
             msg = chan.recv(1)  # check the final status
             if msg != '\0':
-                raise BackendException("scp get %s failed: %s" % (remote_filename, chan.recv(-1)))
+                raise BackendException("scp get %s failed: %s" % (remote_filename,
+                                                                  chan.recv(-1)))
             f.close()
             chan.send('\0')  # send final done indicator
             chan.close()
@@ -332,7 +359,8 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         # In scp mode unavoidable quoting issues will make this fail if the
         # directory name contains single quotes.
         if self.use_scp:
-            output = self.runremote("ls -1 '%s'" % self.remote_dir, False, "scp dir listing ")
+            output = self.runremote("ls -1 '%s'" % self.remote_dir, False,
+                                    "scp dir listing ")
             return output.splitlines()
         else:
             return self.sftp.listdir()
@@ -341,13 +369,15 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         # In scp mode unavoidable quoting issues will cause failures if
         # filenames containing single quotes are encountered.
         if self.use_scp:
-            self.runremote("rm '%s/%s'" % (self.remote_dir, filename), False, "scp rm ")
+            self.runremote("rm '%s/%s'" % (self.remote_dir, filename), False,
+                           "scp rm ")
         else:
             self.sftp.remove(filename)
 
     def runremote(self, cmd, ignoreexitcode=False, errorprefix=""):
-        """small convenience function that opens a shell channel, runs remote command and returns
-        stdout of command. throws an exception if exit code!=0 and not ignored"""
+        """small convenience function that opens a shell channel, runs remote
+        command and returns stdout of command. throws an exception if exit
+        code!=0 and not ignored"""
         try:
             chan = self.client.get_transport().open_session()
             chan.settimeout(globals.timeout)
@@ -357,7 +387,8 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname, key.get_
         output = chan.recv(-1)
         res = chan.recv_exit_status()
         if (res != 0 and not ignoreexitcode):
-            raise BackendException("%sfailed(%d): %s" % (errorprefix, res, chan.recv_stderr(4096)))
+            raise BackendException("%sfailed(%d): %s" % (errorprefix, res,
+                                                         chan.recv_stderr(4096)))
         return output
 
     def gethostconfig(self, file, host):

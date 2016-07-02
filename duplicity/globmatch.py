@@ -39,8 +39,8 @@ def _glob_get_prefix_regexs(glob_str):
     glob_parts = glob_str.split("/")
     if "" in glob_parts[1:-1]:
         # "" OK if comes first or last, as in /foo/
-        raise GlobbingError("Consecutive '/'s found in globbing string "
-                            + glob_str)
+        raise GlobbingError("Consecutive '/'s found in globbing string " +
+                            glob_str)
 
     prefixes = ["/".join(glob_parts[:i + 1]) for i in range(len(glob_parts))]
     # we must make exception for root "/", only dir to end in slash

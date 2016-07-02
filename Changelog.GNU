@@ -1,3 +1,14 @@
+2016-07-02  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/PEP8_W503_fixes
+      - Fix PEP8 W503 errors (line break before binary operator) and enable the
+        PEP8 test for this in test_code.CodeTest.
+    * Merged in lp:~aaron-whitehouse/duplicity/PEP8_line_length
+      - Set line length error length to 120 (matching tox.ini) for PEP8 and
+        fixed E501(line too long) errors.
+    * Merged in lp:~duplicity-team/duplicity/po-updates
+    * Prep for 0.7.08
+
 2016-06-24  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1594780 with patches from B. Reitsma

@@ -133,7 +133,8 @@ class ACDBackend(duplicity.backend.Backend):
 
     def _delete(self, remote_filename):
         """Delete remote_filename"""
-        remote_file_path = os.path.join(urllib.unquote(self.parsed_url.path.replace('///', '/')), remote_filename).rstrip()
+        remote_file_path = os.path.join(urllib.unquote(self.parsed_url.path.replace('///', '/')),
+                                        remote_filename).rstrip()
         commandline = self.acd_cmd + " rm '%s'" % (remote_file_path)
         self.subprocess_popen(commandline)
 

@@ -238,7 +238,9 @@ class BotoBackend(duplicity.backend.Backend):
         upload_end = time.time()
         total_s = abs(upload_end - upload_start) or 1  # prevent a zero value!
         rough_upload_speed = os.path.getsize(source_path.name) / total_s
-        log.Debug("Uploaded %s/%s to %s Storage at roughly %f bytes/second" % (self.straight_url, remote_filename, storage_class, rough_upload_speed))
+        log.Debug("Uploaded %s/%s to %s Storage at roughly %f bytes/second" %
+                  (self.straight_url, remote_filename, storage_class,
+                   rough_upload_speed))
 
     def _get(self, remote_filename, local_path):
         key_name = self.key_prefix + remote_filename

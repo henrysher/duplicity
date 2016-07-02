@@ -67,7 +67,8 @@ class Snapshot(sys_collections.deque):
                 snapshot = pickle.load(progressfd)
                 progressfd.close()
             except:
-                log.Warn("Warning, cannot read stored progress information from previous backup", log.WarningCode.cannot_stat)
+                log.Warn("Warning, cannot read stored progress information from previous backup",
+                         log.WarningCode.cannot_stat)
                 snapshot = Snapshot()
         # Reached here no cached data found or wrong marshalling
         return snapshot
@@ -204,17 +205,20 @@ class ProgressTracker():
 
             """
             Combine variables for progress estimation
-            Fit a smoothed curve that covers the most common data density distributions, aiming for a large number of incremental changes.
+            Fit a smoothed curve that covers the most common data density distributions,
+            aiming for a large number of incremental changes.
             The computation is:
-                Use 50% confidence interval lower bound during first half of the progression. Conversely, use 50% C.I. upper bound during
-                the second half. Scale it to the changes/total ratio
+                Use 50% confidence interval lower bound during first half of the progression.
+                Conversely, use 50% C.I. upper bound during the second half. Scale it to the
+                changes/total ratio
             """
             self.current_estimation = float(changes) / float(total_changes) * (
                 (self.change_mean_ratio - 0.67 * change_sigma) * (1.0 - self.current_estimation) +
                 (self.change_mean_ratio + 0.67 * change_sigma) * self.current_estimation
             )
             """
-            In case that we overpassed the 100%, drop the confidence and trust more the mean as the sigma may be large.
+            In case that we overpassed the 100%, drop the confidence and trust more the mean as the
+            sigma may be large.
             """
             if self.current_estimation > 1.0:
                 self.current_estimation = float(changes) / float(total_changes) * (
@@ -228,15 +232,21 @@ class ProgressTracker():
                 self.current_estimation = self.change_mean_ratio * float(changes) / float(total_changes)
 
         """
-        Lastly, just cap it... nothing else we can do to approximate it better. Cap it to 99%, as the remaining 1% to 100% we reserve it
-        For the last step uploading of signature and manifests
+        Lastly, just cap it... nothing else we can do to approximate it better.
+        Cap it to 99%, as the remaining 1% to 100% we reserve for the last step
+        uploading of signature and manifests
         """
-        self.progress_estimation = max(0.0, min(self.prev_estimation + (1.0 - self.prev_estimation) * self.current_estimation, 0.99))
+        self.progress_estimation = max(0.0, min(self.prev_estimation +
+                                                (1.0 - self.prev_estimation) *
+                                                self.current_estimation, 0.99))
 
         """
-        Estimate the time just as a projection of the remaining time, fit to a [(1 - x) / x] curve
+        Estimate the time just as a projection of the remaining time, fit to a
+        [(1 - x) / x] curve
         """
-        self.elapsed_sum += elapsed  # As sum of timedeltas, so as to avoid clock skew in long runs (adding also microseconds)
+        # As sum of timedeltas, so as to avoid clock skew in long runs
+        # (adding also microseconds)
+        self.elapsed_sum += elapsed
         projection = 1.0
         if self.progress_estimation > 0:
             projection = (1.0 - self.progress_estimation) / self.progress_estimation
@@ -250,7 +260,8 @@ class ProgressTracker():
         Compute Exponential Moving Average of speed as bytes/sec of the last 30 probes
         """
         if elapsed.total_seconds() > 0:
-            self.transfers.append(float(self.total_bytecount - self.last_total_bytecount) / float(elapsed.total_seconds()))
+            self.transfers.append(float(self.total_bytecount - self.last_total_bytecount) /
+                                  float(elapsed.total_seconds()))
         self.last_total_bytecount = self.total_bytecount
         if len(self.transfers) > 30:
             self.transfers.popleft()

@@ -257,7 +257,8 @@ class TemporaryDirectory:
                 try:
                     os.rmdir(self.__dir)
                 except Exception:
-                    log.Warn(_("Cleanup of temporary directory %s failed - this is probably a bug.") % util.ufn(self.__dir))
+                    log.Warn(_("Cleanup of temporary directory %s failed - "
+                               "this is probably a bug.") % util.ufn(self.__dir))
                     pass
                 self.__pending = None
                 self.__dir = None
