@@ -1,3 +1,9 @@
+New in v0.8.00 (2016/07/??)
+---------------------------
+* Merged in lp:~aaron-whitehouse/duplicity/remove-python26
+  - Remove Python 2.6 support references and tests.
+
+
 New in v0.7.08 (2016/07/02)
 ---------------------------
 * Merged in lp:~noizyland/duplicity/fix_azurebackend_typo

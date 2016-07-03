@@ -1,3 +1,8 @@
+2016-07-03  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/remove-python26
+      - Remove Python 2.6 support references and tests.
+
 2016-07-02  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~aaron-whitehouse/duplicity/PEP8_W503_fixes
