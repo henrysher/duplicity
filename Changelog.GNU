@@ -1,3 +1,8 @@
+2016-07-20  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1600692 with patch from Wolfgang Rohdewald
+      - Allow symlink to have optional trailing slash during verify.
+
 2016-07-03  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~aaron-whitehouse/duplicity/remove-python26
