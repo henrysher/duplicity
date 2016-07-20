@@ -395,7 +395,7 @@ class ROPath:
             else:
                 return 1
         elif self.issym():
-            if self.symtext == other.symtext:
+            if self.symtext == other.symtext or self.symtext + "/" == other.symtext:
                 return 1
             else:
                 log_diff(_("Symlink %%s points to %s, expected %s") %

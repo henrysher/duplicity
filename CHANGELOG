@@ -36,6 +36,8 @@ New in v0.7.08 (2016/07/02)
   - Set line length error length to 120 (matching tox.ini) for PEP8 and
     fixed E501(line too long) errors.
 * Merged in lp:~duplicity-team/duplicity/po-updates
+* Fixed bug #1600692 with patch from Wolfgang Rohdewald
+  - Allow symlink to have optional trailing slash during verify.
 
 
 New in v0.7.07.1 (2016/04/19)
