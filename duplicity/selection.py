@@ -149,10 +149,10 @@ class Select:
                             (s == 1 or s == 2):
                         # Path is a file or folder that cannot be read, but
                         # should be included or scanned.
-                        log.Error(_("Error accessing possibly locked file %s") %
-                                  util.ufn(new_path.name),
-                                  log.WarningCode.cannot_read,
-                                  util.escape(new_path.name))
+                        log.Warn(_("Error accessing possibly locked file %s") %
+                                 util.ufn(new_path.name),
+                                 log.WarningCode.cannot_read,
+                                 util.escape(new_path.name))
                         if diffdir.stats:
                             diffdir.stats.Errors += 1
                     elif s == 1:

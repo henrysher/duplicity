@@ -55,6 +55,9 @@ New in v0.7.07.1 (2016/04/19)
 * Fixed bug #1570293 duplicity is very slow due to excessive fsync
   - removed flush() after write.
   - revert to previous version
+* Merged in lp:~aaron-whitehouse/duplicity/07-fix_deja_dup_error_on_locked_files
+  - Revert log.Error to log.Warn, as it was prior to the merge in rev 1224,
+    as this was affecting other applications (e.g. deja dup; Bug #1605939).
 
 
 New in v0.7.07 (2016/04/10)
