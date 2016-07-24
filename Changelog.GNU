@@ -1,3 +1,9 @@
+2016-07-24  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/07-fix_deja_dup_error_on_locked_files
+      - Revert log.Error to log.Warn, as it was prior to the merge in rev 1224,
+        as this was affecting other applications (e.g. deja dup; Bug #1605939).
+
 2016-07-20  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1600692 with patch from Wolfgang Rohdewald
