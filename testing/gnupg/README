@@ -11,3 +11,5 @@ No password
 ID: 9B736B2A
 Name: Recipient Two <two@example.com>
 No password
+
+See also the comments in gpg.conf.
