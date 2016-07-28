@@ -65,7 +65,7 @@ class FunctionalTestCase(DuplicityTestCase):
         # this way we force a failure if duplicity tries to read from the
         # console unexpectedly (like for gpg password or such).
         if platform.platform().startswith('Linux'):
-            cmd_list = ['setsid', '-w']
+            cmd_list = ['setsid']
         else:
             cmd_list = []
         cmd_list.extend(["duplicity"])

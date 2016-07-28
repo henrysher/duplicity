@@ -4,6 +4,7 @@
       - Speedup of path_matches_glob() by about 8x.  See
         https://code.launchpad.net/~mwilck/duplicity/0.7-series/+merge/301332
         for more details.
+    * Remove -w from setsid in functional tests.
 
 2016-07-24  Kenneth Loafman  <kenneth@loafman.com>
 
