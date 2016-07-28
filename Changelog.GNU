@@ -1,3 +1,10 @@
+2016-07-28  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~mwilck/duplicity/0.7-series
+      - Speedup of path_matches_glob() by about 8x.  See
+        https://code.launchpad.net/~mwilck/duplicity/0.7-series/+merge/301332
+        for more details.
+
 2016-07-24  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~aaron-whitehouse/duplicity/07-fix_deja_dup_error_on_locked_files
