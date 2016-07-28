@@ -49,8 +49,9 @@ def _glob_get_prefix_regexs(glob_str):
     return list(map(glob_to_regex, prefixes))
 
 
-def path_matches_glob(path, glob_str, include, ignore_case=False):
-    """Tests whether path matches glob, as per the Unix shell rules, taking as
+def path_matches_glob_fn(glob_str, include, ignore_case=False):
+    """Return a function test_fn(path) which
+    tests whether path matches glob, as per the Unix shell rules, taking as
     arguments a path, a glob string and include (0 indicating that the glob
     string is an exclude glob and 1 indicating that it is an include glob,
     returning:
@@ -83,15 +84,19 @@ def path_matches_glob(path, glob_str, include, ignore_case=False):
     scan_comp_re = re_comp("^(%s)$" %
                            "|".join(_glob_get_prefix_regexs(glob_str)))
 
-    if match_only_dirs and not path.isdir():
-        # If the glob ended with a /, only match directories
-        return None
-    elif glob_comp_re.match(path.name):
-        return include
-    elif include == 1 and scan_comp_re.match(path.name):
-        return 2
-    else:
-        return None
+    def test_fn(path):
+
+        if match_only_dirs and not path.isdir():
+            # If the glob ended with a /, only match directories
+            return None
+        elif glob_comp_re.match(path.name):
+            return include
+        elif include == 1 and scan_comp_re.match(path.name):
+            return 2
+        else:
+            return None
+
+    return test_fn
 
 
 def glob_to_regex(pat):

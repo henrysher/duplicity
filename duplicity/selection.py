@@ -33,7 +33,7 @@ from duplicity import globals  # @Reimport
 from duplicity import diffdir
 from duplicity import util  # @Reimport
 from duplicity.globmatch import GlobbingError, FilePrefixError, \
-    path_matches_glob
+    path_matches_glob_fn
 
 """Iterate exactly the requested files in a directory
 
@@ -544,13 +544,10 @@ probably isn't what you meant.""") %
             ignore_case = True
 
         # Check to make sure prefix is ok
-        if not path_matches_glob(self.rootpath, glob_str, include=1):
+        if not path_matches_glob_fn(glob_str, include=1)(self.rootpath):
             raise FilePrefixError(glob_str)
 
-        def sel_func(path):
-            return path_matches_glob(path, glob_str, include, ignore_case)
-
-        return sel_func
+        return path_matches_glob_fn(glob_str, include, ignore_case)
 
     def exclude_older_get_sf(self, date):
         """Return selection function based on files older than modification date """
