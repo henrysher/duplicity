@@ -11,6 +11,9 @@ New in v0.8.00 (2016/07/??)
   - Speedup of path_matches_glob() by about 8x.  See
     https://code.launchpad.net/~mwilck/duplicity/duplicity/+merge/301268
     for more details.
+* Fixed conflict in merge from Martin Wilck and applied
+  - https://code.launchpad.net/~mwilck/duplicity/0.7-series/+merge/301492
+  - merge fixes setsid usage in functional testing.
 
 
 New in v0.7.08 (2016/07/02)

@@ -1,3 +1,9 @@
+2016-07-31  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed conflict in merge from Martin Wilck and applied
+      - https://code.launchpad.net/~mwilck/duplicity/0.7-series/+merge/301492
+      - merge fixes setsid usage in functional testing.
+
 2016-07-28  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~mwilck/duplicity/duplicity
