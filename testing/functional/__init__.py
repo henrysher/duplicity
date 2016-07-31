@@ -39,6 +39,24 @@ class CmdError(Exception):
 
 class FunctionalTestCase(DuplicityTestCase):
 
+    _setsid_w = None
+
+    @classmethod
+    def _check_setsid(cls):
+        if cls._setsid_w is not None:
+            return
+        if platform.platform().startswith('Linux'):
+            # setsid behavior differs between distributions.
+            # If setsid supports -w ("wait"), use it.
+            import subprocess
+            try:
+                with open("/dev/null", "w") as sink:
+                    subprocess.check_call(["setsid", "-w", "ls"], stdout=sink, stderr=sink)
+            except subprocess.CalledProcessError:
+                cls._setsid_w = False
+            else:
+                cls._setsid_w = True
+
     def setUp(self):
         super(FunctionalTestCase, self).setUp()
 
@@ -55,6 +73,7 @@ class FunctionalTestCase(DuplicityTestCase):
         if bl:
             backend_inst.delete(backend_inst.list())
         backend_inst.close()
+        self._check_setsid()
 
     def run_duplicity(self, options=[], current_time=None, fail=None,
                       passphrase_input=[]):
@@ -66,6 +85,8 @@ class FunctionalTestCase(DuplicityTestCase):
         # console unexpectedly (like for gpg password or such).
         if platform.platform().startswith('Linux'):
             cmd_list = ['setsid']
+            if self._setsid_w:
+                cmd_list.extend(["-w"])
         else:
             cmd_list = []
         cmd_list.extend(["duplicity"])
