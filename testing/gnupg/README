@@ -1,0 +1,15 @@
+There are three keys here:
+
+ID: 56538CCF
+Name: Test User <test@example.com>
+Password: test
+
+ID: B5FA894F
+Name: Recipient One <one@example.com>
+No password
+
+ID: 9B736B2A
+Name: Recipient Two <two@example.com>
+No password
+
+See also the comments in gpg.conf.
