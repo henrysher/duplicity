@@ -80,6 +80,12 @@ class SwiftBackend(duplicity.backend.Backend):
                     os_options.update({'tenant_name': os.environ['SWIFT_TENANTNAME']})
                 if 'SWIFT_ENDPOINT_TYPE' in os.environ:
                     os_options.update({'endpoint_type': os.environ['SWIFT_ENDPOINT_TYPE']})
+                if 'SWIFT_USERID' in os.environ:
+                    os_options.update({'user_id': os.environ['SWIFT_USERID']})
+                if 'SWIFT_TENANTID' in os.environ:
+                    os_options.update({'tenant_id': os.environ['SWIFT_TENANTID']})
+                if 'SWIFT_REGIONNAME' in os.environ:
+                    os_options.update({'region_name': os.environ['SWIFT_REGIONNAME']})
 
         else:
             conn_kwargs['auth_version'] = '1'
