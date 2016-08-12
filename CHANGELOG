@@ -8,6 +8,10 @@ New in v0.7.10 (2016/08/??)
 * Fixed conflict in merge from Martin Wilck and applied
   - https://code.launchpad.net/~mwilck/duplicity/0.7-series/+merge/301492
   - merge fixes setsid usage in functional testing.
+* Fixed bug #1612472 with patch from David Cuthbert
+  - Restore from S3 fails with --with-prefix-archive if prefix includes '/'
+* Merged in lp:~arashad.ahamad/duplicity/duplicity_latest
+  - Changes for connecting to IBM Bluemix ObjectStorage.  See man page.
 
 
 New in v0.7.09 (2016/07/24)
