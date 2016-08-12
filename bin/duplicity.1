@@ -1965,10 +1965,13 @@ See
 .B REQUIREMENTS
 above.
 
-It uses four environment variables for authentification:
+It uses following environment variables for authentification:
 .BR SWIFT_USERNAME " (required),"
 .BR SWIFT_PASSWORD " (required),"
 .BR SWIFT_AUTHURL " (required),"
+.BR SWIFT_USERID " (required, only for IBM Bluemix ObjectStorage),"
+.BR SWIFT_TENANTID " (required, only for IBM Bluemix ObjectStorage),"
+.BR SWIFT_REGIONNAME " (required, only for IBM Bluemix ObjectStorage),"
 .BR SWIFT_TENANTNAME " (optional, the tenant can be included in the username)"
 
 If the user was previously authenticated, the following environment
