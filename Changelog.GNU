@@ -1,3 +1,8 @@
+2016-08-12  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1612472 with patch from David Cuthbert
+      - Restore from S3 fails with --with-prefix-archive if prefix includes '/'
+
 2016-07-31  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed conflict in merge from Martin Wilck and applied

@@ -265,7 +265,7 @@ class BotoBackend(duplicity.backend.Backend):
         # Because of the need for this optimization, it should be left as is.
         # for k in self.bucket.list(prefix = self.key_prefix + 'd', delimiter = '/'):
         filename_list = []
-        for k in self.bucket.list(prefix=self.key_prefix, delimiter='/'):
+        for k in self.bucket.list(prefix=self.key_prefix):
             try:
                 filename = k.key.replace(self.key_prefix, '', 1)
                 filename_list.append(filename)

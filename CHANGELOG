@@ -14,6 +14,8 @@ New in v0.8.00 (2016/07/??)
 * Fixed conflict in merge from Martin Wilck and applied
   - https://code.launchpad.net/~mwilck/duplicity/0.7-series/+merge/301492
   - merge fixes setsid usage in functional testing.
+* Fixed bug #1612472 with patch from David Cuthbert
+  - Restore from S3 fails with --with-prefix-archive if prefix includes '/'
 
 
 New in v0.7.08 (2016/07/02)
