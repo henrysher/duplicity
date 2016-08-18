@@ -1,3 +1,8 @@
+2016-08-18  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~fenisilius/duplicity/acd_init_mkdir
+      - Allow duplicity to create remote folder
+
 2016-08-12  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1612472 with patch from David Cuthbert

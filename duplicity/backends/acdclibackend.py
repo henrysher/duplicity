@@ -59,6 +59,16 @@ class ACDBackend(duplicity.backend.Backend):
 
         self.subprocess_popen(self.acd_cmd + " sync")
 
+        # Initialize remote directory
+        remote_path = urllib.unquote(self.parsed_url.path.replace('///', '/')).rstrip()
+        commandline = self.acd_cmd + " ls '%s'" % (remote_path)
+        try:
+            self.subprocess_popen(commandline)
+        except BackendException as e:
+            if e.code == 50:  # Remote directory not there, create a new one
+                commandline = self.acd_cmd + " mkdir '%s'" % remote_path
+                self.subprocess_popen(commandline)
+
     def _put(self, source_path, remote_filename=None):
         """Transfer source_path to remote_filename"""
         if not remote_filename:
