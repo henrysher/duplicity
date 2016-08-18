@@ -18,6 +18,8 @@ New in v0.8.00 (2016/07/??)
   - Restore from S3 fails with --with-prefix-archive if prefix includes '/'
 * Merged in lp:~arashad.ahamad/duplicity/duplicity_latest
   - Changes for connecting to IBM Bluemix ObjectStorage.  See man page.
+* Merged in lp:~fenisilius/duplicity/acd_init_mkdir
+  - Allow duplicity to create remote folder
 
 
 New in v0.7.08 (2016/07/02)
