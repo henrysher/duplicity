@@ -1,0 +1,304 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.util &mdash; duplicity-src8  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="duplicity-src8  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.util</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2002 Ben Escoto &lt;ben@emerose.org&gt;</span>
+<span class="c1"># Copyright 2007 Kenneth Loafman &lt;kenneth@loafman.com&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Miscellaneous utilities.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">errno</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+
+<span class="kn">from</span> <span class="nn">lockfile</span> <span class="k">import</span> <span class="n">UnlockError</span>
+
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">tarfile</span>
+<span class="kn">import</span> <span class="nn">duplicity.globals</span> <span class="k">as</span> <span class="nn">globals</span>
+<span class="kn">import</span> <span class="nn">duplicity.log</span> <span class="k">as</span> <span class="nn">log</span>
+
+
+<div class="viewcode-block" id="exception_traceback"><a class="viewcode-back" href="../../duplicity.util.html#duplicity.util.exception_traceback">[docs]</a><span class="k">def</span> <span class="nf">exception_traceback</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    @return A string representation in typical Python format of the</span>
+<span class="sd">            currently active/raised exception.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">tb</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span>
+
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_tb</span><span class="p">(</span><span class="n">tb</span><span class="p">,</span> <span class="n">limit</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exception_only</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+
+    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Traceback (innermost last):</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="si">%-20s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">uexc</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="escape"><a class="viewcode-back" href="../../duplicity.util.html#duplicity.util.escape">[docs]</a><span class="k">def</span> <span class="nf">escape</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+    <span class="s2">&quot;Convert a (bytes) filename to a format suitable for logging (quoted utf8)&quot;</span>
+    <span class="n">string</span> <span class="o">=</span> <span class="n">ufn</span><span class="p">(</span><span class="n">string</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;unicode-escape&#39;</span><span class="p">,</span> <span class="s1">&#39;replace&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">u&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">string</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">,</span> <span class="s1">&#39;replace&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ufn"><a class="viewcode-back" href="../../duplicity.util.html#duplicity.util.ufn">[docs]</a><span class="k">def</span> <span class="nf">ufn</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="s2">&quot;Convert a (bytes) filename to unicode for printing&quot;</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">unicode</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">filename</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">getfilesystemencoding</span><span class="p">(),</span> <span class="s1">&#39;replace&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="uindex"><a class="viewcode-back" href="../../duplicity.util.html#duplicity.util.uindex">[docs]</a><span class="k">def</span> <span class="nf">uindex</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+    <span class="s2">&quot;Convert an index (a tuple of path parts) to unicode for printing&quot;</span>
+    <span class="k">if</span> <span class="n">index</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">ufn</span><span class="p">,</span> <span class="n">index</span><span class="p">)))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">u&#39;.&#39;</span></div>
+
+
+<div class="viewcode-block" id="uexc"><a class="viewcode-back" href="../../duplicity.util.html#duplicity.util.uexc">[docs]</a><span class="k">def</span> <span class="nf">uexc</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+    <span class="c1"># Exceptions in duplicity often have path names in them, which if they are</span>
+    <span class="c1"># non-ascii will cause a UnicodeDecodeError when implicitly decoding to</span>
+    <span class="c1"># unicode.  So we decode manually, using the filesystem encoding.</span>
+    <span class="c1"># 99.99% of the time, this will be a fine encoding to use.</span>
+    <span class="k">return</span> <span class="n">ufn</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="maybe_ignore_errors"><a class="viewcode-back" href="../../duplicity.util.html#duplicity.util.maybe_ignore_errors">[docs]</a><span class="k">def</span> <span class="nf">maybe_ignore_errors</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Execute fn. If the global configuration setting ignore_errors is</span>
+<span class="sd">    set to True, catch errors and log them but do continue (and return</span>
+<span class="sd">    None).</span>
+
+<span class="sd">    @param fn: A callable.</span>
+<span class="sd">    @return Whatever fn returns when called, or None if it failed and ignore_errors is true.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">fn</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">globals</span><span class="o">.</span><span class="n">ignore_errors</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;IGNORED_ERROR: Warning: ignoring error as requested: </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                     <span class="o">%</span> <span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">util</span><span class="o">.</span><span class="n">uexc</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span></div>
+
+
+<div class="viewcode-block" id="BlackHoleList"><a class="viewcode-back" href="../../duplicity.util.html#duplicity.util.BlackHoleList">[docs]</a><span class="k">class</span> <span class="nc">BlackHoleList</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BlackHoleList.append"><a class="viewcode-back" href="../../duplicity.util.html#duplicity.util.BlackHoleList.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="FakeTarFile"><a class="viewcode-back" href="../../duplicity.util.html#duplicity.util.FakeTarFile">[docs]</a><span class="k">class</span> <span class="nc">FakeTarFile</span><span class="p">:</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">([])</span>
+
+<div class="viewcode-block" id="FakeTarFile.close"><a class="viewcode-back" href="../../duplicity.util.html#duplicity.util.FakeTarFile.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="make_tarfile"><a class="viewcode-back" href="../../duplicity.util.html#duplicity.util.make_tarfile">[docs]</a><span class="k">def</span> <span class="nf">make_tarfile</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">fp</span><span class="p">):</span>
+    <span class="c1"># We often use &#39;empty&#39; tarfiles for signatures that haven&#39;t been filled out</span>
+    <span class="c1"># yet.  So we want to ignore ReadError exceptions, which are used to signal</span>
+    <span class="c1"># this.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">tf</span> <span class="o">=</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">TarFile</span><span class="p">(</span><span class="s2">&quot;arbitrary&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">fp</span><span class="p">)</span>
+        <span class="c1"># Now we cause TarFile to not cache TarInfo objects.  It would end up</span>
+        <span class="c1"># consuming a lot of memory over the lifetime of our long-lasting</span>
+        <span class="c1"># signature files otherwise.</span>
+        <span class="n">tf</span><span class="o">.</span><span class="n">members</span> <span class="o">=</span> <span class="n">BlackHoleList</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">tf</span>
+    <span class="k">except</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">ReadError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">FakeTarFile</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="get_tarinfo_name"><a class="viewcode-back" href="../../duplicity.util.html#duplicity.util.get_tarinfo_name">[docs]</a><span class="k">def</span> <span class="nf">get_tarinfo_name</span><span class="p">(</span><span class="n">ti</span><span class="p">):</span>
+    <span class="c1"># Python versions before 2.6 ensure that directories end with /, but 2.6</span>
+    <span class="c1"># and later ensure they they *don&#39;t* have /.  ::shrug::  Internally, we</span>
+    <span class="c1"># continue to use pre-2.6 method.</span>
+    <span class="k">if</span> <span class="n">ti</span><span class="o">.</span><span class="n">isdir</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">ti</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ti</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ti</span><span class="o">.</span><span class="n">name</span></div>
+
+
+<div class="viewcode-block" id="ignore_missing"><a class="viewcode-back" href="../../duplicity.util.html#duplicity.util.ignore_missing">[docs]</a><span class="k">def</span> <span class="nf">ignore_missing</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Execute fn on filename.  Ignore ENOENT errors, otherwise raise exception.</span>
+
+<span class="sd">    @param fn: callable</span>
+<span class="sd">    @param filename: string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">fn</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ex</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span></div>
+
+
+<div class="viewcode-block" id="release_lockfile"><a class="viewcode-back" href="../../duplicity.util.html#duplicity.util.release_lockfile">[docs]</a><span class="k">def</span> <span class="nf">release_lockfile</span><span class="p">():</span>
+    <span class="k">if</span> <span class="nb">globals</span><span class="o">.</span><span class="n">lockfile</span> <span class="ow">and</span> <span class="nb">globals</span><span class="o">.</span><span class="n">lockfile</span><span class="o">.</span><span class="n">is_locked</span><span class="p">():</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Releasing lockfile </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="nb">globals</span><span class="o">.</span><span class="n">lockfile</span><span class="o">.</span><span class="n">lock_file</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">globals</span><span class="o">.</span><span class="n">lockfile</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">UnlockError</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="copyfileobj"><a class="viewcode-back" href="../../duplicity.util.html#duplicity.util.copyfileobj">[docs]</a><span class="k">def</span> <span class="nf">copyfileobj</span><span class="p">(</span><span class="n">infp</span><span class="p">,</span> <span class="n">outfp</span><span class="p">,</span> <span class="n">byte_count</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Copy byte_count bytes from infp to outfp, or all if byte_count &lt; 0</span>
+
+<span class="sd">    Returns the number of bytes actually written (may be less than</span>
+<span class="sd">    byte_count if find eof.  Does not close either fileobj.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">blocksize</span> <span class="o">=</span> <span class="mi">64</span> <span class="o">*</span> <span class="mi">1024</span>
+    <span class="n">bytes_written</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">byte_count</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">buf</span> <span class="o">=</span> <span class="n">infp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">blocksize</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">buf</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">bytes_written</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+            <span class="n">outfp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">while</span> <span class="n">bytes_written</span> <span class="o">+</span> <span class="n">blocksize</span> <span class="o">&lt;=</span> <span class="n">byte_count</span><span class="p">:</span>
+            <span class="n">buf</span> <span class="o">=</span> <span class="n">infp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">blocksize</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">buf</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">bytes_written</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+            <span class="n">outfp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+        <span class="n">buf</span> <span class="o">=</span> <span class="n">infp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">byte_count</span> <span class="o">-</span> <span class="n">bytes_written</span><span class="p">)</span>
+        <span class="n">bytes_written</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+        <span class="n">outfp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">bytes_written</span></div>
+
+
+<div class="viewcode-block" id="which"><a class="viewcode-back" href="../../duplicity.util.html#duplicity.util.which">[docs]</a><span class="k">def</span> <span class="nf">which</span><span class="p">(</span><span class="n">program</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return absolute path for program name.</span>
+<span class="sd">    Returns None if program not found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">is_exe</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">X_OK</span><span class="p">)</span>
+
+    <span class="n">fpath</span><span class="p">,</span> <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">program</span><span class="p">)</span>  <span class="c1"># @UnusedVariable</span>
+    <span class="k">if</span> <span class="n">fpath</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">is_exe</span><span class="p">(</span><span class="n">program</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">program</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;PATH&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">pathsep</span><span class="p">):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
+            <span class="n">exe_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">program</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">is_exe</span><span class="p">(</span><span class="n">exe_file</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">exe_file</span>
+
+    <span class="k">return</span> <span class="kc">None</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

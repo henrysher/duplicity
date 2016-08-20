@@ -1,0 +1,1223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.commandline &mdash; duplicity-src8  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="duplicity-src8  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.commandline</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2002 Ben Escoto &lt;ben@emerose.org&gt;</span>
+<span class="c1"># Copyright 2007 Kenneth Loafman &lt;kenneth@loafman.com&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="sd">&quot;&quot;&quot;Parse command line, check for consistency, and set globals&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">future_builtins</span> <span class="k">import</span> <span class="nb">filter</span>
+
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">copy</span>
+<span class="kn">import</span> <span class="nn">optparse</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">hashlib</span> <span class="k">import</span> <span class="n">md5</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">md5</span> <span class="k">import</span> <span class="n">new</span> <span class="k">as</span> <span class="n">md5</span>
+
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">backend</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">dup_time</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="nb">globals</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">gpg</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">path</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">selection</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">util</span>
+
+
+<span class="n">select_opts</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Will hold all the selection options</span>
+<span class="n">select_files</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Will hold file objects when filelist given</span>
+
+<span class="n">full_backup</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Will be set to true if full command given</span>
+<span class="n">list_current</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Will be set to true if list-current command given</span>
+<span class="n">collection_status</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Will be set to true if collection-status command given</span>
+<span class="n">cleanup</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Set to true if cleanup command given</span>
+<span class="n">verify</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Set to true if verify command given</span>
+
+<span class="n">commands</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;cleanup&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;collection-status&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;full&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;incremental&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;list-current-files&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;remove-older-than&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;remove-all-but-n-full&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;remove-all-inc-of-but-n-full&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;restore&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;verify&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+
+
+<div class="viewcode-block" id="old_fn_deprecation"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.old_fn_deprecation">[docs]</a><span class="k">def</span> <span class="nf">old_fn_deprecation</span><span class="p">(</span><span class="n">opt</span><span class="p">):</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Warning: Option </span><span class="si">%s</span><span class="s2"> is pending deprecation &quot;</span>
+              <span class="s2">&quot;and will be removed in a future release.</span><span class="se">\n</span><span class="s2">&quot;</span>
+              <span class="s2">&quot;Use of default filenames is strongly suggested.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">opt</span><span class="p">,</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span> <span class="n">force_print</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="old_globbing_filelist_deprecation"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.old_globbing_filelist_deprecation">[docs]</a><span class="k">def</span> <span class="nf">old_globbing_filelist_deprecation</span><span class="p">(</span><span class="n">opt</span><span class="p">):</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Warning: Option </span><span class="si">%s</span><span class="s2"> is pending deprecation and will be removed in a future release.</span><span class="se">\n</span><span class="s2">&quot;</span>
+              <span class="s2">&quot;--include-filelist and --exclude-filelist now accept globbing characters and should &quot;</span>
+              <span class="s2">&quot;be used instead.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">opt</span><span class="p">,</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span> <span class="n">force_print</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="stdin_deprecation"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.stdin_deprecation">[docs]</a><span class="k">def</span> <span class="nf">stdin_deprecation</span><span class="p">(</span><span class="n">opt</span><span class="p">):</span>
+    <span class="c1"># See https://bugs.launchpad.net/duplicity/+bug/1423367</span>
+    <span class="c1"># In almost all Linux distros stdin is a file represented by /dev/stdin,</span>
+    <span class="c1"># so --exclude-file=/dev/stdin will work as a substitute.</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Warning: Option </span><span class="si">%s</span><span class="s2"> is pending deprecation and will be removed in a future release.</span><span class="se">\n</span><span class="s2">&quot;</span>
+              <span class="s2">&quot;On many GNU/Linux systems, stdin is represented by /dev/stdin and</span><span class="se">\n</span><span class="s2">&quot;</span>
+              <span class="s2">&quot;--include-filelist=/dev/stdin or --exclude-filelist=/dev/stdin could</span><span class="se">\n</span><span class="s2">&quot;</span>
+              <span class="s2">&quot;be used as a substitute.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">opt</span><span class="p">,</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span> <span class="n">force_print</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="expand_fn"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.expand_fn">[docs]</a><span class="k">def</span> <span class="nf">expand_fn</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expandvars</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="expand_archive_dir"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.expand_archive_dir">[docs]</a><span class="k">def</span> <span class="nf">expand_archive_dir</span><span class="p">(</span><span class="n">archdir</span><span class="p">,</span> <span class="n">backname</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return expanded version of archdir joined with backname.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">globals</span><span class="o">.</span><span class="n">backup_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
+        <span class="s2">&quot;expand_archive_dir() called prior to globals.backup_name being set&quot;</span>
+
+    <span class="k">return</span> <span class="n">expand_fn</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">archdir</span><span class="p">,</span> <span class="n">backname</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="generate_default_backup_name"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.generate_default_backup_name">[docs]</a><span class="k">def</span> <span class="nf">generate_default_backup_name</span><span class="p">(</span><span class="n">backend_url</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    @param backend_url: URL to backend.</span>
+<span class="sd">    @returns A default backup name (string).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># For default, we hash args to obtain a reasonably safe default.</span>
+    <span class="c1"># We could be smarter and resolve things like relative paths, but</span>
+    <span class="c1"># this should actually be a pretty good compromise. Normally only</span>
+    <span class="c1"># the destination will matter since you typically only restart</span>
+    <span class="c1"># backups of the same thing to a given destination. The inclusion</span>
+    <span class="c1"># of the source however, does protect against most changes of</span>
+    <span class="c1"># source directory (for whatever reason, such as</span>
+    <span class="c1"># /path/to/different/snapshot). If the user happens to have a case</span>
+    <span class="c1"># where relative paths are used yet the relative path is the same</span>
+    <span class="c1"># (but duplicity is run from a different directory or similar),</span>
+    <span class="c1"># then it is simply up to the user to set --archive-dir properly.</span>
+    <span class="n">burlhash</span> <span class="o">=</span> <span class="n">md5</span><span class="p">()</span>
+    <span class="n">burlhash</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">backend_url</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">burlhash</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="check_file"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.check_file">[docs]</a><span class="k">def</span> <span class="nf">check_file</span><span class="p">(</span><span class="n">option</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">expand_fn</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="check_time"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.check_time">[docs]</a><span class="k">def</span> <span class="nf">check_time</span><span class="p">(</span><span class="n">option</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">genstrtotime</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">TimeException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">optparse</span><span class="o">.</span><span class="n">OptionValueError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="check_verbosity"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.check_verbosity">[docs]</a><span class="k">def</span> <span class="nf">check_verbosity</span><span class="p">(</span><span class="n">option</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="n">fail</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">]:</span>
+        <span class="n">verb</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">ERROR</span>
+    <span class="k">elif</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="s1">&#39;warning&#39;</span><span class="p">]:</span>
+        <span class="n">verb</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">WARNING</span>
+    <span class="k">elif</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">,</span> <span class="s1">&#39;notice&#39;</span><span class="p">]:</span>
+        <span class="n">verb</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">NOTICE</span>
+    <span class="k">elif</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">]:</span>
+        <span class="n">verb</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">INFO</span>
+    <span class="k">elif</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;debug&#39;</span><span class="p">]:</span>
+        <span class="n">verb</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">DEBUG</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">verb</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">verb</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">verb</span> <span class="o">&gt;</span> <span class="mi">9</span><span class="p">:</span>
+                <span class="n">fail</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="n">fail</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="n">fail</span><span class="p">:</span>
+        <span class="c1"># TRANSL: In this portion of the usage instructions, &quot;[ewnid]&quot; indicates which</span>
+        <span class="c1"># characters are permitted (e, w, n, i, or d); the brackets imply their own</span>
+        <span class="c1"># meaning in regex; i.e., only one of the characters is allowed in an instance.</span>
+        <span class="k">raise</span> <span class="n">optparse</span><span class="o">.</span><span class="n">OptionValueError</span><span class="p">(</span><span class="s2">&quot;Verbosity must be one of: digit [0-9], character [ewnid], &quot;</span>
+                                        <span class="s2">&quot;or word [&#39;error&#39;, &#39;warning&#39;, &#39;notice&#39;, &#39;info&#39;, &#39;debug&#39;]. &quot;</span>
+                                        <span class="s2">&quot;The default is 4 (Notice).  It is strongly recommended &quot;</span>
+                                        <span class="s2">&quot;that verbosity level is set at 2 (Warning) or higher.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">verb</span></div>
+
+
+<div class="viewcode-block" id="DupOption"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.DupOption">[docs]</a><span class="k">class</span> <span class="nc">DupOption</span><span class="p">(</span><span class="n">optparse</span><span class="o">.</span><span class="n">Option</span><span class="p">):</span>
+    <span class="n">TYPES</span> <span class="o">=</span> <span class="n">optparse</span><span class="o">.</span><span class="n">Option</span><span class="o">.</span><span class="n">TYPES</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;verbosity&quot;</span><span class="p">,)</span>
+    <span class="n">TYPE_CHECKER</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">optparse</span><span class="o">.</span><span class="n">Option</span><span class="o">.</span><span class="n">TYPE_CHECKER</span><span class="p">)</span>
+    <span class="n">TYPE_CHECKER</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">check_file</span>
+    <span class="n">TYPE_CHECKER</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">check_time</span>
+    <span class="n">TYPE_CHECKER</span><span class="p">[</span><span class="s2">&quot;verbosity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">check_verbosity</span>
+
+    <span class="n">ACTIONS</span> <span class="o">=</span> <span class="n">optparse</span><span class="o">.</span><span class="n">Option</span><span class="o">.</span><span class="n">ACTIONS</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;extend&quot;</span><span class="p">,)</span>
+    <span class="n">STORE_ACTIONS</span> <span class="o">=</span> <span class="n">optparse</span><span class="o">.</span><span class="n">Option</span><span class="o">.</span><span class="n">STORE_ACTIONS</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;extend&quot;</span><span class="p">,)</span>
+    <span class="n">TYPED_ACTIONS</span> <span class="o">=</span> <span class="n">optparse</span><span class="o">.</span><span class="n">Option</span><span class="o">.</span><span class="n">TYPED_ACTIONS</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;extend&quot;</span><span class="p">,)</span>
+    <span class="n">ALWAYS_TYPED_ACTIONS</span> <span class="o">=</span> <span class="n">optparse</span><span class="o">.</span><span class="n">Option</span><span class="o">.</span><span class="n">ALWAYS_TYPED_ACTIONS</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;extend&quot;</span><span class="p">,)</span>
+
+<div class="viewcode-block" id="DupOption.take_action"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.DupOption.take_action">[docs]</a>    <span class="k">def</span> <span class="nf">take_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">parser</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;extend&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dest</span><span class="p">):</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">value</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">optparse</span><span class="o">.</span><span class="n">Option</span><span class="o">.</span><span class="n">take_action</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">parser</span><span class="p">)</span></div></div>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Fix:</span>
+<span class="sd">    File &quot;/usr/lib/pythonX.X/optparse.py&quot;, line XXXX, in print_help</span>
+<span class="sd">    file.write(self.format_help().encode(encoding, &quot;replace&quot;))</span>
+<span class="sd">    UnicodeDecodeError: &#39;ascii&#39; codec can&#39;t decode byte 0xXX in position XXXX:</span>
+<span class="sd">See:</span>
+<span class="sd">    http://bugs.python.org/issue2931</span>
+<span class="sd">    http://mail.python.org/pipermail/python-dev/2006-May/065458.html</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="OPHelpFix"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.OPHelpFix">[docs]</a><span class="k">class</span> <span class="nc">OPHelpFix</span><span class="p">(</span><span class="n">optparse</span><span class="o">.</span><span class="n">OptionParser</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">_get_encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        try to get the encoding or use UTF-8</span>
+<span class="sd">        which is default encoding in python3 and most recent unixes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">encoding</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s2">&quot;encoding&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">encoding</span> <span class="ow">or</span> <span class="s1">&#39;utf-8&#39;</span>
+
+<div class="viewcode-block" id="OPHelpFix.print_help"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.OPHelpFix.print_help">[docs]</a>    <span class="k">def</span> <span class="nf">print_help</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        overwrite method with proper utf-8 decoding</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
+        <span class="n">encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_encoding</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+        <span class="n">help</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_help</span><span class="p">()</span>
+        <span class="c1"># The help is in unicode or bytes depending on the user&#39;s locale</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">help</span><span class="p">,</span> <span class="n">unicode</span><span class="p">):</span>
+            <span class="n">help</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_help</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">help</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="s2">&quot;replace&quot;</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="parse_cmdline_options"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.parse_cmdline_options">[docs]</a><span class="k">def</span> <span class="nf">parse_cmdline_options</span><span class="p">(</span><span class="n">arglist</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parse argument list&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">select_opts</span><span class="p">,</span> <span class="n">select_files</span><span class="p">,</span> <span class="n">full_backup</span>
+    <span class="k">global</span> <span class="n">list_current</span><span class="p">,</span> <span class="n">collection_status</span><span class="p">,</span> <span class="n">cleanup</span><span class="p">,</span> <span class="n">remove_time</span><span class="p">,</span> <span class="n">verify</span>
+
+    <span class="k">def</span> <span class="nf">set_log_fd</span><span class="p">(</span><span class="n">fd</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">fd</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">optparse</span><span class="o">.</span><span class="n">OptionValueError</span><span class="p">(</span><span class="s2">&quot;log-fd must be greater than zero.&quot;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">add_fd</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">set_time_sep</span><span class="p">(</span><span class="n">sep</span><span class="p">,</span> <span class="n">opt</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">sep</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">optparse</span><span class="o">.</span><span class="n">OptionValueError</span><span class="p">(</span><span class="s2">&quot;Dash (&#39;-&#39;) not valid for time-separator.&quot;</span><span class="p">)</span>
+        <span class="nb">globals</span><span class="o">.</span><span class="n">time_separator</span> <span class="o">=</span> <span class="n">sep</span>
+        <span class="n">old_fn_deprecation</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_selection</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+        <span class="n">select_opts</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">add_filelist</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="n">select_opts</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">s</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">select_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">FatalError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Error opening file </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">filename</span><span class="p">,</span>
+                           <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">cant_open_filelist</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">print_ver</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+        <span class="nb">print</span> <span class="s2">&quot;duplicity </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_rename</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+        <span class="nb">globals</span><span class="o">.</span><span class="n">rename</span><span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normcase</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]))]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">OPHelpFix</span><span class="p">(</span><span class="n">option_class</span><span class="o">=</span><span class="n">DupOption</span><span class="p">,</span> <span class="n">usage</span><span class="o">=</span><span class="n">usage</span><span class="p">())</span>
+
+    <span class="c1"># If this is true, only warn and don&#39;t raise fatal error when backup</span>
+    <span class="c1"># source directory doesn&#39;t match previous backup source directory.</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--allow-source-mismatch&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Set to the path of the archive directory (the directory which</span>
+    <span class="c1"># contains the signatures and manifests of the relevent backup</span>
+    <span class="c1"># collection), and for checkpoint state between volumes.</span>
+    <span class="c1"># TRANSL: Used in usage help to represent a Unix-style path name. Example:</span>
+    <span class="c1"># --archive-dir &lt;path&gt;</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--archive-dir&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">))</span>
+
+    <span class="c1"># Asynchronous put/get concurrency limit</span>
+    <span class="c1"># (default of 0 disables asynchronicity).</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--asynchronous-upload&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_const&quot;</span><span class="p">,</span> <span class="n">const</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;async_concurrency&quot;</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--compare-data&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+
+    <span class="c1"># config dir for future use</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--config-dir&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">),</span>
+                      <span class="n">help</span><span class="o">=</span><span class="n">optparse</span><span class="o">.</span><span class="n">SUPPRESS_HELP</span><span class="p">)</span>
+
+    <span class="c1"># for testing -- set current time</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--current-time&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;current_time&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">optparse</span><span class="o">.</span><span class="n">SUPPRESS_HELP</span><span class="p">)</span>
+
+    <span class="c1"># Don&#39;t actually do anything, but still report what would be done</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--dry-run&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+
+    <span class="c1"># TRANSL: Used in usage help to represent an ID for a GnuPG key. Example:</span>
+    <span class="c1"># --encrypt-key &lt;gpg_key_id&gt;</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--encrypt-key&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;gpg-key-id&quot;</span><span class="p">),</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span>
+                      <span class="n">callback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">globals</span><span class="o">.</span><span class="n">gpg_profile</span><span class="o">.</span><span class="n">recipients</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>  <span class="c1"># @UndefinedVariable</span>
+
+    <span class="c1"># secret keyring in which the private encrypt key can be found</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--encrypt-secret-keyring&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">))</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--encrypt-sign-key&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;gpg-key-id&quot;</span><span class="p">),</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span>
+                      <span class="n">callback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">gpg_profile</span><span class="o">.</span><span class="n">recipients</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">set_sign_key</span><span class="p">(</span><span class="n">v</span><span class="p">)))</span>
+
+    <span class="c1"># TRANSL: Used in usage help to represent a &quot;glob&quot; style pattern for</span>
+    <span class="c1"># matching one or more files, as described in the documentation.</span>
+    <span class="c1"># Example:</span>
+    <span class="c1"># --exclude &lt;shell_pattern&gt;</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--exclude&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;shell_pattern&quot;</span><span class="p">),</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">add_selection</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--exclude-device-files&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">add_selection</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--exclude-filelist&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;filename&quot;</span><span class="p">),</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">add_filelist</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--exclude-filelist-stdin&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                      <span class="n">callback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="p">(</span><span class="n">select_opts</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;--exclude-filelist&quot;</span><span class="p">,</span> <span class="s2">&quot;standard input&quot;</span><span class="p">)),</span>
+                                                   <span class="n">select_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="p">),</span>
+                                                   <span class="n">stdin_deprecation</span><span class="p">(</span><span class="n">o</span><span class="p">)),</span>
+                      <span class="n">help</span><span class="o">=</span><span class="n">optparse</span><span class="o">.</span><span class="n">SUPPRESS_HELP</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--exclude-globbing-filelist&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;filename&quot;</span><span class="p">),</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="p">(</span><span class="n">add_filelist</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">),</span>
+                                                                               <span class="n">old_globbing_filelist_deprecation</span><span class="p">(</span><span class="n">s</span><span class="p">)),</span>
+                      <span class="n">help</span><span class="o">=</span><span class="n">optparse</span><span class="o">.</span><span class="n">SUPPRESS_HELP</span><span class="p">)</span>
+
+    <span class="c1"># TRANSL: Used in usage help to represent the name of a file. Example:</span>
+    <span class="c1"># --log-file &lt;filename&gt;</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--exclude-if-present&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;filename&quot;</span><span class="p">),</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                      <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">add_selection</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--exclude-other-filesystems&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">add_selection</span><span class="p">)</span>
+
+    <span class="c1"># TRANSL: Used in usage help to represent a regular expression (regexp).</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--exclude-regexp&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;regular_expression&quot;</span><span class="p">),</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">add_selection</span><span class="p">)</span>
+
+    <span class="c1"># Exclude any files with modification dates older than this from the backup</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--exclude-older-than&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">),</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">add_selection</span><span class="p">)</span>
+
+    <span class="c1"># Whether we should be particularly aggressive when cleaning up</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--extra-clean&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+
+    <span class="c1"># used in testing only - raises exception after volume</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--fail-on-volume&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="n">optparse</span><span class="o">.</span><span class="n">SUPPRESS_HELP</span><span class="p">)</span>
+
+    <span class="c1"># used to provide a prefix on top of the defaul tar file name</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--file-prefix&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;file_prefix&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">)</span>
+
+    <span class="c1"># used to provide a suffix for manifest files only</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--file-prefix-manifest&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;file_prefix_manifest&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">)</span>
+
+    <span class="c1"># used to provide a suffix for archive files only</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--file-prefix-archive&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;file_prefix_archive&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">)</span>
+
+    <span class="c1"># used to provide a suffix for sigature files only</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--file-prefix-signature&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;file_prefix_signature&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">)</span>
+
+    <span class="c1"># used in testing only - skips upload for a given volume</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--skip-volume&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="n">optparse</span><span class="o">.</span><span class="n">SUPPRESS_HELP</span><span class="p">)</span>
+
+    <span class="c1"># If set, restore only the subdirectory or file specified, not the</span>
+    <span class="c1"># whole root.</span>
+    <span class="c1"># TRANSL: Used in usage help to represent a Unix-style path name. Example:</span>
+    <span class="c1"># --archive-dir &lt;path&gt;</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--file-to-restore&quot;</span><span class="p">,</span> <span class="s2">&quot;-r&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;file&quot;</span><span class="p">,</span>
+                      <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">),</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;restore_dir&quot;</span><span class="p">,</span>
+                      <span class="n">callback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">setattr</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="s2">&quot;restore_dir&quot;</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)))</span>
+
+    <span class="c1"># Used to confirm certain destructive operations like deleting old files.</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--force&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+
+    <span class="c1"># FTP data connection type</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--ftp-passive&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_const&quot;</span><span class="p">,</span> <span class="n">const</span><span class="o">=</span><span class="s2">&quot;passive&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;ftp_connection&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--ftp-regular&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_const&quot;</span><span class="p">,</span> <span class="n">const</span><span class="o">=</span><span class="s2">&quot;regular&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;ftp_connection&quot;</span><span class="p">)</span>
+
+    <span class="c1"># If set, forces a full backup if the last full backup is older than</span>
+    <span class="c1"># the time specified</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--full-if-older-than&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;full_force_time&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">))</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--gio&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;use_gio&quot;</span><span class="p">,</span>
+                      <span class="n">callback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="p">(</span><span class="nb">setattr</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="n">dest</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+                                                   <span class="n">old_fn_deprecation</span><span class="p">(</span><span class="n">s</span><span class="p">)))</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--gpg-binary&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">))</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--gpg-options&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;extend&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;options&quot;</span><span class="p">))</span>
+
+    <span class="c1"># TRANSL: Used in usage help to represent an ID for a hidden GnuPG key. Example:</span>
+    <span class="c1"># --hidden-encrypt-key &lt;gpg_key_id&gt;</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--hidden-encrypt-key&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;gpg-key-id&quot;</span><span class="p">),</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span>
+                      <span class="n">callback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">globals</span><span class="o">.</span><span class="n">gpg_profile</span><span class="o">.</span><span class="n">hidden_recipients</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>  <span class="c1"># @UndefinedVariable</span>
+
+    <span class="c1"># ignore (some) errors during operations; supposed to make it more</span>
+    <span class="c1"># likely that you are able to restore data under problematic</span>
+    <span class="c1"># circumstances. the default should absolutely always be False unless</span>
+    <span class="c1"># you know what you are doing.</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--ignore-errors&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;ignore_errors&quot;</span><span class="p">,</span>
+                      <span class="n">callback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span>
+                          <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Running in &#39;ignore errors&#39; mode due to </span><span class="si">%s</span><span class="s2">; please &quot;</span>
+                            <span class="s2">&quot;re-consider if this was not intended&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">s</span><span class="p">),</span>
+                          <span class="nb">setattr</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="s2">&quot;ignore_errors&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)))</span>
+
+    <span class="c1"># Whether to use the full email address as the user name when</span>
+    <span class="c1"># logging into an imap server. If false just the user name</span>
+    <span class="c1"># part of the email address is used.</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--imap-full-address&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Name of the imap folder where we want to store backups.</span>
+    <span class="c1"># Can be changed with a command line argument.</span>
+    <span class="c1"># TRANSL: Used in usage help to represent an imap mailbox</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--imap-mailbox&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;imap_mailbox&quot;</span><span class="p">))</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--include&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;shell_pattern&quot;</span><span class="p">),</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">add_selection</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--include-filelist&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;filename&quot;</span><span class="p">),</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">add_filelist</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--include-filelist-stdin&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                      <span class="n">callback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="p">(</span><span class="n">select_opts</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;--include-filelist&quot;</span><span class="p">,</span> <span class="s2">&quot;standard input&quot;</span><span class="p">)),</span>
+                                                   <span class="n">select_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="p">),</span>
+                                                   <span class="n">stdin_deprecation</span><span class="p">(</span><span class="n">o</span><span class="p">)),</span>
+                      <span class="n">help</span><span class="o">=</span><span class="n">optparse</span><span class="o">.</span><span class="n">SUPPRESS_HELP</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--include-globbing-filelist&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;filename&quot;</span><span class="p">),</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="p">(</span><span class="n">add_filelist</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">),</span>
+                                                                               <span class="n">old_globbing_filelist_deprecation</span><span class="p">(</span><span class="n">s</span><span class="p">)),</span>
+                      <span class="n">help</span><span class="o">=</span><span class="n">optparse</span><span class="o">.</span><span class="n">SUPPRESS_HELP</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--include-regexp&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;regular_expression&quot;</span><span class="p">),</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                      <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">add_selection</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--log-fd&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;file_descriptor&quot;</span><span class="p">),</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span>
+                      <span class="n">callback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">set_log_fd</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+
+    <span class="c1"># TRANSL: Used in usage help to represent the name of a file. Example:</span>
+    <span class="c1"># --log-file &lt;filename&gt;</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--log-file&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;filename&quot;</span><span class="p">),</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span>
+                      <span class="n">callback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">log</span><span class="o">.</span><span class="n">add_file</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+
+    <span class="c1"># Maximum block size for large files</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--max-blocksize&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;number&quot;</span><span class="p">))</span>
+
+    <span class="c1"># TRANSL: Used in usage help (noun)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--name&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;backup_name&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;backup name&quot;</span><span class="p">))</span>
+
+    <span class="c1"># If set to false, then do not encrypt files on remote system</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--no-encryption&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_false&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;encryption&quot;</span><span class="p">)</span>
+
+    <span class="c1"># If set to false, then do not compress files on remote system</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--no-compression&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_false&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;compression&quot;</span><span class="p">)</span>
+
+    <span class="c1"># If set, print the statistics after every backup session</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--no-print-statistics&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_false&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;print_statistics&quot;</span><span class="p">)</span>
+
+    <span class="c1"># If true, filelists and directory statistics will be split on</span>
+    <span class="c1"># nulls instead of newlines.</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--null-separator&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+
+    <span class="c1"># number of retries on network operations</span>
+    <span class="c1"># TRANSL: Used in usage help to represent a desired number of</span>
+    <span class="c1"># something. Example:</span>
+    <span class="c1"># --num-retries &lt;number&gt;</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--num-retries&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;number&quot;</span><span class="p">))</span>
+
+    <span class="c1"># File owner uid keeps number from tar file. Like same option in GNU tar.</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--numeric-owner&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Whether the old filename format is in effect.</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--old-filenames&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;old_filenames&quot;</span><span class="p">,</span>
+                      <span class="n">callback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="p">(</span><span class="nb">setattr</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="n">dest</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+                                                   <span class="n">old_fn_deprecation</span><span class="p">(</span><span class="n">s</span><span class="p">)))</span>
+
+    <span class="c1"># Level of Redundancy in % for Par2 files</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--par2-redundancy&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;number&quot;</span><span class="p">))</span>
+
+    <span class="c1"># Verbatim par2 options</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--par2-options&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;extend&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;options&quot;</span><span class="p">))</span>
+
+    <span class="c1"># Used to display the progress for the full and incremental backup operations</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--progress&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Used to control the progress option update rate in seconds. Default: prompts each 3 seconds</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--progress-rate&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;number&quot;</span><span class="p">))</span>
+
+    <span class="c1"># option to trigger Pydev debugger</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--pydevd&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+
+    <span class="c1"># option to rename files during restore</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--rename&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                      <span class="n">callback</span><span class="o">=</span><span class="n">add_rename</span><span class="p">)</span>
+
+    <span class="c1"># Restores will try to bring back the state as of the following time.</span>
+    <span class="c1"># If it is None, default to current time.</span>
+    <span class="c1"># TRANSL: Used in usage help to represent a time spec for a previous</span>
+    <span class="c1"># point in time, as described in the documentation. Example:</span>
+    <span class="c1"># duplicity remove-older-than time [options] target_url</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--restore-time&quot;</span><span class="p">,</span> <span class="s2">&quot;--time&quot;</span><span class="p">,</span> <span class="s2">&quot;-t&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">))</span>
+
+    <span class="c1"># user added rsync options</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--rsync-options&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;extend&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;options&quot;</span><span class="p">))</span>
+
+    <span class="c1"># Whether to create European buckets (sorry, hard-coded to only</span>
+    <span class="c1"># support european for now).</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--s3-european-buckets&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Whether to use S3 Reduced Redudancy Storage</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--s3-use-rrs&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Whether to use S3 Infrequent Access Storage</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--s3-use-ia&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Whether to use &quot;new-style&quot; subdomain addressing for S3 buckets. Such</span>
+    <span class="c1"># use is not backwards-compatible with upper-case buckets, or buckets</span>
+    <span class="c1"># that are otherwise not expressable in a valid hostname.</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--s3-use-new-style&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Whether to use plain HTTP (without SSL) to send data to S3</span>
+    <span class="c1"># See &lt;https://bugs.launchpad.net/duplicity/+bug/433970&gt;.</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--s3-unencrypted-connection&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Chunk size used for S3 multipart uploads.The number of parallel uploads to</span>
+    <span class="c1"># S3 be given by chunk size / volume size. Use this to maximize the use of</span>
+    <span class="c1"># your bandwidth. Defaults to 25MB</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--s3-multipart-chunk-size&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;number&quot;</span><span class="p">),</span>
+                      <span class="n">callback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">setattr</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="s2">&quot;s3_multipart_chunk_size&quot;</span><span class="p">,</span> <span class="n">v</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">))</span>
+
+    <span class="c1"># Number of processes to set the Processor Pool to when uploading multipart</span>
+    <span class="c1"># uploads to S3. Use this to control the maximum simultaneous uploads to S3.</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--s3-multipart-max-procs&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;number&quot;</span><span class="p">))</span>
+
+    <span class="c1"># Number of seconds to wait for each part of a multipart upload to S3. Use this</span>
+    <span class="c1"># to prevent hangups when doing a multipart upload to S3.</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--s3-multipart-max-timeout&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;number&quot;</span><span class="p">))</span>
+
+    <span class="c1"># Option to allow the s3/boto backend use the multiprocessing version.</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--s3-use-multiprocessing&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Option to allow use of server side encryption in s3</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--s3-use-server-side-encryption&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;s3_use_sse&quot;</span><span class="p">)</span>
+
+    <span class="c1"># scp command to use (ssh pexpect backend)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--scp-command&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;command&quot;</span><span class="p">))</span>
+
+    <span class="c1"># sftp command to use (ssh pexpect backend)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--sftp-command&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;command&quot;</span><span class="p">))</span>
+
+    <span class="c1"># allow the user to switch cloudfiles backend</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--cf-backend&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;pyrax|cloudfiles&quot;</span><span class="p">))</span>
+
+    <span class="c1"># If set, use short (&lt; 30 char) filenames for all the remote files.</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--short-filenames&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;short_filenames&quot;</span><span class="p">,</span>
+                      <span class="n">callback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="p">(</span><span class="nb">setattr</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="n">dest</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+                                                   <span class="n">old_fn_deprecation</span><span class="p">(</span><span class="n">s</span><span class="p">)))</span>
+
+    <span class="c1"># TRANSL: Used in usage help to represent an ID for a GnuPG key. Example:</span>
+    <span class="c1"># --encrypt-key &lt;gpg_key_id&gt;</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--sign-key&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;gpg-key-id&quot;</span><span class="p">),</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span>
+                      <span class="n">callback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">set_sign_key</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+
+    <span class="c1"># default to batch mode using public-key encryption</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--ssh-askpass&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+
+    <span class="c1"># user added ssh options</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--ssh-options&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;extend&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;options&quot;</span><span class="p">))</span>
+
+    <span class="c1"># user added ssl options (used by webdav, lftp backend)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--ssl-cacert-file&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;pem formatted bundle of certificate authorities&quot;</span><span class="p">))</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--ssl-cacert-path&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;path to a folder with certificate authority files&quot;</span><span class="p">))</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--ssl-no-check-certificate&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Working directory for the tempfile module. Defaults to /tmp on most systems.</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--tempdir&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;temproot&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">))</span>
+
+    <span class="c1"># network timeout value</span>
+    <span class="c1"># TRANSL: Used in usage help. Example:</span>
+    <span class="c1"># --timeout &lt;seconds&gt;</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--timeout&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;seconds&quot;</span><span class="p">))</span>
+
+    <span class="c1"># Character used like the &quot;:&quot; in time strings like</span>
+    <span class="c1"># 2002-08-06T04:22:00-07:00.  The colon isn&#39;t good for filenames on</span>
+    <span class="c1"># windows machines.</span>
+    <span class="c1"># TRANSL: abbreviation for &quot;character&quot; (noun)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--time-separator&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;char&quot;</span><span class="p">),</span>
+                      <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span>
+                      <span class="n">callback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">set_time_sep</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">s</span><span class="p">))</span>
+
+    <span class="c1"># Whether to specify --use-agent in GnuPG options</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--use-agent&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--verbosity&quot;</span><span class="p">,</span> <span class="s2">&quot;-v&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;verbosity&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;[0-9]&quot;</span><span class="p">,</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span>
+                      <span class="n">callback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">log</span><span class="o">.</span><span class="n">setverbosity</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;-V&quot;</span><span class="p">,</span> <span class="s2">&quot;--version&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">print_ver</span><span class="p">)</span>
+
+    <span class="c1"># volume size</span>
+    <span class="c1"># TRANSL: Used in usage help to represent a desired number of</span>
+    <span class="c1"># something. Example:</span>
+    <span class="c1"># --num-retries &lt;number&gt;</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--volsize&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;number&quot;</span><span class="p">),</span>
+                      <span class="n">callback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">setattr</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="s2">&quot;volsize&quot;</span><span class="p">,</span> <span class="n">v</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">))</span>
+
+    <span class="c1"># If set, collect only the file status, not the whole root.</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--file-changed&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;callback&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;file&quot;</span><span class="p">,</span>
+                      <span class="n">metavar</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">),</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;file_changed&quot;</span><span class="p">,</span>
+                      <span class="n">callback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">setattr</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="s2">&quot;file_changed&quot;</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)))</span>
+
+    <span class="c1"># parse the options</span>
+    <span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="c1"># Copy all arguments and their values to the globals module.  Don&#39;t copy</span>
+    <span class="c1"># attributes that are &#39;hidden&#39; (start with an underscore) or whose name is</span>
+    <span class="c1"># the empty string (used for arguments that don&#39;t directly store a value</span>
+    <span class="c1"># by using dest=&quot;&quot;)</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">),</span> <span class="nb">dir</span><span class="p">(</span><span class="n">options</span><span class="p">)):</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="c1"># Only set if v is not None because None is the default for all the</span>
+        <span class="c1"># variables.  If user didn&#39;t set it, we&#39;ll use defaults in globals.py</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="nb">globals</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+    <span class="n">socket</span><span class="o">.</span><span class="n">setdefaulttimeout</span><span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+
+    <span class="c1"># expect no cmd and two positional args</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">num_expect</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="c1"># process first arg as command</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">possible</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">commands</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">cmd</span><span class="p">)]</span>
+        <span class="c1"># no unique match, that&#39;s an error</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">possible</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">command_line_error</span><span class="p">(</span><span class="s2">&quot;command &#39;</span><span class="si">%s</span><span class="s2">&#39; not unique, could be </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">possible</span><span class="p">))</span>
+        <span class="c1"># only one match, that&#39;s a keeper</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">possible</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">cmd</span> <span class="o">=</span> <span class="n">possible</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># no matches, assume no cmd</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">possible</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">cmd</span> <span class="o">==</span> <span class="s2">&quot;cleanup&quot;</span><span class="p">:</span>
+        <span class="n">cleanup</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">num_expect</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="n">cmd</span> <span class="o">==</span> <span class="s2">&quot;collection-status&quot;</span><span class="p">:</span>
+        <span class="n">collection_status</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">num_expect</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="n">cmd</span> <span class="o">==</span> <span class="s2">&quot;full&quot;</span><span class="p">:</span>
+        <span class="n">full_backup</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">num_expect</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">elif</span> <span class="n">cmd</span> <span class="o">==</span> <span class="s2">&quot;incremental&quot;</span><span class="p">:</span>
+        <span class="nb">globals</span><span class="o">.</span><span class="n">incremental</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">num_expect</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">elif</span> <span class="n">cmd</span> <span class="o">==</span> <span class="s2">&quot;list-current-files&quot;</span><span class="p">:</span>
+        <span class="n">list_current</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">num_expect</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="n">cmd</span> <span class="o">==</span> <span class="s2">&quot;remove-older-than&quot;</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">arg</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">command_line_error</span><span class="p">(</span><span class="s2">&quot;Missing time string for remove-older-than&quot;</span><span class="p">)</span>
+        <span class="nb">globals</span><span class="o">.</span><span class="n">remove_time</span> <span class="o">=</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">genstrtotime</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+        <span class="n">num_expect</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="n">cmd</span> <span class="o">==</span> <span class="s2">&quot;remove-all-but-n-full&quot;</span> <span class="ow">or</span> <span class="n">cmd</span> <span class="o">==</span> <span class="s2">&quot;remove-all-inc-of-but-n-full&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">cmd</span> <span class="o">==</span> <span class="s2">&quot;remove-all-but-n-full&quot;</span><span class="p">:</span>
+            <span class="nb">globals</span><span class="o">.</span><span class="n">remove_all_but_n_full_mode</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">cmd</span> <span class="o">==</span> <span class="s2">&quot;remove-all-inc-of-but-n-full&quot;</span><span class="p">:</span>
+            <span class="nb">globals</span><span class="o">.</span><span class="n">remove_all_inc_of_but_n_full_mode</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">arg</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">command_line_error</span><span class="p">(</span><span class="s2">&quot;Missing count for &quot;</span> <span class="o">+</span> <span class="n">cmd</span><span class="p">)</span>
+        <span class="nb">globals</span><span class="o">.</span><span class="n">keep_chains</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">globals</span><span class="o">.</span><span class="n">keep_chains</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">command_line_error</span><span class="p">(</span><span class="n">cmd</span> <span class="o">+</span> <span class="s2">&quot; count must be &gt; 0&quot;</span><span class="p">)</span>
+        <span class="n">num_expect</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="n">cmd</span> <span class="o">==</span> <span class="s2">&quot;verify&quot;</span><span class="p">:</span>
+        <span class="n">verify</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">!=</span> <span class="n">num_expect</span><span class="p">:</span>
+        <span class="n">command_line_error</span><span class="p">(</span><span class="s2">&quot;Expected </span><span class="si">%d</span><span class="s2"> args, got </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">num_expect</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)))</span>
+
+    <span class="c1"># expand pathname args, but not URL</span>
+    <span class="k">for</span> <span class="n">loc</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="s1">&#39;://&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="n">loc</span><span class="p">]:</span>
+            <span class="n">args</span><span class="p">[</span><span class="n">loc</span><span class="p">]</span> <span class="o">=</span> <span class="n">expand_fn</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">loc</span><span class="p">])</span>
+
+    <span class="c1"># Note that ProcessCommandLine depends on us verifying the arg</span>
+    <span class="c1"># count here; do not remove without fixing it. We must make the</span>
+    <span class="c1"># checks here in order to make enough sense of args to identify</span>
+    <span class="c1"># the backend URL/lpath for args_to_path_backend().</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">command_line_error</span><span class="p">(</span><span class="s2">&quot;Too few arguments&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">backend_url</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">lpath</span><span class="p">,</span> <span class="n">backend_url</span> <span class="o">=</span> <span class="n">args_to_path_backend</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># @UnusedVariable</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">command_line_error</span><span class="p">(</span><span class="s2">&quot;Too many arguments&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">globals</span><span class="o">.</span><span class="n">backup_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">globals</span><span class="o">.</span><span class="n">backup_name</span> <span class="o">=</span> <span class="n">generate_default_backup_name</span><span class="p">(</span><span class="n">backend_url</span><span class="p">)</span>
+
+    <span class="c1"># set and expand archive dir</span>
+    <span class="n">set_archive_dir</span><span class="p">(</span><span class="n">expand_archive_dir</span><span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">archive_dir</span><span class="p">,</span>
+                                       <span class="nb">globals</span><span class="o">.</span><span class="n">backup_name</span><span class="p">))</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Using archive dir: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">archive_dir</span><span class="o">.</span><span class="n">name</span><span class="p">),))</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Using backup name: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">backup_name</span><span class="p">,))</span>
+
+    <span class="k">return</span> <span class="n">args</span></div>
+
+
+<div class="viewcode-block" id="command_line_error"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.command_line_error">[docs]</a><span class="k">def</span> <span class="nf">command_line_error</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Indicate a command line error and exit&quot;&quot;&quot;</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">FatalError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Command line error: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">message</span><span class="p">,)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                   <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Enter &#39;duplicity --help&#39; for help screen.&quot;</span><span class="p">),</span>
+                   <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">command_line</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="usage"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.usage">[docs]</a><span class="k">def</span> <span class="nf">usage</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns terse usage info. The code is broken down into pieces for ease of</span>
+<span class="sd">    translation maintenance. Any comments that look extraneous or redundant should</span>
+<span class="sd">    be assumed to be for the benefit of translators, since they can get each string</span>
+<span class="sd">    (paired with its preceding comment, if any) independently of the others.&quot;&quot;&quot;</span>
+
+    <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="c1"># TRANSL: Used in usage help to represent a Unix-style path name. Example:</span>
+        <span class="c1"># rsync://user[:password]@other_host[:port]//absolute_path</span>
+        <span class="s1">&#39;absolute_path&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;absolute_path&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in usage help. Example:</span>
+        <span class="c1"># tahoe://alias/some_dir</span>
+        <span class="s1">&#39;alias&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;alias&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in help to represent a &quot;bucket name&quot; for Amazon Web</span>
+        <span class="c1"># Services&#39; Simple Storage Service (S3). Example:</span>
+        <span class="c1"># s3://other.host/bucket_name[/prefix]</span>
+        <span class="s1">&#39;bucket_name&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;bucket_name&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: abbreviation for &quot;character&quot; (noun)</span>
+        <span class="s1">&#39;char&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;char&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: noun</span>
+        <span class="s1">&#39;command&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;command&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in usage help to represent the name of a container in</span>
+        <span class="c1"># Amazon Web Services&#39; Cloudfront. Example:</span>
+        <span class="c1"># cf+http://container_name</span>
+        <span class="s1">&#39;container_name&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;container_name&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: noun</span>
+        <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;count&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in usage help to represent the name of a file directory</span>
+        <span class="s1">&#39;directory&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;directory&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in usage help to represent the name of a file. Example:</span>
+        <span class="c1"># --log-file &lt;filename&gt;</span>
+        <span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;filename&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in usage help to represent an ID for a GnuPG key. Example:</span>
+        <span class="c1"># --encrypt-key &lt;gpg_key_id&gt;</span>
+        <span class="s1">&#39;gpg_key_id&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;gpg-key-id&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in usage help, e.g. to represent the name of a code</span>
+        <span class="c1"># module. Example:</span>
+        <span class="c1"># rsync://user[:password]@other.host[:port]::/module/some_dir</span>
+        <span class="s1">&#39;module&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;module&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in usage help to represent a desired number of</span>
+        <span class="c1"># something. Example:</span>
+        <span class="c1"># --num-retries &lt;number&gt;</span>
+        <span class="s1">&#39;number&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;number&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in usage help. (Should be consistent with the &quot;Options:&quot;</span>
+        <span class="c1"># header.) Example:</span>
+        <span class="c1"># duplicity [full|incremental] [options] source_dir target_url</span>
+        <span class="s1">&#39;options&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;options&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in usage help to represent an internet hostname. Example:</span>
+        <span class="c1"># ftp://user[:password]@other.host[:port]/some_dir</span>
+        <span class="s1">&#39;other_host&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;other.host&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in usage help. Example:</span>
+        <span class="c1"># ftp://user[:password]@other.host[:port]/some_dir</span>
+        <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;password&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in usage help to represent a Unix-style path name. Example:</span>
+        <span class="c1"># --archive-dir &lt;path&gt;</span>
+        <span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in usage help to represent a TCP port number. Example:</span>
+        <span class="c1"># ftp://user[:password]@other.host[:port]/some_dir</span>
+        <span class="s1">&#39;port&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;port&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in usage help. This represents a string to be used as a</span>
+        <span class="c1"># prefix to names for backup files created by Duplicity. Example:</span>
+        <span class="c1"># s3://other.host/bucket_name[/prefix]</span>
+        <span class="s1">&#39;prefix&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;prefix&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in usage help to represent a Unix-style path name. Example:</span>
+        <span class="c1"># rsync://user[:password]@other.host[:port]/relative_path</span>
+        <span class="s1">&#39;relative_path&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;relative_path&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in usage help. Example:</span>
+        <span class="c1"># --timeout &lt;seconds&gt;</span>
+        <span class="s1">&#39;seconds&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;seconds&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in usage help to represent a &quot;glob&quot; style pattern for</span>
+        <span class="c1"># matching one or more files, as described in the documentation.</span>
+        <span class="c1"># Example:</span>
+        <span class="c1"># --exclude &lt;shell_pattern&gt;</span>
+        <span class="s1">&#39;shell_pattern&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;shell_pattern&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in usage help to represent the name of a single file</span>
+        <span class="c1"># directory or a Unix-style path to a directory. Example:</span>
+        <span class="c1"># file:///some_dir</span>
+        <span class="s1">&#39;some_dir&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;some_dir&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in usage help to represent the name of a single file</span>
+        <span class="c1"># directory or a Unix-style path to a directory where files will be</span>
+        <span class="c1"># coming FROM. Example:</span>
+        <span class="c1"># duplicity [full|incremental] [options] source_dir target_url</span>
+        <span class="s1">&#39;source_dir&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;source_dir&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in usage help to represent a URL files will be coming</span>
+        <span class="c1"># FROM. Example:</span>
+        <span class="c1"># duplicity [restore] [options] source_url target_dir</span>
+        <span class="s1">&#39;source_url&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;source_url&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in usage help to represent the name of a single file</span>
+        <span class="c1"># directory or a Unix-style path to a directory. where files will be</span>
+        <span class="c1"># going TO. Example:</span>
+        <span class="c1"># duplicity [restore] [options] source_url target_dir</span>
+        <span class="s1">&#39;target_dir&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;target_dir&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in usage help to represent a URL files will be going TO.</span>
+        <span class="c1"># Example:</span>
+        <span class="c1"># duplicity [full|incremental] [options] source_dir target_url</span>
+        <span class="s1">&#39;target_url&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;target_url&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in usage help to represent a time spec for a previous</span>
+        <span class="c1"># point in time, as described in the documentation. Example:</span>
+        <span class="c1"># duplicity remove-older-than time [options] target_url</span>
+        <span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: Used in usage help to represent a user name (i.e. login).</span>
+        <span class="c1"># Example:</span>
+        <span class="c1"># ftp://user[:password]@other.host[:port]/some_dir</span>
+        <span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: account id for b2. Example: b2://account_id@bucket/</span>
+        <span class="s1">&#39;account_id&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;account_id&quot;</span><span class="p">),</span>
+
+        <span class="c1"># TRANSL: application_key for b2.</span>
+        <span class="c1"># Example: b2://account_id:application_key@bucket/</span>
+        <span class="s1">&#39;application_key&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;application_key&quot;</span><span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="c1"># TRANSL: Header in usage help</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">  duplicity [full|incremental] [</span><span class="si">%(options)s</span><span class="s2">] </span><span class="si">%(source_dir)s</span><span class="s2"> </span><span class="si">%(target_url)s</span><span class="s2"></span>
+<span class="s2">  duplicity [restore] [</span><span class="si">%(options)s</span><span class="s2">] </span><span class="si">%(source_url)s</span><span class="s2"> </span><span class="si">%(target_dir)s</span><span class="s2"></span>
+<span class="s2">  duplicity verify [</span><span class="si">%(options)s</span><span class="s2">] </span><span class="si">%(source_url)s</span><span class="s2"> </span><span class="si">%(target_dir)s</span><span class="s2"></span>
+<span class="s2">  duplicity collection-status [</span><span class="si">%(options)s</span><span class="s2">] </span><span class="si">%(target_url)s</span><span class="s2"></span>
+<span class="s2">  duplicity list-current-files [</span><span class="si">%(options)s</span><span class="s2">] </span><span class="si">%(target_url)s</span><span class="s2"></span>
+<span class="s2">  duplicity cleanup [</span><span class="si">%(options)s</span><span class="s2">] </span><span class="si">%(target_url)s</span><span class="s2"></span>
+<span class="s2">  duplicity remove-older-than </span><span class="si">%(time)s</span><span class="s2"> [</span><span class="si">%(options)s</span><span class="s2">] </span><span class="si">%(target_url)s</span><span class="s2"></span>
+<span class="s2">  duplicity remove-all-but-n-full </span><span class="si">%(count)s</span><span class="s2"> [</span><span class="si">%(options)s</span><span class="s2">] </span><span class="si">%(target_url)s</span><span class="s2"></span>
+<span class="s2">  duplicity remove-all-inc-of-but-n-full </span><span class="si">%(count)s</span><span class="s2"> [</span><span class="si">%(options)s</span><span class="s2">] </span><span class="si">%(target_url)s</span><span class="s2"></span>
+
+<span class="s2">&quot;&quot;&quot;</span> <span class="o">%</span> <span class="nb">dict</span>
+
+    <span class="c1"># TRANSL: Header in usage help</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span> <span class="o">+</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Backends and their URL formats:&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">  cf+http://</span><span class="si">%(container_name)s</span><span class="s2"></span>
+<span class="s2">  file:///</span><span class="si">%(some_dir)s</span><span class="s2"></span>
+<span class="s2">  ftp://</span><span class="si">%(user)s</span><span class="s2">[:</span><span class="si">%(password)s</span><span class="s2">]@</span><span class="si">%(other_host)s</span><span class="s2">[:</span><span class="si">%(port)s</span><span class="s2">]/</span><span class="si">%(some_dir)s</span><span class="s2"></span>
+<span class="s2">  ftps://</span><span class="si">%(user)s</span><span class="s2">[:</span><span class="si">%(password)s</span><span class="s2">]@</span><span class="si">%(other_host)s</span><span class="s2">[:</span><span class="si">%(port)s</span><span class="s2">]/</span><span class="si">%(some_dir)s</span><span class="s2"></span>
+<span class="s2">  hsi://</span><span class="si">%(user)s</span><span class="s2">[:</span><span class="si">%(password)s</span><span class="s2">]@</span><span class="si">%(other_host)s</span><span class="s2">[:</span><span class="si">%(port)s</span><span class="s2">]/</span><span class="si">%(some_dir)s</span><span class="s2"></span>
+<span class="s2">  imap://</span><span class="si">%(user)s</span><span class="s2">[:</span><span class="si">%(password)s</span><span class="s2">]@</span><span class="si">%(other_host)s</span><span class="s2">[:</span><span class="si">%(port)s</span><span class="s2">]/</span><span class="si">%(some_dir)s</span><span class="s2"></span>
+<span class="s2">  rsync://</span><span class="si">%(user)s</span><span class="s2">[:</span><span class="si">%(password)s</span><span class="s2">]@</span><span class="si">%(other_host)s</span><span class="s2">[:</span><span class="si">%(port)s</span><span class="s2">]::/</span><span class="si">%(module)s</span><span class="s2">/</span><span class="si">%(some_dir)s</span><span class="s2"></span>
+<span class="s2">  rsync://</span><span class="si">%(user)s</span><span class="s2">[:</span><span class="si">%(password)s</span><span class="s2">]@</span><span class="si">%(other_host)s</span><span class="s2">[:</span><span class="si">%(port)s</span><span class="s2">]/</span><span class="si">%(relative_path)s</span><span class="s2"></span>
+<span class="s2">  rsync://</span><span class="si">%(user)s</span><span class="s2">[:</span><span class="si">%(password)s</span><span class="s2">]@</span><span class="si">%(other_host)s</span><span class="s2">[:</span><span class="si">%(port)s</span><span class="s2">]//</span><span class="si">%(absolute_path)s</span><span class="s2"></span>
+<span class="s2">  s3://</span><span class="si">%(other_host)s</span><span class="s2">[:</span><span class="si">%(port)s</span><span class="s2">]/</span><span class="si">%(bucket_name)s</span><span class="s2">[/</span><span class="si">%(prefix)s</span><span class="s2">]</span>
+<span class="s2">  s3+http://</span><span class="si">%(bucket_name)s</span><span class="s2">[/</span><span class="si">%(prefix)s</span><span class="s2">]</span>
+<span class="s2">  scp://</span><span class="si">%(user)s</span><span class="s2">[:</span><span class="si">%(password)s</span><span class="s2">]@</span><span class="si">%(other_host)s</span><span class="s2">[:</span><span class="si">%(port)s</span><span class="s2">]/</span><span class="si">%(some_dir)s</span><span class="s2"></span>
+<span class="s2">  ssh://</span><span class="si">%(user)s</span><span class="s2">[:</span><span class="si">%(password)s</span><span class="s2">]@</span><span class="si">%(other_host)s</span><span class="s2">[:</span><span class="si">%(port)s</span><span class="s2">]/</span><span class="si">%(some_dir)s</span><span class="s2"></span>
+<span class="s2">  swift://</span><span class="si">%(container_name)s</span><span class="s2"></span>
+<span class="s2">  tahoe://</span><span class="si">%(alias)s</span><span class="s2">/</span><span class="si">%(directory)s</span><span class="s2"></span>
+<span class="s2">  webdav://</span><span class="si">%(user)s</span><span class="s2">[:</span><span class="si">%(password)s</span><span class="s2">]@</span><span class="si">%(other_host)s</span><span class="s2">/</span><span class="si">%(some_dir)s</span><span class="s2"></span>
+<span class="s2">  webdavs://</span><span class="si">%(user)s</span><span class="s2">[:</span><span class="si">%(password)s</span><span class="s2">]@</span><span class="si">%(other_host)s</span><span class="s2">/</span><span class="si">%(some_dir)s</span><span class="s2"></span>
+<span class="s2">  gdocs://</span><span class="si">%(user)s</span><span class="s2">[:</span><span class="si">%(password)s</span><span class="s2">]@</span><span class="si">%(other_host)s</span><span class="s2">/</span><span class="si">%(some_dir)s</span><span class="s2"></span>
+<span class="s2">  pydrive://</span><span class="si">%(user)s</span><span class="s2">@</span><span class="si">%(other_host)s</span><span class="s2">/</span><span class="si">%(some_dir)s</span><span class="s2"></span>
+<span class="s2">  mega://</span><span class="si">%(user)s</span><span class="s2">[:</span><span class="si">%(password)s</span><span class="s2">]@</span><span class="si">%(other_host)s</span><span class="s2">/</span><span class="si">%(some_dir)s</span><span class="s2"></span>
+<span class="s2">  copy://</span><span class="si">%(user)s</span><span class="s2">[:</span><span class="si">%(password)s</span><span class="s2">]@</span><span class="si">%(other_host)s</span><span class="s2">/</span><span class="si">%(some_dir)s</span><span class="s2"></span>
+<span class="s2">  dpbx:///</span><span class="si">%(some_dir)s</span><span class="s2"></span>
+<span class="s2">  onedrive://</span><span class="si">%(some_dir)s</span><span class="s2"></span>
+<span class="s2">  azure://</span><span class="si">%(container_name)s</span><span class="s2"></span>
+<span class="s2">  b2://</span><span class="si">%(account_id)s</span><span class="s2">[:</span><span class="si">%(application_key)s</span><span class="s2">]@</span><span class="si">%(bucket_name)s</span><span class="s2">/[</span><span class="si">%(some_dir)s</span><span class="s2">/]</span>
+<span class="s2">  mf://</span><span class="si">%(user)s</span><span class="s2">[:</span><span class="si">%(password)s</span><span class="s2">]@</span><span class="si">%(other_host)s</span><span class="s2">/</span><span class="si">%(some_dir)s</span><span class="s2"></span>
+
+<span class="s2">&quot;&quot;&quot;</span> <span class="o">%</span> <span class="nb">dict</span>
+
+    <span class="c1"># TRANSL: Header in usage help</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span> <span class="o">+</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Commands:&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">  cleanup &lt;</span><span class="si">%(target_url)s</span><span class="s2">&gt;</span>
+<span class="s2">  collection-status &lt;</span><span class="si">%(target_url)s</span><span class="s2">&gt;</span>
+<span class="s2">  full &lt;</span><span class="si">%(source_dir)s</span><span class="s2">&gt; &lt;</span><span class="si">%(target_url)s</span><span class="s2">&gt;</span>
+<span class="s2">  incr &lt;</span><span class="si">%(source_dir)s</span><span class="s2">&gt; &lt;</span><span class="si">%(target_url)s</span><span class="s2">&gt;</span>
+<span class="s2">  list-current-files &lt;</span><span class="si">%(target_url)s</span><span class="s2">&gt;</span>
+<span class="s2">  restore &lt;</span><span class="si">%(source_url)s</span><span class="s2">&gt; &lt;</span><span class="si">%(target_dir)s</span><span class="s2">&gt;</span>
+<span class="s2">  remove-older-than &lt;</span><span class="si">%(time)s</span><span class="s2">&gt; &lt;</span><span class="si">%(target_url)s</span><span class="s2">&gt;</span>
+<span class="s2">  remove-all-but-n-full &lt;</span><span class="si">%(count)s</span><span class="s2">&gt; &lt;</span><span class="si">%(target_url)s</span><span class="s2">&gt;</span>
+<span class="s2">  remove-all-inc-of-but-n-full &lt;</span><span class="si">%(count)s</span><span class="s2">&gt; &lt;</span><span class="si">%(target_url)s</span><span class="s2">&gt;</span>
+<span class="s2">  verify &lt;</span><span class="si">%(target_url)s</span><span class="s2">&gt; &lt;</span><span class="si">%(source_dir)s</span><span class="s2">&gt;&quot;&quot;&quot;</span> <span class="o">%</span> <span class="nb">dict</span>
+
+    <span class="k">return</span> <span class="n">msg</span></div>
+
+
+<div class="viewcode-block" id="set_archive_dir"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.set_archive_dir">[docs]</a><span class="k">def</span> <span class="nf">set_archive_dir</span><span class="p">(</span><span class="n">dirstring</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check archive dir and set global&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dirstring</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dirstring</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="n">archive_dir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">dirstring</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">archive_dir</span><span class="o">.</span><span class="n">isdir</span><span class="p">():</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">FatalError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Specified archive directory &#39;</span><span class="si">%s</span><span class="s2">&#39; does not exist, &quot;</span>
+                         <span class="s2">&quot;or is not a directory&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">archive_dir</span><span class="o">.</span><span class="n">name</span><span class="p">),),</span>
+                       <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">bad_archive_dir</span><span class="p">)</span>
+    <span class="nb">globals</span><span class="o">.</span><span class="n">archive_dir</span> <span class="o">=</span> <span class="n">archive_dir</span></div>
+
+
+<div class="viewcode-block" id="set_sign_key"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.set_sign_key">[docs]</a><span class="k">def</span> <span class="nf">set_sign_key</span><span class="p">(</span><span class="n">sign_key</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Set globals.sign_key assuming proper key given&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;^(0x)?([0-9A-Fa-f]</span><span class="si">{8}</span><span class="s2">|[0-9A-Fa-f]</span><span class="si">{16}</span><span class="s2">|[0-9A-Fa-f]</span><span class="si">{40}</span><span class="s2">)$&quot;</span><span class="p">,</span> <span class="n">sign_key</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">FatalError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Sign key should be an 8, 16 alt. 40 character hex string, like &quot;</span>
+                         <span class="s2">&quot;&#39;AA0E73D2&#39;.</span><span class="se">\n</span><span class="s2">Received &#39;</span><span class="si">%s</span><span class="s2">&#39; instead.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">sign_key</span><span class="p">,),</span>
+                       <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">bad_sign_key</span><span class="p">)</span>
+    <span class="nb">globals</span><span class="o">.</span><span class="n">gpg_profile</span><span class="o">.</span><span class="n">sign_key</span> <span class="o">=</span> <span class="n">sign_key</span></div>
+
+
+<div class="viewcode-block" id="set_selection"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.set_selection">[docs]</a><span class="k">def</span> <span class="nf">set_selection</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Return selection iter starting at filename with arguments applied&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">select_opts</span><span class="p">,</span> <span class="n">select_files</span>
+    <span class="n">sel</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">local_path</span><span class="p">)</span>
+    <span class="n">sel</span><span class="o">.</span><span class="n">ParseArgs</span><span class="p">(</span><span class="n">select_opts</span><span class="p">,</span> <span class="n">select_files</span><span class="p">)</span>
+    <span class="nb">globals</span><span class="o">.</span><span class="n">select</span> <span class="o">=</span> <span class="n">sel</span><span class="o">.</span><span class="n">set_iter</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="args_to_path_backend"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.args_to_path_backend">[docs]</a><span class="k">def</span> <span class="nf">args_to_path_backend</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given exactly two arguments, arg1 and arg2, figure out which one</span>
+<span class="sd">    is the backend URL and which one is a local path, and return</span>
+<span class="sd">    (local, backend).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">arg1_is_backend</span><span class="p">,</span> <span class="n">arg2_is_backend</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">is_backend_url</span><span class="p">(</span><span class="n">arg1</span><span class="p">),</span> <span class="n">backend</span><span class="o">.</span><span class="n">is_backend_url</span><span class="p">(</span><span class="n">arg2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">arg1_is_backend</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">arg2_is_backend</span><span class="p">:</span>
+        <span class="n">command_line_error</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">One of the arguments must be an URL.  Examples of URL strings are</span>
+<span class="s2">&quot;scp://user@host.net:1234/path&quot; and &quot;file:///usr/local&quot;.  See the man</span>
+<span class="s2">page for more information.&quot;&quot;&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">arg1_is_backend</span> <span class="ow">and</span> <span class="n">arg2_is_backend</span><span class="p">:</span>
+        <span class="n">command_line_error</span><span class="p">(</span><span class="s2">&quot;Two URLs specified.  &quot;</span>
+                           <span class="s2">&quot;One argument should be a path.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">arg1_is_backend</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">arg2</span><span class="p">,</span> <span class="n">arg1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">arg2_is_backend</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s1">&#39;should not be reached&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="set_backend"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.set_backend">[docs]</a><span class="k">def</span> <span class="nf">set_backend</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Figure out which arg is url, set backend</span>
+
+<span class="sd">    Return value is pair (path_first, path) where is_first is true iff</span>
+<span class="sd">    path made from arg1.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path</span><span class="p">,</span> <span class="n">bend</span> <span class="o">=</span> <span class="n">args_to_path_backend</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">)</span>
+
+    <span class="nb">globals</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">get_backend</span><span class="p">(</span><span class="n">bend</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">path</span> <span class="o">==</span> <span class="n">arg2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">arg2</span><span class="p">)</span>  <span class="c1"># False?</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">arg1</span><span class="p">)</span>  <span class="c1"># True?</span></div>
+
+
+<div class="viewcode-block" id="process_local_dir"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.process_local_dir">[docs]</a><span class="k">def</span> <span class="nf">process_local_dir</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">local_pathname</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check local directory, set globals.local_path&quot;&quot;&quot;</span>
+    <span class="n">local_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">local_pathname</span><span class="p">)</span><span class="o">.</span><span class="n">get_canonical</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;restore&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">local_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">local_path</span><span class="o">.</span><span class="n">isemptydir</span><span class="p">())</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">globals</span><span class="o">.</span><span class="n">force</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">FatalError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Restore destination directory </span><span class="si">%s</span><span class="s2"> already &quot;</span>
+                             <span class="s2">&quot;exists.</span><span class="se">\n</span><span class="s2">Will not overwrite.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">local_path</span><span class="o">.</span><span class="n">name</span><span class="p">),),</span>
+                           <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">restore_dir_exists</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;verify&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">local_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">FatalError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Verify directory </span><span class="si">%s</span><span class="s2"> does not exist&quot;</span><span class="p">)</span> <span class="o">%</span>
+                           <span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">local_path</span><span class="o">.</span><span class="n">name</span><span class="p">),),</span>
+                           <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">verify_dir_doesnt_exist</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;full&quot;</span> <span class="ow">or</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;inc&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">local_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">FatalError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Backup source directory </span><span class="si">%s</span><span class="s2"> does not exist.&quot;</span><span class="p">)</span>
+                           <span class="o">%</span> <span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">local_path</span><span class="o">.</span><span class="n">name</span><span class="p">),),</span>
+                           <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">backup_dir_doesnt_exist</span><span class="p">)</span>
+
+    <span class="nb">globals</span><span class="o">.</span><span class="n">local_path</span> <span class="o">=</span> <span class="n">local_path</span></div>
+
+
+<div class="viewcode-block" id="check_consistency"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.check_consistency">[docs]</a><span class="k">def</span> <span class="nf">check_consistency</span><span class="p">(</span><span class="n">action</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Final consistency check, see if something wrong with command line&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">full_backup</span><span class="p">,</span> <span class="n">select_opts</span><span class="p">,</span> <span class="n">list_current</span>
+
+    <span class="k">def</span> <span class="nf">assert_only_one</span><span class="p">(</span><span class="n">arglist</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Raises error if two or more of the elements of arglist are true&quot;&quot;&quot;</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">arglist</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">assert</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Invalid syntax, two conflicting modes specified&quot;</span>
+
+    <span class="k">if</span> <span class="n">action</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;list-current&quot;</span><span class="p">,</span> <span class="s2">&quot;collection-status&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;cleanup&quot;</span><span class="p">,</span> <span class="s2">&quot;remove-old&quot;</span><span class="p">,</span> <span class="s2">&quot;remove-all-but-n-full&quot;</span><span class="p">,</span> <span class="s2">&quot;remove-all-inc-of-but-n-full&quot;</span><span class="p">]:</span>
+        <span class="n">assert_only_one</span><span class="p">([</span><span class="n">list_current</span><span class="p">,</span> <span class="n">collection_status</span><span class="p">,</span> <span class="n">cleanup</span><span class="p">,</span>
+                         <span class="nb">globals</span><span class="o">.</span><span class="n">remove_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;restore&quot;</span> <span class="ow">or</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;verify&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">full_backup</span><span class="p">:</span>
+            <span class="n">command_line_error</span><span class="p">(</span><span class="s2">&quot;--full option cannot be used when &quot;</span>
+                               <span class="s2">&quot;restoring or verifying&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">globals</span><span class="o">.</span><span class="n">incremental</span><span class="p">:</span>
+            <span class="n">command_line_error</span><span class="p">(</span><span class="s2">&quot;--incremental option cannot be used when &quot;</span>
+                               <span class="s2">&quot;restoring or verifying&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">select_opts</span> <span class="ow">and</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;restore&quot;</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Command line warning: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Selection options --exclude/--include</span><span class="se">\n</span><span class="s2">&quot;</span>
+                                                       <span class="s2">&quot;currently work only when backing up,&quot;</span>
+                                                       <span class="s2">&quot;not restoring.&quot;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;inc&quot;</span> <span class="ow">or</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;full&quot;</span>
+        <span class="k">if</span> <span class="n">verify</span><span class="p">:</span>
+            <span class="n">command_line_error</span><span class="p">(</span><span class="s2">&quot;--verify option cannot be used &quot;</span>
+                               <span class="s2">&quot;when backing up&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">globals</span><span class="o">.</span><span class="n">restore_dir</span><span class="p">:</span>
+            <span class="n">command_line_error</span><span class="p">(</span><span class="s2">&quot;restore option incompatible with </span><span class="si">%s</span><span class="s2"> backup&quot;</span>
+                               <span class="o">%</span> <span class="p">(</span><span class="n">action</span><span class="p">,))</span>
+        <span class="k">if</span> <span class="nb">globals</span><span class="o">.</span><span class="n">s3_use_rrs</span> <span class="ow">and</span> <span class="nb">globals</span><span class="o">.</span><span class="n">s3_use_ia</span><span class="p">:</span>
+            <span class="n">command_line_error</span><span class="p">(</span><span class="s2">&quot;--s3-use-rrs and --s3-use-ia cannot be used together&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ProcessCommandLine"><a class="viewcode-back" href="../../duplicity.commandline.html#duplicity.commandline.ProcessCommandLine">[docs]</a><span class="k">def</span> <span class="nf">ProcessCommandLine</span><span class="p">(</span><span class="n">cmdline_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Process command line, set globals, return action</span>
+
+<span class="sd">    action will be &quot;list-current&quot;, &quot;collection-status&quot;, &quot;cleanup&quot;,</span>
+<span class="sd">    &quot;remove-old&quot;, &quot;restore&quot;, &quot;verify&quot;, &quot;full&quot;, or &quot;inc&quot;.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">globals</span><span class="o">.</span><span class="n">gpg_profile</span> <span class="o">=</span> <span class="n">gpg</span><span class="o">.</span><span class="n">GPGProfile</span><span class="p">()</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parse_cmdline_options</span><span class="p">(</span><span class="n">cmdline_list</span><span class="p">)</span>
+
+    <span class="c1"># we can now try to import all the backends</span>
+    <span class="n">backend</span><span class="o">.</span><span class="n">import_backends</span><span class="p">()</span>
+
+    <span class="c1"># parse_cmdline_options already verified that we got exactly 1 or 2</span>
+    <span class="c1"># non-options arguments</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;arg count should have been checked already&quot;</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">list_current</span><span class="p">:</span>
+            <span class="n">action</span> <span class="o">=</span> <span class="s2">&quot;list-current&quot;</span>
+        <span class="k">elif</span> <span class="n">collection_status</span><span class="p">:</span>
+            <span class="n">action</span> <span class="o">=</span> <span class="s2">&quot;collection-status&quot;</span>
+        <span class="k">elif</span> <span class="n">cleanup</span><span class="p">:</span>
+            <span class="n">action</span> <span class="o">=</span> <span class="s2">&quot;cleanup&quot;</span>
+        <span class="k">elif</span> <span class="nb">globals</span><span class="o">.</span><span class="n">remove_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">action</span> <span class="o">=</span> <span class="s2">&quot;remove-old&quot;</span>
+        <span class="k">elif</span> <span class="nb">globals</span><span class="o">.</span><span class="n">remove_all_but_n_full_mode</span><span class="p">:</span>
+            <span class="n">action</span> <span class="o">=</span> <span class="s2">&quot;remove-all-but-n-full&quot;</span>
+        <span class="k">elif</span> <span class="nb">globals</span><span class="o">.</span><span class="n">remove_all_inc_of_but_n_full_mode</span><span class="p">:</span>
+            <span class="n">action</span> <span class="o">=</span> <span class="s2">&quot;remove-all-inc-of-but-n-full&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">command_line_error</span><span class="p">(</span><span class="s2">&quot;Too few arguments&quot;</span><span class="p">)</span>
+        <span class="nb">globals</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">get_backend</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">globals</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">FatalError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;Bad URL &#39;</span><span class="si">%s</span><span class="s2">&#39;.</span>
+<span class="s2">Examples of URL strings are &quot;scp://user@host.net:1234/path&quot; and</span>
+<span class="s2">&quot;file:///usr/local&quot;.  See the man page for more information.&quot;&quot;&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],),</span>
+                           <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">bad_url</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="c1"># Figure out whether backup or restore</span>
+        <span class="n">backup</span><span class="p">,</span> <span class="n">local_pathname</span> <span class="o">=</span> <span class="n">set_backend</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">backup</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">full_backup</span><span class="p">:</span>
+                <span class="n">action</span> <span class="o">=</span> <span class="s2">&quot;full&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">action</span> <span class="o">=</span> <span class="s2">&quot;inc&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">verify</span><span class="p">:</span>
+                <span class="n">action</span> <span class="o">=</span> <span class="s2">&quot;verify&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">action</span> <span class="o">=</span> <span class="s2">&quot;restore&quot;</span>
+
+        <span class="n">process_local_dir</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">local_pathname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">action</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;full&#39;</span><span class="p">,</span> <span class="s1">&#39;inc&#39;</span><span class="p">,</span> <span class="s1">&#39;verify&#39;</span><span class="p">]:</span>
+            <span class="n">set_selection</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;this code should not be reachable&quot;</span><span class="p">)</span>
+
+    <span class="n">check_consistency</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Main action: &quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">action</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">action</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

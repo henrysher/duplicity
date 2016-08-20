@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.progress module &mdash; duplicity-src8  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="duplicity-src8  documentation" href="index.html" />
+    <link rel="up" title="duplicity package" href="duplicity.html" />
+    <link rel="next" title="duplicity.robust module" href="duplicity.robust.html" />
+    <link rel="prev" title="duplicity.path module" href="duplicity.path.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-duplicity.progress">
+<span id="duplicity-progress-module"></span><h1>duplicity.progress module<a class="headerlink" href="#module-duplicity.progress" title="Permalink to this headline">¶</a></h1>
+<p>Functions to compute progress of compress &amp; upload files
+The heuristics try to infer the ratio between the amount of data collected
+by the deltas and the total size of the changing files. It also infers the
+compression and encryption ration of the raw deltas before sending them to
+the backend.
+With the inferred ratios, the heuristics estimate the percentage of completion
+and the time left to transfer all the (yet unknown) amount of data to send.
+This is a forecast based on gathered evidence.</p>
+<dl class="class">
+<dt id="duplicity.progress.LogProgressThread">
+<em class="property">class </em><code class="descclassname">duplicity.progress.</code><code class="descname">LogProgressThread</code><a class="reference internal" href="_modules/duplicity/progress.html#LogProgressThread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.progress.LogProgressThread" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">threading.Thread</span></code></p>
+<p>Background thread that reports progress to the log,
+every &#8211;progress-rate seconds</p>
+<dl class="method">
+<dt id="duplicity.progress.LogProgressThread.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/progress.html#LogProgressThread.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.progress.LogProgressThread.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.progress.ProgressTracker">
+<em class="property">class </em><code class="descclassname">duplicity.progress.</code><code class="descname">ProgressTracker</code><a class="reference internal" href="_modules/duplicity/progress.html#ProgressTracker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.progress.ProgressTracker" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="duplicity.progress.ProgressTracker.annotate_written_bytes">
+<code class="descname">annotate_written_bytes</code><span class="sig-paren">(</span><em>bytecount</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/progress.html#ProgressTracker.annotate_written_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.progress.ProgressTracker.annotate_written_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Annotate the number of bytes that have been added/changed since last time
+this function was called.
+bytecount param will show the number of bytes since the start of the current
+volume and for the current volume</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.progress.ProgressTracker.has_collected_evidence">
+<code class="descname">has_collected_evidence</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/progress.html#ProgressTracker.has_collected_evidence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.progress.ProgressTracker.has_collected_evidence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns true if the progress computation is on and duplicity has not
+yet started the first dry-run pass to collect some information</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.progress.ProgressTracker.log_upload_progress">
+<code class="descname">log_upload_progress</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/progress.html#ProgressTracker.log_upload_progress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.progress.ProgressTracker.log_upload_progress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Aproximative and evolving method of computing the progress of upload</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.progress.ProgressTracker.set_evidence">
+<code class="descname">set_evidence</code><span class="sig-paren">(</span><em>stats</em>, <em>is_full</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/progress.html#ProgressTracker.set_evidence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.progress.ProgressTracker.set_evidence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stores the collected statistics from a first-pass dry-run, to use this
+information later so as to estimate progress</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.progress.ProgressTracker.set_start_volume">
+<code class="descname">set_start_volume</code><span class="sig-paren">(</span><em>volume</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/progress.html#ProgressTracker.set_start_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.progress.ProgressTracker.set_start_volume" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.progress.ProgressTracker.snapshot_progress">
+<code class="descname">snapshot_progress</code><span class="sig-paren">(</span><em>volume</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/progress.html#ProgressTracker.snapshot_progress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.progress.ProgressTracker.snapshot_progress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Snapshots the current progress status for each volume into the disk cache
+If backup is interrupted, next restart will deserialize the data and try start
+progress from the snapshot</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.progress.ProgressTracker.total_elapsed_seconds">
+<code class="descname">total_elapsed_seconds</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/progress.html#ProgressTracker.total_elapsed_seconds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.progress.ProgressTracker.total_elapsed_seconds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Elapsed seconds since the first call to log_upload_progress method</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.progress.Snapshot">
+<em class="property">class </em><code class="descclassname">duplicity.progress.</code><code class="descname">Snapshot</code><span class="sig-paren">(</span><em>iterable=[]</em>, <em>maxlen=10</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/progress.html#Snapshot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.progress.Snapshot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">collections.deque</span></code></p>
+<p>A convenience class for storing snapshots in a space/timing efficient manner
+Stores up to 10 consecutive progress snapshots, one for each volume</p>
+<dl class="method">
+<dt id="duplicity.progress.Snapshot.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/progress.html#Snapshot.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.progress.Snapshot.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.progress.Snapshot.get_snapshot">
+<code class="descname">get_snapshot</code><span class="sig-paren">(</span><em>volume</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/progress.html#Snapshot.get_snapshot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.progress.Snapshot.get_snapshot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.progress.Snapshot.marshall">
+<code class="descname">marshall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/progress.html#Snapshot.marshall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.progress.Snapshot.marshall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serializes object to cache</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.progress.Snapshot.pop_snapshot">
+<code class="descname">pop_snapshot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/progress.html#Snapshot.pop_snapshot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.progress.Snapshot.pop_snapshot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.progress.Snapshot.push_snapshot">
+<code class="descname">push_snapshot</code><span class="sig-paren">(</span><em>volume</em>, <em>snapshot_data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/progress.html#Snapshot.push_snapshot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.progress.Snapshot.push_snapshot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="duplicity.progress.Snapshot.unmarshall">
+<em class="property">static </em><code class="descname">unmarshall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/progress.html#Snapshot.unmarshall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.progress.Snapshot.unmarshall" title="Permalink to this definition">¶</a></dt>
+<dd><p>De-serializes cached data it if present</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.progress.report_transfer">
+<code class="descclassname">duplicity.progress.</code><code class="descname">report_transfer</code><span class="sig-paren">(</span><em>bytecount</em>, <em>totalbytes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/progress.html#report_transfer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.progress.report_transfer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to call tracker.annotate_written_bytes from outside
+the class, and to offer the &#8220;function(long, long)&#8221; signature
+which is handy to pass as callback</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="duplicity.html">duplicity package</a><ul>
+      <li>Previous: <a href="duplicity.path.html" title="previous chapter">duplicity.path module</a></li>
+      <li>Next: <a href="duplicity.robust.html" title="next chapter">duplicity.robust module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/duplicity.progress.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/duplicity.progress.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

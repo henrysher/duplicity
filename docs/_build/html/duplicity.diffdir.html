@@ -1,0 +1,396 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.diffdir module &mdash; duplicity-src8  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="duplicity-src8  documentation" href="index.html" />
+    <link rel="up" title="duplicity package" href="duplicity.html" />
+    <link rel="next" title="duplicity.dup_temp module" href="duplicity.dup_temp.html" />
+    <link rel="prev" title="duplicity.compilec module" href="duplicity.compilec.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-duplicity.diffdir">
+<span id="duplicity-diffdir-module"></span><h1>duplicity.diffdir module<a class="headerlink" href="#module-duplicity.diffdir" title="Permalink to this headline">¶</a></h1>
+<p>Functions for producing signatures and deltas of directories</p>
+<p>Note that the main processes of this module have two parts.  In the
+first, the signature or delta is constructed of a ROPath iterator.  In
+the second, the ROPath iterator is put into tar block form.</p>
+<dl class="class">
+<dt id="duplicity.diffdir.DeltaTarBlockIter">
+<em class="property">class </em><code class="descclassname">duplicity.diffdir.</code><code class="descname">DeltaTarBlockIter</code><span class="sig-paren">(</span><em>input_iter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#DeltaTarBlockIter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.DeltaTarBlockIter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#duplicity.diffdir.TarBlockIter" title="duplicity.diffdir.TarBlockIter"><code class="xref py py-class docutils literal"><span class="pre">duplicity.diffdir.TarBlockIter</span></code></a></p>
+<p>TarBlockIter that yields parts of a deltatar file</p>
+<p>Unlike SigTarBlockIter, the argument to __init__ is a
+delta_path_iter, so the delta information has already been
+calculated.</p>
+<dl class="method">
+<dt id="duplicity.diffdir.DeltaTarBlockIter.get_data_block">
+<code class="descname">get_data_block</code><span class="sig-paren">(</span><em>fp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#DeltaTarBlockIter.get_data_block"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.DeltaTarBlockIter.get_data_block" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return pair (next data block, boolean last data block)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.diffdir.DeltaTarBlockIter.process">
+<code class="descname">process</code><span class="sig-paren">(</span><em>delta_ropath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#DeltaTarBlockIter.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.DeltaTarBlockIter.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a tarblock from delta_ropath</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.diffdir.DeltaTarBlockIter.process_continued">
+<code class="descname">process_continued</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#DeltaTarBlockIter.process_continued"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.DeltaTarBlockIter.process_continued" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return next volume in multivol diff or snapshot</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="duplicity.diffdir.DiffDirException">
+<em class="property">exception </em><code class="descclassname">duplicity.diffdir.</code><code class="descname">DiffDirException</code><a class="reference internal" href="_modules/duplicity/diffdir.html#DiffDirException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.DiffDirException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.diffdir.DirDelta">
+<code class="descclassname">duplicity.diffdir.</code><code class="descname">DirDelta</code><span class="sig-paren">(</span><em>path_iter</em>, <em>dirsig_fileobj_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#DirDelta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.DirDelta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produce tarblock diff given dirsig_fileobj_list and pathiter</p>
+<p>dirsig_fileobj_list should either be a tar fileobj or a list of
+those, sorted so the most recent is last.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.diffdir.DirDelta_WriteSig">
+<code class="descclassname">duplicity.diffdir.</code><code class="descname">DirDelta_WriteSig</code><span class="sig-paren">(</span><em>path_iter</em>, <em>sig_infp_list</em>, <em>newsig_outfp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#DirDelta_WriteSig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.DirDelta_WriteSig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Like DirDelta but also write signature into sig_fileobj</p>
+<p>Like DirDelta, sig_infp_list can be a tar fileobj or a sorted list
+of those.  A signature will only be written to newsig_outfp if it
+is different from (the combined) sig_infp_list.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.diffdir.DirFull">
+<code class="descclassname">duplicity.diffdir.</code><code class="descname">DirFull</code><span class="sig-paren">(</span><em>path_iter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#DirFull"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.DirFull" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a tarblock full backup of items in path_iter</p>
+<p>A full backup is just a diff starting from nothing (it may be less
+elegant than using a standard tar file, but we can be sure that it
+will be easy to split up the tar and make the volumes the same
+sizes).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.diffdir.DirFull_WriteSig">
+<code class="descclassname">duplicity.diffdir.</code><code class="descname">DirFull_WriteSig</code><span class="sig-paren">(</span><em>path_iter</em>, <em>sig_outfp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#DirFull_WriteSig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.DirFull_WriteSig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return full backup like above, but also write signature to sig_outfp</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.diffdir.DirSig">
+<code class="descclassname">duplicity.diffdir.</code><code class="descname">DirSig</code><span class="sig-paren">(</span><em>path_iter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#DirSig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.DirSig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for SigTarBlockIter below</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.diffdir.DummyBlockIter">
+<em class="property">class </em><code class="descclassname">duplicity.diffdir.</code><code class="descname">DummyBlockIter</code><span class="sig-paren">(</span><em>input_iter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#DummyBlockIter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.DummyBlockIter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#duplicity.diffdir.TarBlockIter" title="duplicity.diffdir.TarBlockIter"><code class="xref py py-class docutils literal"><span class="pre">duplicity.diffdir.TarBlockIter</span></code></a></p>
+<p>TarBlockIter that does no file reading</p>
+<dl class="method">
+<dt id="duplicity.diffdir.DummyBlockIter.process">
+<code class="descname">process</code><span class="sig-paren">(</span><em>delta_ropath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#DummyBlockIter.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.DummyBlockIter.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a fake tarblock from delta_ropath</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.diffdir.FileWithReadCounter">
+<em class="property">class </em><code class="descclassname">duplicity.diffdir.</code><code class="descname">FileWithReadCounter</code><span class="sig-paren">(</span><em>infile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#FileWithReadCounter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.FileWithReadCounter" title="Permalink to this definition">¶</a></dt>
+<dd><p>File-like object which also computes amount read as it is read</p>
+<dl class="method">
+<dt id="duplicity.diffdir.FileWithReadCounter.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#FileWithReadCounter.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.FileWithReadCounter.close" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.diffdir.FileWithReadCounter.read">
+<code class="descname">read</code><span class="sig-paren">(</span><em>length=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#FileWithReadCounter.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.FileWithReadCounter.read" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.diffdir.FileWithSignature">
+<em class="property">class </em><code class="descclassname">duplicity.diffdir.</code><code class="descname">FileWithSignature</code><span class="sig-paren">(</span><em>infile</em>, <em>callback</em>, <em>filelen</em>, <em>*extra_args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#FileWithSignature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.FileWithSignature" title="Permalink to this definition">¶</a></dt>
+<dd><p>File-like object which also computes signature as it is read</p>
+<dl class="attribute">
+<dt id="duplicity.diffdir.FileWithSignature.blocksize">
+<code class="descname">blocksize</code><em class="property"> = 32768</em><a class="headerlink" href="#duplicity.diffdir.FileWithSignature.blocksize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.diffdir.FileWithSignature.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#FileWithSignature.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.FileWithSignature.close" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.diffdir.FileWithSignature.read">
+<code class="descname">read</code><span class="sig-paren">(</span><em>length=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#FileWithSignature.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.FileWithSignature.read" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.diffdir.SigTarBlockIter">
+<em class="property">class </em><code class="descclassname">duplicity.diffdir.</code><code class="descname">SigTarBlockIter</code><span class="sig-paren">(</span><em>input_iter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#SigTarBlockIter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.SigTarBlockIter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#duplicity.diffdir.TarBlockIter" title="duplicity.diffdir.TarBlockIter"><code class="xref py py-class docutils literal"><span class="pre">duplicity.diffdir.TarBlockIter</span></code></a></p>
+<p>TarBlockIter that yields blocks of a signature tar from path_iter</p>
+<dl class="method">
+<dt id="duplicity.diffdir.SigTarBlockIter.process">
+<code class="descname">process</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#SigTarBlockIter.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.SigTarBlockIter.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return associated signature TarBlock from path</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.diffdir.TarBlock">
+<em class="property">class </em><code class="descclassname">duplicity.diffdir.</code><code class="descname">TarBlock</code><span class="sig-paren">(</span><em>index</em>, <em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#TarBlock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.TarBlock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contain information to add next file to tar</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.diffdir.TarBlockIter">
+<em class="property">class </em><code class="descclassname">duplicity.diffdir.</code><code class="descname">TarBlockIter</code><span class="sig-paren">(</span><em>input_iter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#TarBlockIter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.TarBlockIter" title="Permalink to this definition">¶</a></dt>
+<dd><p>A bit like an iterator, yield tar blocks given input iterator</p>
+<p>Unlike an iterator, however, control over the maximum size of a
+tarblock is available by passing an argument to next().  Also the
+get_footer() is available.</p>
+<dl class="method">
+<dt id="duplicity.diffdir.TarBlockIter.get_footer">
+<code class="descname">get_footer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#TarBlockIter.get_footer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.TarBlockIter.get_footer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return closing string for tarfile, reset offset</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.diffdir.TarBlockIter.get_previous_index">
+<code class="descname">get_previous_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#TarBlockIter.get_previous_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.TarBlockIter.get_previous_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return index of last tarblock, or None if no previous index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.diffdir.TarBlockIter.get_read_size">
+<code class="descname">get_read_size</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#TarBlockIter.get_read_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.TarBlockIter.get_read_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.diffdir.TarBlockIter.next">
+<code class="descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#TarBlockIter.next"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.TarBlockIter.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return next block and update offset</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.diffdir.TarBlockIter.process">
+<code class="descname">process</code><span class="sig-paren">(</span><em>val</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#TarBlockIter.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.TarBlockIter.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turn next value of input_iter into a TarBlock</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.diffdir.TarBlockIter.process_continued">
+<code class="descname">process_continued</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#TarBlockIter.process_continued"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.TarBlockIter.process_continued" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get more tarblocks</p>
+<p>If processing val above would produce more than one TarBlock,
+get the rest of them by calling process_continue.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.diffdir.TarBlockIter.queue_index_data">
+<code class="descname">queue_index_data</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#TarBlockIter.queue_index_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.TarBlockIter.queue_index_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Next time next() is called, we will return data instead of processing</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.diffdir.TarBlockIter.recall_index">
+<code class="descname">recall_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#TarBlockIter.recall_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.TarBlockIter.recall_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve index remembered with remember_next_index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.diffdir.TarBlockIter.remember_next_index">
+<code class="descname">remember_next_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#TarBlockIter.remember_next_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.TarBlockIter.remember_next_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>When called, remember the index of the next block iterated</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.diffdir.TarBlockIter.tarinfo2tarblock">
+<code class="descname">tarinfo2tarblock</code><span class="sig-paren">(</span><em>index</em>, <em>tarinfo</em>, <em>file_data=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#TarBlockIter.tarinfo2tarblock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.TarBlockIter.tarinfo2tarblock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make tarblock out of tarinfo and file data</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.diffdir.collate2iters">
+<code class="descclassname">duplicity.diffdir.</code><code class="descname">collate2iters</code><span class="sig-paren">(</span><em>riter1</em>, <em>riter2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#collate2iters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.collate2iters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collate two iterators.</p>
+<p>The elements yielded by each iterator must be have an index
+variable, and this function returns pairs (elem1, elem2), (elem1,
+None), or (None, elem2) two elements in a pair will have the same
+index, and earlier indicies are yielded later than later indicies.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.diffdir.combine_path_iters">
+<code class="descclassname">duplicity.diffdir.</code><code class="descname">combine_path_iters</code><span class="sig-paren">(</span><em>path_iter_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#combine_path_iters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.combine_path_iters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produce new iterator by combining the iterators in path_iter_list</p>
+<p>This new iter will iterate every path that is in path_iter_list in
+order of increasing index.  If multiple iterators in
+path_iter_list yield paths with the same index, combine_path_iters
+will discard all paths but the one yielded by the last path_iter.</p>
+<p>This is used to combine signature iters, as the output will be a
+full up-to-date signature iter.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.diffdir.delta_iter_error_handler">
+<code class="descclassname">duplicity.diffdir.</code><code class="descname">delta_iter_error_handler</code><span class="sig-paren">(</span><em>exc</em>, <em>new_path</em>, <em>sig_path</em>, <em>sig_tar=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#delta_iter_error_handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.delta_iter_error_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by get_delta_iter, report error in getting delta</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.diffdir.get_block_size">
+<code class="descclassname">duplicity.diffdir.</code><code class="descname">get_block_size</code><span class="sig-paren">(</span><em>file_len</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#get_block_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.get_block_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a reasonable block size to use on files of length file_len</p>
+<p>If the block size is too big, deltas will be bigger than is
+necessary.  If the block size is too small, making deltas and
+patching can take a really long time.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.diffdir.get_combined_path_iter">
+<code class="descclassname">duplicity.diffdir.</code><code class="descname">get_combined_path_iter</code><span class="sig-paren">(</span><em>sig_infp_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#get_combined_path_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.get_combined_path_iter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return path iter combining signatures in list of open sig files</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.diffdir.get_delta_iter">
+<code class="descclassname">duplicity.diffdir.</code><code class="descname">get_delta_iter</code><span class="sig-paren">(</span><em>new_iter</em>, <em>sig_iter</em>, <em>sig_fileobj=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#get_delta_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.get_delta_iter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate delta iter from new Path iter and sig Path iter.</p>
+<p>For each delta path of regular file type, path.difftype with be
+set to &#8220;snapshot&#8221;, &#8220;diff&#8221;.  sig_iter will probably iterate ROPaths
+instead of Paths.</p>
+<p>If sig_fileobj is not None, will also write signatures to sig_fileobj.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.diffdir.get_delta_path">
+<code class="descclassname">duplicity.diffdir.</code><code class="descname">get_delta_path</code><span class="sig-paren">(</span><em>new_path</em>, <em>sig_path</em>, <em>sigTarFile=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#get_delta_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.get_delta_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return new delta_path which, when read, writes sig to sig_fileobj,
+if sigTarFile is not None</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.diffdir.log_delta_path">
+<code class="descclassname">duplicity.diffdir.</code><code class="descname">log_delta_path</code><span class="sig-paren">(</span><em>delta_path</em>, <em>new_path=None</em>, <em>stats=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#log_delta_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.log_delta_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Look at delta path and log delta.  Add stats if new_path is set</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.diffdir.sigtar2path_iter">
+<code class="descclassname">duplicity.diffdir.</code><code class="descname">sigtar2path_iter</code><span class="sig-paren">(</span><em>sigtarobj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#sigtar2path_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.sigtar2path_iter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert signature tar file object open for reading into path iter</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.diffdir.write_block_iter">
+<code class="descclassname">duplicity.diffdir.</code><code class="descname">write_block_iter</code><span class="sig-paren">(</span><em>block_iter</em>, <em>out_obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/diffdir.html#write_block_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.diffdir.write_block_iter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write block_iter to filename, path, or file object</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="duplicity.html">duplicity package</a><ul>
+      <li>Previous: <a href="duplicity.compilec.html" title="previous chapter">duplicity.compilec module</a></li>
+      <li>Next: <a href="duplicity.dup_temp.html" title="next chapter">duplicity.dup_temp module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/duplicity.diffdir.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/duplicity.diffdir.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

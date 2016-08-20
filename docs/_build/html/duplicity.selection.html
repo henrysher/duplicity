@@ -1,0 +1,280 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.selection module &mdash; duplicity-src8  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="duplicity-src8  documentation" href="index.html" />
+    <link rel="up" title="duplicity package" href="duplicity.html" />
+    <link rel="next" title="duplicity.statistics module" href="duplicity.statistics.html" />
+    <link rel="prev" title="duplicity.robust module" href="duplicity.robust.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-duplicity.selection">
+<span id="duplicity-selection-module"></span><h1>duplicity.selection module<a class="headerlink" href="#module-duplicity.selection" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="duplicity.selection.Select">
+<em class="property">class </em><code class="descclassname">duplicity.selection.</code><code class="descname">Select</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/selection.html#Select"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.selection.Select" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate appropriate Paths in given directory</p>
+<p>This class acts as an iterator on account of its next() method.
+Basically, it just goes through all the files in a directory in
+order (depth-first) and subjects each file to a bunch of tests
+(selection functions) in order.  The first test that includes or
+excludes the file means that the file gets included (iterated) or
+excluded.  The default is include, so with no tests we would just
+iterate all the files in the directory in order.</p>
+<p>The one complication to this is that sometimes we don&#8217;t know
+whether or not to include a directory until we examine its
+contents.  For instance, if we want to include all the <a href="#id1"><span class="problematic" id="id2">**</span></a>.py
+files.  If /home/ben/foo.py exists, we should also include /home
+and /home/ben, but if these directories contain no <a href="#id3"><span class="problematic" id="id4">**</span></a>.py files,
+they shouldn&#8217;t be included.  For this reason, a test may not
+include or exclude a directory, but merely &#8220;scan&#8221; it.  If later a
+file in the directory gets included, so does the directory.</p>
+<p>As mentioned above, each test takes the form of a selection
+function.  The selection function takes a path, and returns:</p>
+<p>None - means the test has nothing to say about the related file
+0 - the file is excluded by the test
+1 - the file is included
+2 - the test says the file (must be directory) should be scanned</p>
+<p>Also, a selection function f has a variable f.exclude which should
+be true iff f could potentially exclude some file.  This is used
+to signal an error if the last function only includes, which would
+be redundant and presumably isn&#8217;t what the user intends.</p>
+<dl class="method">
+<dt id="duplicity.selection.Select.Iterate">
+<code class="descname">Iterate</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/selection.html#Select.Iterate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.selection.Select.Iterate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return iterator yielding paths in path</p>
+<p>This function looks a bit more complicated than it needs to be
+because it avoids extra recursion (and no extra function calls
+for non-directory files) while still doing the &#8220;directory
+scanning&#8221; bit.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.selection.Select.ParseArgs">
+<code class="descname">ParseArgs</code><span class="sig-paren">(</span><em>argtuples</em>, <em>filelists</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/selection.html#Select.ParseArgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.selection.Select.ParseArgs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create selection functions based on list of tuples</p>
+<p>The tuples are created when the initial commandline arguments
+are read.  They have the form (option string, additional
+argument) except for the filelist tuples, which should be
+(option-string, (additional argument, filelist_fp)).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.selection.Select.Select">
+<code class="descname">Select</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/selection.html#Select.Select"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.selection.Select.Select" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run through the selection functions and return dominant val 0/1/2</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.selection.Select.add_selection_func">
+<code class="descname">add_selection_func</code><span class="sig-paren">(</span><em>sel_func</em>, <em>add_to_start=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/selection.html#Select.add_selection_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.selection.Select.add_selection_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add another selection function at the end or beginning</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.selection.Select.devfiles_get_sf">
+<code class="descname">devfiles_get_sf</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/selection.html#Select.devfiles_get_sf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.selection.Select.devfiles_get_sf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a selection function to exclude all dev files</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.selection.Select.exclude_older_get_sf">
+<code class="descname">exclude_older_get_sf</code><span class="sig-paren">(</span><em>date</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/selection.html#Select.exclude_older_get_sf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.selection.Select.exclude_older_get_sf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return selection function based on files older than modification date</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.selection.Select.filelist_globbing_get_sfs">
+<code class="descname">filelist_globbing_get_sfs</code><span class="sig-paren">(</span><em>filelist_fp</em>, <em>inc_default</em>, <em>list_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/selection.html#Select.filelist_globbing_get_sfs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.selection.Select.filelist_globbing_get_sfs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return list of selection functions by reading fileobj</p>
+<p>filelist_fp should be an open file object
+inc_default is true iff this is an include list
+list_name is just the name of the list, used for logging
+See the man page on &#8211;[include/exclude]-globbing-filelist</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.selection.Select.filelist_sanitise_line">
+<code class="descname">filelist_sanitise_line</code><span class="sig-paren">(</span><em>line</em>, <em>include_default</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/selection.html#Select.filelist_sanitise_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.selection.Select.filelist_sanitise_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sanitises lines of both normal and globbing filelists, returning (line, include) and line=None if blank/comment</p>
+<p>The aim is to parse filelists in a consistent way, prior to the interpretation of globbing statements.
+The function removes whitespace, comment lines and processes modifiers (leading +/-) and quotes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.selection.Select.glob_get_filename_sf">
+<code class="descname">glob_get_filename_sf</code><span class="sig-paren">(</span><em>filename</em>, <em>include</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/selection.html#Select.glob_get_filename_sf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.selection.Select.glob_get_filename_sf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a selection function given a normal filename</p>
+<p>Some of the parsing is better explained in
+filelist_parse_line.  The reason this is split from normal
+globbing is things are a lot less complicated if no special
+globbing characters are used.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.selection.Select.glob_get_normal_sf">
+<code class="descname">glob_get_normal_sf</code><span class="sig-paren">(</span><em>glob_str</em>, <em>include</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/selection.html#Select.glob_get_normal_sf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.selection.Select.glob_get_normal_sf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return selection function based on glob_str</p>
+<p>The basic idea is to turn glob_str into a regular expression,
+and just use the normal regular expression.  There is a
+complication because the selection function should return &#8216;2&#8217;
+(scan) for directories which may contain a file which matches
+the glob_str.  So we break up the glob string into parts, and
+any file which matches an initial sequence of glob parts gets
+scanned.</p>
+<p>Thanks to Donovan Baarda who provided some code which did some
+things similar to this.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.selection.Select.glob_get_sf">
+<code class="descname">glob_get_sf</code><span class="sig-paren">(</span><em>glob_str</em>, <em>include</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/selection.html#Select.glob_get_sf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.selection.Select.glob_get_sf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return selection function given by glob string</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.selection.Select.glob_get_tuple_sf">
+<code class="descname">glob_get_tuple_sf</code><span class="sig-paren">(</span><em>tuple</em>, <em>include</em>, <em>match_only_dirs=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/selection.html#Select.glob_get_tuple_sf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.selection.Select.glob_get_tuple_sf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return selection function based on tuple</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.selection.Select.glob_re">
+<code class="descname">glob_re</code><em class="property"> = &lt;_sre.SRE_Pattern object&gt;</em><a class="headerlink" href="#duplicity.selection.Select.glob_re" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.selection.Select.other_filesystems_get_sf">
+<code class="descname">other_filesystems_get_sf</code><span class="sig-paren">(</span><em>include</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/selection.html#Select.other_filesystems_get_sf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.selection.Select.other_filesystems_get_sf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return selection function matching files on other filesystems</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.selection.Select.parse_catch_error">
+<code class="descname">parse_catch_error</code><span class="sig-paren">(</span><em>exc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/selection.html#Select.parse_catch_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.selection.Select.parse_catch_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deal with selection error exc</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.selection.Select.parse_last_excludes">
+<code class="descname">parse_last_excludes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/selection.html#Select.parse_last_excludes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.selection.Select.parse_last_excludes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exit with error if last selection function isn&#8217;t an exclude</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.selection.Select.present_get_sf">
+<code class="descname">present_get_sf</code><span class="sig-paren">(</span><em>filename</em>, <em>include</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/selection.html#Select.present_get_sf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.selection.Select.present_get_sf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return selection function given by existence of a file in a directory</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.selection.Select.regexp_get_sf">
+<code class="descname">regexp_get_sf</code><span class="sig-paren">(</span><em>regexp_string</em>, <em>include</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/selection.html#Select.regexp_get_sf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.selection.Select.regexp_get_sf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return selection function given by regexp_string</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.selection.Select.set_iter">
+<code class="descname">set_iter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/selection.html#Select.set_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.selection.Select.set_iter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize generator, prepare to iterate.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="duplicity.selection.SelectError">
+<em class="property">exception </em><code class="descclassname">duplicity.selection.</code><code class="descname">SelectError</code><a class="reference internal" href="_modules/duplicity/selection.html#SelectError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.selection.SelectError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+<p>Some error dealing with the Select class</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="duplicity.html">duplicity package</a><ul>
+      <li>Previous: <a href="duplicity.robust.html" title="previous chapter">duplicity.robust module</a></li>
+      <li>Next: <a href="duplicity.statistics.html" title="next chapter">duplicity.statistics module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/duplicity.selection.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/duplicity.selection.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

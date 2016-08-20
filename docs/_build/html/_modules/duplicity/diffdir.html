@@ -1,0 +1,831 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.diffdir &mdash; duplicity-src8  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="duplicity-src8  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.diffdir</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2002 Ben Escoto &lt;ben@emerose.org&gt;</span>
+<span class="c1"># Copyright 2007 Kenneth Loafman &lt;kenneth@loafman.com&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Functions for producing signatures and deltas of directories</span>
+
+<span class="sd">Note that the main processes of this module have two parts.  In the</span>
+<span class="sd">first, the signature or delta is constructed of a ROPath iterator.  In</span>
+<span class="sd">the second, the ROPath iterator is put into tar block form.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">future_builtins</span> <span class="k">import</span> <span class="nb">map</span>
+
+<span class="kn">import</span> <span class="nn">cStringIO</span>
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">statistics</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="nb">globals</span>
+<span class="kn">from</span> <span class="nn">duplicity.path</span> <span class="k">import</span> <span class="o">*</span>  <span class="c1"># @UnusedWildImport</span>
+<span class="kn">from</span> <span class="nn">duplicity.lazy</span> <span class="k">import</span> <span class="o">*</span>  <span class="c1"># @UnusedWildImport</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">progress</span>
+
+<span class="c1"># A StatsObj will be written to this from DirDelta and DirDelta_WriteSig.</span>
+<span class="n">stats</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">tracker</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="DiffDirException"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.DiffDirException">[docs]</a><span class="k">class</span> <span class="nc">DiffDirException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="DirSig"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.DirSig">[docs]</a><span class="k">def</span> <span class="nf">DirSig</span><span class="p">(</span><span class="n">path_iter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Alias for SigTarBlockIter below</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">SigTarBlockIter</span><span class="p">(</span><span class="n">path_iter</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DirFull"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.DirFull">[docs]</a><span class="k">def</span> <span class="nf">DirFull</span><span class="p">(</span><span class="n">path_iter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a tarblock full backup of items in path_iter</span>
+
+<span class="sd">    A full backup is just a diff starting from nothing (it may be less</span>
+<span class="sd">    elegant than using a standard tar file, but we can be sure that it</span>
+<span class="sd">    will be easy to split up the tar and make the volumes the same</span>
+<span class="sd">    sizes).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">DirDelta</span><span class="p">(</span><span class="n">path_iter</span><span class="p">,</span> <span class="n">cStringIO</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="DirFull_WriteSig"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.DirFull_WriteSig">[docs]</a><span class="k">def</span> <span class="nf">DirFull_WriteSig</span><span class="p">(</span><span class="n">path_iter</span><span class="p">,</span> <span class="n">sig_outfp</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return full backup like above, but also write signature to sig_outfp</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">DirDelta_WriteSig</span><span class="p">(</span><span class="n">path_iter</span><span class="p">,</span> <span class="n">cStringIO</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">sig_outfp</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DirDelta"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.DirDelta">[docs]</a><span class="k">def</span> <span class="nf">DirDelta</span><span class="p">(</span><span class="n">path_iter</span><span class="p">,</span> <span class="n">dirsig_fileobj_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Produce tarblock diff given dirsig_fileobj_list and pathiter</span>
+
+<span class="sd">    dirsig_fileobj_list should either be a tar fileobj or a list of</span>
+<span class="sd">    those, sorted so the most recent is last.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">stats</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">statistics</span><span class="o">.</span><span class="n">StatsDeltaProcess</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dirsig_fileobj_list</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">ListType</span><span class="p">):</span>
+        <span class="n">sig_iter</span> <span class="o">=</span> <span class="n">combine_path_iters</span><span class="p">([</span><span class="n">sigtar2path_iter</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span>
+                                       <span class="ow">in</span> <span class="n">dirsig_fileobj_list</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sig_iter</span> <span class="o">=</span> <span class="n">sigtar2path_iter</span><span class="p">(</span><span class="n">dirsig_fileobj_list</span><span class="p">)</span>
+    <span class="n">delta_iter</span> <span class="o">=</span> <span class="n">get_delta_iter</span><span class="p">(</span><span class="n">path_iter</span><span class="p">,</span> <span class="n">sig_iter</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">globals</span><span class="o">.</span><span class="n">dry_run</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">progress</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">progress</span><span class="o">.</span><span class="n">tracker</span><span class="o">.</span><span class="n">has_collected_evidence</span><span class="p">()):</span>
+        <span class="k">return</span> <span class="n">DummyBlockIter</span><span class="p">(</span><span class="n">delta_iter</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">DeltaTarBlockIter</span><span class="p">(</span><span class="n">delta_iter</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="delta_iter_error_handler"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.delta_iter_error_handler">[docs]</a><span class="k">def</span> <span class="nf">delta_iter_error_handler</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">new_path</span><span class="p">,</span> <span class="n">sig_path</span><span class="p">,</span> <span class="n">sig_tar</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Called by get_delta_iter, report error in getting delta</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">new_path</span><span class="p">:</span>
+        <span class="n">index_string</span> <span class="o">=</span> <span class="n">new_path</span><span class="o">.</span><span class="n">get_relative_path</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">sig_path</span><span class="p">:</span>
+        <span class="n">index_string</span> <span class="o">=</span> <span class="n">sig_path</span><span class="o">.</span><span class="n">get_relative_path</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Both new and sig are None for some reason&quot;</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Error </span><span class="si">%s</span><span class="s2"> getting delta for </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">),</span> <span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">index_string</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="get_delta_path"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.get_delta_path">[docs]</a><span class="k">def</span> <span class="nf">get_delta_path</span><span class="p">(</span><span class="n">new_path</span><span class="p">,</span> <span class="n">sig_path</span><span class="p">,</span> <span class="n">sigTarFile</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return new delta_path which, when read, writes sig to sig_fileobj,</span>
+<span class="sd">    if sigTarFile is not None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">new_path</span>
+    <span class="k">if</span> <span class="n">sigTarFile</span><span class="p">:</span>
+        <span class="n">ti</span> <span class="o">=</span> <span class="n">new_path</span><span class="o">.</span><span class="n">get_tarinfo</span><span class="p">()</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">new_path</span><span class="o">.</span><span class="n">index</span>
+    <span class="n">delta_path</span> <span class="o">=</span> <span class="n">new_path</span><span class="o">.</span><span class="n">get_ropath</span><span class="p">()</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Getting delta of </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">new_path</span><span class="p">,</span> <span class="n">sig_path</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="n">sig_string</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Callback activated when FileWithSignature read to end</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ti</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sig_string</span><span class="p">)</span>
+        <span class="n">ti</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;signature/&quot;</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">sigTarFile</span><span class="o">.</span><span class="n">addfile</span><span class="p">(</span><span class="n">ti</span><span class="p">,</span> <span class="n">cStringIO</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">sig_string</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">new_path</span><span class="o">.</span><span class="n">isreg</span><span class="p">()</span> <span class="ow">and</span> <span class="n">sig_path</span> <span class="ow">and</span> <span class="n">sig_path</span><span class="o">.</span><span class="n">isreg</span><span class="p">()</span> <span class="ow">and</span> <span class="n">sig_path</span><span class="o">.</span><span class="n">difftype</span> <span class="o">==</span> <span class="s2">&quot;signature&quot;</span><span class="p">:</span>
+        <span class="n">delta_path</span><span class="o">.</span><span class="n">difftype</span> <span class="o">=</span> <span class="s2">&quot;diff&quot;</span>
+        <span class="n">old_sigfp</span> <span class="o">=</span> <span class="n">sig_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span>
+        <span class="n">newfp</span> <span class="o">=</span> <span class="n">FileWithReadCounter</span><span class="p">(</span><span class="n">new_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">sigTarFile</span><span class="p">:</span>
+            <span class="n">newfp</span> <span class="o">=</span> <span class="n">FileWithSignature</span><span class="p">(</span><span class="n">newfp</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span>
+                                      <span class="n">new_path</span><span class="o">.</span><span class="n">getsize</span><span class="p">())</span>
+        <span class="n">delta_path</span><span class="o">.</span><span class="n">setfileobj</span><span class="p">(</span><span class="n">librsync</span><span class="o">.</span><span class="n">DeltaFile</span><span class="p">(</span><span class="n">old_sigfp</span><span class="p">,</span> <span class="n">newfp</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">delta_path</span><span class="o">.</span><span class="n">difftype</span> <span class="o">=</span> <span class="s2">&quot;snapshot&quot;</span>
+        <span class="k">if</span> <span class="n">sigTarFile</span><span class="p">:</span>
+            <span class="n">ti</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;snapshot/&quot;</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">new_path</span><span class="o">.</span><span class="n">isreg</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">sigTarFile</span><span class="p">:</span>
+                <span class="n">sigTarFile</span><span class="o">.</span><span class="n">addfile</span><span class="p">(</span><span class="n">ti</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">stats</span><span class="p">:</span>
+                <span class="n">stats</span><span class="o">.</span><span class="n">SourceFileSize</span> <span class="o">+=</span> <span class="n">delta_path</span><span class="o">.</span><span class="n">getsize</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">newfp</span> <span class="o">=</span> <span class="n">FileWithReadCounter</span><span class="p">(</span><span class="n">new_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">sigTarFile</span><span class="p">:</span>
+                <span class="n">newfp</span> <span class="o">=</span> <span class="n">FileWithSignature</span><span class="p">(</span><span class="n">newfp</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span>
+                                          <span class="n">new_path</span><span class="o">.</span><span class="n">getsize</span><span class="p">())</span>
+            <span class="n">delta_path</span><span class="o">.</span><span class="n">setfileobj</span><span class="p">(</span><span class="n">newfp</span><span class="p">)</span>
+    <span class="n">new_path</span><span class="o">.</span><span class="n">copy_attribs</span><span class="p">(</span><span class="n">delta_path</span><span class="p">)</span>
+    <span class="n">delta_path</span><span class="o">.</span><span class="n">stat</span><span class="o">.</span><span class="n">st_size</span> <span class="o">=</span> <span class="n">new_path</span><span class="o">.</span><span class="n">stat</span><span class="o">.</span><span class="n">st_size</span>
+    <span class="k">return</span> <span class="n">delta_path</span></div>
+
+
+<div class="viewcode-block" id="log_delta_path"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.log_delta_path">[docs]</a><span class="k">def</span> <span class="nf">log_delta_path</span><span class="p">(</span><span class="n">delta_path</span><span class="p">,</span> <span class="n">new_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stats</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Look at delta path and log delta.  Add stats if new_path is set</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">delta_path</span><span class="o">.</span><span class="n">difftype</span> <span class="o">==</span> <span class="s2">&quot;snapshot&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">new_path</span> <span class="ow">and</span> <span class="n">stats</span><span class="p">:</span>
+            <span class="n">stats</span><span class="o">.</span><span class="n">add_new_file</span><span class="p">(</span><span class="n">new_path</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;A </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span>
+                 <span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">delta_path</span><span class="o">.</span><span class="n">get_relative_path</span><span class="p">())),</span>
+                 <span class="n">log</span><span class="o">.</span><span class="n">InfoCode</span><span class="o">.</span><span class="n">diff_file_new</span><span class="p">,</span>
+                 <span class="n">util</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">delta_path</span><span class="o">.</span><span class="n">get_relative_path</span><span class="p">()))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">new_path</span> <span class="ow">and</span> <span class="n">stats</span><span class="p">:</span>
+            <span class="n">stats</span><span class="o">.</span><span class="n">add_changed_file</span><span class="p">(</span><span class="n">new_path</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;M </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span>
+                 <span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">delta_path</span><span class="o">.</span><span class="n">get_relative_path</span><span class="p">())),</span>
+                 <span class="n">log</span><span class="o">.</span><span class="n">InfoCode</span><span class="o">.</span><span class="n">diff_file_changed</span><span class="p">,</span>
+                 <span class="n">util</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">delta_path</span><span class="o">.</span><span class="n">get_relative_path</span><span class="p">()))</span></div>
+
+
+<div class="viewcode-block" id="get_delta_iter"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.get_delta_iter">[docs]</a><span class="k">def</span> <span class="nf">get_delta_iter</span><span class="p">(</span><span class="n">new_iter</span><span class="p">,</span> <span class="n">sig_iter</span><span class="p">,</span> <span class="n">sig_fileobj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate delta iter from new Path iter and sig Path iter.</span>
+
+<span class="sd">    For each delta path of regular file type, path.difftype with be</span>
+<span class="sd">    set to &quot;snapshot&quot;, &quot;diff&quot;.  sig_iter will probably iterate ROPaths</span>
+<span class="sd">    instead of Paths.</span>
+
+<span class="sd">    If sig_fileobj is not None, will also write signatures to sig_fileobj.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">collated</span> <span class="o">=</span> <span class="n">collate2iters</span><span class="p">(</span><span class="n">new_iter</span><span class="p">,</span> <span class="n">sig_iter</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">sig_fileobj</span><span class="p">:</span>
+        <span class="n">sigTarFile</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">make_tarfile</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">sig_fileobj</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sigTarFile</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">new_path</span><span class="p">,</span> <span class="n">sig_path</span> <span class="ow">in</span> <span class="n">collated</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Comparing </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">new_path</span> <span class="ow">and</span> <span class="n">util</span><span class="o">.</span><span class="n">uindex</span><span class="p">(</span><span class="n">new_path</span><span class="o">.</span><span class="n">index</span><span class="p">),</span>
+                                              <span class="n">sig_path</span> <span class="ow">and</span> <span class="n">util</span><span class="o">.</span><span class="n">uindex</span><span class="p">(</span><span class="n">sig_path</span><span class="o">.</span><span class="n">index</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">new_path</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">new_path</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+            <span class="c1"># File doesn&#39;t exist (but ignore attempts to delete base dir;</span>
+            <span class="c1"># old versions of duplicity could have written out the sigtar in</span>
+            <span class="c1"># such a way as to fool us; LP: #929067)</span>
+            <span class="k">if</span> <span class="n">sig_path</span> <span class="ow">and</span> <span class="n">sig_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">sig_path</span><span class="o">.</span><span class="n">index</span> <span class="o">!=</span> <span class="p">():</span>
+                <span class="c1"># but signature says it did</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;D </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span>
+                         <span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">sig_path</span><span class="o">.</span><span class="n">get_relative_path</span><span class="p">())),</span>
+                         <span class="n">log</span><span class="o">.</span><span class="n">InfoCode</span><span class="o">.</span><span class="n">diff_file_deleted</span><span class="p">,</span>
+                         <span class="n">util</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">sig_path</span><span class="o">.</span><span class="n">get_relative_path</span><span class="p">()))</span>
+                <span class="k">if</span> <span class="n">sigTarFile</span><span class="p">:</span>
+                    <span class="n">ti</span> <span class="o">=</span> <span class="n">ROPath</span><span class="p">(</span><span class="n">sig_path</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">get_tarinfo</span><span class="p">()</span>
+                    <span class="n">ti</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;deleted/&quot;</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sig_path</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+                    <span class="n">sigTarFile</span><span class="o">.</span><span class="n">addfile</span><span class="p">(</span><span class="n">ti</span><span class="p">)</span>
+                <span class="n">stats</span><span class="o">.</span><span class="n">add_deleted_file</span><span class="p">(</span><span class="n">sig_path</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="n">ROPath</span><span class="p">(</span><span class="n">sig_path</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">sig_path</span> <span class="ow">or</span> <span class="n">new_path</span> <span class="o">!=</span> <span class="n">sig_path</span><span class="p">:</span>
+            <span class="c1"># Must calculate new signature and create delta</span>
+            <span class="n">delta_path</span> <span class="o">=</span> <span class="n">robust</span><span class="o">.</span><span class="n">check_common_error</span><span class="p">(</span><span class="n">delta_iter_error_handler</span><span class="p">,</span>
+                                                   <span class="n">get_delta_path</span><span class="p">,</span>
+                                                   <span class="p">(</span><span class="n">new_path</span><span class="p">,</span> <span class="n">sig_path</span><span class="p">,</span> <span class="n">sigTarFile</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">delta_path</span><span class="p">:</span>
+                <span class="c1"># log and collect stats</span>
+                <span class="n">log_delta_path</span><span class="p">(</span><span class="n">delta_path</span><span class="p">,</span> <span class="n">new_path</span><span class="p">,</span> <span class="n">stats</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="n">delta_path</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># if not, an error must have occurred</span>
+                <span class="n">stats</span><span class="o">.</span><span class="n">Errors</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">stats</span><span class="o">.</span><span class="n">add_unchanged_file</span><span class="p">(</span><span class="n">new_path</span><span class="p">)</span>
+    <span class="n">stats</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">sigTarFile</span><span class="p">:</span>
+        <span class="n">sigTarFile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="sigtar2path_iter"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.sigtar2path_iter">[docs]</a><span class="k">def</span> <span class="nf">sigtar2path_iter</span><span class="p">(</span><span class="n">sigtarobj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert signature tar file object open for reading into path iter</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tf</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">make_tarfile</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">sigtarobj</span><span class="p">)</span>
+    <span class="n">tf</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">tarinfo</span> <span class="ow">in</span> <span class="n">tf</span><span class="p">:</span>
+        <span class="n">tiname</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">get_tarinfo_name</span><span class="p">(</span><span class="n">tarinfo</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;signature/&quot;</span><span class="p">,</span> <span class="s2">&quot;snapshot/&quot;</span><span class="p">,</span> <span class="s2">&quot;deleted/&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">tiname</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">):</span>
+                <span class="c1"># strip prefix and &#39;/&#39; from name and set it to difftype</span>
+                <span class="n">name</span><span class="p">,</span> <span class="n">difftype</span> <span class="o">=</span> <span class="n">tiname</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">):],</span> <span class="n">prefix</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DiffDirException</span><span class="p">(</span><span class="s2">&quot;Bad tarinfo name </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tiname</span><span class="p">,))</span>
+
+        <span class="n">index</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># deal with trailing /, &quot;&quot;</span>
+
+        <span class="n">ropath</span> <span class="o">=</span> <span class="n">ROPath</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">ropath</span><span class="o">.</span><span class="n">difftype</span> <span class="o">=</span> <span class="n">difftype</span>
+        <span class="k">if</span> <span class="n">difftype</span> <span class="o">==</span> <span class="s2">&quot;signature&quot;</span> <span class="ow">or</span> <span class="n">difftype</span> <span class="o">==</span> <span class="s2">&quot;snapshot&quot;</span><span class="p">:</span>
+            <span class="n">ropath</span><span class="o">.</span><span class="n">init_from_tarinfo</span><span class="p">(</span><span class="n">tarinfo</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ropath</span><span class="o">.</span><span class="n">isreg</span><span class="p">():</span>
+                <span class="n">ropath</span><span class="o">.</span><span class="n">setfileobj</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">extractfile</span><span class="p">(</span><span class="n">tarinfo</span><span class="p">))</span>
+        <span class="k">yield</span> <span class="n">ropath</span>
+    <span class="n">sigtarobj</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="collate2iters"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.collate2iters">[docs]</a><span class="k">def</span> <span class="nf">collate2iters</span><span class="p">(</span><span class="n">riter1</span><span class="p">,</span> <span class="n">riter2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Collate two iterators.</span>
+
+<span class="sd">    The elements yielded by each iterator must be have an index</span>
+<span class="sd">    variable, and this function returns pairs (elem1, elem2), (elem1,</span>
+<span class="sd">    None), or (None, elem2) two elements in a pair will have the same</span>
+<span class="sd">    index, and earlier indicies are yielded later than later indicies.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">relem1</span><span class="p">,</span> <span class="n">relem2</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">relem1</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">relem1</span> <span class="o">=</span> <span class="n">riter1</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">relem2</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">relem2</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">relem2</span> <span class="ow">in</span> <span class="n">riter2</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">relem2</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="n">index1</span> <span class="o">=</span> <span class="n">relem1</span><span class="o">.</span><span class="n">index</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">relem2</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">relem2</span> <span class="o">=</span> <span class="n">riter2</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">relem1</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="p">(</span><span class="n">relem1</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">relem1</span> <span class="ow">in</span> <span class="n">riter1</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="p">(</span><span class="n">relem1</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="n">index2</span> <span class="o">=</span> <span class="n">relem2</span><span class="o">.</span><span class="n">index</span>
+
+        <span class="k">if</span> <span class="n">index1</span> <span class="o">&lt;</span> <span class="n">index2</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="p">(</span><span class="n">relem1</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">relem1</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">index1</span> <span class="o">==</span> <span class="n">index2</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="p">(</span><span class="n">relem1</span><span class="p">,</span> <span class="n">relem2</span><span class="p">)</span>
+            <span class="n">relem1</span><span class="p">,</span> <span class="n">relem2</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># index2 is less</span>
+            <span class="k">yield</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">relem2</span><span class="p">)</span>
+            <span class="n">relem2</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="combine_path_iters"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.combine_path_iters">[docs]</a><span class="k">def</span> <span class="nf">combine_path_iters</span><span class="p">(</span><span class="n">path_iter_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Produce new iterator by combining the iterators in path_iter_list</span>
+
+<span class="sd">    This new iter will iterate every path that is in path_iter_list in</span>
+<span class="sd">    order of increasing index.  If multiple iterators in</span>
+<span class="sd">    path_iter_list yield paths with the same index, combine_path_iters</span>
+<span class="sd">    will discard all paths but the one yielded by the last path_iter.</span>
+
+<span class="sd">    This is used to combine signature iters, as the output will be a</span>
+<span class="sd">    full up-to-date signature iter.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path_iter_list</span> <span class="o">=</span> <span class="n">path_iter_list</span><span class="p">[:]</span>  <span class="c1"># copy before destructive reverse</span>
+    <span class="n">path_iter_list</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">get_triple</span><span class="p">(</span><span class="n">iter_index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Represent the next element as a triple, to help sorting</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">path_iter_list</span><span class="p">[</span><span class="n">iter_index</span><span class="p">]</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">iter_index</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">refresh_triple_list</span><span class="p">(</span><span class="n">triple_list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update all elements with path_index same as first element</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">path_index</span> <span class="o">=</span> <span class="n">triple_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">iter_index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">iter_index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">triple_list</span><span class="p">):</span>
+            <span class="n">old_triple</span> <span class="o">=</span> <span class="n">triple_list</span><span class="p">[</span><span class="n">iter_index</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">old_triple</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">path_index</span><span class="p">:</span>
+                <span class="n">new_triple</span> <span class="o">=</span> <span class="n">get_triple</span><span class="p">(</span><span class="n">old_triple</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">new_triple</span><span class="p">:</span>
+                    <span class="n">triple_list</span><span class="p">[</span><span class="n">iter_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_triple</span>
+                    <span class="n">iter_index</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="n">triple_list</span><span class="p">[</span><span class="n">iter_index</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">break</span>  <span class="c1"># assumed triple_list sorted, so can exit now</span>
+
+    <span class="n">triple_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">(</span><span class="n">get_triple</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">path_iter_list</span><span class="p">)))</span> <span class="k">if</span> <span class="n">x</span><span class="p">]</span>
+    <span class="k">while</span> <span class="n">triple_list</span><span class="p">:</span>
+        <span class="n">triple_list</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="k">yield</span> <span class="n">triple_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">refresh_triple_list</span><span class="p">(</span><span class="n">triple_list</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DirDelta_WriteSig"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.DirDelta_WriteSig">[docs]</a><span class="k">def</span> <span class="nf">DirDelta_WriteSig</span><span class="p">(</span><span class="n">path_iter</span><span class="p">,</span> <span class="n">sig_infp_list</span><span class="p">,</span> <span class="n">newsig_outfp</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Like DirDelta but also write signature into sig_fileobj</span>
+
+<span class="sd">    Like DirDelta, sig_infp_list can be a tar fileobj or a sorted list</span>
+<span class="sd">    of those.  A signature will only be written to newsig_outfp if it</span>
+<span class="sd">    is different from (the combined) sig_infp_list.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">stats</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">statistics</span><span class="o">.</span><span class="n">StatsDeltaProcess</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sig_infp_list</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">ListType</span><span class="p">):</span>
+        <span class="n">sig_path_iter</span> <span class="o">=</span> <span class="n">get_combined_path_iter</span><span class="p">(</span><span class="n">sig_infp_list</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sig_path_iter</span> <span class="o">=</span> <span class="n">sigtar2path_iter</span><span class="p">(</span><span class="n">sig_infp_list</span><span class="p">)</span>
+    <span class="n">delta_iter</span> <span class="o">=</span> <span class="n">get_delta_iter</span><span class="p">(</span><span class="n">path_iter</span><span class="p">,</span> <span class="n">sig_path_iter</span><span class="p">,</span> <span class="n">newsig_outfp</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">globals</span><span class="o">.</span><span class="n">dry_run</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">progress</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">progress</span><span class="o">.</span><span class="n">tracker</span><span class="o">.</span><span class="n">has_collected_evidence</span><span class="p">()):</span>
+        <span class="k">return</span> <span class="n">DummyBlockIter</span><span class="p">(</span><span class="n">delta_iter</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">DeltaTarBlockIter</span><span class="p">(</span><span class="n">delta_iter</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_combined_path_iter"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.get_combined_path_iter">[docs]</a><span class="k">def</span> <span class="nf">get_combined_path_iter</span><span class="p">(</span><span class="n">sig_infp_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return path iter combining signatures in list of open sig files</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">combine_path_iters</span><span class="p">([</span><span class="n">sigtar2path_iter</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sig_infp_list</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="FileWithReadCounter"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.FileWithReadCounter">[docs]</a><span class="k">class</span> <span class="nc">FileWithReadCounter</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    File-like object which also computes amount read as it is read</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infile</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;FileWithReadCounter initializer&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">infile</span> <span class="o">=</span> <span class="n">infile</span>
+
+<div class="viewcode-block" id="FileWithReadCounter.read"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.FileWithReadCounter.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">buf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">infile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Error </span><span class="si">%s</span><span class="s2"> getting delta for </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">),</span> <span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">infile</span><span class="o">.</span><span class="n">name</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">stats</span><span class="p">:</span>
+            <span class="n">stats</span><span class="o">.</span><span class="n">SourceFileSize</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">buf</span></div>
+
+<div class="viewcode-block" id="FileWithReadCounter.close"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.FileWithReadCounter.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">infile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="FileWithSignature"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.FileWithSignature">[docs]</a><span class="k">class</span> <span class="nc">FileWithSignature</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    File-like object which also computes signature as it is read</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">blocksize</span> <span class="o">=</span> <span class="mi">32</span> <span class="o">*</span> <span class="mi">1024</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infile</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">filelen</span><span class="p">,</span> <span class="o">*</span><span class="n">extra_args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        FileTee initializer</span>
+
+<span class="sd">        The object will act like infile, but whenever it is read it</span>
+<span class="sd">        add infile&#39;s data to a SigGenerator object.  When the file has</span>
+<span class="sd">        been read to the end the callback will be called with the</span>
+<span class="sd">        calculated signature, and any extra_args if given.</span>
+
+<span class="sd">        filelen is used to calculate the block size of the signature.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">infile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback</span> <span class="o">=</span> <span class="n">infile</span><span class="p">,</span> <span class="n">callback</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sig_gen</span> <span class="o">=</span> <span class="n">librsync</span><span class="o">.</span><span class="n">SigGenerator</span><span class="p">(</span><span class="n">get_block_size</span><span class="p">(</span><span class="n">filelen</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activated_callback</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extra_args</span> <span class="o">=</span> <span class="n">extra_args</span>
+
+<div class="viewcode-block" id="FileWithSignature.read"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.FileWithSignature.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">buf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">infile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sig_gen</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">buf</span></div>
+
+<div class="viewcode-block" id="FileWithSignature.close"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.FileWithSignature.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Make sure all of infile read</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">activated_callback</span><span class="p">:</span>
+            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blocksize</span><span class="p">):</span>
+                <span class="k">pass</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activated_callback</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_gen</span><span class="o">.</span><span class="n">getsig</span><span class="p">(),</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">extra_args</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">infile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="TarBlock"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.TarBlock">[docs]</a><span class="k">class</span> <span class="nc">TarBlock</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contain information to add next file to tar</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        TarBlock initializer - just store data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="TarBlockIter"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.TarBlockIter">[docs]</a><span class="k">class</span> <span class="nc">TarBlockIter</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A bit like an iterator, yield tar blocks given input iterator</span>
+
+<span class="sd">    Unlike an iterator, however, control over the maximum size of a</span>
+<span class="sd">    tarblock is available by passing an argument to next().  Also the</span>
+<span class="sd">    get_footer() is available.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_iter</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        TarBlockIter initializer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_iter</span> <span class="o">=</span> <span class="n">input_iter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># total length of data read</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_waiting</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># process_continued has more blocks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_next_vol_number</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># next volume number to write in multivol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_index</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># holds index of last block returned</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_block</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># holds block of last block returned</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remember_next</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># see remember_next_index()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remember_value</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># holds index of next block</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remember_block</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># holds block of next block</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queued_data</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># data to return in next next() call</span>
+
+<div class="viewcode-block" id="TarBlockIter.tarinfo2tarblock"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.TarBlockIter.tarinfo2tarblock">[docs]</a>    <span class="k">def</span> <span class="nf">tarinfo2tarblock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">tarinfo</span><span class="p">,</span> <span class="n">file_data</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Make tarblock out of tarinfo and file data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tarinfo</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">file_data</span><span class="p">)</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">tobuf</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s1">&#39;replace&#39;</span><span class="p">)</span>
+        <span class="n">blocks</span><span class="p">,</span> <span class="n">remainder</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">tarinfo</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">BLOCKSIZE</span><span class="p">)</span>  <span class="c1"># @UnusedVariable</span>
+        <span class="k">if</span> <span class="n">remainder</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">filler_data</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\0</span><span class="s2">&quot;</span> <span class="o">*</span> <span class="p">(</span><span class="n">tarfile</span><span class="o">.</span><span class="n">BLOCKSIZE</span> <span class="o">-</span> <span class="n">remainder</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">filler_data</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">TarBlock</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%s%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">headers</span><span class="p">,</span> <span class="n">file_data</span><span class="p">,</span> <span class="n">filler_data</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="TarBlockIter.process"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.TarBlockIter.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Turn next value of input_iter into a TarBlock</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_waiting</span>
+        <span class="n">XXX</span>  <span class="c1"># Override in subclass @UndefinedVariable</span></div>
+
+<div class="viewcode-block" id="TarBlockIter.process_continued"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.TarBlockIter.process_continued">[docs]</a>    <span class="k">def</span> <span class="nf">process_continued</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get more tarblocks</span>
+
+<span class="sd">        If processing val above would produce more than one TarBlock,</span>
+<span class="sd">        get the rest of them by calling process_continue.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_waiting</span>
+        <span class="n">XXX</span>  <span class="c1"># Override in subclass @UndefinedVariable</span></div>
+
+<div class="viewcode-block" id="TarBlockIter.next"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.TarBlockIter.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return next block and update offset</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">queued_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">queued_data</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">queued_data</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="c1"># Keep rest of metadata as is (like previous_index)</span>
+            <span class="k">return</span> <span class="n">result</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_waiting</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_continued</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Below a StopIteration exception will just be passed upwards</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_iter</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
+        <span class="n">block_number</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_next_vol_number</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_index</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_block</span> <span class="o">=</span> <span class="n">block_number</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">remember_next</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remember_value</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">index</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remember_block</span> <span class="o">=</span> <span class="n">block_number</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remember_next</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="TarBlockIter.get_read_size"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.TarBlockIter.get_read_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_read_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># read size must always be the same, because if we are restarting a</span>
+        <span class="c1"># backup volume where the previous volume ended in a data block, we</span>
+        <span class="c1"># have to be able to assume it&#39;s length in order to continue reading</span>
+        <span class="c1"># the file from the right place.</span>
+        <span class="k">return</span> <span class="mi">64</span> <span class="o">*</span> <span class="mi">1024</span></div>
+
+<div class="viewcode-block" id="TarBlockIter.get_previous_index"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.TarBlockIter.get_previous_index">[docs]</a>    <span class="k">def</span> <span class="nf">get_previous_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return index of last tarblock, or None if no previous index</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">previous_index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">previous_block</span></div>
+
+<div class="viewcode-block" id="TarBlockIter.queue_index_data"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.TarBlockIter.queue_index_data">[docs]</a>    <span class="k">def</span> <span class="nf">queue_index_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Next time next() is called, we will return data instead of processing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queued_data</span> <span class="o">=</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="TarBlockIter.remember_next_index"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.TarBlockIter.remember_next_index">[docs]</a>    <span class="k">def</span> <span class="nf">remember_next_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        When called, remember the index of the next block iterated</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remember_next</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remember_value</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remember_block</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="TarBlockIter.recall_index"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.TarBlockIter.recall_index">[docs]</a>    <span class="k">def</span> <span class="nf">recall_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve index remembered with remember_next_index</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">remember_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">remember_block</span></div>
+
+<div class="viewcode-block" id="TarBlockIter.get_footer"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.TarBlockIter.get_footer">[docs]</a>    <span class="k">def</span> <span class="nf">get_footer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return closing string for tarfile, reset offset</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">blocks</span><span class="p">,</span> <span class="n">remainder</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">RECORDSIZE</span><span class="p">)</span>  <span class="c1"># @UnusedVariable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\0</span><span class="s1">&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="n">tarfile</span><span class="o">.</span><span class="n">RECORDSIZE</span> <span class="o">-</span> <span class="n">remainder</span><span class="p">)</span>  <span class="c1"># remainder can be 0</span></div>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="DummyBlockIter"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.DummyBlockIter">[docs]</a><span class="k">class</span> <span class="nc">DummyBlockIter</span><span class="p">(</span><span class="n">TarBlockIter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    TarBlockIter that does no file reading</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="DummyBlockIter.process"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.DummyBlockIter.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta_ropath</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a fake tarblock from delta_ropath</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ti</span> <span class="o">=</span> <span class="n">delta_ropath</span><span class="o">.</span><span class="n">get_tarinfo</span><span class="p">()</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">delta_ropath</span><span class="o">.</span><span class="n">index</span>
+
+        <span class="c1"># Return blocks of deleted files or fileless snapshots</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">delta_ropath</span><span class="o">.</span><span class="n">type</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">delta_ropath</span><span class="o">.</span><span class="n">fileobj</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tarinfo2tarblock</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">ti</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">stats</span><span class="p">:</span>
+            <span class="c1"># Since we don&#39;t read the source files, we can&#39;t analyze them.</span>
+            <span class="c1"># Best we can do is count them raw.</span>
+            <span class="n">stats</span><span class="o">.</span><span class="n">SourceFiles</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">stats</span><span class="o">.</span><span class="n">SourceFileSize</span> <span class="o">+=</span> <span class="n">delta_ropath</span><span class="o">.</span><span class="n">getsize</span><span class="p">()</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Progress</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">stats</span><span class="o">.</span><span class="n">SourceFileSize</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tarinfo2tarblock</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">ti</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SigTarBlockIter"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.SigTarBlockIter">[docs]</a><span class="k">class</span> <span class="nc">SigTarBlockIter</span><span class="p">(</span><span class="n">TarBlockIter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    TarBlockIter that yields blocks of a signature tar from path_iter</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="SigTarBlockIter.process"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.SigTarBlockIter.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return associated signature TarBlock from path</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ti</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">get_tarinfo</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">isreg</span><span class="p">():</span>
+            <span class="n">sfp</span> <span class="o">=</span> <span class="n">librsync</span><span class="o">.</span><span class="n">SigFile</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">),</span>
+                                   <span class="n">get_block_size</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">()))</span>
+            <span class="n">sigbuf</span> <span class="o">=</span> <span class="n">sfp</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">sfp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">ti</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;signature/&quot;</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tarinfo2tarblock</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">ti</span><span class="p">,</span> <span class="n">sigbuf</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ti</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;snapshot/&quot;</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tarinfo2tarblock</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">ti</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="DeltaTarBlockIter"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.DeltaTarBlockIter">[docs]</a><span class="k">class</span> <span class="nc">DeltaTarBlockIter</span><span class="p">(</span><span class="n">TarBlockIter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    TarBlockIter that yields parts of a deltatar file</span>
+
+<span class="sd">    Unlike SigTarBlockIter, the argument to __init__ is a</span>
+<span class="sd">    delta_path_iter, so the delta information has already been</span>
+<span class="sd">    calculated.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="DeltaTarBlockIter.process"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.DeltaTarBlockIter.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta_ropath</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a tarblock from delta_ropath</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">add_prefix</span><span class="p">(</span><span class="n">tarinfo</span><span class="p">,</span> <span class="n">prefix</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Add prefix to the name of a tarinfo file&quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;.&quot;</span><span class="p">:</span>
+                <span class="n">tarinfo</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tarinfo</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="n">ti</span> <span class="o">=</span> <span class="n">delta_ropath</span><span class="o">.</span><span class="n">get_tarinfo</span><span class="p">()</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">delta_ropath</span><span class="o">.</span><span class="n">index</span>
+
+        <span class="c1"># Return blocks of deleted files or fileless snapshots</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">delta_ropath</span><span class="o">.</span><span class="n">type</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">delta_ropath</span><span class="o">.</span><span class="n">fileobj</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">delta_ropath</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+                <span class="n">add_prefix</span><span class="p">(</span><span class="n">ti</span><span class="p">,</span> <span class="s2">&quot;deleted&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">delta_ropath</span><span class="o">.</span><span class="n">difftype</span> <span class="o">==</span> <span class="s2">&quot;snapshot&quot;</span>
+                <span class="n">add_prefix</span><span class="p">(</span><span class="n">ti</span><span class="p">,</span> <span class="s2">&quot;snapshot&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tarinfo2tarblock</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">ti</span><span class="p">)</span>
+
+        <span class="c1"># Now handle single volume block case</span>
+        <span class="n">fp</span> <span class="o">=</span> <span class="n">delta_ropath</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">,</span> <span class="n">last_block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_block</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stats</span><span class="p">:</span>
+            <span class="n">stats</span><span class="o">.</span><span class="n">RawDeltaSize</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">last_block</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">delta_ropath</span><span class="o">.</span><span class="n">difftype</span> <span class="o">==</span> <span class="s2">&quot;snapshot&quot;</span><span class="p">:</span>
+                <span class="n">add_prefix</span><span class="p">(</span><span class="n">ti</span><span class="p">,</span> <span class="s2">&quot;snapshot&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">delta_ropath</span><span class="o">.</span><span class="n">difftype</span> <span class="o">==</span> <span class="s2">&quot;diff&quot;</span><span class="p">:</span>
+                <span class="n">add_prefix</span><span class="p">(</span><span class="n">ti</span><span class="p">,</span> <span class="s2">&quot;diff&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Unknown difftype&quot;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tarinfo2tarblock</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">ti</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+        <span class="c1"># Finally, do multivol snapshot or diff case</span>
+        <span class="n">full_name</span> <span class="o">=</span> <span class="s2">&quot;multivol_</span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">delta_ropath</span><span class="o">.</span><span class="n">difftype</span><span class="p">,</span> <span class="n">ti</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">ti</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">full_name</span> <span class="o">+</span> <span class="s2">&quot;/1&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_prefix</span> <span class="o">=</span> <span class="n">full_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_fp</span> <span class="o">=</span> <span class="n">fp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_ropath</span> <span class="o">=</span> <span class="n">delta_ropath</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_waiting</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_next_vol_number</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tarinfo2tarblock</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">ti</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DeltaTarBlockIter.get_data_block"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.DeltaTarBlockIter.get_data_block">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fp</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return pair (next data block, boolean last data block)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">read_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_read_size</span><span class="p">()</span>
+        <span class="n">buf</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">read_size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">read_size</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">DiffDirException</span><span class="p">(</span><span class="s2">&quot;Error closing file&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DeltaTarBlockIter.process_continued"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.DeltaTarBlockIter.process_continued">[docs]</a>    <span class="k">def</span> <span class="nf">process_continued</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return next volume in multivol diff or snapshot</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_waiting</span>
+        <span class="n">ropath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_ropath</span>
+        <span class="n">ti</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">ropath</span><span class="o">.</span><span class="n">get_tarinfo</span><span class="p">(),</span> <span class="n">ropath</span><span class="o">.</span><span class="n">index</span>
+        <span class="n">ti</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">process_prefix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_next_vol_number</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">,</span> <span class="n">last_block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_block</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">process_fp</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stats</span><span class="p">:</span>
+            <span class="n">stats</span><span class="o">.</span><span class="n">RawDeltaSize</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">last_block</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process_prefix</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process_fp</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process_ropath</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process_waiting</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process_next_vol_number</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process_next_vol_number</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tarinfo2tarblock</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">ti</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="write_block_iter"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.write_block_iter">[docs]</a><span class="k">def</span> <span class="nf">write_block_iter</span><span class="p">(</span><span class="n">block_iter</span><span class="p">,</span> <span class="n">out_obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Write block_iter to filename, path, or file object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out_obj</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+        <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_obj</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out_obj</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">StringType</span><span class="p">):</span>
+        <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_obj</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fp</span> <span class="o">=</span> <span class="n">out_obj</span>
+    <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">block_iter</span><span class="p">:</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">block_iter</span><span class="o">.</span><span class="n">get_footer</span><span class="p">())</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out_obj</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+        <span class="n">out_obj</span><span class="o">.</span><span class="n">setdata</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="get_block_size"><a class="viewcode-back" href="../../duplicity.diffdir.html#duplicity.diffdir.get_block_size">[docs]</a><span class="k">def</span> <span class="nf">get_block_size</span><span class="p">(</span><span class="n">file_len</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a reasonable block size to use on files of length file_len</span>
+
+<span class="sd">    If the block size is too big, deltas will be bigger than is</span>
+<span class="sd">    necessary.  If the block size is too small, making deltas and</span>
+<span class="sd">    patching can take a really long time.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">file_len</span> <span class="o">&lt;</span> <span class="mi">1024000</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">512</span>  <span class="c1"># set minimum of 512 bytes</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Split file into about 2000 pieces, rounding to 512</span>
+        <span class="n">file_blocksize</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">file_len</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2000</span> <span class="o">*</span> <span class="mi">512</span><span class="p">))</span> <span class="o">*</span> <span class="mi">512</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">file_blocksize</span><span class="p">,</span> <span class="nb">globals</span><span class="o">.</span><span class="n">max_blocksize</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

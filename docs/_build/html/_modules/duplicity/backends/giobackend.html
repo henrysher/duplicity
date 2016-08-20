@@ -1,0 +1,259 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.backends.giobackend &mdash; duplicity-src8  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="duplicity-src8  documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.backends.giobackend</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2009 Michael Terry &lt;mike@mterry.name&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="c1"># pylint: skip-file</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">atexit</span>
+<span class="kn">import</span> <span class="nn">signal</span>
+
+<span class="kn">import</span> <span class="nn">duplicity.backend</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">util</span>
+
+
+<div class="viewcode-block" id="ensure_dbus"><a class="viewcode-back" href="../../../duplicity.backends.giobackend.html#duplicity.backends.giobackend.ensure_dbus">[docs]</a><span class="k">def</span> <span class="nf">ensure_dbus</span><span class="p">():</span>
+    <span class="c1"># GIO requires a dbus session bus which can start the gvfs daemons</span>
+    <span class="c1"># when required.  So we make sure that such a bus exists and that our</span>
+    <span class="c1"># environment points to it.</span>
+    <span class="k">if</span> <span class="s1">&#39;DBUS_SESSION_BUS_ADDRESS&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="s1">&#39;dbus-launch&#39;</span><span class="p">],</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span><span class="o">.</span><span class="n">communicate</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;DBUS_SESSION_BUS_PID&#39;</span><span class="p">:</span>  <span class="c1"># cleanup at end</span>
+                    <span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIGTERM</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="GIOBackend"><a class="viewcode-back" href="../../../duplicity.backends.giobackend.html#duplicity.backends.giobackend.GIOBackend">[docs]</a><span class="k">class</span> <span class="nc">GIOBackend</span><span class="p">(</span><span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Backend</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Use this backend when saving to a GIO URL.</span>
+<span class="sd">       This is a bit of a meta-backend, in that it can handle multiple schemas.</span>
+<span class="sd">       URLs look like schema://user@server/path.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_url</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">gi.repository</span> <span class="k">import</span> <span class="n">Gio</span>  <span class="c1"># @UnresolvedImport</span>
+        <span class="kn">from</span> <span class="nn">gi.repository</span> <span class="k">import</span> <span class="n">GLib</span>  <span class="c1"># @UnresolvedImport</span>
+
+        <span class="k">class</span> <span class="nc">DupMountOperation</span><span class="p">(</span><span class="n">Gio</span><span class="o">.</span><span class="n">MountOperation</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;A simple MountOperation that grabs the password from the environment</span>
+<span class="sd">               or the user.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backend</span><span class="p">):</span>
+                <span class="n">Gio</span><span class="o">.</span><span class="n">MountOperation</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;ask-password&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ask_password_cb</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;ask-question&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ask_question_cb</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">ask_password_cb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_password</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">get_password</span><span class="p">())</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reply</span><span class="p">(</span><span class="n">Gio</span><span class="o">.</span><span class="n">MountOperationResult</span><span class="o">.</span><span class="n">HANDLED</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">ask_question_cb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                <span class="c1"># Obviously just always answering with the first choice is a naive</span>
+                <span class="c1"># approach.  But there&#39;s no easy way to allow for answering questions</span>
+                <span class="c1"># in duplicity&#39;s typical run-from-cron mode with environment variables.</span>
+                <span class="c1"># And only a couple gvfs backends ask questions: &#39;sftp&#39; does about</span>
+                <span class="c1"># new hosts and &#39;afc&#39; does if the device is locked.  0 should be a</span>
+                <span class="c1"># safe choice.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_choice</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reply</span><span class="p">(</span><span class="n">Gio</span><span class="o">.</span><span class="n">MountOperationResult</span><span class="o">.</span><span class="n">HANDLED</span><span class="p">)</span>
+
+        <span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Backend</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_url</span><span class="p">)</span>
+
+        <span class="n">ensure_dbus</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">remote_file</span> <span class="o">=</span> <span class="n">Gio</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">new_for_uri</span><span class="p">(</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">url_string</span><span class="p">)</span>
+
+        <span class="c1"># Now we make sure the location is mounted</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">DupMountOperation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">loop</span> <span class="o">=</span> <span class="n">GLib</span><span class="o">.</span><span class="n">MainLoop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remote_file</span><span class="o">.</span><span class="n">mount_enclosing_volume</span><span class="p">(</span><span class="n">Gio</span><span class="o">.</span><span class="n">MountMountFlags</span><span class="o">.</span><span class="n">NONE</span><span class="p">,</span>
+                                                <span class="n">op</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">__done_with_mount</span><span class="p">,</span> <span class="n">loop</span><span class="p">)</span>
+        <span class="n">loop</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>  <span class="c1"># halt program until we&#39;re done mounting</span>
+
+        <span class="c1"># Now make the directory if it doesn&#39;t exist</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remote_file</span><span class="o">.</span><span class="n">make_directory_with_parents</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">GLib</span><span class="o">.</span><span class="n">GError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span> <span class="o">!=</span> <span class="n">Gio</span><span class="o">.</span><span class="n">IOErrorEnum</span><span class="o">.</span><span class="n">EXISTS</span><span class="p">:</span>
+                <span class="k">raise</span>
+
+    <span class="k">def</span> <span class="nf">__done_with_mount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileobj</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">loop</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">gi.repository</span> <span class="k">import</span> <span class="n">Gio</span>  <span class="c1"># @UnresolvedImport</span>
+        <span class="kn">from</span> <span class="nn">gi.repository</span> <span class="k">import</span> <span class="n">GLib</span>  <span class="c1"># @UnresolvedImport</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fileobj</span><span class="o">.</span><span class="n">mount_enclosing_volume_finish</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">GLib</span><span class="o">.</span><span class="n">GError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># check for NOT_SUPPORTED because some schemas (e.g. file://) validly don&#39;t</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span> <span class="o">!=</span> <span class="n">Gio</span><span class="o">.</span><span class="n">IOErrorEnum</span><span class="o">.</span><span class="n">ALREADY_MOUNTED</span> <span class="ow">and</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span> <span class="o">!=</span> <span class="n">Gio</span><span class="o">.</span><span class="n">IOErrorEnum</span><span class="o">.</span><span class="n">NOT_SUPPORTED</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">FatalError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Connection failed, please check your password: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                               <span class="o">%</span> <span class="n">util</span><span class="o">.</span><span class="n">uexc</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">connection_failed</span><span class="p">)</span>
+        <span class="n">loop</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__copy_progress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">__copy_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">gi.repository</span> <span class="k">import</span> <span class="n">Gio</span>  <span class="c1"># @UnresolvedImport</span>
+        <span class="n">source</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">target</span><span class="p">,</span>
+                    <span class="n">Gio</span><span class="o">.</span><span class="n">FileCopyFlags</span><span class="o">.</span><span class="n">OVERWRITE</span> <span class="o">|</span> <span class="n">Gio</span><span class="o">.</span><span class="n">FileCopyFlags</span><span class="o">.</span><span class="n">NOFOLLOW_SYMLINKS</span><span class="p">,</span>
+                    <span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__copy_progress</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_error_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">gi.repository</span> <span class="k">import</span> <span class="n">Gio</span>  <span class="c1"># @UnresolvedImport</span>
+        <span class="kn">from</span> <span class="nn">gi.repository</span> <span class="k">import</span> <span class="n">GLib</span>  <span class="c1"># @UnresolvedImport</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">GLib</span><span class="o">.</span><span class="n">GError</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span> <span class="o">==</span> <span class="n">Gio</span><span class="o">.</span><span class="n">IOErrorEnum</span><span class="o">.</span><span class="n">FAILED</span> <span class="ow">and</span> <span class="n">operation</span> <span class="o">==</span> <span class="s1">&#39;delete&#39;</span><span class="p">:</span>
+                <span class="c1"># Sometimes delete will return a generic failure on a file not</span>
+                <span class="c1"># found (notably the FTP does that)</span>
+                <span class="k">return</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">backend_not_found</span>
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span> <span class="o">==</span> <span class="n">Gio</span><span class="o">.</span><span class="n">IOErrorEnum</span><span class="o">.</span><span class="n">PERMISSION_DENIED</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">backend_permission_denied</span>
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span> <span class="o">==</span> <span class="n">Gio</span><span class="o">.</span><span class="n">IOErrorEnum</span><span class="o">.</span><span class="n">NOT_FOUND</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">backend_not_found</span>
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span> <span class="o">==</span> <span class="n">Gio</span><span class="o">.</span><span class="n">IOErrorEnum</span><span class="o">.</span><span class="n">NO_SPACE</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">backend_no_space</span>
+
+    <span class="k">def</span> <span class="nf">_put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_path</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">gi.repository</span> <span class="k">import</span> <span class="n">Gio</span>  <span class="c1"># @UnresolvedImport</span>
+        <span class="n">source_file</span> <span class="o">=</span> <span class="n">Gio</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">new_for_path</span><span class="p">(</span><span class="n">source_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">target_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_file</span><span class="o">.</span><span class="n">get_child</span><span class="p">(</span><span class="n">remote_filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__copy_file</span><span class="p">(</span><span class="n">source_file</span><span class="p">,</span> <span class="n">target_file</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">local_path</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">gi.repository</span> <span class="k">import</span> <span class="n">Gio</span>  <span class="c1"># @UnresolvedImport</span>
+        <span class="n">source_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_file</span><span class="o">.</span><span class="n">get_child</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">target_file</span> <span class="o">=</span> <span class="n">Gio</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">new_for_path</span><span class="p">(</span><span class="n">local_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__copy_file</span><span class="p">(</span><span class="n">source_file</span><span class="p">,</span> <span class="n">target_file</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">gi.repository</span> <span class="k">import</span> <span class="n">Gio</span>  <span class="c1"># @UnresolvedImport</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">enum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_file</span><span class="o">.</span><span class="n">enumerate_children</span><span class="p">(</span><span class="n">Gio</span><span class="o">.</span><span class="n">FILE_ATTRIBUTE_STANDARD_NAME</span><span class="p">,</span>
+                                                   <span class="n">Gio</span><span class="o">.</span><span class="n">FileQueryInfoFlags</span><span class="o">.</span><span class="n">NOFOLLOW_SYMLINKS</span><span class="p">,</span>
+                                                   <span class="kc">None</span><span class="p">)</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">next_file</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">info</span><span class="p">:</span>
+            <span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">get_name</span><span class="p">())</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">next_file</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">files</span>
+
+    <span class="k">def</span> <span class="nf">_delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="n">target_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_file</span><span class="o">.</span><span class="n">get_child</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">target_file</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">gi.repository</span> <span class="k">import</span> <span class="n">Gio</span>  <span class="c1"># @UnresolvedImport</span>
+        <span class="n">target_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_file</span><span class="o">.</span><span class="n">get_child</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="n">target_file</span><span class="o">.</span><span class="n">query_info</span><span class="p">(</span><span class="n">Gio</span><span class="o">.</span><span class="n">FILE_ATTRIBUTE_STANDARD_SIZE</span><span class="p">,</span>
+                                      <span class="n">Gio</span><span class="o">.</span><span class="n">FileQueryInfoFlags</span><span class="o">.</span><span class="n">NONE</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="n">info</span><span class="o">.</span><span class="n">get_size</span><span class="p">()}</span></div>
+
+<span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">register_backend_prefix</span><span class="p">(</span><span class="s1">&#39;gio&#39;</span><span class="p">,</span> <span class="n">GIOBackend</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

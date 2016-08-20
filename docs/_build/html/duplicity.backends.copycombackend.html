@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.backends.copycombackend module &mdash; duplicity-src8  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="duplicity-src8  documentation" href="index.html" />
+    <link rel="up" title="duplicity.backends package" href="duplicity.backends.html" />
+    <link rel="next" title="duplicity.backends.dpbxbackend module" href="duplicity.backends.dpbxbackend.html" />
+    <link rel="prev" title="duplicity.backends.cfbackend module" href="duplicity.backends.cfbackend.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-duplicity.backends.copycombackend">
+<span id="duplicity-backends-copycombackend-module"></span><h1>duplicity.backends.copycombackend module<a class="headerlink" href="#module-duplicity.backends.copycombackend" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="duplicity.backends.copycombackend.CoPyCloud">
+<em class="property">class </em><code class="descclassname">duplicity.backends.copycombackend.</code><code class="descname">CoPyCloud</code><span class="sig-paren">(</span><em>username</em>, <em>password</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/copycombackend.html#CoPyCloud"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.copycombackend.CoPyCloud" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="duplicity.backends.copycombackend.CoPyCloud.API_URI">
+<code class="descname">API_URI</code><em class="property"> = 'https://api.copy.com'</em><a class="headerlink" href="#duplicity.backends.copycombackend.CoPyCloud.API_URI" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.backends.copycombackend.CoPyCloud.DEFAULT_ENCODING">
+<code class="descname">DEFAULT_ENCODING</code><em class="property"> = 'latin-1'</em><a class="headerlink" href="#duplicity.backends.copycombackend.CoPyCloud.DEFAULT_ENCODING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.backends.copycombackend.CoPyCloud.DEFAULT_HEADERS">
+<code class="descname">DEFAULT_HEADERS</code><em class="property"> = {'X-Client-Type': 'api', 'X-Api-Version': '1.0', 'Accept': 'application/json', 'X-Authorization': ''}</em><a class="headerlink" href="#duplicity.backends.copycombackend.CoPyCloud.DEFAULT_HEADERS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="exception">
+<dt id="duplicity.backends.copycombackend.CoPyCloud.Error">
+<em class="property">exception </em><code class="descname">Error</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/copycombackend.html#CoPyCloud.Error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.copycombackend.CoPyCloud.Error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.backends.copycombackend.CoPyCloud.PARTS_HEADER_FMT">
+<code class="descclassname">CoPyCloud.</code><code class="descname">PARTS_HEADER_FMT</code><em class="property"> = '!IIIIII'</em><a class="headerlink" href="#duplicity.backends.copycombackend.CoPyCloud.PARTS_HEADER_FMT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.backends.copycombackend.CoPyCloud.PARTS_HEADER_SIG">
+<code class="descclassname">CoPyCloud.</code><code class="descname">PARTS_HEADER_SIG</code><em class="property"> = 3126770193</em><a class="headerlink" href="#duplicity.backends.copycombackend.CoPyCloud.PARTS_HEADER_SIG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.backends.copycombackend.CoPyCloud.PARTS_HEADER_VERSION">
+<code class="descclassname">CoPyCloud.</code><code class="descname">PARTS_HEADER_VERSION</code><em class="property"> = 1</em><a class="headerlink" href="#duplicity.backends.copycombackend.CoPyCloud.PARTS_HEADER_VERSION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.backends.copycombackend.CoPyCloud.PART_ITEM_FMT">
+<code class="descclassname">CoPyCloud.</code><code class="descname">PART_ITEM_FMT</code><em class="property"> = '!IIII73sIIII'</em><a class="headerlink" href="#duplicity.backends.copycombackend.CoPyCloud.PART_ITEM_FMT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.backends.copycombackend.CoPyCloud.PART_ITEM_SIG">
+<code class="descclassname">CoPyCloud.</code><code class="descname">PART_ITEM_SIG</code><em class="property"> = 3400533477</em><a class="headerlink" href="#duplicity.backends.copycombackend.CoPyCloud.PART_ITEM_SIG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.backends.copycombackend.CoPyCloud.PART_ITEM_VERSION">
+<code class="descclassname">CoPyCloud.</code><code class="descname">PART_ITEM_VERSION</code><em class="property"> = 1</em><a class="headerlink" href="#duplicity.backends.copycombackend.CoPyCloud.PART_ITEM_VERSION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.backends.copycombackend.CoPyCloud.PART_MAX_SIZE">
+<code class="descclassname">CoPyCloud.</code><code class="descname">PART_MAX_SIZE</code><em class="property"> = 1048576</em><a class="headerlink" href="#duplicity.backends.copycombackend.CoPyCloud.PART_MAX_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.copycombackend.CoPyCloud.download">
+<code class="descclassname">CoPyCloud.</code><code class="descname">download</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/copycombackend.html#CoPyCloud.download"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.copycombackend.CoPyCloud.download" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.copycombackend.CoPyCloud.list_files">
+<code class="descclassname">CoPyCloud.</code><code class="descname">list_files</code><span class="sig-paren">(</span><em>path=None</em>, <em>max_items=9223372036854775807</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/copycombackend.html#CoPyCloud.list_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.copycombackend.CoPyCloud.list_files" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.copycombackend.CoPyCloud.remove">
+<code class="descclassname">CoPyCloud.</code><code class="descname">remove</code><span class="sig-paren">(</span><em>paths</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/copycombackend.html#CoPyCloud.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.copycombackend.CoPyCloud.remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.copycombackend.CoPyCloud.upload">
+<code class="descclassname">CoPyCloud.</code><code class="descname">upload</code><span class="sig-paren">(</span><em>source</em>, <em>dest</em>, <em>parallel=5</em>, <em>share_id=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/copycombackend.html#CoPyCloud.upload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.copycombackend.CoPyCloud.upload" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.backends.copycombackend.CopyComBackend">
+<em class="property">class </em><code class="descclassname">duplicity.backends.copycombackend.</code><code class="descname">CopyComBackend</code><span class="sig-paren">(</span><em>parsed_url</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/copycombackend.html#CopyComBackend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.copycombackend.CopyComBackend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="duplicity.backend.html#duplicity.backend.Backend" title="duplicity.backend.Backend"><code class="xref py py-class docutils literal"><span class="pre">duplicity.backend.Backend</span></code></a></p>
+<p>Copy.com duplicity backend</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="duplicity.html">duplicity package</a><ul>
+  <li><a href="duplicity.backends.html">duplicity.backends package</a><ul>
+      <li>Previous: <a href="duplicity.backends.cfbackend.html" title="previous chapter">duplicity.backends.cfbackend module</a></li>
+      <li>Next: <a href="duplicity.backends.dpbxbackend.html" title="next chapter">duplicity.backends.dpbxbackend module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/duplicity.backends.copycombackend.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/duplicity.backends.copycombackend.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

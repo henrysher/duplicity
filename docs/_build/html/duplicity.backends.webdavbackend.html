@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.backends.webdavbackend module &mdash; duplicity-src8  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="duplicity-src8  documentation" href="index.html" />
+    <link rel="up" title="duplicity.backends package" href="duplicity.backends.html" />
+    <link rel="next" title="duplicity.asyncscheduler module" href="duplicity.asyncscheduler.html" />
+    <link rel="prev" title="duplicity.backends.tahoebackend module" href="duplicity.backends.tahoebackend.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-duplicity.backends.webdavbackend">
+<span id="duplicity-backends-webdavbackend-module"></span><h1>duplicity.backends.webdavbackend module<a class="headerlink" href="#module-duplicity.backends.webdavbackend" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="duplicity.backends.webdavbackend.CustomMethodRequest">
+<em class="property">class </em><code class="descclassname">duplicity.backends.webdavbackend.</code><code class="descname">CustomMethodRequest</code><span class="sig-paren">(</span><em>method</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/webdavbackend.html#CustomMethodRequest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.webdavbackend.CustomMethodRequest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">urllib2.Request</span></code></p>
+<p>This request subclass allows explicit specification of
+the HTTP request method. Basic urllib2.Request class
+chooses GET or POST depending on self.has_data()</p>
+<dl class="method">
+<dt id="duplicity.backends.webdavbackend.CustomMethodRequest.get_method">
+<code class="descname">get_method</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/webdavbackend.html#CustomMethodRequest.get_method"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.webdavbackend.CustomMethodRequest.get_method" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.backends.webdavbackend.VerifiedHTTPSConnection">
+<em class="property">class </em><code class="descclassname">duplicity.backends.webdavbackend.</code><code class="descname">VerifiedHTTPSConnection</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/webdavbackend.html#VerifiedHTTPSConnection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.webdavbackend.VerifiedHTTPSConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">httplib.HTTPSConnection</span></code></p>
+<dl class="method">
+<dt id="duplicity.backends.webdavbackend.VerifiedHTTPSConnection.connect">
+<code class="descname">connect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/webdavbackend.html#VerifiedHTTPSConnection.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.webdavbackend.VerifiedHTTPSConnection.connect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.webdavbackend.VerifiedHTTPSConnection.request">
+<code class="descname">request</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/webdavbackend.html#VerifiedHTTPSConnection.request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.webdavbackend.VerifiedHTTPSConnection.request" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.backends.webdavbackend.WebDAVBackend">
+<em class="property">class </em><code class="descclassname">duplicity.backends.webdavbackend.</code><code class="descname">WebDAVBackend</code><span class="sig-paren">(</span><em>parsed_url</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/webdavbackend.html#WebDAVBackend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.webdavbackend.WebDAVBackend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="duplicity.backend.html#duplicity.backend.Backend" title="duplicity.backend.Backend"><code class="xref py py-class docutils literal"><span class="pre">duplicity.backend.Backend</span></code></a></p>
+<p>Backend for accessing a WebDAV repository.</p>
+<p>webdav backend contributed in 2006 by Jesper Zedlitz &lt;<a class="reference external" href="mailto:jesper&#37;&#52;&#48;zedlitz&#46;de">jesper<span>&#64;</span>zedlitz<span>&#46;</span>de</a>&gt;</p>
+<dl class="method">
+<dt id="duplicity.backends.webdavbackend.WebDAVBackend.connect">
+<code class="descname">connect</code><span class="sig-paren">(</span><em>forced=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/webdavbackend.html#WebDAVBackend.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.webdavbackend.WebDAVBackend.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect or re-connect to the server, updates self.conn
+# reconnect on errors as a precaution, there are errors e.g.
+# &#8220;[Errno 32] Broken pipe&#8221; or SSl errors that render the connection unusable</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.webdavbackend.WebDAVBackend.getText">
+<code class="descname">getText</code><span class="sig-paren">(</span><em>nodelist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/webdavbackend.html#WebDAVBackend.getText"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.webdavbackend.WebDAVBackend.getText" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.webdavbackend.WebDAVBackend.get_authorization">
+<code class="descname">get_authorization</code><span class="sig-paren">(</span><em>response</em>, <em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/webdavbackend.html#WebDAVBackend.get_authorization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.webdavbackend.WebDAVBackend.get_authorization" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches the auth header based on the requested method (basic or digest)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.webdavbackend.WebDAVBackend.get_basic_authorization">
+<code class="descname">get_basic_authorization</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/webdavbackend.html#WebDAVBackend.get_basic_authorization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.webdavbackend.WebDAVBackend.get_basic_authorization" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the basic auth header</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.webdavbackend.WebDAVBackend.get_digest_authorization">
+<code class="descname">get_digest_authorization</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/webdavbackend.html#WebDAVBackend.get_digest_authorization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.webdavbackend.WebDAVBackend.get_digest_authorization" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the digest auth header</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.webdavbackend.WebDAVBackend.get_kerberos_authorization">
+<code class="descname">get_kerberos_authorization</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/webdavbackend.html#WebDAVBackend.get_kerberos_authorization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.webdavbackend.WebDAVBackend.get_kerberos_authorization" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.backends.webdavbackend.WebDAVBackend.listbody">
+<code class="descname">listbody</code><em class="property"> = '&lt;?xml version=&quot;1.0&quot;?&gt;&lt;D:propfind xmlns:D=&quot;DAV:&quot;&gt;&lt;D:prop&gt;&lt;D:resourcetype/&gt;&lt;/D:prop&gt;&lt;/D:propfind&gt;'</em><a class="headerlink" href="#duplicity.backends.webdavbackend.WebDAVBackend.listbody" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect to remote store using WebDAV Protocol</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.webdavbackend.WebDAVBackend.makedir">
+<code class="descname">makedir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/webdavbackend.html#WebDAVBackend.makedir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.webdavbackend.WebDAVBackend.makedir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make (nested) directories on the server.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.webdavbackend.WebDAVBackend.parse_digest_challenge">
+<code class="descname">parse_digest_challenge</code><span class="sig-paren">(</span><em>challenge_string</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/webdavbackend.html#WebDAVBackend.parse_digest_challenge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.webdavbackend.WebDAVBackend.parse_digest_challenge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.webdavbackend.WebDAVBackend.request">
+<code class="descname">request</code><span class="sig-paren">(</span><em>method</em>, <em>path</em>, <em>data=None</em>, <em>redirected=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/webdavbackend.html#WebDAVBackend.request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.webdavbackend.WebDAVBackend.request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps the connection.request method to retry once if authentication is
+required</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.webdavbackend.WebDAVBackend.sanitize_path">
+<code class="descname">sanitize_path</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/webdavbackend.html#WebDAVBackend.sanitize_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.webdavbackend.WebDAVBackend.sanitize_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.webdavbackend.WebDAVBackend.taste_href">
+<code class="descname">taste_href</code><span class="sig-paren">(</span><em>href</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/webdavbackend.html#WebDAVBackend.taste_href"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.webdavbackend.WebDAVBackend.taste_href" title="Permalink to this definition">¶</a></dt>
+<dd><p>Internal helper to taste the given href node and, if
+it is a duplicity file, collect it as a result file.</p>
+<p>&#64;return: A matching filename, or None if the href did not match.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="duplicity.html">duplicity package</a><ul>
+  <li><a href="duplicity.backends.html">duplicity.backends package</a><ul>
+      <li>Previous: <a href="duplicity.backends.tahoebackend.html" title="previous chapter">duplicity.backends.tahoebackend module</a></li>
+      <li>Next: <a href="duplicity.asyncscheduler.html" title="next chapter">duplicity.asyncscheduler module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/duplicity.backends.webdavbackend.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/duplicity.backends.webdavbackend.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

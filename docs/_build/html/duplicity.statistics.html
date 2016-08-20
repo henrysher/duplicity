@@ -1,0 +1,307 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.statistics module &mdash; duplicity-src8  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="duplicity-src8  documentation" href="index.html" />
+    <link rel="up" title="duplicity package" href="duplicity.html" />
+    <link rel="next" title="duplicity.tarfile module" href="duplicity.tarfile.html" />
+    <link rel="prev" title="duplicity.selection module" href="duplicity.selection.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-duplicity.statistics">
+<span id="duplicity-statistics-module"></span><h1>duplicity.statistics module<a class="headerlink" href="#module-duplicity.statistics" title="Permalink to this headline">¶</a></h1>
+<p>Generate and process backup statistics</p>
+<dl class="class">
+<dt id="duplicity.statistics.StatsDeltaProcess">
+<em class="property">class </em><code class="descclassname">duplicity.statistics.</code><code class="descname">StatsDeltaProcess</code><a class="reference internal" href="_modules/duplicity/statistics.html#StatsDeltaProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsDeltaProcess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#duplicity.statistics.StatsObj" title="duplicity.statistics.StatsObj"><code class="xref py py-class docutils literal"><span class="pre">duplicity.statistics.StatsObj</span></code></a></p>
+<p>Keep track of statistics during DirDelta process</p>
+<dl class="method">
+<dt id="duplicity.statistics.StatsDeltaProcess.add_changed_file">
+<code class="descname">add_changed_file</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsDeltaProcess.add_changed_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsDeltaProcess.add_changed_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add stats of file that has changed since last backup</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsDeltaProcess.add_deleted_file">
+<code class="descname">add_deleted_file</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsDeltaProcess.add_deleted_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsDeltaProcess.add_deleted_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add stats of file no longer in source directory</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsDeltaProcess.add_delta_entries_file">
+<code class="descname">add_delta_entries_file</code><span class="sig-paren">(</span><em>path</em>, <em>action_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsDeltaProcess.add_delta_entries_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsDeltaProcess.add_delta_entries_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsDeltaProcess.add_new_file">
+<code class="descname">add_new_file</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsDeltaProcess.add_new_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsDeltaProcess.add_new_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add stats of new file path to statistics</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsDeltaProcess.add_unchanged_file">
+<code class="descname">add_unchanged_file</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsDeltaProcess.add_unchanged_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsDeltaProcess.add_unchanged_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add stats of file that hasn&#8217;t changed since last backup</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsDeltaProcess.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsDeltaProcess.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsDeltaProcess.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>End collection of data, set EndTime</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsDeltaProcess.get_delta_entries_file">
+<code class="descname">get_delta_entries_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsDeltaProcess.get_delta_entries_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsDeltaProcess.get_delta_entries_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="duplicity.statistics.StatsException">
+<em class="property">exception </em><code class="descclassname">duplicity.statistics.</code><code class="descname">StatsException</code><a class="reference internal" href="_modules/duplicity/statistics.html#StatsException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.statistics.StatsObj">
+<em class="property">class </em><code class="descclassname">duplicity.statistics.</code><code class="descname">StatsObj</code><a class="reference internal" href="_modules/duplicity/statistics.html#StatsObj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsObj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains various statistics, provide string conversion functions</p>
+<dl class="attribute">
+<dt id="duplicity.statistics.StatsObj.byte_abbrev_list">
+<code class="descname">byte_abbrev_list</code><em class="property"> = ((1099511627776, 'TB'), (1073741824, 'GB'), (1048576, 'MB'), (1024, 'KB'))</em><a class="headerlink" href="#duplicity.statistics.StatsObj.byte_abbrev_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsObj.get_byte_summary_string">
+<code class="descname">get_byte_summary_string</code><span class="sig-paren">(</span><em>byte_count</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsObj.get_byte_summary_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsObj.get_byte_summary_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turn byte count into human readable string like &#8220;7.23GB&#8221;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsObj.get_filestats_string">
+<code class="descname">get_filestats_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsObj.get_filestats_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsObj.get_filestats_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return portion of statistics string about files and bytes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsObj.get_miscstats_string">
+<code class="descname">get_miscstats_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsObj.get_miscstats_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsObj.get_miscstats_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return portion of extended stat string about misc attributes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsObj.get_stat">
+<code class="descname">get_stat</code><span class="sig-paren">(</span><em>attribute</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsObj.get_stat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsObj.get_stat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a statistic</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsObj.get_stats_line">
+<code class="descname">get_stats_line</code><span class="sig-paren">(</span><em>index</em>, <em>use_repr=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsObj.get_stats_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsObj.get_stats_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return one line abbreviated version of full stats string</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsObj.get_stats_logstring">
+<code class="descname">get_stats_logstring</code><span class="sig-paren">(</span><em>title</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsObj.get_stats_logstring"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsObj.get_stats_logstring" title="Permalink to this definition">¶</a></dt>
+<dd><p>Like get_stats_string, but add header and footer</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsObj.get_stats_string">
+<code class="descname">get_stats_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsObj.get_stats_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsObj.get_stats_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return extended string printing out statistics</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsObj.get_statsobj_copy">
+<code class="descname">get_statsobj_copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsObj.get_statsobj_copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsObj.get_statsobj_copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return new StatsObj object with same stats as self</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsObj.get_timestats_string">
+<code class="descname">get_timestats_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsObj.get_timestats_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsObj.get_timestats_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return portion of statistics string dealing with time</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsObj.get_total_dest_size_change">
+<code class="descname">get_total_dest_size_change</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsObj.get_total_dest_size_change"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsObj.get_total_dest_size_change" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return total destination size change</p>
+<p>This represents the total increase in the size of the
+duplicity destination directory, or None if not available.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsObj.increment_stat">
+<code class="descname">increment_stat</code><span class="sig-paren">(</span><em>attr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsObj.increment_stat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsObj.increment_stat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add 1 to value of attribute</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsObj.read_stats_from_path">
+<code class="descname">read_stats_from_path</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsObj.read_stats_from_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsObj.read_stats_from_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set statistics from path, return self for convenience</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsObj.set_stat">
+<code class="descname">set_stat</code><span class="sig-paren">(</span><em>attr</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsObj.set_stat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsObj.set_stat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set attribute to given value</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsObj.set_stats_from_line">
+<code class="descname">set_stats_from_line</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsObj.set_stats_from_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsObj.set_stats_from_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set statistics from given line</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsObj.set_stats_from_string">
+<code class="descname">set_stats_from_string</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsObj.set_stats_from_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsObj.set_stats_from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize attributes from string, return self for convenience</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsObj.set_to_average">
+<code class="descname">set_to_average</code><span class="sig-paren">(</span><em>statobj_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsObj.set_to_average"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsObj.set_to_average" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set self&#8217;s attributes to average of those in statobj_list</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.statistics.StatsObj.space_regex">
+<code class="descname">space_regex</code><em class="property"> = &lt;_sre.SRE_Pattern object&gt;</em><a class="headerlink" href="#duplicity.statistics.StatsObj.space_regex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.statistics.StatsObj.stat_attrs">
+<code class="descname">stat_attrs</code><em class="property"> = ('Filename', 'StartTime', 'EndTime', 'ElapsedTime', 'Errors', 'TotalDestinationSizeChange', 'SourceFiles', 'SourceFileSize', 'NewFiles', 'NewFileSize', 'DeletedFiles', 'ChangedFiles', 'ChangedFileSize', 'ChangedDeltaSize', 'DeltaEntries', 'RawDeltaSize')</em><a class="headerlink" href="#duplicity.statistics.StatsObj.stat_attrs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.statistics.StatsObj.stat_file_attrs">
+<code class="descname">stat_file_attrs</code><em class="property"> = ('SourceFiles', 'SourceFileSize', 'NewFiles', 'NewFileSize', 'DeletedFiles', 'ChangedFiles', 'ChangedFileSize', 'ChangedDeltaSize', 'DeltaEntries', 'RawDeltaSize')</em><a class="headerlink" href="#duplicity.statistics.StatsObj.stat_file_attrs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.statistics.StatsObj.stat_file_pairs">
+<code class="descname">stat_file_pairs</code><em class="property"> = (('SourceFiles', False), ('SourceFileSize', True), ('NewFiles', False), ('NewFileSize', True), ('DeletedFiles', False), ('ChangedFiles', False), ('ChangedFileSize', True), ('ChangedDeltaSize', True), ('DeltaEntries', False), ('RawDeltaSize', True))</em><a class="headerlink" href="#duplicity.statistics.StatsObj.stat_file_pairs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.statistics.StatsObj.stat_misc_attrs">
+<code class="descname">stat_misc_attrs</code><em class="property"> = ('Errors', 'TotalDestinationSizeChange')</em><a class="headerlink" href="#duplicity.statistics.StatsObj.stat_misc_attrs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.statistics.StatsObj.stat_time_attrs">
+<code class="descname">stat_time_attrs</code><em class="property"> = ('StartTime', 'EndTime', 'ElapsedTime')</em><a class="headerlink" href="#duplicity.statistics.StatsObj.stat_time_attrs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsObj.stats_equal">
+<code class="descname">stats_equal</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsObj.stats_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsObj.stats_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return true if s has same statistics as self</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.statistics.StatsObj.write_stats_to_path">
+<code class="descname">write_stats_to_path</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/statistics.html#StatsObj.write_stats_to_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.statistics.StatsObj.write_stats_to_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write statistics string to given path</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="duplicity.html">duplicity package</a><ul>
+      <li>Previous: <a href="duplicity.selection.html" title="previous chapter">duplicity.selection module</a></li>
+      <li>Next: <a href="duplicity.tarfile.html" title="next chapter">duplicity.tarfile module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/duplicity.statistics.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/duplicity.statistics.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

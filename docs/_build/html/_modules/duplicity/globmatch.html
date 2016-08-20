@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.globmatch &mdash; duplicity-src8  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="duplicity-src8  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.globmatch</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2002 Ben Escoto &lt;ben@emerose.org&gt;</span>
+<span class="c1"># Copyright 2007 Kenneth Loafman &lt;kenneth@loafman.com&gt;</span>
+<span class="c1"># Copyright 2014 Aaron Whitehouse &lt;aaron@whitehouse.kiwi.nz&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+
+
+<div class="viewcode-block" id="GlobbingError"><a class="viewcode-back" href="../../duplicity.globmatch.html#duplicity.globmatch.GlobbingError">[docs]</a><span class="k">class</span> <span class="nc">GlobbingError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Something has gone wrong when parsing a glob string&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="FilePrefixError"><a class="viewcode-back" href="../../duplicity.globmatch.html#duplicity.globmatch.FilePrefixError">[docs]</a><span class="k">class</span> <span class="nc">FilePrefixError</span><span class="p">(</span><span class="n">GlobbingError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Signals that a specified file doesn&#39;t start with correct prefix&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<span class="k">def</span> <span class="nf">_glob_get_prefix_regexs</span><span class="p">(</span><span class="n">glob_str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return list of regexps equivalent to prefixes of glob_str&quot;&quot;&quot;</span>
+    <span class="c1"># Internal. Used by glob_get_normal_sf.</span>
+    <span class="n">glob_parts</span> <span class="o">=</span> <span class="n">glob_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;&quot;</span> <span class="ow">in</span> <span class="n">glob_parts</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="c1"># &quot;&quot; OK if comes first or last, as in /foo/</span>
+        <span class="k">raise</span> <span class="n">GlobbingError</span><span class="p">(</span><span class="s2">&quot;Consecutive &#39;/&#39;s found in globbing string &quot;</span>
+                            <span class="o">+</span> <span class="n">glob_str</span><span class="p">)</span>
+
+    <span class="n">prefixes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">glob_parts</span><span class="p">[:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">glob_parts</span><span class="p">))]</span>
+    <span class="c1"># we must make exception for root &quot;/&quot;, only dir to end in slash</span>
+    <span class="k">if</span> <span class="n">prefixes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">prefixes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">glob_to_regex</span><span class="p">,</span> <span class="n">prefixes</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="path_matches_glob"><a class="viewcode-back" href="../../duplicity.globmatch.html#duplicity.globmatch.path_matches_glob">[docs]</a><span class="k">def</span> <span class="nf">path_matches_glob</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">glob_str</span><span class="p">,</span> <span class="n">include</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tests whether path matches glob, as per the Unix shell rules, taking as</span>
+<span class="sd">    arguments a path, a glob string and include (0 indicating that the glob</span>
+<span class="sd">    string is an exclude glob and 1 indicating that it is an include glob,</span>
+<span class="sd">    returning:</span>
+<span class="sd">    0 - if the file should be excluded</span>
+<span class="sd">    1 - if the file should be included</span>
+<span class="sd">    2 - if the folder should be scanned for any included/excluded files</span>
+<span class="sd">    None - if the selection function has nothing to say about the file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">match_only_dirs</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># ToDo: Test behaviour of &quot;/&quot; on its own - should always match</span>
+    <span class="k">if</span> <span class="n">glob_str</span> <span class="o">!=</span> <span class="s2">&quot;/&quot;</span> <span class="ow">and</span> <span class="n">glob_str</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;/&quot;</span><span class="p">:</span>
+        <span class="n">match_only_dirs</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># Remove trailing / from directory name (unless that is the entire</span>
+        <span class="c1"># string)</span>
+        <span class="n">glob_str</span> <span class="o">=</span> <span class="n">glob_str</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">re_comp</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">S</span><span class="p">)</span>
+
+    <span class="c1"># matches what glob matches and any files in directory</span>
+    <span class="n">glob_comp_re</span> <span class="o">=</span> <span class="n">re_comp</span><span class="p">(</span><span class="s2">&quot;^</span><span class="si">%s</span><span class="s2">($|/)&quot;</span> <span class="o">%</span> <span class="n">glob_to_regex</span><span class="p">(</span><span class="n">glob_str</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">glob_str</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;**&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">glob_str</span> <span class="o">=</span> <span class="n">glob_str</span><span class="p">[:</span><span class="n">glob_str</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;**&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span>  <span class="c1"># truncate after **</span>
+
+    <span class="n">scan_comp_re</span> <span class="o">=</span> <span class="n">re_comp</span><span class="p">(</span><span class="s2">&quot;^(</span><span class="si">%s</span><span class="s2">)$&quot;</span> <span class="o">%</span>
+                           <span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_glob_get_prefix_regexs</span><span class="p">(</span><span class="n">glob_str</span><span class="p">)))</span>
+
+    <span class="k">if</span> <span class="n">match_only_dirs</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">():</span>
+        <span class="c1"># If the glob ended with a /, only match directories</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">elif</span> <span class="n">glob_comp_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">include</span>
+    <span class="k">elif</span> <span class="n">include</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">scan_comp_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">2</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="glob_to_regex"><a class="viewcode-back" href="../../duplicity.globmatch.html#duplicity.globmatch.glob_to_regex">[docs]</a><span class="k">def</span> <span class="nf">glob_to_regex</span><span class="p">(</span><span class="n">pat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returned regular expression equivalent to shell glob pat</span>
+
+<span class="sd">    Currently only the ?, *, [], and ** expressions are supported.</span>
+<span class="sd">    Ranges like [a-z] are also currently unsupported.  There is no</span>
+<span class="sd">    way to quote these special characters.</span>
+
+<span class="sd">    This function taken with minor modifications from efnmatch.py</span>
+<span class="sd">    by Donovan Baarda.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Internal. Used by glob_get_normal_sf, glob_get_prefix_res and unit tests.</span>
+    <span class="n">i</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">pat</span><span class="p">),</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+        <span class="n">c</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="n">pat</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">pat</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="s1">&#39;**&#39;</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">res</span> <span class="o">+</span> <span class="s1">&#39;.*&#39;</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">res</span> <span class="o">+</span> <span class="s1">&#39;[^/]*&#39;</span>
+        <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="s1">&#39;?&#39;</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">res</span> <span class="o">+</span> <span class="s1">&#39;[^/]&#39;</span>
+        <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="s1">&#39;[&#39;</span><span class="p">:</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="k">if</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">n</span> <span class="ow">and</span> <span class="n">pat</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="ow">in</span> <span class="s1">&#39;!^&#39;</span><span class="p">:</span>
+                <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">n</span> <span class="ow">and</span> <span class="n">pat</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;]&#39;</span><span class="p">:</span>
+                <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">while</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">n</span> <span class="ow">and</span> <span class="n">pat</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;]&#39;</span><span class="p">:</span>
+                <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">j</span> <span class="o">&gt;=</span> <span class="n">n</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">res</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">[&#39;</span>  <span class="c1"># interpret the [ literally</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Deal with inside of [..]</span>
+                <span class="n">stuff</span> <span class="o">=</span> <span class="n">pat</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\\\\</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">stuff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="s1">&#39;!^&#39;</span><span class="p">:</span>
+                    <span class="n">stuff</span> <span class="o">=</span> <span class="s1">&#39;^&#39;</span> <span class="o">+</span> <span class="n">stuff</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">res</span> <span class="o">+</span> <span class="s1">&#39;[&#39;</span> <span class="o">+</span> <span class="n">stuff</span> <span class="o">+</span> <span class="s1">&#39;]&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">res</span> <span class="o">+</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

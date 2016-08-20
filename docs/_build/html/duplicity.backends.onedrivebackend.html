@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.backends.onedrivebackend module &mdash; duplicity-src8  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="duplicity-src8  documentation" href="index.html" />
+    <link rel="up" title="duplicity.backends package" href="duplicity.backends.html" />
+    <link rel="next" title="duplicity.backends.par2backend module" href="duplicity.backends.par2backend.html" />
+    <link rel="prev" title="duplicity.backends.ncftpbackend module" href="duplicity.backends.ncftpbackend.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-duplicity.backends.onedrivebackend">
+<span id="duplicity-backends-onedrivebackend-module"></span><h1>duplicity.backends.onedrivebackend module<a class="headerlink" href="#module-duplicity.backends.onedrivebackend" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="duplicity.backends.onedrivebackend.OneDriveBackend">
+<em class="property">class </em><code class="descclassname">duplicity.backends.onedrivebackend.</code><code class="descname">OneDriveBackend</code><span class="sig-paren">(</span><em>parsed_url</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/onedrivebackend.html#OneDriveBackend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.onedrivebackend.OneDriveBackend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="duplicity.backend.html#duplicity.backend.Backend" title="duplicity.backend.Backend"><code class="xref py py-class docutils literal"><span class="pre">duplicity.backend.Backend</span></code></a></p>
+<p>Uses Microsoft OneDrive (formerly SkyDrive) for backups.</p>
+<dl class="attribute">
+<dt id="duplicity.backends.onedrivebackend.OneDriveBackend.API_URI">
+<code class="descname">API_URI</code><em class="property"> = 'https://apis.live.net/v5.0/'</em><a class="headerlink" href="#duplicity.backends.onedrivebackend.OneDriveBackend.API_URI" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.backends.onedrivebackend.OneDriveBackend.BITS_1_5_UPLOAD_PROTOCOL">
+<code class="descname">BITS_1_5_UPLOAD_PROTOCOL</code><em class="property"> = '{7df0354d-249b-430f-820d-3d2a9bef4931}'</em><a class="headerlink" href="#duplicity.backends.onedrivebackend.OneDriveBackend.BITS_1_5_UPLOAD_PROTOCOL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.backends.onedrivebackend.OneDriveBackend.CLIENT_ID">
+<code class="descname">CLIENT_ID</code><em class="property"> = '000000004C12E85D'</em><a class="headerlink" href="#duplicity.backends.onedrivebackend.OneDriveBackend.CLIENT_ID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.backends.onedrivebackend.OneDriveBackend.CLIENT_SECRET">
+<code class="descname">CLIENT_SECRET</code><em class="property"> = 'k1oR0CbtbvTG9nK1PEDeVW2dzvAaiN4d'</em><a class="headerlink" href="#duplicity.backends.onedrivebackend.OneDriveBackend.CLIENT_SECRET" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.backends.onedrivebackend.OneDriveBackend.MAXIMUM_FRAGMENT_SIZE">
+<code class="descname">MAXIMUM_FRAGMENT_SIZE</code><em class="property"> = 62914560</em><a class="headerlink" href="#duplicity.backends.onedrivebackend.OneDriveBackend.MAXIMUM_FRAGMENT_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.backends.onedrivebackend.OneDriveBackend.OAUTH_AUTHORIZE_URI">
+<code class="descname">OAUTH_AUTHORIZE_URI</code><em class="property"> = 'https://login.live.com/oauth20_authorize.srf'</em><a class="headerlink" href="#duplicity.backends.onedrivebackend.OneDriveBackend.OAUTH_AUTHORIZE_URI" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.backends.onedrivebackend.OneDriveBackend.OAUTH_REDIRECT_URI">
+<code class="descname">OAUTH_REDIRECT_URI</code><em class="property"> = 'https://login.live.com/oauth20_desktop.srf'</em><a class="headerlink" href="#duplicity.backends.onedrivebackend.OneDriveBackend.OAUTH_REDIRECT_URI" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.backends.onedrivebackend.OneDriveBackend.OAUTH_SCOPE">
+<code class="descname">OAUTH_SCOPE</code><em class="property"> = ['wl.skydrive', 'wl.skydrive_update', 'wl.offline_access']</em><a class="headerlink" href="#duplicity.backends.onedrivebackend.OneDriveBackend.OAUTH_SCOPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.backends.onedrivebackend.OneDriveBackend.OAUTH_TOKEN_PATH">
+<code class="descname">OAUTH_TOKEN_PATH</code><em class="property"> = '/Users/ken/.duplicity_onedrive_oauthtoken.json'</em><a class="headerlink" href="#duplicity.backends.onedrivebackend.OneDriveBackend.OAUTH_TOKEN_PATH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.backends.onedrivebackend.OneDriveBackend.OAUTH_TOKEN_URI">
+<code class="descname">OAUTH_TOKEN_URI</code><em class="property"> = 'https://login.live.com/oauth20_token.srf'</em><a class="headerlink" href="#duplicity.backends.onedrivebackend.OneDriveBackend.OAUTH_TOKEN_URI" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.onedrivebackend.OneDriveBackend.get_file_id">
+<code class="descname">get_file_id</code><span class="sig-paren">(</span><em>remote_filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/onedrivebackend.html#OneDriveBackend.get_file_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.onedrivebackend.OneDriveBackend.get_file_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the file id from cache, updating the cache if necessary.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.onedrivebackend.OneDriveBackend.get_files">
+<code class="descname">get_files</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/onedrivebackend.html#OneDriveBackend.get_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.onedrivebackend.OneDriveBackend.get_files" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.onedrivebackend.OneDriveBackend.initialize_oauth2_session">
+<code class="descname">initialize_oauth2_session</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/onedrivebackend.html#OneDriveBackend.initialize_oauth2_session"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.onedrivebackend.OneDriveBackend.initialize_oauth2_session" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.onedrivebackend.OneDriveBackend.mkdir">
+<code class="descname">mkdir</code><span class="sig-paren">(</span><em>object_id</em>, <em>folder_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/onedrivebackend.html#OneDriveBackend.mkdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.onedrivebackend.OneDriveBackend.mkdir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.onedrivebackend.OneDriveBackend.resolve_directory">
+<code class="descname">resolve_directory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/onedrivebackend.html#OneDriveBackend.resolve_directory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.onedrivebackend.OneDriveBackend.resolve_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensures self.directory_id contains the folder id for the path.</p>
+<p>There is no API call to resolve a logical path (e.g.
+/backups/duplicity/notebook/), so we recursively list directories
+until we get the object id of the configured directory, creating
+directories as necessary.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="duplicity.html">duplicity package</a><ul>
+  <li><a href="duplicity.backends.html">duplicity.backends package</a><ul>
+      <li>Previous: <a href="duplicity.backends.ncftpbackend.html" title="previous chapter">duplicity.backends.ncftpbackend module</a></li>
+      <li>Next: <a href="duplicity.backends.par2backend.html" title="next chapter">duplicity.backends.par2backend module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/duplicity.backends.onedrivebackend.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/duplicity.backends.onedrivebackend.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,451 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.backends.dpbxbackend &mdash; duplicity-src8  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="duplicity-src8  documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.backends.dpbxbackend</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2013 jno &lt;jno@pisem.net&gt;</span>
+<span class="c1"># Copyright 2016 Dmitry Nezhevenko &lt;dion@dion.org.ua&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># Version: 0.3</span>
+<span class="c1">#</span>
+<span class="c1"># 0. You can make me happy with https://www.dropbox.com/referrals/NTE2ODA0Mzg5</span>
+<span class="c1"># 1. Most of the code was taken from cli_client.py. The ftpsbackend.py was used as a template</span>
+<span class="c1"># 2. DPBX &amp; dpbx are used because the use of the actual name is prohibited</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="kn">import</span> <span class="nn">StringIO</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">log</span><span class="p">,</span> <span class="nb">globals</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">progress</span>
+<span class="kn">import</span> <span class="nn">duplicity.backend</span>
+<span class="kn">from</span> <span class="nn">duplicity.errors</span> <span class="k">import</span> <span class="n">BackendException</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">from</span> <span class="nn">dropbox</span> <span class="k">import</span> <span class="n">Dropbox</span>
+<span class="kn">from</span> <span class="nn">dropbox.exceptions</span> <span class="k">import</span> <span class="n">AuthError</span><span class="p">,</span> <span class="n">BadInputError</span><span class="p">,</span> <span class="n">ApiError</span>
+<span class="kn">from</span> <span class="nn">dropbox.files</span> <span class="k">import</span> <span class="n">UploadSessionCursor</span><span class="p">,</span> <span class="n">CommitInfo</span><span class="p">,</span> <span class="n">WriteMode</span><span class="p">,</span> \
+    <span class="n">GetMetadataError</span><span class="p">,</span> <span class="n">DeleteError</span><span class="p">,</span> <span class="n">UploadSessionLookupError</span>
+<span class="kn">from</span> <span class="nn">dropbox.oauth</span> <span class="k">import</span> <span class="n">DropboxOAuth2FlowNoRedirect</span>
+<span class="kn">from</span> <span class="nn">requests.exceptions</span> <span class="k">import</span> <span class="ne">ConnectionError</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">duplicity.globals</span> <span class="k">import</span> <span class="n">num_retries</span>
+
+<span class="c1"># This is chunk size for upload using Dpbx chumked API v2. It doesn&#39;t</span>
+<span class="c1"># make sense to make it much large since Dpbx SDK uses connection pool</span>
+<span class="c1"># internally. So multiple chunks will sent using same keep-alive socket</span>
+<span class="c1"># Plus in case of network problems we most likely will be able to retry</span>
+<span class="c1"># only failed chunk</span>
+<span class="n">DPBX_UPLOAD_CHUNK_SIZE</span> <span class="o">=</span> <span class="mi">16</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>
+
+<span class="c1"># Download internal buffer size. Files are downloaded using one request.</span>
+<span class="n">DPBX_DOWNLOAD_BUF_SIZE</span> <span class="o">=</span> <span class="mi">512</span> <span class="o">*</span> <span class="mi">1024</span>
+
+<span class="n">DPBX_AUTORENAMED_FILE_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39; \([0-9]+\)\.[^\.]+$&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="log_exception"><a class="viewcode-back" href="../../../duplicity.backends.dpbxbackend.html#duplicity.backends.dpbxbackend.log_exception">[docs]</a><span class="k">def</span> <span class="nf">log_exception</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span><span class="s1">&#39;Exception [</span><span class="si">%s</span><span class="s1">]:&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">e</span><span class="p">,))</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">StringIO</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+    <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">():</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span><span class="s1">&#39;| &#39;</span> <span class="o">+</span> <span class="n">s</span><span class="o">.</span><span class="n">rstrip</span><span class="p">())</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="command"><a class="viewcode-back" href="../../../duplicity.backends.dpbxbackend.html#duplicity.backends.dpbxbackend.command">[docs]</a><span class="k">def</span> <span class="nf">command</span><span class="p">(</span><span class="n">login_required</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;a decorator for handling authentication and exceptions&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">decorate</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">log_exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s1">&#39;dpbx type error &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">e</span><span class="p">,))</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">log_exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span><span class="s1">&#39;dpbx code error &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">e</span><span class="p">,),</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">backend_code_error</span><span class="p">)</span>
+                <span class="k">raise</span>
+
+        <span class="n">wrapper</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">__doc__</span>
+        <span class="k">return</span> <span class="n">wrapper</span>
+    <span class="k">return</span> <span class="n">decorate</span></div>
+
+
+<div class="viewcode-block" id="DPBXBackend"><a class="viewcode-back" href="../../../duplicity.backends.dpbxbackend.html#duplicity.backends.dpbxbackend.DPBXBackend">[docs]</a><span class="k">class</span> <span class="nc">DPBXBackend</span><span class="p">(</span><span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Backend</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Connect to remote store using Dr*pB*x service&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_url</span><span class="p">):</span>
+        <span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Backend</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_url</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">api_account</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">auth_flow</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">login</span><span class="p">()</span>
+
+<div class="viewcode-block" id="DPBXBackend.load_access_token"><a class="viewcode-back" href="../../../duplicity.backends.dpbxbackend.html#duplicity.backends.dpbxbackend.DPBXBackend.load_access_token">[docs]</a>    <span class="k">def</span> <span class="nf">load_access_token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;DPBX_ACCESS_TOKEN&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DPBXBackend.save_access_token"><a class="viewcode-back" href="../../../duplicity.backends.dpbxbackend.html#duplicity.backends.dpbxbackend.DPBXBackend.save_access_token">[docs]</a>    <span class="k">def</span> <span class="nf">save_access_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">access_token</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s1">&#39;dpbx: Please set DPBX_ACCESS_TOKEN=</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s1"> environment variable&#39;</span> <span class="o">%</span> <span class="n">access_token</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DPBXBackend.obtain_access_token"><a class="viewcode-back" href="../../../duplicity.backends.dpbxbackend.html#duplicity.backends.dpbxbackend.DPBXBackend.obtain_access_token">[docs]</a>    <span class="k">def</span> <span class="nf">obtain_access_token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;dpbx: trying to obtain access token&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">env_var</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;DPBX_APP_KEY&#39;</span><span class="p">,</span> <span class="s1">&#39;DPBX_APP_SECRET&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">env_var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s1">&#39;dpbx: </span><span class="si">%s</span><span class="s1"> environment variable not set&#39;</span> <span class="o">%</span> <span class="n">env_var</span><span class="p">)</span>
+
+        <span class="n">app_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DPBX_APP_KEY&#39;</span><span class="p">]</span>
+        <span class="n">app_secret</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DPBX_APP_SECRET&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">isatty</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">isatty</span><span class="p">():</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">FatalError</span><span class="p">(</span><span class="s1">&#39;dpbx error: cannot interact, but need human attention&#39;</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">backend_command_error</span><span class="p">)</span>
+
+        <span class="n">auth_flow</span> <span class="o">=</span> <span class="n">DropboxOAuth2FlowNoRedirect</span><span class="p">(</span><span class="n">app_key</span><span class="p">,</span> <span class="n">app_secret</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s1">&#39;dpbx,auth_flow.start()&#39;</span><span class="p">)</span>
+        <span class="n">authorize_url</span> <span class="o">=</span> <span class="n">auth_flow</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="nb">print</span>
+        <span class="nb">print</span> <span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="mi">72</span>
+        <span class="nb">print</span> <span class="s2">&quot;1. Go to: &quot;</span> <span class="o">+</span> <span class="n">authorize_url</span>
+        <span class="nb">print</span> <span class="s2">&quot;2. Click </span><span class="se">\&quot;</span><span class="s2">Allow</span><span class="se">\&quot;</span><span class="s2"> (you might have to log in first).&quot;</span>
+        <span class="nb">print</span> <span class="s2">&quot;3. Copy the authorization code.&quot;</span>
+        <span class="nb">print</span> <span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="mi">72</span>
+        <span class="n">auth_code</span> <span class="o">=</span> <span class="n">raw_input</span><span class="p">(</span><span class="s2">&quot;Enter the authorization code here: &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s1">&#39;dpbx,auth_flow.finish(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">auth_code</span><span class="p">)</span>
+            <span class="n">access_token</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">auth_flow</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="n">auth_code</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s1">&#39;dpbx: Unable to obtain access token: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;dpbx: Authentication successfull&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_access_token</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DPBXBackend.login"><a class="viewcode-back" href="../../../duplicity.backends.dpbxbackend.html#duplicity.backends.dpbxbackend.DPBXBackend.login">[docs]</a>    <span class="k">def</span> <span class="nf">login</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_access_token</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obtain_access_token</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span> <span class="o">=</span> <span class="n">Dropbox</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">load_access_token</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api_account</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s1">&#39;dpbx,users_get_current_account([token])&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">api_account</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">users_get_current_account</span><span class="p">()</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s2">&quot;dpbx,</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_account</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="p">(</span><span class="n">BadInputError</span><span class="p">,</span> <span class="n">AuthError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s1">&#39;dpbx,exception: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;dpbx: Authentication failed. Trying to obtain new access token&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">obtain_access_token</span><span class="p">()</span>
+
+            <span class="c1"># We&#39;re assuming obtain_access_token will throw exception. So this line should not be reached</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;dpbx: Please update DPBX_ACCESS_TOKEN and try again&quot;</span><span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;dpbx: Successfully authenticated as </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_account</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">display_name</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_error_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">ApiError</span><span class="p">):</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">error</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="n">GetMetadataError</span><span class="p">)</span> <span class="ow">and</span> <span class="n">err</span><span class="o">.</span><span class="n">is_path</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">err</span><span class="o">.</span><span class="n">get_path</span><span class="p">()</span><span class="o">.</span><span class="n">is_not_found</span><span class="p">():</span>
+                    <span class="k">return</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">backend_not_found</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="n">DeleteError</span><span class="p">)</span> <span class="ow">and</span> <span class="n">err</span><span class="o">.</span><span class="n">is_path_lookup</span><span class="p">():</span>
+                <span class="n">lookup</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">get_path_lookup</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">lookup</span><span class="o">.</span><span class="n">is_not_found</span><span class="p">():</span>
+                    <span class="k">return</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">backend_not_found</span>
+
+    <span class="nd">@command</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">_put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_path</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">):</span>
+        <span class="n">remote_dir</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">unquote</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">))</span>
+        <span class="n">remote_path</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">remote_dir</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+
+        <span class="n">file_size</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">source_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">source_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;rb&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">progress</span><span class="o">.</span><span class="n">report_transfer</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">file_size</span><span class="p">)</span>
+            <span class="n">buf</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">DPBX_UPLOAD_CHUNK_SIZE</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s1">&#39;dpbx,files_upload_session_start([</span><span class="si">%d</span><span class="s1"> bytes]), total: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="n">file_size</span><span class="p">))</span>
+            <span class="n">upload_sid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">files_upload_session_start</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s1">&#39;dpbx,files_upload_session_start(): </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">upload_sid</span><span class="p">)</span>
+            <span class="n">upload_cursor</span> <span class="o">=</span> <span class="n">UploadSessionCursor</span><span class="p">(</span><span class="n">upload_sid</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">())</span>
+            <span class="n">commit_info</span> <span class="o">=</span> <span class="n">CommitInfo</span><span class="p">(</span><span class="n">remote_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">WriteMode</span><span class="o">.</span><span class="n">overwrite</span><span class="p">,</span> <span class="n">autorename</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">client_modified</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mute</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">res_metadata</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">progress</span><span class="o">.</span><span class="n">report_transfer</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">(),</span> <span class="n">file_size</span><span class="p">)</span>
+
+            <span class="n">requested_offset</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">current_chunk_size</span> <span class="o">=</span> <span class="n">DPBX_UPLOAD_CHUNK_SIZE</span>
+            <span class="n">retry_number</span> <span class="o">=</span> <span class="nb">globals</span><span class="o">.</span><span class="n">num_retries</span>
+
+            <span class="c1"># We&#39;re doing our own error handling and retrying logic because</span>
+            <span class="c1"># we can benefit from Dpbx chunked upload and retry only failed chunk</span>
+            <span class="k">while</span> <span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">file_size</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">res_metadata</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">requested_offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">upload_cursor</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">requested_offset</span>
+
+                    <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">!=</span> <span class="n">upload_cursor</span><span class="o">.</span><span class="n">offset</span><span class="p">:</span>
+                        <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">upload_cursor</span><span class="o">.</span><span class="n">offset</span><span class="p">)</span>
+                    <span class="n">buf</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">current_chunk_size</span><span class="p">)</span>
+
+                    <span class="c1"># reset temporary status variables</span>
+                    <span class="n">requested_offset</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">current_chunk_size</span> <span class="o">=</span> <span class="n">DPBX_UPLOAD_CHUNK_SIZE</span>
+                    <span class="n">retry_number</span> <span class="o">=</span> <span class="nb">globals</span><span class="o">.</span><span class="n">num_retries</span>
+
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s1">&#39;dpbx,files_upload_sesssion_append([</span><span class="si">%d</span><span class="s1"> bytes], offset=</span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="n">upload_cursor</span><span class="o">.</span><span class="n">offset</span><span class="p">))</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">files_upload_session_append</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">upload_cursor</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span> <span class="n">upload_cursor</span><span class="o">.</span><span class="n">offset</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s1">&#39;dpbx,files_upload_sesssion_finish([</span><span class="si">%d</span><span class="s1"> bytes], offset=</span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="n">upload_cursor</span><span class="o">.</span><span class="n">offset</span><span class="p">))</span>
+                        <span class="n">res_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">files_upload_session_finish</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">upload_cursor</span><span class="p">,</span> <span class="n">commit_info</span><span class="p">)</span>
+
+                    <span class="n">upload_cursor</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s1">&#39;progress: </span><span class="si">%d</span><span class="s1"> of </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">upload_cursor</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">file_size</span><span class="p">))</span>
+                    <span class="n">progress</span><span class="o">.</span><span class="n">report_transfer</span><span class="p">(</span><span class="n">upload_cursor</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">file_size</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">ApiError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">error</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">error</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">UploadSessionLookupError</span><span class="p">)</span> <span class="ow">and</span> <span class="n">error</span><span class="o">.</span><span class="n">is_incorrect_offset</span><span class="p">():</span>
+                        <span class="c1"># Server reports that we should send another chunk. Most likely this is caused by</span>
+                        <span class="c1"># network error during previous upload attempt. In such case we&#39;ll get expected offset</span>
+                        <span class="c1"># from server and it&#39;s enough to just seek() and retry again</span>
+                        <span class="n">new_offset</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="n">get_incorrect_offset</span><span class="p">()</span><span class="o">.</span><span class="n">correct_offset</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s1">&#39;dpbx,files_upload_session_append: incorrect offset: </span><span class="si">%d</span><span class="s1"> (expected: </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">upload_cursor</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">new_offset</span><span class="p">))</span>
+                        <span class="k">if</span> <span class="n">requested_offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="c1"># chunk failed even after seek attempt. Something strange and no safe way to recover</span>
+                            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;dpbx: unable to chunk upload&quot;</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="c1"># will seek and retry</span>
+                            <span class="n">requested_offset</span> <span class="o">=</span> <span class="n">new_offset</span>
+                        <span class="k">continue</span>
+                    <span class="k">raise</span>
+                <span class="k">except</span> <span class="ne">ConnectionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s1">&#39;dpbx,files_upload_session_append: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
+
+                    <span class="n">retry_number</span> <span class="o">-=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">retry_number</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">raise</span>
+
+                    <span class="c1"># We don&#39;t know for sure, was partial upload successfull or not. So it&#39;s better to retry smaller amount to avoid extra reupload</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s1">&#39;dpbx: sleeping a bit before chunk retry&#39;</span><span class="p">)</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+                    <span class="n">current_chunk_size</span> <span class="o">=</span> <span class="n">DPBX_UPLOAD_CHUNK_SIZE</span> <span class="o">/</span> <span class="mi">5</span>
+                    <span class="n">requested_offset</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">!=</span> <span class="n">file_size</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s1">&#39;dpbx: something wrong&#39;</span><span class="p">)</span>
+
+            <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s1">&#39;dpbx,files_upload_sesssion_finish(): </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">res_metadata</span><span class="p">)</span>
+            <span class="n">progress</span><span class="o">.</span><span class="n">report_transfer</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">(),</span> <span class="n">file_size</span><span class="p">)</span>
+
+            <span class="c1"># A few sanity checks</span>
+            <span class="k">if</span> <span class="n">res_metadata</span><span class="o">.</span><span class="n">path_display</span> <span class="o">!=</span> <span class="n">remote_path</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s1">&#39;dpbx: result path mismatch: </span><span class="si">%s</span><span class="s1"> (expected: </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">res_metadata</span><span class="o">.</span><span class="n">path_display</span><span class="p">,</span> <span class="n">remote_path</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">res_metadata</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">file_size</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s1">&#39;dpbx: result size mismatch: </span><span class="si">%s</span><span class="s1"> (expected: </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">res_metadata</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">file_size</span><span class="p">))</span>
+
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="nd">@command</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">,</span> <span class="n">local_path</span><span class="p">):</span>
+        <span class="n">remote_dir</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">unquote</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">))</span>
+        <span class="n">remote_path</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">remote_dir</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s1">&#39;dpbx,files_download(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">remote_path</span><span class="p">)</span>
+        <span class="n">res_metadata</span><span class="p">,</span> <span class="n">http_fd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">files_download</span><span class="p">(</span><span class="n">remote_path</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s1">&#39;dpbx,files_download(</span><span class="si">%s</span><span class="s1">): </span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">remote_path</span><span class="p">,</span> <span class="n">res_metadata</span><span class="p">,</span> <span class="n">http_fd</span><span class="p">))</span>
+        <span class="n">file_size</span> <span class="o">=</span> <span class="n">res_metadata</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">to_fd</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">progress</span><span class="o">.</span><span class="n">report_transfer</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">file_size</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">to_fd</span> <span class="o">=</span> <span class="n">local_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">http_fd</span><span class="o">.</span><span class="n">iter_content</span><span class="p">(</span><span class="n">DPBX_DOWNLOAD_BUF_SIZE</span><span class="p">):</span>
+                <span class="n">to_fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+                <span class="n">progress</span><span class="o">.</span><span class="n">report_transfer</span><span class="p">(</span><span class="n">to_fd</span><span class="o">.</span><span class="n">tell</span><span class="p">(),</span> <span class="n">file_size</span><span class="p">)</span>
+
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">to_fd</span><span class="p">:</span>
+                <span class="n">to_fd</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">http_fd</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="c1"># It&#39;s different from _query() check because we&#39;re not querying metadata again.</span>
+        <span class="c1"># Since this check is free, it&#39;s better to have it here</span>
+        <span class="n">local_size</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">local_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">local_size</span> <span class="o">!=</span> <span class="n">file_size</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;dpbx: wrong file size: </span><span class="si">%d</span><span class="s2"> (expected: </span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">local_size</span><span class="p">,</span> <span class="n">file_size</span><span class="p">))</span>
+
+        <span class="n">local_path</span><span class="o">.</span><span class="n">setdata</span><span class="p">()</span>
+
+    <span class="nd">@command</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Do a long listing to avoid connection reset</span>
+        <span class="n">remote_dir</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">urllib</span><span class="o">.</span><span class="n">unquote</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s1">&#39;dpbx.files_list_folder(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">remote_dir</span><span class="p">)</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">files_list_folder</span><span class="p">(</span><span class="n">remote_dir</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s1">&#39;dpbx.list(</span><span class="si">%s</span><span class="s1">): </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">remote_dir</span><span class="p">,</span> <span class="n">resp</span><span class="p">))</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">entry</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">resp</span><span class="o">.</span><span class="n">entries</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">resp</span><span class="o">.</span><span class="n">has_more</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">files_list_folder_continue</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">cursor</span><span class="p">)</span>
+
+        <span class="c1"># Warn users of old version dpbx about automatically renamed files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_renamed_files</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">res</span>
+
+    <span class="nd">@command</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">_delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="n">remote_dir</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">unquote</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">))</span>
+        <span class="n">remote_path</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">remote_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s1">&#39;dpbx.files_delete(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">remote_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">files_delete</span><span class="p">(</span><span class="n">remote_path</span><span class="p">)</span>
+
+        <span class="c1"># files_permanently_delete seems to be better for backup purpose</span>
+        <span class="c1"># but it&#39;s only available for Business accounts</span>
+        <span class="c1"># self.api_client.files_permanently_delete(remote_path)</span>
+
+    <span class="nd">@command</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">_close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;close backend session? no! just &quot;flush&quot; the data&quot;&quot;&quot;</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s1">&#39;dpbx.close():&#39;</span><span class="p">)</span>
+
+    <span class="nd">@command</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="n">remote_dir</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">unquote</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">))</span>
+        <span class="n">remote_path</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">remote_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s1">&#39;dpbx.files_get_metadata(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">remote_path</span><span class="p">)</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">files_get_metadata</span><span class="p">(</span><span class="n">remote_path</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s1">&#39;dpbx.files_get_metadata(</span><span class="si">%s</span><span class="s1">): </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">remote_path</span><span class="p">,</span> <span class="n">info</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="n">info</span><span class="o">.</span><span class="n">size</span><span class="p">}</span>
+
+<div class="viewcode-block" id="DPBXBackend.check_renamed_files"><a class="viewcode-back" href="../../../duplicity.backends.dpbxbackend.html#duplicity.backends.dpbxbackend.DPBXBackend.check_renamed_files">[docs]</a>    <span class="k">def</span> <span class="nf">check_renamed_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_list</span><span class="p">):</span>
+        <span class="n">bad_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">file_list</span> <span class="k">if</span> <span class="n">DPBX_AUTORENAMED_FILE_RE</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bad_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="mi">72</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="s1">&#39;Warning! It looks like there are automatically renamed files on backend&#39;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="s1">&#39;They were probably created when using older version of duplicity.&#39;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="s1">&#39;Please check your backup consistency. Most likely you will need to choose&#39;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="s1">&#39;largest file from duplicity-* (number).gpg and remove brackets from its name.&#39;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="s1">&#39;These files are not managed by duplicity at all and will not be&#39;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="s1">&#39;removed/rotated automatically.&#39;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="s1">&#39;Affected files:&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">bad_list</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="s1">&#39;In any case it</span><span class="se">\&#39;</span><span class="s1">s better to create full backup.&#39;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="mi">72</span><span class="p">)</span></div></div>
+
+
+<span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">register_backend</span><span class="p">(</span><span class="s2">&quot;dpbx&quot;</span><span class="p">,</span> <span class="n">DPBXBackend</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

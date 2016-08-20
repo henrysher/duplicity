@@ -1,0 +1,495 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.path module &mdash; duplicity-src8  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="duplicity-src8  documentation" href="index.html" />
+    <link rel="up" title="duplicity package" href="duplicity.html" />
+    <link rel="next" title="duplicity.progress module" href="duplicity.progress.html" />
+    <link rel="prev" title="duplicity.patchdir module" href="duplicity.patchdir.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-duplicity.path">
+<span id="duplicity-path-module"></span><h1>duplicity.path module<a class="headerlink" href="#module-duplicity.path" title="Permalink to this headline">¶</a></h1>
+<p>Wrapper class around a file like &#8220;/usr/bin/env&#8221;</p>
+<p>This class makes certain file operations more convenient and
+associates stat information with filenames</p>
+<dl class="class">
+<dt id="duplicity.path.DupPath">
+<em class="property">class </em><code class="descclassname">duplicity.path.</code><code class="descname">DupPath</code><span class="sig-paren">(</span><em>base</em>, <em>index=()</em>, <em>parseresults=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#DupPath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.DupPath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#duplicity.path.Path" title="duplicity.path.Path"><code class="xref py py-class docutils literal"><span class="pre">duplicity.path.Path</span></code></a></p>
+<p>Represent duplicity data files</p>
+<p>Based on the file name, files that are compressed or encrypted
+will have different open() methods.</p>
+<dl class="method">
+<dt id="duplicity.path.DupPath.filtered_open">
+<code class="descname">filtered_open</code><span class="sig-paren">(</span><em>mode='rb'</em>, <em>gpg_profile=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#DupPath.filtered_open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.DupPath.filtered_open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return fileobj with appropriate encryption/compression</p>
+<p>If encryption is specified but no gpg_profile, use
+globals.default_profile.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.path.Path">
+<em class="property">class </em><code class="descclassname">duplicity.path.</code><code class="descname">Path</code><span class="sig-paren">(</span><em>base</em>, <em>index=()</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#duplicity.path.ROPath" title="duplicity.path.ROPath"><code class="xref py py-class docutils literal"><span class="pre">duplicity.path.ROPath</span></code></a></p>
+<p>Path class - wrapper around ordinary local files</p>
+<p>Besides caching stat() results, this class organizes various file
+code.</p>
+<dl class="method">
+<dt id="duplicity.path.Path.append">
+<code class="descname">append</code><span class="sig-paren">(</span><em>ext</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.append" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return new Path with ext added to index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.Path.chmod">
+<code class="descname">chmod</code><span class="sig-paren">(</span><em>mode</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.chmod"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.chmod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change permissions of the path</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.Path.compare_recursive">
+<code class="descname">compare_recursive</code><span class="sig-paren">(</span><em>other</em>, <em>verbose=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.compare_recursive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.compare_recursive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compare self to other Path, descending down directories</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.Path.delete">
+<code class="descname">delete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove this file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.Path.deltree">
+<code class="descname">deltree</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.deltree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.deltree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove self by recursively deleting files under it</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.Path.get_canonical">
+<code class="descname">get_canonical</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.get_canonical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.get_canonical" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return string of canonical version of path</p>
+<p>Remove &#8221;.&#8221;, and trailing slashes where possible.  Note that
+it&#8217;s harder to remove &#8221;..&#8221;, as &#8220;foo/bar/..&#8221; is not necessarily
+&#8220;foo&#8221;, so we can&#8217;t use path.normpath()</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.Path.get_filename">
+<code class="descname">get_filename</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.get_filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.get_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return filename of last component</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.Path.get_parent_dir">
+<code class="descname">get_parent_dir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.get_parent_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.get_parent_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return directory that self is in</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.Path.get_temp_in_same_dir">
+<code class="descname">get_temp_in_same_dir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.get_temp_in_same_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.get_temp_in_same_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return temp non existent path in same directory as self</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.Path.isemptydir">
+<code class="descname">isemptydir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.isemptydir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.isemptydir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return true if path is a directory and is empty</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.Path.listdir">
+<code class="descname">listdir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.listdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.listdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return list generated by os.listdir</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.Path.makedev">
+<code class="descname">makedev</code><span class="sig-paren">(</span><em>type</em>, <em>major</em>, <em>minor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.makedev"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.makedev" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a device file with specified type, major/minor nums</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.Path.mkdir">
+<code class="descname">mkdir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.mkdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.mkdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make directory(s) at specified path</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.Path.move">
+<code class="descname">move</code><span class="sig-paren">(</span><em>new_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.move"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.move" title="Permalink to this definition">¶</a></dt>
+<dd><p>Like rename but destination may be on different file system</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.Path.new_index">
+<code class="descname">new_index</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.new_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.new_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return new Path with index index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.Path.open">
+<code class="descname">open</code><span class="sig-paren">(</span><em>mode='rb'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return fileobj associated with self</p>
+<p>Usually this is just the file data on disk, but can be
+replaced with arbitrary data using the setfileobj method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.Path.patch_with_attribs">
+<code class="descname">patch_with_attribs</code><span class="sig-paren">(</span><em>diff_ropath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.patch_with_attribs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.patch_with_attribs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Patch self with diff and then copy attributes over</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.Path.quote">
+<code class="descname">quote</code><span class="sig-paren">(</span><em>s=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.quote"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.quote" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return quoted version of s (defaults to self.name)</p>
+<p>The output is meant to be interpreted with shells, so can be
+used with os.system.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.path.Path.regex_chars_to_quote">
+<code class="descname">regex_chars_to_quote</code><em class="property"> = &lt;_sre.SRE_Pattern object&gt;</em><a class="headerlink" href="#duplicity.path.Path.regex_chars_to_quote" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.Path.rename">
+<code class="descname">rename</code><span class="sig-paren">(</span><em>new_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.rename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.rename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rename file at current path to new_path.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.Path.rename_index">
+<code class="descname">rename_index</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.rename_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.rename_index" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.Path.setdata">
+<code class="descname">setdata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.setdata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.setdata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Refresh stat cache</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.Path.touch">
+<code class="descname">touch</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.touch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.touch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open the file, write 0 bytes, close</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.Path.unquote">
+<code class="descname">unquote</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.unquote"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.unquote" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return unquoted version of string s, as quoted by above quote()</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.Path.writefileobj">
+<code class="descname">writefileobj</code><span class="sig-paren">(</span><em>fin</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#Path.writefileobj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.Path.writefileobj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy file object fin to self.  Close both when done.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.path.PathDeleter">
+<em class="property">class </em><code class="descclassname">duplicity.path.</code><code class="descname">PathDeleter</code><a class="reference internal" href="_modules/duplicity/path.html#PathDeleter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.PathDeleter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="duplicity.lazy.html#duplicity.lazy.ITRBranch" title="duplicity.lazy.ITRBranch"><code class="xref py py-class docutils literal"><span class="pre">duplicity.lazy.ITRBranch</span></code></a></p>
+<p>Delete a directory.  Called by Path.deltree</p>
+<dl class="method">
+<dt id="duplicity.path.PathDeleter.can_fast_process">
+<code class="descname">can_fast_process</code><span class="sig-paren">(</span><em>index</em>, <em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#PathDeleter.can_fast_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.PathDeleter.can_fast_process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.PathDeleter.end_process">
+<code class="descname">end_process</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#PathDeleter.end_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.PathDeleter.end_process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.PathDeleter.fast_process">
+<code class="descname">fast_process</code><span class="sig-paren">(</span><em>index</em>, <em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#PathDeleter.fast_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.PathDeleter.fast_process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.PathDeleter.start_process">
+<code class="descname">start_process</code><span class="sig-paren">(</span><em>index</em>, <em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#PathDeleter.start_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.PathDeleter.start_process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="duplicity.path.PathException">
+<em class="property">exception </em><code class="descclassname">duplicity.path.</code><code class="descname">PathException</code><a class="reference internal" href="_modules/duplicity/path.html#PathException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.PathException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.path.ROPath">
+<em class="property">class </em><code class="descclassname">duplicity.path.</code><code class="descname">ROPath</code><span class="sig-paren">(</span><em>index</em>, <em>stat=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read only Path</p>
+<p>Objects of this class doesn&#8217;t represent real files, so they don&#8217;t
+have a name.  They are required to be indexed though.</p>
+<dl class="method">
+<dt id="duplicity.path.ROPath.blank">
+<code class="descname">blank</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.blank"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.blank" title="Permalink to this definition">¶</a></dt>
+<dd><p>Black out self - set type and stat to None</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.compare_data">
+<code class="descname">compare_data</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.compare_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.compare_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compare data from two regular files, return true if same</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.compare_verbose">
+<code class="descname">compare_verbose</code><span class="sig-paren">(</span><em>other</em>, <em>include_data=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.compare_verbose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.compare_verbose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compare ROPaths like __eq__, but log reason if different</p>
+<p>This is placed in a separate function from __eq__ because
+__eq__ should be very time sensitive, and logging statements
+would slow it down.  Used when verifying.</p>
+<p>Only run if include_data is true.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy self to other.  Also copies data.  Other must be Path</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.copy_attribs">
+<code class="descname">copy_attribs</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.copy_attribs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.copy_attribs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Only copy attributes from self to other</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.exists">
+<code class="descname">exists</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.exists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if corresponding file exists</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.get_data">
+<code class="descname">get_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return contents of associated fileobj in string</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.get_relative_path">
+<code class="descname">get_relative_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.get_relative_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.get_relative_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return relative path, created from index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.get_ropath">
+<code class="descname">get_ropath</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.get_ropath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.get_ropath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return ropath copy of self</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.get_tarinfo">
+<code class="descname">get_tarinfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.get_tarinfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.get_tarinfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a tarfile.TarInfo object based on self</p>
+<p>Doesn&#8217;t set size based on stat, because we may want to replace
+data wiht other stream.  Size should be set separately by
+calling function.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.getdevloc">
+<code class="descname">getdevloc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.getdevloc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.getdevloc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return device number path resides on</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.getmtime">
+<code class="descname">getmtime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.getmtime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.getmtime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return mod time of path in seconds</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.getperms">
+<code class="descname">getperms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.getperms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.getperms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return permissions mode, owner and group</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.getsize">
+<code class="descname">getsize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.getsize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.getsize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return length in bytes from stat object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.init_from_tarinfo">
+<code class="descname">init_from_tarinfo</code><span class="sig-paren">(</span><em>tarinfo</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.init_from_tarinfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.init_from_tarinfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set data from tarinfo object (part of tarfile module)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.isdev">
+<code class="descname">isdev</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.isdev"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.isdev" title="Permalink to this definition">¶</a></dt>
+<dd><p>True is self is a device file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.isdir">
+<code class="descname">isdir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.isdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.isdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if self is dir</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.isfifo">
+<code class="descname">isfifo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.isfifo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.isfifo" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if self is fifo</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.isreg">
+<code class="descname">isreg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.isreg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.isreg" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if self corresponds to regular file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.issock">
+<code class="descname">issock</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.issock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.issock" title="Permalink to this definition">¶</a></dt>
+<dd><p>True is self is socket</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.issym">
+<code class="descname">issym</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.issym"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.issym" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if self is sym</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.open">
+<code class="descname">open</code><span class="sig-paren">(</span><em>mode</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return fileobj associated with self</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.perms_equal">
+<code class="descname">perms_equal</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.perms_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.perms_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if self and other have same permissions and ownership</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.set_from_stat">
+<code class="descname">set_from_stat</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.set_from_stat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.set_from_stat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the value of self.type, self.mode from self.stat</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.path.ROPath.setfileobj">
+<code class="descname">setfileobj</code><span class="sig-paren">(</span><em>fileobj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/path.html#ROPath.setfileobj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.ROPath.setfileobj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set file object returned by open()</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.path.StatResult">
+<em class="property">class </em><code class="descclassname">duplicity.path.</code><code class="descname">StatResult</code><a class="reference internal" href="_modules/duplicity/path.html#StatResult"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.path.StatResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to emulate the output of os.stat() and related</p>
+<dl class="attribute">
+<dt id="duplicity.path.StatResult.st_mode">
+<code class="descname">st_mode</code><em class="property"> = 0</em><a class="headerlink" href="#duplicity.path.StatResult.st_mode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="duplicity.html">duplicity package</a><ul>
+      <li>Previous: <a href="duplicity.patchdir.html" title="previous chapter">duplicity.patchdir module</a></li>
+      <li>Next: <a href="duplicity.progress.html" title="next chapter">duplicity.progress module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/duplicity.path.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/duplicity.path.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

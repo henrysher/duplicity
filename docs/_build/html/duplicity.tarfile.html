@@ -1,0 +1,515 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.tarfile module &mdash; duplicity-src8  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="duplicity-src8  documentation" href="index.html" />
+    <link rel="up" title="duplicity package" href="duplicity.html" />
+    <link rel="next" title="duplicity.tempdir module" href="duplicity.tempdir.html" />
+    <link rel="prev" title="duplicity.statistics module" href="duplicity.statistics.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-duplicity.tarfile">
+<span id="duplicity-tarfile-module"></span><h1>duplicity.tarfile module<a class="headerlink" href="#module-duplicity.tarfile" title="Permalink to this headline">¶</a></h1>
+<p>Read from and write to tar format archives.</p>
+<dl class="class">
+<dt id="duplicity.tarfile.TarFile">
+<em class="property">class </em><code class="descclassname">duplicity.tarfile.</code><code class="descname">TarFile</code><span class="sig-paren">(</span><em>name=None</em>, <em>mode='r'</em>, <em>fileobj=None</em>, <em>format=None</em>, <em>tarinfo=None</em>, <em>dereference=None</em>, <em>ignore_zeros=None</em>, <em>encoding=None</em>, <em>errors=None</em>, <em>pax_headers=None</em>, <em>debug=None</em>, <em>errorlevel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>The TarFile Class provides an interface to tar archives.</p>
+<dl class="attribute">
+<dt id="duplicity.tarfile.TarFile.OPEN_METH">
+<code class="descname">OPEN_METH</code><em class="property"> = {'gz': 'gzopen', 'tar': 'taropen', 'bz2': 'bz2open'}</em><a class="headerlink" href="#duplicity.tarfile.TarFile.OPEN_METH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarFile.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>name</em>, <em>arcname=None</em>, <em>recursive=True</em>, <em>exclude=None</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the file <a href="#id1"><span class="problematic" id="id2">`</span></a>name&#8217; to the archive. <a href="#id3"><span class="problematic" id="id4">`</span></a>name&#8217; may be any type of file
+(directory, fifo, symbolic link, etc.). If given, <a href="#id5"><span class="problematic" id="id6">`</span></a>arcname&#8217;
+specifies an alternative name for the file in the archive.
+Directories are added recursively by default. This can be avoided by
+setting <a href="#id7"><span class="problematic" id="id8">`</span></a>recursive&#8217; to False. <a href="#id9"><span class="problematic" id="id10">`</span></a>exclude&#8217; is a function that should
+return True for each filename to be excluded. <a href="#id11"><span class="problematic" id="id12">`</span></a>filter&#8217; is a function
+that expects a TarInfo object argument and returns the changed
+TarInfo object, if it returns None the TarInfo object will be
+excluded from the archive.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarFile.addfile">
+<code class="descname">addfile</code><span class="sig-paren">(</span><em>tarinfo</em>, <em>fileobj=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.addfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.addfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the TarInfo object <a href="#id13"><span class="problematic" id="id14">`</span></a>tarinfo&#8217; to the archive. If <a href="#id15"><span class="problematic" id="id16">`</span></a>fileobj&#8217; is
+given, tarinfo.size bytes are read from it and added to the archive.
+You can create TarInfo objects directly, or by using gettarinfo().
+On Windows platforms, <a href="#id17"><span class="problematic" id="id18">`</span></a>fileobj&#8217; should always be opened with mode
+&#8216;rb&#8217; to avoid irritation about the file size.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="duplicity.tarfile.TarFile.bz2open">
+<em class="property">classmethod </em><code class="descname">bz2open</code><span class="sig-paren">(</span><em>name</em>, <em>mode='r'</em>, <em>fileobj=None</em>, <em>compresslevel=9</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.bz2open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.bz2open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open bzip2 compressed tar archive name for reading or writing.
+Appending is not allowed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarFile.chmod">
+<code class="descname">chmod</code><span class="sig-paren">(</span><em>tarinfo</em>, <em>targetpath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.chmod"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.chmod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set file permissions of targetpath according to tarinfo.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarFile.chown">
+<code class="descname">chown</code><span class="sig-paren">(</span><em>tarinfo</em>, <em>targetpath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.chown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.chown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set owner of targetpath according to tarinfo.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarFile.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the TarFile. In write-mode, two finishing zero blocks are
+appended to the archive.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.tarfile.TarFile.debug">
+<code class="descname">debug</code><em class="property"> = 0</em><a class="headerlink" href="#duplicity.tarfile.TarFile.debug" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.tarfile.TarFile.dereference">
+<code class="descname">dereference</code><em class="property"> = False</em><a class="headerlink" href="#duplicity.tarfile.TarFile.dereference" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.tarfile.TarFile.encoding">
+<code class="descname">encoding</code><em class="property"> = 'utf-8'</em><a class="headerlink" href="#duplicity.tarfile.TarFile.encoding" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.tarfile.TarFile.errorlevel">
+<code class="descname">errorlevel</code><em class="property"> = 1</em><a class="headerlink" href="#duplicity.tarfile.TarFile.errorlevel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.tarfile.TarFile.errors">
+<code class="descname">errors</code><em class="property"> = None</em><a class="headerlink" href="#duplicity.tarfile.TarFile.errors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarFile.extract">
+<code class="descname">extract</code><span class="sig-paren">(</span><em>member</em>, <em>path=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.extract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.extract" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract a member from the archive to the current working directory,
+using its full name. Its file information is extracted as accurately
+as possible. <a href="#id19"><span class="problematic" id="id20">`</span></a>member&#8217; may be a filename or a TarInfo object. You can
+specify a different directory using <a href="#id21"><span class="problematic" id="id22">`</span></a>path&#8217;.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarFile.extractall">
+<code class="descname">extractall</code><span class="sig-paren">(</span><em>path='.'</em>, <em>members=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.extractall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.extractall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract all members from the archive to the current working
+directory and set owner, modification time and permissions on
+directories afterwards. <a href="#id23"><span class="problematic" id="id24">`</span></a>path&#8217; specifies a different directory
+to extract to. <a href="#id25"><span class="problematic" id="id26">`</span></a>members&#8217; is optional and must be a subset of the
+list returned by getmembers().</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarFile.extractfile">
+<code class="descname">extractfile</code><span class="sig-paren">(</span><em>member</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.extractfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.extractfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract a member from the archive as a file object. <a href="#id27"><span class="problematic" id="id28">`</span></a>member&#8217; may be
+a filename or a TarInfo object. If <a href="#id29"><span class="problematic" id="id30">`</span></a>member&#8217; is a regular file, a
+file-like object is returned. If <a href="#id31"><span class="problematic" id="id32">`</span></a>member&#8217; is a link, a file-like
+object is constructed from the link&#8217;s target. If <a href="#id33"><span class="problematic" id="id34">`</span></a>member&#8217; is none of
+the above, None is returned.
+The file-like object is read-only and provides the following
+methods: read(), readline(), readlines(), seek() and tell()</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.tarfile.TarFile.fileobject">
+<code class="descname">fileobject</code><a class="headerlink" href="#duplicity.tarfile.TarFile.fileobject" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">ExFileObject</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.tarfile.TarFile.format">
+<code class="descname">format</code><em class="property"> = 1</em><a class="headerlink" href="#duplicity.tarfile.TarFile.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarFile.getmember">
+<code class="descname">getmember</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.getmember"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.getmember" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a TarInfo object for member <a href="#id35"><span class="problematic" id="id36">`</span></a>name&#8217;. If <a href="#id37"><span class="problematic" id="id38">`</span></a>name&#8217; can not be
+found in the archive, KeyError is raised. If a member occurs more
+than once in the archive, its last occurrence is assumed to be the
+most up-to-date version.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarFile.getmembers">
+<code class="descname">getmembers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.getmembers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.getmembers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the members of the archive as a list of TarInfo objects. The
+list has the same order as the members in the archive.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarFile.getnames">
+<code class="descname">getnames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.getnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.getnames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the members of the archive as a list of their names. It has
+the same order as the list returned by getmembers().</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarFile.gettarinfo">
+<code class="descname">gettarinfo</code><span class="sig-paren">(</span><em>name=None</em>, <em>arcname=None</em>, <em>fileobj=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.gettarinfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.gettarinfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a TarInfo object from the result of os.stat or equivalent
+on an existing file. The file is either named by <a href="#id39"><span class="problematic" id="id40">`</span></a>name&#8217;, or
+specified as a file object <a href="#id41"><span class="problematic" id="id42">`</span></a>fileobj&#8217; with a file descriptor. If
+given, <a href="#id43"><span class="problematic" id="id44">`</span></a>arcname&#8217; specifies an alternative name for the file in the
+archive, otherwise, the name is taken from the &#8216;name&#8217; attribute of
+&#8216;fileobj&#8217;, or the &#8216;name&#8217; argument.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="duplicity.tarfile.TarFile.gzopen">
+<em class="property">classmethod </em><code class="descname">gzopen</code><span class="sig-paren">(</span><em>name</em>, <em>mode='r'</em>, <em>fileobj=None</em>, <em>compresslevel=9</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.gzopen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.gzopen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open gzip compressed tar archive name for reading or writing.
+Appending is not allowed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.tarfile.TarFile.ignore_zeros">
+<code class="descname">ignore_zeros</code><em class="property"> = False</em><a class="headerlink" href="#duplicity.tarfile.TarFile.ignore_zeros" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarFile.list">
+<code class="descname">list</code><span class="sig-paren">(</span><em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print a table of contents to sys.stdout. If <a href="#id45"><span class="problematic" id="id46">`</span></a>verbose&#8217; is False, only
+the names of the members are printed. If it is True, an <a href="#id47"><span class="problematic" id="id48">`</span></a>ls -l&#8217;-like
+output is produced.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarFile.makedev">
+<code class="descname">makedev</code><span class="sig-paren">(</span><em>tarinfo</em>, <em>targetpath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.makedev"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.makedev" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a character or block device called targetpath.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarFile.makedir">
+<code class="descname">makedir</code><span class="sig-paren">(</span><em>tarinfo</em>, <em>targetpath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.makedir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.makedir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a directory called targetpath.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarFile.makefifo">
+<code class="descname">makefifo</code><span class="sig-paren">(</span><em>tarinfo</em>, <em>targetpath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.makefifo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.makefifo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a fifo called targetpath.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarFile.makefile">
+<code class="descname">makefile</code><span class="sig-paren">(</span><em>tarinfo</em>, <em>targetpath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.makefile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.makefile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a file called targetpath.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarFile.makelink">
+<code class="descname">makelink</code><span class="sig-paren">(</span><em>tarinfo</em>, <em>targetpath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.makelink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.makelink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a (symbolic) link called targetpath. If it cannot be created
+(platform limitation), we try to make a copy of the referenced file
+instead of a link.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarFile.makeunknown">
+<code class="descname">makeunknown</code><span class="sig-paren">(</span><em>tarinfo</em>, <em>targetpath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.makeunknown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.makeunknown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a file from a TarInfo object with an unknown type
+at targetpath.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarFile.next">
+<code class="descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.next"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the next member of the archive as a TarInfo object, when
+TarFile is opened for reading. Return None if there is no more
+available.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="duplicity.tarfile.TarFile.open">
+<em class="property">classmethod </em><code class="descname">open</code><span class="sig-paren">(</span><em>name=None</em>, <em>mode='r'</em>, <em>fileobj=None</em>, <em>bufsize=10240</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open a tar archive for reading, writing or appending. Return
+an appropriate TarFile class.</p>
+<p>mode:
+&#8216;r&#8217; or &#8216;r:<a href="#id49"><span class="problematic" id="id50">*</span></a>&#8216; open for reading with transparent compression
+&#8216;r:&#8217;         open for reading exclusively uncompressed
+&#8216;r:gz&#8217;       open for reading with gzip compression
+&#8216;r:bz2&#8217;      open for reading with bzip2 compression
+&#8216;a&#8217; or &#8216;a:&#8217;  open for appending, creating the file if necessary
+&#8216;w&#8217; or &#8216;w:&#8217;  open for writing without compression
+&#8216;w:gz&#8217;       open for writing with gzip compression
+&#8216;w:bz2&#8217;      open for writing with bzip2 compression</p>
+<p>&#8216;r|*&#8217;        open a stream of tar blocks with transparent compression
+&#8216;r|&#8217;         open an uncompressed stream of tar blocks for reading
+&#8216;r|gz&#8217;       open a gzip compressed stream of tar blocks
+&#8216;r|bz2&#8217;      open a bzip2 compressed stream of tar blocks
+&#8216;w|&#8217;         open an uncompressed stream for writing
+&#8216;w|gz&#8217;       open a gzip compressed stream for writing
+&#8216;w|bz2&#8217;      open a bzip2 compressed stream for writing</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.tarfile.TarFile.posix">
+<code class="descname">posix</code><a class="headerlink" href="#duplicity.tarfile.TarFile.posix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.tarfile.TarFile.tarinfo">
+<code class="descname">tarinfo</code><a class="headerlink" href="#duplicity.tarfile.TarFile.tarinfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#duplicity.tarfile.TarInfo" title="duplicity.tarfile.TarInfo"><code class="xref py py-class docutils literal"><span class="pre">TarInfo</span></code></a></p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="duplicity.tarfile.TarFile.taropen">
+<em class="property">classmethod </em><code class="descname">taropen</code><span class="sig-paren">(</span><em>name</em>, <em>mode='r'</em>, <em>fileobj=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.taropen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.taropen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open uncompressed tar archive name for reading or writing.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarFile.utime">
+<code class="descname">utime</code><span class="sig-paren">(</span><em>tarinfo</em>, <em>targetpath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarFile.utime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarFile.utime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set modification time of targetpath according to tarinfo.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.tarfile.TarInfo">
+<em class="property">class </em><code class="descclassname">duplicity.tarfile.</code><code class="descname">TarInfo</code><span class="sig-paren">(</span><em>name=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Informational class which holds the details about an
+archive member given by a tar header block.
+TarInfo objects are returned by TarFile.getmember(),
+TarFile.getmembers() and TarFile.gettarinfo() and are
+usually created internally.</p>
+<dl class="method">
+<dt id="duplicity.tarfile.TarInfo.create_gnu_header">
+<code class="descname">create_gnu_header</code><span class="sig-paren">(</span><em>info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarInfo.create_gnu_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarInfo.create_gnu_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the object as a GNU header block sequence.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="duplicity.tarfile.TarInfo.create_pax_global_header">
+<em class="property">classmethod </em><code class="descname">create_pax_global_header</code><span class="sig-paren">(</span><em>pax_headers</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarInfo.create_pax_global_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarInfo.create_pax_global_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the object as a pax global header block sequence.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarInfo.create_pax_header">
+<code class="descname">create_pax_header</code><span class="sig-paren">(</span><em>info</em>, <em>encoding</em>, <em>errors</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarInfo.create_pax_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarInfo.create_pax_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the object as a ustar header block. If it cannot be
+represented this way, prepend a pax extended header sequence
+with supplement information.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarInfo.create_ustar_header">
+<code class="descname">create_ustar_header</code><span class="sig-paren">(</span><em>info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarInfo.create_ustar_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarInfo.create_ustar_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the object as a ustar header block.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="duplicity.tarfile.TarInfo.frombuf">
+<em class="property">classmethod </em><code class="descname">frombuf</code><span class="sig-paren">(</span><em>buf</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarInfo.frombuf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarInfo.frombuf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a TarInfo object from a 512 byte string buffer.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="duplicity.tarfile.TarInfo.fromtarfile">
+<em class="property">classmethod </em><code class="descname">fromtarfile</code><span class="sig-paren">(</span><em>tarfile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarInfo.fromtarfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarInfo.fromtarfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the next TarInfo object from TarFile object
+tarfile.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarInfo.get_info">
+<code class="descname">get_info</code><span class="sig-paren">(</span><em>encoding</em>, <em>errors</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarInfo.get_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarInfo.get_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the TarInfo&#8217;s attributes as a dictionary.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarInfo.isblk">
+<code class="descname">isblk</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarInfo.isblk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarInfo.isblk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarInfo.ischr">
+<code class="descname">ischr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarInfo.ischr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarInfo.ischr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarInfo.isdev">
+<code class="descname">isdev</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarInfo.isdev"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarInfo.isdev" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarInfo.isdir">
+<code class="descname">isdir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarInfo.isdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarInfo.isdir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarInfo.isfifo">
+<code class="descname">isfifo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarInfo.isfifo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarInfo.isfifo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarInfo.isfile">
+<code class="descname">isfile</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarInfo.isfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarInfo.isfile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarInfo.islnk">
+<code class="descname">islnk</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarInfo.islnk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarInfo.islnk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarInfo.isreg">
+<code class="descname">isreg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarInfo.isreg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarInfo.isreg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarInfo.issparse">
+<code class="descname">issparse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarInfo.issparse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarInfo.issparse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarInfo.issym">
+<code class="descname">issym</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarInfo.issym"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarInfo.issym" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.tarfile.TarInfo.linkpath">
+<code class="descname">linkpath</code><a class="headerlink" href="#duplicity.tarfile.TarInfo.linkpath" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.tarfile.TarInfo.path">
+<code class="descname">path</code><a class="headerlink" href="#duplicity.tarfile.TarInfo.path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tarfile.TarInfo.tobuf">
+<code class="descname">tobuf</code><span class="sig-paren">(</span><em>format=1</em>, <em>encoding='utf-8'</em>, <em>errors='strict'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#TarInfo.tobuf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarInfo.tobuf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a tar header as a string of 512 byte blocks.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.tarfile.is_tarfile">
+<code class="descclassname">duplicity.tarfile.</code><code class="descname">is_tarfile</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tarfile.html#is_tarfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.is_tarfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if name points to a tar archive that we
+are able to handle, else return False.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="duplicity.tarfile.TarError">
+<em class="property">exception </em><code class="descclassname">duplicity.tarfile.</code><code class="descname">TarError</code><a class="reference internal" href="_modules/tarfile.html#TarError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tarfile.TarError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+<p>Base exception.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="duplicity.html">duplicity package</a><ul>
+      <li>Previous: <a href="duplicity.statistics.html" title="previous chapter">duplicity.statistics module</a></li>
+      <li>Next: <a href="duplicity.tempdir.html" title="next chapter">duplicity.tempdir module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/duplicity.tarfile.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/duplicity.tarfile.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

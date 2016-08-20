@@ -1,0 +1,384 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.backends.multibackend &mdash; duplicity-src8  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="duplicity-src8  documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.backends.multibackend</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2015 Steve Tynor &lt;steve.tynor@gmail.com&gt;</span>
+<span class="c1"># Copyright 2016 Thomas Harning Jr &lt;harningt@gmail.com&gt;</span>
+<span class="c1">#                  - mirror/stripe modes</span>
+<span class="c1">#                  - write error modes</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="c1">#</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
+<span class="kn">import</span> <span class="nn">urlparse</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="kn">import</span> <span class="nn">duplicity.backend</span>
+<span class="kn">from</span> <span class="nn">duplicity.errors</span> <span class="k">import</span> <span class="n">BackendException</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">log</span>
+
+
+<div class="viewcode-block" id="MultiBackend"><a class="viewcode-back" href="../../../duplicity.backends.multibackend.html#duplicity.backends.multibackend.MultiBackend">[docs]</a><span class="k">class</span> <span class="nc">MultiBackend</span><span class="p">(</span><span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Backend</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Store files across multiple remote stores. URL is a path to a local file containing URLs/other config defining the remote store&quot;&quot;&quot;</span>
+
+    <span class="c1"># the stores we are managing</span>
+    <span class="n">__stores</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Set of known query paramaters</span>
+    <span class="n">__knownQueryParameters</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">([</span>
+        <span class="s1">&#39;mode&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;onfail&#39;</span><span class="p">,</span>
+    <span class="p">])</span>
+
+    <span class="c1"># the mode of operation to follow</span>
+    <span class="c1"># can be one of &#39;stripe&#39; or &#39;mirror&#39; currently</span>
+    <span class="n">__mode</span> <span class="o">=</span> <span class="s1">&#39;stripe&#39;</span>
+    <span class="n">__mode_allowedSet</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">([</span>
+        <span class="s1">&#39;mirror&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;stripe&#39;</span><span class="p">,</span>
+    <span class="p">])</span>
+
+    <span class="c1"># the write error handling logic</span>
+    <span class="c1"># can be one of the following:</span>
+    <span class="c1"># * continue - default, on failure continues to next source</span>
+    <span class="c1"># * abort - stop all further operations</span>
+    <span class="n">__onfail_mode</span> <span class="o">=</span> <span class="s1">&#39;continue&#39;</span>
+    <span class="n">__onfail_mode_allowedSet</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">([</span>
+        <span class="s1">&#39;abort&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;continue&#39;</span><span class="p">,</span>
+    <span class="p">])</span>
+
+    <span class="c1"># when we write in stripe mode, we &quot;stripe&quot; via a simple round-robin across</span>
+    <span class="c1"># remote stores.  It&#39;s hard to get too much more sophisticated</span>
+    <span class="c1"># since we can&#39;t rely on the backend to give us any useful meta</span>
+    <span class="c1"># data (e.g. sizes of files, capacity of the store (quotas)) to do</span>
+    <span class="c1"># a better job of balancing load across stores.</span>
+    <span class="n">__write_cursor</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MultiBackend.get_query_params"><a class="viewcode-back" href="../../../duplicity.backends.multibackend.html#duplicity.backends.multibackend.MultiBackend.get_query_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_query_params</span><span class="p">(</span><span class="n">parsed_url</span><span class="p">):</span>
+        <span class="c1"># Reparse so the query string is available</span>
+        <span class="n">reparsed_url</span> <span class="o">=</span> <span class="n">urlparse</span><span class="o">.</span><span class="n">urlparse</span><span class="p">(</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">geturl</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">reparsed_url</span><span class="o">.</span><span class="n">query</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">queryMultiDict</span> <span class="o">=</span> <span class="n">urlparse</span><span class="o">.</span><span class="n">parse_qs</span><span class="p">(</span><span class="n">reparsed_url</span><span class="o">.</span><span class="n">query</span><span class="p">,</span> <span class="n">strict_parsing</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;MultiBackend: Could not parse query string </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2"> &quot;</span><span class="p">)</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="n">reparsed_url</span><span class="o">.</span><span class="n">query</span><span class="p">,</span> <span class="n">e</span><span class="p">),</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s1">&#39;Could not parse query string&#39;</span><span class="p">)</span>
+        <span class="n">queryDict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="c1"># Convert the multi-dict to a single dictionary</span>
+        <span class="c1"># while checking to make sure that no unrecognized values are found</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">valueList</span> <span class="ow">in</span> <span class="n">queryMultiDict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">valueList</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;MultiBackend: Invalid query string </span><span class="si">%s</span><span class="s2">: more than one value for </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="o">%</span> <span class="p">(</span><span class="n">reparsed_url</span><span class="o">.</span><span class="n">query</span><span class="p">,</span> <span class="n">name</span><span class="p">),</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s1">&#39;Invalid query string&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">MultiBackend</span><span class="o">.</span><span class="n">__knownQueryParameters</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;MultiBackend: Invalid query string </span><span class="si">%s</span><span class="s2">: unknown parameter </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="o">%</span> <span class="p">(</span><span class="n">reparsed_url</span><span class="o">.</span><span class="n">query</span><span class="p">,</span> <span class="n">name</span><span class="p">),</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s1">&#39;Invalid query string&#39;</span><span class="p">)</span>
+
+            <span class="n">queryDict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">valueList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">queryDict</span></div>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_url</span><span class="p">):</span>
+        <span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Backend</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_url</span><span class="p">)</span>
+
+        <span class="c1"># Init each of the wrapped stores</span>
+        <span class="c1">#</span>
+        <span class="c1"># config file is a json formatted collection of values, one for</span>
+        <span class="c1"># each backend.  We will &#39;stripe&#39; data across all the given stores:</span>
+        <span class="c1">#</span>
+        <span class="c1">#  &#39;url&#39;  - the URL used for the backend store</span>
+        <span class="c1">#  &#39;env&#39; - an optional list of enviroment variable values to set</span>
+        <span class="c1">#      during the intialization of the backend</span>
+        <span class="c1">#</span>
+        <span class="c1"># Example:</span>
+        <span class="c1">#</span>
+        <span class="c1"># [</span>
+        <span class="c1">#  {</span>
+        <span class="c1">#   &quot;url&quot;: &quot;abackend://myuser@domain.com/backup&quot;,</span>
+        <span class="c1">#   &quot;env&quot;: [</span>
+        <span class="c1">#     {</span>
+        <span class="c1">#      &quot;name&quot; : &quot;MYENV&quot;,</span>
+        <span class="c1">#      &quot;value&quot; : &quot;xyz&quot;</span>
+        <span class="c1">#     },</span>
+        <span class="c1">#     {</span>
+        <span class="c1">#      &quot;name&quot; : &quot;FOO&quot;,</span>
+        <span class="c1">#      &quot;value&quot; : &quot;bar&quot;</span>
+        <span class="c1">#     }</span>
+        <span class="c1">#    ]</span>
+        <span class="c1">#  },</span>
+        <span class="c1">#  {</span>
+        <span class="c1">#   &quot;url&quot;: &quot;file:///path/to/dir&quot;</span>
+        <span class="c1">#  }</span>
+        <span class="c1"># ]</span>
+
+        <span class="n">queryParams</span> <span class="o">=</span> <span class="n">MultiBackend</span><span class="o">.</span><span class="n">get_query_params</span><span class="p">(</span><span class="n">parsed_url</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;mode&#39;</span> <span class="ow">in</span> <span class="n">queryParams</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__mode</span> <span class="o">=</span> <span class="n">queryParams</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="s1">&#39;onfail&#39;</span> <span class="ow">in</span> <span class="n">queryParams</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__onfail_mode</span> <span class="o">=</span> <span class="n">queryParams</span><span class="p">[</span><span class="s1">&#39;onfail&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">MultiBackend</span><span class="o">.</span><span class="n">__mode_allowedSet</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;MultiBackend: illegal value for </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;mode&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mode</span><span class="p">),</span> <span class="n">log</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;MultiBackend: invalid mode value&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__onfail_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">MultiBackend</span><span class="o">.</span><span class="n">__onfail_mode_allowedSet</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;MultiBackend: illegal value for </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;onfail&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__onfail_mode</span><span class="p">),</span> <span class="n">log</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;MultiBackend: invalid onfail value&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">configs</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;MultiBackend: Url </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">geturl</span><span class="p">()),</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+
+            <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;MultiBackend: Could not load config file </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2"> &quot;</span><span class="p">)</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">e</span><span class="p">),</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s1">&#39;Could not load config file&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">configs</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span>
+            <span class="c1"># Fix advised in bug #1471795</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;MultiBackend: use store </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">),</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;env&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">env</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;env&#39;</span><span class="p">]:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;MultiBackend: set env </span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                            <span class="o">%</span> <span class="p">(</span><span class="n">env</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">env</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]),</span>
+                            <span class="n">log</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">env</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">env</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+
+            <span class="n">store</span> <span class="o">=</span> <span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">get_backend</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__stores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
+            <span class="c1"># store_list = store.list()</span>
+            <span class="c1"># log.Log(_(&quot;MultiBackend: at init, store %s has %s files&quot;)</span>
+            <span class="c1">#         % (url, len(store_list)),</span>
+            <span class="c1">#         log.INFO)</span>
+
+    <span class="k">def</span> <span class="nf">_put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_path</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">):</span>
+        <span class="c1"># Store an indication of whether any of these passed</span>
+        <span class="n">passed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># Mirror mode always starts at zero</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mode</span> <span class="o">==</span> <span class="s1">&#39;mirror&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__write_cursor</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">first</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__write_cursor</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">store</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stores</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__write_cursor</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="nb">next</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__write_cursor</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nb">next</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__stores</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="nb">next</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;MultiBackend: _put: write to store #</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">)</span>
+                        <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__write_cursor</span><span class="p">,</span> <span class="n">store</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">url_string</span><span class="p">),</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">source_path</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">)</span>
+                <span class="n">passed</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__write_cursor</span> <span class="o">=</span> <span class="nb">next</span>
+                <span class="c1"># No matter what, if we loop around, break this loop</span>
+                <span class="k">if</span> <span class="nb">next</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="c1"># If in stripe mode, don&#39;t continue to the next</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mode</span> <span class="o">==</span> <span class="s1">&#39;stripe&#39;</span><span class="p">:</span>
+                    <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;MultiBackend: failed to write to store #</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">), try #</span><span class="si">%s</span><span class="s2">, Exception: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__write_cursor</span><span class="p">,</span> <span class="n">store</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">url_string</span><span class="p">,</span> <span class="nb">next</span><span class="p">,</span> <span class="n">e</span><span class="p">),</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__write_cursor</span> <span class="o">=</span> <span class="nb">next</span>
+
+                <span class="c1"># If we consider write failure as abort, abort</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__onfail_mode</span> <span class="o">==</span> <span class="s1">&#39;abort&#39;</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;MultiBackend: failed to write </span><span class="si">%s</span><span class="s2">. Aborting process.&quot;</span><span class="p">)</span>
+                            <span class="o">%</span> <span class="p">(</span><span class="n">source_path</span><span class="p">),</span>
+                            <span class="n">log</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;failed to write&quot;</span><span class="p">)</span>
+
+                <span class="c1"># If we&#39;ve looped around, and none of them passed, fail</span>
+                <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__write_cursor</span> <span class="o">==</span> <span class="n">first</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">passed</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;MultiBackend: failed to write </span><span class="si">%s</span><span class="s2">. Tried all backing stores and none succeeded&quot;</span><span class="p">)</span>
+                            <span class="o">%</span> <span class="p">(</span><span class="n">source_path</span><span class="p">),</span>
+                            <span class="n">log</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;failed to write&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">,</span> <span class="n">local_path</span><span class="p">):</span>
+        <span class="c1"># since the backend operations will be retried, we can&#39;t</span>
+        <span class="c1"># simply try to get from the store, if not found, move to the</span>
+        <span class="c1"># next store (since each failure will be retried n times</span>
+        <span class="c1"># before finally giving up).  So we need to get the list first</span>
+        <span class="c1"># before we try to fetch</span>
+        <span class="c1"># ENHANCEME: maintain a cached list for each store</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stores</span><span class="p">:</span>
+            <span class="nb">list</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">remote_filename</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">:</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">remote_filename</span><span class="p">,</span> <span class="n">local_path</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;MultiBackend: failed to get </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="n">remote_filename</span><span class="p">,</span> <span class="n">local_path</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">url_string</span><span class="p">),</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;MultiBackend: failed to get </span><span class="si">%s</span><span class="s2">. Tried all backing stores and none succeeded&quot;</span><span class="p">)</span>
+                <span class="o">%</span> <span class="p">(</span><span class="n">remote_filename</span><span class="p">),</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;failed to get&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">lists</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stores</span><span class="p">:</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;MultiBackend: list from </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">url_string</span><span class="p">,</span> <span class="n">l</span><span class="p">),</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+            <span class="n">lists</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">list</span><span class="p">())</span>
+        <span class="c1"># combine the lists into a single flat list w/o duplicates via set:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">list</span><span class="p">({</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">lists</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">})</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;MultiBackend: combined list: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="o">%</span> <span class="p">(</span><span class="n">result</span><span class="p">),</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="nf">_delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="c1"># Store an indication on whether any passed</span>
+        <span class="n">passed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># since the backend operations will be retried, we can&#39;t</span>
+        <span class="c1"># simply try to get from the store, if not found, move to the</span>
+        <span class="c1"># next store (since each failure will be retried n times</span>
+        <span class="c1"># before finally giving up).  So we need to get the list first</span>
+        <span class="c1"># before we try to delete</span>
+        <span class="c1"># ENHANCEME: maintain a cached list for each store</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stores</span><span class="p">:</span>
+            <span class="nb">list</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">filename</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">:</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">_do_delete</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+                <span class="n">passed</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="c1"># In stripe mode, only one item will have the file</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mode</span> <span class="o">==</span> <span class="s1">&#39;stripe&#39;</span><span class="p">:</span>
+                    <span class="k">return</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;MultiBackend: failed to delete </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">url_string</span><span class="p">),</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">passed</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;MultiBackend: failed to delete </span><span class="si">%s</span><span class="s2">. Tried all backing stores and none succeeded&quot;</span><span class="p">)</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="n">filename</span><span class="p">),</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span></div>
+<span class="c1">#           raise BackendException(&quot;failed to delete&quot;)</span>
+
+<span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">register_backend</span><span class="p">(</span><span class="s1">&#39;multi&#39;</span><span class="p">,</span> <span class="n">MultiBackend</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

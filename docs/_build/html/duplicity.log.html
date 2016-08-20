@@ -1,0 +1,698 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.log module &mdash; duplicity-src8  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="duplicity-src8  documentation" href="index.html" />
+    <link rel="up" title="duplicity package" href="duplicity.html" />
+    <link rel="next" title="duplicity.manifest module" href="duplicity.manifest.html" />
+    <link rel="prev" title="duplicity.librsync module" href="duplicity.librsync.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-duplicity.log">
+<span id="duplicity-log-module"></span><h1>duplicity.log module<a class="headerlink" href="#module-duplicity.log" title="Permalink to this headline">¶</a></h1>
+<p>Log various messages depending on verbosity level</p>
+<dl class="function">
+<dt id="duplicity.log.Debug">
+<code class="descclassname">duplicity.log.</code><code class="descname">Debug</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#Debug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.Debug" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut used for debug message (verbosity 9).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.log.DupToLoggerLevel">
+<code class="descclassname">duplicity.log.</code><code class="descname">DupToLoggerLevel</code><span class="sig-paren">(</span><em>verb</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#DupToLoggerLevel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.DupToLoggerLevel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert duplicity level to the logging module&#8217;s system, where higher is
+more severe</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.log.ErrFilter">
+<em class="property">class </em><code class="descclassname">duplicity.log.</code><code class="descname">ErrFilter</code><span class="sig-paren">(</span><em>name=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#ErrFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.ErrFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">logging.Filter</span></code></p>
+<p>Filter that only allows messages more important than warnings</p>
+<dl class="method">
+<dt id="duplicity.log.ErrFilter.filter">
+<code class="descname">filter</code><span class="sig-paren">(</span><em>record</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#ErrFilter.filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.ErrFilter.filter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.log.Error">
+<code class="descclassname">duplicity.log.</code><code class="descname">Error</code><span class="sig-paren">(</span><em>s</em>, <em>code=1</em>, <em>extra=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#Error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.Error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write error message</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.log.ErrorCode">
+<em class="property">class </em><code class="descclassname">duplicity.log.</code><code class="descname">ErrorCode</code><a class="reference internal" href="_modules/duplicity/log.html#ErrorCode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.ErrorCode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enumeration class to hold error code values.
+These values should never change, as frontends rely upon them.
+Don&#8217;t use 0 or negative numbers.  This code is returned by duplicity
+to indicate which error occurred via both exit code and log.</p>
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.backend_code_error">
+<code class="descname">backend_code_error</code><em class="property"> = 55</em><a class="headerlink" href="#duplicity.log.ErrorCode.backend_code_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.backend_command_error">
+<code class="descname">backend_command_error</code><em class="property"> = 54</em><a class="headerlink" href="#duplicity.log.ErrorCode.backend_command_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.backend_error">
+<code class="descname">backend_error</code><em class="property"> = 50</em><a class="headerlink" href="#duplicity.log.ErrorCode.backend_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.backend_no_space">
+<code class="descname">backend_no_space</code><em class="property"> = 53</em><a class="headerlink" href="#duplicity.log.ErrorCode.backend_no_space" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.backend_not_found">
+<code class="descname">backend_not_found</code><em class="property"> = 52</em><a class="headerlink" href="#duplicity.log.ErrorCode.backend_not_found" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.backend_permission_denied">
+<code class="descname">backend_permission_denied</code><em class="property"> = 51</em><a class="headerlink" href="#duplicity.log.ErrorCode.backend_permission_denied" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.backup_dir_doesnt_exist">
+<code class="descname">backup_dir_doesnt_exist</code><em class="property"> = 13</em><a class="headerlink" href="#duplicity.log.ErrorCode.backup_dir_doesnt_exist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.bad_archive_dir">
+<code class="descname">bad_archive_dir</code><em class="property"> = 9</em><a class="headerlink" href="#duplicity.log.ErrorCode.bad_archive_dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.bad_request">
+<code class="descname">bad_request</code><em class="property"> = 48</em><a class="headerlink" href="#duplicity.log.ErrorCode.bad_request" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.bad_sign_key">
+<code class="descname">bad_sign_key</code><em class="property"> = 10</em><a class="headerlink" href="#duplicity.log.ErrorCode.bad_sign_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.bad_url">
+<code class="descname">bad_url</code><em class="property"> = 8</em><a class="headerlink" href="#duplicity.log.ErrorCode.bad_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.boto_calling_format">
+<code class="descname">boto_calling_format</code><em class="property"> = 26</em><a class="headerlink" href="#duplicity.log.ErrorCode.boto_calling_format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.boto_lib_too_old">
+<code class="descname">boto_lib_too_old</code><em class="property"> = 25</em><a class="headerlink" href="#duplicity.log.ErrorCode.boto_lib_too_old" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.boto_old_style">
+<code class="descname">boto_old_style</code><em class="property"> = 24</em><a class="headerlink" href="#duplicity.log.ErrorCode.boto_old_style" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.cant_open_filelist">
+<code class="descname">cant_open_filelist</code><em class="property"> = 7</em><a class="headerlink" href="#duplicity.log.ErrorCode.cant_open_filelist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.command_line">
+<code class="descname">command_line</code><em class="property"> = 2</em><a class="headerlink" href="#duplicity.log.ErrorCode.command_line" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.connection_failed">
+<code class="descname">connection_failed</code><em class="property"> = 38</em><a class="headerlink" href="#duplicity.log.ErrorCode.connection_failed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.dpbx_nologin">
+<code class="descname">dpbx_nologin</code><em class="property"> = 47</em><a class="headerlink" href="#duplicity.log.ErrorCode.dpbx_nologin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.enryption_mismatch">
+<code class="descname">enryption_mismatch</code><em class="property"> = 45</em><a class="headerlink" href="#duplicity.log.ErrorCode.enryption_mismatch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.exception">
+<code class="descname">exception</code><em class="property"> = 30</em><a class="headerlink" href="#duplicity.log.ErrorCode.exception" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.file_prefix_error">
+<code class="descname">file_prefix_error</code><em class="property"> = 14</em><a class="headerlink" href="#duplicity.log.ErrorCode.file_prefix_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.ftp_ncftp_missing">
+<code class="descname">ftp_ncftp_missing</code><em class="property"> = 27</em><a class="headerlink" href="#duplicity.log.ErrorCode.ftp_ncftp_missing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.ftp_ncftp_too_old">
+<code class="descname">ftp_ncftp_too_old</code><em class="property"> = 28</em><a class="headerlink" href="#duplicity.log.ErrorCode.ftp_ncftp_too_old" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.ftps_lftp_missing">
+<code class="descname">ftps_lftp_missing</code><em class="property"> = 43</em><a class="headerlink" href="#duplicity.log.ErrorCode.ftps_lftp_missing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.generic">
+<code class="descname">generic</code><em class="property"> = 1</em><a class="headerlink" href="#duplicity.log.ErrorCode.generic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.get_freespace_failed">
+<code class="descname">get_freespace_failed</code><em class="property"> = 34</em><a class="headerlink" href="#duplicity.log.ErrorCode.get_freespace_failed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.get_ulimit_failed">
+<code class="descname">get_ulimit_failed</code><em class="property"> = 36</em><a class="headerlink" href="#duplicity.log.ErrorCode.get_ulimit_failed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.gio_not_available">
+<code class="descname">gio_not_available</code><em class="property"> = 40</em><a class="headerlink" href="#duplicity.log.ErrorCode.gio_not_available" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.globbing_error">
+<code class="descname">globbing_error</code><em class="property"> = 15</em><a class="headerlink" href="#duplicity.log.ErrorCode.globbing_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.gpg_failed">
+<code class="descname">gpg_failed</code><em class="property"> = 31</em><a class="headerlink" href="#duplicity.log.ErrorCode.gpg_failed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.hostname_mismatch">
+<code class="descname">hostname_mismatch</code><em class="property"> = 3</em><a class="headerlink" href="#duplicity.log.ErrorCode.hostname_mismatch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.inc_without_sigs">
+<code class="descname">inc_without_sigs</code><em class="property"> = 17</em><a class="headerlink" href="#duplicity.log.ErrorCode.inc_without_sigs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.maxopen_too_low">
+<code class="descname">maxopen_too_low</code><em class="property"> = 37</em><a class="headerlink" href="#duplicity.log.ErrorCode.maxopen_too_low" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.mismatched_hash">
+<code class="descname">mismatched_hash</code><em class="property"> = 21</em><a class="headerlink" href="#duplicity.log.ErrorCode.mismatched_hash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.mismatched_manifests">
+<code class="descname">mismatched_manifests</code><em class="property"> = 5</em><a class="headerlink" href="#duplicity.log.ErrorCode.mismatched_manifests" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.no_manifests">
+<code class="descname">no_manifests</code><em class="property"> = 4</em><a class="headerlink" href="#duplicity.log.ErrorCode.no_manifests" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.no_restore_files">
+<code class="descname">no_restore_files</code><em class="property"> = 20</em><a class="headerlink" href="#duplicity.log.ErrorCode.no_restore_files" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.no_sigs">
+<code class="descname">no_sigs</code><em class="property"> = 18</em><a class="headerlink" href="#duplicity.log.ErrorCode.no_sigs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.not_enough_freespace">
+<code class="descname">not_enough_freespace</code><em class="property"> = 35</em><a class="headerlink" href="#duplicity.log.ErrorCode.not_enough_freespace" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.not_implemented">
+<code class="descname">not_implemented</code><em class="property"> = 33</em><a class="headerlink" href="#duplicity.log.ErrorCode.not_implemented" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.pythonoptimize_set">
+<code class="descname">pythonoptimize_set</code><em class="property"> = 46</em><a class="headerlink" href="#duplicity.log.ErrorCode.pythonoptimize_set" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.redundant_inclusion">
+<code class="descname">redundant_inclusion</code><em class="property"> = 16</em><a class="headerlink" href="#duplicity.log.ErrorCode.redundant_inclusion" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.restart_file_not_found">
+<code class="descname">restart_file_not_found</code><em class="property"> = 39</em><a class="headerlink" href="#duplicity.log.ErrorCode.restart_file_not_found" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.restore_dir_exists">
+<code class="descname">restore_dir_exists</code><em class="property"> = 11</em><a class="headerlink" href="#duplicity.log.ErrorCode.restore_dir_exists" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.restore_dir_not_found">
+<code class="descname">restore_dir_not_found</code><em class="property"> = 19</em><a class="headerlink" href="#duplicity.log.ErrorCode.restore_dir_not_found" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.s3_bucket_not_style">
+<code class="descname">s3_bucket_not_style</code><em class="property"> = 32</em><a class="headerlink" href="#duplicity.log.ErrorCode.s3_bucket_not_style" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.source_dir_mismatch">
+<code class="descname">source_dir_mismatch</code><em class="property"> = 42</em><a class="headerlink" href="#duplicity.log.ErrorCode.source_dir_mismatch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.unreadable_manifests">
+<code class="descname">unreadable_manifests</code><em class="property"> = 6</em><a class="headerlink" href="#duplicity.log.ErrorCode.unreadable_manifests" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.unsigned_volume">
+<code class="descname">unsigned_volume</code><em class="property"> = 22</em><a class="headerlink" href="#duplicity.log.ErrorCode.unsigned_volume" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.user_error">
+<code class="descname">user_error</code><em class="property"> = 23</em><a class="headerlink" href="#duplicity.log.ErrorCode.user_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.verify_dir_doesnt_exist">
+<code class="descname">verify_dir_doesnt_exist</code><em class="property"> = 12</em><a class="headerlink" href="#duplicity.log.ErrorCode.verify_dir_doesnt_exist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.ErrorCode.volume_wrong_size">
+<code class="descname">volume_wrong_size</code><em class="property"> = 44</em><a class="headerlink" href="#duplicity.log.ErrorCode.volume_wrong_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.log.FatalError">
+<code class="descclassname">duplicity.log.</code><code class="descname">FatalError</code><span class="sig-paren">(</span><em>s</em>, <em>code=1</em>, <em>extra=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#FatalError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.FatalError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write fatal error message and exit</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.log.Info">
+<code class="descclassname">duplicity.log.</code><code class="descname">Info</code><span class="sig-paren">(</span><em>s</em>, <em>code=1</em>, <em>extra=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#Info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.Info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut used for info messages (verbosity 5).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.log.InfoCode">
+<em class="property">class </em><code class="descclassname">duplicity.log.</code><code class="descname">InfoCode</code><a class="reference internal" href="_modules/duplicity/log.html#InfoCode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.InfoCode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enumeration class to hold info code values.
+These values should never change, as frontends rely upon them.
+Don&#8217;t use 0 or negative numbers.</p>
+<dl class="attribute">
+<dt id="duplicity.log.InfoCode.asynchronous_upload_begin">
+<code class="descname">asynchronous_upload_begin</code><em class="property"> = 12</em><a class="headerlink" href="#duplicity.log.InfoCode.asynchronous_upload_begin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.InfoCode.asynchronous_upload_done">
+<code class="descname">asynchronous_upload_done</code><em class="property"> = 14</em><a class="headerlink" href="#duplicity.log.InfoCode.asynchronous_upload_done" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.InfoCode.collection_status">
+<code class="descname">collection_status</code><em class="property"> = 3</em><a class="headerlink" href="#duplicity.log.InfoCode.collection_status" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.InfoCode.diff_file_changed">
+<code class="descname">diff_file_changed</code><em class="property"> = 5</em><a class="headerlink" href="#duplicity.log.InfoCode.diff_file_changed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.InfoCode.diff_file_deleted">
+<code class="descname">diff_file_deleted</code><em class="property"> = 6</em><a class="headerlink" href="#duplicity.log.InfoCode.diff_file_deleted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.InfoCode.diff_file_new">
+<code class="descname">diff_file_new</code><em class="property"> = 4</em><a class="headerlink" href="#duplicity.log.InfoCode.diff_file_new" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.InfoCode.file_list">
+<code class="descname">file_list</code><em class="property"> = 10</em><a class="headerlink" href="#duplicity.log.InfoCode.file_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.InfoCode.generic">
+<code class="descname">generic</code><em class="property"> = 1</em><a class="headerlink" href="#duplicity.log.InfoCode.generic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.InfoCode.patch_file_patching">
+<code class="descname">patch_file_patching</code><em class="property"> = 8</em><a class="headerlink" href="#duplicity.log.InfoCode.patch_file_patching" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.InfoCode.patch_file_writing">
+<code class="descname">patch_file_writing</code><em class="property"> = 7</em><a class="headerlink" href="#duplicity.log.InfoCode.patch_file_writing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.InfoCode.progress">
+<code class="descname">progress</code><em class="property"> = 2</em><a class="headerlink" href="#duplicity.log.InfoCode.progress" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.InfoCode.skipping_socket">
+<code class="descname">skipping_socket</code><em class="property"> = 15</em><a class="headerlink" href="#duplicity.log.InfoCode.skipping_socket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.InfoCode.synchronous_upload_begin">
+<code class="descname">synchronous_upload_begin</code><em class="property"> = 11</em><a class="headerlink" href="#duplicity.log.InfoCode.synchronous_upload_begin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.InfoCode.synchronous_upload_done">
+<code class="descname">synchronous_upload_done</code><em class="property"> = 13</em><a class="headerlink" href="#duplicity.log.InfoCode.synchronous_upload_done" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.InfoCode.upload_progress">
+<code class="descname">upload_progress</code><em class="property"> = 16</em><a class="headerlink" href="#duplicity.log.InfoCode.upload_progress" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.log.LevelName">
+<code class="descclassname">duplicity.log.</code><code class="descname">LevelName</code><span class="sig-paren">(</span><em>level</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#LevelName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.LevelName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="duplicity.log.Log">
+<code class="descclassname">duplicity.log.</code><code class="descname">Log</code><span class="sig-paren">(</span><em>s</em>, <em>verb_level</em>, <em>code=1</em>, <em>extra=None</em>, <em>force_print=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#Log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.Log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write s to stderr if verbosity level low enough</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.log.LoggerToDupLevel">
+<code class="descclassname">duplicity.log.</code><code class="descname">LoggerToDupLevel</code><span class="sig-paren">(</span><em>verb</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#LoggerToDupLevel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.LoggerToDupLevel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert logging module level to duplicity&#8217;s system, where lowere is
+more severe</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.log.MachineFilter">
+<em class="property">class </em><code class="descclassname">duplicity.log.</code><code class="descname">MachineFilter</code><span class="sig-paren">(</span><em>name=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#MachineFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.MachineFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">logging.Filter</span></code></p>
+<p>Filter that only allows levels that are consumable by other processes.</p>
+<dl class="method">
+<dt id="duplicity.log.MachineFilter.filter">
+<code class="descname">filter</code><span class="sig-paren">(</span><em>record</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#MachineFilter.filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.MachineFilter.filter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.log.MachineFormatter">
+<em class="property">class </em><code class="descclassname">duplicity.log.</code><code class="descname">MachineFormatter</code><a class="reference internal" href="_modules/duplicity/log.html#MachineFormatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.MachineFormatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">logging.Formatter</span></code></p>
+<p>Formatter that creates messages in a syntax easily consumable by other
+processes.</p>
+<dl class="method">
+<dt id="duplicity.log.MachineFormatter.format">
+<code class="descname">format</code><span class="sig-paren">(</span><em>record</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#MachineFormatter.format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.MachineFormatter.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.log.Notice">
+<code class="descclassname">duplicity.log.</code><code class="descname">Notice</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#Notice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.Notice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut used for notice messages (verbosity 3, the default).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.log.OutFilter">
+<em class="property">class </em><code class="descclassname">duplicity.log.</code><code class="descname">OutFilter</code><span class="sig-paren">(</span><em>name=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#OutFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.OutFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">logging.Filter</span></code></p>
+<p>Filter that only allows warning or less important messages</p>
+<dl class="method">
+<dt id="duplicity.log.OutFilter.filter">
+<code class="descname">filter</code><span class="sig-paren">(</span><em>record</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#OutFilter.filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.OutFilter.filter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.log.PrintCollectionFileChangedStatus">
+<code class="descclassname">duplicity.log.</code><code class="descname">PrintCollectionFileChangedStatus</code><span class="sig-paren">(</span><em>col_stats</em>, <em>filepath</em>, <em>force_print=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#PrintCollectionFileChangedStatus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.PrintCollectionFileChangedStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints a collection status to the log</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.log.PrintCollectionStatus">
+<code class="descclassname">duplicity.log.</code><code class="descname">PrintCollectionStatus</code><span class="sig-paren">(</span><em>col_stats</em>, <em>force_print=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#PrintCollectionStatus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.PrintCollectionStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints a collection status to the log</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.log.Progress">
+<code class="descclassname">duplicity.log.</code><code class="descname">Progress</code><span class="sig-paren">(</span><em>s</em>, <em>current</em>, <em>total=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#Progress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.Progress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut used for progress messages (verbosity 5).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.log.TransferProgress">
+<code class="descclassname">duplicity.log.</code><code class="descname">TransferProgress</code><span class="sig-paren">(</span><em>progress</em>, <em>eta</em>, <em>changed_bytes</em>, <em>elapsed</em>, <em>speed</em>, <em>stalled</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#TransferProgress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.TransferProgress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut used for upload progress messages (verbosity 5).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.log.Warn">
+<code class="descclassname">duplicity.log.</code><code class="descname">Warn</code><span class="sig-paren">(</span><em>s</em>, <em>code=1</em>, <em>extra=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#Warn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.Warn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut used for warning messages (verbosity 2)</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.log.WarningCode">
+<em class="property">class </em><code class="descclassname">duplicity.log.</code><code class="descname">WarningCode</code><a class="reference internal" href="_modules/duplicity/log.html#WarningCode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.WarningCode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enumeration class to hold warning code values.
+These values should never change, as frontends rely upon them.
+Don&#8217;t use 0 or negative numbers.</p>
+<dl class="attribute">
+<dt id="duplicity.log.WarningCode.cannot_iterate">
+<code class="descname">cannot_iterate</code><em class="property"> = 8</em><a class="headerlink" href="#duplicity.log.WarningCode.cannot_iterate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.WarningCode.cannot_process">
+<code class="descname">cannot_process</code><em class="property"> = 12</em><a class="headerlink" href="#duplicity.log.WarningCode.cannot_process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.WarningCode.cannot_read">
+<code class="descname">cannot_read</code><em class="property"> = 10</em><a class="headerlink" href="#duplicity.log.WarningCode.cannot_read" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.WarningCode.cannot_stat">
+<code class="descname">cannot_stat</code><em class="property"> = 9</em><a class="headerlink" href="#duplicity.log.WarningCode.cannot_stat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.WarningCode.ftp_ncftp_v320">
+<code class="descname">ftp_ncftp_v320</code><em class="property"> = 7</em><a class="headerlink" href="#duplicity.log.WarningCode.ftp_ncftp_v320" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.WarningCode.generic">
+<code class="descname">generic</code><em class="property"> = 1</em><a class="headerlink" href="#duplicity.log.WarningCode.generic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.WarningCode.incomplete_backup">
+<code class="descname">incomplete_backup</code><em class="property"> = 5</em><a class="headerlink" href="#duplicity.log.WarningCode.incomplete_backup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.WarningCode.no_sig_for_time">
+<code class="descname">no_sig_for_time</code><em class="property"> = 11</em><a class="headerlink" href="#duplicity.log.WarningCode.no_sig_for_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.WarningCode.orphaned_backup">
+<code class="descname">orphaned_backup</code><em class="property"> = 6</em><a class="headerlink" href="#duplicity.log.WarningCode.orphaned_backup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.WarningCode.orphaned_sig">
+<code class="descname">orphaned_sig</code><em class="property"> = 2</em><a class="headerlink" href="#duplicity.log.WarningCode.orphaned_sig" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.WarningCode.process_skipped">
+<code class="descname">process_skipped</code><em class="property"> = 13</em><a class="headerlink" href="#duplicity.log.WarningCode.process_skipped" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.WarningCode.unmatched_sig">
+<code class="descname">unmatched_sig</code><em class="property"> = 4</em><a class="headerlink" href="#duplicity.log.WarningCode.unmatched_sig" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.log.WarningCode.unnecessary_sig">
+<code class="descname">unnecessary_sig</code><em class="property"> = 3</em><a class="headerlink" href="#duplicity.log.WarningCode.unnecessary_sig" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.log.add_fd">
+<code class="descclassname">duplicity.log.</code><code class="descname">add_fd</code><span class="sig-paren">(</span><em>fd</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#add_fd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.add_fd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add stream to which to write machine-readable logging</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.log.add_file">
+<code class="descclassname">duplicity.log.</code><code class="descname">add_file</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#add_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.add_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add file to which to write machine-readable logging</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.log.getverbosity">
+<code class="descclassname">duplicity.log.</code><code class="descname">getverbosity</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#getverbosity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.getverbosity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the verbosity level</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.log.setup">
+<code class="descclassname">duplicity.log.</code><code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize logging</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.log.setverbosity">
+<code class="descclassname">duplicity.log.</code><code class="descname">setverbosity</code><span class="sig-paren">(</span><em>verb</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#setverbosity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.setverbosity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the verbosity level</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.log.shutdown">
+<code class="descclassname">duplicity.log.</code><code class="descname">shutdown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/log.html#shutdown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.log.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleanup and flush loggers</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="duplicity.html">duplicity package</a><ul>
+      <li>Previous: <a href="duplicity.librsync.html" title="previous chapter">duplicity.librsync module</a></li>
+      <li>Next: <a href="duplicity.manifest.html" title="next chapter">duplicity.manifest module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/duplicity.log.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/duplicity.log.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

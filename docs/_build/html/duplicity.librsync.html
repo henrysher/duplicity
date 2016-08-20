@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.librsync module &mdash; duplicity-src8  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="duplicity-src8  documentation" href="index.html" />
+    <link rel="up" title="duplicity package" href="duplicity.html" />
+    <link rel="next" title="duplicity.log module" href="duplicity.log.html" />
+    <link rel="prev" title="duplicity.lazy module" href="duplicity.lazy.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-duplicity.librsync">
+<span id="duplicity-librsync-module"></span><h1>duplicity.librsync module<a class="headerlink" href="#module-duplicity.librsync" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="duplicity.librsync.DeltaFile">
+<em class="property">class </em><code class="descclassname">duplicity.librsync.</code><code class="descname">DeltaFile</code><span class="sig-paren">(</span><em>signature</em>, <em>new_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/librsync.html#DeltaFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.librsync.DeltaFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#duplicity.librsync.LikeFile" title="duplicity.librsync.LikeFile"><code class="xref py py-class docutils literal"><span class="pre">duplicity.librsync.LikeFile</span></code></a></p>
+<p>File-like object which incrementally generates a librsync delta</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.librsync.LikeFile">
+<em class="property">class </em><code class="descclassname">duplicity.librsync.</code><code class="descname">LikeFile</code><span class="sig-paren">(</span><em>infile</em>, <em>need_seek=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/librsync.html#LikeFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.librsync.LikeFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>File-like object used by SigFile, DeltaFile, and PatchFile</p>
+<dl class="method">
+<dt id="duplicity.librsync.LikeFile.check_file">
+<code class="descname">check_file</code><span class="sig-paren">(</span><em>file</em>, <em>need_seek=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/librsync.html#LikeFile.check_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.librsync.LikeFile.check_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raise type error if file doesn&#8217;t have necessary attributes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.librsync.LikeFile.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/librsync.html#LikeFile.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.librsync.LikeFile.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close infile</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.librsync.LikeFile.maker">
+<code class="descname">maker</code><em class="property"> = None</em><a class="headerlink" href="#duplicity.librsync.LikeFile.maker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.librsync.LikeFile.mode">
+<code class="descname">mode</code><em class="property"> = 'rb'</em><a class="headerlink" href="#duplicity.librsync.LikeFile.mode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.librsync.LikeFile.read">
+<code class="descname">read</code><span class="sig-paren">(</span><em>length=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/librsync.html#LikeFile.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.librsync.LikeFile.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build up self.outbuf, return first length bytes</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.librsync.PatchedFile">
+<em class="property">class </em><code class="descclassname">duplicity.librsync.</code><code class="descname">PatchedFile</code><span class="sig-paren">(</span><em>basis_file</em>, <em>delta_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/librsync.html#PatchedFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.librsync.PatchedFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#duplicity.librsync.LikeFile" title="duplicity.librsync.LikeFile"><code class="xref py py-class docutils literal"><span class="pre">duplicity.librsync.LikeFile</span></code></a></p>
+<p>File-like object which applies a librsync delta incrementally</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.librsync.SigFile">
+<em class="property">class </em><code class="descclassname">duplicity.librsync.</code><code class="descname">SigFile</code><span class="sig-paren">(</span><em>infile</em>, <em>blocksize=2048</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/librsync.html#SigFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.librsync.SigFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#duplicity.librsync.LikeFile" title="duplicity.librsync.LikeFile"><code class="xref py py-class docutils literal"><span class="pre">duplicity.librsync.LikeFile</span></code></a></p>
+<p>File-like object which incrementally generates a librsync signature</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.librsync.SigGenerator">
+<em class="property">class </em><code class="descclassname">duplicity.librsync.</code><code class="descname">SigGenerator</code><span class="sig-paren">(</span><em>blocksize=2048</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/librsync.html#SigGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.librsync.SigGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate signature.</p>
+<p>Input and output is same as SigFile, but the interface is like md5
+module, not filelike object</p>
+<dl class="method">
+<dt id="duplicity.librsync.SigGenerator.getsig">
+<code class="descname">getsig</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/librsync.html#SigGenerator.getsig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.librsync.SigGenerator.getsig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return signature over given data</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.librsync.SigGenerator.process_buffer">
+<code class="descname">process_buffer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/librsync.html#SigGenerator.process_buffer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.librsync.SigGenerator.process_buffer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run self.buffer through sig_maker, add to self.sig_string</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.librsync.SigGenerator.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>buf</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/librsync.html#SigGenerator.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.librsync.SigGenerator.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add buf to data that signature will be calculated over</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="duplicity.librsync.librsyncError">
+<em class="property">exception </em><code class="descclassname">duplicity.librsync.</code><code class="descname">librsyncError</code><a class="reference internal" href="_modules/duplicity/librsync.html#librsyncError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.librsync.librsyncError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+<p>Signifies error in internal librsync processing (bad signature, etc.)</p>
+<p>underlying _librsync.librsyncError&#8217;s are regenerated using this
+class because the C-created exceptions are by default
+unPickleable.  There is probably a way to fix this in _librsync,
+but this scheme was easier.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="duplicity.html">duplicity package</a><ul>
+      <li>Previous: <a href="duplicity.lazy.html" title="previous chapter">duplicity.lazy module</a></li>
+      <li>Next: <a href="duplicity.log.html" title="next chapter">duplicity.log module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/duplicity.librsync.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/duplicity.librsync.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

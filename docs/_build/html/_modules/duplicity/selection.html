@@ -1,0 +1,656 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.selection &mdash; duplicity-src8  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="duplicity-src8  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.selection</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2002 Ben Escoto &lt;ben@emerose.org&gt;</span>
+<span class="c1"># Copyright 2007 Kenneth Loafman &lt;kenneth@loafman.com&gt;</span>
+<span class="c1"># Copyright 2014 Aaron Whitehouse &lt;aaron@whitehouse.kiwi.nz&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="kn">from</span> <span class="nn">future_builtins</span> <span class="k">import</span> <span class="nb">filter</span><span class="p">,</span> <span class="nb">map</span>
+
+<span class="kn">import</span> <span class="nn">os</span>  <span class="c1"># @UnusedImport</span>
+<span class="kn">import</span> <span class="nn">stat</span>  <span class="c1"># @UnusedImport</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">from</span> <span class="nn">duplicity.path</span> <span class="k">import</span> <span class="o">*</span>  <span class="c1"># @UnusedWildImport</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">log</span>  <span class="c1"># @Reimport</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="nb">globals</span>  <span class="c1"># @Reimport</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">diffdir</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">util</span>  <span class="c1"># @Reimport</span>
+<span class="kn">from</span> <span class="nn">duplicity.globmatch</span> <span class="k">import</span> <span class="n">GlobbingError</span><span class="p">,</span> <span class="n">FilePrefixError</span><span class="p">,</span> \
+    <span class="n">path_matches_glob</span>
+
+<span class="sd">&quot;&quot;&quot;Iterate exactly the requested files in a directory</span>
+
+<span class="sd">Parses includes and excludes to yield correct files.  More</span>
+<span class="sd">documentation on what this code does can be found on the man page.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="SelectError"><a class="viewcode-back" href="../../duplicity.selection.html#duplicity.selection.SelectError">[docs]</a><span class="k">class</span> <span class="nc">SelectError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Some error dealing with the Select class&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Select"><a class="viewcode-back" href="../../duplicity.selection.html#duplicity.selection.Select">[docs]</a><span class="k">class</span> <span class="nc">Select</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Iterate appropriate Paths in given directory</span>
+
+<span class="sd">    This class acts as an iterator on account of its next() method.</span>
+<span class="sd">    Basically, it just goes through all the files in a directory in</span>
+<span class="sd">    order (depth-first) and subjects each file to a bunch of tests</span>
+<span class="sd">    (selection functions) in order.  The first test that includes or</span>
+<span class="sd">    excludes the file means that the file gets included (iterated) or</span>
+<span class="sd">    excluded.  The default is include, so with no tests we would just</span>
+<span class="sd">    iterate all the files in the directory in order.</span>
+
+<span class="sd">    The one complication to this is that sometimes we don&#39;t know</span>
+<span class="sd">    whether or not to include a directory until we examine its</span>
+<span class="sd">    contents.  For instance, if we want to include all the **.py</span>
+<span class="sd">    files.  If /home/ben/foo.py exists, we should also include /home</span>
+<span class="sd">    and /home/ben, but if these directories contain no **.py files,</span>
+<span class="sd">    they shouldn&#39;t be included.  For this reason, a test may not</span>
+<span class="sd">    include or exclude a directory, but merely &quot;scan&quot; it.  If later a</span>
+<span class="sd">    file in the directory gets included, so does the directory.</span>
+
+<span class="sd">    As mentioned above, each test takes the form of a selection</span>
+<span class="sd">    function.  The selection function takes a path, and returns:</span>
+
+<span class="sd">    None - means the test has nothing to say about the related file</span>
+<span class="sd">    0 - the file is excluded by the test</span>
+<span class="sd">    1 - the file is included</span>
+<span class="sd">    2 - the test says the file (must be directory) should be scanned</span>
+
+<span class="sd">    Also, a selection function f has a variable f.exclude which should</span>
+<span class="sd">    be true iff f could potentially exclude some file.  This is used</span>
+<span class="sd">    to signal an error if the last function only includes, which would</span>
+<span class="sd">    be redundant and presumably isn&#39;t what the user intends.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># This re should not match normal filenames, but usually just globs</span>
+    <span class="n">glob_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;(.*[*?[]|ignorecase</span><span class="se">\\</span><span class="s2">:)&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">S</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initializer, called with Path of root directory&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">Path</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selection_functions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rootpath</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rootpath</span><span class="o">.</span><span class="n">name</span>
+
+<div class="viewcode-block" id="Select.set_iter"><a class="viewcode-back" href="../../duplicity.selection.html#duplicity.selection.Select.set_iter">[docs]</a>    <span class="k">def</span> <span class="nf">set_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize generator, prepare to iterate.&quot;&quot;&quot;</span>
+        <span class="c1"># Externally-accessed method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rootpath</span><span class="o">.</span><span class="n">setdata</span><span class="p">()</span>  <span class="c1"># this may have changed since Select init</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Iterate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rootpath</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter</span><span class="o">.</span><span class="n">next</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__iter__</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Select.Iterate"><a class="viewcode-back" href="../../duplicity.selection.html#duplicity.selection.Select.Iterate">[docs]</a>    <span class="k">def</span> <span class="nf">Iterate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return iterator yielding paths in path</span>
+
+<span class="sd">        This function looks a bit more complicated than it needs to be</span>
+<span class="sd">        because it avoids extra recursion (and no extra function calls</span>
+<span class="sd">        for non-directory files) while still doing the &quot;directory</span>
+<span class="sd">        scanning&quot; bit.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Only called by set_iter. Internal.</span>
+        <span class="k">def</span> <span class="nf">error_handler</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+            <span class="n">fullpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">mode</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">fullpath</span><span class="p">)[</span><span class="n">stat</span><span class="o">.</span><span class="n">ST_MODE</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_ISSOCK</span><span class="p">(</span><span class="n">mode</span><span class="p">):</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Skipping socket </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">fullpath</span><span class="p">),</span>
+                             <span class="n">log</span><span class="o">.</span><span class="n">InfoCode</span><span class="o">.</span><span class="n">skipping_socket</span><span class="p">,</span>
+                             <span class="n">util</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">fullpath</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Error initializing file </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">fullpath</span><span class="p">),</span>
+                             <span class="n">log</span><span class="o">.</span><span class="n">WarningCode</span><span class="o">.</span><span class="n">cannot_iterate</span><span class="p">,</span>
+                             <span class="n">util</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">fullpath</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Error accessing possibly locked file </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">fullpath</span><span class="p">),</span>
+                         <span class="n">log</span><span class="o">.</span><span class="n">WarningCode</span><span class="o">.</span><span class="n">cannot_stat</span><span class="p">,</span>
+                         <span class="n">util</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">fullpath</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">def</span> <span class="nf">diryield</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Generate relevant files in directory path</span>
+
+<span class="sd">            Returns (path, num) where num == 0 means path should be</span>
+<span class="sd">            generated normally, num == 1 means the path is a directory</span>
+<span class="sd">            and should be included iff something inside is included.</span>
+
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="c1"># Only called by Iterate. Internal.</span>
+            <span class="c1"># todo: get around circular dependency issue by importing here</span>
+            <span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">robust</span>  <span class="c1"># @Reimport</span>
+            <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">robust</span><span class="o">.</span><span class="n">listpath</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="n">new_path</span> <span class="o">=</span> <span class="n">robust</span><span class="o">.</span><span class="n">check_common_error</span><span class="p">(</span>
+                    <span class="n">error_handler</span><span class="p">,</span> <span class="n">Path</span><span class="o">.</span><span class="n">append</span><span class="p">,</span> <span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
+                <span class="c1"># make sure file is read accessible</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">new_path</span> <span class="ow">and</span> <span class="n">new_path</span><span class="o">.</span><span class="n">type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;reg&quot;</span><span class="p">,</span> <span class="s2">&quot;dir&quot;</span><span class="p">]</span>
+                        <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">new_path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">R_OK</span><span class="p">)):</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Error accessing possibly locked file </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">new_path</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                             <span class="n">log</span><span class="o">.</span><span class="n">WarningCode</span><span class="o">.</span><span class="n">cannot_read</span><span class="p">,</span>
+                             <span class="n">util</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">new_path</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">diffdir</span><span class="o">.</span><span class="n">stats</span><span class="p">:</span>
+                        <span class="n">diffdir</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">Errors</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">new_path</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">elif</span> <span class="n">new_path</span><span class="p">:</span>
+                    <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span><span class="n">new_path</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="k">yield</span> <span class="p">(</span><span class="n">new_path</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">s</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">new_path</span><span class="o">.</span><span class="n">isdir</span><span class="p">():</span>
+                        <span class="k">yield</span> <span class="p">(</span><span class="n">new_path</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+            <span class="c1"># base doesn&#39;t exist</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Warning: base </span><span class="si">%s</span><span class="s2"> doesn&#39;t exist, continuing&quot;</span><span class="p">)</span> <span class="o">%</span>
+                     <span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="k">return</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Selecting </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="k">yield</span> <span class="n">path</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">():</span>
+            <span class="k">return</span>
+        <span class="n">diryield_stack</span> <span class="o">=</span> <span class="p">[</span><span class="n">diryield</span><span class="p">(</span><span class="n">path</span><span class="p">)]</span>
+        <span class="n">delayed_path_stack</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">while</span> <span class="n">diryield_stack</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">subpath</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="n">diryield_stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                <span class="n">diryield_stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">delayed_path_stack</span><span class="p">:</span>
+                    <span class="n">delayed_path_stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">delayed_path_stack</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">delayed_path</span> <span class="ow">in</span> <span class="n">delayed_path_stack</span><span class="p">:</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Selecting </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">delayed_path</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="mi">6</span><span class="p">)</span>
+                        <span class="k">yield</span> <span class="n">delayed_path</span>
+                    <span class="k">del</span> <span class="n">delayed_path_stack</span><span class="p">[:]</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Selecting </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">subpath</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+                <span class="k">yield</span> <span class="n">subpath</span>
+                <span class="k">if</span> <span class="n">subpath</span><span class="o">.</span><span class="n">isdir</span><span class="p">():</span>
+                    <span class="n">diryield_stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">diryield</span><span class="p">(</span><span class="n">subpath</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">val</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">delayed_path_stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subpath</span><span class="p">)</span>
+                <span class="n">diryield_stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">diryield</span><span class="p">(</span><span class="n">subpath</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Select.Select"><a class="viewcode-back" href="../../duplicity.selection.html#duplicity.selection.Select.Select">[docs]</a>    <span class="k">def</span> <span class="nf">Select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run through the selection functions and return dominant val 0/1/2&quot;&quot;&quot;</span>
+        <span class="c1"># Only used by diryield and tests. Internal.</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s2">&quot;Selection: examining path </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">selection_functions</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s2">&quot;Selection:     + no selection functions found. Including&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="n">scan_pending</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">sf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">selection_functions</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">sf</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s2">&quot;Selection:     result: </span><span class="si">%4s</span><span class="s2"> from function: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                      <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="p">),</span> <span class="n">sf</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="c1"># Selection function says that the path should be scanned for matching files, but keep going</span>
+                <span class="c1"># through the selection functions looking for a real match (0 or 1).</span>
+                <span class="n">scan_pending</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">elif</span> <span class="n">result</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">result</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># A real match found, no need to try other functions.</span>
+                <span class="k">break</span>
+
+        <span class="k">if</span> <span class="n">scan_pending</span> <span class="ow">and</span> <span class="n">result</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># A selection function returned 2 and either no real match was</span>
+            <span class="c1"># found or the highest-priority match was 0</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s2">&quot;Selection:     - excluding file&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">result</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s2">&quot;Selection:     + including file&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="mi">2</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s2">&quot;Selection:     ? scanning directory for matches&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="Select.ParseArgs"><a class="viewcode-back" href="../../duplicity.selection.html#duplicity.selection.Select.ParseArgs">[docs]</a>    <span class="k">def</span> <span class="nf">ParseArgs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">argtuples</span><span class="p">,</span> <span class="n">filelists</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create selection functions based on list of tuples</span>
+
+<span class="sd">        The tuples are created when the initial commandline arguments</span>
+<span class="sd">        are read.  They have the form (option string, additional</span>
+<span class="sd">        argument) except for the filelist tuples, which should be</span>
+<span class="sd">        (option-string, (additional argument, filelist_fp)).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Called by commandline.py set_selection. External.</span>
+        <span class="n">filelists_index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">opt</span><span class="p">,</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">argtuples</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">opt</span> <span class="o">==</span> <span class="s2">&quot;--exclude&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_selection_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">glob_get_sf</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">opt</span> <span class="o">==</span> <span class="s2">&quot;--exclude-if-present&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_selection_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">present_get_sf</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">opt</span> <span class="o">==</span> <span class="s2">&quot;--exclude-device-files&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_selection_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">devfiles_get_sf</span><span class="p">())</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">opt</span> <span class="o">==</span> <span class="s2">&quot;--exclude-filelist&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">opt</span> <span class="o">==</span> <span class="s2">&quot;--exclude-globbing-filelist&quot;</span><span class="p">):</span>
+                    <span class="c1"># --exclude-globbing-filelist is now deprecated, as all filelists are globbing</span>
+                    <span class="c1"># but keep this here for the short term for backwards-compatibility</span>
+                    <span class="k">for</span> <span class="n">sf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filelist_globbing_get_sfs</span><span class="p">(</span><span class="n">filelists</span><span class="p">[</span><span class="n">filelists_index</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">add_selection_func</span><span class="p">(</span><span class="n">sf</span><span class="p">)</span>
+                    <span class="n">filelists_index</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">elif</span> <span class="n">opt</span> <span class="o">==</span> <span class="s2">&quot;--exclude-other-filesystems&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_selection_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">other_filesystems_get_sf</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">opt</span> <span class="o">==</span> <span class="s2">&quot;--exclude-regexp&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_selection_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regexp_get_sf</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">opt</span> <span class="o">==</span> <span class="s2">&quot;--exclude-older-than&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_selection_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exclude_older_get_sf</span><span class="p">(</span><span class="n">arg</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">opt</span> <span class="o">==</span> <span class="s2">&quot;--include&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_selection_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">glob_get_sf</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">opt</span> <span class="o">==</span> <span class="s2">&quot;--include-filelist&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">opt</span> <span class="o">==</span> <span class="s2">&quot;--include-globbing-filelist&quot;</span><span class="p">):</span>
+                    <span class="c1"># --include-globbing-filelist is now deprecated, as all filelists are globbing</span>
+                    <span class="c1"># but keep this here for the short term for backwards-compatibility</span>
+                    <span class="k">for</span> <span class="n">sf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filelist_globbing_get_sfs</span><span class="p">(</span><span class="n">filelists</span><span class="p">[</span><span class="n">filelists_index</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">add_selection_func</span><span class="p">(</span><span class="n">sf</span><span class="p">)</span>
+                    <span class="n">filelists_index</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">elif</span> <span class="n">opt</span> <span class="o">==</span> <span class="s2">&quot;--include-regexp&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_selection_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regexp_get_sf</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Bad selection option </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">opt</span>
+        <span class="k">except</span> <span class="n">SelectError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parse_catch_error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">filelists_index</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">filelists</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse_last_excludes</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Select.parse_catch_error"><a class="viewcode-back" href="../../duplicity.selection.html#duplicity.selection.Select.parse_catch_error">[docs]</a>    <span class="k">def</span> <span class="nf">parse_catch_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Deal with selection error exc&quot;&quot;&quot;</span>
+        <span class="c1"># Internal, used by ParseArgs.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">FilePrefixError</span><span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">FatalError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">Fatal Error: The file specification</span>
+<span class="s2">    </span><span class="si">%s</span><span class="s2"></span>
+<span class="s2">cannot match any files in the base directory</span>
+<span class="s2">    </span><span class="si">%s</span><span class="s2"></span>
+<span class="s2">Useful file specifications begin with the base directory or some</span>
+<span class="s2">pattern (such as &#39;**&#39;) which matches the base directory.&quot;&quot;&quot;</span><span class="p">)</span> <span class="o">%</span>
+                           <span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="p">)),</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">file_prefix_error</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">GlobbingError</span><span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">FatalError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Fatal Error while processing expression</span><span class="se">\n</span><span class="s2">&quot;</span>
+                             <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">exc</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">globbing_error</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span>  <span class="c1"># pylint: disable=misplaced-bare-raise</span></div>
+
+<div class="viewcode-block" id="Select.parse_last_excludes"><a class="viewcode-back" href="../../duplicity.selection.html#duplicity.selection.Select.parse_last_excludes">[docs]</a>    <span class="k">def</span> <span class="nf">parse_last_excludes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Exit with error if last selection function isn&#39;t an exclude&quot;&quot;&quot;</span>
+        <span class="c1"># Internal. Used by ParseArgs.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selection_functions</span> <span class="ow">and</span>
+                <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">selection_functions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">exclude</span><span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">FatalError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">Last selection expression:</span>
+<span class="s2">    </span><span class="si">%s</span><span class="s2"></span>
+<span class="s2">only specifies that files be included.  Because the default is to</span>
+<span class="s2">include all files, the expression is redundant.  Exiting because this</span>
+<span class="s2">probably isn&#39;t what you meant.&quot;&quot;&quot;</span><span class="p">)</span> <span class="o">%</span>
+                           <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selection_functions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">,),</span>
+                           <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">redundant_inclusion</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Select.add_selection_func"><a class="viewcode-back" href="../../duplicity.selection.html#duplicity.selection.Select.add_selection_func">[docs]</a>    <span class="k">def</span> <span class="nf">add_selection_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sel_func</span><span class="p">,</span> <span class="n">add_to_start</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add another selection function at the end or beginning&quot;&quot;&quot;</span>
+        <span class="c1"># Internal. Used by ParseArgs.</span>
+        <span class="k">if</span> <span class="n">add_to_start</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selection_functions</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">sel_func</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selection_functions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sel_func</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Select.filelist_sanitise_line"><a class="viewcode-back" href="../../duplicity.selection.html#duplicity.selection.Select.filelist_sanitise_line">[docs]</a>    <span class="k">def</span> <span class="nf">filelist_sanitise_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">include_default</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sanitises lines of both normal and globbing filelists, returning (line, include) and line=None if blank/comment</span>
+
+<span class="sd">        The aim is to parse filelists in a consistent way, prior to the interpretation of globbing statements.</span>
+<span class="sd">        The function removes whitespace, comment lines and processes modifiers (leading +/-) and quotes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Internal. Used by filelist_globbing_get_sfs</span>
+
+        <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>  <span class="c1"># skip blanks</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">include_default</span>
+        <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;#&quot;</span><span class="p">:</span>  <span class="c1"># skip full-line comments</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">include_default</span>
+
+        <span class="n">include</span> <span class="o">=</span> <span class="n">include_default</span>
+        <span class="k">if</span> <span class="n">line</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;+ &quot;</span><span class="p">:</span>
+            <span class="c1"># Check for &quot;+ &quot; or &quot;- &quot; syntax</span>
+            <span class="n">include</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+        <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;- &quot;</span><span class="p">:</span>
+            <span class="n">include</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">line</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&#39;&quot;</span> <span class="ow">and</span> <span class="n">line</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">line</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&quot;&#39;</span> <span class="ow">and</span> <span class="n">line</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">):</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">line</span><span class="p">,</span> <span class="n">include</span></div>
+
+<div class="viewcode-block" id="Select.filelist_globbing_get_sfs"><a class="viewcode-back" href="../../duplicity.selection.html#duplicity.selection.Select.filelist_globbing_get_sfs">[docs]</a>    <span class="k">def</span> <span class="nf">filelist_globbing_get_sfs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filelist_fp</span><span class="p">,</span> <span class="n">inc_default</span><span class="p">,</span> <span class="n">list_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return list of selection functions by reading fileobj</span>
+
+<span class="sd">        filelist_fp should be an open file object</span>
+<span class="sd">        inc_default is true iff this is an include list</span>
+<span class="sd">        list_name is just the name of the list, used for logging</span>
+<span class="sd">        See the man page on --[include/exclude]-globbing-filelist</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Internal. Used by ParseArgs.</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Notice</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Reading globbing filelist </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">list_name</span><span class="p">)</span>
+        <span class="n">separator</span> <span class="o">=</span> <span class="nb">globals</span><span class="o">.</span><span class="n">null_separator</span> <span class="ow">and</span> <span class="s2">&quot;</span><span class="se">\0</span><span class="s2">&quot;</span> <span class="ow">or</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">filelist_fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">filelist_fp</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">separator</span><span class="p">):</span>
+            <span class="n">line</span><span class="p">,</span> <span class="n">include</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filelist_sanitise_line</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">inc_default</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
+                <span class="c1"># Skip blanks and comment lines</span>
+                <span class="k">continue</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">glob_get_sf</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">include</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Select.other_filesystems_get_sf"><a class="viewcode-back" href="../../duplicity.selection.html#duplicity.selection.Select.other_filesystems_get_sf">[docs]</a>    <span class="k">def</span> <span class="nf">other_filesystems_get_sf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">include</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return selection function matching files on other filesystems&quot;&quot;&quot;</span>
+        <span class="c1"># Internal. Used by ParseArgs and unit tests.</span>
+        <span class="k">assert</span> <span class="n">include</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">include</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="n">root_devloc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rootpath</span><span class="o">.</span><span class="n">getdevloc</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">sel_func</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">path</span><span class="o">.</span><span class="n">getdevloc</span><span class="p">()</span> <span class="o">!=</span> <span class="n">root_devloc</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">include</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">sel_func</span><span class="o">.</span><span class="n">exclude</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">include</span>
+        <span class="n">sel_func</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Match other filesystems&quot;</span>
+        <span class="k">return</span> <span class="n">sel_func</span></div>
+
+<div class="viewcode-block" id="Select.regexp_get_sf"><a class="viewcode-back" href="../../duplicity.selection.html#duplicity.selection.Select.regexp_get_sf">[docs]</a>    <span class="k">def</span> <span class="nf">regexp_get_sf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regexp_string</span><span class="p">,</span> <span class="n">include</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return selection function given by regexp_string&quot;&quot;&quot;</span>
+        <span class="c1"># Internal. Used by ParseArgs and unit tests.</span>
+        <span class="k">assert</span> <span class="n">include</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">include</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">regexp</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">regexp_string</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Error compiling regular expression </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">regexp_string</span><span class="p">)</span>
+            <span class="k">raise</span>
+
+        <span class="k">def</span> <span class="nf">sel_func</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">regexp</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">include</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">sel_func</span><span class="o">.</span><span class="n">exclude</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">include</span>
+        <span class="n">sel_func</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Regular expression: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">regexp_string</span>
+        <span class="k">return</span> <span class="n">sel_func</span></div>
+
+<div class="viewcode-block" id="Select.devfiles_get_sf"><a class="viewcode-back" href="../../duplicity.selection.html#duplicity.selection.Select.devfiles_get_sf">[docs]</a>    <span class="k">def</span> <span class="nf">devfiles_get_sf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a selection function to exclude all dev files&quot;&quot;&quot;</span>
+        <span class="c1"># Internal. Used by ParseArgs.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">selection_functions</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Warning: exclude-device-files is not the first &quot;</span>
+                       <span class="s2">&quot;selector.</span><span class="se">\n</span><span class="s2">This may not be what you intended&quot;</span><span class="p">))</span>
+
+        <span class="k">def</span> <span class="nf">sel_func</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">isdev</span><span class="p">():</span>
+                <span class="k">return</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">sel_func</span><span class="o">.</span><span class="n">exclude</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">sel_func</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Exclude device files&quot;</span>
+        <span class="k">return</span> <span class="n">sel_func</span></div>
+
+<div class="viewcode-block" id="Select.glob_get_sf"><a class="viewcode-back" href="../../duplicity.selection.html#duplicity.selection.Select.glob_get_sf">[docs]</a>    <span class="k">def</span> <span class="nf">glob_get_sf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">glob_str</span><span class="p">,</span> <span class="n">include</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return selection function given by glob string&quot;&quot;&quot;</span>
+        <span class="c1"># Internal. Used by ParseArgs, filelist_globbing_get_sfs and unit tests.</span>
+        <span class="k">assert</span> <span class="n">include</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">include</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">glob_str</span> <span class="o">==</span> <span class="s2">&quot;**&quot;</span><span class="p">:</span>
+            <span class="n">sel_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">path</span><span class="p">:</span> <span class="n">include</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">glob_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">glob_str</span><span class="p">):</span>
+            <span class="c1"># normal file</span>
+            <span class="n">sel_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">glob_get_filename_sf</span><span class="p">(</span><span class="n">glob_str</span><span class="p">,</span> <span class="n">include</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sel_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">glob_get_normal_sf</span><span class="p">(</span><span class="n">glob_str</span><span class="p">,</span> <span class="n">include</span><span class="p">)</span>
+
+        <span class="n">sel_func</span><span class="o">.</span><span class="n">exclude</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">include</span>
+        <span class="n">sel_func</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Command-line </span><span class="si">%s</span><span class="s2"> glob: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> \
+                        <span class="p">(</span><span class="n">include</span> <span class="ow">and</span> <span class="s2">&quot;include&quot;</span> <span class="ow">or</span> <span class="s2">&quot;exclude&quot;</span><span class="p">,</span> <span class="n">glob_str</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sel_func</span></div>
+
+<div class="viewcode-block" id="Select.present_get_sf"><a class="viewcode-back" href="../../duplicity.selection.html#duplicity.selection.Select.present_get_sf">[docs]</a>    <span class="k">def</span> <span class="nf">present_get_sf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">include</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return selection function given by existence of a file in a directory&quot;&quot;&quot;</span>
+        <span class="c1"># Internal. Used by ParseArgs.</span>
+        <span class="k">assert</span> <span class="n">include</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">include</span> <span class="o">==</span> <span class="mi">1</span>
+
+        <span class="k">def</span> <span class="nf">exclude_sel_func</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="c1"># do not follow symbolic links when checking for file existence!</span>
+            <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">()</span> <span class="ow">and</span> <span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">return</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">include</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">sel_func</span> <span class="o">=</span> <span class="n">exclude_sel_func</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">FatalError</span><span class="p">(</span><span class="s2">u&quot;--include-if-present not implemented (would it make sense?).&quot;</span><span class="p">,</span>
+                           <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">not_implemented</span><span class="p">)</span>
+
+        <span class="n">sel_func</span><span class="o">.</span><span class="n">exclude</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">include</span>
+        <span class="n">sel_func</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Command-line </span><span class="si">%s</span><span class="s2"> filename: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> \
+                        <span class="p">(</span><span class="n">include</span> <span class="ow">and</span> <span class="s2">&quot;include-if-present&quot;</span> <span class="ow">or</span> <span class="s2">&quot;exclude-if-present&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sel_func</span></div>
+
+<div class="viewcode-block" id="Select.glob_get_filename_sf"><a class="viewcode-back" href="../../duplicity.selection.html#duplicity.selection.Select.glob_get_filename_sf">[docs]</a>    <span class="k">def</span> <span class="nf">glob_get_filename_sf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">include</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a selection function given a normal filename</span>
+
+<span class="sd">        Some of the parsing is better explained in</span>
+<span class="sd">        filelist_parse_line.  The reason this is split from normal</span>
+<span class="sd">        globbing is things are a lot less complicated if no special</span>
+<span class="sd">        globbing characters are used.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Internal. Used by glob_get_sf and unit tests.</span>
+        <span class="n">match_only_dirs</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">filename</span> <span class="o">!=</span> <span class="s2">&quot;/&quot;</span> <span class="ow">and</span> <span class="n">filename</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;/&quot;</span><span class="p">:</span>
+            <span class="n">match_only_dirs</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="c1"># Remove trailing / from directory name (unless that is the entire</span>
+            <span class="c1"># string)</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">FilePrefixError</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span>
+                             <span class="n">filename</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="p">):]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">glob_get_tuple_sf</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">include</span><span class="p">,</span> <span class="n">match_only_dirs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Select.glob_get_tuple_sf"><a class="viewcode-back" href="../../duplicity.selection.html#duplicity.selection.Select.glob_get_tuple_sf">[docs]</a>    <span class="k">def</span> <span class="nf">glob_get_tuple_sf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">include</span><span class="p">,</span> <span class="n">match_only_dirs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return selection function based on tuple&quot;&quot;&quot;</span>
+        <span class="c1"># Internal. Used by glob_get_filename_sf.</span>
+
+        <span class="k">def</span> <span class="nf">include_sel_func</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">match_only_dirs</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">():</span>
+                <span class="c1"># If the glob ended with a /, only match directories</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="nb">tuple</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">index</span><span class="p">)]</span> <span class="ow">or</span>
+                    <span class="n">path</span><span class="o">.</span><span class="n">index</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="nb">tuple</span><span class="p">)]</span> <span class="o">==</span> <span class="nb">tuple</span><span class="p">):</span>
+                <span class="k">return</span> <span class="mi">1</span>  <span class="c1"># /foo/bar implicitly matches /foo, vice-versa</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">def</span> <span class="nf">exclude_sel_func</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">match_only_dirs</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">():</span>
+                <span class="c1"># If the glob ended with a /, only match directories</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">elif</span> <span class="n">path</span><span class="o">.</span><span class="n">index</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="nb">tuple</span><span class="p">)]</span> <span class="o">==</span> <span class="nb">tuple</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">0</span>  <span class="c1"># /foo excludes /foo/bar, not vice-versa</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">include</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">sel_func</span> <span class="o">=</span> <span class="n">include_sel_func</span>
+        <span class="k">elif</span> <span class="n">include</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">sel_func</span> <span class="o">=</span> <span class="n">exclude_sel_func</span>
+        <span class="n">sel_func</span><span class="o">.</span><span class="n">exclude</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">include</span>
+        <span class="n">sel_func</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Tuple select </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,)</span>
+        <span class="k">return</span> <span class="n">sel_func</span></div>
+
+<div class="viewcode-block" id="Select.glob_get_normal_sf"><a class="viewcode-back" href="../../duplicity.selection.html#duplicity.selection.Select.glob_get_normal_sf">[docs]</a>    <span class="k">def</span> <span class="nf">glob_get_normal_sf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">glob_str</span><span class="p">,</span> <span class="n">include</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return selection function based on glob_str</span>
+
+<span class="sd">        The basic idea is to turn glob_str into a regular expression,</span>
+<span class="sd">        and just use the normal regular expression.  There is a</span>
+<span class="sd">        complication because the selection function should return &#39;2&#39;</span>
+<span class="sd">        (scan) for directories which may contain a file which matches</span>
+<span class="sd">        the glob_str.  So we break up the glob string into parts, and</span>
+<span class="sd">        any file which matches an initial sequence of glob parts gets</span>
+<span class="sd">        scanned.</span>
+
+<span class="sd">        Thanks to Donovan Baarda who provided some code which did some</span>
+<span class="sd">        things similar to this.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Internal. Used by glob_get_sf and unit tests.</span>
+
+        <span class="n">ignore_case</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">glob_str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;ignorecase:&quot;</span><span class="p">):</span>
+            <span class="c1"># Glob string starts with ignorecase, so remove that from the</span>
+            <span class="c1"># string and change it to lowercase.</span>
+            <span class="n">glob_str</span> <span class="o">=</span> <span class="n">glob_str</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;ignorecase:&quot;</span><span class="p">):]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">ignore_case</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Check to make sure prefix is ok</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path_matches_glob</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rootpath</span><span class="p">,</span> <span class="n">glob_str</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">FilePrefixError</span><span class="p">(</span><span class="n">glob_str</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">sel_func</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">ignore_case</span><span class="p">:</span>
+                <span class="n">path</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">path_matches_glob</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">glob_str</span><span class="p">,</span> <span class="n">include</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">sel_func</span></div>
+
+<div class="viewcode-block" id="Select.exclude_older_get_sf"><a class="viewcode-back" href="../../duplicity.selection.html#duplicity.selection.Select.exclude_older_get_sf">[docs]</a>    <span class="k">def</span> <span class="nf">exclude_older_get_sf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return selection function based on files older than modification date &quot;&quot;&quot;</span>
+        <span class="c1"># Internal. Used by ParseArgs.</span>
+
+        <span class="k">def</span> <span class="nf">sel_func</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isreg</span><span class="p">():</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">date</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="mi">0</span>
+            <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">pass</span>  <span class="c1"># this is probably only on a race condition of file being deleted</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">sel_func</span><span class="o">.</span><span class="n">exclude</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">sel_func</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Select older than </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">date</span><span class="p">,)</span>
+        <span class="k">return</span> <span class="n">sel_func</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,348 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.backends.imapbackend &mdash; duplicity-src8  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="duplicity-src8  documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.backends.imapbackend</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2002 Ben Escoto &lt;ben@emerose.org&gt;</span>
+<span class="c1"># Copyright 2007 Kenneth Loafman &lt;kenneth@loafman.com&gt;</span>
+<span class="c1"># Copyright 2008 Ian Barton &lt;ian@manor-farm.org&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="kn">import</span> <span class="nn">imaplib</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">StringIO</span>
+<span class="kn">import</span> <span class="nn">rfc822</span>
+<span class="kn">import</span> <span class="nn">getpass</span>
+<span class="kn">import</span> <span class="nn">email</span>
+
+<span class="kn">import</span> <span class="nn">duplicity.backend</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="nb">globals</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">duplicity.errors</span> <span class="k">import</span> <span class="o">*</span>  <span class="c1"># @UnusedWildImport</span>
+
+
+<div class="viewcode-block" id="ImapBackend"><a class="viewcode-back" href="../../../duplicity.backends.imapbackend.html#duplicity.backends.imapbackend.ImapBackend">[docs]</a><span class="k">class</span> <span class="nc">ImapBackend</span><span class="p">(</span><span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Backend</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_url</span><span class="p">):</span>
+        <span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Backend</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_url</span><span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s2">&quot;I&#39;m </span><span class="si">%s</span><span class="s2"> (scheme </span><span class="si">%s</span><span class="s2">) connecting to </span><span class="si">%s</span><span class="s2"> as </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                  <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">username</span><span class="p">))</span>
+
+        <span class="c1">#  Store url for reconnection on error</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">parsed_url</span>
+
+        <span class="c1">#  Set the username</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">username</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">username</span> <span class="o">=</span> <span class="n">raw_input</span><span class="p">(</span><span class="s1">&#39;Enter account userid: &#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">username</span> <span class="o">=</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">username</span>
+
+        <span class="c1">#  Set the password</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">password</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s1">&#39;IMAP_PASSWORD&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+                <span class="n">password</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;IMAP_PASSWORD&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">password</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">(</span><span class="s2">&quot;Enter account password: &quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">password</span> <span class="o">=</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">password</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="n">username</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">password</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resetConnection</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ImapBackend.resetConnection"><a class="viewcode-back" href="../../../duplicity.backends.imapbackend.html#duplicity.backends.imapbackend.ImapBackend.resetConnection">[docs]</a>    <span class="k">def</span> <span class="nf">resetConnection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">parsed_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">imap_server</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;IMAP_SERVER&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">imap_server</span> <span class="o">=</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">hostname</span>
+
+        <span class="c1">#  Try to close the connection cleanly</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;imap&quot;</span><span class="p">):</span>
+            <span class="n">cl</span> <span class="o">=</span> <span class="n">imaplib</span><span class="o">.</span><span class="n">IMAP4</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="n">cl</span><span class="p">(</span><span class="n">imap_server</span><span class="p">,</span> <span class="mi">143</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;imaps&quot;</span><span class="p">):</span>
+            <span class="n">cl</span> <span class="o">=</span> <span class="n">imaplib</span><span class="o">.</span><span class="n">IMAP4_SSL</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="n">cl</span><span class="p">(</span><span class="n">imap_server</span><span class="p">,</span> <span class="mi">993</span><span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s2">&quot;Type of imap class: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cl</span><span class="o">.</span><span class="n">__name__</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remote_dir</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">r&#39;^/&#39;</span><span class="p">,</span> <span class="s1">r&#39;&#39;</span><span class="p">,</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1">#  Login</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span><span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">imap_full_address</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">imap_mailbox</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;IMAP connected&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="o">+</span> <span class="s2">&quot;@&quot;</span> <span class="o">+</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">imap_mailbox</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;IMAP connected&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImapBackend.prepareBody"><a class="viewcode-back" href="../../../duplicity.backends.imapbackend.html#duplicity.backends.imapbackend.ImapBackend.prepareBody">[docs]</a>    <span class="k">def</span> <span class="nf">prepareBody</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">rname</span><span class="p">):</span>
+        <span class="n">mp</span> <span class="o">=</span> <span class="n">email</span><span class="o">.</span><span class="n">MIMEMultipart</span><span class="o">.</span><span class="n">MIMEMultipart</span><span class="p">()</span>
+
+        <span class="c1"># I am going to use the remote_dir as the From address so that</span>
+        <span class="c1"># multiple archives can be stored in an IMAP account and can be</span>
+        <span class="c1"># accessed separately</span>
+        <span class="n">mp</span><span class="p">[</span><span class="s2">&quot;From&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_dir</span>
+        <span class="n">mp</span><span class="p">[</span><span class="s2">&quot;Subject&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rname</span>
+
+        <span class="n">a</span> <span class="o">=</span> <span class="n">email</span><span class="o">.</span><span class="n">MIMEBase</span><span class="o">.</span><span class="n">MIMEBase</span><span class="p">(</span><span class="s2">&quot;application&quot;</span><span class="p">,</span> <span class="s2">&quot;binary&quot;</span><span class="p">)</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">set_payload</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+        <span class="n">email</span><span class="o">.</span><span class="n">Encoders</span><span class="o">.</span><span class="n">encode_base64</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+        <span class="n">mp</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">mp</span><span class="o">.</span><span class="n">as_string</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_path</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">):</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">source_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span>
+        <span class="n">allowedTimeout</span> <span class="o">=</span> <span class="nb">globals</span><span class="o">.</span><span class="n">timeout</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">allowedTimeout</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="c1"># Allow a total timeout of 1 day</span>
+            <span class="n">allowedTimeout</span> <span class="o">=</span> <span class="mi">2880</span>
+        <span class="k">while</span> <span class="n">allowedTimeout</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">remote_filename</span><span class="p">)</span>
+                <span class="n">body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepareBody</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">)</span>
+                <span class="c1"># If we don&#39;t select the IMAP folder before</span>
+                <span class="c1"># append, the message goes into the INBOX.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">imap_mailbox</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">imap_mailbox</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="p">(</span><span class="n">imaplib</span><span class="o">.</span><span class="n">IMAP4</span><span class="o">.</span><span class="n">abort</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">sslerror</span><span class="p">):</span>
+                <span class="n">allowedTimeout</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;Error saving &#39;</span><span class="si">%s</span><span class="s2">&#39;, retrying in 30s &quot;</span> <span class="o">%</span> <span class="n">remote_filename</span><span class="p">)</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+                <span class="k">while</span> <span class="n">allowedTimeout</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">resetConnection</span><span class="p">()</span>
+                        <span class="k">break</span>
+                    <span class="k">except</span> <span class="p">(</span><span class="n">imaplib</span><span class="o">.</span><span class="n">IMAP4</span><span class="o">.</span><span class="n">abort</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">sslerror</span><span class="p">):</span>
+                        <span class="n">allowedTimeout</span> <span class="o">-=</span> <span class="mi">1</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;Error reconnecting, retrying in 30s &quot;</span><span class="p">)</span>
+                        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;IMAP mail with &#39;</span><span class="si">%s</span><span class="s2">&#39; subject stored&quot;</span> <span class="o">%</span> <span class="n">remote_filename</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">,</span> <span class="n">local_path</span><span class="p">):</span>
+        <span class="n">allowedTimeout</span> <span class="o">=</span> <span class="nb">globals</span><span class="o">.</span><span class="n">timeout</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">allowedTimeout</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="c1"># Allow a total timeout of 1 day</span>
+            <span class="n">allowedTimeout</span> <span class="o">=</span> <span class="mi">2880</span>
+        <span class="k">while</span> <span class="n">allowedTimeout</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">imap_mailbox</span><span class="p">)</span>
+                <span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;Subject&#39;</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">result</span> <span class="o">!=</span> <span class="s2">&quot;OK&quot;</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="nb">list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+                <span class="c1"># check if there is any result</span>
+                <span class="k">if</span> <span class="nb">list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;no mail with subject </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="nb">list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;(RFC822)&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">result</span> <span class="o">!=</span> <span class="s2">&quot;OK&quot;</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="nb">list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">rawbody</span> <span class="o">=</span> <span class="nb">list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="n">p</span> <span class="o">=</span> <span class="n">email</span><span class="o">.</span><span class="n">Parser</span><span class="o">.</span><span class="n">Parser</span><span class="p">()</span>
+
+                <span class="n">m</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">parsestr</span><span class="p">(</span><span class="n">rawbody</span><span class="p">)</span>
+
+                <span class="n">mp</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">get_payload</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+                <span class="n">body</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">get_payload</span><span class="p">(</span><span class="n">decode</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="p">(</span><span class="n">imaplib</span><span class="o">.</span><span class="n">IMAP4</span><span class="o">.</span><span class="n">abort</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">sslerror</span><span class="p">):</span>
+                <span class="n">allowedTimeout</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;Error loading &#39;</span><span class="si">%s</span><span class="s2">&#39;, retrying in 30s &quot;</span> <span class="o">%</span> <span class="n">remote_filename</span><span class="p">)</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+                <span class="k">while</span> <span class="n">allowedTimeout</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">resetConnection</span><span class="p">()</span>
+                        <span class="k">break</span>
+                    <span class="k">except</span> <span class="p">(</span><span class="n">imaplib</span><span class="o">.</span><span class="n">IMAP4</span><span class="o">.</span><span class="n">abort</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">sslerror</span><span class="p">):</span>
+                        <span class="n">allowedTimeout</span> <span class="o">-=</span> <span class="mi">1</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;Error reconnecting, retrying in 30s &quot;</span><span class="p">)</span>
+                        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+
+        <span class="n">tfile</span> <span class="o">=</span> <span class="n">local_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;wb&quot;</span><span class="p">)</span>
+        <span class="n">tfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+        <span class="n">local_path</span><span class="o">.</span><span class="n">setdata</span><span class="p">()</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;IMAP mail with &#39;</span><span class="si">%s</span><span class="s2">&#39; subject fetched&quot;</span> <span class="o">%</span> <span class="n">remote_filename</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">imap_mailbox</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="o">!=</span> <span class="s2">&quot;OK&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="nb">list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># Going to find all the archives which have remote_dir in the From</span>
+        <span class="c1"># address</span>
+
+        <span class="c1"># Search returns an error if you haven&#39;t selected an IMAP folder.</span>
+        <span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;FROM&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_dir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="o">!=</span> <span class="s2">&quot;OK&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="nb">list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ret</span>
+        <span class="n">nums</span> <span class="o">=</span> <span class="nb">list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+        <span class="nb">set</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">:</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">nums</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="nb">set</span><span class="p">,</span> <span class="s2">&quot;(BODY[HEADER])&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="o">!=</span> <span class="s2">&quot;OK&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="nb">list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">io</span> <span class="o">=</span> <span class="n">StringIO</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">rfc822</span><span class="o">.</span><span class="n">Message</span><span class="p">(</span><span class="n">io</span><span class="p">)</span>
+            <span class="n">subj</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">getheader</span><span class="p">(</span><span class="s2">&quot;subject&quot;</span><span class="p">)</span>
+            <span class="n">header_from</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">getheader</span><span class="p">(</span><span class="s2">&quot;from&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Catch messages with empty headers which cause an exception.</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="n">header_from</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;^&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_dir</span> <span class="o">+</span> <span class="s2">&quot;$&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">header_from</span><span class="p">)):</span>
+                    <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subj</span><span class="p">)</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;IMAP LIST: </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">subj</span><span class="p">,</span> <span class="n">header_from</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">ret</span>
+
+<div class="viewcode-block" id="ImapBackend.imapf"><a class="viewcode-back" href="../../../duplicity.backends.imapbackend.html#duplicity.backends.imapbackend.ImapBackend.imapf">[docs]</a>    <span class="k">def</span> <span class="nf">imapf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fun</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="o">=</span> <span class="n">fun</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret</span> <span class="o">!=</span> <span class="s2">&quot;OK&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="nb">list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="nb">list</span></div>
+
+<div class="viewcode-block" id="ImapBackend.delete_single_mail"><a class="viewcode-back" href="../../../duplicity.backends.imapbackend.html#duplicity.backends.imapbackend.ImapBackend.delete_single_mail">[docs]</a>    <span class="k">def</span> <span class="nf">delete_single_mail</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imapf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">store</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s2">&quot;+FLAGS&quot;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">DELETED&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImapBackend.expunge"><a class="viewcode-back" href="../../../duplicity.backends.imapbackend.html#duplicity.backends.imapbackend.ImapBackend.expunge">[docs]</a>    <span class="k">def</span> <span class="nf">expunge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">imapf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">expunge</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_delete_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename_list</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">filename_list</span><span class="p">:</span>
+            <span class="nb">list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">imapf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">search</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;(SUBJECT </span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
+            <span class="nb">list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">delete_single_mail</span><span class="p">(</span><span class="nb">list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">Notice</span><span class="p">(</span><span class="s2">&quot;marked </span><span class="si">%s</span><span class="s2"> to be deleted&quot;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expunge</span><span class="p">()</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Notice</span><span class="p">(</span><span class="s2">&quot;IMAP expunged </span><span class="si">%s</span><span class="s2"> files&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">filename_list</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">imap_mailbox</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span></div>
+
+<span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">register_backend</span><span class="p">(</span><span class="s2">&quot;imap&quot;</span><span class="p">,</span> <span class="n">ImapBackend</span><span class="p">)</span>
+<span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">register_backend</span><span class="p">(</span><span class="s2">&quot;imaps&quot;</span><span class="p">,</span> <span class="n">ImapBackend</span><span class="p">)</span>
+<span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">uses_netloc</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;imap&#39;</span><span class="p">,</span> <span class="s1">&#39;imaps&#39;</span><span class="p">])</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
