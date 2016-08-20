@@ -1,3 +1,7 @@
+2016-08-20  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Prep for 0.7.10
+
 2016-08-18  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~fenisilius/duplicity/acd_init_mkdir
