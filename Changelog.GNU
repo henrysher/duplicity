@@ -1,3 +1,7 @@
+2016-08-22  Kenneth Loafman  <kenneth@loafman.com>
+    * Fixed bugs #815510 and #1615480
+      - Changed default --volsize to 200MB
+
 2016-08-18  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~fenisilius/duplicity/acd_init_mkdir
