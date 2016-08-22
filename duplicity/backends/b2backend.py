@@ -74,7 +74,7 @@ class B2Backend(duplicity.backend.Backend):
         headers = {'Authorization': basic_auth_string}
 
         request = urllib2.Request(
-            'https://api.backblaze.com/b2api/v1/b2_authorize_account',
+            'https://api.backblazeb2.com/b2api/v1/b2_authorize_account',
             headers=headers
         )
 

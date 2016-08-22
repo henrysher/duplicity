@@ -1,6 +1,9 @@
 2016-08-22  Kenneth Loafman  <kenneth@loafman.com>
+
     * Fixed bugs #815510 and #1615480
       - Changed default --volsize to 200MB
+    * Merged in lp:~mstoll-de/duplicity/duplicity
+      - Backblaze announced a new domain for the b2 api
 
 2016-08-20  Kenneth Loafman  <kenneth@loafman.com>
 
