@@ -947,7 +947,7 @@ Print duplicity's version and quit.
 .BI "--volsize " number
 Change the volume size to
 .IR number
-Mb. Default is 25Mb.
+MB. Default is 200MB.
 
 .SH ENVIRONMENT VARIABLES
 
@@ -1563,8 +1563,8 @@ https://www.dropbox.com/developers/apps/create
 Then visit app settings and just use 'Generated access token' under
 OAuth2 section.
 .br
-Alternatively you can let duplicity generate access token itself. In such 
-case temporary export 
+Alternatively you can let duplicity generate access token itself. In such
+case temporary export
 .B DPBX_APP_KEY ","
 .B DPBX_APP_SECRET
 using values from app settings page and run duplicity interactively.
@@ -1585,7 +1585,7 @@ token kind it may be:
 . B Full Dropbox:
 path is absolute and starts from 'Dropbox' root folder.
 .br
-. B App Folder: 
+. B App Folder:
 path is related to application folder. Dropbox client will show it in
 . B ~/Dropbox/Apps/<app-name>
 .RE
@@ -1918,7 +1918,7 @@ an sftp service running on the backend server, which is sometimes not an option.
 .SH A NOTE ON SSL CERTIFICATE VERIFICATION
 Certificate verification as implemented right now [02.2016] only in the webdav
 and lftp backends. older pythons 2.7.8- and older lftp binaries need a file
-based database of certification authority certificates (cacert file). 
+based database of certification authority certificates (cacert file).
 .br
 Newer python 2.7.9+ and recent lftp versions however support the system default
 certificates (usually in /etc/ssl/certs) and also giving an alternative ca cert

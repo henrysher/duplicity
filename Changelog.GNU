@@ -1,3 +1,7 @@
+2016-08-22  Kenneth Loafman  <kenneth@loafman.com>
+    * Fixed bugs #815510 and #1615480
+      - Changed default --volsize to 200MB
+
 2016-08-20  Kenneth Loafman  <kenneth@loafman.com>
 
     * Prep for 0.7.10
