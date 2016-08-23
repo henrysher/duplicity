@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# duplicity-src8 documentation build configuration file, created by
+# duplicity documentation build configuration file, created by
 # sphinx-quickstart on Sat Aug 20 09:52:11 2016.
 #
 # This file is execfile()d with the current directory set to its
@@ -52,9 +52,9 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'duplicity-src8'
-copyright = u'2016, Author'
-author = u'Author'
+project = u'duplicity'
+copyright = u'2016, Kenneth Loafman and Duplicity Team'
+author = u'Kenneth Loafman and Duplicity Team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -137,7 +137,7 @@ html_theme = 'alabaster'
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
 #
-# html_title = u'duplicity-src8 v'
+# html_title = u'duplicity v'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #
@@ -237,7 +237,7 @@ html_static_path = ['_static']
 # html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'duplicity-src8doc'
+htmlhelp_basename = 'duplicitydoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -263,7 +263,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'duplicity-src8.tex', u'duplicity-src8 Documentation',
+    (master_doc, 'duplicity.tex', u'duplicity Documentation',
      u'Author', 'manual'),
 ]
 
@@ -305,7 +305,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'duplicity-src8', u'duplicity-src8 Documentation',
+    (master_doc, 'duplicity', u'duplicity Documentation',
      [author], 1)
 ]
 
@@ -320,8 +320,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'duplicity-src8', u'duplicity-src8 Documentation',
-     author, 'duplicity-src8', 'One line description of project.',
+    (master_doc, 'duplicity', u'duplicity Documentation',
+     author, 'duplicity', 'One line description of project.',
      'Miscellaneous'),
 ]
 
