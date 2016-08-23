@@ -28,7 +28,7 @@ class Mock(MagicMock):
     def __getattr__(cls, name):
         return Mock()
 
-MOCK_MODULES = ['librsync', 'lockfile']
+MOCK_MODULES = ['librsync', '_librsync', 'lockfile']
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 
