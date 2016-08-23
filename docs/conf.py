@@ -16,9 +16,21 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+
+import os
+import sys
+from mock import Mock as MagicMock
+
+sys.path.insert(0, os.path.abspath('../.'))
+
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+        return Mock()
+
+MOCK_MODULES = ['librsync', '_librsync', 'lockfile']
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+
 
 # -- General configuration ------------------------------------------------
 
@@ -425,21 +437,3 @@ epub_exclude_files = ['search.html']
 # If false, no index is generated.
 #
 # epub_use_index = True
-
-
-# -- Needed to build on RTD -----------------------------------------------
-
-import os
-import sys
-from mock import Mock as MagicMock
-
-class Mock(MagicMock):
-    @classmethod
-    def __getattr__(cls, name):
-        return Mock()
-
-MOCK_MODULES = ['librsync', '_librsync', 'lockfile']
-sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
-
-if os.environ.get('READTHEDOCS') == 'True':
-    sys.path.insert(0, os.path.abspath('../.'))
