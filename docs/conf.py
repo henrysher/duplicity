@@ -25,7 +25,7 @@ sys.path.insert(0, os.path.abspath('../.'))
 
 MOCK_MODULES = ['librsync', '_librsync', 'lockfile']
 for mod_name in MOCK_MODULES:
-    sys.modules.update(mod_name, Mock())
+    sys.modules.update((mod_name, Mock()))
 
 
 # -- General configuration ------------------------------------------------
