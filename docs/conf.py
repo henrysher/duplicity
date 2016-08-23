@@ -19,14 +19,17 @@
 
 import os
 import sys
-from mock import MagicMock as Mock
+from mock import MagicMock
 
 sys.path.insert(0, os.path.abspath('../.'))
 
-MOCK_MODULES = ['librsync', '_librsync', 'lockfile']
-for mod_name in MOCK_MODULES:
-    sys.modules.update((mod_name, Mock()))
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+            return Mock()
 
+MOCK_MODULES = ['_librsync', 'lockfile']
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 # -- General configuration ------------------------------------------------
 
