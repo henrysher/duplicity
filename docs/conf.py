@@ -34,9 +34,7 @@ sys.path.insert(0, os.path.abspath('../.'))
 autodoc_mock_imports = [
     'lockfile',
     'librsync',
-    'duplicity.librsync',
 ]
-
 
 
 # -- General configuration ------------------------------------------------
