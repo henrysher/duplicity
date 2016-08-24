@@ -26,10 +26,11 @@ sys.path.insert(0, os.path.abspath('../.'))
 class Mock(MagicMock):
     @classmethod
     def __getattr__(cls, name):
-            return Mock()
+        return Mock()
 
-MOCK_MODULES = ['_librsync', 'lockfile']
+MOCK_MODULES = ['duplicity._librsync', 'duplicity.librsync', 'lockfile']
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+
 
 # -- General configuration ------------------------------------------------
 
