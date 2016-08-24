@@ -69,6 +69,15 @@ for root, dirs, files in os.walk(os.path.join(top_dir, "po")):
                 ('share/locale/%s/LC_MESSAGES' % lang,
                  ["po/%s/duplicity.mo" % lang]))
 
+if not os.environ.get('READTHEDOCS') == 'True':
+    ext_modules=[Extension("duplicity._librsync",
+                           ["duplicity/_librsyncmodule.c"],
+                           include_dirs=incdir_list,
+                           library_dirs=libdir_list,
+                           libraries=["rsync"])]
+else:
+    ext_modules = []
+
 
 class TestCommand(test):
 
@@ -184,11 +193,7 @@ setup(name="duplicity",
                 'testing.unit'],
       package_dir={"duplicity": "duplicity",
                    "duplicity.backends": "duplicity/backends", },
-      ext_modules=[Extension("duplicity._librsync",
-                             ["duplicity/_librsyncmodule.c"],
-                             include_dirs=incdir_list,
-                             library_dirs=libdir_list,
-                             libraries=["rsync"])],
+      ext_modules=ext_modules,
       scripts=['bin/rdiffdir', 'bin/duplicity'],
       data_files=data_files,
       install_requires=['lockfile'],
