@@ -19,23 +19,11 @@
 
 import os
 import sys
-# from mock import Mock as MagicMock
+import mock
 
 sys.path.insert(0, os.path.abspath('../.'))
 
-# class Mock(MagicMock):
-#     @classmethod
-#     def __getattr__(cls, name):
-#         return Mock()
-#
-# MOCK_MODULES = ['duplicity.librsync', 'lockfile']
-# sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
-
-autodoc_mock_imports = [
-    'lockfile',
-    'librsync',
-    '_librsync',
-]
+sys.modules['lockfile'] = mock.Mock()
 
 
 # -- General configuration ------------------------------------------------

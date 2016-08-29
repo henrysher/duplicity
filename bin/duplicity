@@ -48,9 +48,9 @@ if '--pydevd' in sys.argv or os.getenv('PYDEVD', None):
     # The following is for starting remote debugging in Eclipse with Pydev.
     # Adjust the path to your location and version of Eclipse and Pydev.
     if platform.platform().startswith('Linux'):
-        pysrc = "/opt/liclipse/plugins/org.python.pydev_5.0.0.201605050916//pysrc"
+        pysrc = "/opt/liclipse/plugins/org.python.pydev_5.2.0.201608171655/pysrc"
     elif platform.platform().startswith('Darwin'):
-        pysrc = "/Applications/LiClipse.app/Contents/liclipse/plugins/org.python.pydev_5.0.0.201605050916//pysrc"
+        pysrc = "/Applications/LiClipse.app/Contents/liclipse/plugins/org.python.pydev_5.2.0.201608171655/pysrc"
     else:
         raise Exception("Platform %s not supported by pydevd." % platform.platform())
     sys.path.append(pysrc)

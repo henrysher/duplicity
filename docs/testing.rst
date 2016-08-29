@@ -7,7 +7,6 @@ Subpackages
 .. toctree::
 
     testing.functional
-    testing.manual
     testing.overrides
     testing.unit
 

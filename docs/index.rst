@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to duplicity's documentation!
-==========================================
+=====================================
 
 Contents:
 
@@ -12,7 +12,6 @@ Contents:
    :maxdepth: 4
 
    duplicity
-   setup
    testing
 
 
