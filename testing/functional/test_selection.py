@@ -926,5 +926,48 @@ class TestGlobbingReplacement(IncludeExcludeFunctionalTest):
         self.assertEqual(restored, self.expected_restored_tree)
 
 
+class TestExcludeIfPresent(IncludeExcludeFunctionalTest):
+    """ This tests the behaviour of duplicity's --exclude-if-present option"""
+
+    def test_exclude_if_present_baseline(self):
+        """ Test that duplicity normally backs up files"""
+        with open("testfiles/select2/1/1sub1/1sub1sub1/.nobackup", "w") as tag:
+            tag.write("Files in this folder should not be backed up.")
+        self.backup("full", "testfiles/select2/1/1sub1",
+                    options=["--include", "testfiles/select2/1/1sub1/1sub1sub1/*",
+                             "--exclude", "**"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, [['1sub1sub1'],
+                                    ['.nobackup', '1sub1sub1_file.txt']])
+
+    def test_exclude_if_present_excludes(self):
+        """ Test that duplicity excludes files with relevant tag"""
+        with open("testfiles/select2/1/1sub1/1sub1sub1/.nobackup", "w") as tag:
+            tag.write("Files in this folder should not be backed up.")
+        self.backup("full", "testfiles/select2/1/1sub1",
+                    options=["--exclude-if-present", ".nobackup",
+                             "--include", "testfiles/select2/1/1sub1/1sub1sub1/*",
+                             "--exclude", "**"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, [])
+
+    def test_exclude_if_present_excludes_2(self):
+        """ Test that duplicity excludes files with relevant tag"""
+        with open("testfiles/select2/1/1sub1/1sub1sub1/EXCLUDE.tag", "w") as tag:
+            tag.write("Files in this folder should also not be backed up.")
+        self.backup("full", "testfiles/select2/1/1sub1",
+                    options=["--exclude-if-present", "EXCLUDE.tag",
+                             "--include", "testfiles/select2/1/1sub1/1sub1sub1/*",
+                             "--exclude", "**"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, [])
+
+
 if __name__ == "__main__":
     unittest.main()
