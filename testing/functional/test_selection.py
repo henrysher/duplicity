@@ -969,5 +969,42 @@ class TestExcludeIfPresent(IncludeExcludeFunctionalTest):
         self.assertEqual(restored, [])
 
 
+class TestLockedFoldersNoError(IncludeExcludeFunctionalTest):
+    """ This tests that inaccessible folders do not cause an error"""
+
+    def test_locked_baseline(self):
+        """ Test no error if locked in path but excluded"""
+        folder_to_lock = "testfiles/select2/1/1sub1/1sub1sub3"
+        initial_mode = os.stat(folder_to_lock).st_mode
+        os.chmod(folder_to_lock, 0o0000)
+        self.backup("full", "testfiles/select2/1/1sub1",
+                    options=["--include", "testfiles/select2/1/1sub1/1sub1sub1/*",
+                             "--exclude", "**"])
+        os.chmod(folder_to_lock, initial_mode)
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, [['1sub1sub1'],
+                                    ['1sub1sub1_file.txt']])
+
+    def test_locked_excl_if_present(self):
+        """ Test no error if excluded locked with --exclude-if-present"""
+        # Regression test for Bug #1620085
+        # https://bugs.launchpad.net/duplicity/+bug/1620085
+        folder_to_lock = "testfiles/select2/1/1sub1/1sub1sub3"
+        initial_mode = os.stat(folder_to_lock).st_mode
+        os.chmod(folder_to_lock, 0o0000)
+        self.backup("full", "testfiles/select2/1/1sub1",
+                    options=["--exclude-if-present", "EXCLUDE.tag",
+                             "--include", "testfiles/select2/1/1sub1/1sub1sub1/*",
+                             "--exclude", "**"])
+        os.chmod(folder_to_lock, initial_mode)
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, [['1sub1sub1'],
+                                    ['1sub1sub1_file.txt']])
+
+
 if __name__ == "__main__":
     unittest.main()
