@@ -124,10 +124,7 @@ class JottaCloudBackend(duplicity.backend.Backend):
         # - List all files in the backend
         # - Return a list of filenames
         # - Retried if an exception is thrown
-        encoding = locale.getdefaultlocale()[1]
-        if encoding is None:
-            encoding = 'LATIN1'
-        return list([f.name.encode(encoding) for f in self.folder.files()
+        return list([f.name for f in self.folder.files()
                      if not f.is_deleted() and f.state != 'INCOMPLETE'])
 
 
