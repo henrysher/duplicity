@@ -91,6 +91,7 @@ class JottaCloudBackend(duplicity.backend.Backend):
         self.client = JFS.JFS()
 
         self.folder = self.get_or_create_directory(parsed_url.path.lstrip('/'))
+        log.Debug("Jottacloud folder for duplicity: %r" % self.folder.path)
 
 
     def get_or_create_directory(self, directory_name):
@@ -159,4 +160,3 @@ class JottaCloudBackend(duplicity.backend.Backend):
 
 duplicity.backend.register_backend("jottacloud", JottaCloudBackend)
 """ jottacloud is a Norwegian backup company """
-duplicity.backend.uses_netloc.extend(['jottacloud'])
