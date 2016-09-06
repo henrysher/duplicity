@@ -1,3 +1,8 @@
+2016-09-06  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/bug_1620085_exclude-if-present-locked-folder
+      - Fixes Bug #1620085: --exclude-if-present gives OSError looking for tag in locked folders
+
 2016-08-22  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bugs #815510 and #1615480
