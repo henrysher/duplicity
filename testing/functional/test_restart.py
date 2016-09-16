@@ -327,6 +327,8 @@ class RestartTestWithoutEncryption(RestartTest):
             tarcmd = "tar"
         elif platform.platform().startswith('Darwin'):
             tarcmd = "gtar"
+        elif platform.platform().endswith('BSD'):
+            tarcmd = "gtar"
         else:
             raise Exception("Platform %s not supported by tar/gtar." % platform.platform())
 

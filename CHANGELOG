@@ -6,6 +6,8 @@ New in v0.7.11 (2016/09/??)
   - Backblaze announced a new domain for the b2 api
 * Merged in lp:~aaron-whitehouse/duplicity/bug_1620085_exclude-if-present-locked-folder
   - Fixes Bug #1620085: --exclude-if-present gives OSError looking for tag in locked folders
+* Fixed bug #1623342 with patch from Daniel Jakots
+  - failing test on OpenBSD because tar/gtar not found
 
 
 New in v0.7.10 (2016/08/20)

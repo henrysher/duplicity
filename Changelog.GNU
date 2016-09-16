@@ -1,3 +1,8 @@
+2016-09-16  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1623342 with patch from Daniel Jakots
+      - failing test on OpenBSD because tar/gtar not found
+
 2016-09-06  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~aaron-whitehouse/duplicity/bug_1620085_exclude-if-present-locked-folder
