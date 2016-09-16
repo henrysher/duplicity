@@ -24,6 +24,8 @@ New in v0.8.00 (2016/07/??)
   - Changed default --volsize to 200MB
 * Merged in lp:~mstoll-de/duplicity/duplicity
   - Backblaze announced a new domain for the b2 api
+* Fixed bug #1623342 with patch from Daniel Jakots
+  - failing test on OpenBSD because tar/gtar not found
 
 
 New in v0.7.08 (2016/07/02)

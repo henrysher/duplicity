@@ -1,3 +1,8 @@
+2016-09-16  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1623342 with patch from Daniel Jakots
+      - failing test on OpenBSD because tar/gtar not found
+
 2016-08-22  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bugs #815510 and #1615480
