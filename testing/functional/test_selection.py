@@ -19,8 +19,11 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import os
-import os.path
-import unittest
+import sys
+if sys.version_info < (2, 7):
+    import unittest2 as unittest
+else:
+    import unittest
 
 from . import FunctionalTestCase
 
@@ -1005,6 +1008,33 @@ class TestLockedFoldersNoError(IncludeExcludeFunctionalTest):
         self.assertEqual(restored, [['1sub1sub1'],
                                     ['1sub1sub1_file.txt']])
 
+
+class TestFolderIncludesFiles(IncludeExcludeFunctionalTest):
+    """ This tests that including a folder includes the files within it"""
+    # https://bugs.launchpad.net/duplicity/+bug/1624725
+
+    def test_includes_files(self):
+        """This tests that including a folder includes the files within it"""
+        self.backup("full", "testfiles/select2/1/1sub1",
+                    options=["--include", "testfiles/select2/1/1sub1/1sub1sub1",
+                             "--exclude", "**"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, [['1sub1sub1'],
+                                    ['1sub1sub1_file.txt']])
+
+    @unittest.expectedFailure
+    def test_includes_files_trailing_slash(self):
+        """This tests that including a folder includes the files within it"""
+        self.backup("full", "testfiles/select2/1/1sub1",
+                    options=["--include", "testfiles/select2/1/1sub1/1sub1sub1/",
+                             "--exclude", "**"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, [['1sub1sub1'],
+                                    ['1sub1sub1_file.txt']])
 
 if __name__ == "__main__":
     unittest.main()
