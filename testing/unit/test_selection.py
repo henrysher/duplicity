@@ -83,8 +83,6 @@ class MatchingTest(UnitTestCase):
 
         with patch('duplicity.path.ROPath.isdir') as mock_isdir:
             mock_isdir.return_value = True
-            # Can't pass the return_value as an argument to patch, as build
-            # system's mock is too old to support it.
 
             assert sf2(self.makeext("usr")) is None
             assert sf2(self.makeext("usr/local")) is None
