@@ -62,7 +62,6 @@ def path_matches_glob_fn(glob_str, include, ignore_case=False):
     """
     match_only_dirs = False
 
-    # ToDo: Test behaviour of "/" on its own - should always match
     if glob_str != "/" and glob_str[-1] == "/":
         match_only_dirs = True
         # Remove trailing / from directory name (unless that is the entire
@@ -76,11 +75,20 @@ def path_matches_glob_fn(glob_str, include, ignore_case=False):
     re_comp = lambda r: re.compile(r, re.S | flags)
 
     # matches what glob matches and any files in directory
+    # Resulting regular expression is:
+    # ^ string must be at the beginning of path
+    # string translated into regex
+    # ($|/) nothing must follow except for the end of the string, newline or /
     glob_comp_re = re_comp("^%s($|/)" % glob_to_regex(glob_str))
 
     if glob_str.find("**") != -1:
+        # glob_str has a ** in it
         glob_str = glob_str[:glob_str.find("**") + 2]  # truncate after **
 
+    # Below regex is translates to:
+    # ^ string must be at the beginning of path
+    # the regexs corresponding to the parent directories of glob_str
+    # $ nothing must follow except for the end of the string or newline
     scan_comp_re = re_comp("^(%s)$" %
                            "|".join(_glob_get_prefix_regexs(glob_str)))
 

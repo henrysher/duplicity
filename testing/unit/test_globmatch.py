@@ -47,6 +47,34 @@ class MatchingTest(UnitTestCase):
         assert r == "[a*b-c]e[^]]", r
 
 
+class TestDoubleAsteriskOnIncludesExcludes(UnitTestCase):
+    """Test ** on includes and exclude patterns"""
+
+    def test_double_asterisk_include(self):
+        """Test a few globbing patterns, including **"""
+        self.assertEqual(
+            path_matches_glob_fn("**", 1)(Path("foo.txt")), 1)
+        with patch('duplicity.path.Path.isdir') as mock_isdir:
+            mock_isdir.return_value = True
+            self.assertEqual(
+                path_matches_glob_fn("**", 1)(Path("folder/")), 1)
+
+    def test_double_asterisk_extension_include(self):
+        """Test **.py"""
+        self.assertEqual(
+            path_matches_glob_fn("**.py", 1)(Path("what/ever.py")), 1)
+        self.assertEqual(
+            path_matches_glob_fn("**.py", 1)(Path("what/ever.py/foo")), 1)
+        with patch('duplicity.path.Path.isdir') as mock_isdir:
+            mock_isdir.return_value = True
+            self.assertEqual(
+                path_matches_glob_fn("**.py", 1)(Path("foo/")), 2)
+            self.assertEqual(
+                path_matches_glob_fn("**.py", 1)(Path("usr/local/bin/")), 2)
+            self.assertEqual(
+                path_matches_glob_fn("**.py", 1)(Path("/usr/local/bin/")), 2)
+
+
 class TestTrailingSlash(UnitTestCase):
     """Test glob matching where the glob has a trailing slash"""
 
@@ -88,6 +116,27 @@ class TestTrailingSlash(UnitTestCase):
             self.assertEqual(
                 path_matches_glob_fn("fold*/", 1)(Path("folder/file.txt")), 1)
 
+    @unittest.expectedFailure
+    def test_slash_matches_everything(self):
+        """Test / matches everything"""
+        with patch('duplicity.path.Path.isdir') as mock_isdir:
+            mock_isdir.return_value = True
+            self.assertEqual(
+                path_matches_glob_fn("/",
+                                     1)(Path("/tmp/testfiles/select/1/2/")), 1)
+            self.assertEqual(
+                path_matches_glob_fn("/",
+                                     1)(Path("/test/random/path/")), 1)
+            self.assertEqual(
+                path_matches_glob_fn("/",
+                                     1)(Path("/")), 1)
+            self.assertEqual(
+                path_matches_glob_fn("/",
+                                     1)(Path("/var/log/")), 1)
+            self.assertEqual(
+                path_matches_glob_fn("/",
+                                     1)(Path("/var/log/log.txt")), 1)
+
     def test_slash_star_includes_folder(self):
         """Test that folder/* includes folder/"""
         with patch('duplicity.path.Path.isdir') as mock_isdir:
@@ -99,5 +148,47 @@ class TestTrailingSlash(UnitTestCase):
         """Test that folder/** includes folder/"""
         with patch('duplicity.path.Path.isdir') as mock_isdir:
             mock_isdir.return_value = True
+
+    def test_simple_trailing_slash_match(self):
+        """Test that a normal folder string ending in / matches that path"""
+        with patch('duplicity.path.Path.isdir') as mock_isdir:
+            mock_isdir.return_value = True
+            test_path = "testfiles/select/1/2/1/"
             self.assertEqual(
-                path_matches_glob_fn("folder/**", 1)(Path("folder/")), 1)
+                path_matches_glob_fn(test_path, 1)(Path(test_path)), 1)
+
+    def test_double_asterisk_string_slash(self):
+        """Test string starting with ** and ending in /"""
+        with patch('duplicity.path.Path.isdir') as mock_isdir:
+            mock_isdir.return_value = True
+            self.assertEqual(
+                path_matches_glob_fn("**/1/2/",
+                                     1)(Path("testfiles/select/1/2/")), 1)
+
+    def test_string_double_asterisk_string_slash(self):
+        """Test string ** string /"""
+        with patch('duplicity.path.Path.isdir') as mock_isdir:
+            mock_isdir.return_value = True
+            self.assertEqual(
+                path_matches_glob_fn("testfiles**/2/",
+                                     1)(Path("testfiles/select/1/2/")), 1)
+
+
+class TestDoubleAsterisk(UnitTestCase):
+    """Test glob matching where the glob finishes with a **"""
+
+    def test_simple_trailing_slash_match(self):
+        """Test that a folder string ending in /** matches that path"""
+        with patch('duplicity.path.Path.isdir') as mock_isdir:
+            mock_isdir.return_value = True
+            self.assertEqual(
+                path_matches_glob_fn("/test/folder/**", 1)(
+                    Path("/test/foo/")), None)
+
+    def test_simple_trailing_slash_match_2(self):
+        """Test folder string ending in */**"""
+        with patch('duplicity.path.Path.isdir') as mock_isdir:
+            mock_isdir.return_value = True
+            self.assertEqual(
+                path_matches_glob_fn("fold*/**", 1)(
+                    Path("folder/")), 1)
