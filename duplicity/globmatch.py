@@ -79,6 +79,8 @@ def path_matches_glob_fn(glob_str, include, ignore_case=False):
     # ^ string must be at the beginning of path
     # string translated into regex
     # ($|/) nothing must follow except for the end of the string, newline or /
+    # Note that the "/" at the end of the regex means that it will match
+    # if the glob matches a parent folders of path
     glob_comp_re = re_comp("^%s($|/)" % glob_to_regex(glob_str))
 
     if glob_str.find("**") != -1:
