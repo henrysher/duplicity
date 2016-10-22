@@ -1015,6 +1015,9 @@ Formats of each of the URL schemes follow:
 .PP
 .RS
 amazondrive://some_dir
+.PP
+See also
+.B "A NOTE ON AMAZONDRIVE"
 .RE
 .PP
 .BR "Azure"
@@ -1495,6 +1498,25 @@ or contained in matched files.  So for instance
 matches any files whose full pathnames contain 7 consecutive digits
 which aren't followed by 'foo'.  However, it wouldn't match /home even
 if /home/ben/1234567 existed.
+
+.SH A NOTE ON AMAZONDRIVE
+.IP 1.
+The API Keys used for AmazonDrive have not been granted production limits.
+Amazon do not say what the development limits are and are not replying to
+to requests to whitelist duplicity. A related tool, acd_cli, was demoted to
+development limits, but continues to work fine except for cases of excessive
+usage. If you experience throttling and similar issues with AmazonDrive using
+this backend, please report them to the mailing list.
+.IR
+.IP 2.
+If you previously used the
+.BI acd+acdcli
+backend, it is strongly recommended to update to the
+.BI amazondrive
+backend instead, since it interfaces directly with AmazonDrive. You will need
+to setup the OAuth once again, but can otherwise keep your backups and config.
+.IR
+.RE
 
 .SH A NOTE ON AZURE ACCESS
 The Azure backend requires the Microsoft Azure Storage SDK for Python to be
