@@ -1,3 +1,10 @@
+2016-10-22  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~mwilck/duplicity/duplicity
+      - GPG: enable truly non-interactive operation with gpg2
+      - This patch fixes the IMO unexpected behavior that, when using GnuPG2, a pass phrase dialog always pops up for
+        saving backups. This is particularly annoying when trying to do unattended / fully automatic backups.
+
 2016-09-16  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1623342 with patch from Daniel Jakots
