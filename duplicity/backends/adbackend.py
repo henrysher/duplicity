@@ -31,14 +31,14 @@ from duplicity.errors import BackendException
 from duplicity import globals
 from duplicity import log
 
-class AmazonDriveBackend(duplicity.backend.Backend):
+class ADBackend(duplicity.backend.Backend):
     """
-    Backend for AmazonDrive. It communicates directly with AmazonDrive using
+    Backend for Amazon Drive. It communicates directly with Amazon Drive using
     their RESTful API and does not rely on externally setup software (like
     acd_cli).
     """
 
-    OAUTH_TOKEN_PATH = os.path.expanduser('~/.duplicity_amazondrive_oauthtoken.json')
+    OAUTH_TOKEN_PATH = os.path.expanduser('~/.duplicity_ad_oauthtoken.json')
 
     OAUTH_AUTHORIZE_URL = 'https://www.amazon.com/ap/oa'
     OAUTH_TOKEN_URL = 'https://api.amazon.com/auth/o2/token'
@@ -68,7 +68,7 @@ class AmazonDriveBackend(duplicity.backend.Backend):
             # https://forums.developer.amazon.com/questions/22038/support-for-chunked-transfer-encoding.html
             log.FatalError(
                 'Your --volsize is bigger than 10 GiB, which is the maximum '
-                'file size on AmazonDrive that does not require work arounds.')
+                'file size on Amazon Drive that does not require work arounds.')
 
         try:
             global requests
@@ -77,7 +77,7 @@ class AmazonDriveBackend(duplicity.backend.Backend):
             from requests_oauthlib import OAuth2Session
         except ImportError:
             raise BackendException(
-                'AmazonDrive backend requires python-requests and '
+                'Amazon Drive backend requires python-requests and '
                 'python-requests-oauthlib to be installed.\n\n'
                 'For Debian and derivates use:\n'
                 '  apt-get install python-requests python-requests-oauthlib\n'
@@ -88,7 +88,7 @@ class AmazonDriveBackend(duplicity.backend.Backend):
         self.resolve_backup_target()
 
     def initialize_oauth2_session(self):
-        """Setup or refresh oauth2 session with AmazonDrive"""
+        """Setup or refresh oauth2 session with Amazon Drive"""
 
         def token_updater(token):
             """Stores oauth2 token on disk"""
@@ -134,12 +134,12 @@ class AmazonDriveBackend(duplicity.backend.Backend):
                 log.FatalError('The OAuth2 token could not be loaded from %s '
                                'and you are not running duplicity '
                                'interactively, so duplicity cannot possibly '
-                               'access AmazonDrive.' % self.OAUTH_TOKEN_PATH)
+                               'access Amazon Drive.' % self.OAUTH_TOKEN_PATH)
             authorization_url, _ = self.http_client.authorization_url(
                 self.OAUTH_AUTHORIZE_URL)
 
             print ''
-            print ('In order to allow duplicity to access AmazonDrive, please '
+            print ('In order to allow duplicity to access Amazon Drive, please '
                    'open the following URL in a browser and copy the URL of the '
                    'page you see after authorization here:')
             print authorization_url
@@ -277,7 +277,7 @@ class AmazonDriveBackend(duplicity.backend.Backend):
                                'the retry limit has been reached.' % remote_filename)
 
     def _put(self, source_path, remote_filename):
-        """Upload a local file to AmazonDrive"""
+        """Upload a local file to Amazon Drive"""
 
         quota = self.http_client.get(self.metadata_url + 'account/quota')
         quota.raise_for_status()
@@ -288,13 +288,13 @@ class AmazonDriveBackend(duplicity.backend.Backend):
         if source_size > available:
             raise BackendException(
                 'Out of space: trying to store "%s" (%d bytes), but only '
-                '%d bytes available on AmazonDrive.' % (
+                '%d bytes available on Amazon Drive.' % (
                     source_path.name, source_size, available))
 
         # Just check the cached list, to avoid _list for every new file being
         # uploaded
         if remote_filename in self.names_to_ids:
-            log.Debug('File %s seems to already exist on AmazonDrive. Deleting '
+            log.Debug('File %s seems to already exist on Amazon Drive. Deleting '
                       'before attempting to upload it again.' % remote_filename)
             self._delete(remote_filename)
 
@@ -315,7 +315,7 @@ class AmazonDriveBackend(duplicity.backend.Backend):
             log.Debug('%s uploaded successfully' % remote_filename)
         elif response.status_code == 408 or response.status_code == 504:
             log.Info('%s upload failed with timeout status code=%d. Speculatively '
-                     'waiting for %d seconds to see if AmazonDrive finished the '
+                     'waiting for %d seconds to see if Amazon Drive finished the '
                      'upload anyway' % (remote_filename, response.status_code,
                                         globals.timeout))
             tries = globals.timeout / 15
@@ -352,7 +352,7 @@ class AmazonDriveBackend(duplicity.backend.Backend):
         self.names_to_ids[parsed['name']] = parsed['id']
 
     def _get(self, remote_filename, local_path):
-        """Download file from AmazonDrive"""
+        """Download file from Amazon Drive"""
 
         with local_path.open('wb') as local_file:
             file_id = self.get_file_id(remote_filename)
@@ -370,7 +370,7 @@ class AmazonDriveBackend(duplicity.backend.Backend):
             local_file.flush()
 
     def _query(self, remote_filename):
-        """Retrieve file size info from AmazonDrive"""
+        """Retrieve file size info from Amazon Drive"""
 
         file_id = self.get_file_id(remote_filename)
         if file_id is None:
@@ -381,7 +381,7 @@ class AmazonDriveBackend(duplicity.backend.Backend):
         return {'size': response.json()['contentProperties']['size']}
 
     def _list(self):
-        """List files in AmazonDrive backup folder"""
+        """List files in Amazon Drive backup folder"""
 
         files = self.read_all_pages(
             self.metadata_url + 'nodes/' + self.backup_target_id +
@@ -392,7 +392,7 @@ class AmazonDriveBackend(duplicity.backend.Backend):
         return self.names_to_ids.keys()
 
     def _delete(self, remote_filename):
-        """Delete file from AmazonDrive"""
+        """Delete file from Amazon Drive"""
 
         file_id = self.get_file_id(remote_filename)
         if file_id is None:
@@ -403,4 +403,4 @@ class AmazonDriveBackend(duplicity.backend.Backend):
         response.raise_for_status()
         del self.names_to_ids[remote_filename]
 
-duplicity.backend.register_backend('amazondrive', AmazonDriveBackend)
+duplicity.backend.register_backend('ad', AmazonDriveBackend)
