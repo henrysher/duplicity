@@ -30,6 +30,8 @@ New in v0.8.00 (2016/07/??)
   - GPG: enable truly non-interactive operation with gpg2
   - This patch fixes the IMO unexpected behavior that, when using GnuPG2, a pass phrase dialog always pops up for
     saving backups. This is particularly annoying when trying to do unattended / fully automatic backups.
+* Fixed bug #1621194 with code from Tornhoof
+  - Do backup to google drive working without a service account
 
 
 New in v0.7.08 (2016/07/02)

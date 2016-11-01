@@ -102,6 +102,7 @@ class GPGProfile:
             return int(mtc.group("maj"), 10)
         raise GPGError("failed to determine gpg version of %s from %s" % (binary, line))
 
+
 class GPGFile:
     """
     File-like object that encrypts decrypts another file on the fly
