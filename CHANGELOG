@@ -36,6 +36,8 @@ New in v0.8.00 (2016/07/??)
   - Adds support for a new backend, jottacloud.com, using the scheme `jottacloud:/<folder>`.
   - Reverse-engineered library, `jottalib`: http://github.com/havardgulldahl/jottalib
   - Here's how you set up jottalib https://github.com/havardgulldahl/jottalib/wiki
+* Merged in lp:~breunigs/duplicity/amazondrive
+  - Provide a native backend for AmazonDrive
 
 
 New in v0.7.08 (2016/07/02)
