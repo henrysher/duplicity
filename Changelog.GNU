@@ -1,3 +1,8 @@
+2016-11-01  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1621194 with code from Tornhoof
+      - Do backup to google drive working without a service account
+
 2016-10-22  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~mwilck/duplicity/duplicity
