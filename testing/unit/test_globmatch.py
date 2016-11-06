@@ -25,10 +25,7 @@ from duplicity.globmatch import *
 from duplicity.path import *
 from . import UnitTestCase
 from mock import patch
-if sys.version_info < (2, 7):
-    import unittest2 as unittest
-else:
-    import unittest
+import unittest
 
 
 class MatchingTest(UnitTestCase):
@@ -90,6 +87,11 @@ class TestTrailingSlash(UnitTestCase):
             self.assertEqual(
                 path_matches_glob_fn("fold*/", 1)(Path("folder")), None)
 
+            # Test the file named "folder" is not included if it is not a dir
+            mock_isdir.return_value = False
+            self.assertEqual(
+                path_matches_glob_fn("folder/", 1)(Path("folder")), None)
+
             mock_isdir.return_value = False
             self.assertEqual(
                 path_matches_glob_fn("fo*/", 1)(Path("foo.txt")), None)
@@ -118,7 +120,6 @@ class TestTrailingSlash(UnitTestCase):
             self.assertEqual(
                 path_matches_glob_fn("folder/2", 1)(Path("folder/2/file.txt")), 1)
 
-    @unittest.expectedFailure
     def test_included_files_are_matched_slash(self):
         """Test that files within an included folder are matched with /"""
         # Bug #1624725
@@ -126,28 +127,65 @@ class TestTrailingSlash(UnitTestCase):
         with patch('duplicity.path.Path.isdir') as mock_isdir:
             mock_isdir.return_value = False
             self.assertEqual(
-                path_matches_glob_fn("fold*/", 1)(Path("folder/file.txt")), 1)
+                path_matches_glob_fn("folder/", 1)(Path("folder/file.txt")), 1)
 
-    @unittest.expectedFailure
-    def test_slash_matches_everything(self):
-        """Test / matches everything"""
+    def test_included_files_are_matched_slash_2(self):
+        """Test that files within an included folder are matched with /"""
+        # Bug #1624725
+        # https://bugs.launchpad.net/duplicity/+bug/1624725
+        with patch('duplicity.path.Path.isdir') as mock_isdir:
+            mock_isdir.return_value = False
+            self.assertEqual(
+                path_matches_glob_fn("testfiles/select2/1/1sub1/1sub1sub1/", 1)
+                (Path("testfiles/select2/1/1sub1/1sub1sub1/1sub1sub1_file.txt")
+                 ), 1)
+
+    def test_included_files_are_matched_slash_2_parents(self):
+        """Test that duplicity will scan parent of glob/"""
+        # Bug #1624725
+        # https://bugs.launchpad.net/duplicity/+bug/1624725
         with patch('duplicity.path.Path.isdir') as mock_isdir:
             mock_isdir.return_value = True
             self.assertEqual(
-                path_matches_glob_fn("/",
-                                     1)(Path("/tmp/testfiles/select/1/2")), 1)
+                path_matches_glob_fn("testfiles/select2/1/1sub1/1sub1sub1/", 1)
+                (Path("testfiles/select2/1/1sub1/1sub1sub1")
+                 ), 1)
             self.assertEqual(
-                path_matches_glob_fn("/",
-                                     1)(Path("/test/random/path")), 1)
+                path_matches_glob_fn("testfiles/select2/1/1sub1/1sub1sub1/", 1)
+                (Path("testfiles/select2/1/1sub1")
+                 ), 2)
+
+    def test_included_files_are_matched_slash_wildcard(self):
+        """Test that files within an included folder are matched with /"""
+        # Bug #1624725
+        # https://bugs.launchpad.net/duplicity/+bug/1624725
+        with patch('duplicity.path.Path.isdir') as mock_isdir:
+            mock_isdir.return_value = False
             self.assertEqual(
-                path_matches_glob_fn("/",
-                                     1)(Path("/")), 1)
-            self.assertEqual(
-                path_matches_glob_fn("/",
-                                     1)(Path("/var/log")), 1)
-            self.assertEqual(
-                path_matches_glob_fn("/",
-                                     1)(Path("/var/log/log.txt")), 1)
+                path_matches_glob_fn("fold*/", 1)(Path("folder/file.txt")), 1)
+    #
+    # def test_slash_matches_everything(self):
+    #     """Test / matches everything"""
+    #     # ToDo: Not relevant at this stage, as "/" would not go through
+    #     # globmatch because it has no special characters, but it should be
+    #     # made to work
+    #     with patch('duplicity.path.Path.isdir') as mock_isdir:
+    #         mock_isdir.return_value = True
+    #         self.assertEqual(
+    #             path_matches_glob_fn("/",
+    #                                  1)(Path("/tmp/testfiles/select/1/2")), 1)
+    #         self.assertEqual(
+    #             path_matches_glob_fn("/",
+    #                                  1)(Path("/test/random/path")), 1)
+    #         self.assertEqual(
+    #             path_matches_glob_fn("/",
+    #                                  1)(Path("/")), 1)
+    #         self.assertEqual(
+    #             path_matches_glob_fn("/",
+    #                                  1)(Path("/var/log")), 1)
+    #         self.assertEqual(
+    #             path_matches_glob_fn("/",
+    #                                  1)(Path("/var/log/log.txt")), 1)
 
     def test_slash_star_scans_folder(self):
         """Test that folder/* scans folder/"""

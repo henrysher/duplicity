@@ -664,6 +664,22 @@ class ParseArgsTest(UnitTestCase):
                         ("--exclude", "**t/1/3")],
                        [(), ('2',), ('2', '1')])
 
+    def test_includes_files(self):
+        """Unit test the functional test test_includes_files"""
+        self.root = Path("testfiles/select2/1/1sub1")
+        self.ParseTest([("--include", "testfiles/select2/1/1sub1/1sub1sub1"),
+                        ("--exclude", "**")],
+                       [(), ('1sub1sub1',), ('1sub1sub1',
+                                             '1sub1sub1_file.txt')])
+
+    def test_includes_files_trailing_slash(self):
+        """Unit test the functional test test_includes_files_trailing_slash"""
+        self.root = Path("testfiles/select2/1/1sub1")
+        self.ParseTest([("--include", "testfiles/select2/1/1sub1/1sub1sub1/"),
+                        ("--exclude", "**")],
+                       [(), ('1sub1sub1',), ('1sub1sub1',
+                                             '1sub1sub1_file.txt')])
+
     def test_glob(self):
         """Test globbing expression"""
         self.ParseTest([("--exclude", "**[3-5]"),

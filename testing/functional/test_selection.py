@@ -19,11 +19,7 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import os
-import sys
-if sys.version_info < (2, 7):
-    import unittest2 as unittest
-else:
-    import unittest
+import unittest
 
 from . import FunctionalTestCase
 
@@ -1024,7 +1020,6 @@ class TestFolderIncludesFiles(IncludeExcludeFunctionalTest):
         self.assertEqual(restored, [['1sub1sub1'],
                                     ['1sub1sub1_file.txt']])
 
-    @unittest.expectedFailure
     def test_includes_files_trailing_slash(self):
         """This tests that including a folder includes the files within it"""
         self.backup("full", "testfiles/select2/1/1sub1",
