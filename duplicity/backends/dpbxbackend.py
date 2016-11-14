@@ -35,6 +35,7 @@ import sys
 import traceback
 import urllib
 import re
+import urllib2
 
 from dropbox import Dropbox
 from dropbox.exceptions import AuthError, BadInputError, ApiError
@@ -57,6 +58,12 @@ DPBX_DOWNLOAD_BUF_SIZE = 512 * 1024
 
 DPBX_AUTORENAMED_FILE_RE = re.compile(r' \([0-9]+\)\.[^\.]+$')
 
+def internet_on():
+    try:
+        urllib2.urlopen('http://8.8.8.8', timeout=1)
+        return True
+    except urllib2.URLError as err:
+        return False
 
 def log_exception(e):
     log.Error('Exception [%s]:' % (e,))
@@ -98,7 +105,14 @@ class DPBXBackend(duplicity.backend.Backend):
         self.auth_flow = None
 
         self.login()
-
+    def user_authenticated(self):
+        try:
+            account = self.api_client.users_get_current_account()
+            log.Debug("User authenticated as ,%s" % account)
+            return True
+        except:
+            log.Debug('User not authenticated')
+            return False
     def load_access_token(self):
         return os.environ.get('DPBX_ACCESS_TOKEN', None)
 
@@ -196,6 +210,9 @@ class DPBXBackend(duplicity.backend.Backend):
                                    (res_metadata.size, file_size))
 
     def put_file_small(self, source_path, remote_path):
+        if not self.user_authenticated():
+            self.login()
+
         file_size = os.path.getsize(source_path.name)
         f = source_path.open('rb')
         try:
@@ -212,6 +229,9 @@ class DPBXBackend(duplicity.backend.Backend):
             f.close()
 
     def put_file_chunked(self, source_path, remote_path):
+        if not self.user_authenticated():
+            self.login()
+
         file_size = os.path.getsize(source_path.name)
         f = source_path.open('rb')
         try:
@@ -295,6 +315,10 @@ class DPBXBackend(duplicity.backend.Backend):
                     log.Debug('dpbx,files_upload_session_append: %s' % e)
 
                     retry_number -= 1
+
+                    if not self.user_authenticated():
+                        self.login()
+
                     if retry_number == 0:
                         raise
 
@@ -320,6 +344,9 @@ class DPBXBackend(duplicity.backend.Backend):
 
     @command()
     def _get(self, remote_filename, local_path):
+        if not self.user_authenticated():
+            self.login()
+
         remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/'))
         remote_path = '/' + os.path.join(remote_dir, remote_filename).rstrip()
 
@@ -353,6 +380,8 @@ class DPBXBackend(duplicity.backend.Backend):
     @command()
     def _list(self):
         # Do a long listing to avoid connection reset
+        if not self.user_authenticated():
+            self.login()
         remote_dir = '/' + urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
 
         log.Debug('dpbx.files_list_folder(%s)' % remote_dir)
@@ -373,6 +402,9 @@ class DPBXBackend(duplicity.backend.Backend):
 
     @command()
     def _delete(self, filename):
+        if not self.user_authenticated():
+            self.login()
+
         remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/'))
         remote_path = '/' + os.path.join(remote_dir, filename).rstrip()
 
@@ -390,6 +422,8 @@ class DPBXBackend(duplicity.backend.Backend):
 
     @command()
     def _query(self, filename):
+        if not self.user_authenticated():
+            self.login()
         remote_dir = urllib.unquote(self.parsed_url.path.lstrip('/'))
         remote_path = '/' + os.path.join(remote_dir, filename).rstrip()
 
@@ -399,6 +433,8 @@ class DPBXBackend(duplicity.backend.Backend):
         return {'size': info.size}
 
     def check_renamed_files(self, file_list):
+        if not self.user_authenticated():
+            self.login()
         bad_list = [x for x in file_list if DPBX_AUTORENAMED_FILE_RE.search(x) is not None]
         if len(bad_list) == 0:
             return
