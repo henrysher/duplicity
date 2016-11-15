@@ -35,7 +35,6 @@ import sys
 import traceback
 import urllib
 import re
-import urllib2
 
 from dropbox import Dropbox
 from dropbox.exceptions import AuthError, BadInputError, ApiError
@@ -58,12 +57,6 @@ DPBX_DOWNLOAD_BUF_SIZE = 512 * 1024
 
 DPBX_AUTORENAMED_FILE_RE = re.compile(r' \([0-9]+\)\.[^\.]+$')
 
-def internet_on():
-    try:
-        urllib2.urlopen('http://8.8.8.8', timeout=1)
-        return True
-    except urllib2.URLError as err:
-        return False
 
 def log_exception(e):
     log.Error('Exception [%s]:' % (e,))
@@ -217,6 +210,7 @@ class DPBXBackend(duplicity.backend.Backend):
         f = source_path.open('rb')
         try:
             log.Debug('dpbx,files_upload(%s, [%d bytes])' % (remote_path, file_size))
+
             res_metadata = self.api_client.files_upload(f, remote_path,
                                                         mode=WriteMode.overwrite,
                                                         autorename=False,
