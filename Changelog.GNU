@@ -1,3 +1,8 @@
+2016-11-16  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1642098 - does not create PAR2 archives when '--par2-options' is used
+      - Missing space between par2-options plus default options
+
 2016-11-01  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1621194 with code from Tornhoof

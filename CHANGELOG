@@ -14,6 +14,8 @@ New in v0.7.11 (2016/09/??)
     saving backups. This is particularly annoying when trying to do unattended / fully automatic backups.
 * Fixed bug #1621194 with code from Tornhoof
   - Do backup to google drive working without a service account
+* Fixed bug #1642098 - does not create PAR2 archives when '--par2-options' is used
+  - Missing space between par2-options plus default options
 
 
 New in v0.7.10 (2016/08/20)
