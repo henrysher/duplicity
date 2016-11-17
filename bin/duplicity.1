@@ -313,6 +313,12 @@ location; rather than needing to store only one volume at a time,
 enough storage space is required to store two volumes.
 
 .TP
+.BI "--backend-retry-delay "
+Specify the time (in seconds) that duplicity waits after an error has
+occured before attempting to repeat the operation. 
+
+
+.TP
 .BI "--cf-backend " backend
 Allows the explicit selection of a cloudfiles backend. Defaults to
 .BR pyrax .
