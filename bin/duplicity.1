@@ -917,9 +917,15 @@ or
 if needed.
 .br
 .B Note:
-GnuPG 2 and newer ignore this option and will always use a running
-.B gpg-agent
-if no passphrase was delivered.
+Contrary to previous versions of duplicity, this option will also be honored
+by GnuPG 2 and newer versions. If GnuPG 2 is in use, duplicity passes the option
+.I --pinentry-mode=cancel
+to the the gpg process unless
+.I --use-agent
+is specified on the duplicity command line. This has the effect that GnuPG 2
+uses the agent only if
+.I --use-agent
+is given, just like GnuPG 1.
 
 .TP
 .BI "--verbosity " level ", -v" level

@@ -41,7 +41,7 @@ class Par2Backend(backend.Backend):
             self.redundancy = 10
 
         try:
-            self.common_options = globals.par2_options + "-q -q"
+            self.common_options = globals.par2_options + " -q -q"
         except AttributeError:
             self.common_options = "-q -q"
 

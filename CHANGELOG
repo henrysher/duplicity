@@ -8,6 +8,14 @@ New in v0.7.11 (2016/09/??)
   - Fixes Bug #1620085: --exclude-if-present gives OSError looking for tag in locked folders
 * Fixed bug #1623342 with patch from Daniel Jakots
   - failing test on OpenBSD because tar/gtar not found
+* Merged in lp:~mwilck/duplicity/duplicity
+  - GPG: enable truly non-interactive operation with gpg2
+  - This patch fixes the IMO unexpected behavior that, when using GnuPG2, a pass phrase dialog always pops up for
+    saving backups. This is particularly annoying when trying to do unattended / fully automatic backups.
+* Fixed bug #1621194 with code from Tornhoof
+  - Do backup to google drive working without a service account
+* Fixed bug #1642098 - does not create PAR2 archives when '--par2-options' is used
+  - Missing space between par2-options plus default options
 
 
 New in v0.7.10 (2016/08/20)
