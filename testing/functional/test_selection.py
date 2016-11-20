@@ -1031,6 +1031,17 @@ class TestFolderIncludesFiles(IncludeExcludeFunctionalTest):
         self.assertEqual(restored, [['1sub1sub1'],
                                     ['1sub1sub1_file.txt']])
 
+    def test_includes_files_trailing_slash_globbing_chars(self):
+        """Tests folder includes with globbing char and /"""
+        self.backup("full", "testfiles/select2/1/1sub1",
+                    options=["--include", "testfiles/s?lect2/1/1sub1/1sub1sub1/",
+                             "--exclude", "**"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, [['1sub1sub1'],
+                                    ['1sub1sub1_file.txt']])
+
     def test_excludes_files_no_trailing_slash(self):
         """This tests that excluding a folder excludes the files within it"""
         self.backup("full", "testfiles/select2/1/1sub1",
@@ -1045,11 +1056,24 @@ class TestFolderIncludesFiles(IncludeExcludeFunctionalTest):
         self.assertEqual(restored, [])
 
     def test_excludes_files_trailing_slash(self):
-        """This tests that excluding a folder excludes the files within it"""
+        """Excluding a folder excludes the files within it, if ends with /"""
         self.backup("full", "testfiles/select2/1/1sub1",
                     options=["--exclude", "testfiles/select2/1/1sub1/1sub1sub1/",
                              "--exclude", "testfiles/select2/1/1sub1/1sub1sub2/",
                              "--exclude", "testfiles/select2/1/1sub1/1sub1sub3/",
+                             "--include", "testfiles/select2/1/1sub1/1sub1**",
+                             "--exclude", "testfiles/select2/1/1sub1/irrelevant.txt"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, [])
+
+    def test_excludes_files_trailing_slash_globbing_chars(self):
+        """Tests folder excludes with globbing char and /"""
+        self.backup("full", "testfiles/select2/1/1sub1",
+                    options=["--exclude", "testfiles/sel?ct2/1/1sub1/1sub1sub1/",
+                             "--exclude", "testfiles/sel[e,f]ct2/1/1sub1/1sub1sub2/",
+                             "--exclude", "testfiles/sel*t2/1/1sub1/1sub1sub3/",
                              "--include", "testfiles/select2/1/1sub1/1sub1**",
                              "--exclude", "testfiles/select2/1/1sub1/irrelevant.txt"])
         self.restore()

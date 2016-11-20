@@ -666,6 +666,8 @@ class ParseArgsTest(UnitTestCase):
 
     def test_includes_files(self):
         """Unit test the functional test test_includes_files"""
+        # Test for Bug 1624725
+        # https://bugs.launchpad.net/duplicity/+bug/1624725
         self.root = Path("testfiles/select2/1/1sub1")
         self.ParseTest([("--include", "testfiles/select2/1/1sub1/1sub1sub1"),
                         ("--exclude", "**")],
@@ -674,8 +676,20 @@ class ParseArgsTest(UnitTestCase):
 
     def test_includes_files_trailing_slash(self):
         """Unit test the functional test test_includes_files_trailing_slash"""
+        # Test for Bug 1624725
+        # https://bugs.launchpad.net/duplicity/+bug/1624725
         self.root = Path("testfiles/select2/1/1sub1")
         self.ParseTest([("--include", "testfiles/select2/1/1sub1/1sub1sub1/"),
+                        ("--exclude", "**")],
+                       [(), ('1sub1sub1',), ('1sub1sub1',
+                                             '1sub1sub1_file.txt')])
+
+    def test_includes_files_trailing_slash_globbing_chars(self):
+        """Unit test functional test_includes_files_trailing_slash_globbing_chars"""
+        # Test for Bug 1624725
+        # https://bugs.launchpad.net/duplicity/+bug/1624725
+        self.root = Path("testfiles/select2/1/1sub1")
+        self.ParseTest([("--include", "testfiles/s?lect2/1/1sub1/1sub1sub1/"),
                         ("--exclude", "**")],
                        [(), ('1sub1sub1',), ('1sub1sub1',
                                              '1sub1sub1_file.txt')])
