@@ -1,7 +1,7 @@
 *.egg
 *.log
-.DS_Store
 ._.DS_Store
+.DS_Store
 .eggs
 .idea
 .project
@@ -11,6 +11,7 @@
 __pycache__
 build
 config.py
+docs/_build
 duplicity.egg-info
 duplicity.spec
 po/duplicity.pot-e
