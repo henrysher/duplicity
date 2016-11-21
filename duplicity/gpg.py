@@ -66,8 +66,7 @@ class GPGProfile:
         passphrase is the passphrase.  If it is None (not ""), assume
         it hasn't been set.  sign_key can be blank if no signing is
         indicated, and recipients should be a list of keys.  For all
-        keys, the format should be an 8 character hex key like
-        'AA0E73D2'.
+        keys, the format should be an hex key like 'AA0E73D2'.
         """
         assert passphrase is None or isinstance(passphrase, types.StringType)
 
@@ -282,7 +281,7 @@ class GPGFile:
 
     def set_signature(self):
         """
-        Set self.signature to 8 character signature keyID
+        Set self.signature to signature keyID
 
         This only applies to decrypted files.  If the file was not
         signed, set self.signature to None.
@@ -295,11 +294,11 @@ class GPGFile:
             self.signature = None
         else:
             assert len(match.group(1)) >= 8
-            self.signature = match.group(1)[-8:]
+            self.signature = match.group(1)
 
     def get_signature(self):
         """
-        Return 8 character keyID of signature, or None if none
+        Return  keyID of signature, or None if none
         """
         assert self.closed
         return self.signature

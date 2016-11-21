@@ -42,6 +42,8 @@ New in v0.8.00 (2016/07/??)
   - Fixed variable renaming issue
 * Fixed bug #1642098 - does not create PAR2 archives when '--par2-options' is used
   - Missing space between par2-options plus default options
+* Fix bug using 40-char sign keys, from Richard McGraw on mail list
+  - Remove truncation of argument and adjust comments
 
 
 New in v0.7.08 (2016/07/02)

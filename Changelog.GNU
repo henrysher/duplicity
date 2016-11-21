@@ -1,3 +1,8 @@
+2016-11-21  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fix bug using 40-char sign keys, from Richard McGraw on mail list
+      - Remove truncation of argument and adjust comments
+
 2016-11-16  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1642098 - does not create PAR2 archives when '--par2-options' is used
