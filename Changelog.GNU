@@ -9,6 +9,8 @@
       - Added some robustness to dpbxbackend.py that ensures re-authentication
         happens in case that a socket is changed (e.g. due to a forced reconnect
         of a dynamic internet connection).
+    * Merged in lp:~ed.so/duplicity/manpage.fixes
+      - Fix html output via rman on the website
 
 2016-11-16  Kenneth Loafman  <kenneth@loafman.com>
 
