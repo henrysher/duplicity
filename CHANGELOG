@@ -84,6 +84,8 @@ New in v0.7.08 (2016/07/02)
   - Set line length error length to 120 (matching tox.ini) for PEP8 and
     fixed E501(line too long) errors.
 * Merged in lp:~duplicity-team/duplicity/po-updates
+* Fix bug using 40-char sign keys, from Richard McGraw on mail list
+  - Remove truncation of argument and adjust comments
 
 
 New in v0.7.07.1 (2016/04/19)
