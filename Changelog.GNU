@@ -2,18 +2,6 @@
 
     * Fix bug using 40-char sign keys, from Richard McGraw on mail list
       - Remove truncation of argument and adjust comments
-    * Merged in lp:~dernils/duplicity/robust-dropbox-backend
-      - Added new command line option --backend-retry-delay
-        that allows to determine the time that duplicity sleeps
-        before retrying after an error has occured.
-      - Added some robustness to dpbxbackend.py that ensures re-authentication
-        happens in case that a socket is changed (e.g. due to a forced reconnect
-        of a dynamic internet connection).
-
-2016-11-16  Kenneth Loafman  <kenneth@loafman.com>
-
-    * Fixed bug #1642098 - does not create PAR2 archives when '--par2-options' is used
-      - Missing space between par2-options plus default options
 
 2016-11-16  Kenneth Loafman  <kenneth@loafman.com>
 

@@ -313,12 +313,6 @@ location; rather than needing to store only one volume at a time,
 enough storage space is required to store two volumes.
 
 .TP
-.BI "--backend-retry-delay " number
-Specifies the number of seconds that duplicity waits after an error has
-occured before attempting to repeat the operation.
-
-
-.TP
 .BI "--cf-backend " backend
 Allows the explicit selection of a cloudfiles backend. Defaults to
 .BR pyrax .
@@ -1023,15 +1017,6 @@ and are mentioned below the scheme's syntax summary.
 Formats of each of the URL schemes follow:
 
 .PP
-.B "Amazon Drive Backend"
-.PP
-.RS
-ad://some_dir
-.PP
-See also
-.B "A NOTE ON AMAZON DRIVE"
-.RE
-.PP
 .BR "Azure"
 .PP
 .RS
@@ -1510,25 +1495,6 @@ or contained in matched files.  So for instance
 matches any files whose full pathnames contain 7 consecutive digits
 which aren't followed by 'foo'.  However, it wouldn't match /home even
 if /home/ben/1234567 existed.
-
-.SH A NOTE ON AMAZON DRIVE
-.IP 1.
-The API Keys used for Amazon Drive have not been granted production limits.
-Amazon do not say what the development limits are and are not replying to
-to requests to whitelist duplicity. A related tool, acd_cli, was demoted to
-development limits, but continues to work fine except for cases of excessive
-usage. If you experience throttling and similar issues with Amazon Drive using
-this backend, please report them to the mailing list.
-.IR
-.IP 2.
-If you previously used the
-.BI acd+acdcli
-backend, it is strongly recommended to update to the
-.BI ad
-backend instead, since it interfaces directly with Amazon Drive. You will need
-to setup the OAuth once again, but can otherwise keep your backups and config.
-.IR
-.RE
 
 .SH A NOTE ON AZURE ACCESS
 The Azure backend requires the Microsoft Azure Storage SDK for Python to be
@@ -2132,13 +2098,6 @@ interpreter version 2.6+ installed.
 It is best used under GNU/Linux.
 
 Some backends also require additional components (probably available as packages for your specific platform):
-.TP
-.BR "Amazon Drive backend"
-.B python-requests
-- http://python-requests.org
-.br
-.B python-requests-oauthlib
-- https://github.com/requests/requests-oauthlib
 .TP
 .BR "azure backend" " (Azure Blob Storage Service)"
 .B Microsoft Azure Storage SDK for Python
