@@ -395,9 +395,9 @@ def retry(operation, fatal=True):
                                  % (n, e.__class__.__name__, util.uexc(e)))
                     if not at_end:
                         if isinstance(e, TemporaryLoadException):
-                            time.sleep(90)  # wait longer before trying again
+                            time.sleep(3*globals.backend_retry_delay)  # wait longer before trying again
                         else:
-                            time.sleep(30)  # wait a bit before trying again
+                            time.sleep(globals.backend_retry_delay)  # wait a bit before trying again
                         if hasattr(self.backend, '_retry_cleanup'):
                             self.backend._retry_cleanup()
 

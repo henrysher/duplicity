@@ -624,6 +624,11 @@ def parse_cmdline_options(arglist):
                       metavar=_("path"), dest="file_changed",
                       callback=lambda o, s, v, p: setattr(p.values, "file_changed", v.rstrip('/')))
 
+    # delay time before next try after a failure of a backend operation
+    # TRANSL: Used in usage help. Example:
+    # --backend-retry-delay <seconds>
+    parser.add_option("--backend-retry-delay", type="int", metavar=_("seconds"))
+                      
     # parse the options
     (options, args) = parser.parse_args()
 
