@@ -517,7 +517,12 @@ class Path(ROPath):
     def setdata(self):
         """Refresh stat cache"""
         try:
-            self.stat = os.lstat(self.name)
+            # We may be asked to look at the target of symlinks rather than
+            # the link itself.
+            if globals.copy_links:
+                self.stat = os.stat(self.name)
+            else:
+                self.stat = os.lstat(self.name)
         except OSError as e:
             err_string = errno.errorcode[e[0]]
             if err_string in ["ENOENT", "ENOTDIR", "ELOOP", "ENOTCONN"]:
