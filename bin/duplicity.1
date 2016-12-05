@@ -331,6 +331,13 @@ Enable data comparison of regular files on action verify.
 This is disabled by default for performance reasons.
 
 .TP
+.BI --copy-links
+Enable copying the target of symlinks rather than the symlinks.
+This is disabled by default as a restore from the backup will not be identical
+to the original folders/files. Instead of restoring symlinks, the targets of
+the symlinks will be restored.
+
+.TP
 .BI "--dry-run "
 Calculate what would be done, but do not perform any backend actions
 
