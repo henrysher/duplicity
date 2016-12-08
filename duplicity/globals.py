@@ -274,6 +274,10 @@ rename = {}
 # enable data comparison on verify runs
 compare_data = False
 
+# When symlinks are encountered, the item they point to is copied rather than
+# the symlink.
+copy_links = False
+
 # When selected, triggers a dry-run before a full or incremental to compute
 # changes, then runs the real operation and keeps track of the real progress
 progress = False
