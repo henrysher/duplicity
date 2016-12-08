@@ -1,3 +1,8 @@
+2016-12-08  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~horgh/duplicity/copy-symlink-targets-721599
+      - Add --copy-links to copy symlink contents, not just the link itself.
+
 2016-11-21  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fix bug using 40-char sign keys, from Richard McGraw on mail list

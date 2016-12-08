@@ -98,6 +98,7 @@ class DPBXBackend(duplicity.backend.Backend):
         self.auth_flow = None
 
         self.login()
+
     def user_authenticated(self):
         try:
             account = self.api_client.users_get_current_account()
@@ -106,6 +107,7 @@ class DPBXBackend(duplicity.backend.Backend):
         except:
             log.Debug('User not authenticated')
             return False
+
     def load_access_token(self):
         return os.environ.get('DPBX_ACCESS_TOKEN', None)
 

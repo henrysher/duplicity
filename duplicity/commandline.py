@@ -290,6 +290,10 @@ def parse_cmdline_options(arglist):
     parser.add_option("--config-dir", type="file", metavar=_("path"),
                       help=optparse.SUPPRESS_HELP)
 
+    # When symlinks are encountered, the item they point to is copied rather than
+    # the symlink.
+    parser.add_option("--copy-links", action="store_true")
+
     # for testing -- set current time
     parser.add_option("--current-time", type="int",
                       dest="current_time", help=optparse.SUPPRESS_HELP)
@@ -628,7 +632,7 @@ def parse_cmdline_options(arglist):
     # TRANSL: Used in usage help. Example:
     # --backend-retry-delay <seconds>
     parser.add_option("--backend-retry-delay", type="int", metavar=_("seconds"))
-                      
+
     # parse the options
     (options, args) = parser.parse_args()
 

@@ -331,6 +331,12 @@ Enable data comparison of regular files on action verify.
 This is disabled by default for performance reasons.
 
 .TP
+.BI --copy-links
+Resolve symlinks during backup.
+Enabling this will resolve & back up the symlink's file/folder data instead of
+the symlink itself, potentially increasing the size of the backup.
+
+.TP
 .BI "--dry-run "
 Calculate what would be done, but do not perform any backend actions
 
