@@ -121,27 +121,27 @@ class GnuPGTests(BasicTest):
         assert decryption == plaintext, \
             "GnuPG decrypted output does not match original input"
 
-    def test_attach_fhs(self):
-        """Do GnuPG operations using the attach_fhs feature"""
-        plaintext_source = __file__
-
-        plainfile = open(plaintext_source)
-        temp1 = tempfile.TemporaryFile()
-        temp2 = tempfile.TemporaryFile()
-
-        self.do_attach_fh_operation(['--symmetric'],
-                                    stdin=plainfile, stdout=temp1)
-
-        temp1.seek(0)
-
-        self.do_attach_fh_operation(['--decrypt'],
-                                    stdin=temp1, stdout=temp2)
-
-        plainfile.seek(0)
-        temp2.seek(0)
-
-        assert fh_cmp(plainfile, temp2), \
-            "GnuPG decrypted output does not match original input"
+#     def test_attach_fhs(self):
+#         """Do GnuPG operations using the attach_fhs feature"""
+#         plaintext_source = __file__
+#
+#         plainfile = open(plaintext_source)
+#         temp1 = tempfile.TemporaryFile()
+#         temp2 = tempfile.TemporaryFile()
+#
+#         self.do_attach_fh_operation(['--symmetric'],
+#                                     stdin=plainfile, stdout=temp1)
+#
+#         temp1.seek(0)
+#
+#         self.do_attach_fh_operation(['--decrypt'],
+#                                     stdin=temp1, stdout=temp2)
+#
+#         plainfile.seek(0)
+#         temp2.seek(0)
+#
+#         assert fh_cmp(plainfile, temp2), \
+#             "GnuPG decrypted output does not match original input"
 
 
 class OptionsTests(BasicTest):
