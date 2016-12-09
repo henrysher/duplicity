@@ -56,10 +56,10 @@ time.tzset()
 
 class DuplicityTestCase(unittest.TestCase):
 
-    sign_key = '56538CCF'
+    sign_key = '839E6A2856538CCF'
     sign_passphrase = 'test'
-    encrypt_key1 = 'B5FA894F'
-    encrypt_key2 = '9B736B2A'
+    encrypt_key1 = '839E6A2856538CCF'
+    encrypt_key2 = '453005CE9B736B2A'
 
     def setUp(self):
         super(DuplicityTestCase, self).setUp()

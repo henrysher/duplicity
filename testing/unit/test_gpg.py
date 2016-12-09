@@ -108,7 +108,7 @@ class GPGTest(UnitTestCase):
         assert decrypted_file.read() == plaintext
         decrypted_file.close()
         sig = decrypted_file.get_signature()
-        assert sig == self.sign_key, sig
+        assert sig == self.sign_key, sig[-8:]
 
     def test_gpg_signing_and_hidden_encryption(self):
         """Test to make sure GPG reports the proper signature key even with hidden encryption key id"""
@@ -127,7 +127,7 @@ class GPGTest(UnitTestCase):
         assert decrypted_file.read() == plaintext
         decrypted_file.close()
         sig = decrypted_file.get_signature()
-        assert sig == self.sign_key, sig
+        assert sig == self.sign_key, sig[-8:]
 
     def test_GPGWriteFile(self):
         """Test GPGWriteFile"""
