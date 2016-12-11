@@ -83,8 +83,6 @@ class MatchingTest(UnitTestCase):
 
         with patch('duplicity.path.ROPath.isdir') as mock_isdir:
             mock_isdir.return_value = True
-            # Can't pass the return_value as an argument to patch, as build
-            # system's mock is too old to support it.
 
             assert sf2(self.makeext("usr")) is None
             assert sf2(self.makeext("usr/local")) is None
@@ -665,6 +663,36 @@ class ParseArgsTest(UnitTestCase):
                         ("--exclude", "**t/1/1"),
                         ("--exclude", "**t/1/3")],
                        [(), ('2',), ('2', '1')])
+
+    def test_includes_files(self):
+        """Unit test the functional test test_includes_files"""
+        # Test for Bug 1624725
+        # https://bugs.launchpad.net/duplicity/+bug/1624725
+        self.root = Path("testfiles/select2/1/1sub1")
+        self.ParseTest([("--include", "testfiles/select2/1/1sub1/1sub1sub1"),
+                        ("--exclude", "**")],
+                       [(), ('1sub1sub1',), ('1sub1sub1',
+                                             '1sub1sub1_file.txt')])
+
+    def test_includes_files_trailing_slash(self):
+        """Unit test the functional test test_includes_files_trailing_slash"""
+        # Test for Bug 1624725
+        # https://bugs.launchpad.net/duplicity/+bug/1624725
+        self.root = Path("testfiles/select2/1/1sub1")
+        self.ParseTest([("--include", "testfiles/select2/1/1sub1/1sub1sub1/"),
+                        ("--exclude", "**")],
+                       [(), ('1sub1sub1',), ('1sub1sub1',
+                                             '1sub1sub1_file.txt')])
+
+    def test_includes_files_trailing_slash_globbing_chars(self):
+        """Unit test functional test_includes_files_trailing_slash_globbing_chars"""
+        # Test for Bug 1624725
+        # https://bugs.launchpad.net/duplicity/+bug/1624725
+        self.root = Path("testfiles/select2/1/1sub1")
+        self.ParseTest([("--include", "testfiles/s?lect2/1/1sub1/1sub1sub1/"),
+                        ("--exclude", "**")],
+                       [(), ('1sub1sub1',), ('1sub1sub1',
+                                             '1sub1sub1_file.txt')])
 
     def test_glob(self):
         """Test globbing expression"""

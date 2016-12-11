@@ -29,6 +29,10 @@ New in v0.7.11 (2016/09/??)
   - Fix html output via rman on the website
 * Merged in lp:~horgh/duplicity/copy-symlink-targets-721599
   - Add --copy-links to copy symlink contents, not just the link itself.
+* Merged in lp:~aaron-whitehouse/duplicity/Bug_1624725_files_within_folder_slash
+  - Fixed Bug #1624725, so that an include glob ending in "/" now includes folder contents (for globs with
+    and without special characters). This preserves the behaviour that an expression ending in "/" only
+    matches a folder, but now the contents of any matching folder is included.
 
 
 New in v0.7.10 (2016/08/20)
