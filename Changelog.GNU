@@ -1,3 +1,10 @@
+2016-12-11  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/Bug_1624725_files_within_folder_slash
+      - Fixed Bug #1624725, so that an include glob ending in "/" now includes folder contents (for globs with
+        and without special characters). This preserves the behaviour that an expression ending in "/" only
+        matches a folder, but now the contents of any matching folder is included.
+
 2016-12-08  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~horgh/duplicity/copy-symlink-targets-721599
