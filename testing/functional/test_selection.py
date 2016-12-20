@@ -19,7 +19,13 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import os
-import unittest
+import sys
+import platform
+
+if sys.version_info < (2, 7):
+    import unittest2 as unittest  # @UnresolvedImport @UnusedImport
+else:
+    import unittest  # @Reimport
 
 from . import FunctionalTestCase
 
@@ -971,6 +977,8 @@ class TestExcludeIfPresent(IncludeExcludeFunctionalTest):
 class TestLockedFoldersNoError(IncludeExcludeFunctionalTest):
     """ This tests that inaccessible folders do not cause an error"""
 
+    @unittest.skipUnless(platform.platform().startswith('Linux'),
+                         'Skip on non-Linux systems')
     def test_locked_baseline(self):
         """ Test no error if locked in path but excluded"""
         folder_to_lock = "testfiles/select2/1/1sub1/1sub1sub3"
@@ -986,6 +994,8 @@ class TestLockedFoldersNoError(IncludeExcludeFunctionalTest):
         self.assertEqual(restored, [['1sub1sub1'],
                                     ['1sub1sub1_file.txt']])
 
+    @unittest.skipUnless(platform.platform().startswith('Linux'),
+                         'Skip on non-Linux systems')
     def test_locked_excl_if_present(self):
         """ Test no error if excluded locked with --exclude-if-present"""
         # Regression test for Bug #1620085
