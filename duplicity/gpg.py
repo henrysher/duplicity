@@ -140,7 +140,7 @@ class GPGFile:
             # This forces gpg2 to ignore the agent.
             # Necessary to enforce truly non-interactive operation.
             if platform.platform().startswith('Linux'):
-                gnupg.options.extra_args.append('--pinentry-mode=cancel')
+                gnupg.options.extra_args.append('--pinentry-mode=loopback')
         if globals.gpg_options:
             for opt in globals.gpg_options.split():
                 gnupg.options.extra_args.append(opt)
