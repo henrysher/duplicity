@@ -977,11 +977,11 @@ class TestFolderIncludesFiles(IncludeExcludeFunctionalTest):
                              "--exclude", "testfiles/select2/1/1sub1/irrelevant.txt"])
         self.restore()
         restore_dir = 'testfiles/restore_out'
-    @unittest.skipUnless(platform.platform().startswith('Linux'),
-                         'Skip on non-Linux systems')
         restored = self.directory_tree_to_list_of_lists(restore_dir)
         self.assertEqual(restored, [])
 
+    @unittest.skipUnless(platform.platform().startswith('Linux'),
+                         'Skip on non-Linux systems')
     def test_excludes_files_trailing_slash(self):
         """Excluding a folder excludes the files within it, if ends with /"""
         self.backup("full", "testfiles/select2/1/1sub1",

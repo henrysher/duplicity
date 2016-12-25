@@ -18,3 +18,4 @@ po/duplicity.pot-e
 random_seed
 testfiles
 docs/_build
+testing/gnupg/private-keys-v1.d
