@@ -31,6 +31,7 @@ import tempfile
 import re
 import gzip
 import locale
+import platform
 
 from duplicity import globals
 from duplicity import gpginterface
@@ -138,7 +139,8 @@ class GPGFile:
         elif profile.gpg_major == 2:
             # This forces gpg2 to ignore the agent.
             # Necessary to enforce truly non-interactive operation.
-            gnupg.options.extra_args.append('--pinentry-mode=cancel')
+            if platform.platform().startswith('Linux'):
+                gnupg.options.extra_args.append('--pinentry-mode=loopback')
         if globals.gpg_options:
             for opt in globals.gpg_options.split():
                 gnupg.options.extra_args.append(opt)

@@ -19,7 +19,13 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import os
-import unittest
+import sys
+import platform
+
+if sys.version_info < (2, 7):
+    import unittest2 as unittest  # @UnresolvedImport @UnusedImport
+else:
+    import unittest  # @Reimport
 
 from . import FunctionalTestCase
 
@@ -971,6 +977,8 @@ class TestFolderIncludesFiles(IncludeExcludeFunctionalTest):
                              "--exclude", "testfiles/select2/1/1sub1/irrelevant.txt"])
         self.restore()
         restore_dir = 'testfiles/restore_out'
+    @unittest.skipUnless(platform.platform().startswith('Linux'),
+                         'Skip on non-Linux systems')
         restored = self.directory_tree_to_list_of_lists(restore_dir)
         self.assertEqual(restored, [])
 
@@ -986,6 +994,8 @@ class TestFolderIncludesFiles(IncludeExcludeFunctionalTest):
         restore_dir = 'testfiles/restore_out'
         restored = self.directory_tree_to_list_of_lists(restore_dir)
         self.assertEqual(restored, [])
+    @unittest.skipUnless(platform.platform().startswith('Linux'),
+                         'Skip on non-Linux systems')
 
     def test_excludes_files_trailing_slash_globbing_chars(self):
         """Tests folder excludes with globbing char and /"""

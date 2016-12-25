@@ -1,3 +1,8 @@
+2016-12-25  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fix some issues with testing on MacOS
+    * Fix problem with gpg2 in yakety and zesty
+
 2016-12-11  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~aaron-whitehouse/duplicity/Bug_1624725_files_within_folder_slash
