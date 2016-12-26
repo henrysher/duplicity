@@ -447,10 +447,24 @@ probably isn't what you meant.""") %
 
         def exclude_sel_func(path):
             # do not follow symbolic links when checking for file existence!
-            if path.isdir() and path.append(filename).exists():
-                return 0
-            else:
-                return None
+            if path.isdir():
+                # First check path is read accessible
+                if not (os.access(path.name, os.R_OK)):
+                    # Path is not read accessible
+                    # ToDo: Ideally this error would only show if the folder
+                    # was ultimately included by the full set of selection
+                    # functions. Currently this will give an error for any
+                    # locked directory within the folder being backed up.
+                    log.Warn(_(
+                        "Error accessing possibly locked file %s") % util.ufn(
+                        path.name),
+                        log.WarningCode.cannot_read, util.escape(path.name))
+                    if diffdir.stats:
+                        diffdir.stats.Errors += 1
+                elif path.append(filename).exists():
+                    return 0
+                else:
+                    return None
 
         if include == 0:
             sel_func = exclude_sel_func
