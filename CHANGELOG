@@ -63,6 +63,10 @@ New in v0.8.00 (2016/07/??)
 * Fix problem with gpg2 in yakety and zesty
 * Fix Bug #1642813 with patch from Ravi
   - If stat() returns None, don't attempt to set perms.
+* Merged in lp:~breunigs/duplicity/amazondrive3
+  - As reported on the mailinglist, if a space is entered while duplicity asks for the URL, it fails.
+    Since all important spaces are URL encoded anyway, this should be fine even if there are spaces in
+    the URL at all. I also patched it in the onedrive backend, because it must have similar issues.
 
 
 New in v0.7.08 (2016/07/02)

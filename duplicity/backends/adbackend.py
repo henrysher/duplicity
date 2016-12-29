@@ -147,7 +147,7 @@ class ADBackend(duplicity.backend.Backend):
             print ''
 
             redirected_to = (raw_input('URL of the resulting page: ')
-                             .replace('http://', 'https://', 1))
+                             .replace('http://', 'https://', 1)).strip()
 
             token = self.http_client.fetch_token(
                 self.OAUTH_TOKEN_URL,
