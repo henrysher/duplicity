@@ -1,3 +1,8 @@
+2016-12-29  Kenneth Loafman  <kenneth@loafman.com>
+
+* Fix Bug #1642813 with patch from Ravi
+  - If stat() returns None, don't attempt to set perms.
+
 2016-12-25  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fix some issues with testing on MacOS

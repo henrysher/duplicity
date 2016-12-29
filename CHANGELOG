@@ -61,6 +61,8 @@ New in v0.8.00 (2016/07/??)
     matches a folder, but now the contents of any matching folder is included.
 * Fix some issues with testing on MacOS
 * Fix problem with gpg2 in yakety and zesty
+* Fix Bug #1642813 with patch from Ravi
+  - If stat() returns None, don't attempt to set perms.
 
 
 New in v0.7.08 (2016/07/02)

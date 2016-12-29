@@ -464,7 +464,8 @@ class ROPath:
     def copy_attribs(self, other):
         """Only copy attributes from self to other"""
         if isinstance(other, Path):
-            util.maybe_ignore_errors(lambda: os.chown(other.name, self.stat.st_uid, self.stat.st_gid))
+            if self.stat is not None:
+                util.maybe_ignore_errors(lambda: os.chown(other.name, self.stat.st_uid, self.stat.st_gid))
             util.maybe_ignore_errors(lambda: os.chmod(other.name, self.mode))
             util.maybe_ignore_errors(lambda: os.utime(other.name, (time.time(), self.stat.st_mtime)))
             other.setdata()
