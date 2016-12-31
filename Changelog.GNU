@@ -1,3 +1,7 @@
+2016-12-31  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Prep for 0.7.11
+
 2016-12-29  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fix Bug #1642813 with patch from Ravi
