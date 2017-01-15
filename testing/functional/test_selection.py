@@ -855,7 +855,7 @@ class TestTrailingSlash2(IncludeExcludeFunctionalTest):
 
     def test_trailing_slash(self):
         """ Test that globs with a trailing slash only match directories"""
-        # ToDo: Bug #1479545
+        # Regression test for Bug #1479545
         # (https://bugs.launchpad.net/duplicity/+bug/1479545)
         self.backup("full", "testfiles/select2",
                     options=["--include", "testfiles/select2/1.py/",
@@ -887,7 +887,7 @@ class TestTrailingSlash2(IncludeExcludeFunctionalTest):
         restore_dir = 'testfiles/restore_out'
         restored = self.directory_tree_to_list_of_lists(restore_dir)
         self.assertEqual(restored, [['1'], ['1sub1'],
-                                     ['1sub1sub1', '1sub1sub2', '1sub1sub3']])
+                                    ['1sub1sub1', '1sub1sub2', '1sub1sub3']])
 
 
 class TestGlobbingReplacement(IncludeExcludeFunctionalTest):
@@ -926,6 +926,90 @@ class TestGlobbingReplacement(IncludeExcludeFunctionalTest):
         restore_dir = 'testfiles/restore_out'
         restored = self.directory_tree_to_list_of_lists(restore_dir)
         self.assertEqual(restored, self.expected_restored_tree)
+
+
+class TestExcludeIfPresent(IncludeExcludeFunctionalTest):
+    """ This tests the behaviour of duplicity's --exclude-if-present option"""
+
+    def test_exclude_if_present_baseline(self):
+        """ Test that duplicity normally backs up files"""
+        with open("testfiles/select2/1/1sub1/1sub1sub1/.nobackup", "w") as tag:
+            tag.write("Files in this folder should not be backed up.")
+        self.backup("full", "testfiles/select2/1/1sub1",
+                    options=["--include", "testfiles/select2/1/1sub1/1sub1sub1/*",
+                             "--exclude", "**"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, [['1sub1sub1'],
+                                    ['.nobackup', '1sub1sub1_file.txt']])
+
+    def test_exclude_if_present_excludes(self):
+        """ Test that duplicity excludes files with relevant tag"""
+        with open("testfiles/select2/1/1sub1/1sub1sub1/.nobackup", "w") as tag:
+            tag.write("Files in this folder should not be backed up.")
+        self.backup("full", "testfiles/select2/1/1sub1",
+                    options=["--exclude-if-present", ".nobackup",
+                             "--include", "testfiles/select2/1/1sub1/1sub1sub1/*",
+                             "--exclude", "**"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, [])
+
+    def test_exclude_if_present_excludes_2(self):
+        """ Test that duplicity excludes files with relevant tag"""
+        with open("testfiles/select2/1/1sub1/1sub1sub1/EXCLUDE.tag", "w") as tag:
+            tag.write("Files in this folder should also not be backed up.")
+        self.backup("full", "testfiles/select2/1/1sub1",
+                    options=["--exclude-if-present", "EXCLUDE.tag",
+                             "--include", "testfiles/select2/1/1sub1/1sub1sub1/*",
+                             "--exclude", "**"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, [])
+
+
+class TestLockedFoldersNoError(IncludeExcludeFunctionalTest):
+    """ This tests that inaccessible folders do not cause an error"""
+
+    @unittest.skipUnless(platform.platform().startswith('Linux'),
+                         'Skip on non-Linux systems')
+    def test_locked_baseline(self):
+        """ Test no error if locked in path but excluded"""
+        folder_to_lock = "testfiles/select2/1/1sub1/1sub1sub3"
+        initial_mode = os.stat(folder_to_lock).st_mode
+        os.chmod(folder_to_lock, 0o0000)
+        self.backup("full", "testfiles/select2/1/1sub1",
+                    options=["--include", "testfiles/select2/1/1sub1/1sub1sub1/*",
+                             "--exclude", "**"])
+        os.chmod(folder_to_lock, initial_mode)
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, [['1sub1sub1'],
+                                    ['1sub1sub1_file.txt']])
+
+    @unittest.skipUnless(platform.platform().startswith('Linux'),
+                         'Skip on non-Linux systems')
+    def test_locked_excl_if_present(self):
+        """ Test no error if excluded locked with --exclude-if-present"""
+        # Regression test for Bug #1620085
+        # https://bugs.launchpad.net/duplicity/+bug/1620085
+        folder_to_lock = "testfiles/select2/1/1sub1/1sub1sub3"
+        initial_mode = os.stat(folder_to_lock).st_mode
+        os.chmod(folder_to_lock, 0o0000)
+        self.backup("full", "testfiles/select2/1/1sub1",
+                    options=["--exclude-if-present", "EXCLUDE.tag",
+                             "--include", "testfiles/select2/1/1sub1/1sub1sub1/*",
+                             "--exclude", "**"])
+        os.chmod(folder_to_lock, initial_mode)
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, [['1sub1sub1'],
+                                    ['1sub1sub1_file.txt']])
 
 
 class TestFolderIncludesFiles(IncludeExcludeFunctionalTest):
@@ -978,8 +1062,6 @@ class TestFolderIncludesFiles(IncludeExcludeFunctionalTest):
         restored = self.directory_tree_to_list_of_lists(restore_dir)
         self.assertEqual(restored, [])
 
-    @unittest.skipUnless(platform.platform().startswith('Linux'),
-                         'Skip on non-Linux systems')
     def test_excludes_files_trailing_slash(self):
         """Excluding a folder excludes the files within it, if ends with /"""
         self.backup("full", "testfiles/select2/1/1sub1",
@@ -992,8 +1074,6 @@ class TestFolderIncludesFiles(IncludeExcludeFunctionalTest):
         restore_dir = 'testfiles/restore_out'
         restored = self.directory_tree_to_list_of_lists(restore_dir)
         self.assertEqual(restored, [])
-    @unittest.skipUnless(platform.platform().startswith('Linux'),
-                         'Skip on non-Linux systems')
 
     def test_excludes_files_trailing_slash_globbing_chars(self):
         """Tests folder excludes with globbing char and /"""
