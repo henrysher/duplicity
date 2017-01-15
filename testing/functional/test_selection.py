@@ -22,10 +22,7 @@ import os
 import sys
 import platform
 
-if sys.version_info < (2, 7):
-    import unittest2 as unittest  # @UnresolvedImport @UnusedImport
-else:
-    import unittest  # @Reimport
+import unittest
 
 from . import FunctionalTestCase
 
@@ -842,45 +839,7 @@ class TestTrailingSlash(IncludeExcludeFunctionalTest):
         self.restore_and_check()
 
 
-class TestGlobbingReplacement(IncludeExcludeFunctionalTest):
-    """ This tests the behaviour of the extended shell globbing pattern replacement functions."""
-    # See the manual for a description of behaviours, but in summary:
-    # * can be expanded to any string of characters not containing "/"
-    # ? expands to any character except "/" and
-    # [...] expands to a single character of those characters specified (ranges are acceptable).
-    # The new special pattern, **, expands to any string of characters whether or not it contains "/".
-    # Furthermore, if the pattern starts with "ignorecase:" (case insensitive), then this prefix will be
-    # removed and any character in the string can be replaced with an upper- or lowercase version of itself.
-
-    def test_globbing_replacement_in_includes(self):
-        """ Test behaviour of the extended shell globbing pattern replacement functions in both include and exclude"""
-        # Identical to test_include_exclude_basic with globbing characters added to both include and exclude lines
-        # Exhibits the issue reported in Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371).
-        # See above and the unit tests for more granularity on the issue.
-        self.backup("full", "testfiles/select2",
-                    options=["--include", "testfiles/select2/**/3sub3sub2/3sub3su?2_file.txt",  # Note ** and ? added
-                             "--exclude", "testfiles/select2/*/3s*1",  # Note * added in both directory and filename
-                             "--exclude", "testfiles/select2/**/2sub1sub3",  # Note ** added
-                             "--exclude", "ignorecase:testfiles/select2/2/2sub1/2Sub1Sub2",  # Note ignorecase added
-                             "--include", "ignorecase:testfiles/sel[w,u,e,q]ct2/2/2S?b1",    # Note ignorecase, [] and
-                             # ? added
-                             "--exclude", "testfiles/select2/1/1sub3/1s[w,u,p,q]b3sub2",  # Note [] added
-                             "--exclude", "testfiles/select2/1/1sub[1-4]/1sub3sub1",  # Note [range] added
-                             "--include", "testfiles/select2/*/1sub2/1s[w,u,p,q]b2sub1",  # Note * and [] added
-                             "--exclude", "testfiles/select2/1/1sub1/1sub1sub3/1su?1sub3_file.txt",  # Note ? added
-                             "--exclude", "testfiles/select2/1/1*1/1sub1sub2",  # Note * added
-                             "--exclude", "testfiles/select2/1/1sub2",
-                             "--include", "testfiles/select[2-4]/*.py",  # Note * and [range] added
-                             "--include", "testfiles/*2/3",  # Note * added
-                             "--include", "**/select2/1",  # Note ** added
-                             "--exclude", "testfiles/select2/**"])
-        self.restore()
-        restore_dir = 'testfiles/restore_out'
-        restored = self.directory_tree_to_list_of_lists(restore_dir)
-        self.assertEqual(restored, self.expected_restored_tree)
-
-
-class TestTrailingSlash(IncludeExcludeFunctionalTest):
+class TestTrailingSlash2(IncludeExcludeFunctionalTest):
     """ This tests the behaviour of globbing strings with a trailing slash"""
     # See Bug #1479545 (https://bugs.launchpad.net/duplicity/+bug/1479545)
 
@@ -929,6 +888,45 @@ class TestTrailingSlash(IncludeExcludeFunctionalTest):
         restored = self.directory_tree_to_list_of_lists(restore_dir)
         self.assertEqual(restored, [['1'], ['1sub1'],
                                      ['1sub1sub1', '1sub1sub2', '1sub1sub3']])
+
+
+class TestGlobbingReplacement(IncludeExcludeFunctionalTest):
+    """ This tests the behaviour of the extended shell globbing pattern replacement functions."""
+    # See the manual for a description of behaviours, but in summary:
+    # * can be expanded to any string of characters not containing "/"
+    # ? expands to any character except "/" and
+    # [...] expands to a single character of those characters specified (ranges are acceptable).
+    # The new special pattern, **, expands to any string of characters whether or not it contains "/".
+    # Furthermore, if the pattern starts with "ignorecase:" (case insensitive), then this prefix will be
+    # removed and any character in the string can be replaced with an upper- or lowercase version of itself.
+
+    def test_globbing_replacement_in_includes(self):
+        """ Test behaviour of the extended shell globbing pattern replacement functions in both include and exclude"""
+        # Identical to test_include_exclude_basic with globbing characters added to both include and exclude lines
+        # Exhibits the issue reported in Bug #884371 (https://bugs.launchpad.net/duplicity/+bug/884371).
+        # See above and the unit tests for more granularity on the issue.
+        self.backup("full", "testfiles/select2",
+                    options=["--include", "testfiles/select2/**/3sub3sub2/3sub3su?2_file.txt",  # Note ** and ? added
+                             "--exclude", "testfiles/select2/*/3s*1",  # Note * added in both directory and filename
+                             "--exclude", "testfiles/select2/**/2sub1sub3",  # Note ** added
+                             "--exclude", "ignorecase:testfiles/select2/2/2sub1/2Sub1Sub2",  # Note ignorecase added
+                             "--include", "ignorecase:testfiles/sel[w,u,e,q]ct2/2/2S?b1",    # Note ignorecase, [] and
+                             # ? added
+                             "--exclude", "testfiles/select2/1/1sub3/1s[w,u,p,q]b3sub2",  # Note [] added
+                             "--exclude", "testfiles/select2/1/1sub[1-4]/1sub3sub1",  # Note [range] added
+                             "--include", "testfiles/select2/*/1sub2/1s[w,u,p,q]b2sub1",  # Note * and [] added
+                             "--exclude", "testfiles/select2/1/1sub1/1sub1sub3/1su?1sub3_file.txt",  # Note ? added
+                             "--exclude", "testfiles/select2/1/1*1/1sub1sub2",  # Note * added
+                             "--exclude", "testfiles/select2/1/1sub2",
+                             "--include", "testfiles/select[2-4]/*.py",  # Note * and [range] added
+                             "--include", "testfiles/*2/3",  # Note * added
+                             "--include", "**/select2/1",  # Note ** added
+                             "--exclude", "testfiles/select2/**"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, self.expected_restored_tree)
+
 
 class TestFolderIncludesFiles(IncludeExcludeFunctionalTest):
     """ This tests that including a folder includes the files within it"""
