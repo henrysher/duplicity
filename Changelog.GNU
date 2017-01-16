@@ -2,6 +2,8 @@
 
     * Fixed bug #1623342 with patch supplied by Daniel Jakots
       - Failing test on OpenBSD because tar/gtar not found
+    * Fixed bug #1654220 with patch supplied by Kenneth Newwood
+      - Duplicity fails on MacOS because GPG version parsing fails
 
 2016-12-31  Kenneth Loafman  <kenneth@loafman.com>
 
