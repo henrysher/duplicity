@@ -139,12 +139,12 @@ class ADBackend(duplicity.backend.Backend):
             authorization_url, _ = self.http_client.authorization_url(
                 self.OAUTH_AUTHORIZE_URL)
 
-            print ''
-            print ('In order to allow duplicity to access Amazon Drive, please '
-                   'open the following URL in a browser and copy the URL of the '
-                   'page you see after authorization here:')
-            print authorization_url
-            print ''
+            print('')
+            print('In order to allow duplicity to access Amazon Drive, please '
+                  'open the following URL in a browser and copy the URL of the '
+                  'page you see after authorization here:')
+            print(authorization_url)
+            print('')
 
             redirected_to = (raw_input('URL of the resulting page: ')
                              .replace('http://', 'https://', 1)).strip()

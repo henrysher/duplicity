@@ -71,7 +71,13 @@ New in v0.8.00 (2016/07/??)
   - Failing test on OpenBSD because tar/gtar not found
 * Fixed bug #1654220 with patch supplied by Kenneth Newwood
   - Duplicity fails on MacOS because GPG version parsing fails
-
+* Merged in lp:~aaron-whitehouse/duplicity/0-8-merge_selection_tests
+  - Merge in TestExcludeIfPresent from 0.7-series, which tests the behaviour of
+    duplicity's --exclude-if-present option.
+  - Move and rename TestTrailingSlash2 test (was duplicate name) as in 0.7-series.
+  - Fix PEP error on adbackend.py.
+  - Add jottalib as a tox dep to fix pylint error.
+  - Remove unnecessary skipUnless Linux as per 0.7-series.
 
 New in v0.7.08 (2016/07/02)
 ---------------------------
