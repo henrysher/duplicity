@@ -323,11 +323,11 @@ class RestartTestWithoutEncryption(RestartTest):
         https://launchpad.net/bugs/929067
         """
 
-        if platform.platform().startswith('Linux'):
+        if platform.system().startswith('Linux'):
             tarcmd = "tar"
-        elif platform.platform().startswith('Darwin'):
+        elif platform.system().startswith('Darwin'):
             tarcmd = "gtar"
-        elif platform.platform().endswith('BSD'):
+        elif platform.system().endswith('BSD'):
             tarcmd = "gtar"
         else:
             raise Exception("Platform %s not supported by tar/gtar." % platform.platform())
