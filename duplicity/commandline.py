@@ -1089,9 +1089,22 @@ def ProcessCommandLine(cmdline_list):
     "remove-old", "restore", "verify", "full", or "inc".
 
     """
+    # build initial gpg_profile
     globals.gpg_profile = gpg.GPGProfile()
 
+    # parse command line
     args = parse_cmdline_options(cmdline_list)
+
+    # if we get a different gpg-binary from the commandline then redo gpg_profile
+    if globals.gpg_binary is not None:
+        src = globals.gpg_profile
+        globals.gpg_profile = gpg.GPGProfile(
+            passphrase=src.passphrase,
+            sign_key=src.sign_key,
+            recipients=src.recipients,
+            hidden_recipients=src.hidden_recipients)
+    log.Debug(_("GPG binary is %s, version %d") %
+        ((globals.gpg_binary or 'gpg'), globals.gpg_profile.gpg_major))
 
     # we can now try to import all the backends
     backend.import_backends()
