@@ -35,7 +35,7 @@ class VolumeInfoTest(UnitTestCase):
         vi.set_info(3, ("hello", "there"), None, (), None)
         vi.set_hash("MD5", "aoseutaohe")
         s = vi.to_string()
-        assert isinstance(s, bytes)
+        assert isinstance(s, types.StringType)
         # print "---------\n%s\n---------" % s
         vi2 = manifest.VolumeInfo()
         vi2.from_string(s)
@@ -50,7 +50,7 @@ class VolumeInfoTest(UnitTestCase):
                     ("\n",),
                     None)
         s = vi.to_string()
-        assert isinstance(s, bytes)
+        assert isinstance(s, types.StringType)
         # print "---------\n%s\n---------" % s
         vi2 = manifest.VolumeInfo()
         vi2.from_string(s)

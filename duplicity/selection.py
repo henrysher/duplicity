@@ -176,7 +176,7 @@ class Select:
 
         while diryield_stack:
             try:
-                subpath, val = diryield_stack[-1].next()
+                subpath, val = next(diryield_stack[-1])
             except StopIteration:
                 diryield_stack.pop()
                 if delayed_path_stack:
