@@ -78,6 +78,9 @@ New in v0.8.00 (2016/07/??)
   - Fix PEP error on adbackend.py.
   - Add jottalib as a tox dep to fix pylint error.
   - Remove unnecessary skipUnless Linux as per 0.7-series.
+* Fixed bug #1655268 "--gpg-binary option not working"
+  - If gpg binary is specified rebuild gpg profile using new binary location
+
 
 New in v0.7.08 (2016/07/02)
 ---------------------------

@@ -1,3 +1,8 @@
+2017-01-19  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1655268 "--gpg-binary option not working"
+      - If gpg binary is specified rebuild gpg profile using new binary location
+
 2017-01-16  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1623342 with patch supplied by Daniel Jakots
