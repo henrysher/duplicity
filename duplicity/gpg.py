@@ -87,19 +87,19 @@ class GPGProfile:
         else:
             self.hidden_recipients = []
 
-        self.gpg_major = self.get_gpg_major(globals.gpg_binary)
+        self.gpg_version = self.get_gpg_version(globals.gpg_binary)
 
-    _version_re = re.compile(r'^gpg.*\(GnuPG(?:\/MacGPG2)?\) (?P<maj>[0-9])\.[0-9]+\.[0-9]+$')
+    _version_re = re.compile(r'^gpg.*\(GnuPG(?:/MacGPG2)?\) (?P<maj>[0-9]+)\.(?P<min>[0-9]+)\.(?P<bug>[0-9]+)$')
 
-    def get_gpg_major(self, binary):
+    def get_gpg_version(self, binary):
         gpg = gpginterface.GnuPG()
         if binary is not None:
             gpg.call = binary
         res = gpg.run(["--version"], create_fhs=["stdout"])
         line = res.handles["stdout"].readline().rstrip()
-        mtc = self._version_re.search(line)
-        if mtc is not None:
-            return int(mtc.group("maj"), 10)
+        m = self._version_re.search(line)
+        if m is not None:
+            return (int(m.group("maj")), int(m.group("min")), int(m.group("bug")))
         raise GPGError("failed to determine gpg version of %s from %s" % (binary, line))
 
 
@@ -136,11 +136,10 @@ class GPGFile:
         gnupg.options.extra_args.append('--no-secmem-warning')
         if globals.use_agent:
             gnupg.options.extra_args.append('--use-agent')
-        elif profile.gpg_major == 2:
+        elif profile.gpg_version >= (2, 1, 0):
             # This forces gpg2 to ignore the agent.
             # Necessary to enforce truly non-interactive operation.
-            if platform.platform().startswith('Linux'):
-                gnupg.options.extra_args.append('--pinentry-mode=loopback')
+            gnupg.options.extra_args.append('--pinentry-mode=loopback')
         if globals.gpg_options:
             for opt in globals.gpg_options.split():
                 gnupg.options.extra_args.append(opt)
