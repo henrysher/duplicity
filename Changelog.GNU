@@ -1,3 +1,11 @@
+2017-01-24  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~matthew-t-bentley/duplicity/duplicity
+      - Sets a user agent. Backblaze asked for this in case there are errors that originate
+        from the Duplicity B2 backend
+      - Only retrieves a new upload URL when the current one expires, to bring it in line
+        with their best practices for integrations: https://www.backblaze.com/b2/docs/integration_checklist.html
+
 2017-01-19  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1655268 "--gpg-binary option not working"
