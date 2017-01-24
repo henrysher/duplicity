@@ -24,6 +24,7 @@
 
 import os
 import hashlib
+from sys import version_info
 
 import duplicity.backend
 from duplicity.errors import BackendException, FatalBackendException
@@ -63,6 +64,7 @@ class B2Backend(duplicity.backend.Backend):
 
         self.id_and_key = self.account_id + ":" + account_key
         self._authorize()
+        self.upload_info = None
 
         try:
             self.find_or_create_bucket(self.bucket_name)
@@ -71,7 +73,12 @@ class B2Backend(duplicity.backend.Backend):
 
     def _authorize(self):
         basic_auth_string = 'Basic ' + base64.b64encode(self.id_and_key)
-        headers = {'Authorization': basic_auth_string}
+        v = version_info
+        headers = {
+            'Authorization': basic_auth_string,
+            'User-Agent': 'duplicity version $version, python %s.%s.%s' % (
+                v[0], v[1], v[2]),
+        }
 
         request = urllib2.Request(
             'https://api.backblazeb2.com/b2api/v1/b2_authorize_account',
@@ -245,9 +252,11 @@ class B2Backend(duplicity.backend.Backend):
         """
         Get an upload url for a bucket
         """
-        endpoint = 'b2_get_upload_url'
-        url = self.formatted_url(endpoint)
-        return self.get_or_post(url, {'bucketId': bucket_id})
+        if self.upload_info is None:
+            endpoint = 'b2_get_upload_url'
+            url = self.formatted_url(endpoint)
+            self.upload_info = self.get_or_post(url, {'bucketId': bucket_id})
+        return self.upload_info
 
     def get_or_post(self, url, data, headers=None, data_file=None):
         """
@@ -264,6 +273,9 @@ class B2Backend(duplicity.backend.Backend):
             data = data_file
         else:
             data = json.dumps(data) if data else None
+        v = version_info
+        headers['User-Agent'] = "duplicity version $version, " + \
+            "python %s.%s.%s" % (v[0], v[1], v[2])
 
         encoded_headers = dict(
             (k, urllib2.quote(v.encode('utf-8')))
@@ -278,6 +290,7 @@ class B2Backend(duplicity.backend.Backend):
             except ValueError:
                 return out
         except urllib2.HTTPError as e:
+            self.upload_info = None
             if e.code == 401:
                 self.auth_token = None
                 log.Warn("Authtoken expired, will reauthenticate with next attempt")
