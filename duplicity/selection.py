@@ -431,7 +431,7 @@ probably isn't what you meant.""") %
             sel_func = lambda path: include
         elif not self.glob_re.match(glob_str):
             # normal file
-            sel_func = self.glob_get_filename_sf(glob_str, include)
+            sel_func = self._glob_get_filename_sf(glob_str, include)
         else:
             sel_func = self.glob_get_normal_sf(glob_str, include)
 
@@ -477,7 +477,7 @@ probably isn't what you meant.""") %
                         (include and "include-if-present" or "exclude-if-present", filename)
         return sel_func
 
-    def glob_get_filename_sf(self, filename, include):
+    def _glob_get_filename_sf(self, filename, include):
         """Get a selection function given a normal filename
 
         Some of the parsing is better explained in
@@ -486,7 +486,7 @@ probably isn't what you meant.""") %
         globbing characters are used.
 
         """
-        # Internal. Used by glob_get_sf and unit tests.
+        # Internal. Used by glob_get_sf.
         # ToDo: Make all globbing/non-globbing use same code path
         # This distinction has bitten us too many times with bugs in one or
         # the other.
@@ -502,9 +502,9 @@ probably isn't what you meant.""") %
             raise FilePrefixError(filename)
         index = tuple(filter(lambda x: x,
                              filename[len(self.prefix):].split("/")))
-        return self.glob_get_tuple_sf(index, include, match_only_dirs)
+        return self._glob_get_tuple_sf(index, include, match_only_dirs)
 
-    def glob_get_tuple_sf(self, tuple, include, match_only_dirs=False):
+    def _glob_get_tuple_sf(self, tuple, include, match_only_dirs=False):
         """Return selection function based on tuple"""
         # Internal. Used by glob_get_filename_sf.
 
