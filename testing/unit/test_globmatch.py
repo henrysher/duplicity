@@ -163,29 +163,29 @@ class TestTrailingSlash(UnitTestCase):
             mock_isdir.return_value = False
             self.assertEqual(
                 path_matches_glob_fn("fold*/", 1)(Path("folder/file.txt")), 1)
-    #
-    # def test_slash_matches_everything(self):
-    #     """Test / matches everything"""
-    #     # ToDo: Not relevant at this stage, as "/" would not go through
-    #     # globmatch because it has no special characters, but it should be
-    #     # made to work
-    #     with patch('duplicity.path.Path.isdir') as mock_isdir:
-    #         mock_isdir.return_value = True
-    #         self.assertEqual(
-    #             path_matches_glob_fn("/",
-    #                                  1)(Path("/tmp/testfiles/select/1/2")), 1)
-    #         self.assertEqual(
-    #             path_matches_glob_fn("/",
-    #                                  1)(Path("/test/random/path")), 1)
-    #         self.assertEqual(
-    #             path_matches_glob_fn("/",
-    #                                  1)(Path("/")), 1)
-    #         self.assertEqual(
-    #             path_matches_glob_fn("/",
-    #                                  1)(Path("/var/log")), 1)
-    #         self.assertEqual(
-    #             path_matches_glob_fn("/",
-    #                                  1)(Path("/var/log/log.txt")), 1)
+
+    def test_slash_matches_everything(self):
+        """Test / matches everything"""
+        # ToDo: Not relevant at this stage, as "/" would not go through
+        # globmatch because it has no special characters, but it should be
+        # made to work
+        with patch('duplicity.path.Path.isdir') as mock_isdir:
+            mock_isdir.return_value = True
+            self.assertEqual(
+                path_matches_glob_fn("/",
+                                     1)(Path("/tmp/testfiles/select/1/2")), 1)
+            self.assertEqual(
+                path_matches_glob_fn("/",
+                                     1)(Path("/test/random/path")), 1)
+            self.assertEqual(
+                path_matches_glob_fn("/",
+                                     1)(Path("/")), 1)
+            self.assertEqual(
+                path_matches_glob_fn("/",
+                                     1)(Path("/var/log")), 1)
+            self.assertEqual(
+                path_matches_glob_fn("/",
+                                     1)(Path("/var/log/log.txt")), 1)
 
     def test_slash_star_scans_folder(self):
         """Test that folder/* scans folder/"""

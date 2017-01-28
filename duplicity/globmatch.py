@@ -59,10 +59,15 @@ def path_matches_glob_fn(glob_str, include, ignore_case=False):
     1 - if the file should be included
     2 - if the folder should be scanned for any included/excluded files
     None - if the selection function has nothing to say about the file
+
+    Note: including a folder implicitly includes everything within it.
     """
     glob_ends_w_slash = False
 
-    if glob_str != "/" and glob_str[-1] == "/":
+    if glob_str == "/":
+        # If the glob string is '/', it implicitly includes everything
+        glob_str = "/**"
+    elif glob_str[-1] == "/":
         glob_ends_w_slash = True
         # Remove trailing / from directory name (unless that is the entire
         # string)
@@ -80,7 +85,8 @@ def path_matches_glob_fn(glob_str, include, ignore_case=False):
     # string translated into regex
     # ($|/) nothing must follow except for the end of the string, newline or /
     # Note that the "/" at the end of the regex means that it will match
-    # if the glob matches a parent folders of path
+    # if the glob matches a parent folders of path, i.e. including a folder
+    # includes everything within it.
     glob_comp_re = re_comp("^%s($|/)" % glob_to_regex(glob_str))
 
     if glob_ends_w_slash:

@@ -892,7 +892,8 @@ class TestGlobGetNormalSf(UnitTestCase):
 
     def test_glob_get_normal_sf_exclude_root(self):
         """Test simple exclude with / as the glob."""
-        self.assertEqual(self.exclude_glob_tester("/.git", "/"), None)
+        self.assertEqual(self.exclude_glob_tester("/.git", "/"), 0)
+        self.assertEqual(self.exclude_glob_tester("/testfile", "/"), 0)
 
     def test_glob_get_normal_sf_2(self):
         """Test same behaviour as the functional test test_globbing_replacement."""
