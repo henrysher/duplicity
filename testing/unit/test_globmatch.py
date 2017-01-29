@@ -44,6 +44,25 @@ class MatchingTest(UnitTestCase):
         assert r == "[a*b-c]e[^]]", r
 
 
+class TestMiscellaneousGlobMatching(UnitTestCase):
+    """Test various glob matching"""
+
+    def test_glob_scans_parent_directories(self):
+        """Test glob scans parent"""
+        with patch('duplicity.path.Path.isdir') as mock_isdir:
+            mock_isdir.return_value = True
+            # Note: paths ending in '/' do not work!
+            # self.assertEqual(
+            #     path_matches_glob_fn("testfiles/parent/sub/", 1)(Path(
+            #         "testfiles/parent/")), 2)
+            self.assertEqual(
+                path_matches_glob_fn("testfiles/parent/sub", 1)(Path(
+                    "testfiles/parent")), 2)
+            self.assertEqual(
+                path_matches_glob_fn("testfiles/select2/3/3sub2", 1)(Path(
+                "testfiles/select2/3")), 2)
+
+
 class TestDoubleAsteriskOnIncludesExcludes(UnitTestCase):
     """Test ** on includes and exclude patterns"""
 
@@ -166,9 +185,6 @@ class TestTrailingSlash(UnitTestCase):
 
     def test_slash_matches_everything(self):
         """Test / matches everything"""
-        # ToDo: Not relevant at this stage, as "/" would not go through
-        # globmatch because it has no special characters, but it should be
-        # made to work
         with patch('duplicity.path.Path.isdir') as mock_isdir:
             mock_isdir.return_value = True
             self.assertEqual(

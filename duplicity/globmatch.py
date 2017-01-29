@@ -107,6 +107,11 @@ def path_matches_glob_fn(glob_str, include, ignore_case=False):
                            "|".join(_glob_get_prefix_regexs(glob_str)))
 
     def test_fn(path):
+        assert not path.name[-1] == "/" or path.name == "/", \
+            "path.name should never end in '/' during normal operation for " \
+            "normal paths (except '/' alone)\n" \
+            "path.name here is " + path.name + " and glob is " + glob_str
+
         if glob_comp_re.match(path.name):
             # Path matches glob, or is contained within a matching folder
             if not glob_ends_w_slash:

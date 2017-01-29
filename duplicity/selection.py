@@ -431,7 +431,7 @@ probably isn't what you meant.""") %
             sel_func = lambda path: include
         elif not self.glob_re.match(glob_str):
             # normal file
-            sel_func = self._glob_get_filename_sf(glob_str, include)
+            sel_func = self.glob_get_normal_sf(glob_str, include)
         else:
             sel_func = self.glob_get_normal_sf(glob_str, include)
 
@@ -562,9 +562,13 @@ probably isn't what you meant.""") %
             glob_str = glob_str[len("ignorecase:"):].lower()
             ignore_case = True
 
-        # Check to make sure prefix is ok
-        if not path_matches_glob_fn(glob_str, include=1)(self.rootpath):
-            raise FilePrefixError(glob_str)
+        # Check to make sure prefix is ok, i.e. the glob string is within
+        # the root folder being backed up
+        file_prefix_selection = path_matches_glob_fn(glob_str, include=1)(self.rootpath)
+        if not file_prefix_selection:
+            # file_prefix_selection == 1 (include) or 2 (scan)
+            raise FilePrefixError(glob_str + " glob with " + self.rootpath.name +
+                                  " path gives " + str(file_prefix_selection))
 
         return path_matches_glob_fn(glob_str, include, ignore_case)
 
