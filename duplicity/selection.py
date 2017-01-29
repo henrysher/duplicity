@@ -429,9 +429,6 @@ probably isn't what you meant.""") %
         assert include == 0 or include == 1
         if glob_str == "**":
             sel_func = lambda path: include
-        elif not self.glob_re.match(glob_str):
-            # normal file
-            sel_func = self.glob_get_normal_sf(glob_str, include)
         else:
             sel_func = self.glob_get_normal_sf(glob_str, include)
 
@@ -475,66 +472,6 @@ probably isn't what you meant.""") %
         sel_func.exclude = not include
         sel_func.name = "Command-line %s filename: %s" % \
                         (include and "include-if-present" or "exclude-if-present", filename)
-        return sel_func
-
-    def _glob_get_filename_sf(self, filename, include):
-        """Get a selection function given a normal filename
-
-        Some of the parsing is better explained in
-        filelist_parse_line.  The reason this is split from normal
-        globbing is things are a lot less complicated if no special
-        globbing characters are used.
-
-        """
-        # Internal. Used by glob_get_sf.
-        # ToDo: Make all globbing/non-globbing use same code path
-        # This distinction has bitten us too many times with bugs in one or
-        # the other.
-        match_only_dirs = False
-
-        if filename != "/" and filename[-1] == "/":
-            match_only_dirs = True
-            # Remove trailing / from directory name (unless that is the entire
-            # string)
-            filename = filename[:-1]
-
-        if not filename.startswith(self.prefix):
-            raise FilePrefixError(filename)
-        index = tuple(filter(lambda x: x,
-                             filename[len(self.prefix):].split("/")))
-        return self._glob_get_tuple_sf(index, include, match_only_dirs)
-
-    def _glob_get_tuple_sf(self, tuple, include, match_only_dirs=False):
-        """Return selection function based on tuple"""
-        # Internal. Used by glob_get_filename_sf.
-
-        def include_sel_func(path):
-            if len(tuple) == len(path.index) and match_only_dirs and not path.isdir():
-                # If we are assessing the actual directory (rather than the
-                # contents of the directory) and the glob ended with a /,
-                # only match directories
-                return None
-            elif (path.index == tuple[:len(path.index)] or
-                    path.index[:len(tuple)] == tuple):
-                return 1  # /foo/bar implicitly matches /foo, vice-versa
-            else:
-                return None
-
-        def exclude_sel_func(path):
-            if match_only_dirs and not path.isdir():
-                # If the glob ended with a /, only match directories
-                return None
-            elif path.index[:len(tuple)] == tuple:
-                return 0  # /foo excludes /foo/bar, not vice-versa
-            else:
-                return None
-
-        if include == 1:
-            sel_func = include_sel_func
-        elif include == 0:
-            sel_func = exclude_sel_func
-        sel_func.exclude = not include
-        sel_func.name = "Tuple select %s" % (tuple,)
         return sel_func
 
     def glob_get_normal_sf(self, glob_str, include):
