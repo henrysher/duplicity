@@ -980,8 +980,6 @@ class TestGlobGetNormalSf(UnitTestCase):
             mock_isdir.return_value = True
             self.assertEqual(
                 self.glob_tester("parent", "parent/hello.txt", 1, "parent"), 2)
-            # self.assertEqual(self.include_glob_tester("/parent/", "/parent/hello.txt"), 2)
-            # self.assertEqual(self.include_glob_tester("/parent/folder/", "/parent/folder/hello.txt"), 2)
 
     def test_glob_dirs_to_scan_glob(self):
         """Test parent directories are marked as needing to be scanned - globs"""
@@ -991,9 +989,40 @@ class TestGlobGetNormalSf(UnitTestCase):
                 self.glob_tester("testfiles/select/1", "*/select/1/1", 1,
                                  "testfiles/select"), 2)
             self.assertEqual(
-                self.glob_tester("testfiles/select/1/2", "*/select/1/2/1", 1, "testfiles/select"), 2)
+                self.glob_tester("testfiles/select/1/2",
+                                 "*/select/1/2/1", 1, "testfiles/select"), 2)
             self.assertEqual(
                 self.glob_tester("parent", "parent/hel?o.txt", 1, "parent"), 2)
+            self.assertEqual(
+                self.glob_tester("test/parent/folder",
+                                 "test/par*t/folder/hello.txt", 1, "test"), 2)
+            self.assertEqual(
+                self.glob_tester("testfiles/select/1/1",
+                                 "**/1/2/1", 1, "testfiles"), 2)
+            self.assertEqual(
+                self.glob_tester("testfiles/select2/3/3sub2",
+                                 "testfiles/select2/3/**file.txt", 1,
+                                 "testfiles"), 2)
+            self.assertEqual(
+                self.glob_tester("testfiles/select/1/2",
+                                 "*/select/1/2/1", 1, "testfiles"), 2)
+            self.assertEqual(
+                self.glob_tester("testfiles/select/1",
+                                 "testfiles/select**/2", 1, "testfiles"), 2)
+            self.assertEqual(
+                self.glob_tester("testfiles/select/efools",
+                                 "testfiles/select/*foo*/p*", 1,
+                                 "testfiles"), 2)
+            self.assertEqual(
+                self.glob_tester("testfiles/select/3",
+                                 "testfiles/select/**2", 1, "testfiles"), 2)
+            self.assertEqual(
+                self.glob_tester("testfiles/select2/1/1sub1/1sub1sub2",
+                                 "testfiles/select2/**/3sub3sub2/3sub3su?2_file.txt",
+                                 1, "testfiles"), 2)
+            self.assertEqual(
+                self.glob_tester("testfiles/select/1",
+                                 "*/select/1/1", 1, "testfiles"), 2)
 
 if __name__ == "__main__":
     unittest.main()
