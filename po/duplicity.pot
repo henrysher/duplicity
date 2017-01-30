@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2017-01-16 09:46-0600\n"
+"POT-Creation-Date: 2017-01-30 15:34-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -392,7 +392,7 @@ msgid "Error initializing file %s"
 msgstr ""
 
 #: ../duplicity/selection.py:127 ../duplicity/selection.py:152
-#: ../duplicity/selection.py:459
+#: ../duplicity/selection.py:456
 #, python-format
 msgid "Error accessing possibly locked file %s"
 msgstr ""
@@ -804,7 +804,12 @@ msgid ""
 "currently work only when backing up,not restoring."
 msgstr ""
 
-#: ../duplicity/commandline.py:1120
+#: ../duplicity/commandline.py:1106
+#, python-format
+msgid "GPG binary is %s, version %d"
+msgstr ""
+
+#: ../duplicity/commandline.py:1133
 #, python-format
 msgid ""
 "Bad URL '%s'.\n"
@@ -812,7 +817,7 @@ msgid ""
 "\"file:///usr/local\".  See the man page for more information."
 msgstr ""
 
-#: ../duplicity/commandline.py:1145
+#: ../duplicity/commandline.py:1158
 msgid "Main action: "
 msgstr ""
 

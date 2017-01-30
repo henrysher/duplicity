@@ -1,3 +1,10 @@
+2017-01-30  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/08-merge-glob-parsers
+      - Use a single code path for glob strings whether or not these contain special
+        characters/wildcards (glob_get_normal_sf) and remove glob_get_filename_sf and glob_get_tuple_sf.
+      - Remove run-tests-ve as this was identical to run-tests.
+
 2017-01-24  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~matthew-t-bentley/duplicity/duplicity

@@ -85,6 +85,10 @@ New in v0.8.00 (2016/07/??)
     from the Duplicity B2 backend
   - Only retrieves a new upload URL when the current one expires, to bring it in line
     with their best practices for integrations: https://www.backblaze.com/b2/docs/integration_checklist.html
+* Merged in lp:~aaron-whitehouse/duplicity/08-merge-glob-parsers
+  - Use a single code path for glob strings whether or not these contain special
+    characters/wildcards (glob_get_normal_sf) and remove glob_get_filename_sf and glob_get_tuple_sf.
+  - Remove run-tests-ve as this was identical to run-tests.
 
 
 New in v0.7.08 (2016/07/02)
