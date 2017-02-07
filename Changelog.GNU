@@ -1,3 +1,7 @@
+2017-02-07  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Add detail about import exceptions in onedrivebackend.py
+
 2017-01-24  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~matthew-t-bentley/duplicity/duplicity

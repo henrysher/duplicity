@@ -15,6 +15,7 @@ New in v0.7.12 (2017/01/??)
     from the Duplicity B2 backend
   - Only retrieves a new upload URL when the current one expires, to bring it in line
     with their best practices for integrations: https://www.backblaze.com/b2/docs/integration_checklist.html
+* Add detail about import exceptions in onedrivebackend.py
 
 
 New in v0.7.11 (2016/12/31)
