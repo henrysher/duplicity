@@ -3,6 +3,8 @@
     * Merged in lp:~aaron-whitehouse/duplicity/08-refactor-unit-test-globmatch
       - Rename path_matches_glob_fn to select_fn_from_glob, as this more accurately reflects the return value.
       - Significantly refactored unit/test_globmatch.py to make this cleaner and clearer.
+    * Fixed bug #1657916 with patch supplied by Daniel Harvey
+      - B2 provider cannot handle two backups in the same bucket
 
 2017-02-07  Kenneth Loafman  <kenneth@loafman.com>
 
