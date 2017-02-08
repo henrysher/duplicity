@@ -141,6 +141,7 @@ class B2Backend(duplicity.backend.Backend):
         params = {
             'bucketId': self.bucket_id,
             'maxFileCount': 1000,
+            'prefix': self.path,
         }
         try:
             resp = self.get_or_post(url, params)

@@ -1,3 +1,8 @@
+2017-02-08  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1657916 with patch supplied by Daniel Harvey
+      - B2 provider cannot handle two backups in the same bucket
+
 2017-02-07  Kenneth Loafman  <kenneth@loafman.com>
 
     * Add detail about import exceptions in onedrivebackend.py
