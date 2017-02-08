@@ -1,3 +1,9 @@
+2017-02-08  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/08-refactor-unit-test-globmatch
+      - Rename path_matches_glob_fn to select_fn_from_glob, as this more accurately reflects the return value.
+      - Significantly refactored unit/test_globmatch.py to make this cleaner and clearer.
+
 2017-02-07  Kenneth Loafman  <kenneth@loafman.com>
 
     * Add detail about import exceptions in onedrivebackend.py

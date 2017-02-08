@@ -49,7 +49,7 @@ def _glob_get_prefix_regexs(glob_str):
     return list(map(glob_to_regex, prefixes))
 
 
-def path_matches_glob_fn(glob_str, include, ignore_case=False):
+def select_fn_from_glob(glob_str, include, ignore_case=False):
     """Return a function test_fn(path) which
     tests whether path matches glob, as per the Unix shell rules, taking as
     arguments a path, a glob string and include (0 indicating that the glob
@@ -143,7 +143,7 @@ def glob_to_regex(pat):
     """Returned regular expression equivalent to shell glob pat
 
     Currently only the ?, *, [], and ** expressions are supported.
-    Ranges like [a-z] are also currently unsupported.  There is no
+    Ranges like [a-z] are currently unsupported.  There is no
     way to quote these special characters.
 
     This function taken with minor modifications from efnmatch.py
