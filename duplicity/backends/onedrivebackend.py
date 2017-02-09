@@ -70,11 +70,11 @@ class OneDriveBackend(duplicity.backend.Backend):
             global OAuth2Session
             import requests
             from requests_oauthlib import OAuth2Session
-        except ImportError:
+        except ImportError as e:
             raise BackendException((
                 'OneDrive backend requires python-requests and '
                 'python-requests-oauthlib to be installed. Please install '
-                'them and try again.'))
+                'them and try again.\n' + str(e)))
 
         self.names_to_ids = None
         self.user_id = None
@@ -149,7 +149,7 @@ class OneDriveBackend(duplicity.backend.Backend):
                   'page the dialog leads to.' % authorization_url)
             print()
 
-            redirected_to = raw_input('URL of the blank page: ')
+            redirected_to = raw_input('URL of the blank page: ').strip()
 
             token = self.http_client.fetch_token(
                 self.OAUTH_TOKEN_URI,

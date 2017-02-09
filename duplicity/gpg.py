@@ -31,6 +31,7 @@ import tempfile
 import re
 import gzip
 import locale
+import platform
 
 from duplicity import globals
 from duplicity import gpginterface
@@ -66,8 +67,7 @@ class GPGProfile:
         passphrase is the passphrase.  If it is None (not ""), assume
         it hasn't been set.  sign_key can be blank if no signing is
         indicated, and recipients should be a list of keys.  For all
-        keys, the format should be an 8 character hex key like
-        'AA0E73D2'.
+        keys, the format should be an hex key like 'AA0E73D2'.
         """
         assert passphrase is None or isinstance(passphrase, types.StringType)
 
@@ -87,20 +87,21 @@ class GPGProfile:
         else:
             self.hidden_recipients = []
 
-        self.gpg_major = self.get_gpg_major(globals.gpg_binary)
+        self.gpg_version = self.get_gpg_version(globals.gpg_binary)
 
-    _version_re = re.compile(r'^gpg.*\(GnuPG\) (?P<maj>[0-9])\.[0-9]+\.[0-9]+$')
+    _version_re = re.compile(r'^gpg.*\(GnuPG(?:/MacGPG2)?\) (?P<maj>[0-9]+)\.(?P<min>[0-9]+)\.(?P<bug>[0-9]+)$')
 
-    def get_gpg_major(self, binary):
+    def get_gpg_version(self, binary):
         gpg = gpginterface.GnuPG()
         if binary is not None:
             gpg.call = binary
         res = gpg.run(["--version"], create_fhs=["stdout"])
         line = res.handles["stdout"].readline().rstrip()
-        mtc = self._version_re.search(line)
-        if mtc is not None:
-            return int(mtc.group("maj"), 10)
+        m = self._version_re.search(line)
+        if m is not None:
+            return (int(m.group("maj")), int(m.group("min")), int(m.group("bug")))
         raise GPGError("failed to determine gpg version of %s from %s" % (binary, line))
+
 
 class GPGFile:
     """
@@ -135,10 +136,10 @@ class GPGFile:
         gnupg.options.extra_args.append('--no-secmem-warning')
         if globals.use_agent:
             gnupg.options.extra_args.append('--use-agent')
-        elif profile.gpg_major == 2:
+        elif profile.gpg_version >= (2, 1, 0):
             # This forces gpg2 to ignore the agent.
             # Necessary to enforce truly non-interactive operation.
-            gnupg.options.extra_args.append('--pinentry-mode=cancel')
+            gnupg.options.extra_args.append('--pinentry-mode=loopback')
         if globals.gpg_options:
             for opt in globals.gpg_options.split():
                 gnupg.options.extra_args.append(opt)
@@ -281,7 +282,7 @@ class GPGFile:
 
     def set_signature(self):
         """
-        Set self.signature to 8 character signature keyID
+        Set self.signature to signature keyID
 
         This only applies to decrypted files.  If the file was not
         signed, set self.signature to None.
@@ -294,11 +295,11 @@ class GPGFile:
             self.signature = None
         else:
             assert len(match.group(1)) >= 8
-            self.signature = match.group(1)[-8:]
+            self.signature = match.group(1)
 
     def get_signature(self):
         """
-        Return 8 character keyID of signature, or None if none
+        Return  keyID of signature, or None if none
         """
         assert self.closed
         return self.signature

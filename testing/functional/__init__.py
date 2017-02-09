@@ -23,6 +23,7 @@ from future_builtins import map
 import os
 import pexpect
 import platform
+import sys
 import time
 import unittest
 
@@ -104,7 +105,7 @@ class FunctionalTestCase(DuplicityTestCase):
 
         if not passphrase_input:
             cmdline += " < /dev/null"
-        child = pexpect.spawn('/bin/sh', ['-c', cmdline])
+        child = pexpect.spawn('/bin/sh', ['-c', cmdline], timeout=None)
         for passphrase in passphrase_input:
             child.expect('passphrase.*:')
             child.sendline(passphrase)
@@ -116,12 +117,12 @@ class FunctionalTestCase(DuplicityTestCase):
             lines.append(child.readline())
         return_val = child.exitstatus
 
-#         print "duplicity command:", cmdline
-#         print "current dir:", os.getcwd()
-#         print "....output:"
+#         print >>sys.stderr, "duplicity command:", cmdline
+#         print >>sys.stderr, "current dir:", os.getcwd()
+#         print >>sys.stderr, "....output:"
 #         for line in lines:
-#             print line,
-#         print "....return_val:", return_val
+#             print >>sys.stderr, line,
+#         print >>sys.stderr, "....return_val:", return_val
 
         if fail:
             self.assertEqual(30, return_val)

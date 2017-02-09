@@ -290,6 +290,10 @@ def parse_cmdline_options(arglist):
     parser.add_option("--config-dir", type="file", metavar=_("path"),
                       help=optparse.SUPPRESS_HELP)
 
+    # When symlinks are encountered, the item they point to is copied rather than
+    # the symlink.
+    parser.add_option("--copy-links", action="store_true")
+
     # for testing -- set current time
     parser.add_option("--current-time", type="int",
                       dest="current_time", help=optparse.SUPPRESS_HELP)
@@ -623,6 +627,11 @@ def parse_cmdline_options(arglist):
     parser.add_option("--file-changed", action="callback", type="file",
                       metavar=_("path"), dest="file_changed",
                       callback=lambda o, s, v, p: setattr(p.values, "file_changed", v.rstrip('/')))
+
+    # delay time before next try after a failure of a backend operation
+    # TRANSL: Used in usage help. Example:
+    # --backend-retry-delay <seconds>
+    parser.add_option("--backend-retry-delay", type="int", metavar=_("seconds"))
 
     # parse the options
     (options, args) = parser.parse_args()
@@ -1080,9 +1089,23 @@ def ProcessCommandLine(cmdline_list):
     "remove-old", "restore", "verify", "full", or "inc".
 
     """
+    # build initial gpg_profile
     globals.gpg_profile = gpg.GPGProfile()
 
+    # parse command line
     args = parse_cmdline_options(cmdline_list)
+
+    # if we get a different gpg-binary from the commandline then redo gpg_profile
+    if globals.gpg_binary is not None:
+        src = globals.gpg_profile
+        globals.gpg_profile = gpg.GPGProfile(
+            passphrase=src.passphrase,
+            sign_key=src.sign_key,
+            recipients=src.recipients,
+            hidden_recipients=src.hidden_recipients)
+    log.Debug(_("GPG binary is %s, version %s") %
+              ((globals.gpg_binary or 'gpg'),
+               "%d.%d.%d" % globals.gpg_profile.gpg_version))
 
     # we can now try to import all the backends
     backend.import_backends()

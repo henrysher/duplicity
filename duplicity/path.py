@@ -464,7 +464,8 @@ class ROPath:
     def copy_attribs(self, other):
         """Only copy attributes from self to other"""
         if isinstance(other, Path):
-            util.maybe_ignore_errors(lambda: os.chown(other.name, self.stat.st_uid, self.stat.st_gid))
+            if self.stat is not None:
+                util.maybe_ignore_errors(lambda: os.chown(other.name, self.stat.st_uid, self.stat.st_gid))
             util.maybe_ignore_errors(lambda: os.chmod(other.name, self.mode))
             util.maybe_ignore_errors(lambda: os.utime(other.name, (time.time(), self.stat.st_mtime)))
             other.setdata()
@@ -517,7 +518,12 @@ class Path(ROPath):
     def setdata(self):
         """Refresh stat cache"""
         try:
-            self.stat = os.lstat(self.name)
+            # We may be asked to look at the target of symlinks rather than
+            # the link itself.
+            if globals.copy_links:
+                self.stat = os.stat(self.name)
+            else:
+                self.stat = os.lstat(self.name)
         except OSError as e:
             err_string = errno.errorcode[e[0]]
             if err_string in ["ENOENT", "ENOTDIR", "ELOOP", "ENOTCONN"]:

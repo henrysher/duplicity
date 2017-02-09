@@ -1,4 +1,26 @@
-New in v0.7.11 (2016/09/??)
+New in v0.7.12 (2017/01/??)
+---------------------------
+* Fixed bug #1623342 with patch supplied by Daniel Jakots
+  - Failing test on OpenBSD because tar/gtar not found
+* Fixed bug #1654220 with patch supplied by Kenneth Newwood
+  - Duplicity fails on MacOS because GPG version parsing fails
+* Fixed bug #1655268 "--gpg-binary option not working"
+  - If gpg binary is specified rebuild gpg profile using new binary location
+* Fixed bug #1658283 "Duplicity 0.7.11 broken with GnuPG 2.0"
+  - Made gpg version check more robust than just major version
+  - Now use --pinentry-mode=loopback on gpg 2.1 and greater
+  - Removed check for non-Linux systems, a false problem
+* Merged in lp:~matthew-t-bentley/duplicity/duplicity
+  - Sets a user agent. Backblaze asked for this in case there are errors that originate
+    from the Duplicity B2 backend
+  - Only retrieves a new upload URL when the current one expires, to bring it in line
+    with their best practices for integrations: https://www.backblaze.com/b2/docs/integration_checklist.html
+* Add detail about import exceptions in onedrivebackend.py
+* Fixed bug #1657916 with patch supplied by Daniel Harvey
+  - B2 provider cannot handle two backups in the same bucket
+
+
+New in v0.7.11 (2016/12/31)
 ---------------------------
 * Fixed bugs #815510 and #1615480
   - Changed default --volsize to 200MB
@@ -8,6 +30,39 @@ New in v0.7.11 (2016/09/??)
   - Fixes Bug #1620085: --exclude-if-present gives OSError looking for tag in locked folders
 * Fixed bug #1623342 with patch from Daniel Jakots
   - failing test on OpenBSD because tar/gtar not found
+* Merged in lp:~mwilck/duplicity/duplicity
+  - GPG: enable truly non-interactive operation with gpg2
+  - This patch fixes the IMO unexpected behavior that, when using GnuPG2, a pass phrase dialog always pops up for
+    saving backups. This is particularly annoying when trying to do unattended / fully automatic backups.
+* Fixed bug #1621194 with code from Tornhoof
+  - Do backup to google drive working without a service account
+* Fixed bug #1642098 - does not create PAR2 archives when '--par2-options' is used
+  - Missing space between par2-options plus default options
+* Fix bug using 40-char sign keys, from Richard McGraw on mail list
+  - Remove truncation of argument and adjust comments
+* Merged in lp:~dernils/duplicity/robust-dropbox-backend
+  - Added new command line option --backend-retry-delay
+    that allows to determine the time that duplicity sleeps
+    before retrying after an error has occured.
+  - Added some robustness to dpbxbackend.py that ensures re-authentication
+    happens in case that a socket is changed (e.g. due to a forced reconnect
+    of a dynamic internet connection).
+* Merged in lp:~ed.so/duplicity/manpage.fixes
+  - Fix html output via rman on the website
+* Merged in lp:~horgh/duplicity/copy-symlink-targets-721599
+  - Add --copy-links to copy symlink contents, not just the link itself.
+* Merged in lp:~aaron-whitehouse/duplicity/Bug_1624725_files_within_folder_slash
+  - Fixed Bug #1624725, so that an include glob ending in "/" now includes folder contents (for globs with
+    and without special characters). This preserves the behaviour that an expression ending in "/" only
+    matches a folder, but now the contents of any matching folder is included.
+* Fix problem with gpg2 in yakety and zesty
+* Fix Bug #1642813 with patch from Ravi
+  - If stat() returns None, don't attempt to set perms.
+* Merged in lp:~breunigs/duplicity/amazondrive3
+  - As reported on the mailinglist, if a space is entered while duplicity asks for the URL, it fails.
+    Since all important spaces are URL encoded anyway, this should be fine even if there are spaces in
+    the URL at all. I also patched it in the onedrive backend, because it must have similar issues.
+* Prep for 0.7.11
 
 
 New in v0.7.10 (2016/08/20)
@@ -76,6 +131,8 @@ New in v0.7.08 (2016/07/02)
   - Set line length error length to 120 (matching tox.ini) for PEP8 and
     fixed E501(line too long) errors.
 * Merged in lp:~duplicity-team/duplicity/po-updates
+* Fix bug using 40-char sign keys, from Richard McGraw on mail list
+  - Remove truncation of argument and adjust comments
 
 
 New in v0.7.07.1 (2016/04/19)

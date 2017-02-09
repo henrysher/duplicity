@@ -60,11 +60,10 @@ def path_matches_glob_fn(glob_str, include, ignore_case=False):
     2 - if the folder should be scanned for any included/excluded files
     None - if the selection function has nothing to say about the file
     """
-    match_only_dirs = False
+    glob_ends_w_slash = False
 
-    # ToDo: Test behaviour of "/" on its own - should always match
     if glob_str != "/" and glob_str[-1] == "/":
-        match_only_dirs = True
+        glob_ends_w_slash = True
         # Remove trailing / from directory name (unless that is the entire
         # string)
         glob_str = glob_str[:-1]
@@ -76,21 +75,51 @@ def path_matches_glob_fn(glob_str, include, ignore_case=False):
     re_comp = lambda r: re.compile(r, re.S | flags)
 
     # matches what glob matches and any files in directory
+    # Resulting regular expression is:
+    # ^ string must be at the beginning of path
+    # string translated into regex
+    # ($|/) nothing must follow except for the end of the string, newline or /
+    # Note that the "/" at the end of the regex means that it will match
+    # if the glob matches a parent folders of path
     glob_comp_re = re_comp("^%s($|/)" % glob_to_regex(glob_str))
 
+    if glob_ends_w_slash:
+        # Creates a version of glob_comp_re that does not match folder contents
+        # This can be used later to check that an exact match is actually a
+        # folder, rather than a file.
+        glob_comp_re_exact = re_comp("^%s($)" % glob_to_regex(glob_str))
+
     if glob_str.find("**") != -1:
+        # glob_str has a ** in it
         glob_str = glob_str[:glob_str.find("**") + 2]  # truncate after **
 
+    # Below regex is translates to:
+    # ^ string must be at the beginning of path
+    # the regexs corresponding to the parent directories of glob_str
+    # $ nothing must follow except for the end of the string or newline
     scan_comp_re = re_comp("^(%s)$" %
                            "|".join(_glob_get_prefix_regexs(glob_str)))
 
     def test_fn(path):
+        if glob_comp_re.match(path.name):
+            # Path matches glob, or is contained within a matching folder
+            if not glob_ends_w_slash:
+                return include
+            else:
+                # Glob ended with a /, so we need to check any exact match was
+                # a folder
+                if glob_comp_re_exact.match(path.name):
+                    # Not an included file/folder, so must be a folder to match
+                    if path.isdir():
+                        # Is a directory, so all is well
+                        return include
+                    else:
+                        # Exact match and not a folder
+                        return None
+                else:
+                    # An included file/folder, so normal approach is fine
+                    return include
 
-        if match_only_dirs and not path.isdir():
-            # If the glob ended with a /, only match directories
-            return None
-        elif glob_comp_re.match(path.name):
-            return include
         elif include == 1 and scan_comp_re.match(path.name):
             return 2
         else:

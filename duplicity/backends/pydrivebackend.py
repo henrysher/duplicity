@@ -66,6 +66,17 @@ class PyDriveBackend(duplicity.backend.Backend):
         elif 'GOOGLE_DRIVE_SETTINGS' in os.environ:
             gauth = GoogleAuth(settings_file=os.environ['GOOGLE_DRIVE_SETTINGS'])
             gauth.CommandLineAuth()
+        elif ('GOOGLE_SECRETS_FILE' in os.environ and 'GOOGLE_CREDENTIALS_FILE' in os.environ):
+            gauth = GoogleAuth()
+            gauth.LoadClientConfigFile(os.environ['GOOGLE_SECRETS_FILE'])
+            gauth.LoadCredentialsFile(os.environ['GOOGLE_CREDENTIALS_FILE'])
+            if gauth.credentials is None:
+                gauth.CommandLineAuth()
+            elif gauth.access_token_expired:
+                gauth.Refresh()
+            else:
+                gauth.Authorize()
+            gauth.SaveCredentialsFile(os.environ['GOOGLE_CREDENTIALS_FILE'])
         else:
             raise BackendException(
                 'GOOGLE_DRIVE_ACCOUNT_KEY or GOOGLE_DRIVE_SETTINGS environment '

@@ -487,6 +487,9 @@ probably isn't what you meant.""") %
 
         """
         # Internal. Used by glob_get_sf and unit tests.
+        # ToDo: Make all globbing/non-globbing use same code path
+        # This distinction has bitten us too many times with bugs in one or
+        # the other.
         match_only_dirs = False
 
         if filename != "/" and filename[-1] == "/":
@@ -506,8 +509,10 @@ probably isn't what you meant.""") %
         # Internal. Used by glob_get_filename_sf.
 
         def include_sel_func(path):
-            if match_only_dirs and not path.isdir():
-                # If the glob ended with a /, only match directories
+            if len(tuple) == len(path.index) and match_only_dirs and not path.isdir():
+                # If we are assessing the actual directory (rather than the
+                # contents of the directory) and the glob ended with a /,
+                # only match directories
                 return None
             elif (path.index == tuple[:len(path.index)] or
                     path.index[:len(tuple)] == tuple):

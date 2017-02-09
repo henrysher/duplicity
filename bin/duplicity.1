@@ -313,6 +313,12 @@ location; rather than needing to store only one volume at a time,
 enough storage space is required to store two volumes.
 
 .TP
+.BI "--backend-retry-delay " number
+Specifies the number of seconds that duplicity waits after an error has
+occured before attempting to repeat the operation.
+
+
+.TP
 .BI "--cf-backend " backend
 Allows the explicit selection of a cloudfiles backend. Defaults to
 .BR pyrax .
@@ -323,6 +329,12 @@ Alternatively you might choose
 .BI --compare-data
 Enable data comparison of regular files on action verify.
 This is disabled by default for performance reasons.
+
+.TP
+.BI --copy-links
+Resolve symlinks during backup.
+Enabling this will resolve & back up the symlink's file/folder data instead of
+the symlink itself, potentially increasing the size of the backup.
 
 .TP
 .BI "--dry-run "
@@ -1698,7 +1710,6 @@ the
 will distinguish between different backups.
 
 .SH A NOTE ON MULTI BACKEND
-
 The multi backend allows duplicity to combine the storage available in
 more than one backend store (e.g., you can store across a google drive
 account and a onedrive account to get effectively the combined storage
@@ -1708,58 +1719,46 @@ specify "query" parameters to configure overall behavior.
 Each element of the list must have a "url" element, and may also contain
 an optional "description" and an optional "env" list of environment
 variables used to configure that backend.
-
 .SS Query Parameters
-
 Query parameters come after the file URL in standard HTTP format
 for example:
-
-.nf
 .RS
+.nf
 multi:///path/to/config.json?mode=mirror&onfail=abort
 multi:///path/to/config.json?mode=stripe&onfail=continue
 multi:///path/to/config.json?onfail=abort&mode=stripe
 multi:///path/to/config.json?onfail=abort
+.fi
 .RE
-
 Order does not matter, however unrecognized parameters are considered
 an error.
-
 .TP
 .BI "mode=" stripe
-
 This mode (the default) performs round-robin access to the list of
 backends. In this mode, all backends must be reliable as a loss of one
 means a loss of one of the archive files.
-
 .TP
 .BI "mode=" mirror
-
 This mode accesses backends as a RAID1-store, storing every file in
 every backend and reading files from the first-successful backend.
 A loss of any backend should result in no failure. Note that backends
 added later will only get new files and may require a manual sync
 with one of the other operating ones.
-
 .TP
 .BI "onfail=" continue
-
 This setting (the default) continues all write operations in as
 best-effort. Any failure results in the next backend tried. Failure
 is reported only when all backends fail a given operation with the
 error result from the last failure.
-
 .TP
 .BI "onfail=" abort
-
 This setting considers any backend write failure as a terminating
 condition and reports the error.
 Data reading and listing operations are independent of this and
 will try with the next backend on failure.
-
 .SS JSON File Example
-.nf
 .RS
+.nf
 [
  {
   "description": "a comment about the backend"
@@ -1779,8 +1778,8 @@ will try with the next backend on failure.
   "url": "file:///path/to/dir"
  }
 ]
-.RE
 .fi
+.RE
 
 .SH A NOTE ON PAR2 WRAPPER BACKEND
 Par2 Wrapper Backend can be used in combination with all other backends to
