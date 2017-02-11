@@ -1,3 +1,40 @@
+2017-02-11  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1603704 with patch supplied by Maciej Bliziński
+      - Crash with UnicodeEncodeError
+
+2017-02-08  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/08-refactor-unit-test-globmatch
+      - Rename path_matches_glob_fn to select_fn_from_glob, as this more accurately reflects the return value.
+      - Significantly refactored unit/test_globmatch.py to make this cleaner and clearer.
+    * Fixed bug #1657916 with patch supplied by Daniel Harvey
+      - B2 provider cannot handle two backups in the same bucket
+
+2017-02-07  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Add detail about import exceptions in onedrivebackend.py
+
+2017-01-30  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/08-merge-glob-parsers
+      - Use a single code path for glob strings whether or not these contain special
+        characters/wildcards (glob_get_normal_sf) and remove glob_get_filename_sf and glob_get_tuple_sf.
+      - Remove run-tests-ve as this was identical to run-tests.
+
+2017-01-24  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~matthew-t-bentley/duplicity/duplicity
+      - Sets a user agent. Backblaze asked for this in case there are errors that originate
+        from the Duplicity B2 backend
+      - Only retrieves a new upload URL when the current one expires, to bring it in line
+        with their best practices for integrations: https://www.backblaze.com/b2/docs/integration_checklist.html
+
+2017-01-19  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1655268 "--gpg-binary option not working"
+      - If gpg binary is specified rebuild gpg profile using new binary location
+
 2017-01-16  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1623342 with patch supplied by Daniel Jakots

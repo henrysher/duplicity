@@ -33,7 +33,7 @@ from duplicity import globals  # @Reimport
 from duplicity import diffdir
 from duplicity import util  # @Reimport
 from duplicity.globmatch import GlobbingError, FilePrefixError, \
-    path_matches_glob_fn
+    select_fn_from_glob
 
 """Iterate exactly the requested files in a directory
 
@@ -429,9 +429,6 @@ probably isn't what you meant.""") %
         assert include == 0 or include == 1
         if glob_str == "**":
             sel_func = lambda path: include
-        elif not self.glob_re.match(glob_str):
-            # normal file
-            sel_func = self.glob_get_filename_sf(glob_str, include)
         else:
             sel_func = self.glob_get_normal_sf(glob_str, include)
 
@@ -477,66 +474,6 @@ probably isn't what you meant.""") %
                         (include and "include-if-present" or "exclude-if-present", filename)
         return sel_func
 
-    def glob_get_filename_sf(self, filename, include):
-        """Get a selection function given a normal filename
-
-        Some of the parsing is better explained in
-        filelist_parse_line.  The reason this is split from normal
-        globbing is things are a lot less complicated if no special
-        globbing characters are used.
-
-        """
-        # Internal. Used by glob_get_sf and unit tests.
-        # ToDo: Make all globbing/non-globbing use same code path
-        # This distinction has bitten us too many times with bugs in one or
-        # the other.
-        match_only_dirs = False
-
-        if filename != "/" and filename[-1] == "/":
-            match_only_dirs = True
-            # Remove trailing / from directory name (unless that is the entire
-            # string)
-            filename = filename[:-1]
-
-        if not filename.startswith(self.prefix):
-            raise FilePrefixError(filename)
-        index = tuple(filter(lambda x: x,
-                             filename[len(self.prefix):].split("/")))
-        return self.glob_get_tuple_sf(index, include, match_only_dirs)
-
-    def glob_get_tuple_sf(self, tuple, include, match_only_dirs=False):
-        """Return selection function based on tuple"""
-        # Internal. Used by glob_get_filename_sf.
-
-        def include_sel_func(path):
-            if len(tuple) == len(path.index) and match_only_dirs and not path.isdir():
-                # If we are assessing the actual directory (rather than the
-                # contents of the directory) and the glob ended with a /,
-                # only match directories
-                return None
-            elif (path.index == tuple[:len(path.index)] or
-                    path.index[:len(tuple)] == tuple):
-                return 1  # /foo/bar implicitly matches /foo, vice-versa
-            else:
-                return None
-
-        def exclude_sel_func(path):
-            if match_only_dirs and not path.isdir():
-                # If the glob ended with a /, only match directories
-                return None
-            elif path.index[:len(tuple)] == tuple:
-                return 0  # /foo excludes /foo/bar, not vice-versa
-            else:
-                return None
-
-        if include == 1:
-            sel_func = include_sel_func
-        elif include == 0:
-            sel_func = exclude_sel_func
-        sel_func.exclude = not include
-        sel_func.name = "Tuple select %s" % (tuple,)
-        return sel_func
-
     def glob_get_normal_sf(self, glob_str, include):
         """Return selection function based on glob_str
 
@@ -562,11 +499,15 @@ probably isn't what you meant.""") %
             glob_str = glob_str[len("ignorecase:"):].lower()
             ignore_case = True
 
-        # Check to make sure prefix is ok
-        if not path_matches_glob_fn(glob_str, include=1)(self.rootpath):
-            raise FilePrefixError(glob_str)
+        # Check to make sure prefix is ok, i.e. the glob string is within
+        # the root folder being backed up
+        file_prefix_selection = select_fn_from_glob(glob_str, include=1)(self.rootpath)
+        if not file_prefix_selection:
+            # file_prefix_selection == 1 (include) or 2 (scan)
+            raise FilePrefixError(glob_str + " glob with " + self.rootpath.name +
+                                  " path gives " + str(file_prefix_selection))
 
-        return path_matches_glob_fn(glob_str, include, ignore_case)
+        return select_fn_from_glob(glob_str, include, ignore_case)
 
     def exclude_older_get_sf(self, date):
         """Return selection function based on files older than modification date """

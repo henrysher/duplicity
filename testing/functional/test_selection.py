@@ -1088,5 +1088,36 @@ class TestFolderIncludesFiles(IncludeExcludeFunctionalTest):
         restored = self.directory_tree_to_list_of_lists(restore_dir)
         self.assertEqual(restored, [])
 
+
+class TestAbsolutePaths(IncludeExcludeFunctionalTest):
+    """ Tests include/exclude options with absolute paths"""
+
+    def test_absolute_paths_non_globbing(self):
+        """ Test --include and --exclude work with absolute paths"""
+        self.backup("full", os.path.abspath("testfiles/select2"),
+                    options=["--include", os.path.abspath("testfiles/select2/3/3sub3/3sub3sub2/3sub3sub2_file.txt"),
+                             "--exclude", os.path.abspath("testfiles/select2/3/3sub3/3sub3sub2"),
+                             "--include", os.path.abspath("testfiles/select2/3/3sub2/3sub2sub2"),
+                             "--include", os.path.abspath("testfiles/select2/3/3sub3"),
+                             "--exclude", os.path.abspath("testfiles/select2/3/3sub1"),
+                             "--exclude", os.path.abspath("testfiles/select2/2/2sub1/2sub1sub3"),
+                             "--exclude", os.path.abspath("testfiles/select2/2/2sub1/2sub1sub2"),
+                             "--include", os.path.abspath("testfiles/select2/2/2sub1"),
+                             "--exclude", os.path.abspath("testfiles/select2/1/1sub3/1sub3sub2"),
+                             "--exclude", os.path.abspath("testfiles/select2/1/1sub3/1sub3sub1"),
+                             "--exclude", os.path.abspath("testfiles/select2/1/1sub2/1sub2sub3"),
+                             "--include", os.path.abspath("testfiles/select2/1/1sub2/1sub2sub1"),
+                             "--exclude", os.path.abspath("testfiles/select2/1/1sub1/1sub1sub3/1sub1sub3_file.txt"),
+                             "--exclude", os.path.abspath("testfiles/select2/1/1sub1/1sub1sub2"),
+                             "--exclude", os.path.abspath("testfiles/select2/1/1sub2"),
+                             "--include", os.path.abspath("testfiles/select2/1.py"),
+                             "--include", os.path.abspath("testfiles/select2/3"),
+                             "--include", os.path.abspath("testfiles/select2/1"),
+                             "--exclude", os.path.abspath("testfiles/select2/**")])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, self.expected_restored_tree)
+
 if __name__ == "__main__":
     unittest.main()
