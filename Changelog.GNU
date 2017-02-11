@@ -2,6 +2,9 @@
 
     * Fixed bug #1603704 with patch supplied by Maciej Bliziński
       - Crash with UnicodeEncodeError
+    * Some fixes to gpg.py to handle gpg1 & gpg2 & gpg2.1 commandline issues
+      - --gpg-agent is optional on gpg1, but on gpg2 it is used automatically
+      - --pinentry-mode is not a valid opt until gpg2.1, so condition on that
 
 2017-02-08  Kenneth Loafman  <kenneth@loafman.com>
 

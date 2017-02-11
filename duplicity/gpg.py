@@ -134,9 +134,10 @@ class GPGFile:
             gnupg.call = globals.gpg_binary
         gnupg.options.meta_interactive = 0
         gnupg.options.extra_args.append('--no-secmem-warning')
-        if globals.use_agent:
+        if globals.use_agent and profile.gpg_version < (2, 0, 0):
+            # gpg2 always requires the agent where gpg1 does not
             gnupg.options.extra_args.append('--use-agent')
-        elif profile.gpg_version >= (2, 1, 0):
+        if profile.gpg_version >= (2, 1, 0):
             # This forces gpg2 to ignore the agent.
             # Necessary to enforce truly non-interactive operation.
             gnupg.options.extra_args.append('--pinentry-mode=loopback')

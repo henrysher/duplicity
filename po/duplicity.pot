@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2017-01-18 16:01-0600\n"
+"POT-Creation-Date: 2017-02-11 10:19-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -806,10 +806,10 @@ msgstr ""
 
 #: ../duplicity/commandline.py:1106
 #, python-format
-msgid "GPG binary is: %s"
+msgid "GPG binary is %s, version %s"
 msgstr ""
 
-#: ../duplicity/commandline.py:1132
+#: ../duplicity/commandline.py:1134
 #, python-format
 msgid ""
 "Bad URL '%s'.\n"
@@ -817,7 +817,7 @@ msgid ""
 "\"file:///usr/local\".  See the man page for more information."
 msgstr ""
 
-#: ../duplicity/commandline.py:1157
+#: ../duplicity/commandline.py:1159
 msgid "Main action: "
 msgstr ""
 
@@ -1665,12 +1665,12 @@ msgstr ""
 msgid "Cleanup of temporary directory %s failed - this is probably a bug."
 msgstr ""
 
-#: ../duplicity/util.py:96
+#: ../duplicity/util.py:97
 #, python-format
 msgid "IGNORED_ERROR: Warning: ignoring error as requested: %s: %s"
 msgstr ""
 
-#: ../duplicity/util.py:162
+#: ../duplicity/util.py:163
 #, python-format
 msgid "Releasing lockfile %s"
 msgstr ""
