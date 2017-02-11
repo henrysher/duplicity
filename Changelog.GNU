@@ -1,3 +1,8 @@
+2017-02-11  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1603704 with patch supplied by Maciej Bliziński
+      - Crash with UnicodeEncodeError
+
 2017-02-08  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1657916 with patch supplied by Daniel Harvey
