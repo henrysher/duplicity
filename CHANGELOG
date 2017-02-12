@@ -97,6 +97,11 @@ New in v0.8.00 (2016/07/??)
   - B2 provider cannot handle two backups in the same bucket
 * Fixed bug #1603704 with patch supplied by Maciej Bliziński
   - Crash with UnicodeEncodeError
+* Merged in lp:~aaron-whitehouse/duplicity/08-python-futurize-stage-1
+  - Made many of the safer changes for improved Python 3 support (python-future's futurize -stage1)
+    without functional change to the code (and leaving the isinstance(s, types.StringType) tests unchanged).
+  - Created Python 2/3 compatible tests for int and long.
+  - Update setup.py to show only Python 2.7 support.
 
 
 New in v0.7.08 (2016/07/02)

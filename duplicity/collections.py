@@ -25,7 +25,7 @@ from future_builtins import filter, map
 
 import types
 import gettext
-
+import sys
 
 from duplicity import log
 from duplicity import file_naming
@@ -36,6 +36,12 @@ from duplicity import globals
 from duplicity import manifest
 from duplicity import util
 from duplicity.gpg import GPGError
+
+# For type testing against both int and long types that works in python 2/3
+if sys.version_info < (3,):
+    integer_types = (int, types.LongType)
+else:
+    integer_types = (int,)
 
 
 class CollectionsError(Exception):
@@ -489,7 +495,7 @@ class SignatureChain:
         Check to make sure times are in whole seconds
         """
         for time in time_list:
-            if type(time) not in (types.LongType, types.IntType):
+            if type(time) not in integer_types:
                 assert 0, "Time %s in %s wrong type" % (time, time_list)
 
     def islocal(self):

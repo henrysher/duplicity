@@ -76,13 +76,13 @@ class GPGProfile:
         self.sign_key = sign_key
         self.encrypt_secring = None
         if recipients is not None:
-            assert isinstance(recipients, types.ListType)  # must be list, not tuple
+            assert isinstance(recipients, list)  # must be list, not tuple
             self.recipients = recipients
         else:
             self.recipients = []
 
         if hidden_recipients is not None:
-            assert isinstance(hidden_recipients, types.ListType)  # must be list, not tuple
+            assert isinstance(hidden_recipients, list)  # must be list, not tuple
             self.hidden_recipients = hidden_recipients
         else:
             self.hidden_recipients = []
@@ -418,7 +418,7 @@ def GzipWriteFile(block_iter, filename, size=200 * 1024 * 1024, gzipped=True):
         if bytes_to_go < block_iter.get_read_size():
             break
         try:
-            new_block = block_iter.next()
+            new_block = next(block_iter)
         except StopIteration:
             at_end_of_blockiter = 1
             break

@@ -20,6 +20,7 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 """Parse command line, check for consistency, and set globals"""
+from __future__ import print_function
 
 from future_builtins import filter
 
@@ -260,7 +261,7 @@ def parse_cmdline_options(arglist):
                            log.ErrorCode.cant_open_filelist)
 
     def print_ver(o, s, v, p):
-        print "duplicity %s" % (globals.version)
+        print("duplicity %s" % (globals.version))
         sys.exit(0)
 
     def add_rename(o, s, v, p):

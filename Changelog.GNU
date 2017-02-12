@@ -1,3 +1,11 @@
+2017-02-12  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/08-python-futurize-stage-1
+      - Made many of the safer changes for improved Python 3 support (python-future's futurize -stage1)
+        without functional change to the code (and leaving the isinstance(s, types.StringType) tests unchanged).
+      - Created Python 2/3 compatible tests for int and long.
+      - Update setup.py to show only Python 2.7 support.
+
 2017-02-11  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1603704 with patch supplied by Maciej Bliziński
