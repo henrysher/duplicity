@@ -51,15 +51,23 @@ class AzureBackend(duplicity.backend.Backend):
             raise BackendException('Azure backend requires Microsoft Azure Storage SDK for Python '
                                    '(https://pypi.python.org/pypi/azure-storage/).')
 
-        if 'AZURE_ACCOUNT_NAME' not in os.environ:
-            raise BackendException('AZURE_ACCOUNT_NAME environment variable not set.')
-        if 'AZURE_ACCOUNT_KEY' not in os.environ:
-            raise BackendException('AZURE_ACCOUNT_KEY environment variable not set.')
-        self.blob_service = BlobService(account_name=os.environ['AZURE_ACCOUNT_NAME'],
-                                        account_key=os.environ['AZURE_ACCOUNT_KEY'])
-
         # TODO: validate container name
         self.container = parsed_url.path.lstrip('/')
+
+        if 'AZURE_ACCOUNT_NAME' not in os.environ:
+            raise BackendException('AZURE_ACCOUNT_NAME environment variable not set.')
+
+        if 'AZURE_ACCOUNT_KEY' in os.environ:
+            self.blob_service = BlobService(account_name=os.environ['AZURE_ACCOUNT_NAME'],
+                                            account_key=os.environ['AZURE_ACCOUNT_KEY'])
+            self._create_container()
+        elif 'AZURE_SHARED_ACCESS_SIGNATURE' in os.environ:
+            self.blob_service = BlobService(account_name=os.environ['AZURE_ACCOUNT_NAME'],
+                                            sas_token=os.environ['AZURE_SHARED_ACCESS_SIGNATURE'])
+        else:
+            raise BackendException('Neither AZURE_ACCOUNT_KEY nor AZURE_SHARED_ACCESS_SIGNATURE environment variable not set.')
+
+    def _create_container(self):
         try:
             self.blob_service.create_container(self.container, fail_on_exist=True)
         except self.AzureConflictError:
