@@ -44,7 +44,11 @@ class AzureBackend(duplicity.backend.Backend):
                 self.AzureConflictError = azure.WindowsAzureConflictError
             else:
                 # v1.0.0 and above
-                from azure.storage.blob import BlobService
+                import azure.storage.blob
+                if hasattr(azure.storage.blob, 'BlobService'):
+                    from azure.storage.blob import BlobService
+                else:
+                    from azure.storage.blob.blockblobservice import BlockBlobService as BlobService
                 self.AzureMissingResourceError = azure.common.AzureMissingResourceHttpError
                 self.AzureConflictError = azure.common.AzureConflictHttpError
         except ImportError:
