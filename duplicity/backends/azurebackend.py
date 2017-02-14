@@ -76,7 +76,10 @@ class AzureBackend(duplicity.backend.Backend):
 
     def _put(self, source_path, remote_filename):
         # https://azure.microsoft.com/en-us/documentation/articles/storage-python-how-to-use-blob-storage/#upload-a-blob-into-a-container
-        self.blob_service.put_block_blob_from_path(self.container, remote_filename, source_path.name)
+        try:
+            self.blob_service.create_blob_from_path(self.container, remote_filename, source_path.name)
+        except AttributeError:  # Old versions use a different method name
+            self.blob_service.put_block_blob_from_path(self.container, remote_filename, source_path.name)
 
     def _get(self, remote_filename, local_path):
         # https://azure.microsoft.com/en-us/documentation/articles/storage-python-how-to-use-blob-storage/#download-blobs
@@ -100,7 +103,12 @@ class AzureBackend(duplicity.backend.Backend):
 
     def _query(self, filename):
         prop = self.blob_service.get_blob_properties(self.container, filename)
-        return {'size': int(prop['content-length'])}
+        try:
+            info = {'size': int(prop.properties.content_length)}
+        except AttributeError:
+            # old versions directly returned the properties
+            info = {'size': int(prop['content-length'])}
+        return info
 
     def _error_code(self, operation, e):
         if isinstance(e, self.AzureMissingResourceError):
