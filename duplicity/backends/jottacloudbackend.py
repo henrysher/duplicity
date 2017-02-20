@@ -153,5 +153,6 @@ class JottaCloudBackend(duplicity.backend.Backend):
         # - If your backend needs to clean up after itself, do that here.
         pass
 
+
 duplicity.backend.register_backend("jottacloud", JottaCloudBackend)
 """ jottacloud is a Norwegian backup company """

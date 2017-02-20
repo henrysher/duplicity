@@ -210,4 +210,5 @@ class Par2Backend(backend.Backend):
     def close(self):
         self.wrapped_backend._close()
 
+
 backend.register_backend_prefix('par2', Par2Backend)

@@ -102,4 +102,5 @@ class AzureBackend(duplicity.backend.Backend):
         if isinstance(e, self.AzureMissingResourceError):
             return log.ErrorCode.backend_not_found
 
+
 duplicity.backend.register_backend('azure', AzureBackend)

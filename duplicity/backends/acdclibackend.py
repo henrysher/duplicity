@@ -148,4 +148,5 @@ class ACDBackend(duplicity.backend.Backend):
         commandline = self.acd_cmd + " rm '%s'" % (remote_file_path)
         self.subprocess_popen(commandline)
 
+
 duplicity.backend.register_backend("acd+acdcli", ACDBackend)

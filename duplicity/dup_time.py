@@ -40,6 +40,7 @@ else:
 class TimeException(Exception):
     pass
 
+
 _interval_conv_dict = {"s": 1, "m": 60, "h": 3600, "D": 86400,
                        "W": 7 * 86400, "M": 30 * 86400, "Y": 365 * 86400}
 _integer_regexp = re.compile("^[0-9]+$")

@@ -345,4 +345,5 @@ class OneDriveBackend(duplicity.backend.Backend):
     def _retry_cleanup(self):
         self.initialize_oauth2_session()
 
+
 duplicity.backend.register_backend('onedrive', OneDriveBackend)
