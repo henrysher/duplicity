@@ -635,7 +635,7 @@ def parse_cmdline_options(arglist):
     parser.add_option("--backend-retry-delay", type="int", metavar=_("seconds"))
 
     # parse the options
-    (options, args) = parser.parse_args()
+    (options, args) = parser.parse_args(arglist)
 
     # Copy all arguments and their values to the globals module.  Don't copy
     # attributes that are 'hidden' (start with an underscore) or whose name is
@@ -731,7 +731,7 @@ def parse_cmdline_options(arglist):
         globals.backup_name = generate_default_backup_name(backend_url)
 
     # set and expand archive dir
-    set_archive_dir(expand_archive_dir(globals.archive_dir,
+    set_archive_dir(expand_archive_dir(globals.archive_dir_root,
                                        globals.backup_name))
 
     log.Info(_("Using archive dir: %s") % (util.ufn(globals.archive_dir.name),))
