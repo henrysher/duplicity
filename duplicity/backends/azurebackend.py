@@ -69,7 +69,8 @@ class AzureBackend(duplicity.backend.Backend):
             self.blob_service = BlobService(account_name=os.environ['AZURE_ACCOUNT_NAME'],
                                             sas_token=os.environ['AZURE_SHARED_ACCESS_SIGNATURE'])
         else:
-            raise BackendException('Neither AZURE_ACCOUNT_KEY nor AZURE_SHARED_ACCESS_SIGNATURE environment variable not set.')
+            raise BackendException(
+                'Neither AZURE_ACCOUNT_KEY nor AZURE_SHARED_ACCESS_SIGNATURE environment variable not set.')
 
     def _create_container(self):
         try:
