@@ -209,7 +209,7 @@ class ImapBackend(duplicity.backend.Backend):
             raise Exception(list[0])
         if list[0] == '':
             return ret
-        nums = list[0].split(" ")
+        nums = list[0].strip().split(" ")
         set = "%s:%s" % (nums[0], nums[-1])
         (result, list) = self.conn.fetch(set, "(BODY[HEADER])")
         if result != "OK":
@@ -256,6 +256,7 @@ class ImapBackend(duplicity.backend.Backend):
         self.conn.select(globals.imap_mailbox)
         self.conn.close()
         self.conn.logout()
+
 
 duplicity.backend.register_backend("imap", ImapBackend)
 duplicity.backend.register_backend("imaps", ImapBackend)

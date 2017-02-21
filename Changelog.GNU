@@ -1,3 +1,9 @@
+2017-02-21  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1367675 - IMAP Backend does not work with Yahoo server
+      - added the split() as needed in 'nums=list[0].strip().split(" ")'
+      - the other fixes mentioned in the bug report comments were already done
+
 2017-02-11  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1603704 with patch supplied by Maciej Bliziński

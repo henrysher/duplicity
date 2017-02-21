@@ -23,6 +23,9 @@ New in v0.7.12 (2017/01/??)
 * Some fixes to gpg.py to handle gpg1 & gpg2 & gpg2.1 commandline issues
   - --gpg-agent is optional on gpg1, but on gpg2 it is used automatically
   - --pinentry-mode is not a valid opt until gpg2.1, so condition on that
+* Fixed bug #1367675 - IMAP Backend does not work with Yahoo server
+  - added the split() as needed in 'nums=list[0].strip().split(" ")'
+  - the other fixes mentioned in the bug report comments were already done
 
 
 New in v0.7.11 (2016/12/31)
