@@ -10,6 +10,8 @@
       - Fix PEP-8 testing by moving to using pycodestyle library.
       - Temporarily add ignores to allow these tests to pass.
       - Fix E305 PEP8 errors: expected 2 blank lines after class or function definition, found 1.
+    * Merged in lp:~benoit.bertholon/duplicity/duplicity
+      - Fixes bug #1666194 - ProcessCommandLine function called twice fail and arglist argument not used
 
 2017-02-12  Kenneth Loafman  <kenneth@loafman.com>
 
