@@ -19,10 +19,13 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import os
-import sys
 import subprocess
-
 import unittest
+
+if os.getenv('RUN_CODE_TESTS', None) == '1':
+    # Make conditional so that we do not have to import in environments that
+    # do not run the tests (e.g. the build servers)
+    import pycodestyle
 
 from . import _top_dir, DuplicityTestCase  # @IgnorePep8
 
@@ -85,17 +88,14 @@ class CodeTest(DuplicityTestCase):
     @unittest.skipUnless(os.getenv('RUN_CODE_TESTS', None) == '1',
                          'Must set environment var RUN_CODE_TESTS=1')
     def test_pep8(self):
-        ignores = [
-            "E402",  # module level import not at top of file
-            "E731",  # do not assign a lambda expression, use a def
-        ]
-        self.run_checker(["pep8",
-                          "--ignore=" + ','.join(ignores),
-                          "--max-line-length=120",
-                          os.path.join(_top_dir, 'duplicity'),
-                          os.path.join(_top_dir, 'bin/duplicity'),
-                          os.path.join(_top_dir, 'bin/rdiffdir')])
-
+        """Test that we conform to PEP-8 using pycodestyle."""
+        # Note that the settings, ignores etc for pycodestyle are set in tox.ini, not here
+        style = pycodestyle.StyleGuide(config_file=os.path.join(_top_dir, 'tox.ini'))
+        result = style.check_files([os.path.join(_top_dir, 'duplicity'),
+                                    os.path.join(_top_dir, 'bin/duplicity'),
+                                    os.path.join(_top_dir, 'bin/rdiffdir')])
+        self.assertEqual(result.total_errors, 0,
+                         "Found %s code style errors (and warnings)." % result.total_errors)
 
 if __name__ == "__main__":
     unittest.main()

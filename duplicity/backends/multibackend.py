@@ -296,4 +296,5 @@ class MultiBackend(duplicity.backend.Backend):
                     log.ERROR)
 #           raise BackendException("failed to delete")
 
+
 duplicity.backend.register_backend('multi', MultiBackend)

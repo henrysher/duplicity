@@ -200,6 +200,7 @@ class LFTPBackend(duplicity.backend.Backend):
         log.Debug("STDOUT:\n"
                   "%s" % (l))
 
+
 duplicity.backend.register_backend("ftp", LFTPBackend)
 duplicity.backend.register_backend("ftps", LFTPBackend)
 duplicity.backend.register_backend("fish", LFTPBackend)

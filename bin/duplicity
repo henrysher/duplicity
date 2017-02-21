@@ -1541,6 +1541,7 @@ def with_tempdir(fn):
     finally:
         tempdir.default().cleanup()
 
+
 if __name__ == "__main__":
     try:
         with_tempdir(main)

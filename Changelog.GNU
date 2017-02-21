@@ -6,6 +6,10 @@
     * Merged in lp:~marix/duplicity/azure-storage-sas
       - This branch adds support for Shared Access Signature to the Azure backend
         which allows to run Duplicity with a minimal set of permissions.
+    * Merged in lp:~aaron-whitehouse/duplicity/pep8_test_fixes
+      - Fix PEP-8 testing by moving to using pycodestyle library.
+      - Temporarily add ignores to allow these tests to pass.
+      - Fix E305 PEP8 errors: expected 2 blank lines after class or function definition, found 1.
 
 2017-02-12  Kenneth Loafman  <kenneth@loafman.com>
 

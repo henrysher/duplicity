@@ -64,6 +64,7 @@ def listpath(path):
     dir_listing.sort()
     return dir_listing
 
+
 from duplicity import librsync
 from duplicity import log
 from duplicity import util

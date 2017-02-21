@@ -404,4 +404,5 @@ class ADBackend(duplicity.backend.Backend):
         response.raise_for_status()
         del self.names_to_ids[remote_filename]
 
+
 duplicity.backend.register_backend('ad', ADBackend)

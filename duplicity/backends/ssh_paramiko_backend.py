@@ -406,6 +406,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname,
 
         return sshconfig.lookup(host)
 
+
 duplicity.backend.register_backend("sftp", SSHParamikoBackend)
 duplicity.backend.register_backend("scp", SSHParamikoBackend)
 duplicity.backend.register_backend("paramiko+sftp", SSHParamikoBackend)

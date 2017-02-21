@@ -287,6 +287,7 @@ class SSHPExpectBackend(duplicity.backend.Backend):
         commandline = ("%s %s %s" % (self.sftp_command, globals.ssh_options, self.host_string))
         self.run_sftp_command(commandline, commands)
 
+
 duplicity.backend.register_backend("pexpect+sftp", SSHPExpectBackend)
 duplicity.backend.register_backend("pexpect+scp", SSHPExpectBackend)
 duplicity.backend.uses_netloc.extend(['pexpect+sftp', 'pexpect+scp'])

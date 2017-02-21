@@ -154,4 +154,5 @@ class SwiftBackend(duplicity.backend.Backend):
         sobject = self.conn.head_object(self.container, self.prefix + filename)
         return {'size': int(sobject['content-length'])}
 
+
 duplicity.backend.register_backend("swift", SwiftBackend)

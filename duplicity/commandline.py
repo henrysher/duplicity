@@ -197,6 +197,7 @@ class DupOption(optparse.Option):
             optparse.Option.take_action(
                 self, action, dest, opt, value, values, parser)
 
+
 """
 Fix:
     File "/usr/lib/pythonX.X/optparse.py", line XXXX, in print_help

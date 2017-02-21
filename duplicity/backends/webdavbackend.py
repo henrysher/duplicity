@@ -469,6 +469,7 @@ class WebDAVBackend(duplicity.backend.Backend):
             if response:
                 response.close()
 
+
 duplicity.backend.register_backend("http", WebDAVBackend)
 duplicity.backend.register_backend("https", WebDAVBackend)
 duplicity.backend.register_backend("webdav", WebDAVBackend)

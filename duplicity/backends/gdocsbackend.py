@@ -185,6 +185,7 @@ class GDocsBackend(duplicity.backend.Backend):
         # Done!
         return result
 
+
 """ gdata is an alternate way to access gdocs, currently 05/2015 lacking OAuth support """
 duplicity.backend.register_backend('gdata+gdocs', GDocsBackend)
 duplicity.backend.uses_netloc.extend(['gdata+gdocs'])
