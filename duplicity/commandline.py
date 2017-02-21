@@ -732,7 +732,7 @@ def parse_cmdline_options(arglist):
         globals.backup_name = generate_default_backup_name(backend_url)
 
     # set and expand archive dir
-    set_archive_dir(expand_archive_dir(globals.archive_dir_root,
+    set_archive_dir(expand_archive_dir(globals.archive_dir,
                                        globals.backup_name))
 
     log.Info(_("Using archive dir: %s") % (util.ufn(globals.archive_dir.name),))

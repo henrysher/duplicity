@@ -12,6 +12,8 @@
       - Fix E305 PEP8 errors: expected 2 blank lines after class or function definition, found 1.
     * Merged in lp:~benoit.bertholon/duplicity/duplicity
       - Fixes bug #1666194 - ProcessCommandLine function called twice fail and arglist argument not used
+    * Fixed variable name change in last merge which broke a bunch of tests
+      - Changed archive_dir_root back to archive_dir
 
 2017-02-12  Kenneth Loafman  <kenneth@loafman.com>
 
