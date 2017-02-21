@@ -102,6 +102,9 @@ New in v0.8.00 (2016/07/??)
     without functional change to the code (and leaving the isinstance(s, types.StringType) tests unchanged).
   - Created Python 2/3 compatible tests for int and long.
   - Update setup.py to show only Python 2.7 support.
+* Merged in lp:~marix/duplicity/azure-storage-0.30.0-plus
+  - This makes the Azure backend compatible with version 0.30.0 and up of the
+    underlying azure-storage package.
 
 
 New in v0.7.08 (2016/07/02)

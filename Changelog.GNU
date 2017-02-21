@@ -1,3 +1,9 @@
+2017-02-21  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~marix/duplicity/azure-storage-0.30.0-plus
+      - This makes the Azure backend compatible with version 0.30.0 and up of the
+        underlying azure-storage package.
+
 2017-02-12  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~aaron-whitehouse/duplicity/08-python-futurize-stage-1
