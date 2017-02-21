@@ -3,6 +3,9 @@
     * Merged in lp:~marix/duplicity/azure-storage-0.30.0-plus
       - This makes the Azure backend compatible with version 0.30.0 and up of the
         underlying azure-storage package.
+    * Merged in lp:~marix/duplicity/azure-storage-sas
+      - This branch adds support for Shared Access Signature to the Azure backend
+        which allows to run Duplicity with a minimal set of permissions.
 
 2017-02-12  Kenneth Loafman  <kenneth@loafman.com>
 

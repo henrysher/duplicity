@@ -1543,9 +1543,13 @@ See
 .B REQUIREMENTS
 above.
 
-It uses two environment variables for authentification:
+It uses environment variables for authentification:
 .BR AZURE_ACCOUNT_NAME " (required),"
-.BR AZURE_ACCOUNT_KEY " (required)"
+.BR AZURE_ACCOUNT_KEY " (optional),
+.BR AZURE_SHARED_ACCESS_SIGNATURE " (optional)."
+One of
+.BR AZURE_ACCOUNT_KEY " or"
+.BR AZURE_SHARED_ACCESS_SIGNATURE " is required."
 
 A container name must be a valid DNS name, conforming to the following naming
 rules:
