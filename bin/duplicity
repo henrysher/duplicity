@@ -481,7 +481,7 @@ def get_man_fileobj(backup_type):
     """
     Return a fileobj opened for writing, save results as manifest
 
-    Save manifest in globals.archive_dir gzipped.
+    Save manifest in globals.archive_dir_path gzipped.
     Save them on the backend encrypted as needed.
 
     @type man_type: string
@@ -501,7 +501,7 @@ def get_man_fileobj(backup_type):
                                           manifest=True,
                                           encrypted=globals.encryption)
 
-    fh = dup_temp.get_fileobj_duppath(globals.archive_dir,
+    fh = dup_temp.get_fileobj_duppath(globals.archive_dir_path,
                                       part_man_filename,
                                       perm_man_filename,
                                       remote_man_filename)
@@ -531,7 +531,7 @@ def get_sig_fileobj(sig_type):
     remote_sig_filename = file_naming.get(sig_type, encrypted=globals.encryption,
                                           gzipped=globals.compression)
 
-    fh = dup_temp.get_fileobj_duppath(globals.archive_dir,
+    fh = dup_temp.get_fileobj_duppath(globals.archive_dir_path,
                                       part_sig_filename,
                                       perm_sig_filename,
                                       remote_sig_filename,
@@ -541,7 +541,7 @@ def get_sig_fileobj(sig_type):
 
 def full_backup(col_stats):
     """
-    Do full backup of directory to backend, using archive_dir
+    Do full backup of directory to backend, using archive_dir_path
 
     @type col_stats: CollectionStatus object
     @param col_stats: collection status
@@ -630,7 +630,7 @@ def print_statistics(stats, bytes_written):
 
 def incremental_backup(sig_chain):
     """
-    Do incremental backup of directory to backend, using archive_dir
+    Do incremental backup of directory to backend, using archive_dir_path
 
     @rtype: void
     @return: void
@@ -910,7 +910,7 @@ def cleanup(col_stats):
             col_stats.backend.delete(ext_remote)
             for fn in ext_local:
                 try:
-                    globals.archive_dir.append(fn).delete()
+                    globals.archive_dir_path.append(fn).delete()
                 except Exception:
                     pass
     else:
@@ -1079,7 +1079,7 @@ def sync_archive(decrypt):
         return (pr, loc_name, fn)
 
     def remove_local(fn):
-        del_name = globals.archive_dir.append(fn).name
+        del_name = globals.archive_dir_path.append(fn).name
 
         log.Notice(_("Deleting local %s (not authoritative at backend).") %
                    util.ufn(del_name))
@@ -1143,14 +1143,14 @@ def sync_archive(decrypt):
         else:
             gpg.GzipWriteFile(src_iter, tdp.name, size=sys.maxsize)
         tdp.setdata()
-        tdp.move(globals.archive_dir.append(loc_name))
+        tdp.move(globals.archive_dir_path.append(loc_name))
 
     # get remote metafile list
     remlist = globals.backend.list()
     remote_metafiles, ignored, rem_needpass = get_metafiles(remlist)
 
     # get local metafile list
-    loclist = globals.archive_dir.listdir()
+    loclist = globals.archive_dir_path.listdir()
     local_metafiles, local_partials, loc_needpass = get_metafiles(loclist)
 
     # we have the list of metafiles on both sides. remote is always
@@ -1374,13 +1374,13 @@ See https://bugs.launchpad.net/duplicity/+bug/931175
     # determine what action we're performing and process command line
     action = commandline.ProcessCommandLine(sys.argv[1:])
 
-    globals.lockfile = FileLock(os.path.join(globals.archive_dir.name, "lockfile"), threaded=False)
+    globals.lockfile = FileLock(os.path.join(globals.archive_dir_path.name, "lockfile"), threaded=False)
     if globals.lockfile.is_locked():
         log.FatalError(
             "Another instance is already running with this archive directory\n"
             "If you are sure that this is the  only instance running you may delete\n"
             "the following lockfile and run the command again :\n"
-            "\t%s" % os.path.join(globals.archive_dir.name, "lockfile.lock"),
+            "\t%s" % os.path.join(globals.archive_dir_path.name, "lockfile.lock"),
             log.ErrorCode.user_error)
         log.shutdown()
         sys.exit(2)
@@ -1413,7 +1413,7 @@ def do_backup(action):
 
     # get current collection status
     col_stats = collections.CollectionsStatus(globals.backend,
-                                              globals.archive_dir).set_values()
+                                              globals.archive_dir_path).set_values()
 
     while True:
         # if we have to clean up the last partial, then col_stats are invalidated
@@ -1443,7 +1443,7 @@ def do_backup(action):
                     log.Notice(_("Cleaning up previous partial %s backup set, restarting." % action))
                     last_backup.delete()
                     col_stats = collections.CollectionsStatus(globals.backend,
-                                                              globals.archive_dir).set_values()
+                                                              globals.archive_dir_path).set_values()
                     continue
             break
         break

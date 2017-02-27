@@ -63,7 +63,7 @@ class Snapshot(sys_collections.deque):
         # If restarting Full, discard marshalled data and start over
         if globals.restart is not None and globals.restart.start_vol >= 1:
             try:
-                progressfd = open('%s/progress' % globals.archive_dir.name, 'r')
+                progressfd = open('%s/progress' % globals.archive_dir_path.name, 'r')
                 snapshot = pickle.load(progressfd)
                 progressfd.close()
             except:
@@ -77,7 +77,7 @@ class Snapshot(sys_collections.deque):
         """
         Serializes object to cache
         """
-        progressfd = open('%s/progress' % globals.archive_dir.name, 'w+')
+        progressfd = open('%s/progress' % globals.archive_dir_path.name, 'w+')
         pickle.dump(self, progressfd)
         progressfd.close()
 

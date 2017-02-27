@@ -735,7 +735,7 @@ def parse_cmdline_options(arglist):
     set_archive_dir(expand_archive_dir(globals.archive_dir,
                                        globals.backup_name))
 
-    log.Info(_("Using archive dir: %s") % (util.ufn(globals.archive_dir.name),))
+    log.Info(_("Using archive dir: %s") % (util.ufn(globals.archive_dir_path.name),))
     log.Info(_("Using backup name: %s") % (globals.backup_name,))
 
     return args
@@ -956,12 +956,12 @@ def set_archive_dir(dirstring):
             os.makedirs(dirstring)
         except Exception:
             pass
-    archive_dir = path.Path(dirstring)
-    if not archive_dir.isdir():
+    archive_dir_path = path.Path(dirstring)
+    if not archive_dir_path.isdir():
         log.FatalError(_("Specified archive directory '%s' does not exist, "
-                         "or is not a directory") % (util.ufn(archive_dir.name),),
+                         "or is not a directory") % (util.ufn(archive_dir_path.name),),
                        log.ErrorCode.bad_archive_dir)
-    globals.archive_dir = archive_dir
+    globals.archive_dir_path = archive_dir_path
 
 
 def set_sign_key(sign_key):
