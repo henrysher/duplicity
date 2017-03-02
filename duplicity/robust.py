@@ -20,6 +20,9 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import errno
+from duplicity import librsync
+from duplicity import log
+from duplicity import util
 
 tmp_file_index = 1
 
@@ -63,8 +66,3 @@ def listpath(path):
     dir_listing = check_common_error(error_handler, path.listdir)
     dir_listing.sort()
     return dir_listing
-
-
-from duplicity import librsync
-from duplicity import log
-from duplicity import util

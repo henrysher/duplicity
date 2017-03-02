@@ -27,18 +27,38 @@
 # Please send mail to me or the mailing list if you find bugs or have
 # any suggestions.
 
+import duplicity.errors
 import gzip
 import os
-import sys
-import time
-import types
-import traceback
 import platform
-import statvfs
-import resource
 import re
+import resource
+import statvfs
+import sys
 import threading
+import time
+import traceback
+import types
+
 from datetime import datetime
+from duplicity import asyncscheduler
+from duplicity import collections
+from duplicity import commandline
+from duplicity import diffdir
+from duplicity import dup_temp
+from duplicity import dup_time
+from duplicity import file_naming
+from duplicity import globals
+from duplicity import gpg
+from duplicity import log
+from duplicity import manifest
+from duplicity import patchdir
+from duplicity import path
+from duplicity import progress
+from duplicity import robust
+from duplicity import tempdir
+from duplicity import util
+
 try:
     from lockfile import FileLock
 except:
@@ -63,27 +83,7 @@ if '--pydevd' in sys.argv or os.getenv('PYDEVD', None):
     sys.path.insert(0, base)
 # end remote debugger startup
 
-from duplicity import log
 log.setup()
-
-import duplicity.errors
-
-from duplicity import collections
-from duplicity import commandline
-from duplicity import diffdir
-from duplicity import dup_temp
-from duplicity import dup_time
-from duplicity import file_naming
-from duplicity import globals
-from duplicity import gpg
-from duplicity import manifest
-from duplicity import patchdir
-from duplicity import path
-from duplicity import robust
-from duplicity import tempdir
-from duplicity import asyncscheduler
-from duplicity import util
-from duplicity import progress
 
 # If exit_val is not None, exit with given value at end.
 exit_val = None
