@@ -59,6 +59,7 @@ current_time = None
 # NOTE: this gets expanded in duplicity.commandline
 os.environ["XDG_CACHE_HOME"] = os.getenv("XDG_CACHE_HOME", os.path.expanduser("~/.cache"))
 archive_dir = os.path.expandvars("$XDG_CACHE_HOME/duplicity")
+archive_dir_path = None
 
 # config dir for future use
 os.environ["XDG_CONFIG_HOME"] = os.getenv("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))

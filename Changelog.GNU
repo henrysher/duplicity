@@ -1,3 +1,9 @@
+2017-03-02  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~benoit.bertholon/duplicity/duplicity
+      - Use the globals.archive_dir variable to store only a string
+        in the case of a path, uses globals.archive_dir_path
+
 2017-02-21  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~marix/duplicity/azure-storage-0.30.0-plus

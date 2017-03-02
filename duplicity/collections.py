@@ -142,14 +142,14 @@ class BackupSet:
                                                remote_filename)
         self.remote_manifest_name = remote_filename
 
-        for local_filename in globals.archive_dir.listdir():
+        for local_filename in globals.archive_dir_path.listdir():
             pr = file_naming.parse(local_filename)
             if (pr and pr.manifest and pr.type == self.type and
                     pr.time == self.time and
                     pr.start_time == self.start_time and
                     pr.end_time == self.end_time):
                 self.local_manifest_path = \
-                    globals.archive_dir.append(local_filename)
+                    globals.archive_dir_path.append(local_filename)
 
                 self.set_files_changed()
                 break
@@ -165,13 +165,13 @@ class BackupSet:
         except Exception:
             log.Debug(_("BackupSet.delete: missing %s") % [util.ufn(f) for f in rfn])
             pass
-        for lfn in globals.archive_dir.listdir():
+        for lfn in globals.archive_dir_path.listdir():
             pr = file_naming.parse(lfn)
             if (pr and pr.time == self.time and
                     pr.start_time == self.start_time and
                     pr.end_time == self.end_time):
                 try:
-                    globals.archive_dir.append(lfn).delete()
+                    globals.archive_dir_path.append(lfn).delete()
                 except Exception:
                     log.Debug(_("BackupSet.delete: missing %s") % [util.ufn(f) for f in lfn])
                     pass
@@ -459,19 +459,19 @@ class SignatureChain:
         Return new SignatureChain.
 
         local should be true iff the signature chain resides in
-        globals.archive_dir and false if the chain is in
+        globals.archive_dir_path and false if the chain is in
         globals.backend.
 
-        @param local: True if sig chain in globals.archive_dir
+        @param local: True if sig chain in globals.archive_dir_path
         @type local: Boolean
 
         @param location: Where the sig chain is located
-        @type location: globals.archive_dir or globals.backend
+        @type location: globals.archive_dir_path or globals.backend
         """
         if local:
-            self.archive_dir, self.backend = location, None
+            self.archive_dir_path, self.backend = location, None
         else:
-            self.archive_dir, self.backend = None, location
+            self.archive_dir_path, self.backend = None, location
         self.fullsig = None  # filename of full signature
         self.inclist = []  # list of filenames of incremental signatures
         self.start_time, self.end_time = None, None
@@ -480,7 +480,7 @@ class SignatureChain:
         """
         Local or Remote and List of files in the set
         """
-        if self.archive_dir:
+        if self.archive_dir_path:
             place = _("local")
         else:
             place = _("remote")
@@ -502,7 +502,7 @@ class SignatureChain:
         """
         Return true if represents a signature chain in archive_dir
         """
-        if self.archive_dir:
+        if self.archive_dir_path:
             return True
         else:
             return False
@@ -539,10 +539,10 @@ class SignatureChain:
         optionally at a certain time
         """
         assert self.fullsig
-        if self.archive_dir:  # local
+        if self.archive_dir_path:  # local
             def filename_to_fileobj(filename):
-                """Open filename in archive_dir, return filtered fileobj"""
-                sig_dp = path.DupPath(self.archive_dir.name, (filename,))
+                """Open filename in archive_dir_path, return filtered fileobj"""
+                sig_dp = path.DupPath(self.archive_dir_path.name, (filename,))
                 return sig_dp.filtered_open("rb")
         else:
             filename_to_fileobj = self.backend.get_fileobj_read
@@ -553,11 +553,11 @@ class SignatureChain:
         Remove all files in signature set
         """
         # Try to delete in opposite order, so something useful even if aborted
-        if self.archive_dir:
+        if self.archive_dir_path:
             for i in range(len(self.inclist) - 1, -1, -1):
-                self.archive_dir.append(self.inclist[i]).delete()
+                self.archive_dir_path.append(self.inclist[i]).delete()
             if not keep_full:
-                self.archive_dir.append(self.fullsig).delete()
+                self.archive_dir_path.append(self.fullsig).delete()
         else:
             assert self.backend
             inclist_copy = self.inclist[:]
@@ -588,12 +588,12 @@ class CollectionsStatus:
     """
     Hold information about available chains and sets
     """
-    def __init__(self, backend, archive_dir):
+    def __init__(self, backend, archive_dir_path):
         """
         Make new object.  Does not set values
         """
         self.backend = backend
-        self.archive_dir = archive_dir
+        self.archive_dir_path = archive_dir_path
 
         # Will hold (signature chain, backup chain) pair of active
         # (most recent) chains
@@ -618,7 +618,7 @@ class CollectionsStatus:
         Return summary of the collection, suitable for printing to log
         """
         l = ["backend %s" % (self.backend.__class__.__name__,),
-             "archive-dir %s" % (self.archive_dir,)]
+             "archive-dir %s" % (self.archive_dir_path,)]
 
         for i in range(len(self.other_backup_chains)):
             # A bit of a misnomer.  Chain might have a sig.
@@ -642,7 +642,7 @@ class CollectionsStatus:
              u"-----------------",
              _("Connecting with backend: %s") %
              (self.backend.__class__.__name__,),
-             _("Archive dir: %s") % (util.ufn(self.archive_dir.name),)]
+             _("Archive dir: %s") % (util.ufn(self.archive_dir_path.name),)]
 
         l.append("\n" +
                  ngettext("Found %d secondary backup chain.",
@@ -681,7 +681,7 @@ class CollectionsStatus:
 
     def set_values(self, sig_chain_warning=1):
         """
-        Set values from archive_dir and backend.
+        Set values from archive_dir_path and backend.
 
         Returns self for convenience.  If sig_chain_warning is set to None,
         do not warn about unnecessary sig chains.  This is because there may
@@ -697,7 +697,7 @@ class CollectionsStatus:
                   len(backend_filename_list))
 
         # get local filename list
-        local_filename_list = self.archive_dir.listdir()
+        local_filename_list = self.archive_dir_path.listdir()
         log.Debug(ngettext("%d file exists in cache",
                            "%d files exist in cache",
                            len(local_filename_list)) %
@@ -884,7 +884,7 @@ class CollectionsStatus:
 
     def get_signature_chains(self, local, filelist=None):
         """
-        Find chains in archive_dir (if local is true) or backend
+        Find chains in archive_dir_path (if local is true) or backend
 
         Use filelist if given, otherwise regenerate.  Return value is
         pair (list of chains, list of signature paths not in any
@@ -894,7 +894,7 @@ class CollectionsStatus:
             if filelist is not None:
                 return filelist
             elif local:
-                return self.archive_dir.listdir()
+                return self.archive_dir_path.listdir()
             else:
                 return self.backend.list()
 
@@ -903,7 +903,7 @@ class CollectionsStatus:
             Return new empty signature chain
             """
             if local:
-                return SignatureChain(True, self.archive_dir)
+                return SignatureChain(True, self.archive_dir_path)
             else:
                 return SignatureChain(False, self.backend)
 
