@@ -23,6 +23,9 @@
 from __future__ import print_function
 
 import os
+from duplicity import log
+from duplicity import robust
+from duplicity import util
 
 
 class Iter:
@@ -420,8 +423,3 @@ class ITRBranch:
         log.Warn(_("Skipping %s because of previous error") % util.ufn(index_str),
                  log.WarningCode.process_skipped,
                  util.escape(index_str))
-
-
-from duplicity import log
-from duplicity import robust
-from duplicity import util

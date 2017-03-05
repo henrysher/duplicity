@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2017-03-02 10:35-0600\n"
+"POT-Creation-Date: 2017-03-05 10:38-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1159,7 +1159,7 @@ msgstr ""
 msgid "Type of file change:"
 msgstr ""
 
-#: ../duplicity/robust.py:61
+#: ../duplicity/robust.py:64
 #, python-format
 msgid "Error listing directory %s"
 msgstr ""
@@ -1194,17 +1194,17 @@ msgstr ""
 msgid "D %s"
 msgstr ""
 
-#: ../duplicity/lazy.py:335
+#: ../duplicity/lazy.py:338
 #, python-format
 msgid "Warning: oldindex %s >= newindex %s"
 msgstr ""
 
-#: ../duplicity/lazy.py:410
+#: ../duplicity/lazy.py:413
 #, python-format
 msgid "Error '%s' processing %s"
 msgstr ""
 
-#: ../duplicity/lazy.py:420
+#: ../duplicity/lazy.py:423
 #, python-format
 msgid "Skipping %s because of previous error"
 msgstr ""

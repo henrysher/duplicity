@@ -1,3 +1,8 @@
+2017-03-05  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in p:~aaron-whitehouse/duplicity/pep8_E402_fixes
+      - Fixed PEP8 errors: E402 module level import not at top of file
+
 2017-03-02  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~benoit.bertholon/duplicity/duplicity

@@ -26,13 +26,14 @@ which is written in C.  The goal was to use C as little as possible...
 
 """
 import os
+from . import _librsync
+import types
+import array
+
 if os.environ.get('READTHEDOCS') == 'True':
     import mock
     import duplicity
     duplicity._librsync = mock.MagicMock()
-from . import _librsync
-import types
-import array
 
 blocksize = _librsync.RS_JOB_BLOCKSIZE
 
