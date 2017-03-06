@@ -1,0 +1,395 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.dup_threading &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.dup_threading</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2002 Ben Escoto &lt;ben@emerose.org&gt;</span>
+<span class="c1"># Copyright 2007 Kenneth Loafman &lt;kenneth@loafman.com&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Duplicity specific but otherwise generic threading interfaces and</span>
+<span class="sd">utilities.</span>
+
+<span class="sd">(Not called &quot;threading&quot; because we do not want to conflict with</span>
+<span class="sd">the standard threading module, and absolute imports require</span>
+<span class="sd">at least python 2.5.)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">errors</span>
+
+
+<span class="n">_threading_supported</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">thread</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">dummy_thread</span> <span class="k">as</span> <span class="nn">thread</span>
+    <span class="n">_threading_supported</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">threading</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">dummy_threading</span> <span class="k">as</span> <span class="nn">threading</span>
+    <span class="n">_threading_supported</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+<div class="viewcode-block" id="threading_supported"><a class="viewcode-back" href="../../duplicity.dup_threading.html#duplicity.dup_threading.threading_supported">[docs]</a><span class="k">def</span> <span class="nf">threading_supported</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns whether threading is supported on the system we are</span>
+<span class="sd">    running on.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_threading_supported</span></div>
+
+
+<div class="viewcode-block" id="require_threading"><a class="viewcode-back" href="../../duplicity.dup_threading.html#duplicity.dup_threading.require_threading">[docs]</a><span class="k">def</span> <span class="nf">require_threading</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Assert that threading is required for operation to continue. Raise</span>
+<span class="sd">    an appropriate exception if this is not the case.</span>
+
+<span class="sd">    Reason specifies an optional reason why threading is required,</span>
+<span class="sd">    which will be used for error reporting in case threading is not</span>
+<span class="sd">    supported.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">threading_supported</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">reason</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">reason</span> <span class="o">=</span> <span class="s2">&quot;(no reason given)&quot;</span>
+        <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">NotSupported</span><span class="p">(</span><span class="s2">&quot;threading was needed because [</span><span class="si">%s</span><span class="s2">], but &quot;</span>
+                                  <span class="s2">&quot;is not supported by the python &quot;</span>
+                                  <span class="s2">&quot;interpreter&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">reason</span><span class="p">,))</span></div>
+
+
+<div class="viewcode-block" id="thread_module"><a class="viewcode-back" href="../../duplicity.dup_threading.html#duplicity.dup_threading.thread_module">[docs]</a><span class="k">def</span> <span class="nf">thread_module</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the thread module, or dummy_thread if threading is not</span>
+<span class="sd">    supported.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">thread</span></div>
+
+
+<div class="viewcode-block" id="threading_module"><a class="viewcode-back" href="../../duplicity.dup_threading.html#duplicity.dup_threading.threading_module">[docs]</a><span class="k">def</span> <span class="nf">threading_module</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the threading module, or dummy_thread if threading is not</span>
+<span class="sd">    supported.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">threading</span></div>
+
+
+<div class="viewcode-block" id="with_lock"><a class="viewcode-back" href="../../duplicity.dup_threading.html#duplicity.dup_threading.with_lock">[docs]</a><span class="k">def</span> <span class="nf">with_lock</span><span class="p">(</span><span class="n">lock</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Call fn with lock acquired. Guarantee that lock is released upon</span>
+<span class="sd">    the return of fn.</span>
+
+<span class="sd">    Returns the value returned by fn, or raises the exception raised</span>
+<span class="sd">    by fn.</span>
+
+<span class="sd">    (Lock can actually be anything responding to acquire() and</span>
+<span class="sd">    release().)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">fn</span><span class="p">()</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">lock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="interruptably_wait"><a class="viewcode-back" href="../../duplicity.dup_threading.html#duplicity.dup_threading.interruptably_wait">[docs]</a><span class="k">def</span> <span class="nf">interruptably_wait</span><span class="p">(</span><span class="n">cv</span><span class="p">,</span> <span class="n">waitFor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    cv   - The threading.Condition instance to wait on</span>
+<span class="sd">    test - Callable returning a boolean to indicate whether</span>
+<span class="sd">           the criteria being waited on has been satisfied.</span>
+
+<span class="sd">    Perform a wait on a condition such that it is keyboard</span>
+<span class="sd">    interruptable when done in the main thread. Due to Python</span>
+<span class="sd">    limitations as of &lt;= 2.5, lock acquisition and conditions waits</span>
+<span class="sd">    are not interruptable when performed in the main thread.</span>
+
+<span class="sd">    Currently, this comes at a cost additional CPU use, compared to a</span>
+<span class="sd">    normal wait. Future implementations may be more efficient if the</span>
+<span class="sd">    underlying python supports it.</span>
+
+<span class="sd">    The condition must be acquired.</span>
+
+<span class="sd">    This function should only be used on conditions that are never</span>
+<span class="sd">    expected to be acquired for extended periods of time, or the</span>
+<span class="sd">    lock-acquire of the underlying condition could cause an</span>
+<span class="sd">    uninterruptable state despite the efforts of this function.</span>
+
+<span class="sd">    There is no equivalent for acquireing a lock, as that cannot be</span>
+<span class="sd">    done efficiently.</span>
+
+<span class="sd">    Example:</span>
+
+<span class="sd">    Instead of:</span>
+
+<span class="sd">      cv.acquire()</span>
+<span class="sd">      while not thing_done:</span>
+<span class="sd">        cv.wait(someTimeout)</span>
+<span class="sd">      cv.release()</span>
+
+<span class="sd">    do:</span>
+
+<span class="sd">      cv.acquire()</span>
+<span class="sd">      interruptable_condwait(cv, lambda: thing_done)</span>
+<span class="sd">      cv.release()</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># We can either poll at some interval, or wait with a short enough</span>
+    <span class="c1"># timeout to be practical (i.e., such that it interactively seems</span>
+    <span class="c1"># to response semi-immediately to an interrupt).</span>
+    <span class="c1">#</span>
+    <span class="c1"># Both approaches waste CPU, but the latter approach does not</span>
+    <span class="c1"># imply a latency penalty in the common case of a</span>
+    <span class="c1"># notify.</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">waitFor</span><span class="p">():</span>
+        <span class="n">cv</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="async_split"><a class="viewcode-back" href="../../duplicity.dup_threading.html#duplicity.dup_threading.async_split">[docs]</a><span class="k">def</span> <span class="nf">async_split</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Splits the act of calling the given function into one front-end</span>
+<span class="sd">    part for waiting on the result, and a back-end part for performing</span>
+<span class="sd">    the work in another thread.</span>
+
+<span class="sd">    Returns (waiter, caller) where waiter is a function to be called</span>
+<span class="sd">    in order to wait for the results of an asynchronous invokation of</span>
+<span class="sd">    fn to complete, returning fn&#39;s result or propagating it&#39;s</span>
+<span class="sd">    exception.</span>
+
+<span class="sd">    Caller is the function to call in a background thread in order to</span>
+<span class="sd">    execute fn asynchronously. Caller will return (success, waiter)</span>
+<span class="sd">    where success is a boolean indicating whether the function</span>
+<span class="sd">    suceeded (did NOT raise an exception), and waiter is the waiter</span>
+<span class="sd">    that was originally returned by the call to async_split().</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Implementation notes:</span>
+    <span class="c1">#</span>
+    <span class="c1"># We use a dictionary to track the state of the asynchronous call,</span>
+    <span class="c1"># rather than local variables. This is to get around the way</span>
+    <span class="c1"># closures work with respect to local variables in Python. We do</span>
+    <span class="c1"># not care about hash lookup overhead since this is intended to be</span>
+    <span class="c1"># used for significant amounts of work.</span>
+
+    <span class="n">cv</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Condition</span><span class="p">()</span>  <span class="c1"># @UndefinedVariable</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;done&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="s1">&#39;trace&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">waiter</span><span class="p">():</span>
+        <span class="n">cv</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">interruptably_wait</span><span class="p">(</span><span class="n">cv</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;done&#39;</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;error&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;error&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">with_traceback</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;trace&#39;</span><span class="p">])</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">cv</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">caller</span><span class="p">():</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">fn</span><span class="p">()</span>
+
+            <span class="n">cv</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+            <span class="n">state</span><span class="p">[</span><span class="s1">&#39;done&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">state</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="n">cv</span><span class="o">.</span><span class="n">notify</span><span class="p">()</span>
+            <span class="n">cv</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">waiter</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">cv</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+            <span class="n">state</span><span class="p">[</span><span class="s1">&#39;done&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">state</span><span class="p">[</span><span class="s1">&#39;error&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e</span>
+            <span class="n">state</span><span class="p">[</span><span class="s1">&#39;trace&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">cv</span><span class="o">.</span><span class="n">notify</span><span class="p">()</span>
+            <span class="n">cv</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">waiter</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">waiter</span><span class="p">,</span> <span class="n">caller</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Value"><a class="viewcode-back" href="../../duplicity.dup_threading.html#duplicity.dup_threading.Value">[docs]</a><span class="k">class</span> <span class="nc">Value</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A thread-safe container of a reference to an object (but not the</span>
+<span class="sd">    object itself).</span>
+
+<span class="sd">    In particular this means it is safe to:</span>
+
+<span class="sd">      value.set(1)</span>
+
+<span class="sd">    But unsafe to:</span>
+
+<span class="sd">      value.get()[&#39;key&#39;] = value</span>
+
+<span class="sd">    Where the latter must be done using something like:</span>
+
+<span class="sd">      def _setprop():</span>
+<span class="sd">        value.get()[&#39;key&#39;] = value</span>
+
+<span class="sd">      with_lock(value, _setprop)</span>
+
+<span class="sd">    Operations such as increments are best done as:</span>
+
+<span class="sd">      value.transform(lambda val: val + 1)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialuze with the given value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cv</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Condition</span><span class="p">()</span>  <span class="c1"># @UndefinedVariable</span>
+
+<div class="viewcode-block" id="Value.get"><a class="viewcode-back" href="../../duplicity.dup_threading.html#duplicity.dup_threading.Value.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the value protected by this Value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">with_lock</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__cv</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Value.set"><a class="viewcode-back" href="../../duplicity.dup_threading.html#duplicity.dup_threading.Value.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resets the value protected by this Value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">_set</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="n">with_lock</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__cv</span><span class="p">,</span> <span class="n">_set</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Value.transform"><a class="viewcode-back" href="../../duplicity.dup_threading.html#duplicity.dup_threading.Value.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Call fn with the current value as the parameter, and reset the</span>
+<span class="sd">        value to the return value of fn.</span>
+
+<span class="sd">        During the execution of fn, all other access to this Value is</span>
+<span class="sd">        prevented.</span>
+
+<span class="sd">        If fn raised an exception, the value is not reset.</span>
+
+<span class="sd">        Returns the value returned by fn, or raises the exception</span>
+<span class="sd">        raised by fn.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">_transform</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span>
+
+        <span class="k">return</span> <span class="n">with_lock</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cv</span><span class="p">,</span> <span class="n">_transform</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Value.acquire"><a class="viewcode-back" href="../../duplicity.dup_threading.html#duplicity.dup_threading.Value.acquire">[docs]</a>    <span class="k">def</span> <span class="nf">acquire</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Acquire this Value for mutually exclusive access. Only ever</span>
+<span class="sd">        needed when calling code must perform operations that cannot</span>
+<span class="sd">        be done with get(), set() or transform().</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cv</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Value.release"><a class="viewcode-back" href="../../duplicity.dup_threading.html#duplicity.dup_threading.Value.release">[docs]</a>    <span class="k">def</span> <span class="nf">release</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Release this Value for mutually exclusive access.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cv</span><span class="o">.</span><span class="n">release</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,767 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.backend &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.backend</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2002 Ben Escoto &lt;ben@emerose.org&gt;</span>
+<span class="c1"># Copyright 2007 Kenneth Loafman &lt;kenneth@loafman.com&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Provides a common interface to all backends and certain sevices</span>
+<span class="sd">intended to be used by the backends themselves.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">errno</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">getpass</span>
+<span class="kn">import</span> <span class="nn">gettext</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
+<span class="kn">import</span> <span class="nn">urlparse</span>
+
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">dup_temp</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">file_naming</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="nb">globals</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">path</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">progress</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">util</span>
+
+<span class="kn">from</span> <span class="nn">duplicity.util</span> <span class="k">import</span> <span class="n">exception_traceback</span>
+
+<span class="kn">from</span> <span class="nn">duplicity.errors</span> <span class="k">import</span> <span class="n">BackendException</span>
+<span class="kn">from</span> <span class="nn">duplicity.errors</span> <span class="k">import</span> <span class="n">FatalBackendException</span>
+<span class="kn">from</span> <span class="nn">duplicity.errors</span> <span class="k">import</span> <span class="n">TemporaryLoadException</span>
+<span class="kn">from</span> <span class="nn">duplicity.errors</span> <span class="k">import</span> <span class="n">ConflictingScheme</span>
+<span class="kn">from</span> <span class="nn">duplicity.errors</span> <span class="k">import</span> <span class="n">InvalidBackendURL</span>
+<span class="kn">from</span> <span class="nn">duplicity.errors</span> <span class="k">import</span> <span class="n">UnsupportedBackendScheme</span>
+
+<span class="kn">import</span> <span class="nn">duplicity.backends</span>
+
+
+<span class="c1"># todo: this should really NOT be done here</span>
+<span class="n">socket</span><span class="o">.</span><span class="n">setdefaulttimeout</span><span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+
+<span class="n">_backends</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">_backend_prefixes</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="c1"># These URL schemes have a backend with a notion of an RFC &quot;network location&quot;.</span>
+<span class="c1"># The &#39;file&#39; and &#39;s3+http&#39; schemes should not be in this list.</span>
+<span class="c1"># &#39;http&#39; and &#39;https&#39; are not actually used for duplicity backend urls, but are needed</span>
+<span class="c1"># in order to properly support urls returned from some webdav servers. adding them here</span>
+<span class="c1"># is a hack. we should instead not stomp on the url parsing module to begin with.</span>
+<span class="c1">#</span>
+<span class="c1"># This looks similar to urlparse&#39;s &#39;uses_netloc&#39; list, but urlparse doesn&#39;t use</span>
+<span class="c1"># that list for parsing, only creating urls.  And doesn&#39;t include our custom</span>
+<span class="c1"># schemes anyway.  So we keep our own here for our own use.</span>
+<span class="c1">#</span>
+<span class="c1"># NOTE: this is filled by the respective backends during registering</span>
+<span class="n">uses_netloc</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<div class="viewcode-block" id="import_backends"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.import_backends">[docs]</a><span class="k">def</span> <span class="nf">import_backends</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Import files in the duplicity/backends directory where</span>
+<span class="sd">    the filename ends in &#39;backend.py&#39; and ignore the rest.</span>
+
+<span class="sd">    @rtype: void</span>
+<span class="sd">    @return: void</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">duplicity</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;duplicity/backends&quot;</span><span class="p">),</span> <span class="n">duplicity</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">__path__</span>
+
+    <span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">files</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">fn</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;backend.py&quot;</span><span class="p">):</span>
+            <span class="n">fn</span> <span class="o">=</span> <span class="n">fn</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">imp</span> <span class="o">=</span> <span class="s2">&quot;duplicity.backends.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fn</span><span class="p">,)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="nb">__import__</span><span class="p">(</span><span class="n">imp</span><span class="p">)</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="s2">&quot;Succeeded&quot;</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="s2">&quot;Failed: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Import of </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">imp</span><span class="p">,</span> <span class="n">res</span><span class="p">),</span> <span class="n">log</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">continue</span></div>
+
+
+<div class="viewcode-block" id="register_backend"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.register_backend">[docs]</a><span class="k">def</span> <span class="nf">register_backend</span><span class="p">(</span><span class="n">scheme</span><span class="p">,</span> <span class="n">backend_factory</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Register a given backend factory responsible for URL:s with the</span>
+<span class="sd">    given scheme.</span>
+
+<span class="sd">    The backend must be a callable which, when called with a URL as</span>
+<span class="sd">    the single parameter, returns an object implementing the backend</span>
+<span class="sd">    protocol (i.e., a subclass of Backend).</span>
+
+<span class="sd">    Typically the callable will be the Backend subclass itself.</span>
+
+<span class="sd">    This function is not thread-safe and is intended to be called</span>
+<span class="sd">    during module importation or start-up.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_backends</span>
+
+    <span class="k">assert</span> <span class="n">callable</span><span class="p">(</span><span class="n">backend_factory</span><span class="p">),</span> <span class="s2">&quot;backend factory must be callable&quot;</span>
+
+    <span class="k">if</span> <span class="n">scheme</span> <span class="ow">in</span> <span class="n">_backends</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ConflictingScheme</span><span class="p">(</span><span class="s2">&quot;the scheme </span><span class="si">%s</span><span class="s2"> already has a backend &quot;</span>
+                                <span class="s2">&quot;associated with it&quot;</span>
+                                <span class="s2">&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">scheme</span><span class="p">,))</span>
+
+    <span class="n">_backends</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span> <span class="o">=</span> <span class="n">backend_factory</span></div>
+
+
+<div class="viewcode-block" id="register_backend_prefix"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.register_backend_prefix">[docs]</a><span class="k">def</span> <span class="nf">register_backend_prefix</span><span class="p">(</span><span class="n">scheme</span><span class="p">,</span> <span class="n">backend_factory</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Register a given backend factory responsible for URL:s with the</span>
+<span class="sd">    given scheme prefix.</span>
+
+<span class="sd">    The backend must be a callable which, when called with a URL as</span>
+<span class="sd">    the single parameter, returns an object implementing the backend</span>
+<span class="sd">    protocol (i.e., a subclass of Backend).</span>
+
+<span class="sd">    Typically the callable will be the Backend subclass itself.</span>
+
+<span class="sd">    This function is not thread-safe and is intended to be called</span>
+<span class="sd">    during module importation or start-up.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_backend_prefixes</span>
+
+    <span class="k">assert</span> <span class="n">callable</span><span class="p">(</span><span class="n">backend_factory</span><span class="p">),</span> <span class="s2">&quot;backend factory must be callable&quot;</span>
+
+    <span class="k">if</span> <span class="n">scheme</span> <span class="ow">in</span> <span class="n">_backend_prefixes</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ConflictingScheme</span><span class="p">(</span><span class="s2">&quot;the prefix </span><span class="si">%s</span><span class="s2"> already has a backend &quot;</span>
+                                <span class="s2">&quot;associated with it&quot;</span>
+                                <span class="s2">&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">scheme</span><span class="p">,))</span>
+
+    <span class="n">_backend_prefixes</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span> <span class="o">=</span> <span class="n">backend_factory</span></div>
+
+
+<div class="viewcode-block" id="strip_prefix"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.strip_prefix">[docs]</a><span class="k">def</span> <span class="nf">strip_prefix</span><span class="p">(</span><span class="n">url_string</span><span class="p">,</span> <span class="n">prefix_scheme</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    strip the prefix from a string e.g. par2+ftp://... -&gt; ftp://...</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;(?i)^&#39;</span> <span class="o">+</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">prefix_scheme</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;\+&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">url_string</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="is_backend_url"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.is_backend_url">[docs]</a><span class="k">def</span> <span class="nf">is_backend_url</span><span class="p">(</span><span class="n">url_string</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    @return Whether the given string looks like a backend URL.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pu</span> <span class="o">=</span> <span class="n">ParsedUrl</span><span class="p">(</span><span class="n">url_string</span><span class="p">)</span>
+
+    <span class="c1"># Be verbose to actually return True/False rather than string.</span>
+    <span class="k">if</span> <span class="n">pu</span><span class="o">.</span><span class="n">scheme</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="get_backend_object"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.get_backend_object">[docs]</a><span class="k">def</span> <span class="nf">get_backend_object</span><span class="p">(</span><span class="n">url_string</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find the right backend class instance for the given URL, or return None</span>
+<span class="sd">    if the given string looks like a local path rather than a URL.</span>
+
+<span class="sd">    Raise InvalidBackendURL if the URL is not a valid URL.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_backend_url</span><span class="p">(</span><span class="n">url_string</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">global</span> <span class="n">_backends</span><span class="p">,</span> <span class="n">_backend_prefixes</span>
+
+    <span class="n">pu</span> <span class="o">=</span> <span class="n">ParsedUrl</span><span class="p">(</span><span class="n">url_string</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">pu</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span> <span class="s2">&quot;should be a backend url according to is_backend_url&quot;</span>
+
+    <span class="n">factory</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">for</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="n">_backend_prefixes</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">url_string</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s1">&#39;+&#39;</span><span class="p">):</span>
+            <span class="n">factory</span> <span class="o">=</span> <span class="n">_backend_prefixes</span><span class="p">[</span><span class="n">prefix</span><span class="p">]</span>
+            <span class="n">pu</span> <span class="o">=</span> <span class="n">ParsedUrl</span><span class="p">(</span><span class="n">strip_prefix</span><span class="p">(</span><span class="n">url_string</span><span class="p">,</span> <span class="n">prefix</span><span class="p">))</span>
+            <span class="k">break</span>
+
+    <span class="k">if</span> <span class="n">factory</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">pu</span><span class="o">.</span><span class="n">scheme</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_backends</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UnsupportedBackendScheme</span><span class="p">(</span><span class="n">url_string</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">factory</span> <span class="o">=</span> <span class="n">_backends</span><span class="p">[</span><span class="n">pu</span><span class="o">.</span><span class="n">scheme</span><span class="p">]</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">factory</span><span class="p">(</span><span class="n">pu</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Could not initialize backend: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]))</span></div>
+
+
+<div class="viewcode-block" id="get_backend"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.get_backend">[docs]</a><span class="k">def</span> <span class="nf">get_backend</span><span class="p">(</span><span class="n">url_string</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Instantiate a backend suitable for the given URL, or return None</span>
+<span class="sd">    if the given string looks like a local path rather than a URL.</span>
+
+<span class="sd">    Raise InvalidBackendURL if the URL is not a valid URL.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">globals</span><span class="o">.</span><span class="n">use_gio</span><span class="p">:</span>
+        <span class="n">url_string</span> <span class="o">=</span> <span class="s1">&#39;gio+&#39;</span> <span class="o">+</span> <span class="n">url_string</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">get_backend_object</span><span class="p">(</span><span class="n">url_string</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">obj</span><span class="p">:</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">BackendWrapper</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">obj</span></div>
+
+
+<div class="viewcode-block" id="ParsedUrl"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.ParsedUrl">[docs]</a><span class="k">class</span> <span class="nc">ParsedUrl</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse the given URL as a duplicity backend URL.</span>
+
+<span class="sd">    Returns the data of a parsed URL with the same names as that of</span>
+<span class="sd">    the standard urlparse.urlparse() except that all values have been</span>
+<span class="sd">    resolved rather than deferred.  There are no get_* members.  This</span>
+<span class="sd">    makes sure that the URL parsing errors are detected early.</span>
+
+<span class="sd">    Raise InvalidBackendURL on invalid URL&#39;s</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_string</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url_string</span> <span class="o">=</span> <span class="n">url_string</span>
+
+        <span class="c1"># Python &lt; 2.6.5 still examine urlparse.uses_netlock when parsing urls,</span>
+        <span class="c1"># so stuff our custom list in there before we parse.</span>
+        <span class="n">urlparse</span><span class="o">.</span><span class="n">uses_netloc</span> <span class="o">=</span> <span class="n">uses_netloc</span>
+
+        <span class="c1"># While useful in some cases, the fact is that the urlparser makes</span>
+        <span class="c1"># all the properties in the URL deferred or lazy.  This means that</span>
+        <span class="c1"># problems don&#39;t get detected till called.  We&#39;ll try to trap those</span>
+        <span class="c1"># problems here, so they will be caught early.</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">pu</span> <span class="o">=</span> <span class="n">urlparse</span><span class="o">.</span><span class="n">urlparse</span><span class="p">(</span><span class="n">url_string</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidBackendURL</span><span class="p">(</span><span class="s2">&quot;Syntax error in: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">url_string</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scheme</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">scheme</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidBackendURL</span><span class="p">(</span><span class="s2">&quot;Syntax error (scheme) in: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">url_string</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">netloc</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">netloc</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidBackendURL</span><span class="p">(</span><span class="s2">&quot;Syntax error (netloc) in: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">url_string</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">path</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">unquote</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidBackendURL</span><span class="p">(</span><span class="s2">&quot;Syntax error (path) in: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">url_string</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">username</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidBackendURL</span><span class="p">(</span><span class="s2">&quot;Syntax error (username) in: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">url_string</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">unquote</span><span class="p">(</span><span class="n">pu</span><span class="o">.</span><span class="n">username</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">password</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidBackendURL</span><span class="p">(</span><span class="s2">&quot;Syntax error (password) in: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">url_string</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">unquote</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">hostname</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidBackendURL</span><span class="p">(</span><span class="s2">&quot;Syntax error (hostname) in: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">url_string</span><span class="p">)</span>
+
+        <span class="c1"># init to None, overwrite with actual value on success</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">port</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># not raised in python2.7+, just returns None</span>
+            <span class="c1"># old style rsync://host::[/]dest, are still valid, though they contain no port</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scheme</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;rsync&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;::[^:]*$&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">url_string</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="n">InvalidBackendURL</span><span class="p">(</span><span class="s2">&quot;Syntax error (port) in: </span><span class="si">%s</span><span class="s2"> A</span><span class="si">%s</span><span class="s2"> B</span><span class="si">%s</span><span class="s2"> C</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                                        <span class="p">(</span><span class="n">url_string</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scheme</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;rsync&#39;</span><span class="p">]),</span>
+                                         <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;::[^:]+$&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">netloc</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">netloc</span><span class="p">))</span>
+
+        <span class="c1"># Our URL system uses two slashes more than urlparse&#39;s does when using</span>
+        <span class="c1"># non-netloc URLs.  And we want to make sure that if urlparse assuming</span>
+        <span class="c1"># a netloc where we don&#39;t want one, that we correct it.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scheme</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">uses_netloc</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">netloc</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;//&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">netloc</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">netloc</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;//&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;//&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
+
+        <span class="c1"># This happens for implicit local paths.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">scheme</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Our backends do not handle implicit hosts.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scheme</span> <span class="ow">in</span> <span class="n">uses_netloc</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidBackendURL</span><span class="p">(</span><span class="s2">&quot;Missing hostname in a backend URL which &quot;</span>
+                                    <span class="s2">&quot;requires an explicit hostname: </span><span class="si">%s</span><span class="s2">&quot;</span>
+                                    <span class="s2">&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url_string</span><span class="p">))</span>
+
+        <span class="c1"># Our backends do not handle implicit relative paths.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scheme</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">uses_netloc</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;//&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">InvalidBackendURL</span><span class="p">(</span><span class="s2">&quot;missing // - relative paths not supported &quot;</span>
+                                    <span class="s2">&quot;for scheme </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span>
+                                    <span class="s2">&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span> <span class="n">url_string</span><span class="p">))</span>
+
+<div class="viewcode-block" id="ParsedUrl.geturl"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.ParsedUrl.geturl">[docs]</a>    <span class="k">def</span> <span class="nf">geturl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">url_string</span></div></div>
+
+
+<div class="viewcode-block" id="strip_auth_from_url"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.strip_auth_from_url">[docs]</a><span class="k">def</span> <span class="nf">strip_auth_from_url</span><span class="p">(</span><span class="n">parsed_url</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a URL from a urlparse object without a username or password.&quot;&quot;&quot;</span>
+
+    <span class="n">clean_url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;^([^:/]+://)(.*@)?(.*)&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\1\3&#39;</span><span class="p">,</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">geturl</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">clean_url</span></div>
+
+
+<span class="k">def</span> <span class="nf">_get_code_from_exception</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">BackendException</span><span class="p">)</span> <span class="ow">and</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span> <span class="o">!=</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">backend_error</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="s1">&#39;_error_code&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">backend</span><span class="o">.</span><span class="n">_error_code</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="ow">or</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">backend_error</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s1">&#39;errno&#39;</span><span class="p">):</span>
+        <span class="c1"># A few backends return such errors (local, paramiko, etc)</span>
+        <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">EACCES</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">backend_permission_denied</span>
+        <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">backend_not_found</span>
+        <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">ENOSPC</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">backend_no_space</span>
+    <span class="k">return</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">backend_error</span>
+
+
+<div class="viewcode-block" id="retry"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.retry">[docs]</a><span class="k">def</span> <span class="nf">retry</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">fatal</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="c1"># Decorators with arguments introduce a new level of indirection.  So we</span>
+    <span class="c1"># have to return a decorator function (which itself returns a function!)</span>
+    <span class="k">def</span> <span class="nf">outer_retry</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">inner_retry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">globals</span><span class="o">.</span><span class="n">num_retries</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">FatalBackendException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="c1"># die on fatal errors</span>
+                    <span class="k">raise</span> <span class="n">e</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="c1"># retry on anything else</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Backtrace of previous error: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                              <span class="o">%</span> <span class="n">exception_traceback</span><span class="p">())</span>
+                    <span class="n">at_end</span> <span class="o">=</span> <span class="n">n</span> <span class="o">==</span> <span class="nb">globals</span><span class="o">.</span><span class="n">num_retries</span>
+                    <span class="n">code</span> <span class="o">=</span> <span class="n">_get_code_from_exception</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">code</span> <span class="o">==</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">backend_not_found</span><span class="p">:</span>
+                        <span class="c1"># If we tried to do something, but the file just isn&#39;t there,</span>
+                        <span class="c1"># no need to retry.</span>
+                        <span class="n">at_end</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">if</span> <span class="n">at_end</span> <span class="ow">and</span> <span class="n">fatal</span><span class="p">:</span>
+                        <span class="k">def</span> <span class="nf">make_filename</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">ROPath</span><span class="p">):</span>
+                                <span class="k">return</span> <span class="n">util</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="k">return</span> <span class="n">util</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                        <span class="n">extra</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">operation</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">make_filename</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">args</span> <span class="k">if</span> <span class="n">x</span><span class="p">])</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">FatalError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Giving up after </span><span class="si">%s</span><span class="s2"> attempts. </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                                       <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                                          <span class="n">util</span><span class="o">.</span><span class="n">uexc</span><span class="p">(</span><span class="n">e</span><span class="p">)),</span> <span class="n">code</span><span class="o">=</span><span class="n">code</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="n">extra</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Attempt </span><span class="si">%s</span><span class="s2"> failed. </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                                 <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">util</span><span class="o">.</span><span class="n">uexc</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">at_end</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">TemporaryLoadException</span><span class="p">):</span>
+                            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="nb">globals</span><span class="o">.</span><span class="n">backend_retry_delay</span><span class="p">)</span>  <span class="c1"># wait longer before trying again</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">backend_retry_delay</span><span class="p">)</span>  <span class="c1"># wait a bit before trying again</span>
+                        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="s1">&#39;_retry_cleanup&#39;</span><span class="p">):</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">_retry_cleanup</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">inner_retry</span>
+    <span class="k">return</span> <span class="n">outer_retry</span></div>
+
+
+<div class="viewcode-block" id="Backend"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.Backend">[docs]</a><span class="k">class</span> <span class="nc">Backend</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    See README in backends directory for information on how to write a backend.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_url</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span> <span class="o">=</span> <span class="n">parsed_url</span>
+
+    <span class="sd">&quot;&quot;&quot; use getpass by default, inherited backends may overwrite this behaviour &quot;&quot;&quot;</span>
+    <span class="n">use_getpass</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="Backend.get_password"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.Backend.get_password">[docs]</a>    <span class="k">def</span> <span class="nf">get_password</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a password for authentication purposes. The password</span>
+<span class="sd">        will be obtained from the backend URL, the environment, by</span>
+<span class="sd">        asking the user, or by some other method. When applicable, the</span>
+<span class="sd">        result will be cached for future invocations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">password</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">password</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">password</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;FTP_PASSWORD&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_getpass</span><span class="p">:</span>
+                <span class="n">password</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">(</span><span class="s2">&quot;Password for &#39;</span><span class="si">%s</span><span class="s2">@</span><span class="si">%s</span><span class="s2">&#39;: &quot;</span> <span class="o">%</span>
+                                           <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">hostname</span><span class="p">))</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;FTP_PASSWORD&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">password</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">password</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">password</span></div>
+
+<div class="viewcode-block" id="Backend.munge_password"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.Backend.munge_password">[docs]</a>    <span class="k">def</span> <span class="nf">munge_password</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">commandline</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove password from commandline by substituting the password</span>
+<span class="sd">        found in the URL, if any, with a generic place-holder.</span>
+
+<span class="sd">        This is intended for display purposes only, and it is not</span>
+<span class="sd">        guaranteed that the results are correct (i.e., more than just</span>
+<span class="sd">        the &#39;:password@&#39; may be substituted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">password</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(:([^\s:/@]+)@([^\s@]+))&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;:*****@\3&#39;</span><span class="p">,</span> <span class="n">commandline</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">commandline</span></div>
+
+    <span class="k">def</span> <span class="nf">__subprocess_popen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">commandline</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For internal use.</span>
+<span class="sd">        Execute the given command line, interpreted as a shell command.</span>
+<span class="sd">        Returns int Exitcode, string StdOut, string StdErr</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">shlex</span>
+        <span class="kn">from</span> <span class="nn">subprocess</span> <span class="k">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">PIPE</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">commandline</span><span class="p">)</span>
+        <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">PIPE</span><span class="p">)</span>
+        <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span>
+
+    <span class="sd">&quot;&quot;&quot; a dictionary for breaking exceptions, syntax is</span>
+<span class="sd">        { &#39;command&#39; : [ code1, code2 ], ... } see ftpbackend for an example &quot;&quot;&quot;</span>
+    <span class="n">popen_breaks</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="Backend.subprocess_popen"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.Backend.subprocess_popen">[docs]</a>    <span class="k">def</span> <span class="nf">subprocess_popen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">commandline</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute the given command line with error check.</span>
+<span class="sd">        Returns int Exitcode, string StdOut, string StdErr</span>
+
+<span class="sd">        Raise a BackendException on failure.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">private</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">munge_password</span><span class="p">(</span><span class="n">commandline</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Reading results of &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">private</span><span class="p">)</span>
+        <span class="n">result</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__subprocess_popen</span><span class="p">(</span><span class="n">commandline</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;^\s*([\S]+)&quot;</span><span class="p">,</span> <span class="n">commandline</span><span class="p">)</span>
+                <span class="n">cmd</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">ignores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">popen_breaks</span><span class="p">[</span><span class="n">cmd</span><span class="p">]</span>
+                <span class="n">ignores</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+                <span class="sd">&quot;&quot;&quot; ignore a predefined set of error codes &quot;&quot;&quot;</span>
+                <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;Error running &#39;</span><span class="si">%s</span><span class="s2">&#39;: returned </span><span class="si">%d</span><span class="s2">, with output:</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                                       <span class="p">(</span><span class="n">private</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">stderr</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span></div></div>
+
+
+<div class="viewcode-block" id="BackendWrapper"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.BackendWrapper">[docs]</a><span class="k">class</span> <span class="nc">BackendWrapper</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a generic duplicity backend, capable of storing and</span>
+<span class="sd">    retrieving files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backend</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>
+
+    <span class="k">def</span> <span class="nf">__do_put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_path</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="s1">&#39;_put&#39;</span><span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Writing </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">remote_filename</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">_put</span><span class="p">(</span><span class="n">source_path</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="nd">@retry</span><span class="p">(</span><span class="s1">&#39;put&#39;</span><span class="p">,</span> <span class="n">fatal</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="viewcode-block" id="BackendWrapper.put"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.BackendWrapper.put">[docs]</a>    <span class="k">def</span> <span class="nf">put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_path</span><span class="p">,</span> <span class="n">remote_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transfer source_path (Path object) to remote_filename (string)</span>
+
+<span class="sd">        If remote_filename is None, get the filename from the last</span>
+<span class="sd">        path component of pathname.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">remote_filename</span><span class="p">:</span>
+            <span class="n">remote_filename</span> <span class="o">=</span> <span class="n">source_path</span><span class="o">.</span><span class="n">get_filename</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__do_put</span><span class="p">(</span><span class="n">source_path</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">)</span></div>
+
+    <span class="nd">@retry</span><span class="p">(</span><span class="s1">&#39;move&#39;</span><span class="p">,</span> <span class="n">fatal</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="viewcode-block" id="BackendWrapper.move"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.BackendWrapper.move">[docs]</a>    <span class="k">def</span> <span class="nf">move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_path</span><span class="p">,</span> <span class="n">remote_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Move source_path (Path object) to remote_filename (string)</span>
+
+<span class="sd">        Same as put(), but unlinks source_path in the process.  This allows the</span>
+<span class="sd">        local backend to do this more efficiently using rename.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">remote_filename</span><span class="p">:</span>
+            <span class="n">remote_filename</span> <span class="o">=</span> <span class="n">source_path</span><span class="o">.</span><span class="n">get_filename</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="s1">&#39;_move&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">_move</span><span class="p">(</span><span class="n">source_path</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="n">source_path</span><span class="o">.</span><span class="n">setdata</span><span class="p">()</span>
+                <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__do_put</span><span class="p">(</span><span class="n">source_path</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">)</span>
+        <span class="n">source_path</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span></div>
+
+    <span class="nd">@retry</span><span class="p">(</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="n">fatal</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="viewcode-block" id="BackendWrapper.get"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.BackendWrapper.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">,</span> <span class="n">local_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve remote_filename and place in local_path&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="s1">&#39;_get&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">remote_filename</span><span class="p">,</span> <span class="n">local_path</span><span class="p">)</span>
+            <span class="n">local_path</span><span class="o">.</span><span class="n">setdata</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">local_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;File </span><span class="si">%s</span><span class="s2"> not found locally after get &quot;</span>
+                                         <span class="s2">&quot;from backend&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">local_path</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+    <span class="nd">@retry</span><span class="p">(</span><span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">fatal</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="viewcode-block" id="BackendWrapper.list"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.BackendWrapper.list">[docs]</a>    <span class="k">def</span> <span class="nf">list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return list of filenames (byte strings) present in backend</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">tobytes</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+            <span class="s2">&quot;Convert a (maybe unicode) filename to bytes&quot;</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">unicode</span><span class="p">):</span>
+                <span class="c1"># There shouldn&#39;t be any encoding errors for files we care</span>
+                <span class="c1"># about, since duplicity filenames are ascii.  But user files</span>
+                <span class="c1"># may be in the same directory.  So just replace characters.</span>
+                <span class="k">return</span> <span class="n">filename</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">getfilesystemencoding</span><span class="p">(),</span> <span class="s1">&#39;replace&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">filename</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="s1">&#39;_list&#39;</span><span class="p">):</span>
+            <span class="c1"># Make sure that duplicity internals only ever see byte strings</span>
+            <span class="c1"># for filenames, no matter what the backend thinks it is talking.</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">tobytes</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">_list</span><span class="p">()]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BackendWrapper.delete"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.BackendWrapper.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename_list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete each filename in filename_list, in order if possible.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename_list</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">StringType</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="s1">&#39;_delete_list&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_do_delete_list</span><span class="p">(</span><span class="n">filename_list</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="s1">&#39;_delete&#39;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">filename_list</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_do_delete</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+    <span class="nd">@retry</span><span class="p">(</span><span class="s1">&#39;delete&#39;</span><span class="p">,</span> <span class="n">fatal</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_do_delete_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename_list</span><span class="p">):</span>
+        <span class="k">while</span> <span class="n">filename_list</span><span class="p">:</span>
+            <span class="n">sublist</span> <span class="o">=</span> <span class="n">filename_list</span><span class="p">[:</span><span class="mi">100</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">_delete_list</span><span class="p">(</span><span class="n">sublist</span><span class="p">)</span>
+            <span class="n">filename_list</span> <span class="o">=</span> <span class="n">filename_list</span><span class="p">[</span><span class="mi">100</span><span class="p">:]</span>
+
+    <span class="nd">@retry</span><span class="p">(</span><span class="s1">&#39;delete&#39;</span><span class="p">,</span> <span class="n">fatal</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_do_delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">_delete</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="c1"># Should never cause FatalError.</span>
+    <span class="c1"># Returns a dictionary of dictionaries.  The outer dictionary maps</span>
+    <span class="c1"># filenames to metadata dictionaries.  Supported metadata are:</span>
+    <span class="c1">#</span>
+    <span class="c1"># &#39;size&#39;: if &gt;= 0, size of file</span>
+    <span class="c1">#         if -1, file is not found</span>
+    <span class="c1">#         if None, error querying file</span>
+    <span class="c1">#</span>
+    <span class="c1"># Returned dictionary is guaranteed to contain a metadata dictionary for</span>
+    <span class="c1"># each filename, and all metadata are guaranteed to be present.</span>
+<div class="viewcode-block" id="BackendWrapper.query_info"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.BackendWrapper.query_info">[docs]</a>    <span class="k">def</span> <span class="nf">query_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename_list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return metadata about each filename in filename_list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="s1">&#39;_query_list&#39;</span><span class="p">):</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_query_list</span><span class="p">(</span><span class="n">filename_list</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">info</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="s1">&#39;_query&#39;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">filename_list</span><span class="p">:</span>
+                <span class="n">info</span><span class="p">[</span><span class="n">filename</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_query</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+        <span class="c1"># Fill out any missing entries (may happen if backend has no support</span>
+        <span class="c1"># or its query_list support is lazy)</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">filename_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">filename</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">info</span> <span class="ow">or</span> <span class="n">info</span><span class="p">[</span><span class="n">filename</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">info</span><span class="p">[</span><span class="n">filename</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">metadata</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">]:</span>
+                <span class="n">info</span><span class="p">[</span><span class="n">filename</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">info</span></div>
+
+    <span class="nd">@retry</span><span class="p">(</span><span class="s1">&#39;query&#39;</span><span class="p">,</span> <span class="n">fatal</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_do_query_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename_list</span><span class="p">):</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">_query_list</span><span class="p">(</span><span class="n">filename_list</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">return</span> <span class="n">info</span>
+
+    <span class="nd">@retry</span><span class="p">(</span><span class="s1">&#39;query&#39;</span><span class="p">,</span> <span class="n">fatal</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_do_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">code</span> <span class="o">=</span> <span class="n">_get_code_from_exception</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="s1">&#39;query&#39;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">code</span> <span class="o">==</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">backend_not_found</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">e</span>
+
+<div class="viewcode-block" id="BackendWrapper.close"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.BackendWrapper.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Close the backend, releasing any resources held and</span>
+<span class="sd">        invalidating any file objects obtained from the backend.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="s1">&#39;_close&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BackendWrapper.get_fileobj_read"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.BackendWrapper.get_fileobj_read">[docs]</a>    <span class="k">def</span> <span class="nf">get_fileobj_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">parseresults</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return fileobject opened for reading of filename on backend</span>
+
+<span class="sd">        The file will be downloaded first into a temp file.  When the</span>
+<span class="sd">        returned fileobj is closed, the temp file will be deleted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">parseresults</span><span class="p">:</span>
+            <span class="n">parseresults</span> <span class="o">=</span> <span class="n">file_naming</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">parseresults</span><span class="p">,</span> <span class="s2">&quot;Filename not correctly parsed&quot;</span>
+        <span class="n">tdp</span> <span class="o">=</span> <span class="n">dup_temp</span><span class="o">.</span><span class="n">new_tempduppath</span><span class="p">(</span><span class="n">parseresults</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">tdp</span><span class="p">)</span>
+        <span class="n">tdp</span><span class="o">.</span><span class="n">setdata</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">tdp</span><span class="o">.</span><span class="n">filtered_open_with_delete</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BackendWrapper.get_data"><a class="viewcode-back" href="../../duplicity.backend.html#duplicity.backend.BackendWrapper.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">parseresults</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve a file from backend, process it, return contents.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fileobj_read</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">parseresults</span><span class="p">)</span>
+        <span class="n">buf</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">buf</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,564 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.backends.webdavbackend &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.backends.webdavbackend</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2002 Ben Escoto &lt;ben@emerose.org&gt;</span>
+<span class="c1"># Copyright 2007 Kenneth Loafman &lt;kenneth@loafman.com&gt;</span>
+<span class="c1"># Copyright 2013 Edgar Soldin</span>
+<span class="c1">#                 - ssl cert verification, some robustness enhancements</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">httplib</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
+<span class="kn">import</span> <span class="nn">urllib2</span>
+<span class="kn">import</span> <span class="nn">urlparse</span>
+<span class="kn">import</span> <span class="nn">xml.dom.minidom</span>
+
+<span class="kn">import</span> <span class="nn">duplicity.backend</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="nb">globals</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">duplicity.errors</span> <span class="k">import</span> <span class="n">BackendException</span><span class="p">,</span> <span class="n">FatalBackendException</span>
+
+
+<div class="viewcode-block" id="CustomMethodRequest"><a class="viewcode-back" href="../../../duplicity.backends.webdavbackend.html#duplicity.backends.webdavbackend.CustomMethodRequest">[docs]</a><span class="k">class</span> <span class="nc">CustomMethodRequest</span><span class="p">(</span><span class="n">urllib2</span><span class="o">.</span><span class="n">Request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This request subclass allows explicit specification of</span>
+<span class="sd">    the HTTP request method. Basic urllib2.Request class</span>
+<span class="sd">    chooses GET or POST depending on self.has_data()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
+        <span class="n">urllib2</span><span class="o">.</span><span class="n">Request</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CustomMethodRequest.get_method"><a class="viewcode-back" href="../../../duplicity.backends.webdavbackend.html#duplicity.backends.webdavbackend.CustomMethodRequest.get_method">[docs]</a>    <span class="k">def</span> <span class="nf">get_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span></div></div>
+
+
+<div class="viewcode-block" id="VerifiedHTTPSConnection"><a class="viewcode-back" href="../../../duplicity.backends.webdavbackend.html#duplicity.backends.webdavbackend.VerifiedHTTPSConnection">[docs]</a><span class="k">class</span> <span class="nc">VerifiedHTTPSConnection</span><span class="p">(</span><span class="n">httplib</span><span class="o">.</span><span class="n">HTTPSConnection</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">global</span> <span class="n">socket</span><span class="p">,</span> <span class="n">ssl</span>
+                <span class="kn">import</span> <span class="nn">socket</span>
+                <span class="kn">import</span> <span class="nn">ssl</span>
+            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">FatalBackendException</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Missing socket or ssl python modules.&quot;</span><span class="p">))</span>
+
+            <span class="n">httplib</span><span class="o">.</span><span class="n">HTTPSConnection</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">cacert_file</span> <span class="o">=</span> <span class="nb">globals</span><span class="o">.</span><span class="n">ssl_cacert_file</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cacert_candidates</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;~/.duplicity/cacert.pem&quot;</span><span class="p">,</span>
+                                      <span class="s2">&quot;~/duplicity_cacert.pem&quot;</span><span class="p">,</span>
+                                      <span class="s2">&quot;/etc/duplicity/cacert.pem&quot;</span><span class="p">]</span>
+            <span class="c1"># if no cacert file was given search default locations</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cacert_file</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cacert_candidates</span><span class="p">:</span>
+                    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="p">)):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">cacert_file</span> <span class="o">=</span> <span class="n">path</span>
+                        <span class="k">break</span>
+
+            <span class="c1"># check if file is accessible (libssl errors are not very detailed)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cacert_file</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cacert_file</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">R_OK</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">FatalBackendException</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Cacert database file &#39;</span><span class="si">%s</span><span class="s2">&#39; is not readable.&quot;</span><span class="p">)</span> <span class="o">%</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">cacert_file</span><span class="p">)</span>
+
+<div class="viewcode-block" id="VerifiedHTTPSConnection.connect"><a class="viewcode-back" href="../../../duplicity.backends.webdavbackend.html#duplicity.backends.webdavbackend.VerifiedHTTPSConnection.connect">[docs]</a>        <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="c1"># create new socket</span>
+            <span class="n">sock</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">create_connection</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">),</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tunnel_host</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sock</span> <span class="o">=</span> <span class="n">sock</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tunnel</span><span class="p">()</span>
+
+            <span class="c1"># python 2.7.9+ supports default system certs now</span>
+            <span class="k">if</span> <span class="s2">&quot;create_default_context&quot;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">ssl</span><span class="p">):</span>
+                <span class="n">context</span> <span class="o">=</span> <span class="n">ssl</span><span class="o">.</span><span class="n">create_default_context</span><span class="p">(</span><span class="n">ssl</span><span class="o">.</span><span class="n">Purpose</span><span class="o">.</span><span class="n">SERVER_AUTH</span><span class="p">,</span>
+                                                     <span class="n">cafile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cacert_file</span><span class="p">,</span>
+                                                     <span class="n">capath</span><span class="o">=</span><span class="nb">globals</span><span class="o">.</span><span class="n">ssl_cacert_path</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sock</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">wrap_socket</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="n">server_hostname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">)</span>
+            <span class="c1"># the legacy way needing a cert file</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">globals</span><span class="o">.</span><span class="n">ssl_cacert_path</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">FatalBackendException</span><span class="p">(</span>
+                        <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Option &#39;--ssl-cacert-path&#39; is not supported &quot;</span>
+                          <span class="s2">&quot;with python 2.7.8 and below.&quot;</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cacert_file</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">FatalBackendException</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">For certificate verification with python 2.7.8 or earlier a cacert database</span>
+<span class="s2">file is needed in one of these locations: </span><span class="si">%s</span><span class="s2"></span>
+<span class="s2">Hints:</span>
+<span class="s2">  Consult the man page, chapter &#39;SSL Certificate Verification&#39;.</span>
+<span class="s2">  Consider using the options --ssl-cacert-file, --ssl-no-check-certificate .&quot;&quot;&quot;</span><span class="p">)</span> <span class="o">%</span>
+                                                <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cacert_candidates</span><span class="p">))</span>
+
+                <span class="c1"># wrap the socket in ssl using verification</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sock</span> <span class="o">=</span> <span class="n">ssl</span><span class="o">.</span><span class="n">wrap_socket</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span>
+                                            <span class="n">cert_reqs</span><span class="o">=</span><span class="n">ssl</span><span class="o">.</span><span class="n">CERT_REQUIRED</span><span class="p">,</span>
+                                            <span class="n">ca_certs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cacert_file</span><span class="p">,</span>
+                                            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="VerifiedHTTPSConnection.request"><a class="viewcode-back" href="../../../duplicity.backends.webdavbackend.html#duplicity.backends.webdavbackend.VerifiedHTTPSConnection.request">[docs]</a>        <span class="k">def</span> <span class="nf">request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pylint: disable=method-hidden</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">httplib</span><span class="o">.</span><span class="n">HTTPSConnection</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">ssl</span><span class="o">.</span><span class="n">SSLError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># encapsulate ssl errors</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;SSL failed: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">util</span><span class="o">.</span><span class="n">uexc</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
+                                       <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">backend_error</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="WebDAVBackend"><a class="viewcode-back" href="../../../duplicity.backends.webdavbackend.html#duplicity.backends.webdavbackend.WebDAVBackend">[docs]</a><span class="k">class</span> <span class="nc">WebDAVBackend</span><span class="p">(</span><span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Backend</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Backend for accessing a WebDAV repository.</span>
+
+<span class="sd">    webdav backend contributed in 2006 by Jesper Zedlitz &lt;jesper@zedlitz.de&gt;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Request just the names.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">listbody</span> <span class="o">=</span> <span class="s1">&#39;&lt;?xml version=&quot;1.0&quot;?&gt;&lt;D:propfind xmlns:D=&quot;DAV:&quot;&gt;&lt;D:prop&gt;&lt;D:resourcetype/&gt;&lt;/D:prop&gt;&lt;/D:propfind&gt;&#39;</span>
+
+    <span class="sd">&quot;&quot;&quot;Connect to remote store using WebDAV Protocol&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_url</span><span class="p">):</span>
+        <span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Backend</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Connection&#39;</span><span class="p">:</span> <span class="s1">&#39;keep-alive&#39;</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span> <span class="o">=</span> <span class="n">parsed_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">digest_challenge</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">digest_auth_handler</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">username</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_password</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">directory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sanitize_path</span><span class="p">(</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Using WebDAV protocol </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">webdav_proto</span><span class="p">,))</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Using WebDAV host </span><span class="si">%s</span><span class="s2"> port </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span>
+                                                      <span class="n">parsed_url</span><span class="o">.</span><span class="n">port</span><span class="p">))</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Using WebDAV directory </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">directory</span><span class="p">,))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="WebDAVBackend.sanitize_path"><a class="viewcode-back" href="../../../duplicity.backends.webdavbackend.html#duplicity.backends.webdavbackend.WebDAVBackend.sanitize_path">[docs]</a>    <span class="k">def</span> <span class="nf">sanitize_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">path</span><span class="p">:</span>
+            <span class="n">foldpath</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;/+&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">foldpath</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;/&#39;</span></div>
+
+<div class="viewcode-block" id="WebDAVBackend.getText"><a class="viewcode-back" href="../../../duplicity.backends.webdavbackend.html#duplicity.backends.webdavbackend.WebDAVBackend.getText">[docs]</a>    <span class="k">def</span> <span class="nf">getText</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodelist</span><span class="p">):</span>
+        <span class="n">rc</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodelist</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">nodeType</span> <span class="o">==</span> <span class="n">node</span><span class="o">.</span><span class="n">TEXT_NODE</span><span class="p">:</span>
+                <span class="n">rc</span> <span class="o">=</span> <span class="n">rc</span> <span class="o">+</span> <span class="n">node</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">return</span> <span class="n">rc</span></div>
+
+    <span class="k">def</span> <span class="nf">_retry_cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">forced</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<div class="viewcode-block" id="WebDAVBackend.connect"><a class="viewcode-back" href="../../../duplicity.backends.webdavbackend.html#duplicity.backends.webdavbackend.WebDAVBackend.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forced</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Connect or re-connect to the server, updates self.conn</span>
+<span class="sd">        # reconnect on errors as a precaution, there are errors e.g.</span>
+<span class="sd">        # &quot;[Errno 32] Broken pipe&quot; or SSl errors that render the connection unusable</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">forced</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> \
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">host</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">hostname</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;WebDAV create connection on &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">hostname</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
+        <span class="c1"># http schemes needed for redirect urls from servers</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">scheme</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;webdav&#39;</span><span class="p">,</span> <span class="s1">&#39;http&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="n">httplib</span><span class="o">.</span><span class="n">HTTPConnection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">scheme</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;webdavs&#39;</span><span class="p">,</span> <span class="s1">&#39;https&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="nb">globals</span><span class="o">.</span><span class="n">ssl_no_check_certificate</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="n">httplib</span><span class="o">.</span><span class="n">HTTPSConnection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="n">VerifiedHTTPSConnection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FatalBackendException</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;WebDAV Unknown URI scheme: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">scheme</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">_close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<div class="viewcode-block" id="WebDAVBackend.request"><a class="viewcode-back" href="../../../duplicity.backends.webdavbackend.html#duplicity.backends.webdavbackend.WebDAVBackend.request">[docs]</a>    <span class="k">def</span> <span class="nf">request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">redirected</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wraps the connection.request method to retry once if authentication is</span>
+<span class="sd">        required</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>  <span class="c1"># or we get previous request&#39;s data or exception</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+        <span class="n">quoted_path</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;/:~&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">digest_challenge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Authorization&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_digest_authorization</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;WebDAV </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> request with headers: </span><span class="si">%s</span><span class="s2"> &quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">quoted_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="p">))</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;WebDAV data length: </span><span class="si">%s</span><span class="s2"> &quot;</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">quoted_path</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">getresponse</span><span class="p">()</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;WebDAV response status </span><span class="si">%s</span><span class="s2"> with reason &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">reason</span><span class="p">))</span>
+        <span class="c1"># resolve redirects and reset url on listing requests (they usually come before everything else)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">301</span><span class="p">,</span> <span class="mi">302</span><span class="p">]</span> <span class="ow">and</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;PROPFIND&#39;</span><span class="p">:</span>
+            <span class="n">redirect_url</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">getheader</span><span class="p">(</span><span class="s1">&#39;location&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">redirect_url</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">Notice</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;WebDAV redirect to: </span><span class="si">%s</span><span class="s2"> &quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">urllib</span><span class="o">.</span><span class="n">unquote</span><span class="p">(</span><span class="n">redirect_url</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">redirected</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">FatalBackendException</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;WebDAV redirected 10 times. Giving up.&quot;</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span> <span class="o">=</span> <span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">ParsedUrl</span><span class="p">(</span><span class="n">redirect_url</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">directory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sanitize_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">directory</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">redirected</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">FatalBackendException</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;WebDAV missing location header in redirect response.&quot;</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">401</span><span class="p">:</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Authorization&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_authorization</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">quoted_path</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;WebDAV retry request with authentification headers.&quot;</span><span class="p">))</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;WebDAV </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> request2 with headers: </span><span class="si">%s</span><span class="s2"> &quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">quoted_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="p">))</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;WebDAV data length: </span><span class="si">%s</span><span class="s2"> &quot;</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">quoted_path</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">getresponse</span><span class="p">()</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;WebDAV response2 status </span><span class="si">%s</span><span class="s2"> with reason &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">reason</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">response</span></div>
+
+<div class="viewcode-block" id="WebDAVBackend.get_authorization"><a class="viewcode-back" href="../../../duplicity.backends.webdavbackend.html#duplicity.backends.webdavbackend.WebDAVBackend.get_authorization">[docs]</a>    <span class="k">def</span> <span class="nf">get_authorization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fetches the auth header based on the requested method (basic or digest)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">auth_hdr</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">getheader</span><span class="p">(</span><span class="s1">&#39;www-authenticate&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">token</span><span class="p">,</span> <span class="n">challenge</span> <span class="o">=</span> <span class="n">auth_hdr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">token</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;negotiate&#39;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_kerberos_authorization</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;python-kerberos needed to use kerberos </span><span class="se">\</span>
+<span class="s2">                          authorization, falling back to basic auth.&quot;</span><span class="p">))</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_basic_authorization</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Kerberos authorization failed: </span><span class="si">%s</span><span class="s2">.</span><span class="se">\</span>
+<span class="s2">                          Falling back to basic auth.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_basic_authorization</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">token</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;basic&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_basic_authorization</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">digest_challenge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_digest_challenge</span><span class="p">(</span><span class="n">challenge</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_digest_authorization</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WebDAVBackend.parse_digest_challenge"><a class="viewcode-back" href="../../../duplicity.backends.webdavbackend.html#duplicity.backends.webdavbackend.WebDAVBackend.parse_digest_challenge">[docs]</a>    <span class="k">def</span> <span class="nf">parse_digest_challenge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">challenge_string</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">parse_keqv_list</span><span class="p">(</span><span class="n">urllib2</span><span class="o">.</span><span class="n">parse_http_list</span><span class="p">(</span><span class="n">challenge_string</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="WebDAVBackend.get_kerberos_authorization"><a class="viewcode-back" href="../../../duplicity.backends.webdavbackend.html#duplicity.backends.webdavbackend.WebDAVBackend.get_kerberos_authorization">[docs]</a>    <span class="k">def</span> <span class="nf">get_kerberos_authorization</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">kerberos</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ctx</span> <span class="o">=</span> <span class="n">kerberos</span><span class="o">.</span><span class="n">authGSSClientInit</span><span class="p">(</span><span class="s2">&quot;HTTP@</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">host</span><span class="p">)</span>
+        <span class="n">kerberos</span><span class="o">.</span><span class="n">authGSSClientStep</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">tgt</span> <span class="o">=</span> <span class="n">kerberos</span><span class="o">.</span><span class="n">authGSSClientResponse</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;Negotiate </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">tgt</span></div>
+
+<div class="viewcode-block" id="WebDAVBackend.get_basic_authorization"><a class="viewcode-back" href="../../../duplicity.backends.webdavbackend.html#duplicity.backends.webdavbackend.WebDAVBackend.get_basic_authorization">[docs]</a>    <span class="k">def</span> <span class="nf">get_basic_authorization</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the basic auth header</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">auth_string</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;Basic </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">base64</span><span class="o">.</span><span class="n">encodestring</span><span class="p">(</span><span class="n">auth_string</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="WebDAVBackend.get_digest_authorization"><a class="viewcode-back" href="../../../duplicity.backends.webdavbackend.html#duplicity.backends.webdavbackend.WebDAVBackend.get_digest_authorization">[docs]</a>    <span class="k">def</span> <span class="nf">get_digest_authorization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the digest auth header</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">digest_auth_handler</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">pw_manager</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">HTTPPasswordMgrWithDefaultRealm</span><span class="p">()</span>
+            <span class="n">pw_manager</span><span class="o">.</span><span class="n">add_password</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">digest_auth_handler</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">HTTPDigestAuthHandler</span><span class="p">(</span><span class="n">pw_manager</span><span class="p">)</span>
+
+        <span class="c1"># building a dummy request that gets never sent,</span>
+        <span class="c1"># needed for call to auth_handler.get_authorization</span>
+        <span class="n">scheme</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;webdavs&#39;</span> <span class="ow">and</span> <span class="s1">&#39;https&#39;</span> <span class="ow">or</span> <span class="s1">&#39;http&#39;</span>
+        <span class="n">hostname</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">port</span> <span class="ow">and</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">:</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">port</span><span class="p">)</span> <span class="ow">or</span> <span class="n">u</span><span class="o">.</span><span class="n">hostname</span>
+        <span class="n">dummy_url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">://</span><span class="si">%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">scheme</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+        <span class="n">dummy_req</span> <span class="o">=</span> <span class="n">CustomMethodRequest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">_method</span><span class="p">,</span> <span class="n">dummy_url</span><span class="p">)</span>
+        <span class="n">auth_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">digest_auth_handler</span><span class="o">.</span><span class="n">get_authorization</span><span class="p">(</span><span class="n">dummy_req</span><span class="p">,</span>
+                                                                 <span class="bp">self</span><span class="o">.</span><span class="n">digest_challenge</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;Digest </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">auth_string</span></div>
+
+    <span class="k">def</span> <span class="nf">_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Depth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">&quot;PROPFIND&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">directory</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">listbody</span><span class="p">)</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Depth&#39;</span><span class="p">]</span>
+            <span class="c1"># if the target collection does not exist, create it.</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">404</span><span class="p">:</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>  <span class="c1"># otherwise next request fails with ResponseNotReady</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">makedir</span><span class="p">()</span>
+                <span class="c1"># just created an empty folder, so return empty</span>
+                <span class="k">return</span> <span class="p">[]</span>
+            <span class="k">elif</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">207</span><span class="p">]:</span>
+                <span class="n">document</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span>
+                <span class="n">reason</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">reason</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;Bad status code </span><span class="si">%s</span><span class="s2"> reason </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">reason</span><span class="p">))</span>
+
+            <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">document</span><span class="p">,))</span>
+            <span class="n">dom</span> <span class="o">=</span> <span class="n">xml</span><span class="o">.</span><span class="n">dom</span><span class="o">.</span><span class="n">minidom</span><span class="o">.</span><span class="n">parseString</span><span class="p">(</span><span class="n">document</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">href</span> <span class="ow">in</span> <span class="n">dom</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;d:href&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">dom</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;D:href&#39;</span><span class="p">):</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">taste_href</span><span class="p">(</span><span class="n">href</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">result</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">e</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">response</span><span class="p">:</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<div class="viewcode-block" id="WebDAVBackend.makedir"><a class="viewcode-back" href="../../../duplicity.backends.webdavbackend.html#duplicity.backends.webdavbackend.WebDAVBackend.makedir">[docs]</a>    <span class="k">def</span> <span class="nf">makedir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make (nested) directories on the server.&quot;&quot;&quot;</span>
+        <span class="n">dirs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">directory</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+        <span class="c1"># url causes directory to start with /, but it might be given</span>
+        <span class="c1"># with or without trailing / (which is required)</span>
+        <span class="k">if</span> <span class="n">dirs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">dirs</span> <span class="o">=</span> <span class="n">dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dirs</span><span class="p">)):</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Depth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">&quot;PROPFIND&quot;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Depth&#39;</span><span class="p">]</span>
+
+            <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;Checking existence dir </span><span class="si">%s</span><span class="s2">: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">404</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Creating missing directory </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">d</span><span class="p">)</span>
+
+                <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">&quot;MKCOL&quot;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="mi">201</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;WebDAV MKCOL </span><span class="si">%s</span><span class="s2"> failed: </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span>
+                                           <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">reason</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="WebDAVBackend.taste_href"><a class="viewcode-back" href="../../../duplicity.backends.webdavbackend.html#duplicity.backends.webdavbackend.WebDAVBackend.taste_href">[docs]</a>    <span class="k">def</span> <span class="nf">taste_href</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">href</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Internal helper to taste the given href node and, if</span>
+<span class="sd">        it is a duplicity file, collect it as a result file.</span>
+
+<span class="sd">        @return: A matching filename, or None if the href did not match.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">raw_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getText</span><span class="p">(</span><span class="n">href</span><span class="o">.</span><span class="n">childNodes</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">parsed_url</span> <span class="o">=</span> <span class="n">urlparse</span><span class="o">.</span><span class="n">urlparse</span><span class="p">(</span><span class="n">urllib</span><span class="o">.</span><span class="n">unquote</span><span class="p">(</span><span class="n">raw_filename</span><span class="p">))</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;WebDAV path decoding and translation: &quot;</span>
+                  <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> -&gt; </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">raw_filename</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
+
+        <span class="c1"># at least one WebDAV server returns files in the form</span>
+        <span class="c1"># of full URL:s. this may or may not be</span>
+        <span class="c1"># according to the standard, but regardless we</span>
+        <span class="c1"># feel we want to bail out if the hostname</span>
+        <span class="c1"># does not match until someone has looked into</span>
+        <span class="c1"># what the WebDAV protocol mandages.</span>
+        <span class="k">if</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">hostname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> \
+           <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">hostname</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">hostname</span><span class="p">):</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="s2">&quot;Received filename was in the form of a &quot;</span>\
+                <span class="s2">&quot;full url, but the hostname (</span><span class="si">%s</span><span class="s2">) did &quot;</span>\
+                <span class="s2">&quot;not match that of the webdav backend &quot;</span>\
+                <span class="s2">&quot;url (</span><span class="si">%s</span><span class="s2">) - aborting as a conservative &quot;</span>\
+                <span class="s2">&quot;safety measure. If this happens to you, &quot;</span>\
+                <span class="s2">&quot;please report the problem&quot;</span>\
+                <span class="s2">&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">hostname</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">directory</span><span class="p">):</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">directory</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">filename</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+    <span class="k">def</span> <span class="nf">_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">,</span> <span class="n">local_path</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">directory</span> <span class="o">+</span> <span class="n">remote_filename</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">target_file</span> <span class="o">=</span> <span class="n">local_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;wb&quot;</span><span class="p">)</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="c1"># data=response.read()</span>
+                <span class="n">target_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+                <span class="c1"># import hashlib</span>
+                <span class="c1"># log.Info(&quot;WebDAV GOT %s bytes with md5=%s&quot; %</span>
+                <span class="c1"># (len(data),hashlib.md5(data).hexdigest()) )</span>
+                <span class="k">assert</span> <span class="ow">not</span> <span class="n">target_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span>
+                <span class="n">reason</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">reason</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;WebDAV GET Bad status code </span><span class="si">%s</span><span class="s2"> reason </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">)</span> <span class="o">%</span>
+                                       <span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">reason</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">e</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">response</span><span class="p">:</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_path</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">directory</span> <span class="o">+</span> <span class="n">remote_filename</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">source_file</span> <span class="o">=</span> <span class="n">source_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">&quot;PUT&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">source_file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+            <span class="c1"># 200 is returned if a file is overwritten during restarting</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">201</span><span class="p">,</span> <span class="mi">204</span><span class="p">]:</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span>
+                <span class="n">reason</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">reason</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;WebDAV PUT Bad status code </span><span class="si">%s</span><span class="s2"> reason </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">)</span> <span class="o">%</span>
+                                       <span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">reason</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">e</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">response</span><span class="p">:</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">directory</span> <span class="o">+</span> <span class="n">filename</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">&quot;DELETE&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">204</span><span class="p">]:</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span>
+                <span class="n">reason</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">reason</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;WebDAV DEL Bad status code </span><span class="si">%s</span><span class="s2"> reason </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">)</span> <span class="o">%</span>
+                                       <span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">reason</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">e</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">response</span><span class="p">:</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">register_backend</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">,</span> <span class="n">WebDAVBackend</span><span class="p">)</span>
+<span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">register_backend</span><span class="p">(</span><span class="s2">&quot;https&quot;</span><span class="p">,</span> <span class="n">WebDAVBackend</span><span class="p">)</span>
+<span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">register_backend</span><span class="p">(</span><span class="s2">&quot;webdav&quot;</span><span class="p">,</span> <span class="n">WebDAVBackend</span><span class="p">)</span>
+<span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">register_backend</span><span class="p">(</span><span class="s2">&quot;webdavs&quot;</span><span class="p">,</span> <span class="n">WebDAVBackend</span><span class="p">)</span>
+<span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">uses_netloc</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;http&#39;</span><span class="p">,</span> <span class="s1">&#39;https&#39;</span><span class="p">,</span> <span class="s1">&#39;webdav&#39;</span><span class="p">,</span> <span class="s1">&#39;webdavs&#39;</span><span class="p">])</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

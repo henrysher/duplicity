@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.backends.mediafirebackend &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.backends.mediafirebackend</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2016 Roman Yepishev &lt;rye@keypressure.com&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="sd">&quot;&quot;&quot;MediaFire Duplicity Backend&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">duplicity.backend</span>
+
+<span class="kn">from</span> <span class="nn">duplicity.errors</span> <span class="k">import</span> <span class="n">BackendException</span>
+
+<span class="n">DUPLICITY_APP_ID</span> <span class="o">=</span> <span class="s1">&#39;45593&#39;</span>
+
+
+<div class="viewcode-block" id="MediafireBackend"><a class="viewcode-back" href="../../../duplicity.backends.mediafirebackend.html#duplicity.backends.mediafirebackend.MediafireBackend">[docs]</a><span class="k">class</span> <span class="nc">MediafireBackend</span><span class="p">(</span><span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Backend</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Use this backend when saving to MediaFire</span>
+
+<span class="sd">    URLs look like mf:/root/folder.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_url</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">mediafire.client</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;This backend requires &quot;</span>
+                                   <span class="s2">&quot;the mediafire library&quot;</span><span class="p">)</span>
+
+        <span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Backend</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_url</span><span class="p">)</span>
+
+        <span class="n">mediafire_email</span> <span class="o">=</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">username</span>
+        <span class="n">mediafire_password</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_password</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_res</span> <span class="o">=</span> <span class="n">mediafire</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">File</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_folder_res</span> <span class="o">=</span> <span class="n">mediafire</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">Folder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_downloaderror_exc</span> <span class="o">=</span> <span class="n">mediafire</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">DownloadError</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_notfound_exc</span> <span class="o">=</span> <span class="n">mediafire</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">ResourceNotFoundError</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">mediafire</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">MediaFireClient</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">app_id</span><span class="o">=</span><span class="n">DUPLICITY_APP_ID</span><span class="p">,</span>
+                          <span class="n">email</span><span class="o">=</span><span class="n">mediafire_email</span><span class="p">,</span>
+                          <span class="n">password</span><span class="o">=</span><span class="n">mediafire_password</span><span class="p">)</span>
+
+        <span class="c1"># //username:password@host/path/to/folder -&gt; path/to/folder</span>
+        <span class="n">uri</span> <span class="o">=</span> <span class="s1">&#39;mf:///&#39;</span> <span class="o">+</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)[</span><span class="mi">3</span><span class="p">]</span>
+
+        <span class="c1"># Create folder if it does not exist and make sure it is private</span>
+        <span class="c1"># See MediaFire Account Settings /Security and Privacy / Share Link</span>
+        <span class="c1"># to set &quot;Inherit from parent folder&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">folder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get_resource_by_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_folder_res</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;target_url already exists &quot;</span>
+                                       <span class="s2">&quot;and is not a folder&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">mediafire</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">ResourceNotFoundError</span><span class="p">:</span>
+            <span class="c1"># force folder to be private</span>
+            <span class="n">folder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">create_folder</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">update_folder_metadata</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">privacy</span><span class="o">=</span><span class="s1">&#39;private&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="o">=</span> <span class="n">folder</span>
+
+    <span class="k">def</span> <span class="nf">_put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_path</span><span class="p">,</span> <span class="n">remote_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Upload file&quot;&quot;&quot;</span>
+        <span class="c1"># Use source file name if remote one is not defined</span>
+        <span class="k">if</span> <span class="n">remote_filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">remote_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">source_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="n">uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_uri</span><span class="p">(</span><span class="n">remote_filename</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">upload_session</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span><span class="n">source_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;rb&#39;</span><span class="p">),</span> <span class="n">uri</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">local_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Download file&quot;&quot;&quot;</span>
+        <span class="n">uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_uri</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">local_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;wb&#39;</span><span class="p">))</span>
+        <span class="k">except</span> <span class="bp">self</span><span class="o">.</span><span class="n">_downloaderror_exc</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;List files in backup directory&quot;&quot;&quot;</span>
+        <span class="n">uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_uri</span><span class="p">()</span>
+        <span class="n">filenames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get_folder_contents_iter</span><span class="p">(</span><span class="n">uri</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_res</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="n">filenames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">filenames</span>
+
+    <span class="k">def</span> <span class="nf">_delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Delete single file&quot;&quot;&quot;</span>
+        <span class="n">uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_uri</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">delete_file</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_delete_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename_list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Delete list of files&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">filename_list</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_delete</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Stat the remote file&quot;&quot;&quot;</span>
+        <span class="n">uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_uri</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">resource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get_resource_by_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">resource</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="bp">self</span><span class="o">.</span><span class="n">_notfound_exc</span><span class="p">:</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="n">size</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">_build_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Build relative URI&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="s1">&#39;mf:&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">[</span><span class="s2">&quot;folderkey&quot;</span><span class="p">]</span> <span class="o">+</span>
+            <span class="p">(</span><span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">filename</span> <span class="k">if</span> <span class="n">filename</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+<span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">register_backend</span><span class="p">(</span><span class="s2">&quot;mf&quot;</span><span class="p">,</span> <span class="n">MediafireBackend</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

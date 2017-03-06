@@ -1,0 +1,802 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.gpginterface &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.gpginterface</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Interface to GNU Privacy Guard (GnuPG)</span>
+
+<span class="sd">!!! This was renamed to gpginterface.py.</span>
+<span class="sd">    Please refer to duplicity&#39;s README for the reason. !!!</span>
+
+<span class="sd">gpginterface is a Python module to interface with GnuPG which based on</span>
+<span class="sd">GnuPGInterface by Frank J. Tobin.</span>
+<span class="sd">It concentrates on interacting with GnuPG via filehandles,</span>
+<span class="sd">providing access to control GnuPG via versatile and extensible means.</span>
+
+<span class="sd">This module is based on GnuPG::Interface, a Perl module by the same author.</span>
+
+<span class="sd">Normally, using this module will involve creating a</span>
+<span class="sd">GnuPG object, setting some options in it&#39;s &#39;options&#39; data member</span>
+<span class="sd">(which is of type Options), creating some pipes</span>
+<span class="sd">to talk with GnuPG, and then calling the run() method, which will</span>
+<span class="sd">connect those pipes to the GnuPG process. run() returns a</span>
+<span class="sd">Process object, which contains the filehandles to talk to GnuPG with.</span>
+
+<span class="sd">Example code:</span>
+
+<span class="sd">&gt;&gt;&gt; import gpginterface</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; plaintext  = &quot;Three blind mice&quot;</span>
+<span class="sd">&gt;&gt;&gt; passphrase = &quot;This is the passphrase&quot;</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; gnupg = gpginterface.GnuPG()</span>
+<span class="sd">&gt;&gt;&gt; gnupg.options.armor = 1</span>
+<span class="sd">&gt;&gt;&gt; gnupg.options.meta_interactive = 0</span>
+<span class="sd">&gt;&gt;&gt; gnupg.options.extra_args.append(&#39;--no-secmem-warning&#39;)</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; # Normally we might specify something in</span>
+<span class="sd">&gt;&gt;&gt; # gnupg.options.recipients, like</span>
+<span class="sd">&gt;&gt;&gt; # gnupg.options.recipients = [ &#39;0xABCD1234&#39;, &#39;bob@foo.bar&#39; ]</span>
+<span class="sd">&gt;&gt;&gt; # but since we&#39;re doing symmetric-only encryption, it&#39;s not needed.</span>
+<span class="sd">&gt;&gt;&gt; # If you are doing standard, public-key encryption, using</span>
+<span class="sd">&gt;&gt;&gt; # --encrypt, you will need to specify recipients before</span>
+<span class="sd">&gt;&gt;&gt; # calling gnupg.run()</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; # First we&#39;ll encrypt the test_text input symmetrically</span>
+<span class="sd">&gt;&gt;&gt; p1 = gnupg.run([&#39;--symmetric&#39;],</span>
+<span class="sd">...                create_fhs=[&#39;stdin&#39;, &#39;stdout&#39;, &#39;passphrase&#39;])</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; p1.handles[&#39;passphrase&#39;].write(passphrase)</span>
+<span class="sd">&gt;&gt;&gt; p1.handles[&#39;passphrase&#39;].close()</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; p1.handles[&#39;stdin&#39;].write(plaintext)</span>
+<span class="sd">&gt;&gt;&gt; p1.handles[&#39;stdin&#39;].close()</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; ciphertext = p1.handles[&#39;stdout&#39;].read()</span>
+<span class="sd">&gt;&gt;&gt; p1.handles[&#39;stdout&#39;].close()</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; # process cleanup</span>
+<span class="sd">&gt;&gt;&gt; p1.wait()</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; # Now we&#39;ll decrypt what we just encrypted it,</span>
+<span class="sd">&gt;&gt;&gt; # using the convience method to get the</span>
+<span class="sd">&gt;&gt;&gt; # passphrase to GnuPG</span>
+<span class="sd">&gt;&gt;&gt; gnupg.passphrase = passphrase</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; p2 = gnupg.run([&#39;--decrypt&#39;], create_fhs=[&#39;stdin&#39;, &#39;stdout&#39;])</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; p2.handles[&#39;stdin&#39;].write(ciphertext)</span>
+<span class="sd">&gt;&gt;&gt; p2.handles[&#39;stdin&#39;].close()</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; decrypted_plaintext = p2.handles[&#39;stdout&#39;].read()</span>
+<span class="sd">&gt;&gt;&gt; p2.handles[&#39;stdout&#39;].close()</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; # process cleanup</span>
+<span class="sd">&gt;&gt;&gt; p2.wait()</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; # Our decrypted plaintext:</span>
+<span class="sd">&gt;&gt;&gt; decrypted_plaintext</span>
+<span class="sd">&#39;Three blind mice&#39;</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; # ...and see it&#39;s the same as what we orignally encrypted</span>
+<span class="sd">&gt;&gt;&gt; assert decrypted_plaintext == plaintext, \</span>
+<span class="sd">          &quot;GnuPG decrypted output does not match original input&quot;</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; ##################################################</span>
+<span class="sd">&gt;&gt;&gt; # Now let&#39;s trying using run()&#39;s attach_fhs paramter</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; # we&#39;re assuming we&#39;re running on a unix...</span>
+<span class="sd">&gt;&gt;&gt; input = open(&#39;/etc/motd&#39;)</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; p1 = gnupg.run([&#39;--symmetric&#39;], create_fhs=[&#39;stdout&#39;],</span>
+<span class="sd">...                                 attach_fhs={&#39;stdin&#39;: input})</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; # GnuPG will read the stdin from /etc/motd</span>
+<span class="sd">&gt;&gt;&gt; ciphertext = p1.handles[&#39;stdout&#39;].read()</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; # process cleanup</span>
+<span class="sd">&gt;&gt;&gt; p1.wait()</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; # Now let&#39;s run the output through GnuPG</span>
+<span class="sd">&gt;&gt;&gt; # We&#39;ll write the output to a temporary file,</span>
+<span class="sd">&gt;&gt;&gt; import tempfile</span>
+<span class="sd">&gt;&gt;&gt; temp = tempfile.TemporaryFile()</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; p2 = gnupg.run([&#39;--decrypt&#39;], create_fhs=[&#39;stdin&#39;],</span>
+<span class="sd">...                               attach_fhs={&#39;stdout&#39;: temp})</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; # give GnuPG our encrypted stuff from the first run</span>
+<span class="sd">&gt;&gt;&gt; p2.handles[&#39;stdin&#39;].write(ciphertext)</span>
+<span class="sd">&gt;&gt;&gt; p2.handles[&#39;stdin&#39;].close()</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; # process cleanup</span>
+<span class="sd">&gt;&gt;&gt; p2.wait()</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; # rewind the tempfile and see what GnuPG gave us</span>
+<span class="sd">&gt;&gt;&gt; temp.seek(0)</span>
+<span class="sd">&gt;&gt;&gt; decrypted_plaintext = temp.read()</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; # compare what GnuPG decrypted with our original input</span>
+<span class="sd">&gt;&gt;&gt; input.seek(0)</span>
+<span class="sd">&gt;&gt;&gt; input_data = input.read()</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; assert decrypted_plaintext == input_data, \</span>
+<span class="sd">           &quot;GnuPG decrypted output does not match original input&quot;</span>
+
+<span class="sd">To do things like public-key encryption, simply pass do something</span>
+<span class="sd">like:</span>
+
+<span class="sd">gnupg.passphrase = &#39;My passphrase&#39;</span>
+<span class="sd">gnupg.options.recipients = [ &#39;bob@foobar.com&#39; ]</span>
+<span class="sd">gnupg.run( [&#39;--sign&#39;, &#39;--encrypt&#39;], create_fhs=..., attach_fhs=...)</span>
+
+<span class="sd">Here is an example of subclassing gpginterface.GnuPG,</span>
+<span class="sd">so that it has an encrypt_string() method that returns</span>
+<span class="sd">ciphertext.</span>
+
+<span class="sd">&gt;&gt;&gt; import gpginterface</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; class MyGnuPG(gpginterface.GnuPG):</span>
+<span class="sd">...</span>
+<span class="sd">...     def __init__(self):</span>
+<span class="sd">...         gpginterface.GnuPG.__init__(self)</span>
+<span class="sd">...         self.setup_my_options()</span>
+<span class="sd">...</span>
+<span class="sd">...     def setup_my_options(self):</span>
+<span class="sd">...         self.options.armor = 1</span>
+<span class="sd">...         self.options.meta_interactive = 0</span>
+<span class="sd">...         self.options.extra_args.append(&#39;--no-secmem-warning&#39;)</span>
+<span class="sd">...</span>
+<span class="sd">...     def encrypt_string(self, string, recipients):</span>
+<span class="sd">...        gnupg.options.recipients = recipients   # a list!</span>
+<span class="sd">...</span>
+<span class="sd">...        proc = gnupg.run([&#39;--encrypt&#39;], create_fhs=[&#39;stdin&#39;, &#39;stdout&#39;])</span>
+<span class="sd">...</span>
+<span class="sd">...        proc.handles[&#39;stdin&#39;].write(string)</span>
+<span class="sd">...        proc.handles[&#39;stdin&#39;].close()</span>
+<span class="sd">...</span>
+<span class="sd">...        output = proc.handles[&#39;stdout&#39;].read()</span>
+<span class="sd">...        proc.handles[&#39;stdout&#39;].close()</span>
+<span class="sd">...</span>
+<span class="sd">...        proc.wait()</span>
+<span class="sd">...        return output</span>
+<span class="sd">...</span>
+<span class="sd">&gt;&gt;&gt; gnupg = MyGnuPG()</span>
+<span class="sd">&gt;&gt;&gt; ciphertext = gnupg.encrypt_string(&quot;The secret&quot;, [&#39;0x260C4FA3&#39;])</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; # just a small sanity test here for doctest</span>
+<span class="sd">&gt;&gt;&gt; import types</span>
+<span class="sd">&gt;&gt;&gt; assert isinstance(ciphertext, types.StringType), \</span>
+<span class="sd">           &quot;What GnuPG gave back is not a string!&quot;</span>
+
+<span class="sd">Here is an example of generating a key:</span>
+<span class="sd">&gt;&gt;&gt; import gpginterface</span>
+<span class="sd">&gt;&gt;&gt; gnupg = gpginterface.GnuPG()</span>
+<span class="sd">&gt;&gt;&gt; gnupg.options.meta_interactive = 0</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; # We will be creative and use the logger filehandle to capture</span>
+<span class="sd">&gt;&gt;&gt; # what GnuPG says this time, instead stderr; no stdout to listen to,</span>
+<span class="sd">&gt;&gt;&gt; # but we capture logger to surpress the dry-run command.</span>
+<span class="sd">&gt;&gt;&gt; # We also have to capture stdout since otherwise doctest complains;</span>
+<span class="sd">&gt;&gt;&gt; # Normally you can let stdout through when generating a key.</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; proc = gnupg.run([&#39;--gen-key&#39;], create_fhs=[&#39;stdin&#39;, &#39;stdout&#39;,</span>
+<span class="sd">...                                             &#39;logger&#39;])</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; proc.handles[&#39;stdin&#39;].write(&#39;&#39;&#39;Key-Type: DSA</span>
+<span class="sd">... Key-Length: 1024</span>
+<span class="sd">... # We are only testing syntax this time, so dry-run</span>
+<span class="sd">... %dry-run</span>
+<span class="sd">... Subkey-Type: ELG-E</span>
+<span class="sd">... Subkey-Length: 1024</span>
+<span class="sd">... Name-Real: Joe Tester</span>
+<span class="sd">... Name-Comment: with stupid passphrase</span>
+<span class="sd">... Name-Email: joe@foo.bar</span>
+<span class="sd">... Expire-Date: 2y</span>
+<span class="sd">... Passphrase: abc</span>
+<span class="sd">... %pubring foo.pub</span>
+<span class="sd">... %secring foo.sec</span>
+<span class="sd">... &#39;&#39;&#39;)</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; proc.handles[&#39;stdin&#39;].close()</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; report = proc.handles[&#39;logger&#39;].read()</span>
+<span class="sd">&gt;&gt;&gt; proc.handles[&#39;logger&#39;].close()</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; proc.wait()</span>
+
+
+<span class="sd">COPYRIGHT:</span>
+
+<span class="sd">Copyright (C) 2001  Frank J. Tobin, ftobin@neverending.org</span>
+
+<span class="sd">LICENSE:</span>
+
+<span class="sd">This library is free software; you can redistribute it and/or</span>
+<span class="sd">modify it under the terms of the GNU Lesser General Public</span>
+<span class="sd">License as published by the Free Software Foundation; either</span>
+<span class="sd">version 2.1 of the License, or (at your option) any later version.</span>
+
+<span class="sd">This library is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="sd">Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public</span>
+<span class="sd">License along with this library; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</span>
+<span class="sd">or see http://www.gnu.org/copyleft/lesser.html</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">fcntl</span>
+
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">log</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">threading</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">dummy_threading</span>  <span class="c1"># @UnusedImport</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Threading not available -- zombie processes may appear&quot;</span><span class="p">))</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Frank J. Tobin, ftobin@neverending.org&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.3.2&quot;</span>
+<span class="n">__revision__</span> <span class="o">=</span> <span class="s2">&quot;$Id: GnuPGInterface.py,v 1.6 2009/06/06 17:35:19 loafman Exp $&quot;</span>
+
+<span class="c1"># &quot;standard&quot; filehandles attached to processes</span>
+<span class="n">_stds</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">,</span> <span class="s1">&#39;stdout&#39;</span><span class="p">,</span> <span class="s1">&#39;stderr&#39;</span><span class="p">]</span>
+
+<span class="c1"># the permissions each type of fh needs to be opened with</span>
+<span class="n">_fd_modes</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;stdin&#39;</span><span class="p">:</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;stdout&#39;</span><span class="p">:</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;stderr&#39;</span><span class="p">:</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;passphrase&#39;</span><span class="p">:</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;command&#39;</span><span class="p">:</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;logger&#39;</span><span class="p">:</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="s1">&#39;r&#39;</span>
+             <span class="p">}</span>
+
+<span class="c1"># correlation between handle names and the arguments we&#39;ll pass</span>
+<span class="n">_fd_options</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;passphrase&#39;</span><span class="p">:</span> <span class="s1">&#39;--passphrase-fd&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;logger&#39;</span><span class="p">:</span> <span class="s1">&#39;--logger-fd&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="s1">&#39;--status-fd&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;command&#39;</span><span class="p">:</span> <span class="s1">&#39;--command-fd&#39;</span>
+               <span class="p">}</span>
+
+
+<div class="viewcode-block" id="GnuPG"><a class="viewcode-back" href="../../duplicity.gpginterface.html#duplicity.gpginterface.GnuPG">[docs]</a><span class="k">class</span> <span class="nc">GnuPG</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Class instances represent GnuPG.</span>
+
+<span class="sd">    Instance attributes of a GnuPG object are:</span>
+
+<span class="sd">    * call -- string to call GnuPG with.  Defaults to &quot;gpg&quot;</span>
+
+<span class="sd">    * passphrase -- Since it is a common operation</span>
+<span class="sd">      to pass in a passphrase to GnuPG,</span>
+<span class="sd">      and working with the passphrase filehandle mechanism directly</span>
+<span class="sd">      can be mundane, if set, the passphrase attribute</span>
+<span class="sd">      works in a special manner.  If the passphrase attribute is set,</span>
+<span class="sd">      and no passphrase file object is sent in to run(),</span>
+<span class="sd">      then GnuPG instnace will take care of sending the passphrase to</span>
+<span class="sd">      GnuPG, the executable instead of having the user sent it in manually.</span>
+
+<span class="sd">    * options -- Object of type gpginterface.Options.</span>
+<span class="sd">      Attribute-setting in options determines</span>
+<span class="sd">      the command-line options used when calling GnuPG.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">call</span> <span class="o">=</span> <span class="s1">&#39;gpg&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">passphrase</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">Options</span><span class="p">()</span>
+
+<div class="viewcode-block" id="GnuPG.run"><a class="viewcode-back" href="../../duplicity.gpginterface.html#duplicity.gpginterface.GnuPG.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gnupg_commands</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">create_fhs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">attach_fhs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calls GnuPG with the list of string commands gnupg_commands,</span>
+<span class="sd">        complete with prefixing dashes.</span>
+<span class="sd">        For example, gnupg_commands could be</span>
+<span class="sd">        &#39;[&quot;--sign&quot;, &quot;--encrypt&quot;]&#39;</span>
+<span class="sd">        Returns a gpginterface.Process object.</span>
+
+<span class="sd">        args is an optional list of GnuPG command arguments (not options),</span>
+<span class="sd">        such as keyID&#39;s to export, filenames to process, etc.</span>
+
+<span class="sd">        create_fhs is an optional list of GnuPG filehandle</span>
+<span class="sd">        names that will be set as keys of the returned Process object&#39;s</span>
+<span class="sd">        &#39;handles&#39; attribute.  The generated filehandles can be used</span>
+<span class="sd">        to communicate with GnuPG via standard input, standard output,</span>
+<span class="sd">        the status-fd, passphrase-fd, etc.</span>
+
+<span class="sd">        Valid GnuPG filehandle names are:</span>
+<span class="sd">          * stdin</span>
+<span class="sd">          * stdout</span>
+<span class="sd">          * stderr</span>
+<span class="sd">          * status</span>
+<span class="sd">          * passphase</span>
+<span class="sd">          * command</span>
+<span class="sd">          * logger</span>
+
+<span class="sd">        The purpose of each filehandle is described in the GnuPG</span>
+<span class="sd">        documentation.</span>
+
+<span class="sd">        attach_fhs is an optional dictionary with GnuPG filehandle</span>
+<span class="sd">        names mapping to opened files.  GnuPG will read or write</span>
+<span class="sd">        to the file accordingly.  For example, if &#39;my_file&#39; is an</span>
+<span class="sd">        opened file and &#39;attach_fhs[stdin] is my_file&#39;, then GnuPG</span>
+<span class="sd">        will read its standard input from my_file. This is useful</span>
+<span class="sd">        if you want GnuPG to read/write to/from an existing file.</span>
+<span class="sd">        For instance:</span>
+
+<span class="sd">            f = open(&quot;encrypted.gpg&quot;)</span>
+<span class="sd">            gnupg.run([&quot;--decrypt&quot;], attach_fhs={&#39;stdin&#39;: f})</span>
+
+<span class="sd">        Using attach_fhs also helps avoid system buffering</span>
+<span class="sd">        issues that can arise when using create_fhs, which</span>
+<span class="sd">        can cause the process to deadlock.</span>
+
+<span class="sd">        If not mentioned in create_fhs or attach_fhs,</span>
+<span class="sd">        GnuPG filehandles which are a std* (stdin, stdout, stderr)</span>
+<span class="sd">        are defaulted to the running process&#39; version of handle.</span>
+<span class="sd">        Otherwise, that type of handle is simply not used when calling GnuPG.</span>
+<span class="sd">        For example, if you do not care about getting data from GnuPG&#39;s</span>
+<span class="sd">        status filehandle, simply do not specify it.</span>
+
+<span class="sd">        run() returns a Process() object which has a &#39;handles&#39;</span>
+<span class="sd">        which is a dictionary mapping from the handle name</span>
+<span class="sd">        (such as &#39;stdin&#39; or &#39;stdout&#39;) to the respective</span>
+<span class="sd">        newly-created FileObject connected to the running GnuPG process.</span>
+<span class="sd">        For instance, if the call was</span>
+
+<span class="sd">          process = gnupg.run([&quot;--decrypt&quot;], stdin=1)</span>
+
+<span class="sd">        after run returns &#39;process.handles[&quot;stdin&quot;]&#39;</span>
+<span class="sd">        is a FileObject connected to GnuPG&#39;s standard input,</span>
+<span class="sd">        and can be written to.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">create_fhs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">create_fhs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">attach_fhs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">attach_fhs</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">std</span> <span class="ow">in</span> <span class="n">_stds</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">std</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attach_fhs</span> \
+               <span class="ow">and</span> <span class="n">std</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">create_fhs</span><span class="p">:</span>
+                <span class="n">attach_fhs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">std</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span> <span class="n">std</span><span class="p">))</span>
+
+        <span class="n">handle_passphrase</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">passphrase</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> \
+           <span class="ow">and</span> <span class="s1">&#39;passphrase&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attach_fhs</span> \
+           <span class="ow">and</span> <span class="s1">&#39;passphrase&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">create_fhs</span><span class="p">:</span>
+            <span class="n">handle_passphrase</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">create_fhs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;passphrase&#39;</span><span class="p">)</span>
+
+        <span class="n">process</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attach_fork_exec</span><span class="p">(</span><span class="n">gnupg_commands</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span>
+                                         <span class="n">create_fhs</span><span class="p">,</span> <span class="n">attach_fhs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">handle_passphrase</span><span class="p">:</span>
+            <span class="n">passphrase_fh</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;passphrase&#39;</span><span class="p">]</span>
+            <span class="n">passphrase_fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">passphrase</span><span class="p">)</span>
+            <span class="n">passphrase_fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">del</span> <span class="n">process</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;passphrase&#39;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">process</span></div>
+
+    <span class="k">def</span> <span class="nf">_attach_fork_exec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gnupg_commands</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">create_fhs</span><span class="p">,</span> <span class="n">attach_fhs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This is like run(), but without the passphrase-helping</span>
+<span class="sd">        (note that run() calls this).&quot;&quot;&quot;</span>
+
+        <span class="n">process</span> <span class="o">=</span> <span class="n">Process</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">fh_name</span> <span class="ow">in</span> <span class="n">create_fhs</span> <span class="o">+</span> <span class="n">attach_fhs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">fh_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_fd_modes</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;unrecognized filehandle name &#39;</span><span class="si">%s</span><span class="s2">&#39;; must be one of </span><span class="si">%s</span><span class="s2">&quot;</span>
+                               <span class="o">%</span> <span class="p">(</span><span class="n">fh_name</span><span class="p">,</span> <span class="n">_fd_modes</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+
+        <span class="k">for</span> <span class="n">fh_name</span> <span class="ow">in</span> <span class="n">create_fhs</span><span class="p">:</span>
+            <span class="c1"># make sure the user doesn&#39;t specify a filehandle</span>
+            <span class="c1"># to be created *and* attached</span>
+            <span class="k">if</span> <span class="n">fh_name</span> <span class="ow">in</span> <span class="n">attach_fhs</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;cannot have filehandle &#39;</span><span class="si">%s</span><span class="s2">&#39; in both create_fhs and attach_fhs&quot;</span>
+                                 <span class="o">%</span> <span class="n">fh_name</span><span class="p">)</span>
+
+            <span class="n">pipe</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">pipe</span><span class="p">()</span>
+            <span class="c1"># fix by drt@un.bewaff.net noting</span>
+            <span class="c1"># that since pipes are unidirectional on some systems,</span>
+            <span class="c1"># so we have to &#39;turn the pipe around&#39;</span>
+            <span class="c1"># if we are writing</span>
+            <span class="k">if</span> <span class="n">_fd_modes</span><span class="p">[</span><span class="n">fh_name</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;w&#39;</span><span class="p">:</span>
+                <span class="n">pipe</span> <span class="o">=</span> <span class="p">(</span><span class="n">pipe</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">pipe</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">process</span><span class="o">.</span><span class="n">_pipes</span><span class="p">[</span><span class="n">fh_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Pipe</span><span class="p">(</span><span class="n">pipe</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pipe</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">fh_name</span><span class="p">,</span> <span class="n">fh</span> <span class="ow">in</span> <span class="n">attach_fhs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">process</span><span class="o">.</span><span class="n">_pipes</span><span class="p">[</span><span class="n">fh_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Pipe</span><span class="p">(</span><span class="n">fh</span><span class="o">.</span><span class="n">fileno</span><span class="p">(),</span> <span class="n">fh</span><span class="o">.</span><span class="n">fileno</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">process</span><span class="o">.</span><span class="n">pid</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fork</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">process</span><span class="o">.</span><span class="n">pid</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># start a threaded_waitpid on the child</span>
+            <span class="n">process</span><span class="o">.</span><span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">threaded_waitpid</span><span class="p">,</span>
+                                              <span class="n">name</span><span class="o">=</span><span class="s2">&quot;wait</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">process</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span>
+                                              <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">process</span><span class="p">,))</span>
+            <span class="n">process</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">process</span><span class="o">.</span><span class="n">pid</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_as_child</span><span class="p">(</span><span class="n">process</span><span class="p">,</span> <span class="n">gnupg_commands</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_as_parent</span><span class="p">(</span><span class="n">process</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_as_parent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Stuff run after forking in parent&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">process</span><span class="o">.</span><span class="n">_pipes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">direct</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">child</span><span class="p">)</span>
+                <span class="n">process</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fdopen</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="n">_fd_modes</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+
+        <span class="c1"># user doesn&#39;t need these</span>
+        <span class="k">del</span> <span class="n">process</span><span class="o">.</span><span class="n">_pipes</span>
+
+        <span class="k">return</span> <span class="n">process</span>
+
+    <span class="k">def</span> <span class="nf">_as_child</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process</span><span class="p">,</span> <span class="n">gnupg_commands</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Stuff run after forking in child&quot;&quot;&quot;</span>
+        <span class="c1"># child</span>
+        <span class="k">for</span> <span class="n">std</span> <span class="ow">in</span> <span class="n">_stds</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">_pipes</span><span class="p">[</span><span class="n">std</span><span class="p">]</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">dup2</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">child</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span> <span class="s2">&quot;__</span><span class="si">%s</span><span class="s2">__&quot;</span> <span class="o">%</span> <span class="n">std</span><span class="p">)</span><span class="o">.</span><span class="n">fileno</span><span class="p">())</span>
+
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">process</span><span class="o">.</span><span class="n">_pipes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">direct</span> <span class="ow">and</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_stds</span><span class="p">:</span>
+                <span class="c1"># we want the fh to stay open after execing</span>
+                <span class="n">fcntl</span><span class="o">.</span><span class="n">fcntl</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">child</span><span class="p">,</span> <span class="n">fcntl</span><span class="o">.</span><span class="n">F_SETFD</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">fd_args</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">process</span><span class="o">.</span><span class="n">_pipes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># set command-line options for non-standard fds</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_stds</span><span class="p">:</span>
+                <span class="n">fd_args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">_fd_options</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">p</span><span class="o">.</span><span class="n">child</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">direct</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+
+        <span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">call</span><span class="p">]</span> <span class="o">+</span> <span class="n">fd_args</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get_args</span><span class="p">()</span> <span class="o">+</span> <span class="n">gnupg_commands</span> <span class="o">+</span> <span class="n">args</span>
+
+        <span class="n">os</span><span class="o">.</span><span class="n">execvp</span><span class="p">(</span><span class="n">command</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">command</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Pipe"><a class="viewcode-back" href="../../duplicity.gpginterface.html#duplicity.gpginterface.Pipe">[docs]</a><span class="k">class</span> <span class="nc">Pipe</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;simple struct holding stuff about pipes we use&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">child</span><span class="p">,</span> <span class="n">direct</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">child</span> <span class="o">=</span> <span class="n">child</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">direct</span> <span class="o">=</span> <span class="n">direct</span></div>
+
+
+<div class="viewcode-block" id="Options"><a class="viewcode-back" href="../../duplicity.gpginterface.html#duplicity.gpginterface.Options">[docs]</a><span class="k">class</span> <span class="nc">Options</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Objects of this class encompass options passed to GnuPG.</span>
+<span class="sd">    This class is responsible for determining command-line arguments</span>
+<span class="sd">    which are based on options.  It can be said that a GnuPG</span>
+<span class="sd">    object has-a Options object in its options attribute.</span>
+
+<span class="sd">    Attributes which correlate directly to GnuPG options:</span>
+
+<span class="sd">    Each option here defaults to false or None, and is described in</span>
+<span class="sd">    GnuPG documentation.</span>
+
+<span class="sd">    Booleans (set these attributes to booleans)</span>
+
+<span class="sd">      * armor</span>
+<span class="sd">      * no_greeting</span>
+<span class="sd">      * no_verbose</span>
+<span class="sd">      * quiet</span>
+<span class="sd">      * batch</span>
+<span class="sd">      * always_trust</span>
+<span class="sd">      * rfc1991</span>
+<span class="sd">      * openpgp</span>
+<span class="sd">      * force_v3_sigs</span>
+<span class="sd">      * no_options</span>
+<span class="sd">      * textmode</span>
+
+<span class="sd">    Strings (set these attributes to strings)</span>
+
+<span class="sd">      * homedir</span>
+<span class="sd">      * default_key</span>
+<span class="sd">      * comment</span>
+<span class="sd">      * compress_algo</span>
+<span class="sd">      * options</span>
+
+<span class="sd">    Lists (set these attributes to lists)</span>
+
+<span class="sd">      * recipients  (***NOTE*** plural of &#39;recipient&#39;)</span>
+<span class="sd">      * encrypt_to</span>
+
+<span class="sd">    Meta options</span>
+
+<span class="sd">    Meta options are options provided by this module that do</span>
+<span class="sd">    not correlate directly to any GnuPG option by name,</span>
+<span class="sd">    but are rather bundle of options used to accomplish</span>
+<span class="sd">    a specific goal, such as obtaining compatibility with PGP 5.</span>
+<span class="sd">    The actual arguments each of these reflects may change with time.  Each</span>
+<span class="sd">    defaults to false unless otherwise specified.</span>
+
+<span class="sd">    meta_pgp_5_compatible -- If true, arguments are generated to try</span>
+<span class="sd">    to be compatible with PGP 5.x.</span>
+
+<span class="sd">    meta_pgp_2_compatible -- If true, arguments are generated to try</span>
+<span class="sd">    to be compatible with PGP 2.x.</span>
+
+<span class="sd">    meta_interactive -- If false, arguments are generated to try to</span>
+<span class="sd">    help the using program use GnuPG in a non-interactive</span>
+<span class="sd">    environment, such as CGI scripts.  Default is true.</span>
+
+<span class="sd">    extra_args -- Extra option arguments may be passed in</span>
+<span class="sd">    via the attribute extra_args, a list.</span>
+
+<span class="sd">    &gt;&gt;&gt; import gpginterface</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; gnupg = gpginterface.GnuPG()</span>
+<span class="sd">    &gt;&gt;&gt; gnupg.options.armor = 1</span>
+<span class="sd">    &gt;&gt;&gt; gnupg.options.recipients = [&#39;Alice&#39;, &#39;Bob&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; gnupg.options.extra_args = [&#39;--no-secmem-warning&#39;]</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; # no need for users to call this normally; just for show here</span>
+<span class="sd">    &gt;&gt;&gt; gnupg.options.get_args()</span>
+<span class="sd">    [&#39;--armor&#39;, &#39;--recipient&#39;, &#39;Alice&#39;, &#39;--recipient&#39;, &#39;Bob&#39;, &#39;--no-secmem-warning&#39;]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># booleans</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">armor</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">no_greeting</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">no_verbose</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quiet</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">always_trust</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rfc1991</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">openpgp</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">force_v3_sigs</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">no_options</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">textmode</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># meta-option booleans</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta_pgp_5_compatible</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta_pgp_2_compatible</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta_interactive</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="c1"># strings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">homedir</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_key</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compress_algo</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># lists</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encrypt_to</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recipients</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_recipients</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># miscellaneous arguments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extra_args</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="Options.get_args"><a class="viewcode-back" href="../../duplicity.gpginterface.html#duplicity.gpginterface.Options.get_args">[docs]</a>    <span class="k">def</span> <span class="nf">get_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate a list of GnuPG arguments based upon attributes.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_meta_args</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_standard_args</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_args</span></div>
+
+<div class="viewcode-block" id="Options.get_standard_args"><a class="viewcode-back" href="../../duplicity.gpginterface.html#duplicity.gpginterface.Options.get_standard_args">[docs]</a>    <span class="k">def</span> <span class="nf">get_standard_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate a list of standard, non-meta or extra arguments&quot;&quot;&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">homedir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;--homedir&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">homedir</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;--options&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;--comment&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compress_algo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;--compress-algo&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compress_algo</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;--default-key&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_key</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_options</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--no-options&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">armor</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--armor&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">textmode</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--textmode&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_greeting</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--no-greeting&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--verbose&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_verbose</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--no-verbose&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">quiet</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--quiet&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--batch&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">always_trust</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--always-trust&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_v3_sigs</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--force-v3-sigs&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rfc1991</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--rfc1991&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">openpgp</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--openpgp&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipients</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;--recipient&#39;</span><span class="p">,</span> <span class="n">r</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_recipients</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;--hidden-recipient&#39;</span><span class="p">,</span> <span class="n">r</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">encrypt_to</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;--encrypt-to&#39;</span><span class="p">,</span> <span class="n">r</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">args</span></div>
+
+<div class="viewcode-block" id="Options.get_meta_args"><a class="viewcode-back" href="../../duplicity.gpginterface.html#duplicity.gpginterface.Options.get_meta_args">[docs]</a>    <span class="k">def</span> <span class="nf">get_meta_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a list of generated meta-arguments&quot;&quot;&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta_pgp_5_compatible</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;--compress-algo&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;--force-v3-sigs&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta_pgp_2_compatible</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--rfc1991&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta_interactive</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;--batch&#39;</span><span class="p">,</span> <span class="s1">&#39;--no-tty&#39;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">args</span></div></div>
+
+
+<div class="viewcode-block" id="Process"><a class="viewcode-back" href="../../duplicity.gpginterface.html#duplicity.gpginterface.Process">[docs]</a><span class="k">class</span> <span class="nc">Process</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Objects of this class encompass properties of a GnuPG</span>
+<span class="sd">    process spawned by GnuPG.run().</span>
+
+<span class="sd">    # gnupg is a GnuPG object</span>
+<span class="sd">    process = gnupg.run( [ &#39;--decrypt&#39; ], stdout = 1 )</span>
+<span class="sd">    out = process.handles[&#39;stdout&#39;].read()</span>
+<span class="sd">    ...</span>
+<span class="sd">    os.waitpid( process.pid, 0 )</span>
+
+<span class="sd">    Data Attributes</span>
+
+<span class="sd">    handles -- This is a map of filehandle-names to</span>
+<span class="sd">    the file handles, if any, that were requested via run() and hence</span>
+<span class="sd">    are connected to the running GnuPG process.  Valid names</span>
+<span class="sd">    of this map are only those handles that were requested.</span>
+
+<span class="sd">    pid -- The PID of the spawned GnuPG process.</span>
+<span class="sd">    Useful to know, since once should call</span>
+<span class="sd">    os.waitpid() to clean up the process, especially</span>
+<span class="sd">    if multiple calls are made to run().</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pipes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">handles</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pid</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_waited</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thread</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">returned</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Process.wait"><a class="viewcode-back" href="../../duplicity.gpginterface.html#duplicity.gpginterface.Process.wait">[docs]</a>    <span class="k">def</span> <span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wait on threaded_waitpid to exit and examine results.</span>
+<span class="sd">        Will raise an IOError if the process exits non-zero.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">returned</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">returned</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;GnuPG exited non-zero, with code </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">returned</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="threaded_waitpid"><a class="viewcode-back" href="../../duplicity.gpginterface.html#duplicity.gpginterface.threaded_waitpid">[docs]</a><span class="k">def</span> <span class="nf">threaded_waitpid</span><span class="p">(</span><span class="n">process</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    When started as a thread with the Process object, thread</span>
+<span class="sd">    will execute an immediate waitpid() against the process</span>
+<span class="sd">    pid and will collect the process termination info.  This</span>
+<span class="sd">    will allow us to reap child processes as soon as possible,</span>
+<span class="sd">    thus freeing resources quickly.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">process</span><span class="o">.</span><span class="n">returned</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">waitpid</span><span class="p">(</span><span class="n">process</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;GPG process </span><span class="si">%d</span><span class="s2"> terminated before wait()&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">process</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span>
+        <span class="n">process</span><span class="o">.</span><span class="n">returned</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+
+<span class="k">def</span> <span class="nf">_run_doctests</span><span class="p">():</span>
+    <span class="kn">import</span> <span class="nn">doctest</span>
+    <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">gpginterface</span>
+    <span class="k">return</span> <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">(</span><span class="n">GnuPGInterface</span><span class="p">)</span>
+
+
+<span class="c1"># deprecated</span>
+<span class="n">GnuPGInterface</span> <span class="o">=</span> <span class="n">GnuPG</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">_run_doctests</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

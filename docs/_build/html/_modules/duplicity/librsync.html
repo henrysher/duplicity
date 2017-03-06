@@ -1,0 +1,309 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.librsync &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.librsync</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2002 Ben Escoto &lt;ben@emerose.org&gt;</span>
+<span class="c1"># Copyright 2007 Kenneth Loafman &lt;kenneth@loafman.com&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># duplicity is free software; you can redistribute it and/or modify</span>
+<span class="c1"># under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="sd">&quot;&quot;&quot;Provides a high-level interface to some librsync functions</span>
+
+<span class="sd">This is a python wrapper around the lower-level _librsync module,</span>
+<span class="sd">which is written in C.  The goal was to use C as little as possible...</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">_librsync</span>
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">import</span> <span class="nn">array</span>
+
+<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;READTHEDOCS&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;True&#39;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">mock</span>
+    <span class="kn">import</span> <span class="nn">duplicity</span>
+    <span class="n">duplicity</span><span class="o">.</span><span class="n">_librsync</span> <span class="o">=</span> <span class="n">mock</span><span class="o">.</span><span class="n">MagicMock</span><span class="p">()</span>
+
+<span class="n">blocksize</span> <span class="o">=</span> <span class="n">_librsync</span><span class="o">.</span><span class="n">RS_JOB_BLOCKSIZE</span>
+
+
+<div class="viewcode-block" id="librsyncError"><a class="viewcode-back" href="../../duplicity.librsync.html#duplicity.librsync.librsyncError">[docs]</a><span class="k">class</span> <span class="nc">librsyncError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Signifies error in internal librsync processing (bad signature, etc.)</span>
+
+<span class="sd">    underlying _librsync.librsyncError&#39;s are regenerated using this</span>
+<span class="sd">    class because the C-created exceptions are by default</span>
+<span class="sd">    unPickleable.  There is probably a way to fix this in _librsync,</span>
+<span class="sd">    but this scheme was easier.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="LikeFile"><a class="viewcode-back" href="../../duplicity.librsync.html#duplicity.librsync.LikeFile">[docs]</a><span class="k">class</span> <span class="nc">LikeFile</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;File-like object used by SigFile, DeltaFile, and PatchFile&quot;&quot;&quot;</span>
+    <span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;rb&quot;</span>
+
+    <span class="c1"># This will be replaced in subclasses by an object with</span>
+    <span class="c1"># appropriate cycle() method</span>
+    <span class="n">maker</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infile</span><span class="p">,</span> <span class="n">need_seek</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;LikeFile initializer - zero buffers, set eofs off&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_file</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="n">need_seek</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">infile</span> <span class="o">=</span> <span class="n">infile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">closed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">infile_closed</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inbuf</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outbuf</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eof</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">infile_eof</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="LikeFile.check_file"><a class="viewcode-back" href="../../duplicity.librsync.html#duplicity.librsync.LikeFile.check_file">[docs]</a>    <span class="k">def</span> <span class="nf">check_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">need_seek</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Raise type error if file doesn&#39;t have necessary attributes&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s2">&quot;read&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Basis file must have a read() method&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s2">&quot;close&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Basis file must have a close() method&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">need_seek</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s2">&quot;seek&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Basis file must have a seek() method&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LikeFile.read"><a class="viewcode-back" href="../../duplicity.librsync.html#duplicity.librsync.LikeFile.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Build up self.outbuf, return first length bytes&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">length</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">eof</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_add_to_outbuf_once</span><span class="p">()</span>
+            <span class="n">real_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outbuf</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">eof</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outbuf</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">length</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_add_to_outbuf_once</span><span class="p">()</span>
+            <span class="n">real_len</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outbuf</span><span class="p">))</span>
+
+        <span class="n">return_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outbuf</span><span class="p">[:</span><span class="n">real_len</span><span class="p">]</span><span class="o">.</span><span class="n">tostring</span><span class="p">()</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">outbuf</span><span class="p">[:</span><span class="n">real_len</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">return_val</span></div>
+
+    <span class="k">def</span> <span class="nf">_add_to_outbuf_once</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add one cycle&#39;s worth of output to self.outbuf&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">infile_eof</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_to_inbuf</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">eof</span><span class="p">,</span> <span class="n">len_inbuf_read</span><span class="p">,</span> <span class="n">cycle_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">maker</span><span class="o">.</span><span class="n">cycle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inbuf</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">_librsync</span><span class="o">.</span><span class="n">librsyncError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">librsyncError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inbuf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inbuf</span><span class="p">[</span><span class="n">len_inbuf_read</span><span class="p">:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outbuf</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">cycle_out</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_add_to_inbuf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make sure len(self.inbuf) &gt;= blocksize&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">infile_eof</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inbuf</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">blocksize</span><span class="p">:</span>
+            <span class="n">new_in</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">infile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">blocksize</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">new_in</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">infile_eof</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">infile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">infile_closed</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">break</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inbuf</span> <span class="o">+=</span> <span class="n">new_in</span>
+
+<div class="viewcode-block" id="LikeFile.close"><a class="viewcode-back" href="../../duplicity.librsync.html#duplicity.librsync.LikeFile.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Close infile&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">infile_closed</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">infile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">closed</span> <span class="o">=</span> <span class="mi">1</span></div></div>
+
+
+<div class="viewcode-block" id="SigFile"><a class="viewcode-back" href="../../duplicity.librsync.html#duplicity.librsync.SigFile">[docs]</a><span class="k">class</span> <span class="nc">SigFile</span><span class="p">(</span><span class="n">LikeFile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;File-like object which incrementally generates a librsync signature&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infile</span><span class="p">,</span> <span class="n">blocksize</span><span class="o">=</span><span class="n">_librsync</span><span class="o">.</span><span class="n">RS_DEFAULT_BLOCK_LEN</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;SigFile initializer - takes basis file</span>
+
+<span class="sd">        basis file only needs to have read() and close() methods.  It</span>
+<span class="sd">        will be closed when we come to the end of the signature.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">LikeFile</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infile</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">maker</span> <span class="o">=</span> <span class="n">_librsync</span><span class="o">.</span><span class="n">new_sigmaker</span><span class="p">(</span><span class="n">blocksize</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">_librsync</span><span class="o">.</span><span class="n">librsyncError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">librsyncError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="DeltaFile"><a class="viewcode-back" href="../../duplicity.librsync.html#duplicity.librsync.DeltaFile">[docs]</a><span class="k">class</span> <span class="nc">DeltaFile</span><span class="p">(</span><span class="n">LikeFile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;File-like object which incrementally generates a librsync delta&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">new_file</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;DeltaFile initializer - call with signature and new file</span>
+
+<span class="sd">        Signature can either be a string or a file with read() and</span>
+<span class="sd">        close() methods.  New_file also only needs to have read() and</span>
+<span class="sd">        close() methods.  It will be closed when self is closed.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">LikeFile</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_file</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">signature</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">StringType</span><span class="p">):</span>
+            <span class="n">sig_string</span> <span class="o">=</span> <span class="n">signature</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_file</span><span class="p">(</span><span class="n">signature</span><span class="p">)</span>
+            <span class="n">sig_string</span> <span class="o">=</span> <span class="n">signature</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="n">signature</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">maker</span> <span class="o">=</span> <span class="n">_librsync</span><span class="o">.</span><span class="n">new_deltamaker</span><span class="p">(</span><span class="n">sig_string</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">_librsync</span><span class="o">.</span><span class="n">librsyncError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">librsyncError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="PatchedFile"><a class="viewcode-back" href="../../duplicity.librsync.html#duplicity.librsync.PatchedFile">[docs]</a><span class="k">class</span> <span class="nc">PatchedFile</span><span class="p">(</span><span class="n">LikeFile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;File-like object which applies a librsync delta incrementally&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basis_file</span><span class="p">,</span> <span class="n">delta_file</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;PatchedFile initializer - call with basis delta</span>
+
+<span class="sd">        Here basis_file must be a true Python file, because we may</span>
+<span class="sd">        need to seek() around in it a lot, and this is done in C.</span>
+<span class="sd">        delta_file only needs read() and close() methods.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">LikeFile</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta_file</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">basis_file</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">FileType</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;basis_file must be a (true) file&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">maker</span> <span class="o">=</span> <span class="n">_librsync</span><span class="o">.</span><span class="n">new_patchmaker</span><span class="p">(</span><span class="n">basis_file</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">_librsync</span><span class="o">.</span><span class="n">librsyncError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">librsyncError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="SigGenerator"><a class="viewcode-back" href="../../duplicity.librsync.html#duplicity.librsync.SigGenerator">[docs]</a><span class="k">class</span> <span class="nc">SigGenerator</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Calculate signature.</span>
+
+<span class="sd">    Input and output is same as SigFile, but the interface is like md5</span>
+<span class="sd">    module, not filelike object</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">blocksize</span><span class="o">=</span><span class="n">_librsync</span><span class="o">.</span><span class="n">RS_DEFAULT_BLOCK_LEN</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return new signature instance&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sig_maker</span> <span class="o">=</span> <span class="n">_librsync</span><span class="o">.</span><span class="n">new_sigmaker</span><span class="p">(</span><span class="n">blocksize</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">_librsync</span><span class="o">.</span><span class="n">librsyncError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">librsyncError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gotsig</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigstring_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="SigGenerator.update"><a class="viewcode-back" href="../../duplicity.librsync.html#duplicity.librsync.SigGenerator.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buf</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add buf to data that signature will be calculated over&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gotsig</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">librsyncError</span><span class="p">(</span><span class="s2">&quot;SigGenerator already provided signature&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">+=</span> <span class="n">buf</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">blocksize</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_buffer</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">librsyncError</span><span class="p">(</span><span class="s2">&quot;Premature EOF received from sig_maker&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SigGenerator.process_buffer"><a class="viewcode-back" href="../../duplicity.librsync.html#duplicity.librsync.SigGenerator.process_buffer">[docs]</a>    <span class="k">def</span> <span class="nf">process_buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run self.buffer through sig_maker, add to self.sig_string&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">eof</span><span class="p">,</span> <span class="n">len_buf_read</span><span class="p">,</span> <span class="n">cycle_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sig_maker</span><span class="o">.</span><span class="n">cycle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">_librsync</span><span class="o">.</span><span class="n">librsyncError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">librsyncError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">[</span><span class="n">len_buf_read</span><span class="p">:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigstring_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cycle_out</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">eof</span></div>
+
+<div class="viewcode-block" id="SigGenerator.getsig"><a class="viewcode-back" href="../../duplicity.librsync.html#duplicity.librsync.SigGenerator.getsig">[docs]</a>    <span class="k">def</span> <span class="nf">getsig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return signature over given data&quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_buffer</span><span class="p">():</span>
+            <span class="k">pass</span>  <span class="c1"># keep running until eof</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sigstring_list</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

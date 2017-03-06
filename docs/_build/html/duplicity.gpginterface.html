@@ -1,0 +1,535 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.gpginterface module &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="duplicity.lazy module" href="duplicity.lazy.html" />
+    <link rel="prev" title="duplicity.gpg module" href="duplicity.gpg.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-duplicity.gpginterface">
+<span id="duplicity-gpginterface-module"></span><h1>duplicity.gpginterface module<a class="headerlink" href="#module-duplicity.gpginterface" title="Permalink to this headline">¶</a></h1>
+<p>Interface to GNU Privacy Guard (GnuPG)</p>
+<dl class="docutils">
+<dt>!!! This was renamed to gpginterface.py.</dt>
+<dd>Please refer to duplicity&#8217;s README for the reason. !!!</dd>
+</dl>
+<p>gpginterface is a Python module to interface with GnuPG which based on
+GnuPGInterface by Frank J. Tobin.
+It concentrates on interacting with GnuPG via filehandles,
+providing access to control GnuPG via versatile and extensible means.</p>
+<p>This module is based on GnuPG::Interface, a Perl module by the same author.</p>
+<p>Normally, using this module will involve creating a
+GnuPG object, setting some options in it&#8217;s &#8216;options&#8217; data member
+(which is of type Options), creating some pipes
+to talk with GnuPG, and then calling the run() method, which will
+connect those pipes to the GnuPG process. run() returns a
+Process object, which contains the filehandles to talk to GnuPG with.</p>
+<p>Example code:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">gpginterface</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plaintext</span>  <span class="o">=</span> <span class="s2">&quot;Three blind mice&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">passphrase</span> <span class="o">=</span> <span class="s2">&quot;This is the passphrase&quot;</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gnupg</span> <span class="o">=</span> <span class="n">gpginterface</span><span class="o">.</span><span class="n">GnuPG</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">armor</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">meta_interactive</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">extra_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--no-secmem-warning&#39;</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Normally we might specify something in</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># gnupg.options.recipients, like</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># gnupg.options.recipients = [ &#39;0xABCD1234&#39;, &#39;bob@foo.bar&#39; ]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># but since we&#39;re doing symmetric-only encryption, it&#39;s not needed.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># If you are doing standard, public-key encryption, using</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># --encrypt, you will need to specify recipients before</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># calling gnupg.run()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># First we&#39;ll encrypt the test_text input symmetrically</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">gnupg</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s1">&#39;--symmetric&#39;</span><span class="p">],</span>
+<span class="gp">... </span>               <span class="n">create_fhs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">,</span> <span class="s1">&#39;stdout&#39;</span><span class="p">,</span> <span class="s1">&#39;passphrase&#39;</span><span class="p">])</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;passphrase&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">passphrase</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;passphrase&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">plaintext</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ciphertext</span> <span class="o">=</span> <span class="n">p1</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;stdout&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;stdout&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># process cleanup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Now we&#39;ll decrypt what we just encrypted it,</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># using the convience method to get the</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># passphrase to GnuPG</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gnupg</span><span class="o">.</span><span class="n">passphrase</span> <span class="o">=</span> <span class="n">passphrase</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span> <span class="o">=</span> <span class="n">gnupg</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s1">&#39;--decrypt&#39;</span><span class="p">],</span> <span class="n">create_fhs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">,</span> <span class="s1">&#39;stdout&#39;</span><span class="p">])</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_plaintext</span> <span class="o">=</span> <span class="n">p2</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;stdout&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;stdout&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># process cleanup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Our decrypted plaintext:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_plaintext</span>
+<span class="go">&#39;Three blind mice&#39;</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># ...and see it&#39;s the same as what we orignally encrypted</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">decrypted_plaintext</span> <span class="o">==</span> <span class="n">plaintext</span><span class="p">,</span>           <span class="s2">&quot;GnuPG decrypted output does not match original input&quot;</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">##################################################</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Now let&#39;s trying using run()&#39;s attach_fhs paramter</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># we&#39;re assuming we&#39;re running on a unix...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;/etc/motd&#39;</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">gnupg</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s1">&#39;--symmetric&#39;</span><span class="p">],</span> <span class="n">create_fhs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;stdout&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                <span class="n">attach_fhs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;stdin&#39;</span><span class="p">:</span> <span class="nb">input</span><span class="p">})</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># GnuPG will read the stdin from /etc/motd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ciphertext</span> <span class="o">=</span> <span class="n">p1</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;stdout&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># process cleanup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Now let&#39;s run the output through GnuPG</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># We&#39;ll write the output to a temporary file,</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">temp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryFile</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span> <span class="o">=</span> <span class="n">gnupg</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s1">&#39;--decrypt&#39;</span><span class="p">],</span> <span class="n">create_fhs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                              <span class="n">attach_fhs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;stdout&#39;</span><span class="p">:</span> <span class="n">temp</span><span class="p">})</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># give GnuPG our encrypted stuff from the first run</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># process cleanup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># rewind the tempfile and see what GnuPG gave us</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">temp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_plaintext</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># compare what GnuPG decrypted with our original input</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">input_data</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">decrypted_plaintext</span> <span class="o">==</span> <span class="n">input_data</span><span class="p">,</span>            <span class="s2">&quot;GnuPG decrypted output does not match original input&quot;</span>
+</pre></div>
+</div>
+<p>To do things like public-key encryption, simply pass do something
+like:</p>
+<p>gnupg.passphrase = &#8216;My passphrase&#8217;
+gnupg.options.recipients = [ <a class="reference external" href="mailto:'bob&#37;&#52;&#48;foobar&#46;com">'bob<span>&#64;</span>foobar<span>&#46;</span>com</a>&#8216; ]
+gnupg.run( [&#8216;&#8211;sign&#8217;, &#8216;&#8211;encrypt&#8217;], create_fhs=..., attach_fhs=...)</p>
+<p>Here is an example of subclassing gpginterface.GnuPG,
+so that it has an encrypt_string() method that returns
+ciphertext.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">gpginterface</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyGnuPG</span><span class="p">(</span><span class="n">gpginterface</span><span class="o">.</span><span class="n">GnuPG</span><span class="p">):</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="n">gpginterface</span><span class="o">.</span><span class="n">GnuPG</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">setup_my_options</span><span class="p">()</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">setup_my_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">armor</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">meta_interactive</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">extra_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--no-secmem-warning&#39;</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">encrypt_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">string</span><span class="p">,</span> <span class="n">recipients</span><span class="p">):</span>
+<span class="gp">... </span>       <span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">recipients</span> <span class="o">=</span> <span class="n">recipients</span>   <span class="c1"># a list!</span>
+<span class="gp">...</span>
+<span class="gp">... </span>       <span class="n">proc</span> <span class="o">=</span> <span class="n">gnupg</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s1">&#39;--encrypt&#39;</span><span class="p">],</span> <span class="n">create_fhs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">,</span> <span class="s1">&#39;stdout&#39;</span><span class="p">])</span>
+<span class="gp">...</span>
+<span class="gp">... </span>       <span class="n">proc</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="gp">... </span>       <span class="n">proc</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="gp">...</span>
+<span class="gp">... </span>       <span class="n">output</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;stdout&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="gp">... </span>       <span class="n">proc</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;stdout&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="gp">...</span>
+<span class="gp">... </span>       <span class="n">proc</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+<span class="gp">... </span>       <span class="k">return</span> <span class="n">output</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gnupg</span> <span class="o">=</span> <span class="n">MyGnuPG</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ciphertext</span> <span class="o">=</span> <span class="n">gnupg</span><span class="o">.</span><span class="n">encrypt_string</span><span class="p">(</span><span class="s2">&quot;The secret&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;0x260C4FA3&#39;</span><span class="p">])</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># just a small sanity test here for doctest</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">types</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">StringType</span><span class="p">),</span>            <span class="s2">&quot;What GnuPG gave back is not a string!&quot;</span>
+</pre></div>
+</div>
+<p>Here is an example of generating a key:
+&gt;&gt;&gt; import gpginterface
+&gt;&gt;&gt; gnupg = gpginterface.GnuPG()
+&gt;&gt;&gt; gnupg.options.meta_interactive = 0
+&gt;&gt;&gt;
+&gt;&gt;&gt; # We will be creative and use the logger filehandle to capture
+&gt;&gt;&gt; # what GnuPG says this time, instead stderr; no stdout to listen to,
+&gt;&gt;&gt; # but we capture logger to surpress the dry-run command.
+&gt;&gt;&gt; # We also have to capture stdout since otherwise doctest complains;
+&gt;&gt;&gt; # Normally you can let stdout through when generating a key.
+&gt;&gt;&gt;
+&gt;&gt;&gt; proc = gnupg.run([&#8216;&#8211;gen-key&#8217;], create_fhs=[&#8216;stdin&#8217;, &#8216;stdout&#8217;,
+...                                             &#8216;logger&#8217;])
+&gt;&gt;&gt;
+&gt;&gt;&gt; proc.handles[&#8216;stdin&#8217;].write(&#8216;&#8217;&#8216;Key-Type: DSA
+... Key-Length: 1024
+... # We are only testing syntax this time, so dry-run
+... %dry-run
+... Subkey-Type: ELG-E
+... Subkey-Length: 1024
+... Name-Real: Joe Tester
+... Name-Comment: with stupid passphrase
+... Name-Email: <a class="reference external" href="mailto:joe&#37;&#52;&#48;foo&#46;bar">joe<span>&#64;</span>foo<span>&#46;</span>bar</a>
+... Expire-Date: 2y
+... Passphrase: abc
+... %pubring foo.pub
+... %secring foo.sec
+... &#8216;&#8217;&#8216;)
+&gt;&gt;&gt;
+&gt;&gt;&gt; proc.handles[&#8216;stdin&#8217;].close()
+&gt;&gt;&gt;
+&gt;&gt;&gt; report = proc.handles[&#8216;logger&#8217;].read()
+&gt;&gt;&gt; proc.handles[&#8216;logger&#8217;].close()
+&gt;&gt;&gt;
+&gt;&gt;&gt; proc.wait()</p>
+<p>COPYRIGHT:</p>
+<p>Copyright (C) 2001  Frank J. Tobin, <a class="reference external" href="mailto:ftobin&#37;&#52;&#48;neverending&#46;org">ftobin<span>&#64;</span>neverending<span>&#46;</span>org</a></p>
+<p>LICENSE:</p>
+<p>This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.</p>
+<p>This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.</p>
+<p>You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+or see <a class="reference external" href="http://www.gnu.org/copyleft/lesser.html">http://www.gnu.org/copyleft/lesser.html</a></p>
+<dl class="class">
+<dt id="duplicity.gpginterface.GnuPG">
+<em class="property">class </em><code class="descclassname">duplicity.gpginterface.</code><code class="descname">GnuPG</code><a class="reference internal" href="_modules/duplicity/gpginterface.html#GnuPG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.gpginterface.GnuPG" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class instances represent GnuPG.</p>
+<p>Instance attributes of a GnuPG object are:</p>
+<ul class="simple">
+<li>call &#8211; string to call GnuPG with.  Defaults to &#8220;gpg&#8221;</li>
+<li>passphrase &#8211; Since it is a common operation
+to pass in a passphrase to GnuPG,
+and working with the passphrase filehandle mechanism directly
+can be mundane, if set, the passphrase attribute
+works in a special manner.  If the passphrase attribute is set,
+and no passphrase file object is sent in to run(),
+then GnuPG instnace will take care of sending the passphrase to
+GnuPG, the executable instead of having the user sent it in manually.</li>
+<li>options &#8211; Object of type gpginterface.Options.
+Attribute-setting in options determines
+the command-line options used when calling GnuPG.</li>
+</ul>
+<dl class="method">
+<dt id="duplicity.gpginterface.GnuPG.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>gnupg_commands</em>, <em>args=None</em>, <em>create_fhs=None</em>, <em>attach_fhs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/gpginterface.html#GnuPG.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.gpginterface.GnuPG.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls GnuPG with the list of string commands gnupg_commands,
+complete with prefixing dashes.
+For example, gnupg_commands could be
+&#8216;[&#8220;&#8211;sign&#8221;, &#8220;&#8211;encrypt&#8221;]&#8217;
+Returns a gpginterface.Process object.</p>
+<p>args is an optional list of GnuPG command arguments (not options),
+such as keyID&#8217;s to export, filenames to process, etc.</p>
+<p>create_fhs is an optional list of GnuPG filehandle
+names that will be set as keys of the returned Process object&#8217;s
+&#8216;handles&#8217; attribute.  The generated filehandles can be used
+to communicate with GnuPG via standard input, standard output,
+the status-fd, passphrase-fd, etc.</p>
+<dl class="docutils">
+<dt>Valid GnuPG filehandle names are:</dt>
+<dd><ul class="first last simple">
+<li>stdin</li>
+<li>stdout</li>
+<li>stderr</li>
+<li>status</li>
+<li>passphase</li>
+<li>command</li>
+<li>logger</li>
+</ul>
+</dd>
+</dl>
+<p>The purpose of each filehandle is described in the GnuPG
+documentation.</p>
+<p>attach_fhs is an optional dictionary with GnuPG filehandle
+names mapping to opened files.  GnuPG will read or write
+to the file accordingly.  For example, if &#8216;my_file&#8217; is an
+opened file and &#8216;attach_fhs[stdin] is my_file&#8217;, then GnuPG
+will read its standard input from my_file. This is useful
+if you want GnuPG to read/write to/from an existing file.
+For instance:</p>
+<blockquote>
+<div>f = open(&#8220;encrypted.gpg&#8221;)
+gnupg.run([&#8220;&#8211;decrypt&#8221;], attach_fhs={&#8216;stdin&#8217;: f})</div></blockquote>
+<p>Using attach_fhs also helps avoid system buffering
+issues that can arise when using create_fhs, which
+can cause the process to deadlock.</p>
+<p>If not mentioned in create_fhs or attach_fhs,
+GnuPG filehandles which are a std* (stdin, stdout, stderr)
+are defaulted to the running process&#8217; version of handle.
+Otherwise, that type of handle is simply not used when calling GnuPG.
+For example, if you do not care about getting data from GnuPG&#8217;s
+status filehandle, simply do not specify it.</p>
+<p>run() returns a Process() object which has a &#8216;handles&#8217;
+which is a dictionary mapping from the handle name
+(such as &#8216;stdin&#8217; or &#8216;stdout&#8217;) to the respective
+newly-created FileObject connected to the running GnuPG process.
+For instance, if the call was</p>
+<blockquote>
+<div>process = gnupg.run([&#8220;&#8211;decrypt&#8221;], stdin=1)</div></blockquote>
+<p>after run returns &#8216;process.handles[&#8220;stdin&#8221;]&#8217;
+is a FileObject connected to GnuPG&#8217;s standard input,
+and can be written to.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.gpginterface.GnuPGInterface">
+<code class="descclassname">duplicity.gpginterface.</code><code class="descname">GnuPGInterface</code><a class="headerlink" href="#duplicity.gpginterface.GnuPGInterface" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#duplicity.gpginterface.GnuPG" title="duplicity.gpginterface.GnuPG"><code class="xref py py-class docutils literal"><span class="pre">GnuPG</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.gpginterface.Options">
+<em class="property">class </em><code class="descclassname">duplicity.gpginterface.</code><code class="descname">Options</code><a class="reference internal" href="_modules/duplicity/gpginterface.html#Options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.gpginterface.Options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Objects of this class encompass options passed to GnuPG.
+This class is responsible for determining command-line arguments
+which are based on options.  It can be said that a GnuPG
+object has-a Options object in its options attribute.</p>
+<p>Attributes which correlate directly to GnuPG options:</p>
+<p>Each option here defaults to false or None, and is described in
+GnuPG documentation.</p>
+<p>Booleans (set these attributes to booleans)</p>
+<blockquote>
+<div><ul class="simple">
+<li>armor</li>
+<li>no_greeting</li>
+<li>no_verbose</li>
+<li>quiet</li>
+<li>batch</li>
+<li>always_trust</li>
+<li>rfc1991</li>
+<li>openpgp</li>
+<li>force_v3_sigs</li>
+<li>no_options</li>
+<li>textmode</li>
+</ul>
+</div></blockquote>
+<p>Strings (set these attributes to strings)</p>
+<blockquote>
+<div><ul class="simple">
+<li>homedir</li>
+<li>default_key</li>
+<li>comment</li>
+<li>compress_algo</li>
+<li>options</li>
+</ul>
+</div></blockquote>
+<p>Lists (set these attributes to lists)</p>
+<blockquote>
+<div><ul class="simple">
+<li>recipients  (<strong>*NOTE*</strong> plural of &#8216;recipient&#8217;)</li>
+<li>encrypt_to</li>
+</ul>
+</div></blockquote>
+<p>Meta options</p>
+<p>Meta options are options provided by this module that do
+not correlate directly to any GnuPG option by name,
+but are rather bundle of options used to accomplish
+a specific goal, such as obtaining compatibility with PGP 5.
+The actual arguments each of these reflects may change with time.  Each
+defaults to false unless otherwise specified.</p>
+<p>meta_pgp_5_compatible &#8211; If true, arguments are generated to try
+to be compatible with PGP 5.x.</p>
+<p>meta_pgp_2_compatible &#8211; If true, arguments are generated to try
+to be compatible with PGP 2.x.</p>
+<p>meta_interactive &#8211; If false, arguments are generated to try to
+help the using program use GnuPG in a non-interactive
+environment, such as CGI scripts.  Default is true.</p>
+<p>extra_args &#8211; Extra option arguments may be passed in
+via the attribute extra_args, a list.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">gpginterface</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gnupg</span> <span class="o">=</span> <span class="n">gpginterface</span><span class="o">.</span><span class="n">GnuPG</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">armor</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">recipients</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Alice&#39;</span><span class="p">,</span> <span class="s1">&#39;Bob&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">extra_args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;--no-secmem-warning&#39;</span><span class="p">]</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># no need for users to call this normally; just for show here</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get_args</span><span class="p">()</span>
+<span class="go">[&#39;--armor&#39;, &#39;--recipient&#39;, &#39;Alice&#39;, &#39;--recipient&#39;, &#39;Bob&#39;, &#39;--no-secmem-warning&#39;]</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="duplicity.gpginterface.Options.get_args">
+<code class="descname">get_args</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/gpginterface.html#Options.get_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.gpginterface.Options.get_args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a list of GnuPG arguments based upon attributes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.gpginterface.Options.get_meta_args">
+<code class="descname">get_meta_args</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/gpginterface.html#Options.get_meta_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.gpginterface.Options.get_meta_args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a list of generated meta-arguments</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.gpginterface.Options.get_standard_args">
+<code class="descname">get_standard_args</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/gpginterface.html#Options.get_standard_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.gpginterface.Options.get_standard_args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a list of standard, non-meta or extra arguments</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.gpginterface.Pipe">
+<em class="property">class </em><code class="descclassname">duplicity.gpginterface.</code><code class="descname">Pipe</code><span class="sig-paren">(</span><em>parent</em>, <em>child</em>, <em>direct</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/gpginterface.html#Pipe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.gpginterface.Pipe" title="Permalink to this definition">¶</a></dt>
+<dd><p>simple struct holding stuff about pipes we use</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.gpginterface.Process">
+<em class="property">class </em><code class="descclassname">duplicity.gpginterface.</code><code class="descname">Process</code><a class="reference internal" href="_modules/duplicity/gpginterface.html#Process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.gpginterface.Process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Objects of this class encompass properties of a GnuPG
+process spawned by GnuPG.run().</p>
+<p># gnupg is a GnuPG object
+process = gnupg.run( [ &#8216;&#8211;decrypt&#8217; ], stdout = 1 )
+out = process.handles[&#8216;stdout&#8217;].read()
+...
+os.waitpid( process.pid, 0 )</p>
+<p>Data Attributes</p>
+<p>handles &#8211; This is a map of filehandle-names to
+the file handles, if any, that were requested via run() and hence
+are connected to the running GnuPG process.  Valid names
+of this map are only those handles that were requested.</p>
+<p>pid &#8211; The PID of the spawned GnuPG process.
+Useful to know, since once should call
+os.waitpid() to clean up the process, especially
+if multiple calls are made to run().</p>
+<dl class="method">
+<dt id="duplicity.gpginterface.Process.wait">
+<code class="descname">wait</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/gpginterface.html#Process.wait"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.gpginterface.Process.wait" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait on threaded_waitpid to exit and examine results.
+Will raise an IOError if the process exits non-zero.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.gpginterface.threaded_waitpid">
+<code class="descclassname">duplicity.gpginterface.</code><code class="descname">threaded_waitpid</code><span class="sig-paren">(</span><em>process</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/gpginterface.html#threaded_waitpid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.gpginterface.threaded_waitpid" title="Permalink to this definition">¶</a></dt>
+<dd><p>When started as a thread with the Process object, thread
+will execute an immediate waitpid() against the process
+pid and will collect the process termination info.  This
+will allow us to reap child processes as soon as possible,
+thus freeing resources quickly.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="duplicity.html">duplicity package</a><ul>
+      <li>Previous: <a href="duplicity.gpg.html" title="previous chapter">duplicity.gpg module</a></li>
+      <li>Next: <a href="duplicity.lazy.html" title="next chapter">duplicity.lazy module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/duplicity.gpginterface.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/duplicity.gpginterface.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

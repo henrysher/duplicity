@@ -1,0 +1,364 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.dup_temp &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.dup_temp</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2002 Ben Escoto &lt;ben@emerose.org&gt;</span>
+<span class="c1"># Copyright 2007 Kenneth Loafman &lt;kenneth@loafman.com&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="sd">&quot;&quot;&quot;Manage temporary files&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">path</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">file_naming</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">tempdir</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="nb">globals</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">gpg</span>
+
+
+<div class="viewcode-block" id="new_temppath"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.new_temppath">[docs]</a><span class="k">def</span> <span class="nf">new_temppath</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a new TempPath</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">tempdir</span><span class="o">.</span><span class="n">default</span><span class="p">()</span><span class="o">.</span><span class="n">mktemp</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">TempPath</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TempPath"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.TempPath">[docs]</a><span class="k">class</span> <span class="nc">TempPath</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">Path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Path object used as a temporary file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="TempPath.delete"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.TempPath.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Forget and delete</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">Path</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">tempdir</span><span class="o">.</span><span class="n">default</span><span class="p">()</span><span class="o">.</span><span class="n">forget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TempPath.open_with_delete"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.TempPath.open_with_delete">[docs]</a>    <span class="k">def</span> <span class="nf">open_with_delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a fileobj.  When that is closed, delete file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fh</span> <span class="o">=</span> <span class="n">FileobjHooked</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">Path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">))</span>
+        <span class="n">fh</span><span class="o">.</span><span class="n">addhook</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delete</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fh</span></div></div>
+
+
+<div class="viewcode-block" id="get_fileobj_duppath"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.get_fileobj_duppath">[docs]</a><span class="k">def</span> <span class="nf">get_fileobj_duppath</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">partname</span><span class="p">,</span> <span class="n">permname</span><span class="p">,</span> <span class="n">remname</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a file object open for writing, will write to filename</span>
+
+<span class="sd">    Data will be processed and written to a temporary file.  When the</span>
+<span class="sd">    return fileobject is closed, rename to final position.  filename</span>
+<span class="sd">    must be a recognizable duplicity data file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">globals</span><span class="o">.</span><span class="n">restart</span><span class="p">:</span>
+        <span class="n">td</span> <span class="o">=</span> <span class="n">tempdir</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">(</span><span class="n">dirpath</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">tdpname</span> <span class="o">=</span> <span class="n">td</span><span class="o">.</span><span class="n">mktemp</span><span class="p">()</span>
+        <span class="n">tdp</span> <span class="o">=</span> <span class="n">TempDupPath</span><span class="p">(</span><span class="n">tdpname</span><span class="p">,</span> <span class="n">parseresults</span><span class="o">=</span><span class="n">file_naming</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">partname</span><span class="p">))</span>
+        <span class="n">fh</span> <span class="o">=</span> <span class="n">FileobjHooked</span><span class="p">(</span><span class="n">tdp</span><span class="o">.</span><span class="n">filtered_open</span><span class="p">(</span><span class="s2">&quot;wb&quot;</span><span class="p">),</span> <span class="n">tdp</span><span class="o">=</span><span class="n">tdp</span><span class="p">,</span> <span class="n">dirpath</span><span class="o">=</span><span class="n">dirpath</span><span class="p">,</span>
+                           <span class="n">partname</span><span class="o">=</span><span class="n">partname</span><span class="p">,</span> <span class="n">permname</span><span class="o">=</span><span class="n">permname</span><span class="p">,</span> <span class="n">remname</span><span class="o">=</span><span class="n">remname</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dp</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">DupPath</span><span class="p">(</span><span class="n">dirpath</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">(</span><span class="n">partname</span><span class="p">,))</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;ab&quot;</span>
+        <span class="k">if</span> <span class="n">overwrite</span><span class="p">:</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;wb&quot;</span>
+        <span class="n">fh</span> <span class="o">=</span> <span class="n">FileobjHooked</span><span class="p">(</span><span class="n">dp</span><span class="o">.</span><span class="n">filtered_open</span><span class="p">(</span><span class="n">mode</span><span class="p">),</span> <span class="n">tdp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dirpath</span><span class="o">=</span><span class="n">dirpath</span><span class="p">,</span>
+                           <span class="n">partname</span><span class="o">=</span><span class="n">partname</span><span class="p">,</span> <span class="n">permname</span><span class="o">=</span><span class="n">permname</span><span class="p">,</span> <span class="n">remname</span><span class="o">=</span><span class="n">remname</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">rename_and_forget</span><span class="p">():</span>
+        <span class="n">tdp</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">dirpath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">partname</span><span class="p">))</span>
+        <span class="n">td</span><span class="o">.</span><span class="n">forget</span><span class="p">(</span><span class="n">tdpname</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">globals</span><span class="o">.</span><span class="n">restart</span><span class="p">:</span>
+        <span class="n">fh</span><span class="o">.</span><span class="n">addhook</span><span class="p">(</span><span class="n">rename_and_forget</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fh</span></div>
+
+
+<div class="viewcode-block" id="new_tempduppath"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.new_tempduppath">[docs]</a><span class="k">def</span> <span class="nf">new_tempduppath</span><span class="p">(</span><span class="n">parseresults</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a new TempDupPath, using settings from parseresults</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">tempdir</span><span class="o">.</span><span class="n">default</span><span class="p">()</span><span class="o">.</span><span class="n">mktemp</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">TempDupPath</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">parseresults</span><span class="o">=</span><span class="n">parseresults</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TempDupPath"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.TempDupPath">[docs]</a><span class="k">class</span> <span class="nc">TempDupPath</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">DupPath</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Like TempPath, but build around DupPath</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="TempDupPath.delete"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.TempDupPath.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Forget and delete</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">DupPath</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">tempdir</span><span class="o">.</span><span class="n">default</span><span class="p">()</span><span class="o">.</span><span class="n">forget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TempDupPath.filtered_open_with_delete"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.TempDupPath.filtered_open_with_delete">[docs]</a>    <span class="k">def</span> <span class="nf">filtered_open_with_delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a filtered fileobj.  When that is closed, delete file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fh</span> <span class="o">=</span> <span class="n">FileobjHooked</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">DupPath</span><span class="o">.</span><span class="n">filtered_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">))</span>
+        <span class="n">fh</span><span class="o">.</span><span class="n">addhook</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delete</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fh</span></div>
+
+<div class="viewcode-block" id="TempDupPath.open_with_delete"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.TempDupPath.open_with_delete">[docs]</a>    <span class="k">def</span> <span class="nf">open_with_delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;rb&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a fileobj.  When that is closed, delete file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;rb&quot;</span>  <span class="c1"># Why write a file and then close it immediately?</span>
+        <span class="n">fh</span> <span class="o">=</span> <span class="n">FileobjHooked</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">DupPath</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">))</span>
+        <span class="n">fh</span><span class="o">.</span><span class="n">addhook</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delete</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fh</span></div></div>
+
+
+<div class="viewcode-block" id="FileobjHooked"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.FileobjHooked">[docs]</a><span class="k">class</span> <span class="nc">FileobjHooked</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simulate a file, but add hook on close</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileobj</span><span class="p">,</span> <span class="n">tdp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dirpath</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">partname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">permname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">remname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializer.  fileobj is the file object to simulate</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span> <span class="o">=</span> <span class="n">fileobj</span>  <span class="c1"># the actual file object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">closed</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># True if closed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hooklist</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># filled later with thunks to run on close</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tdp</span> <span class="o">=</span> <span class="n">tdp</span>  <span class="c1"># TempDupPath object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dirpath</span> <span class="o">=</span> <span class="n">dirpath</span>  <span class="c1"># path to directory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">partname</span> <span class="o">=</span> <span class="n">partname</span>  <span class="c1"># partial filename</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">permname</span> <span class="o">=</span> <span class="n">permname</span>  <span class="c1"># permanent filename</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remname</span> <span class="o">=</span> <span class="n">remname</span>  <span class="c1"># remote filename</span>
+
+<div class="viewcode-block" id="FileobjHooked.write"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.FileobjHooked.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buf</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write fileobj, return result of write()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FileobjHooked.flush"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.FileobjHooked.flush">[docs]</a>    <span class="k">def</span> <span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Flush fileobj and force sync.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">fsync</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span><span class="o">.</span><span class="n">fileno</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="FileobjHooked.to_partial"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.FileobjHooked.to_partial">[docs]</a>    <span class="k">def</span> <span class="nf">to_partial</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        We have achieved the first checkpoint, make file visible and permanent.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="nb">globals</span><span class="o">.</span><span class="n">restart</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tdp</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dirpath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">partname</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooklist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="FileobjHooked.to_remote"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.FileobjHooked.to_remote">[docs]</a>    <span class="k">def</span> <span class="nf">to_remote</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        We have written the last checkpoint, now encrypt or compress</span>
+<span class="sd">        and send a copy of it to the remote for final storage.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pr</span> <span class="o">=</span> <span class="n">file_naming</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remname</span><span class="p">)</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirpath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">partname</span><span class="p">)</span>
+        <span class="n">tgt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirpath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remname</span><span class="p">)</span>
+        <span class="n">src_iter</span> <span class="o">=</span> <span class="n">SrcIter</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pr</span><span class="o">.</span><span class="n">compressed</span><span class="p">:</span>
+            <span class="n">gpg</span><span class="o">.</span><span class="n">GzipWriteFile</span><span class="p">(</span><span class="n">src_iter</span><span class="p">,</span> <span class="n">tgt</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">pr</span><span class="o">.</span><span class="n">encrypted</span><span class="p">:</span>
+            <span class="n">gpg</span><span class="o">.</span><span class="n">GPGWriteFile</span><span class="p">(</span><span class="n">src_iter</span><span class="p">,</span> <span class="n">tgt</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">globals</span><span class="o">.</span><span class="n">gpg_profile</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;cp -p </span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s2"> </span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">tgt</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="nb">globals</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">tgt</span><span class="p">)</span>  <span class="c1"># @UndefinedVariable</span></div>
+
+<div class="viewcode-block" id="FileobjHooked.to_final"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.FileobjHooked.to_final">[docs]</a>    <span class="k">def</span> <span class="nf">to_final</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        We are finished, rename to final, gzip if needed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirpath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">partname</span><span class="p">)</span>
+        <span class="n">tgt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirpath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">permname</span><span class="p">)</span>
+        <span class="n">src_iter</span> <span class="o">=</span> <span class="n">SrcIter</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
+        <span class="n">pr</span> <span class="o">=</span> <span class="n">file_naming</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">permname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pr</span><span class="o">.</span><span class="n">compressed</span><span class="p">:</span>
+            <span class="n">gpg</span><span class="o">.</span><span class="n">GzipWriteFile</span><span class="p">(</span><span class="n">src_iter</span><span class="p">,</span> <span class="n">tgt</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">tgt</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FileobjHooked.read"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.FileobjHooked.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read fileobj, return result of read()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">length</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FileobjHooked.tell"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.FileobjHooked.tell">[docs]</a>    <span class="k">def</span> <span class="nf">tell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns current location of fileobj</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="FileobjHooked.seek"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.FileobjHooked.seek">[docs]</a>    <span class="k">def</span> <span class="nf">seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Seeks to a location of fileobj</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FileobjHooked.close"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.FileobjHooked.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Close fileobj, running hooks right afterwards</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooklist</span><span class="p">:</span>
+            <span class="n">hook</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="FileobjHooked.addhook"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.FileobjHooked.addhook">[docs]</a>    <span class="k">def</span> <span class="nf">addhook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hook</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add hook (function taking no arguments) to run upon closing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hooklist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hook</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FileobjHooked.get_name"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.FileobjHooked.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the name of the file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span><span class="o">.</span><span class="n">name</span></div>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Block"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.Block">[docs]</a><span class="k">class</span> <span class="nc">Block</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Data block to return from SrcIter</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="SrcIter"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.SrcIter">[docs]</a><span class="k">class</span> <span class="nc">SrcIter</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Iterate over source and return Block of data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">src</span> <span class="o">=</span> <span class="n">src</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SrcIter.next"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.SrcIter.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">Block</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_read_size</span><span class="p">()))</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">FatalError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Failed to read </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span>
+                           <span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()),</span>
+                           <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">generic</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span>
+        <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="SrcIter.get_read_size"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.SrcIter.get_read_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_read_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">128</span> <span class="o">*</span> <span class="mi">1024</span></div>
+
+<div class="viewcode-block" id="SrcIter.get_footer"><a class="viewcode-back" href="../../duplicity.dup_temp.html#duplicity.dup_temp.SrcIter.get_footer">[docs]</a>    <span class="k">def</span> <span class="nf">get_footer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

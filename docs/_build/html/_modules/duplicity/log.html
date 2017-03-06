@@ -1,0 +1,519 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.log &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.log</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2002 Ben Escoto &lt;ben@emerose.org&gt;</span>
+<span class="c1"># Copyright 2007 Kenneth Loafman &lt;kenneth@loafman.com&gt;</span>
+<span class="c1"># Copyright 2008 Michael Terry &lt;mike@mterry.name&gt;</span>
+<span class="c1"># Copyright 2011 Canonical Ltd</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="sd">&quot;&quot;&quot;Log various messages depending on verbosity level&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="n">MIN</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">ERROR</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">WARNING</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">NOTICE</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">INFO</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">DEBUG</span> <span class="o">=</span> <span class="mi">9</span>
+<span class="n">MAX</span> <span class="o">=</span> <span class="mi">9</span>
+
+<span class="n">_logger</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="DupToLoggerLevel"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.DupToLoggerLevel">[docs]</a><span class="k">def</span> <span class="nf">DupToLoggerLevel</span><span class="p">(</span><span class="n">verb</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert duplicity level to the logging module&#39;s system, where higher is</span>
+<span class="sd">       more severe&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">MAX</span> <span class="o">-</span> <span class="n">verb</span> <span class="o">+</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="LoggerToDupLevel"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.LoggerToDupLevel">[docs]</a><span class="k">def</span> <span class="nf">LoggerToDupLevel</span><span class="p">(</span><span class="n">verb</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert logging module level to duplicity&#39;s system, where lowere is</span>
+<span class="sd">       more severe&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">DupToLoggerLevel</span><span class="p">(</span><span class="n">verb</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LevelName"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.LevelName">[docs]</a><span class="k">def</span> <span class="nf">LevelName</span><span class="p">(</span><span class="n">level</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">level</span> <span class="o">&gt;=</span> <span class="mi">9</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;DEBUG&quot;</span>
+    <span class="k">elif</span> <span class="n">level</span> <span class="o">&gt;=</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;INFO&quot;</span>
+    <span class="k">elif</span> <span class="n">level</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;NOTICE&quot;</span>
+    <span class="k">elif</span> <span class="n">level</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;WARNING&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;ERROR&quot;</span></div>
+
+
+<div class="viewcode-block" id="Log"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.Log">[docs]</a><span class="k">def</span> <span class="nf">Log</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">verb_level</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force_print</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Write s to stderr if verbosity level low enough&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_logger</span>
+    <span class="k">if</span> <span class="n">extra</span><span class="p">:</span>
+        <span class="n">controlLine</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">extra</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">controlLine</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">code</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">s</span><span class="p">:</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>  <span class="c1"># If None is passed, standard logging would render it as &#39;None&#39;</span>
+
+    <span class="k">if</span> <span class="n">force_print</span><span class="p">:</span>
+        <span class="n">initial_level</span> <span class="o">=</span> <span class="n">_logger</span><span class="o">.</span><span class="n">getEffectiveLevel</span><span class="p">()</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">DupToLoggerLevel</span><span class="p">(</span><span class="n">MAX</span><span class="p">))</span>
+
+    <span class="c1"># If all the backends kindly gave us unicode, we could enable this next</span>
+    <span class="c1"># assert line.  As it is, we&#39;ll attempt to convert s to unicode if we</span>
+    <span class="c1"># are handed bytes.  One day we should update the backends.</span>
+    <span class="c1"># assert isinstance(s, unicode)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">unicode</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">,</span> <span class="s2">&quot;replace&quot;</span><span class="p">)</span>
+
+    <span class="n">_logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">DupToLoggerLevel</span><span class="p">(</span><span class="n">verb_level</span><span class="p">),</span> <span class="n">s</span><span class="p">,</span>
+                <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;levelName&#39;</span><span class="p">:</span> <span class="n">LevelName</span><span class="p">(</span><span class="n">verb_level</span><span class="p">),</span>
+                       <span class="s1">&#39;controlLine&#39;</span><span class="p">:</span> <span class="n">controlLine</span><span class="p">})</span>
+
+    <span class="k">if</span> <span class="n">force_print</span><span class="p">:</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">initial_level</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Debug"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.Debug">[docs]</a><span class="k">def</span> <span class="nf">Debug</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Shortcut used for debug message (verbosity 9).&quot;&quot;&quot;</span>
+    <span class="n">Log</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">DEBUG</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InfoCode"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.InfoCode">[docs]</a><span class="k">class</span> <span class="nc">InfoCode</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Enumeration class to hold info code values.</span>
+<span class="sd">       These values should never change, as frontends rely upon them.</span>
+<span class="sd">       Don&#39;t use 0 or negative numbers.&quot;&quot;&quot;</span>
+    <span class="n">generic</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">progress</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">collection_status</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">diff_file_new</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">diff_file_changed</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">diff_file_deleted</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">patch_file_writing</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">patch_file_patching</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="c1"># file_list = 9 # 9 isn&#39;t used anymore.  It corresponds to an older syntax for listing files</span>
+    <span class="n">file_list</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">synchronous_upload_begin</span> <span class="o">=</span> <span class="mi">11</span>
+    <span class="n">asynchronous_upload_begin</span> <span class="o">=</span> <span class="mi">12</span>
+    <span class="n">synchronous_upload_done</span> <span class="o">=</span> <span class="mi">13</span>
+    <span class="n">asynchronous_upload_done</span> <span class="o">=</span> <span class="mi">14</span>
+    <span class="n">skipping_socket</span> <span class="o">=</span> <span class="mi">15</span>
+    <span class="n">upload_progress</span> <span class="o">=</span> <span class="mi">16</span></div>
+
+
+<div class="viewcode-block" id="Info"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.Info">[docs]</a><span class="k">def</span> <span class="nf">Info</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">InfoCode</span><span class="o">.</span><span class="n">generic</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Shortcut used for info messages (verbosity 5).&quot;&quot;&quot;</span>
+    <span class="n">Log</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">INFO</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">extra</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Progress"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.Progress">[docs]</a><span class="k">def</span> <span class="nf">Progress</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">current</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Shortcut used for progress messages (verbosity 5).&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">total</span><span class="p">:</span>
+        <span class="n">controlLine</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="n">total</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">controlLine</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">current</span>
+    <span class="n">Log</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">INFO</span><span class="p">,</span> <span class="n">InfoCode</span><span class="o">.</span><span class="n">progress</span><span class="p">,</span> <span class="n">controlLine</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_ElapsedSecs2Str</span><span class="p">(</span><span class="n">secs</span><span class="p">):</span>
+    <span class="n">tdelta</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">secs</span><span class="p">)</span>
+    <span class="n">hours</span><span class="p">,</span> <span class="n">rem</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">tdelta</span><span class="o">.</span><span class="n">seconds</span><span class="p">,</span> <span class="mi">3600</span><span class="p">)</span>
+    <span class="n">minutes</span><span class="p">,</span> <span class="n">seconds</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">rem</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">tdelta</span><span class="o">.</span><span class="n">days</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">d,&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tdelta</span><span class="o">.</span><span class="n">days</span><span class="p">)</span>
+    <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s%02d</span><span class="s2">:</span><span class="si">%02d</span><span class="s2">:</span><span class="si">%02d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="n">hours</span><span class="p">,</span> <span class="n">minutes</span><span class="p">,</span> <span class="n">seconds</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fmt</span>
+
+
+<span class="k">def</span> <span class="nf">_RemainingSecs2Str</span><span class="p">(</span><span class="n">secs</span><span class="p">):</span>
+    <span class="n">tdelta</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">secs</span><span class="p">)</span>
+    <span class="n">hours</span><span class="p">,</span> <span class="n">rem</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">tdelta</span><span class="o">.</span><span class="n">seconds</span><span class="p">,</span> <span class="mi">3600</span><span class="p">)</span>
+    <span class="n">minutes</span><span class="p">,</span> <span class="n">seconds</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">rem</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">tdelta</span><span class="o">.</span><span class="n">days</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">d&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tdelta</span><span class="o">.</span><span class="n">days</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hours</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%d</span><span class="s2">h&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="n">hours</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">minutes</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%d</span><span class="s2">min&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="n">minutes</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">hours</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">h&quot;</span> <span class="o">%</span> <span class="n">hours</span>
+        <span class="k">if</span> <span class="n">minutes</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%d</span><span class="s2">min&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="n">minutes</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">minutes</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">min&quot;</span> <span class="o">%</span> <span class="n">minutes</span>
+    <span class="k">elif</span> <span class="n">minutes</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">min&quot;</span> <span class="o">%</span> <span class="n">minutes</span>
+        <span class="k">if</span> <span class="n">seconds</span> <span class="o">&gt;=</span> <span class="mi">30</span><span class="p">:</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> 30sec&quot;</span> <span class="o">%</span> <span class="n">fmt</span>
+    <span class="k">elif</span> <span class="n">seconds</span> <span class="o">&gt;</span> <span class="mi">45</span><span class="p">:</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;&lt; 1min&quot;</span>
+    <span class="k">elif</span> <span class="n">seconds</span> <span class="o">&gt;</span> <span class="mi">30</span><span class="p">:</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;&lt; 45sec&quot;</span>
+    <span class="k">elif</span> <span class="n">seconds</span> <span class="o">&gt;</span> <span class="mi">15</span><span class="p">:</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;&lt; 30sec&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">sec&quot;</span> <span class="o">%</span> <span class="n">seconds</span>
+    <span class="k">return</span> <span class="n">fmt</span>
+
+
+<div class="viewcode-block" id="TransferProgress"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.TransferProgress">[docs]</a><span class="k">def</span> <span class="nf">TransferProgress</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">changed_bytes</span><span class="p">,</span> <span class="n">elapsed</span><span class="p">,</span> <span class="n">speed</span><span class="p">,</span> <span class="n">stalled</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Shortcut used for upload progress messages (verbosity 5).&quot;&quot;&quot;</span>
+    <span class="n">dots</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.4</span> <span class="o">*</span> <span class="n">progress</span><span class="p">)</span>  <span class="c1"># int(40.0 * progress / 100.0) -- for 40 chars</span>
+    <span class="n">data_amount</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">changed_bytes</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1024.0</span>
+    <span class="n">data_scale</span> <span class="o">=</span> <span class="s2">&quot;KB&quot;</span>
+    <span class="k">if</span> <span class="n">data_amount</span> <span class="o">&gt;</span> <span class="mf">1000.0</span><span class="p">:</span>
+        <span class="n">data_amount</span> <span class="o">/=</span> <span class="mf">1024.0</span>
+        <span class="n">data_scale</span> <span class="o">=</span> <span class="s2">&quot;MB&quot;</span>
+    <span class="k">if</span> <span class="n">data_amount</span> <span class="o">&gt;</span> <span class="mf">1000.0</span><span class="p">:</span>
+        <span class="n">data_amount</span> <span class="o">/=</span> <span class="mf">1024.0</span>
+        <span class="n">data_scale</span> <span class="o">=</span> <span class="s2">&quot;GB&quot;</span>
+    <span class="k">if</span> <span class="n">stalled</span><span class="p">:</span>
+        <span class="n">eta_str</span> <span class="o">=</span> <span class="s2">&quot;Stalled!&quot;</span>
+        <span class="n">speed_amount</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">speed_scale</span> <span class="o">=</span> <span class="s2">&quot;B&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">eta_str</span> <span class="o">=</span> <span class="n">_RemainingSecs2Str</span><span class="p">(</span><span class="n">eta</span><span class="p">)</span>
+        <span class="n">speed_amount</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1024.0</span>
+        <span class="n">speed_scale</span> <span class="o">=</span> <span class="s2">&quot;KB&quot;</span>
+        <span class="k">if</span> <span class="n">speed_amount</span> <span class="o">&gt;</span> <span class="mf">1000.0</span><span class="p">:</span>
+            <span class="n">speed_amount</span> <span class="o">/=</span> <span class="mf">1024.0</span>
+            <span class="n">speed_scale</span> <span class="o">=</span> <span class="s2">&quot;MB&quot;</span>
+        <span class="k">if</span> <span class="n">speed_amount</span> <span class="o">&gt;</span> <span class="mf">1000.0</span><span class="p">:</span>
+            <span class="n">speed_amount</span> <span class="o">/=</span> <span class="mf">1024.0</span>
+            <span class="n">speed_scale</span> <span class="o">=</span> <span class="s2">&quot;GB&quot;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%.1f%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> [</span><span class="si">%.1f%s</span><span class="s2">/s] [</span><span class="si">%s</span><span class="s2">&gt;</span><span class="si">%s</span><span class="s2">] </span><span class="si">%d%%</span><span class="s2"> ETA </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data_amount</span><span class="p">,</span> <span class="n">data_scale</span><span class="p">,</span>
+                                                      <span class="n">_ElapsedSecs2Str</span><span class="p">(</span><span class="n">elapsed</span><span class="p">),</span>
+                                                      <span class="n">speed_amount</span><span class="p">,</span> <span class="n">speed_scale</span><span class="p">,</span>
+                                                      <span class="s1">&#39;=&#39;</span> <span class="o">*</span> <span class="n">dots</span><span class="p">,</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="p">(</span><span class="mi">40</span> <span class="o">-</span> <span class="n">dots</span><span class="p">),</span>
+                                                      <span class="n">progress</span><span class="p">,</span>
+                                                      <span class="n">eta_str</span>
+                                                      <span class="p">)</span>
+
+    <span class="n">controlLine</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">changed_bytes</span><span class="p">,</span> <span class="n">elapsed</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">speed</span><span class="p">,</span> <span class="n">stalled</span><span class="p">)</span>
+    <span class="n">Log</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">NOTICE</span><span class="p">,</span> <span class="n">InfoCode</span><span class="o">.</span><span class="n">upload_progress</span><span class="p">,</span> <span class="n">controlLine</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PrintCollectionStatus"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.PrintCollectionStatus">[docs]</a><span class="k">def</span> <span class="nf">PrintCollectionStatus</span><span class="p">(</span><span class="n">col_stats</span><span class="p">,</span> <span class="n">force_print</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Prints a collection status to the log&quot;&quot;&quot;</span>
+    <span class="n">Log</span><span class="p">(</span><span class="n">unicode</span><span class="p">(</span><span class="n">col_stats</span><span class="p">),</span> <span class="mi">8</span><span class="p">,</span> <span class="n">InfoCode</span><span class="o">.</span><span class="n">collection_status</span><span class="p">,</span>
+        <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">col_stats</span><span class="o">.</span><span class="n">to_log_info</span><span class="p">()),</span> <span class="n">force_print</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PrintCollectionFileChangedStatus"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.PrintCollectionFileChangedStatus">[docs]</a><span class="k">def</span> <span class="nf">PrintCollectionFileChangedStatus</span><span class="p">(</span><span class="n">col_stats</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">force_print</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Prints a collection status to the log&quot;&quot;&quot;</span>
+    <span class="n">Log</span><span class="p">(</span><span class="n">unicode</span><span class="p">(</span><span class="n">col_stats</span><span class="o">.</span><span class="n">get_file_changed_record</span><span class="p">(</span><span class="n">filepath</span><span class="p">)),</span> <span class="mi">8</span><span class="p">,</span> <span class="n">InfoCode</span><span class="o">.</span><span class="n">collection_status</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">force_print</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Notice"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.Notice">[docs]</a><span class="k">def</span> <span class="nf">Notice</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Shortcut used for notice messages (verbosity 3, the default).&quot;&quot;&quot;</span>
+    <span class="n">Log</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">NOTICE</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WarningCode"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.WarningCode">[docs]</a><span class="k">class</span> <span class="nc">WarningCode</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Enumeration class to hold warning code values.</span>
+<span class="sd">       These values should never change, as frontends rely upon them.</span>
+<span class="sd">       Don&#39;t use 0 or negative numbers.&quot;&quot;&quot;</span>
+    <span class="n">generic</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">orphaned_sig</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">unnecessary_sig</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">unmatched_sig</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">incomplete_backup</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">orphaned_backup</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">ftp_ncftp_v320</span> <span class="o">=</span> <span class="mi">7</span>  <span class="c1"># moved from error</span>
+    <span class="n">cannot_iterate</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="n">cannot_stat</span> <span class="o">=</span> <span class="mi">9</span>
+    <span class="n">cannot_read</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">no_sig_for_time</span> <span class="o">=</span> <span class="mi">11</span>
+    <span class="n">cannot_process</span> <span class="o">=</span> <span class="mi">12</span>
+    <span class="n">process_skipped</span> <span class="o">=</span> <span class="mi">13</span></div>
+
+
+<div class="viewcode-block" id="Warn"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.Warn">[docs]</a><span class="k">def</span> <span class="nf">Warn</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">WarningCode</span><span class="o">.</span><span class="n">generic</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Shortcut used for warning messages (verbosity 2)&quot;&quot;&quot;</span>
+    <span class="n">Log</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">WARNING</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">extra</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ErrorCode"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.ErrorCode">[docs]</a><span class="k">class</span> <span class="nc">ErrorCode</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Enumeration class to hold error code values.</span>
+<span class="sd">       These values should never change, as frontends rely upon them.</span>
+<span class="sd">       Don&#39;t use 0 or negative numbers.  This code is returned by duplicity</span>
+<span class="sd">       to indicate which error occurred via both exit code and log.&quot;&quot;&quot;</span>
+    <span class="n">generic</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># Don&#39;t use if possible, please create a new code and use it</span>
+    <span class="n">command_line</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">hostname_mismatch</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">no_manifests</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">mismatched_manifests</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">unreadable_manifests</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">cant_open_filelist</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">bad_url</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="n">bad_archive_dir</span> <span class="o">=</span> <span class="mi">9</span>
+    <span class="n">bad_sign_key</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">restore_dir_exists</span> <span class="o">=</span> <span class="mi">11</span>
+    <span class="n">verify_dir_doesnt_exist</span> <span class="o">=</span> <span class="mi">12</span>
+    <span class="n">backup_dir_doesnt_exist</span> <span class="o">=</span> <span class="mi">13</span>
+    <span class="n">file_prefix_error</span> <span class="o">=</span> <span class="mi">14</span>
+    <span class="n">globbing_error</span> <span class="o">=</span> <span class="mi">15</span>
+    <span class="n">redundant_inclusion</span> <span class="o">=</span> <span class="mi">16</span>
+    <span class="n">inc_without_sigs</span> <span class="o">=</span> <span class="mi">17</span>
+    <span class="n">no_sigs</span> <span class="o">=</span> <span class="mi">18</span>
+    <span class="n">restore_dir_not_found</span> <span class="o">=</span> <span class="mi">19</span>
+    <span class="n">no_restore_files</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">mismatched_hash</span> <span class="o">=</span> <span class="mi">21</span>
+    <span class="n">unsigned_volume</span> <span class="o">=</span> <span class="mi">22</span>
+    <span class="n">user_error</span> <span class="o">=</span> <span class="mi">23</span>
+    <span class="n">boto_old_style</span> <span class="o">=</span> <span class="mi">24</span>
+    <span class="n">boto_lib_too_old</span> <span class="o">=</span> <span class="mi">25</span>
+    <span class="n">boto_calling_format</span> <span class="o">=</span> <span class="mi">26</span>
+    <span class="n">ftp_ncftp_missing</span> <span class="o">=</span> <span class="mi">27</span>
+    <span class="n">ftp_ncftp_too_old</span> <span class="o">=</span> <span class="mi">28</span>
+    <span class="c1"># ftp_ncftp_v320 = 29 # moved to warning</span>
+    <span class="n">exception</span> <span class="o">=</span> <span class="mi">30</span>
+    <span class="n">gpg_failed</span> <span class="o">=</span> <span class="mi">31</span>
+    <span class="n">s3_bucket_not_style</span> <span class="o">=</span> <span class="mi">32</span>
+    <span class="n">not_implemented</span> <span class="o">=</span> <span class="mi">33</span>
+    <span class="n">get_freespace_failed</span> <span class="o">=</span> <span class="mi">34</span>
+    <span class="n">not_enough_freespace</span> <span class="o">=</span> <span class="mi">35</span>
+    <span class="n">get_ulimit_failed</span> <span class="o">=</span> <span class="mi">36</span>
+    <span class="n">maxopen_too_low</span> <span class="o">=</span> <span class="mi">37</span>
+    <span class="n">connection_failed</span> <span class="o">=</span> <span class="mi">38</span>
+    <span class="n">restart_file_not_found</span> <span class="o">=</span> <span class="mi">39</span>
+    <span class="n">gio_not_available</span> <span class="o">=</span> <span class="mi">40</span>
+    <span class="n">source_dir_mismatch</span> <span class="o">=</span> <span class="mi">42</span>  <span class="c1"># 41 is reserved for par2</span>
+    <span class="n">ftps_lftp_missing</span> <span class="o">=</span> <span class="mi">43</span>
+    <span class="n">volume_wrong_size</span> <span class="o">=</span> <span class="mi">44</span>
+    <span class="n">enryption_mismatch</span> <span class="o">=</span> <span class="mi">45</span>
+    <span class="n">pythonoptimize_set</span> <span class="o">=</span> <span class="mi">46</span>
+
+    <span class="n">dpbx_nologin</span> <span class="o">=</span> <span class="mi">47</span>
+
+    <span class="n">bad_request</span> <span class="o">=</span> <span class="mi">48</span>
+
+    <span class="c1"># 50-&gt;69 reserved for backend errors</span>
+    <span class="n">backend_error</span> <span class="o">=</span> <span class="mi">50</span>
+    <span class="n">backend_permission_denied</span> <span class="o">=</span> <span class="mi">51</span>
+    <span class="n">backend_not_found</span> <span class="o">=</span> <span class="mi">52</span>
+    <span class="n">backend_no_space</span> <span class="o">=</span> <span class="mi">53</span>
+    <span class="n">backend_command_error</span> <span class="o">=</span> <span class="mi">54</span>
+    <span class="n">backend_code_error</span> <span class="o">=</span> <span class="mi">55</span></div>
+
+    <span class="c1"># Reserve 126 because it is used as an error code for pkexec</span>
+    <span class="c1"># Reserve 127 because it is used as an error code for pkexec</span>
+    <span class="c1"># Reserve 255 because it is used as an error code for gksu</span>
+
+
+<div class="viewcode-block" id="Error"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.Error">[docs]</a><span class="k">def</span> <span class="nf">Error</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">generic</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Write error message&quot;&quot;&quot;</span>
+    <span class="n">Log</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">ERROR</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">extra</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FatalError"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.FatalError">[docs]</a><span class="k">def</span> <span class="nf">FatalError</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">generic</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Write fatal error message and exit&quot;&quot;&quot;</span>
+    <span class="n">Log</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">ERROR</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">extra</span><span class="p">)</span>
+    <span class="n">shutdown</span><span class="p">()</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">code</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OutFilter"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.OutFilter">[docs]</a><span class="k">class</span> <span class="nc">OutFilter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Filter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Filter that only allows warning or less important messages&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="OutFilter.filter"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.OutFilter.filter">[docs]</a>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">record</span><span class="o">.</span><span class="n">msg</span> <span class="ow">and</span> <span class="n">record</span><span class="o">.</span><span class="n">levelno</span> <span class="o">&lt;=</span> <span class="n">DupToLoggerLevel</span><span class="p">(</span><span class="n">WARNING</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ErrFilter"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.ErrFilter">[docs]</a><span class="k">class</span> <span class="nc">ErrFilter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Filter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Filter that only allows messages more important than warnings&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ErrFilter.filter"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.ErrFilter.filter">[docs]</a>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">record</span><span class="o">.</span><span class="n">msg</span> <span class="ow">and</span> <span class="n">record</span><span class="o">.</span><span class="n">levelno</span> <span class="o">&gt;</span> <span class="n">DupToLoggerLevel</span><span class="p">(</span><span class="n">WARNING</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="setup"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.setup">[docs]</a><span class="k">def</span> <span class="nf">setup</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Initialize logging&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_logger</span>
+    <span class="k">if</span> <span class="n">_logger</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;duplicity&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Default verbosity allows notices and above</span>
+    <span class="n">setverbosity</span><span class="p">(</span><span class="n">NOTICE</span><span class="p">)</span>
+
+    <span class="c1"># stdout and stderr are for different logging levels</span>
+    <span class="n">outHandler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+    <span class="n">outHandler</span><span class="o">.</span><span class="n">addFilter</span><span class="p">(</span><span class="n">OutFilter</span><span class="p">())</span>
+    <span class="n">_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">outHandler</span><span class="p">)</span>
+
+    <span class="n">errHandler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+    <span class="n">errHandler</span><span class="o">.</span><span class="n">addFilter</span><span class="p">(</span><span class="n">ErrFilter</span><span class="p">())</span>
+    <span class="n">_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">errHandler</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MachineFormatter"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.MachineFormatter">[docs]</a><span class="k">class</span> <span class="nc">MachineFormatter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Formatter that creates messages in a syntax easily consumable by other</span>
+<span class="sd">       processes.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># &#39;message&#39; will be appended by format()</span>
+        <span class="c1"># Note that we use our own, custom-created &#39;levelName&#39; instead of the</span>
+        <span class="c1"># standard &#39;levelname&#39;.  This is because the standard &#39;levelname&#39; can</span>
+        <span class="c1"># be adjusted by any library anywhere in our stack without us knowing.</span>
+        <span class="c1"># But we control &#39;levelName&#39;.</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%(levelName)s</span><span class="s2"> </span><span class="si">%(controlLine)s</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MachineFormatter.format"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.MachineFormatter.format">[docs]</a>    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">)</span>
+
+        <span class="c1"># Add user-text hint of &#39;message&#39; back in, with each line prefixed by a</span>
+        <span class="c1"># dot, so consumers know it&#39;s not part of &#39;controlLine&#39;</span>
+        <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">message</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">record</span><span class="o">.</span><span class="n">message</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">. &#39;</span><span class="p">)</span>
+
+        <span class="c1"># Add a newline so consumers know the message is over.</span>
+        <span class="k">return</span> <span class="n">s</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span></div></div>
+
+
+<div class="viewcode-block" id="MachineFilter"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.MachineFilter">[docs]</a><span class="k">class</span> <span class="nc">MachineFilter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Filter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Filter that only allows levels that are consumable by other processes.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="MachineFilter.filter"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.MachineFilter.filter">[docs]</a>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+        <span class="c1"># We only want to allow records that have our custom level names</span>
+        <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="s1">&#39;levelName&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="add_fd"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.add_fd">[docs]</a><span class="k">def</span> <span class="nf">add_fd</span><span class="p">(</span><span class="n">fd</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add stream to which to write machine-readable logging&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_logger</span>
+    <span class="n">handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">fdopen</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">))</span>
+    <span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">MachineFormatter</span><span class="p">())</span>
+    <span class="n">handler</span><span class="o">.</span><span class="n">addFilter</span><span class="p">(</span><span class="n">MachineFilter</span><span class="p">())</span>
+    <span class="n">_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="add_file"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.add_file">[docs]</a><span class="k">def</span> <span class="nf">add_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add file to which to write machine-readable logging&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_logger</span>
+    <span class="n">handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">MachineFormatter</span><span class="p">())</span>
+    <span class="n">handler</span><span class="o">.</span><span class="n">addFilter</span><span class="p">(</span><span class="n">MachineFilter</span><span class="p">())</span>
+    <span class="n">_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="setverbosity"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.setverbosity">[docs]</a><span class="k">def</span> <span class="nf">setverbosity</span><span class="p">(</span><span class="n">verb</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Set the verbosity level&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_logger</span>
+    <span class="n">_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">DupToLoggerLevel</span><span class="p">(</span><span class="n">verb</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="getverbosity"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.getverbosity">[docs]</a><span class="k">def</span> <span class="nf">getverbosity</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Get the verbosity level&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_logger</span>
+    <span class="k">return</span> <span class="n">LoggerToDupLevel</span><span class="p">(</span><span class="n">_logger</span><span class="o">.</span><span class="n">getEffectiveLevel</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="shutdown"><a class="viewcode-back" href="../../duplicity.log.html#duplicity.log.shutdown">[docs]</a><span class="k">def</span> <span class="nf">shutdown</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Cleanup and flush loggers&quot;&quot;&quot;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

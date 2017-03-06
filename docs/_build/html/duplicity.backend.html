@@ -1,0 +1,300 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.backend module &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="duplicity.cached_ops module" href="duplicity.cached_ops.html" />
+    <link rel="prev" title="duplicity.asyncscheduler module" href="duplicity.asyncscheduler.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-duplicity.backend">
+<span id="duplicity-backend-module"></span><h1>duplicity.backend module<a class="headerlink" href="#module-duplicity.backend" title="Permalink to this headline">¶</a></h1>
+<p>Provides a common interface to all backends and certain sevices
+intended to be used by the backends themselves.</p>
+<dl class="class">
+<dt id="duplicity.backend.Backend">
+<em class="property">class </em><code class="descclassname">duplicity.backend.</code><code class="descname">Backend</code><span class="sig-paren">(</span><em>parsed_url</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#Backend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.Backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>See README in backends directory for information on how to write a backend.</p>
+<dl class="method">
+<dt id="duplicity.backend.Backend.get_password">
+<code class="descname">get_password</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#Backend.get_password"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.Backend.get_password" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a password for authentication purposes. The password
+will be obtained from the backend URL, the environment, by
+asking the user, or by some other method. When applicable, the
+result will be cached for future invocations.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backend.Backend.munge_password">
+<code class="descname">munge_password</code><span class="sig-paren">(</span><em>commandline</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#Backend.munge_password"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.Backend.munge_password" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove password from commandline by substituting the password
+found in the URL, if any, with a generic place-holder.</p>
+<p>This is intended for display purposes only, and it is not
+guaranteed that the results are correct (i.e., more than just
+the &#8216;:password&#64;&#8217; may be substituted.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.backend.Backend.popen_breaks">
+<code class="descname">popen_breaks</code><em class="property"> = {}</em><a class="headerlink" href="#duplicity.backend.Backend.popen_breaks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backend.Backend.subprocess_popen">
+<code class="descname">subprocess_popen</code><span class="sig-paren">(</span><em>commandline</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#Backend.subprocess_popen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.Backend.subprocess_popen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute the given command line with error check.
+Returns int Exitcode, string StdOut, string StdErr</p>
+<p>Raise a BackendException on failure.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="duplicity.backend.Backend.use_getpass">
+<code class="descname">use_getpass</code><em class="property"> = True</em><a class="headerlink" href="#duplicity.backend.Backend.use_getpass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.backend.BackendWrapper">
+<em class="property">class </em><code class="descclassname">duplicity.backend.</code><code class="descname">BackendWrapper</code><span class="sig-paren">(</span><em>backend</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#BackendWrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.BackendWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Represents a generic duplicity backend, capable of storing and
+retrieving files.</p>
+<dl class="method">
+<dt id="duplicity.backend.BackendWrapper.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#BackendWrapper.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.BackendWrapper.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the backend, releasing any resources held and
+invalidating any file objects obtained from the backend.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backend.BackendWrapper.delete">
+<code class="descname">delete</code><span class="sig-paren">(</span><em>filename_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#BackendWrapper.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.BackendWrapper.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete each filename in filename_list, in order if possible.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backend.BackendWrapper.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#BackendWrapper.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.BackendWrapper.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backend.BackendWrapper.get_data">
+<code class="descname">get_data</code><span class="sig-paren">(</span><em>filename</em>, <em>parseresults=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#BackendWrapper.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.BackendWrapper.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a file from backend, process it, return contents.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backend.BackendWrapper.get_fileobj_read">
+<code class="descname">get_fileobj_read</code><span class="sig-paren">(</span><em>filename</em>, <em>parseresults=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#BackendWrapper.get_fileobj_read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.BackendWrapper.get_fileobj_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return fileobject opened for reading of filename on backend</p>
+<p>The file will be downloaded first into a temp file.  When the
+returned fileobj is closed, the temp file will be deleted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backend.BackendWrapper.list">
+<code class="descname">list</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#BackendWrapper.list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.BackendWrapper.list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backend.BackendWrapper.move">
+<code class="descname">move</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#BackendWrapper.move"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.BackendWrapper.move" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backend.BackendWrapper.put">
+<code class="descname">put</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#BackendWrapper.put"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.BackendWrapper.put" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backend.BackendWrapper.query_info">
+<code class="descname">query_info</code><span class="sig-paren">(</span><em>filename_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#BackendWrapper.query_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.BackendWrapper.query_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return metadata about each filename in filename_list</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.backend.ParsedUrl">
+<em class="property">class </em><code class="descclassname">duplicity.backend.</code><code class="descname">ParsedUrl</code><span class="sig-paren">(</span><em>url_string</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#ParsedUrl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.ParsedUrl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse the given URL as a duplicity backend URL.</p>
+<p>Returns the data of a parsed URL with the same names as that of
+the standard urlparse.urlparse() except that all values have been
+resolved rather than deferred.  There are no get_* members.  This
+makes sure that the URL parsing errors are detected early.</p>
+<p>Raise InvalidBackendURL on invalid URL&#8217;s</p>
+<dl class="method">
+<dt id="duplicity.backend.ParsedUrl.geturl">
+<code class="descname">geturl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#ParsedUrl.geturl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.ParsedUrl.geturl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.backend.get_backend">
+<code class="descclassname">duplicity.backend.</code><code class="descname">get_backend</code><span class="sig-paren">(</span><em>url_string</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#get_backend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.get_backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate a backend suitable for the given URL, or return None
+if the given string looks like a local path rather than a URL.</p>
+<p>Raise InvalidBackendURL if the URL is not a valid URL.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.backend.get_backend_object">
+<code class="descclassname">duplicity.backend.</code><code class="descname">get_backend_object</code><span class="sig-paren">(</span><em>url_string</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#get_backend_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.get_backend_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the right backend class instance for the given URL, or return None
+if the given string looks like a local path rather than a URL.</p>
+<p>Raise InvalidBackendURL if the URL is not a valid URL.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.backend.import_backends">
+<code class="descclassname">duplicity.backend.</code><code class="descname">import_backends</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#import_backends"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.import_backends" title="Permalink to this definition">¶</a></dt>
+<dd><p>Import files in the duplicity/backends directory where
+the filename ends in &#8216;backend.py&#8217; and ignore the rest.</p>
+<p>&#64;rtype: void
+&#64;return: void</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.backend.is_backend_url">
+<code class="descclassname">duplicity.backend.</code><code class="descname">is_backend_url</code><span class="sig-paren">(</span><em>url_string</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#is_backend_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.is_backend_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;return Whether the given string looks like a backend URL.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.backend.register_backend">
+<code class="descclassname">duplicity.backend.</code><code class="descname">register_backend</code><span class="sig-paren">(</span><em>scheme</em>, <em>backend_factory</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#register_backend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.register_backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register a given backend factory responsible for URL:s with the
+given scheme.</p>
+<p>The backend must be a callable which, when called with a URL as
+the single parameter, returns an object implementing the backend
+protocol (i.e., a subclass of Backend).</p>
+<p>Typically the callable will be the Backend subclass itself.</p>
+<p>This function is not thread-safe and is intended to be called
+during module importation or start-up.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.backend.register_backend_prefix">
+<code class="descclassname">duplicity.backend.</code><code class="descname">register_backend_prefix</code><span class="sig-paren">(</span><em>scheme</em>, <em>backend_factory</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#register_backend_prefix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.register_backend_prefix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register a given backend factory responsible for URL:s with the
+given scheme prefix.</p>
+<p>The backend must be a callable which, when called with a URL as
+the single parameter, returns an object implementing the backend
+protocol (i.e., a subclass of Backend).</p>
+<p>Typically the callable will be the Backend subclass itself.</p>
+<p>This function is not thread-safe and is intended to be called
+during module importation or start-up.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.backend.retry">
+<code class="descclassname">duplicity.backend.</code><code class="descname">retry</code><span class="sig-paren">(</span><em>operation</em>, <em>fatal=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#retry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.retry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="duplicity.backend.strip_auth_from_url">
+<code class="descclassname">duplicity.backend.</code><code class="descname">strip_auth_from_url</code><span class="sig-paren">(</span><em>parsed_url</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#strip_auth_from_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.strip_auth_from_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a URL from a urlparse object without a username or password.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.backend.strip_prefix">
+<code class="descclassname">duplicity.backend.</code><code class="descname">strip_prefix</code><span class="sig-paren">(</span><em>url_string</em>, <em>prefix_scheme</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backend.html#strip_prefix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backend.strip_prefix" title="Permalink to this definition">¶</a></dt>
+<dd><p>strip the prefix from a string e.g. par2+ftp://... -&gt; ftp://...</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="duplicity.html">duplicity package</a><ul>
+      <li>Previous: <a href="duplicity.asyncscheduler.html" title="previous chapter">duplicity.asyncscheduler module</a></li>
+      <li>Next: <a href="duplicity.cached_ops.html" title="next chapter">duplicity.cached_ops module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/duplicity.backend.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/duplicity.backend.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

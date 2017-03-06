@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>testing.functional package &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="testing.functional.test_badupload module" href="testing.functional.test_badupload.html" />
+    <link rel="prev" title="testing package" href="testing.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="testing-functional-package">
+<h1>testing.functional package<a class="headerlink" href="#testing-functional-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="testing.functional.test_badupload.html">testing.functional.test_badupload module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.functional.test_cleanup.html">testing.functional.test_cleanup module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.functional.test_final.html">testing.functional.test_final module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.functional.test_log.html">testing.functional.test_log module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.functional.test_rdiffdir.html">testing.functional.test_rdiffdir module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.functional.test_restart.html">testing.functional.test_restart module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.functional.test_selection.html">testing.functional.test_selection module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.functional.test_verify.html">testing.functional.test_verify module</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="module-testing.functional">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-testing.functional" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="testing.functional.CmdError">
+<em class="property">exception </em><code class="descclassname">testing.functional.</code><code class="descname">CmdError</code><span class="sig-paren">(</span><em>code</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional.html#CmdError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.CmdError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+<p>Indicates an error running an external command</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="testing.functional.FunctionalTestCase">
+<em class="property">class </em><code class="descclassname">testing.functional.</code><code class="descname">FunctionalTestCase</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional.html#FunctionalTestCase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.FunctionalTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="testing.html#testing.DuplicityTestCase" title="testing.DuplicityTestCase"><code class="xref py py-class docutils literal"><span class="pre">testing.DuplicityTestCase</span></code></a></p>
+<dl class="method">
+<dt id="testing.functional.FunctionalTestCase.backup">
+<code class="descname">backup</code><span class="sig-paren">(</span><em>type</em>, <em>input_dir</em>, <em>options=[]</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional.html#FunctionalTestCase.backup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.FunctionalTestCase.backup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run duplicity backup to default directory</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.FunctionalTestCase.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><em>options=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional.html#FunctionalTestCase.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.FunctionalTestCase.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run duplicity cleanup to default directory</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.FunctionalTestCase.get_backend_files">
+<code class="descname">get_backend_files</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional.html#FunctionalTestCase.get_backend_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.FunctionalTestCase.get_backend_files" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.FunctionalTestCase.make_largefiles">
+<code class="descname">make_largefiles</code><span class="sig-paren">(</span><em>count=3</em>, <em>size=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional.html#FunctionalTestCase.make_largefiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.FunctionalTestCase.make_largefiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a number of large files in testfiles/largefiles that each are
+the specified number of megabytes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.FunctionalTestCase.restore">
+<code class="descname">restore</code><span class="sig-paren">(</span><em>file_to_restore=None</em>, <em>time=None</em>, <em>options=[]</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional.html#FunctionalTestCase.restore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.FunctionalTestCase.restore" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.FunctionalTestCase.run_duplicity">
+<code class="descname">run_duplicity</code><span class="sig-paren">(</span><em>options=[]</em>, <em>current_time=None</em>, <em>fail=None</em>, <em>passphrase_input=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional.html#FunctionalTestCase.run_duplicity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.FunctionalTestCase.run_duplicity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run duplicity binary with given arguments and options</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.FunctionalTestCase.setUp">
+<code class="descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional.html#FunctionalTestCase.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.FunctionalTestCase.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.FunctionalTestCase.verify">
+<code class="descname">verify</code><span class="sig-paren">(</span><em>dirname</em>, <em>file_to_verify=None</em>, <em>time=None</em>, <em>options=[]</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional.html#FunctionalTestCase.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.FunctionalTestCase.verify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">testing.functional package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-testing.functional">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="testing.html">testing package</a><ul>
+      <li>Previous: <a href="testing.html" title="previous chapter">testing package</a></li>
+      <li>Next: <a href="testing.functional.test_badupload.html" title="next chapter">testing.functional.test_badupload module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/testing.functional.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/testing.functional.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

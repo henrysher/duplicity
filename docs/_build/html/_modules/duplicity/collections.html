@@ -1,0 +1,1313 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.collections &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.collections</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2002 Ben Escoto &lt;ben@emerose.org&gt;</span>
+<span class="c1"># Copyright 2007 Kenneth Loafman &lt;kenneth@loafman.com&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="sd">&quot;&quot;&quot;Classes and functions on collections of backup volumes&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">future_builtins</span> <span class="k">import</span> <span class="nb">filter</span><span class="p">,</span> <span class="nb">map</span>
+
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">import</span> <span class="nn">gettext</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">file_naming</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">path</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">dup_time</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="nb">globals</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">manifest</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">duplicity.gpg</span> <span class="k">import</span> <span class="n">GPGError</span>
+
+<span class="c1"># For type testing against both int and long types that works in python 2/3</span>
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,):</span>
+    <span class="n">integer_types</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">LongType</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">integer_types</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">,)</span>
+
+
+<div class="viewcode-block" id="CollectionsError"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.CollectionsError">[docs]</a><span class="k">class</span> <span class="nc">CollectionsError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="BackupSet"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupSet">[docs]</a><span class="k">class</span> <span class="nc">BackupSet</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Backup set - the backup information produced by one session</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backend</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize new backup set, only backend is required at first</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info_set</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># true if fields are set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">volume_name_dict</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># dict from volume number to filename</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remote_manifest_name</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># full name of remote manifest</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">local_manifest_path</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># full path to local manifest</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># will be set if is full backup set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># will be set if inc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># will be set if inc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">partial</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># true if a partial backup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encrypted</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># true if an encrypted backup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">files_changed</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="BackupSet.is_complete"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupSet.is_complete">[docs]</a>    <span class="k">def</span> <span class="nf">is_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assume complete if found manifest file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_manifest_name</span></div>
+
+<div class="viewcode-block" id="BackupSet.add_filename"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupSet.add_filename">[docs]</a>    <span class="k">def</span> <span class="nf">add_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a filename to given set.  Return true if it fits.</span>
+
+<span class="sd">        The filename will match the given set if it has the right</span>
+<span class="sd">        times and is of the right type.  The information will be set</span>
+<span class="sd">        from the first filename given.</span>
+
+<span class="sd">        @param filename: name of file to add</span>
+<span class="sd">        @type filename: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pr</span> <span class="o">=</span> <span class="n">file_naming</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pr</span> <span class="ow">or</span> <span class="ow">not</span> <span class="p">(</span><span class="n">pr</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;full&quot;</span> <span class="ow">or</span> <span class="n">pr</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;inc&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">info_set</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_info</span><span class="p">(</span><span class="n">pr</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pr</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">pr</span><span class="o">.</span><span class="n">time</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">pr</span><span class="o">.</span><span class="n">start_time</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span> <span class="ow">or</span>
+                    <span class="n">pr</span><span class="o">.</span><span class="n">end_time</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="nb">bool</span><span class="p">(</span><span class="n">pr</span><span class="o">.</span><span class="n">encrypted</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encrypted</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">partial</span> <span class="ow">and</span> <span class="n">pr</span><span class="o">.</span><span class="n">encrypted</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">encrypted</span> <span class="o">=</span> <span class="n">pr</span><span class="o">.</span><span class="n">encrypted</span>
+
+        <span class="k">if</span> <span class="n">pr</span><span class="o">.</span><span class="n">manifest</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_manifest</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">pr</span><span class="o">.</span><span class="n">volume_number</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">assert</span> <span class="n">pr</span><span class="o">.</span><span class="n">volume_number</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">volume_name_dict</span><span class="p">,</span> \
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">volume_name_dict</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">volume_name_dict</span><span class="p">[</span><span class="n">pr</span><span class="o">.</span><span class="n">volume_number</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="BackupSet.set_info"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupSet.set_info">[docs]</a>    <span class="k">def</span> <span class="nf">set_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set BackupSet information from ParseResults object</span>
+
+<span class="sd">        @param pr: parse results</span>
+<span class="sd">        @type pf: ParseResults</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">info_set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">pr</span><span class="o">.</span><span class="n">type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">pr</span><span class="o">.</span><span class="n">time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span> <span class="o">=</span> <span class="n">pr</span><span class="o">.</span><span class="n">start_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="n">pr</span><span class="o">.</span><span class="n">end_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">pr</span><span class="o">.</span><span class="n">time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">partial</span> <span class="o">=</span> <span class="n">pr</span><span class="o">.</span><span class="n">partial</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encrypted</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">pr</span><span class="o">.</span><span class="n">encrypted</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info_set</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="BackupSet.set_files_changed"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupSet.set_files_changed">[docs]</a>    <span class="k">def</span> <span class="nf">set_files_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_manifest</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">files_changed</span> <span class="o">=</span> <span class="n">mf</span><span class="o">.</span><span class="n">get_files_changed</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BackupSet.set_manifest"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupSet.set_manifest">[docs]</a>    <span class="k">def</span> <span class="nf">set_manifest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add local and remote manifest filenames to backup set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_manifest_name</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remote_manifest_name</span><span class="p">,</span>
+                                               <span class="n">remote_filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remote_manifest_name</span> <span class="o">=</span> <span class="n">remote_filename</span>
+
+        <span class="k">for</span> <span class="n">local_filename</span> <span class="ow">in</span> <span class="nb">globals</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="o">.</span><span class="n">listdir</span><span class="p">():</span>
+            <span class="n">pr</span> <span class="o">=</span> <span class="n">file_naming</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">local_filename</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">pr</span> <span class="ow">and</span> <span class="n">pr</span><span class="o">.</span><span class="n">manifest</span> <span class="ow">and</span> <span class="n">pr</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="ow">and</span>
+                    <span class="n">pr</span><span class="o">.</span><span class="n">time</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="ow">and</span>
+                    <span class="n">pr</span><span class="o">.</span><span class="n">start_time</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span> <span class="ow">and</span>
+                    <span class="n">pr</span><span class="o">.</span><span class="n">end_time</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">local_manifest_path</span> <span class="o">=</span> \
+                    <span class="nb">globals</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">local_filename</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_files_changed</span><span class="p">()</span>
+                <span class="k">break</span></div>
+
+<div class="viewcode-block" id="BackupSet.delete"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupSet.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove all files in set, both local and remote</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rfn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_filenames</span><span class="p">()</span>
+        <span class="n">rfn</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">rfn</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;BackupSet.delete: missing </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">[</span><span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">rfn</span><span class="p">])</span>
+            <span class="k">pass</span>
+        <span class="k">for</span> <span class="n">lfn</span> <span class="ow">in</span> <span class="nb">globals</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="o">.</span><span class="n">listdir</span><span class="p">():</span>
+            <span class="n">pr</span> <span class="o">=</span> <span class="n">file_naming</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">lfn</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">pr</span> <span class="ow">and</span> <span class="n">pr</span><span class="o">.</span><span class="n">time</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="ow">and</span>
+                    <span class="n">pr</span><span class="o">.</span><span class="n">start_time</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span> <span class="ow">and</span>
+                    <span class="n">pr</span><span class="o">.</span><span class="n">end_time</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="nb">globals</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lfn</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;BackupSet.delete: missing </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">[</span><span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">lfn</span><span class="p">])</span>
+                    <span class="k">pass</span>
+        <span class="n">util</span><span class="o">.</span><span class="n">release_lockfile</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For now just list files in set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filelist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_manifest_name</span><span class="p">:</span>
+            <span class="n">filelist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remote_manifest_name</span><span class="p">)</span>
+        <span class="n">filelist</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">volume_name_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">return</span> <span class="sa">u</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="sa">u</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">,</span> <span class="n">filelist</span><span class="p">))</span>
+
+<div class="viewcode-block" id="BackupSet.get_timestr"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupSet.get_timestr">[docs]</a>    <span class="k">def</span> <span class="nf">get_timestr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return time string suitable for log statements</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">timetopretty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BackupSet.check_manifests"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupSet.check_manifests">[docs]</a>    <span class="k">def</span> <span class="nf">check_manifests</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Make sure remote manifest is equal to local one</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_manifest_name</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_manifest_path</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">FatalError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Fatal Error: No manifests found for most recent backup&quot;</span><span class="p">),</span>
+                           <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">no_manifests</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_manifest_name</span><span class="p">,</span> <span class="s2">&quot;if only one, should be remote&quot;</span>
+
+        <span class="n">remote_manifest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_remote_manifest</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_manifest_path</span><span class="p">:</span>
+            <span class="n">local_manifest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_manifest</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">remote_manifest</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_manifest_path</span> <span class="ow">and</span> <span class="n">local_manifest</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">remote_manifest</span> <span class="o">!=</span> <span class="n">local_manifest</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">FatalError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Fatal Error: Remote manifest does not match &quot;</span>
+                                 <span class="s2">&quot;local one.  Either the remote backup set or &quot;</span>
+                                 <span class="s2">&quot;the local archive directory has been corrupted.&quot;</span><span class="p">),</span>
+                               <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">mismatched_manifests</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">remote_manifest</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_manifest_path</span><span class="p">:</span>
+                <span class="n">remote_manifest</span> <span class="o">=</span> <span class="n">local_manifest</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">FatalError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Fatal Error: Neither remote nor local &quot;</span>
+                                 <span class="s2">&quot;manifest is readable.&quot;</span><span class="p">),</span>
+                               <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">unreadable_manifests</span><span class="p">)</span>
+        <span class="n">remote_manifest</span><span class="o">.</span><span class="n">check_dirinfo</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BackupSet.get_local_manifest"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupSet.get_local_manifest">[docs]</a>    <span class="k">def</span> <span class="nf">get_local_manifest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return manifest object by reading local manifest file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_manifest_path</span>
+        <span class="n">manifest_buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_manifest_path</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Processing local manifest </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">local_manifest_path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">manifest_buffer</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">manifest</span><span class="o">.</span><span class="n">Manifest</span><span class="p">()</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">manifest_buffer</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BackupSet.get_remote_manifest"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupSet.get_remote_manifest">[docs]</a>    <span class="k">def</span> <span class="nf">get_remote_manifest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return manifest by reading remote manifest on backend</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_manifest_name</span>
+        <span class="c1"># Following by MDR.  Should catch if remote encrypted with</span>
+        <span class="c1"># public key w/o secret key</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">manifest_buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remote_manifest_name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">GPGError</span> <span class="k">as</span> <span class="n">message</span><span class="p">:</span>
+            <span class="c1"># TODO: We check for gpg v1 and v2 messages, should be an error code</span>
+            <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;secret key not available&quot;</span> <span class="ow">in</span> <span class="n">message</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span>
+                    <span class="s2">&quot;No secret key&quot;</span> <span class="ow">in</span> <span class="n">message</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Processing remote manifest </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remote_manifest_name</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">manifest_buffer</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">manifest</span><span class="o">.</span><span class="n">Manifest</span><span class="p">()</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">manifest_buffer</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BackupSet.get_manifest"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupSet.get_manifest">[docs]</a>    <span class="k">def</span> <span class="nf">get_manifest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return manifest object, showing preference for local copy</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_manifest_path</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_manifest</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_remote_manifest</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BackupSet.get_filenames"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupSet.get_filenames">[docs]</a>    <span class="k">def</span> <span class="nf">get_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return sorted list of (remote) filenames of files in set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">info_set</span>
+        <span class="n">volume_num_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">volume_name_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="n">volume_num_list</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">volume_filenames</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">volume_name_dict</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">volume_num_list</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_manifest_name</span><span class="p">:</span>
+            <span class="c1"># For convenience of implementation for restart support, we treat</span>
+            <span class="c1"># local partial manifests as this set&#39;s remote manifest.  But</span>
+            <span class="c1"># when specifically asked for a list of remote filenames, we</span>
+            <span class="c1"># should not include it.</span>
+            <span class="n">pr</span> <span class="o">=</span> <span class="n">file_naming</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remote_manifest_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">pr</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">pr</span><span class="o">.</span><span class="n">partial</span><span class="p">:</span>
+                <span class="n">volume_filenames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remote_manifest_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">volume_filenames</span></div>
+
+<div class="viewcode-block" id="BackupSet.get_time"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupSet.get_time">[docs]</a>    <span class="k">def</span> <span class="nf">get_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return time if full backup, or end_time if incremental</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span>
+        <span class="k">assert</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Neither self.time nor self.end_time set&quot;</span></div>
+
+<div class="viewcode-block" id="BackupSet.get_files_changed"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupSet.get_files_changed">[docs]</a>    <span class="k">def</span> <span class="nf">get_files_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">files_changed</span></div>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the number of volumes in the set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">volume_name_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="BackupChain"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupChain">[docs]</a><span class="k">class</span> <span class="nc">BackupChain</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    BackupChain - a number of linked BackupSets</span>
+
+<span class="sd">    A BackupChain always starts with a full backup set and continues</span>
+<span class="sd">    with incremental ones.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backend</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize new chain, only backend is required at first</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fullset</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">incset_list</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># sorted list of BackupSets</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="BackupChain.set_full"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupChain.set_full">[docs]</a>    <span class="k">def</span> <span class="nf">set_full</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullset</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add full backup set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fullset</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fullset</span><span class="p">,</span> <span class="n">BackupSet</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fullset</span> <span class="o">=</span> <span class="n">fullset</span>
+        <span class="k">assert</span> <span class="n">fullset</span><span class="o">.</span><span class="n">time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="n">fullset</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">fullset</span><span class="o">.</span><span class="n">time</span></div>
+
+<div class="viewcode-block" id="BackupChain.add_inc"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupChain.add_inc">[docs]</a>    <span class="k">def</span> <span class="nf">add_inc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">incset</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add incset to self.  Return False if incset does not match</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span> <span class="o">==</span> <span class="n">incset</span><span class="o">.</span><span class="n">start_time</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">incset_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">incset</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">incset_list</span> <span class="ow">and</span>
+                    <span class="n">incset</span><span class="o">.</span><span class="n">start_time</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">incset_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">start_time</span> <span class="ow">and</span>
+                    <span class="n">incset</span><span class="o">.</span><span class="n">end_time</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">incset_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Preferring Backupset over previous one!&quot;</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">incset_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">incset</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Ignoring incremental Backupset (start_time: </span><span class="si">%s</span><span class="s2">; needed: </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">)</span> <span class="o">%</span>
+                         <span class="p">(</span><span class="n">dup_time</span><span class="o">.</span><span class="n">timetopretty</span><span class="p">(</span><span class="n">incset</span><span class="o">.</span><span class="n">start_time</span><span class="p">),</span>
+                          <span class="n">dup_time</span><span class="o">.</span><span class="n">timetopretty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">end_time</span><span class="p">)))</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="n">incset</span><span class="o">.</span><span class="n">end_time</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Added incremental Backupset (start_time: </span><span class="si">%s</span><span class="s2"> / end_time: </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">)</span> <span class="o">%</span>
+                 <span class="p">(</span><span class="n">dup_time</span><span class="o">.</span><span class="n">timetopretty</span><span class="p">(</span><span class="n">incset</span><span class="o">.</span><span class="n">start_time</span><span class="p">),</span>
+                  <span class="n">dup_time</span><span class="o">.</span><span class="n">timetopretty</span><span class="p">(</span><span class="n">incset</span><span class="o">.</span><span class="n">end_time</span><span class="p">)))</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="BackupChain.delete"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupChain.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keep_full</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete all sets in chain, in reverse order</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">incset_list</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">incset_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fullset</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">keep_full</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fullset</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BackupChain.get_sets_at_time"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupChain.get_sets_at_time">[docs]</a>    <span class="k">def</span> <span class="nf">get_sets_at_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a list of sets in chain earlier or equal to time</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">older_incsets</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">incset_list</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">end_time</span> <span class="o">&lt;=</span> <span class="n">time</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fullset</span><span class="p">]</span> <span class="o">+</span> <span class="n">older_incsets</span></div>
+
+<div class="viewcode-block" id="BackupChain.get_last"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupChain.get_last">[docs]</a>    <span class="k">def</span> <span class="nf">get_last</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return last BackupSet in chain</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">incset_list</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">incset_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fullset</span></div>
+
+<div class="viewcode-block" id="BackupChain.get_first"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupChain.get_first">[docs]</a>    <span class="k">def</span> <span class="nf">get_first</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return first BackupSet in chain (ie the full backup)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fullset</span></div>
+
+<div class="viewcode-block" id="BackupChain.short_desc"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupChain.short_desc">[docs]</a>    <span class="k">def</span> <span class="nf">short_desc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a short one-line description of the chain,</span>
+<span class="sd">        suitable for log messages.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">]-[</span><span class="si">%s</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dup_time</span><span class="o">.</span><span class="n">timetopretty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="p">),</span>
+                              <span class="n">dup_time</span><span class="o">.</span><span class="n">timetopretty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">end_time</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="BackupChain.to_log_info"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupChain.to_log_info">[docs]</a>    <span class="k">def</span> <span class="nf">to_log_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return summary, suitable for printing to log</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_all_sets</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">time</span><span class="p">:</span>
+                <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;full&quot;</span>
+                <span class="n">time</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">time</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;inc&quot;</span>
+                <span class="n">time</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">end_time</span>
+            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">encrypted</span><span class="p">:</span>
+                <span class="n">enc</span> <span class="o">=</span> <span class="s2">&quot;enc&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">enc</span> <span class="o">=</span> <span class="s2">&quot;noenc&quot;</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">timetostring</span><span class="p">(</span><span class="n">time</span><span class="p">),</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)),</span> <span class="n">enc</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">l</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return string representation, for testing purposes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">set_schema</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%20s</span><span class="s2">   </span><span class="si">%30s</span><span class="s2">   </span><span class="si">%15s</span><span class="s2">&quot;</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;-------------------------&quot;</span><span class="p">,</span>
+             <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Chain start time: &quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">timetopretty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="p">),</span>
+             <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Chain end time: &quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">timetopretty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">end_time</span><span class="p">),</span>
+             <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Number of contained backup sets: </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span>
+             <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">incset_list</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,),</span>
+             <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Total number of contained volumes: </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span>
+             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_num_volumes</span><span class="p">(),),</span>
+             <span class="n">set_schema</span> <span class="o">%</span> <span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Type of backup set:&quot;</span><span class="p">),</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Time:&quot;</span><span class="p">),</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Num volumes:&quot;</span><span class="p">))]</span>
+
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_all_sets</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">time</span><span class="p">:</span>
+                <span class="nb">type</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Full&quot;</span><span class="p">)</span>
+                <span class="n">time</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">time</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">type</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Incremental&quot;</span><span class="p">)</span>
+                <span class="n">time</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">end_time</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">set_schema</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">timetopretty</span><span class="p">(</span><span class="n">time</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)))</span>
+
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;-------------------------&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BackupChain.get_num_volumes"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupChain.get_num_volumes">[docs]</a>    <span class="k">def</span> <span class="nf">get_num_volumes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the total number of volumes in the chain</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_all_sets</span><span class="p">():</span>
+            <span class="n">n</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">n</span></div>
+
+<div class="viewcode-block" id="BackupChain.get_all_sets"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.BackupChain.get_all_sets">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return list of all backup sets in chain</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fullset</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fullset</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">incset_list</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">incset_list</span></div></div>
+
+
+<div class="viewcode-block" id="SignatureChain"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.SignatureChain">[docs]</a><span class="k">class</span> <span class="nc">SignatureChain</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A number of linked SignatureSets</span>
+
+<span class="sd">    Analog to BackupChain - start with a full-sig, and continue with</span>
+<span class="sd">    new-sigs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local</span><span class="p">,</span> <span class="n">location</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return new SignatureChain.</span>
+
+<span class="sd">        local should be true iff the signature chain resides in</span>
+<span class="sd">        globals.archive_dir_path and false if the chain is in</span>
+<span class="sd">        globals.backend.</span>
+
+<span class="sd">        @param local: True if sig chain in globals.archive_dir_path</span>
+<span class="sd">        @type local: Boolean</span>
+
+<span class="sd">        @param location: Where the sig chain is located</span>
+<span class="sd">        @type location: globals.archive_dir_path or globals.backend</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">local</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">location</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">location</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fullsig</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># filename of full signature</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inclist</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># list of filenames of incremental signatures</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Local or Remote and List of files in the set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="p">:</span>
+            <span class="n">place</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;local&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">place</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;remote&quot;</span><span class="p">)</span>
+        <span class="n">filelist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fullsig</span><span class="p">:</span>
+            <span class="n">filelist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fullsig</span><span class="p">)</span>
+        <span class="n">filelist</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inclist</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: [</span><span class="si">%s</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">place</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filelist</span><span class="p">))</span>
+
+<div class="viewcode-block" id="SignatureChain.check_times"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.SignatureChain.check_times">[docs]</a>    <span class="k">def</span> <span class="nf">check_times</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check to make sure times are in whole seconds</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">time_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">integer_types</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Time </span><span class="si">%s</span><span class="s2"> in </span><span class="si">%s</span><span class="s2"> wrong type&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">time_list</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SignatureChain.islocal"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.SignatureChain.islocal">[docs]</a>    <span class="k">def</span> <span class="nf">islocal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return true if represents a signature chain in archive_dir</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="SignatureChain.add_filename"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.SignatureChain.add_filename">[docs]</a>    <span class="k">def</span> <span class="nf">add_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">pr</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add new sig filename to current chain.  Return true if fits</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pr</span><span class="p">:</span>
+            <span class="n">pr</span> <span class="o">=</span> <span class="n">file_naming</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pr</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fullsig</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pr</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="s2">&quot;new-sig&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">pr</span><span class="o">.</span><span class="n">start_time</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inclist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_times</span><span class="p">([</span><span class="n">pr</span><span class="o">.</span><span class="n">end_time</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="n">pr</span><span class="o">.</span><span class="n">end_time</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pr</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="s2">&quot;full-sig&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fullsig</span> <span class="o">=</span> <span class="n">filename</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_times</span><span class="p">([</span><span class="n">pr</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">pr</span><span class="o">.</span><span class="n">time</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="n">pr</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">pr</span><span class="o">.</span><span class="n">time</span>
+            <span class="k">return</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="SignatureChain.get_fileobjs"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.SignatureChain.get_fileobjs">[docs]</a>    <span class="k">def</span> <span class="nf">get_fileobjs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return ordered list of signature fileobjs opened for reading,</span>
+<span class="sd">        optionally at a certain time</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">fullsig</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="p">:</span>  <span class="c1"># local</span>
+            <span class="k">def</span> <span class="nf">filename_to_fileobj</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+                <span class="sd">&quot;&quot;&quot;Open filename in archive_dir_path, return filtered fileobj&quot;&quot;&quot;</span>
+                <span class="n">sig_dp</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">DupPath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="n">filename</span><span class="p">,))</span>
+                <span class="k">return</span> <span class="n">sig_dp</span><span class="o">.</span><span class="n">filtered_open</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">filename_to_fileobj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">get_fileobj_read</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">filename_to_fileobj</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_filenames</span><span class="p">(</span><span class="n">time</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="SignatureChain.delete"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.SignatureChain.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keep_full</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove all files in signature set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Try to delete in opposite order, so something useful even if aborted</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inclist</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inclist</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_full</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fullsig</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span>
+            <span class="n">inclist_copy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inclist</span><span class="p">[:]</span>
+            <span class="n">inclist_copy</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_full</span><span class="p">:</span>
+                <span class="n">inclist_copy</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fullsig</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">inclist_copy</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SignatureChain.get_filenames"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.SignatureChain.get_filenames">[docs]</a>    <span class="k">def</span> <span class="nf">get_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return ordered list of filenames in set, up to a provided time</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fullsig</span><span class="p">:</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fullsig</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">inclist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inclist</span>
+        <span class="k">if</span> <span class="n">time</span><span class="p">:</span>
+            <span class="n">inclist</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="n">file_naming</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">end_time</span> <span class="o">&lt;=</span> <span class="n">time</span><span class="p">,</span>
+                             <span class="n">inclist</span><span class="p">)</span>
+
+        <span class="n">l</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">inclist</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">l</span></div></div>
+
+
+<div class="viewcode-block" id="CollectionsStatus"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.CollectionsStatus">[docs]</a><span class="k">class</span> <span class="nc">CollectionsStatus</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Hold information about available chains and sets</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="n">archive_dir_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Make new object.  Does not set values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">archive_dir_path</span> <span class="o">=</span> <span class="n">archive_dir_path</span>
+
+        <span class="c1"># Will hold (signature chain, backup chain) pair of active</span>
+        <span class="c1"># (most recent) chains</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matched_chain_pair</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># These should be sorted by end_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_backup_chains</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">other_backup_chains</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_sig_chains</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Other misc paths and sets which shouldn&#39;t be there</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">local_orphaned_sig_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remote_orphaned_sig_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orphaned_backup_sets</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">incomplete_backup_sets</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># True if set_values() below has run</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values_set</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="CollectionsStatus.to_log_info"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.CollectionsStatus.to_log_info">[docs]</a>    <span class="k">def</span> <span class="nf">to_log_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return summary of the collection, suitable for printing to log</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;backend </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,),</span>
+             <span class="s2">&quot;archive-dir </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="p">,)]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">other_backup_chains</span><span class="p">)):</span>
+            <span class="c1"># A bit of a misnomer.  Chain might have a sig.</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;chain-no-sig </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,))</span>
+            <span class="n">l</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">other_backup_chains</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">to_log_info</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matched_chain_pair</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;chain-complete&quot;</span><span class="p">)</span>
+            <span class="n">l</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matched_chain_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_log_info</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;orphaned-sets-num </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">orphaned_backup_sets</span><span class="p">),))</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;incomplete-sets-num </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">incomplete_backup_sets</span><span class="p">),))</span>
+
+        <span class="k">return</span> <span class="n">l</span></div>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return string summary of the collection</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="p">[</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Collection Status&quot;</span><span class="p">),</span>
+             <span class="sa">u</span><span class="s2">&quot;-----------------&quot;</span><span class="p">,</span>
+             <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Connecting with backend: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span>
+             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,),</span>
+             <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Archive dir: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="o">.</span><span class="n">name</span><span class="p">),)]</span>
+
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                 <span class="n">ngettext</span><span class="p">(</span><span class="s2">&quot;Found </span><span class="si">%d</span><span class="s2"> secondary backup chain.&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;Found </span><span class="si">%d</span><span class="s2"> secondary backup chains.&quot;</span><span class="p">,</span>
+                          <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">other_backup_chains</span><span class="p">))</span>
+                 <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">other_backup_chains</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">other_backup_chains</span><span class="p">)):</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Secondary chain </span><span class="si">%d</span><span class="s2"> of </span><span class="si">%d</span><span class="s2">:&quot;</span><span class="p">)</span> <span class="o">%</span>
+                     <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">other_backup_chains</span><span class="p">)))</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">other_backup_chains</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matched_chain_pair</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Found primary backup chain with matching &quot;</span>
+                     <span class="s2">&quot;signature chain:&quot;</span><span class="p">))</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matched_chain_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;No backup chains with active signatures found&quot;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orphaned_backup_sets</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">incomplete_backup_sets</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ngettext</span><span class="p">(</span><span class="s2">&quot;Also found </span><span class="si">%d</span><span class="s2"> backup set not part of any chain,&quot;</span><span class="p">,</span>
+                              <span class="s2">&quot;Also found </span><span class="si">%d</span><span class="s2"> backup sets not part of any chain,&quot;</span><span class="p">,</span>
+                              <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">orphaned_backup_sets</span><span class="p">))</span>
+                     <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">orphaned_backup_sets</span><span class="p">),))</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ngettext</span><span class="p">(</span><span class="s2">&quot;and </span><span class="si">%d</span><span class="s2"> incomplete backup set.&quot;</span><span class="p">,</span>
+                              <span class="s2">&quot;and </span><span class="si">%d</span><span class="s2"> incomplete backup sets.&quot;</span><span class="p">,</span>
+                              <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">incomplete_backup_sets</span><span class="p">))</span>
+                     <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">incomplete_backup_sets</span><span class="p">),))</span>
+            <span class="c1"># TRANSL: &quot;cleanup&quot; is a hard-coded command, so do not translate it</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;These may be deleted by running duplicity with the &#39;</span>
+                       <span class="s1">&#39;&quot;cleanup&quot; command.&#39;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;No orphaned or incomplete backup sets found.&quot;</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="sa">u</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CollectionsStatus.set_values"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.CollectionsStatus.set_values">[docs]</a>    <span class="k">def</span> <span class="nf">set_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sig_chain_warning</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set values from archive_dir_path and backend.</span>
+
+<span class="sd">        Returns self for convenience.  If sig_chain_warning is set to None,</span>
+<span class="sd">        do not warn about unnecessary sig chains.  This is because there may</span>
+<span class="sd">        naturally be some unecessary ones after a full backup.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values_set</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="c1"># get remote filename list</span>
+        <span class="n">backend_filename_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="n">ngettext</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> file exists on backend&quot;</span><span class="p">,</span>
+                           <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> files exist on backend&quot;</span><span class="p">,</span>
+                           <span class="nb">len</span><span class="p">(</span><span class="n">backend_filename_list</span><span class="p">))</span> <span class="o">%</span>
+                  <span class="nb">len</span><span class="p">(</span><span class="n">backend_filename_list</span><span class="p">))</span>
+
+        <span class="c1"># get local filename list</span>
+        <span class="n">local_filename_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="o">.</span><span class="n">listdir</span><span class="p">()</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="n">ngettext</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> file exists in cache&quot;</span><span class="p">,</span>
+                           <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> files exist in cache&quot;</span><span class="p">,</span>
+                           <span class="nb">len</span><span class="p">(</span><span class="n">local_filename_list</span><span class="p">))</span> <span class="o">%</span>
+                  <span class="nb">len</span><span class="p">(</span><span class="n">local_filename_list</span><span class="p">))</span>
+
+        <span class="c1"># check for partial backups</span>
+        <span class="n">partials</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">local_filename</span> <span class="ow">in</span> <span class="n">local_filename_list</span><span class="p">:</span>
+            <span class="n">pr</span> <span class="o">=</span> <span class="n">file_naming</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">local_filename</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pr</span> <span class="ow">and</span> <span class="n">pr</span><span class="o">.</span><span class="n">partial</span><span class="p">:</span>
+                <span class="n">partials</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">local_filename</span><span class="p">)</span>
+
+        <span class="c1"># get various backup sets and chains</span>
+        <span class="p">(</span><span class="n">backup_chains</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">orphaned_backup_sets</span><span class="p">,</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">incomplete_backup_sets</span><span class="p">)</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_backup_chains</span><span class="p">(</span><span class="n">partials</span> <span class="o">+</span> <span class="n">backend_filename_list</span><span class="p">)</span>
+        <span class="n">backup_chains</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sorted_chains</span><span class="p">(</span><span class="n">backup_chains</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_backup_chains</span> <span class="o">=</span> <span class="n">backup_chains</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">backup_chains</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_backup_chains</span><span class="p">),</span> \
+            <span class="s2">&quot;get_sorted_chains() did something more than re-ordering&quot;</span>
+
+        <span class="n">local_sig_chains</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_orphaned_sig_names</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_signature_chains</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">remote_sig_chains</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_orphaned_sig_names</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_signature_chains</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">filelist</span><span class="o">=</span><span class="n">backend_filename_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_matched_chain_pair</span><span class="p">(</span><span class="n">local_sig_chains</span> <span class="o">+</span> <span class="n">remote_sig_chains</span><span class="p">,</span>
+                                    <span class="n">backup_chains</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">sig_chain_warning</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="CollectionsStatus.set_matched_chain_pair"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.CollectionsStatus.set_matched_chain_pair">[docs]</a>    <span class="k">def</span> <span class="nf">set_matched_chain_pair</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sig_chains</span><span class="p">,</span> <span class="n">backup_chains</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set self.matched_chain_pair and self.other_sig/backup_chains</span>
+
+<span class="sd">        The latest matched_chain_pair will be set.  If there are both</span>
+<span class="sd">        remote and local signature chains capable of matching the</span>
+<span class="sd">        latest backup chain, use the local sig chain (it does not need</span>
+<span class="sd">        to be downloaded).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sig_chains</span> <span class="o">=</span> <span class="n">sig_chains</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sorted_chains</span><span class="p">(</span><span class="n">sig_chains</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_sig_chains</span> <span class="o">=</span> <span class="n">sig_chains</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">other_backup_chains</span> <span class="o">=</span> <span class="n">backup_chains</span><span class="p">[:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matched_chain_pair</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">sig_chains</span> <span class="ow">and</span> <span class="n">backup_chains</span><span class="p">:</span>
+            <span class="n">latest_backup_chain</span> <span class="o">=</span> <span class="n">backup_chains</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sig_chains</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">sig_chains</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">end_time</span> <span class="o">==</span> <span class="n">latest_backup_chain</span><span class="o">.</span><span class="n">end_time</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="c1"># See if the set before last matches:</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">latest_backup_chain</span><span class="o">.</span><span class="n">get_all_sets</span><span class="p">())</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="ow">and</span>
+                      <span class="n">sig_chains</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">end_time</span> <span class="o">==</span> <span class="n">latest_backup_chain</span><span class="o">.</span><span class="n">get_all_sets</span><span class="p">()[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">end_time</span><span class="p">):</span>
+                    <span class="c1"># It matches, remove the last backup set:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Warning, discarding last backup set, because &quot;</span>
+                               <span class="s2">&quot;of missing signature file.&quot;</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">incomplete_backup_sets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">latest_backup_chain</span><span class="o">.</span><span class="n">incset_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">latest_backup_chain</span><span class="o">.</span><span class="n">incset_list</span> <span class="o">=</span> <span class="n">latest_backup_chain</span><span class="o">.</span><span class="n">incset_list</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="c1"># Found a matching pair:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matched_chain_pair</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">matched_chain_pair</span> <span class="o">=</span> <span class="p">(</span><span class="n">sig_chains</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">latest_backup_chain</span><span class="p">)</span>
+
+                <span class="k">break</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matched_chain_pair</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">other_backup_chains</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matched_chain_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="CollectionsStatus.warn"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.CollectionsStatus.warn">[docs]</a>    <span class="k">def</span> <span class="nf">warn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sig_chain_warning</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Log various error messages if find incomplete/orphaned files</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">values_set</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_orphaned_sig_names</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="n">ngettext</span><span class="p">(</span><span class="s2">&quot;Warning, found the following local orphaned &quot;</span>
+                              <span class="s2">&quot;signature file:&quot;</span><span class="p">,</span>
+                              <span class="s2">&quot;Warning, found the following local orphaned &quot;</span>
+                              <span class="s2">&quot;signature files:&quot;</span><span class="p">,</span>
+                              <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">local_orphaned_sig_names</span><span class="p">))</span> <span class="o">+</span> <span class="sa">u</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                     <span class="sa">u</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_orphaned_sig_names</span><span class="p">)),</span>
+                     <span class="n">log</span><span class="o">.</span><span class="n">WarningCode</span><span class="o">.</span><span class="n">orphaned_sig</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_orphaned_sig_names</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="n">ngettext</span><span class="p">(</span><span class="s2">&quot;Warning, found the following remote orphaned &quot;</span>
+                              <span class="s2">&quot;signature file:&quot;</span><span class="p">,</span>
+                              <span class="s2">&quot;Warning, found the following remote orphaned &quot;</span>
+                              <span class="s2">&quot;signature files:&quot;</span><span class="p">,</span>
+                              <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remote_orphaned_sig_names</span><span class="p">))</span> <span class="o">+</span> <span class="sa">u</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                     <span class="sa">u</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_orphaned_sig_names</span><span class="p">)),</span>
+                     <span class="n">log</span><span class="o">.</span><span class="n">WarningCode</span><span class="o">.</span><span class="n">orphaned_sig</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_sig_chains</span> <span class="ow">and</span> <span class="n">sig_chain_warning</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">matched_chain_pair</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Warning, found signatures but no corresponding &quot;</span>
+                       <span class="s2">&quot;backup files&quot;</span><span class="p">),</span> <span class="n">log</span><span class="o">.</span><span class="n">WarningCode</span><span class="o">.</span><span class="n">unmatched_sig</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">incomplete_backup_sets</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Warning, found incomplete backup sets, probably left &quot;</span>
+                       <span class="s2">&quot;from aborted session&quot;</span><span class="p">),</span> <span class="n">log</span><span class="o">.</span><span class="n">WarningCode</span><span class="o">.</span><span class="n">incomplete_backup</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orphaned_backup_sets</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="n">ngettext</span><span class="p">(</span><span class="s2">&quot;Warning, found the following orphaned &quot;</span>
+                              <span class="s2">&quot;backup file:&quot;</span><span class="p">,</span>
+                              <span class="s2">&quot;Warning, found the following orphaned &quot;</span>
+                              <span class="s2">&quot;backup files:&quot;</span><span class="p">,</span>
+                              <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">orphaned_backup_sets</span><span class="p">))</span> <span class="o">+</span> <span class="sa">u</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                     <span class="sa">u</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">unicode</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">orphaned_backup_sets</span><span class="p">)),</span>
+                     <span class="n">log</span><span class="o">.</span><span class="n">WarningCode</span><span class="o">.</span><span class="n">orphaned_backup</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CollectionsStatus.get_backup_chains"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.CollectionsStatus.get_backup_chains">[docs]</a>    <span class="k">def</span> <span class="nf">get_backup_chains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename_list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Split given filename_list into chains</span>
+
+<span class="sd">        Return value will be tuple (list of chains, list of sets, list</span>
+<span class="sd">        of incomplete sets), where the list of sets will comprise sets</span>
+<span class="sd">        not fitting into any chain, and the incomplete sets are sets</span>
+<span class="sd">        missing files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Extracting backup chains from list of files: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                  <span class="o">%</span> <span class="p">[</span><span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">filename_list</span><span class="p">])</span>
+        <span class="c1"># First put filenames in set form</span>
+        <span class="n">sets</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">def</span> <span class="nf">add_to_sets</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Try adding filename to existing sets, or make new one</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">for</span> <span class="nb">set</span> <span class="ow">in</span> <span class="n">sets</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">set</span><span class="o">.</span><span class="n">add_filename</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;File </span><span class="si">%s</span><span class="s2"> is part of known set&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">filename</span><span class="p">),))</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;File </span><span class="si">%s</span><span class="s2"> is not part of a known set; creating new set&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">filename</span><span class="p">),))</span>
+                <span class="n">new_set</span> <span class="o">=</span> <span class="n">BackupSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">new_set</span><span class="o">.</span><span class="n">add_filename</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+                    <span class="n">sets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_set</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Ignoring file (rejected by backup set) &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">util</span><span class="o">.</span><span class="n">ufn</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">filename_list</span><span class="p">:</span>
+            <span class="n">add_to_sets</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">sets</span><span class="p">,</span> <span class="n">incomplete_sets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sorted_sets</span><span class="p">(</span><span class="n">sets</span><span class="p">)</span>
+
+        <span class="n">chains</span><span class="p">,</span> <span class="n">orphaned_sets</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+
+        <span class="k">def</span> <span class="nf">add_to_chains</span><span class="p">(</span><span class="nb">set</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Try adding set to existing chains, or make new one</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="nb">set</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;full&quot;</span><span class="p">:</span>
+                <span class="n">new_chain</span> <span class="o">=</span> <span class="n">BackupChain</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">)</span>
+                <span class="n">new_chain</span><span class="o">.</span><span class="n">set_full</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+                <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_chain</span><span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Found backup chain </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">new_chain</span><span class="o">.</span><span class="n">short_desc</span><span class="p">()))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="nb">set</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;inc&quot;</span>
+                <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chains</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">chain</span><span class="o">.</span><span class="n">add_inc</span><span class="p">(</span><span class="nb">set</span><span class="p">):</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Added set </span><span class="si">%s</span><span class="s2"> to pre-existing chain </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="nb">set</span><span class="o">.</span><span class="n">get_timestr</span><span class="p">(),</span>
+                                                                                <span class="n">chain</span><span class="o">.</span><span class="n">short_desc</span><span class="p">()))</span>
+                        <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Found orphaned set </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="nb">set</span><span class="o">.</span><span class="n">get_timestr</span><span class="p">(),))</span>
+                    <span class="n">orphaned_sets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sets</span><span class="p">:</span>
+            <span class="n">add_to_chains</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">chains</span><span class="p">,</span> <span class="n">orphaned_sets</span><span class="p">,</span> <span class="n">incomplete_sets</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CollectionsStatus.get_sorted_sets"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.CollectionsStatus.get_sorted_sets">[docs]</a>    <span class="k">def</span> <span class="nf">get_sorted_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">set_list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sort set list by end time, return (sorted list, incomplete)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">time_set_pairs</span><span class="p">,</span> <span class="n">incomplete_sets</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="nb">set</span> <span class="ow">in</span> <span class="n">set_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="o">.</span><span class="n">is_complete</span><span class="p">():</span>
+                <span class="n">incomplete_sets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">set</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;full&quot;</span><span class="p">:</span>
+                <span class="n">time_set_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">set</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="nb">set</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">time_set_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">set</span><span class="o">.</span><span class="n">end_time</span><span class="p">,</span> <span class="nb">set</span><span class="p">))</span>
+        <span class="n">time_set_pairs</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">([</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">time_set_pairs</span><span class="p">],</span> <span class="n">incomplete_sets</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CollectionsStatus.get_signature_chains"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.CollectionsStatus.get_signature_chains">[docs]</a>    <span class="k">def</span> <span class="nf">get_signature_chains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local</span><span class="p">,</span> <span class="n">filelist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find chains in archive_dir_path (if local is true) or backend</span>
+
+<span class="sd">        Use filelist if given, otherwise regenerate.  Return value is</span>
+<span class="sd">        pair (list of chains, list of signature paths not in any</span>
+<span class="sd">        chains).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">get_filelist</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">filelist</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">filelist</span>
+            <span class="k">elif</span> <span class="n">local</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="o">.</span><span class="n">listdir</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">get_new_sigchain</span><span class="p">():</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Return new empty signature chain</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">local</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">SignatureChain</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">SignatureChain</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">)</span>
+
+        <span class="c1"># Build initial chains from full sig filenames</span>
+        <span class="n">chains</span><span class="p">,</span> <span class="n">new_sig_filenames</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">get_filelist</span><span class="p">():</span>
+            <span class="n">pr</span> <span class="o">=</span> <span class="n">file_naming</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pr</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">pr</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;full-sig&quot;</span><span class="p">:</span>
+                    <span class="n">new_chain</span> <span class="o">=</span> <span class="n">get_new_sigchain</span><span class="p">()</span>
+                    <span class="k">assert</span> <span class="n">new_chain</span><span class="o">.</span><span class="n">add_filename</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">pr</span><span class="p">)</span>
+                    <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_chain</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">pr</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;new-sig&quot;</span><span class="p">:</span>
+                    <span class="n">new_sig_filenames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+        <span class="c1"># compare by file time</span>
+        <span class="k">def</span> <span class="nf">by_start_time</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">file_naming</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">.</span><span class="n">start_time</span><span class="p">)</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">file_naming</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">start_time</span><span class="p">)</span>
+
+        <span class="c1"># Try adding new signatures to existing chains</span>
+        <span class="n">orphaned_filenames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">new_sig_filenames</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">by_start_time</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">sig_filename</span> <span class="ow">in</span> <span class="n">new_sig_filenames</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chains</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">chain</span><span class="o">.</span><span class="n">add_filename</span><span class="p">(</span><span class="n">sig_filename</span><span class="p">):</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">orphaned_filenames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sig_filename</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">chains</span><span class="p">,</span> <span class="n">orphaned_filenames</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CollectionsStatus.get_sorted_chains"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.CollectionsStatus.get_sorted_chains">[docs]</a>    <span class="k">def</span> <span class="nf">get_sorted_chains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chain_list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return chains sorted by end_time.  If tie, local goes last</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Build dictionary from end_times to lists of corresponding chains</span>
+        <span class="n">endtime_chain_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chain_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">chain</span><span class="o">.</span><span class="n">end_time</span> <span class="ow">in</span> <span class="n">endtime_chain_dict</span><span class="p">:</span>
+                <span class="n">endtime_chain_dict</span><span class="p">[</span><span class="n">chain</span><span class="o">.</span><span class="n">end_time</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">endtime_chain_dict</span><span class="p">[</span><span class="n">chain</span><span class="o">.</span><span class="n">end_time</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">chain</span><span class="p">]</span>
+
+        <span class="c1"># Use dictionary to build final sorted list</span>
+        <span class="n">sorted_end_times</span> <span class="o">=</span> <span class="n">endtime_chain_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="n">sorted_end_times</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">sorted_chain_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">end_time</span> <span class="ow">in</span> <span class="n">sorted_end_times</span><span class="p">:</span>
+            <span class="n">chain_list</span> <span class="o">=</span> <span class="n">endtime_chain_dict</span><span class="p">[</span><span class="n">end_time</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chain_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">sorted_chain_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain_list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">chain_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+                <span class="k">if</span> <span class="n">chain_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>  <span class="c1"># is remote, goes first</span>
+                    <span class="n">sorted_chain_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain_list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">sorted_chain_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain_list</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>  <span class="c1"># is local, goes second</span>
+                    <span class="n">sorted_chain_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain_list</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">sorted_chain_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain_list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">sorted_chain_list</span></div>
+
+<div class="viewcode-block" id="CollectionsStatus.get_backup_chain_at_time"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.CollectionsStatus.get_backup_chain_at_time">[docs]</a>    <span class="k">def</span> <span class="nf">get_backup_chain_at_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return backup chain covering specified time</span>
+
+<span class="sd">        Tries to find the backup chain covering the given time.  If</span>
+<span class="sd">        there is none, return the earliest chain before, and failing</span>
+<span class="sd">        that, the earliest chain.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_backup_chains</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CollectionsError</span><span class="p">(</span><span class="s2">&quot;No backup chains found&quot;</span><span class="p">)</span>
+
+        <span class="n">covering_chains</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_backup_chains</span>
+                           <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">start_time</span> <span class="o">&lt;=</span> <span class="n">time</span> <span class="o">&lt;=</span> <span class="n">c</span><span class="o">.</span><span class="n">end_time</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">covering_chains</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CollectionsError</span><span class="p">(</span><span class="s2">&quot;Two chains cover the given time&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">covering_chains</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">covering_chains</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">old_chains</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_backup_chains</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">end_time</span> <span class="o">&lt;</span> <span class="n">time</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">old_chains</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">old_chains</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_backup_chains</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># no chains are old enough</span></div>
+
+<div class="viewcode-block" id="CollectionsStatus.get_signature_chain_at_time"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.CollectionsStatus.get_signature_chain_at_time">[docs]</a>    <span class="k">def</span> <span class="nf">get_signature_chain_at_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return signature chain covering specified time</span>
+
+<span class="sd">        Tries to find the signature chain covering the given time.  If</span>
+<span class="sd">        there is none, return the earliest chain before, and failing</span>
+<span class="sd">        that, the earliest chain.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_sig_chains</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CollectionsError</span><span class="p">(</span><span class="s2">&quot;No signature chains found&quot;</span><span class="p">)</span>
+
+        <span class="n">covering_chains</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_sig_chains</span>
+                           <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">start_time</span> <span class="o">&lt;=</span> <span class="n">time</span> <span class="o">&lt;=</span> <span class="n">c</span><span class="o">.</span><span class="n">end_time</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">covering_chains</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">covering_chains</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># prefer local if multiple sig chains</span>
+
+        <span class="n">old_chains</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_sig_chains</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">end_time</span> <span class="o">&lt;</span> <span class="n">time</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">old_chains</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">old_chains</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># no chains are old enough, give oldest and warn user</span>
+            <span class="n">oldest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_sig_chains</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">time</span> <span class="o">&lt;</span> <span class="n">oldest</span><span class="o">.</span><span class="n">start_time</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;No signature chain for the requested time. &quot;</span>
+                           <span class="s2">&quot;Using oldest available chain, starting at time </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">)</span> <span class="o">%</span>
+                         <span class="n">dup_time</span><span class="o">.</span><span class="n">timetopretty</span><span class="p">(</span><span class="n">oldest</span><span class="o">.</span><span class="n">start_time</span><span class="p">),</span>
+                         <span class="n">log</span><span class="o">.</span><span class="n">WarningCode</span><span class="o">.</span><span class="n">no_sig_for_time</span><span class="p">,</span>
+                         <span class="n">dup_time</span><span class="o">.</span><span class="n">timetostring</span><span class="p">(</span><span class="n">oldest</span><span class="o">.</span><span class="n">start_time</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">oldest</span></div>
+
+<div class="viewcode-block" id="CollectionsStatus.get_extraneous"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.CollectionsStatus.get_extraneous">[docs]</a>    <span class="k">def</span> <span class="nf">get_extraneous</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extra_clean</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return list of the names of extraneous duplicity files</span>
+
+<span class="sd">        A duplicity file is considered extraneous if it is</span>
+<span class="sd">        recognizable as a duplicity file, but isn&#39;t part of some</span>
+<span class="sd">        complete backup set, or current signature chain.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">values_set</span>
+        <span class="n">local_filenames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">remote_filenames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ext_containers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orphaned_backup_sets</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">incomplete_backup_sets</span>
+        <span class="k">if</span> <span class="n">extra_clean</span><span class="p">:</span>
+            <span class="n">old_sig_chains</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_sig_chains</span><span class="p">[:]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matched_chain_pair</span><span class="p">:</span>
+                <span class="n">matched_sig_chain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matched_chain_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">sig_chain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_sig_chains</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">sig_chain</span><span class="o">.</span><span class="n">start_time</span> <span class="o">==</span> <span class="n">matched_sig_chain</span><span class="o">.</span><span class="n">start_time</span> <span class="ow">and</span>
+                            <span class="n">sig_chain</span><span class="o">.</span><span class="n">end_time</span> <span class="o">==</span> <span class="n">matched_sig_chain</span><span class="o">.</span><span class="n">end_time</span><span class="p">):</span>
+                        <span class="n">old_sig_chains</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">sig_chain</span><span class="p">)</span>
+            <span class="n">ext_containers</span> <span class="o">+=</span> <span class="n">old_sig_chains</span>
+        <span class="k">for</span> <span class="n">set_or_chain</span> <span class="ow">in</span> <span class="n">ext_containers</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">set_or_chain</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
+                <span class="n">remote_filenames</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">set_or_chain</span><span class="o">.</span><span class="n">get_filenames</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">local_filenames</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">set_or_chain</span><span class="o">.</span><span class="n">get_filenames</span><span class="p">())</span>
+        <span class="n">local_filenames</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_orphaned_sig_names</span>
+        <span class="n">remote_filenames</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_orphaned_sig_names</span>
+        <span class="k">return</span> <span class="n">local_filenames</span><span class="p">,</span> <span class="n">remote_filenames</span></div>
+
+<div class="viewcode-block" id="CollectionsStatus.sort_sets"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.CollectionsStatus.sort_sets">[docs]</a>    <span class="k">def</span> <span class="nf">sort_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">setlist</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return new list containing same elems of setlist, sorted by time&quot;&quot;&quot;</span>
+        <span class="n">pairs</span> <span class="o">=</span> <span class="p">[(</span><span class="n">s</span><span class="o">.</span><span class="n">get_time</span><span class="p">(),</span> <span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">setlist</span><span class="p">]</span>
+        <span class="n">pairs</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="CollectionsStatus.get_chains_older_than"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.CollectionsStatus.get_chains_older_than">[docs]</a>    <span class="k">def</span> <span class="nf">get_chains_older_than</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of backup chains older than the given time t</span>
+
+<span class="sd">        All of the times will be associated with an intact chain.</span>
+<span class="sd">        Furthermore, none of the times will be of a chain which a newer</span>
+<span class="sd">        set may depend on.  For instance, if set A is a full set older</span>
+<span class="sd">        than t, and set B is an incremental based on A which is newer</span>
+<span class="sd">        than t, then the time of set A will not be returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">values_set</span>
+        <span class="n">old_chains</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_backup_chains</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">end_time</span> <span class="o">&lt;</span> <span class="n">t</span> <span class="ow">and</span>
+                <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">matched_chain_pair</span> <span class="ow">or</span>
+                 <span class="n">chain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">matched_chain_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">])):</span>
+                    <span class="c1"># don&#39;t delete the active (matched) chain</span>
+                    <span class="n">old_chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">old_chains</span></div>
+
+<div class="viewcode-block" id="CollectionsStatus.get_signature_chains_older_than"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.CollectionsStatus.get_signature_chains_older_than">[docs]</a>    <span class="k">def</span> <span class="nf">get_signature_chains_older_than</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of signature chains older than the given time t</span>
+
+<span class="sd">        All of the times will be associated with an intact chain.</span>
+<span class="sd">        Furthermore, none of the times will be of a chain which a newer</span>
+<span class="sd">        set may depend on.  For instance, if set A is a full set older</span>
+<span class="sd">        than t, and set B is an incremental based on A which is newer</span>
+<span class="sd">        than t, then the time of set A will not be returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">values_set</span>
+        <span class="n">old_chains</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_sig_chains</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">end_time</span> <span class="o">&lt;</span> <span class="n">t</span> <span class="ow">and</span>
+                <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">matched_chain_pair</span> <span class="ow">or</span>
+                 <span class="n">chain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">matched_chain_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+                    <span class="c1"># don&#39;t delete the active (matched) chain</span>
+                    <span class="n">old_chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">old_chains</span></div>
+
+<div class="viewcode-block" id="CollectionsStatus.get_last_full_backup_time"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.CollectionsStatus.get_last_full_backup_time">[docs]</a>    <span class="k">def</span> <span class="nf">get_last_full_backup_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the time of the last full backup,</span>
+<span class="sd">        or 0 if there is none.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nth_last_full_backup_time</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CollectionsStatus.get_nth_last_full_backup_time"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.CollectionsStatus.get_nth_last_full_backup_time">[docs]</a>    <span class="k">def</span> <span class="nf">get_nth_last_full_backup_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the time of the nth to last full backup,</span>
+<span class="sd">        or 0 if there is none.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nth_last_backup_chain</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">chain</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">chain</span><span class="o">.</span><span class="n">get_first</span><span class="p">()</span><span class="o">.</span><span class="n">time</span></div>
+
+<div class="viewcode-block" id="CollectionsStatus.get_last_backup_chain"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.CollectionsStatus.get_last_backup_chain">[docs]</a>    <span class="k">def</span> <span class="nf">get_last_backup_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the last full backup of the collection,</span>
+<span class="sd">        or None if there is no full backup chain.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nth_last_backup_chain</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CollectionsStatus.get_nth_last_backup_chain"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.CollectionsStatus.get_nth_last_backup_chain">[docs]</a>    <span class="k">def</span> <span class="nf">get_nth_last_backup_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the nth-to-last full backup of the collection,</span>
+<span class="sd">        or None if there is less than n backup chains.</span>
+
+<span class="sd">        NOTE: n = 1 -&gt; time of latest available chain (n = 0 is not</span>
+<span class="sd">        a valid input). Thus the second-to-last is obtained with n=2</span>
+<span class="sd">        rather than n=1.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">mycmp</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">cmp</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">get_first</span><span class="p">()</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">get_first</span><span class="p">()</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">values_set</span>
+        <span class="k">assert</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_backup_chains</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="nb">sorted</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_backup_chains</span><span class="p">[:]</span>
+        <span class="nb">sorted</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">mycmp</span><span class="p">)</span>
+
+        <span class="nb">sorted</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="CollectionsStatus.get_older_than"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.CollectionsStatus.get_older_than">[docs]</a>    <span class="k">def</span> <span class="nf">get_older_than</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of backup sets older than the given time t</span>
+
+<span class="sd">        All of the times will be associated with an intact chain.</span>
+<span class="sd">        Furthermore, none of the times will be of a set which a newer</span>
+<span class="sd">        set may depend on.  For instance, if set A is a full set older</span>
+<span class="sd">        than t, and set B is an incremental based on A which is newer</span>
+<span class="sd">        than t, then the time of set A will not be returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">old_sets</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_chains_older_than</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+            <span class="n">old_sets</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">get_all_sets</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sort_sets</span><span class="p">(</span><span class="n">old_sets</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CollectionsStatus.get_older_than_required"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.CollectionsStatus.get_older_than_required">[docs]</a>    <span class="k">def</span> <span class="nf">get_older_than_required</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns list of old backup sets required by new sets</span>
+
+<span class="sd">        This function is similar to the previous one, but it only</span>
+<span class="sd">        returns the times of sets which are old but part of the chains</span>
+<span class="sd">        where the newer end of the chain is newer than t.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">values_set</span>
+        <span class="n">new_chains</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">end_time</span> <span class="o">&gt;=</span> <span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_backup_chains</span><span class="p">)</span>
+        <span class="n">result_sets</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">new_chains</span><span class="p">:</span>
+            <span class="n">old_sets</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">get_time</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">t</span><span class="p">,</span> <span class="n">chain</span><span class="o">.</span><span class="n">get_all_sets</span><span class="p">())</span>
+            <span class="n">result_sets</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">old_sets</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sort_sets</span><span class="p">(</span><span class="n">result_sets</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CollectionsStatus.get_file_changed_record"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.CollectionsStatus.get_file_changed_record">[docs]</a>    <span class="k">def</span> <span class="nf">get_file_changed_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns time line of specified file changed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># quick fix to spaces in filepath</span>
+        <span class="n">modified_filepath</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot; &quot;</span> <span class="ow">in</span> <span class="n">filepath</span><span class="p">:</span>
+            <span class="n">modified_filepath</span> <span class="o">=</span> <span class="s1">&#39;&quot;&#39;</span> <span class="o">+</span> <span class="n">filepath</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\x20&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">matched_chain_pair</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="n">all_backup_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matched_chain_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_all_sets</span><span class="p">()</span>
+        <span class="n">specified_file_backup_set</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">specified_file_backup_type</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">bs</span> <span class="ow">in</span> <span class="n">all_backup_set</span><span class="p">:</span>
+            <span class="n">filelist</span> <span class="o">=</span> <span class="p">[</span><span class="n">fileinfo</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">fileinfo</span> <span class="ow">in</span> <span class="n">bs</span><span class="o">.</span><span class="n">get_files_changed</span><span class="p">()]</span>
+            <span class="k">if</span> <span class="n">modified_filepath</span> <span class="ow">in</span> <span class="n">filelist</span><span class="p">:</span>
+                <span class="n">specified_file_backup_set</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bs</span><span class="p">)</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="n">filelist</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">modified_filepath</span><span class="p">)</span>
+                <span class="n">specified_file_backup_type</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bs</span><span class="o">.</span><span class="n">get_files_changed</span><span class="p">()[</span><span class="n">index</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">FileChangedStatus</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">specified_file_backup_type</span><span class="p">,</span> <span class="n">specified_file_backup_set</span><span class="p">)))</span></div></div>
+
+
+<div class="viewcode-block" id="FileChangedStatus"><a class="viewcode-back" href="../../duplicity.collections.html#duplicity.collections.FileChangedStatus">[docs]</a><span class="k">class</span> <span class="nc">FileChangedStatus</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">fileinfo_list</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filepath</span> <span class="o">=</span> <span class="n">filepath</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fileinfo_list</span> <span class="o">=</span> <span class="n">fileinfo_list</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">set_schema</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%20s</span><span class="s2">   </span><span class="si">%30s</span><span class="s2">  </span><span class="si">%20s</span><span class="s2">&quot;</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;-------------------------&quot;</span><span class="p">,</span>
+             <span class="n">_</span><span class="p">(</span><span class="s2">&quot;File: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">),</span>
+             <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Total number of backup: </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileinfo_list</span><span class="p">),</span>
+             <span class="n">set_schema</span> <span class="o">%</span> <span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Type of backup set:&quot;</span><span class="p">),</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Time:&quot;</span><span class="p">),</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Type of file change:&quot;</span><span class="p">))]</span>
+
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileinfo_list</span><span class="p">:</span>
+            <span class="n">backup_type</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">backup_set</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">backup_set</span><span class="o">.</span><span class="n">time</span><span class="p">:</span>
+                <span class="nb">type</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Full&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">type</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Incremental&quot;</span><span class="p">)</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">set_schema</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">timetopretty</span><span class="p">(</span><span class="n">backup_set</span><span class="o">.</span><span class="n">get_time</span><span class="p">()),</span> <span class="n">backup_type</span><span class="o">.</span><span class="n">title</span><span class="p">()))</span>
+
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;-------------------------&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">l</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

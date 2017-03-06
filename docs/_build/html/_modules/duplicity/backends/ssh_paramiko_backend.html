@@ -1,0 +1,501 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.backends.ssh_paramiko_backend &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.backends.ssh_paramiko_backend</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2002 Ben Escoto &lt;ben@emerose.org&gt;</span>
+<span class="c1"># Copyright 2007 Kenneth Loafman &lt;kenneth@loafman.com&gt;</span>
+<span class="c1"># Copyright 2011 Alexander Zangerl &lt;az@snafu.priv.at&gt;</span>
+<span class="c1"># Copyright 2012 edso (ssh_config added)</span>
+<span class="c1">#</span>
+<span class="c1"># $Id: sshbackend.py,v 1.2 2011/12/31 04:44:12 az Exp $</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">errno</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">getpass</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">binascii</span> <span class="k">import</span> <span class="n">hexlify</span>
+
+<span class="kn">import</span> <span class="nn">duplicity.backend</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="nb">globals</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">duplicity.errors</span> <span class="k">import</span> <span class="n">BackendException</span>
+
+<span class="n">read_blocksize</span> <span class="o">=</span> <span class="mi">65635</span>  <span class="c1"># for doing scp retrievals, where we need to read ourselves</span>
+
+
+<div class="viewcode-block" id="SSHParamikoBackend"><a class="viewcode-back" href="../../../duplicity.backends.ssh_paramiko_backend.html#duplicity.backends.ssh_paramiko_backend.SSHParamikoBackend">[docs]</a><span class="k">class</span> <span class="nc">SSHParamikoBackend</span><span class="p">(</span><span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Backend</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This backend accesses files using the sftp or scp protocols.</span>
+<span class="sd">    It does not need any local client programs, but an ssh server and the sftp</span>
+<span class="sd">    program must be installed on the remote side (or with scp, the programs</span>
+<span class="sd">    scp, ls, mkdir, rm and a POSIX-compliant shell).</span>
+
+<span class="sd">    Authentication keys are requested from an ssh agent if present, then</span>
+<span class="sd">    ~/.ssh/id_rsa/dsa are tried. If -oIdentityFile=path is present in</span>
+<span class="sd">    --ssh-options, then that file is also tried. The passphrase for any of</span>
+<span class="sd">    these keys is taken from the URI or FTP_PASSWORD. If none of the above are</span>
+<span class="sd">    available, password authentication is attempted (using the URI or</span>
+<span class="sd">    FTP_PASSWORD).</span>
+
+<span class="sd">    Missing directories on the remote side will be created.</span>
+
+<span class="sd">    If scp is active then all operations on the remote side require passing</span>
+<span class="sd">    arguments through a shell, which introduces unavoidable quoting issues:</span>
+<span class="sd">    directory and file names that contain single quotes will not work.</span>
+<span class="sd">    This problem does not exist with sftp.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_url</span><span class="p">):</span>
+        <span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Backend</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_url</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">retry_delay</span> <span class="o">=</span> <span class="mi">10</span>
+
+        <span class="k">if</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+            <span class="c1"># remove first leading &#39;/&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remote_dir</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^/&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remote_dir</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span>
+
+        <span class="c1"># lazily import paramiko when we need it</span>
+        <span class="c1"># debian squeeze&#39;s paramiko is a bit old, so we silence randompool</span>
+        <span class="c1"># depreciation warning note also: passphrased private keys work with</span>
+        <span class="c1"># squeeze&#39;s paramiko only if done with DES, not AES</span>
+        <span class="kn">import</span> <span class="nn">warnings</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+        <span class="kn">import</span> <span class="nn">paramiko</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">resetwarnings</span><span class="p">()</span>
+
+        <span class="k">class</span> <span class="nc">AgreedAddPolicy</span> <span class="p">(</span><span class="n">paramiko</span><span class="o">.</span><span class="n">AutoAddPolicy</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Policy for showing a yes/no prompt and adding the hostname and new</span>
+<span class="sd">            host key to the known host file accordingly.</span>
+
+<span class="sd">            This class simply extends the AutoAddPolicy class with a yes/no</span>
+<span class="sd">            prompt.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">def</span> <span class="nf">missing_host_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+                <span class="n">fp</span> <span class="o">=</span> <span class="n">hexlify</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">get_fingerprint</span><span class="p">())</span>
+                <span class="n">fingerprint</span> <span class="o">=</span> <span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">fp</span><span class="p">[::</span><span class="mi">2</span><span class="p">],</span> <span class="n">fp</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]))</span>
+                <span class="n">question</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;The authenticity of host &#39;</span><span class="si">%s</span><span class="s2">&#39; can&#39;t be established.</span>
+<span class="si">%s</span><span class="s2"> key fingerprint is </span><span class="si">%s</span><span class="s2">.</span>
+<span class="s2">Are you sure you want to continue connecting (yes/no)? &quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">hostname</span><span class="p">,</span>
+                                                              <span class="n">key</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span>
+                                                              <span class="n">fingerprint</span><span class="p">)</span>
+                <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">question</span><span class="p">)</span>
+                    <span class="n">choice</span> <span class="o">=</span> <span class="n">raw_input</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">choice</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;yes&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]:</span>
+                        <span class="n">paramiko</span><span class="o">.</span><span class="n">AutoAddPolicy</span><span class="o">.</span><span class="n">missing_host_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span>
+                                                                <span class="n">hostname</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+                        <span class="k">return</span>
+                    <span class="k">elif</span> <span class="n">choice</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;no&#39;</span><span class="p">,</span> <span class="s1">&#39;n&#39;</span><span class="p">]:</span>
+                        <span class="k">raise</span> <span class="n">AuthenticityException</span><span class="p">(</span><span class="n">hostname</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">question</span> <span class="o">=</span> <span class="s2">&quot;Please type &#39;yes&#39; or &#39;no&#39;: &quot;</span>
+
+        <span class="k">class</span> <span class="nc">AuthenticityException</span> <span class="p">(</span><span class="n">paramiko</span><span class="o">.</span><span class="n">SSHException</span><span class="p">):</span>
+            <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hostname</span><span class="p">):</span>
+                <span class="n">paramiko</span><span class="o">.</span><span class="n">SSHException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                               <span class="s1">&#39;Host key verification for server </span><span class="si">%s</span><span class="s1"> failed.&#39;</span> <span class="o">%</span>
+                                               <span class="n">hostname</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">paramiko</span><span class="o">.</span><span class="n">SSHClient</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">set_missing_host_key_policy</span><span class="p">(</span><span class="n">AgreedAddPolicy</span><span class="p">())</span>
+
+        <span class="c1"># paramiko uses logging with the normal python severity levels,</span>
+        <span class="c1"># but duplicity uses both custom levels and inverted logic...*sigh*</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">set_log_channel</span><span class="p">(</span><span class="s2">&quot;sshbackend&quot;</span><span class="p">)</span>
+        <span class="n">ours</span> <span class="o">=</span> <span class="n">paramiko</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;sshbackend&quot;</span><span class="p">)</span>
+        <span class="n">dest</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s1">&#39;ssh: </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">))</span>
+        <span class="n">ours</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span>
+
+        <span class="c1"># ..and the duplicity levels are neither linear,</span>
+        <span class="c1"># nor are the names compatible with python logging,</span>
+        <span class="c1"># eg. &#39;NOTICE&#39;...WAAAAAH!</span>
+        <span class="n">plevel</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;duplicity&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">getEffectiveLevel</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">plevel</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">wanted</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+        <span class="k">elif</span> <span class="n">plevel</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="n">wanted</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
+        <span class="k">elif</span> <span class="n">plevel</span> <span class="o">&lt;=</span> <span class="mi">7</span><span class="p">:</span>
+            <span class="n">wanted</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
+        <span class="k">elif</span> <span class="n">plevel</span> <span class="o">&lt;=</span> <span class="mi">9</span><span class="p">:</span>
+            <span class="n">wanted</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">wanted</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">CRITICAL</span>
+        <span class="n">ours</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">wanted</span><span class="p">)</span>
+
+        <span class="c1"># load known_hosts files</span>
+        <span class="c1"># paramiko is very picky wrt format and bails out on any problem...</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s2">&quot;/etc/ssh/ssh_known_hosts&quot;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">load_system_host_keys</span><span class="p">(</span><span class="s2">&quot;/etc/ssh/ssh_known_hosts&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;could not load /etc/ssh/ssh_known_hosts, &quot;</span>
+                                   <span class="s2">&quot;maybe corrupt?&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># use load_host_keys() to signal it&#39;s writable to paramiko</span>
+            <span class="c1"># load if file exists or add filename to create it if needed</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/.ssh/known_hosts&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">load_host_keys</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">_host_keys_filename</span> <span class="o">=</span> <span class="n">file</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;could not load ~/.ssh/known_hosts, &quot;</span>
+                                   <span class="s2">&quot;maybe corrupt?&quot;</span><span class="p">)</span>
+
+        <span class="sd">&quot;&quot;&quot; the next block reorganizes all host parameters into a</span>
+<span class="sd">        dictionary like SSHConfig does. this dictionary &#39;self.config&#39;</span>
+<span class="sd">        becomes the authorative source for these values from here on.</span>
+<span class="sd">        rationale is that it is easiest to deal wrt overwriting multiple</span>
+<span class="sd">        values from ssh_config file. (ede 03/2012)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;hostname&#39;</span><span class="p">:</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">hostname</span><span class="p">}</span>
+        <span class="c1"># get system host config entries</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gethostconfig</span><span class="p">(</span><span class="s1">&#39;/etc/ssh/ssh_config&#39;</span><span class="p">,</span>
+                                              <span class="n">parsed_url</span><span class="o">.</span><span class="n">hostname</span><span class="p">))</span>
+        <span class="c1"># update with user&#39;s config file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gethostconfig</span><span class="p">(</span><span class="s1">&#39;~/.ssh/config&#39;</span><span class="p">,</span>
+                                              <span class="n">parsed_url</span><span class="o">.</span><span class="n">hostname</span><span class="p">))</span>
+        <span class="c1"># update with url values</span>
+        <span class="c1"># username from url</span>
+        <span class="k">if</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">username</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">username</span><span class="p">})</span>
+        <span class="c1"># username from input</span>
+        <span class="k">if</span> <span class="s1">&#39;user&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">()})</span>
+        <span class="c1"># port from url</span>
+        <span class="k">if</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">port</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;port&#39;</span><span class="p">:</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">port</span><span class="p">})</span>
+        <span class="c1"># ensure there is deafult 22 or an int value</span>
+        <span class="k">if</span> <span class="s1">&#39;port&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;port&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;port&#39;</span><span class="p">])})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;port&#39;</span><span class="p">:</span> <span class="mi">22</span><span class="p">})</span>
+        <span class="c1"># parse ssh options for alternative ssh private key, identity file</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;^(?:.+\s+)?(?:-oIdentityFile=|-i\s+)(([</span><span class="se">\&quot;</span><span class="s2">&#39;])([^</span><span class="se">\\</span><span class="s2">2]+)</span><span class="se">\\</span><span class="s2">2|[\S]+).*&quot;</span><span class="p">,</span>
+                      <span class="nb">globals</span><span class="o">.</span><span class="n">ssh_options</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">keyfilename</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="k">else</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;identityfile&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">keyfilename</span>
+        <span class="c1"># ensure ~ is expanded and identity exists in dictionary</span>
+        <span class="k">if</span> <span class="s1">&#39;identityfile&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;identityfile&#39;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="c1"># Paramiko 1.9.0 and earlier do not support multiple</span>
+                <span class="c1"># identity files when parsing config files and always</span>
+                <span class="c1"># return a string; later versions always return a list,</span>
+                <span class="c1"># even if there is only one file given.</span>
+                <span class="c1">#</span>
+                <span class="c1"># All recent versions seem to support *using* multiple</span>
+                <span class="c1"># identity files, though, so to make things easier, we</span>
+                <span class="c1"># simply always use a list.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;identityfile&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;identityfile&#39;</span><span class="p">]]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;identityfile&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;identityfile&#39;</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;identityfile&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># get password, enable prompt if askpass is set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_getpass</span> <span class="o">=</span> <span class="nb">globals</span><span class="o">.</span><span class="n">ssh_askpass</span>
+        <span class="c1"># set url values for beautiful login prompt</span>
+        <span class="n">parsed_url</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">]</span>
+        <span class="n">parsed_url</span><span class="o">.</span><span class="n">hostname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;hostname&#39;</span><span class="p">]</span>
+        <span class="n">password</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_password</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">hostname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;hostname&#39;</span><span class="p">],</span>
+                                <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;port&#39;</span><span class="p">],</span>
+                                <span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span>
+                                <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">,</span>
+                                <span class="n">allow_agent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                <span class="n">look_for_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                <span class="n">key_filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;identityfile&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;ssh connection to </span><span class="si">%s</span><span class="s2">@</span><span class="si">%s</span><span class="s2">:</span><span class="si">%d</span><span class="s2"> failed: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;hostname&#39;</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;port&#39;</span><span class="p">],</span> <span class="n">e</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get_transport</span><span class="p">()</span><span class="o">.</span><span class="n">set_keepalive</span><span class="p">((</span><span class="nb">int</span><span class="p">)(</span><span class="nb">globals</span><span class="o">.</span><span class="n">timeout</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">scheme</span> <span class="o">=</span> <span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">strip_prefix</span><span class="p">(</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span>
+                                                     <span class="s1">&#39;paramiko&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_scp</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;scp&#39;</span><span class="p">)</span>
+
+        <span class="c1"># scp or sftp?</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">use_scp</span><span class="p">):</span>
+            <span class="c1"># sanity-check the directory name</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_dir</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;cannot handle directory names with single quotes with scp&quot;</span><span class="p">)</span>
+
+            <span class="c1"># make directory if needed</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">runremote</span><span class="p">(</span><span class="s2">&quot;mkdir -p &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remote_dir</span><span class="p">,),</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;scp mkdir &quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sftp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">open_sftp</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;sftp negotiation failed: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
+
+            <span class="c1"># move to the appropriate directory, possibly after creating it and its parents</span>
+            <span class="n">dirs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_dir</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dirs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="n">dirs</span> <span class="o">=</span> <span class="n">dirs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                    <span class="n">dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dirs</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">d</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+                        <span class="k">continue</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sftp</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">:</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">sftp</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+                            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;sftp mkdir </span><span class="si">%s</span><span class="s2"> failed: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                                                       <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sftp</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;sftp stat </span><span class="si">%s</span><span class="s2"> failed: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                                                   <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sftp</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">sftp</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;sftp chdir to </span><span class="si">%s</span><span class="s2"> failed: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                                               <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sftp</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_path</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_scp</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">(</span><span class="n">source_path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">chan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get_transport</span><span class="p">()</span><span class="o">.</span><span class="n">open_session</span><span class="p">()</span>
+                <span class="n">chan</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+                <span class="c1"># scp in sink mode uses the arg as base directory</span>
+                <span class="n">chan</span><span class="o">.</span><span class="n">exec_command</span><span class="p">(</span><span class="s2">&quot;scp -t &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_dir</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;scp execution failed: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
+            <span class="c1"># scp protocol: one 0x0 after startup, one after the Create meta,</span>
+            <span class="c1"># one after saving if there&#39;s a problem: 0x1 or 0x02 and some error</span>
+            <span class="c1"># text</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">chan</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">response</span> <span class="o">!=</span> <span class="s2">&quot;</span><span class="se">\0</span><span class="s2">&quot;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;scp remote error: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">chan</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">fstat</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">source_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">chan</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s1">&#39;C</span><span class="si">%s</span><span class="s1"> </span><span class="si">%d</span><span class="s1"> </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">oct</span><span class="p">(</span><span class="n">fstat</span><span class="o">.</span><span class="n">st_mode</span><span class="p">)[</span><span class="o">-</span><span class="mi">4</span><span class="p">:],</span> <span class="n">fstat</span><span class="o">.</span><span class="n">st_size</span><span class="p">,</span>
+                                       <span class="n">remote_filename</span><span class="p">))</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">chan</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">response</span> <span class="o">!=</span> <span class="s2">&quot;</span><span class="se">\0</span><span class="s2">&quot;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;scp remote error: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">chan</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">chan</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\0</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">chan</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">response</span> <span class="o">!=</span> <span class="s2">&quot;</span><span class="se">\0</span><span class="s2">&quot;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;scp remote error: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">chan</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">chan</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sftp</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">source_path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">,</span> <span class="n">local_path</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_scp</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">chan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get_transport</span><span class="p">()</span><span class="o">.</span><span class="n">open_session</span><span class="p">()</span>
+                <span class="n">chan</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+                <span class="n">chan</span><span class="o">.</span><span class="n">exec_command</span><span class="p">(</span><span class="s2">&quot;scp -f &#39;</span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remote_dir</span><span class="p">,</span>
+                                                      <span class="n">remote_filename</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;scp execution failed: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
+
+            <span class="n">chan</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\0</span><span class="s1">&#39;</span><span class="p">)</span>  <span class="c1"># overall ready indicator</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">chan</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;C([0-7]</span><span class="si">{4}</span><span class="s2">)\s+(\d+)\s+(\S.*)$&quot;</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">m</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">!=</span> <span class="n">remote_filename</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;scp get </span><span class="si">%s</span><span class="s2"> failed: incorrect response &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span>
+                                       <span class="p">(</span><span class="n">remote_filename</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span>
+            <span class="n">chan</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># dispose of the newline trailing the C message</span>
+
+            <span class="n">size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+            <span class="n">togo</span> <span class="o">=</span> <span class="n">size</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">(</span><span class="n">local_path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span>
+            <span class="n">chan</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\0</span><span class="s1">&#39;</span><span class="p">)</span>  <span class="c1"># ready for data</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">while</span> <span class="n">togo</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">togo</span> <span class="o">&gt;</span> <span class="n">read_blocksize</span><span class="p">:</span>
+                        <span class="n">blocksize</span> <span class="o">=</span> <span class="n">read_blocksize</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">blocksize</span> <span class="o">=</span> <span class="n">togo</span>
+                    <span class="n">buff</span> <span class="o">=</span> <span class="n">chan</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">blocksize</span><span class="p">)</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buff</span><span class="p">)</span>
+                    <span class="n">togo</span> <span class="o">-=</span> <span class="nb">len</span><span class="p">(</span><span class="n">buff</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;scp get </span><span class="si">%s</span><span class="s2"> failed: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">remote_filename</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">chan</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># check the final status</span>
+            <span class="k">if</span> <span class="n">msg</span> <span class="o">!=</span> <span class="s1">&#39;</span><span class="se">\0</span><span class="s1">&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;scp get </span><span class="si">%s</span><span class="s2"> failed: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">remote_filename</span><span class="p">,</span>
+                                                                  <span class="n">chan</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">chan</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\0</span><span class="s1">&#39;</span><span class="p">)</span>  <span class="c1"># send final done indicator</span>
+            <span class="n">chan</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sftp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">remote_filename</span><span class="p">,</span> <span class="n">local_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># In scp mode unavoidable quoting issues will make this fail if the</span>
+        <span class="c1"># directory name contains single quotes.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_scp</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runremote</span><span class="p">(</span><span class="s2">&quot;ls -1 &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_dir</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span>
+                                    <span class="s2">&quot;scp dir listing &quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">output</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sftp</span><span class="o">.</span><span class="n">listdir</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="c1"># In scp mode unavoidable quoting issues will cause failures if</span>
+        <span class="c1"># filenames containing single quotes are encountered.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_scp</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">runremote</span><span class="p">(</span><span class="s2">&quot;rm &#39;</span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remote_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="kc">False</span><span class="p">,</span>
+                           <span class="s2">&quot;scp rm &quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sftp</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SSHParamikoBackend.runremote"><a class="viewcode-back" href="../../../duplicity.backends.ssh_paramiko_backend.html#duplicity.backends.ssh_paramiko_backend.SSHParamikoBackend.runremote">[docs]</a>    <span class="k">def</span> <span class="nf">runremote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">ignoreexitcode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">errorprefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;small convenience function that opens a shell channel, runs remote</span>
+<span class="sd">        command and returns stdout of command. throws an exception if exit</span>
+<span class="sd">        code!=0 and not ignored&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">chan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get_transport</span><span class="p">()</span><span class="o">.</span><span class="n">open_session</span><span class="p">()</span>
+            <span class="n">chan</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+            <span class="n">chan</span><span class="o">.</span><span class="n">exec_command</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">execution failed: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">errorprefix</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">chan</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">chan</span><span class="o">.</span><span class="n">recv_exit_status</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">res</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">ignoreexitcode</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">failed(</span><span class="si">%d</span><span class="s2">): </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">errorprefix</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span>
+                                                         <span class="n">chan</span><span class="o">.</span><span class="n">recv_stderr</span><span class="p">(</span><span class="mi">4096</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">output</span></div>
+
+<div class="viewcode-block" id="SSHParamikoBackend.gethostconfig"><a class="viewcode-back" href="../../../duplicity.backends.ssh_paramiko_backend.html#duplicity.backends.ssh_paramiko_backend.SSHParamikoBackend.gethostconfig">[docs]</a>    <span class="k">def</span> <span class="nf">gethostconfig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">host</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">paramiko</span>
+
+        <span class="n">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{}</span>
+
+        <span class="n">sshconfig</span> <span class="o">=</span> <span class="n">paramiko</span><span class="o">.</span><span class="n">SSHConfig</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sshconfig</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;could not load &#39;</span><span class="si">%s</span><span class="s2">&#39;, maybe corrupt?&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">sshconfig</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">host</span><span class="p">)</span></div></div>
+
+
+<span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">register_backend</span><span class="p">(</span><span class="s2">&quot;sftp&quot;</span><span class="p">,</span> <span class="n">SSHParamikoBackend</span><span class="p">)</span>
+<span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">register_backend</span><span class="p">(</span><span class="s2">&quot;scp&quot;</span><span class="p">,</span> <span class="n">SSHParamikoBackend</span><span class="p">)</span>
+<span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">register_backend</span><span class="p">(</span><span class="s2">&quot;paramiko+sftp&quot;</span><span class="p">,</span> <span class="n">SSHParamikoBackend</span><span class="p">)</span>
+<span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">register_backend</span><span class="p">(</span><span class="s2">&quot;paramiko+scp&quot;</span><span class="p">,</span> <span class="n">SSHParamikoBackend</span><span class="p">)</span>
+<span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">uses_netloc</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;sftp&#39;</span><span class="p">,</span> <span class="s1">&#39;scp&#39;</span><span class="p">,</span> <span class="s1">&#39;paramiko+sftp&#39;</span><span class="p">,</span> <span class="s1">&#39;paramiko+scp&#39;</span><span class="p">])</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,591 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.manifest &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.manifest</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2002 Ben Escoto &lt;ben@emerose.org&gt;</span>
+<span class="c1"># Copyright 2007 Kenneth Loafman &lt;kenneth@loafman.com&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="sd">&quot;&quot;&quot;Create and edit manifest for session contents&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">future_builtins</span> <span class="k">import</span> <span class="nb">filter</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="nb">globals</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">util</span>
+
+
+<div class="viewcode-block" id="ManifestError"><a class="viewcode-back" href="../../duplicity.manifest.html#duplicity.manifest.ManifestError">[docs]</a><span class="k">class</span> <span class="nc">ManifestError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Exception raised when problem with manifest</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Manifest"><a class="viewcode-back" href="../../duplicity.manifest.html#duplicity.manifest.Manifest">[docs]</a><span class="k">class</span> <span class="nc">Manifest</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    List of volumes and information about each one</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fh</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create blank Manifest</span>
+
+<span class="sd">        @param fh: fileobj for manifest</span>
+<span class="sd">        @type fh: DupPath</span>
+
+<span class="sd">        @rtype: Manifest</span>
+<span class="sd">        @return: manifest</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">local_dirname</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">volume_info_dict</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># dictionary vol numbers -&gt; vol infos</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fh</span> <span class="o">=</span> <span class="n">fh</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">files_changed</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="Manifest.set_dirinfo"><a class="viewcode-back" href="../../duplicity.manifest.html#duplicity.manifest.Manifest.set_dirinfo">[docs]</a>    <span class="k">def</span> <span class="nf">set_dirinfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set information about directory from globals,</span>
+<span class="sd">        and write to manifest file.</span>
+
+<span class="sd">        @rtype: Manifest</span>
+<span class="sd">        @return: manifest</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="o">=</span> <span class="nb">globals</span><span class="o">.</span><span class="n">hostname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">local_dirname</span> <span class="o">=</span> <span class="nb">globals</span><span class="o">.</span><span class="n">local_path</span><span class="o">.</span><span class="n">name</span>  <span class="c1"># @UndefinedVariable</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fh</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Hostname </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_dirname</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Localdir </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">Quote</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">local_dirname</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Manifest.check_dirinfo"><a class="viewcode-back" href="../../duplicity.manifest.html#duplicity.manifest.Manifest.check_dirinfo">[docs]</a>    <span class="k">def</span> <span class="nf">check_dirinfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return None if dirinfo is the same, otherwise error message</span>
+
+<span class="sd">        Does not raise an error message if hostname or local_dirname</span>
+<span class="sd">        are not available.</span>
+
+<span class="sd">        @rtype: string</span>
+<span class="sd">        @return: None or error message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">globals</span><span class="o">.</span><span class="n">allow_source_mismatch</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="o">!=</span> <span class="nb">globals</span><span class="o">.</span><span class="n">hostname</span><span class="p">:</span>
+            <span class="n">errmsg</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Fatal Error: Backup source host has changed.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                       <span class="s2">&quot;Current hostname: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span>
+                       <span class="s2">&quot;Previous hostname: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="p">)</span>
+            <span class="n">code</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">hostname_mismatch</span>
+            <span class="n">code_extra</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">hostname</span><span class="p">),</span> <span class="n">util</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="p">))</span>
+
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">local_dirname</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_dirname</span> <span class="o">!=</span> <span class="nb">globals</span><span class="o">.</span><span class="n">local_path</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>  <span class="c1"># @UndefinedVariable</span>
+            <span class="n">errmsg</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Fatal Error: Backup source directory has changed.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                       <span class="s2">&quot;Current directory: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span>
+                       <span class="s2">&quot;Previous directory: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">local_path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_dirname</span><span class="p">)</span>  <span class="c1"># @UndefinedVariable</span>
+            <span class="n">code</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">source_dir_mismatch</span>
+            <span class="n">code_extra</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">local_path</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                                    <span class="n">util</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">local_dirname</span><span class="p">))</span>  <span class="c1"># @UndefinedVariable</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">FatalError</span><span class="p">(</span><span class="n">errmsg</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                       <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Aborting because you may have accidentally tried to &quot;</span>
+                         <span class="s2">&quot;backup two different data sets to the same remote &quot;</span>
+                         <span class="s2">&quot;location, or using the same archive directory.  If &quot;</span>
+                         <span class="s2">&quot;this is not a mistake, use the &quot;</span>
+                         <span class="s2">&quot;--allow-source-mismatch switch to avoid seeing this &quot;</span>
+                         <span class="s2">&quot;message&quot;</span><span class="p">),</span> <span class="n">code</span><span class="p">,</span> <span class="n">code_extra</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Manifest.set_files_changed_info"><a class="viewcode-back" href="../../duplicity.manifest.html#duplicity.manifest.Manifest.set_files_changed_info">[docs]</a>    <span class="k">def</span> <span class="nf">set_files_changed_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">files_changed</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">files_changed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">files_changed</span> <span class="o">=</span> <span class="n">files_changed</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fh</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Filelist </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_changed</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">fileinfo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">files_changed</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;    </span><span class="si">%-7s</span><span class="s2">  </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fileinfo</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">Quote</span><span class="p">(</span><span class="n">fileinfo</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span></div>
+
+<div class="viewcode-block" id="Manifest.add_volume_info"><a class="viewcode-back" href="../../duplicity.manifest.html#duplicity.manifest.Manifest.add_volume_info">[docs]</a>    <span class="k">def</span> <span class="nf">add_volume_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vi</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add volume info vi to manifest and write to manifest</span>
+
+<span class="sd">        @param vi: volume info to add</span>
+<span class="sd">        @type vi: VolumeInfo</span>
+
+<span class="sd">        @return: void</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vol_num</span> <span class="o">=</span> <span class="n">vi</span><span class="o">.</span><span class="n">volume_number</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">volume_info_dict</span><span class="p">[</span><span class="n">vol_num</span><span class="p">]</span> <span class="o">=</span> <span class="n">vi</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fh</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">vi</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Manifest.del_volume_info"><a class="viewcode-back" href="../../duplicity.manifest.html#duplicity.manifest.Manifest.del_volume_info">[docs]</a>    <span class="k">def</span> <span class="nf">del_volume_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vol_num</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove volume vol_num from the manifest</span>
+
+<span class="sd">        @param vol_num: volume number to delete</span>
+<span class="sd">        @type vi: int</span>
+
+<span class="sd">        @return: void</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">volume_info_dict</span><span class="p">[</span><span class="n">vol_num</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ManifestError</span><span class="p">(</span><span class="s2">&quot;Volume </span><span class="si">%d</span><span class="s2"> not present in manifest&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">vol_num</span><span class="p">,))</span></div>
+
+<div class="viewcode-block" id="Manifest.to_string"><a class="viewcode-back" href="../../duplicity.manifest.html#duplicity.manifest.Manifest.to_string">[docs]</a>    <span class="k">def</span> <span class="nf">to_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return string version of self (just concatenate vi strings)</span>
+
+<span class="sd">        @rtype: string</span>
+<span class="sd">        @return: self in string form</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="s2">&quot;Hostname </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_dirname</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="s2">&quot;Localdir </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">Quote</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">local_dirname</span><span class="p">)</span>
+
+        <span class="n">result</span> <span class="o">+=</span> <span class="s2">&quot;Filelist </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_changed</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">fileinfo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">files_changed</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="s2">&quot;    </span><span class="si">%-7s</span><span class="s2">  </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fileinfo</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">Quote</span><span class="p">(</span><span class="n">fileinfo</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+        <span class="n">vol_num_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">volume_info_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="n">vol_num_list</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">vol_num_to_string</span><span class="p">(</span><span class="n">vol_num</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">volume_info_dict</span><span class="p">[</span><span class="n">vol_num</span><span class="p">]</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">result</span><span class="p">,</span>
+                             <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">vol_num_to_string</span><span class="p">,</span> <span class="n">vol_num_list</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+    <span class="fm">__str__</span> <span class="o">=</span> <span class="n">to_string</span>
+
+<div class="viewcode-block" id="Manifest.from_string"><a class="viewcode-back" href="../../duplicity.manifest.html#duplicity.manifest.Manifest.from_string">[docs]</a>    <span class="k">def</span> <span class="nf">from_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize self from string s, return self</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">get_field</span><span class="p">(</span><span class="n">fieldname</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Return the value of a field by parsing s, or None if no field</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;(^|</span><span class="se">\\</span><span class="s2">n)</span><span class="si">%s</span><span class="se">\\</span><span class="s2">s(.*?)</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">fieldname</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">m</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Unquote</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="o">=</span> <span class="n">get_field</span><span class="p">(</span><span class="s2">&quot;hostname&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">local_dirname</span> <span class="o">=</span> <span class="n">get_field</span><span class="p">(</span><span class="s2">&quot;localdir&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Get file changed list</span>
+        <span class="n">filelist_regexp</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;(^|</span><span class="se">\\</span><span class="s2">n)filelist</span><span class="se">\\</span><span class="s2">s([0-9]+)</span><span class="se">\\</span><span class="s2">n(.*?)(</span><span class="se">\\</span><span class="s2">nvolume</span><span class="se">\\</span><span class="s2">s|$)&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">S</span><span class="p">)</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">filelist_regexp</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">filecount</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+            <span class="n">filecount</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">filecount</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">def</span> <span class="nf">parse_fileinfo</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+                <span class="n">fileinfo</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">fileinfo</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fileinfo</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">files_changed</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">parse_fileinfo</span><span class="p">,</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)))</span>
+        <span class="k">assert</span> <span class="n">filecount</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_changed</span><span class="p">)</span>
+
+        <span class="n">highest_vol</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">latest_vol</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">vi_regexp</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;(?:^|</span><span class="se">\\</span><span class="s2">n)(volume</span><span class="se">\\</span><span class="s2">s.*(?:</span><span class="se">\\</span><span class="s2">n.*)*?)(?=</span><span class="se">\\</span><span class="s2">nvolume</span><span class="se">\\</span><span class="s2">s|$)&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+        <span class="n">vi_iterator</span> <span class="o">=</span> <span class="n">vi_regexp</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">vi_iterator</span><span class="p">:</span>
+            <span class="n">vi</span> <span class="o">=</span> <span class="n">VolumeInfo</span><span class="p">()</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_volume_info</span><span class="p">(</span><span class="n">vi</span><span class="p">)</span>
+            <span class="n">latest_vol</span> <span class="o">=</span> <span class="n">vi</span><span class="o">.</span><span class="n">volume_number</span>
+            <span class="n">highest_vol</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">highest_vol</span><span class="p">,</span> <span class="n">latest_vol</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Found manifest volume </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">latest_vol</span><span class="p">)</span>
+        <span class="c1"># If we restarted after losing some remote volumes, the highest volume</span>
+        <span class="c1"># seen may be higher than the last volume recorded.  That is, the</span>
+        <span class="c1"># manifest could contain &quot;vol1, vol2, vol3, vol2.&quot;  If so, we don&#39;t</span>
+        <span class="c1"># want to keep vol3&#39;s info.</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">latest_vol</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">highest_vol</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">del_volume_info</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Found </span><span class="si">%s</span><span class="s2"> volumes in manifest&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">latest_vol</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Manifest.get_files_changed"><a class="viewcode-back" href="../../duplicity.manifest.html#duplicity.manifest.Manifest.get_files_changed">[docs]</a>    <span class="k">def</span> <span class="nf">get_files_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">files_changed</span></div>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Two manifests are equal if they contain the same volume infos</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vi_list1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">volume_info_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="n">vi_list1</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">vi_list2</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">volume_info_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="n">vi_list2</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">vi_list1</span> <span class="o">!=</span> <span class="n">vi_list2</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Notice</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Manifests not equal because different volume numbers&quot;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vi_list1</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">vi_list1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">vi_list2</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">Notice</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Manifests not equal because volume lists differ&quot;</span><span class="p">))</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">hostname</span> <span class="ow">or</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">local_dirname</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">local_dirname</span><span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Notice</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Manifests not equal because hosts or directories differ&quot;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Defines !=.  Not doing this always leads to annoying bugs...</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Manifest.write_to_path"><a class="viewcode-back" href="../../duplicity.manifest.html#duplicity.manifest.Manifest.write_to_path">[docs]</a>    <span class="k">def</span> <span class="nf">write_to_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write string version of manifest to given path</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+        <span class="n">fout</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;wb&quot;</span><span class="p">)</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">fout</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">setdata</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Manifest.get_containing_volumes"><a class="viewcode-back" href="../../duplicity.manifest.html#duplicity.manifest.Manifest.get_containing_volumes">[docs]</a>    <span class="k">def</span> <span class="nf">get_containing_volumes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index_prefix</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return list of volume numbers that may contain index_prefix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">vol_num</span><span class="p">:</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">volume_info_dict</span><span class="p">[</span><span class="n">vol_num</span><span class="p">]</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">index_prefix</span><span class="p">),</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">volume_info_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div></div>
+
+
+<div class="viewcode-block" id="VolumeInfoError"><a class="viewcode-back" href="../../duplicity.manifest.html#duplicity.manifest.VolumeInfoError">[docs]</a><span class="k">class</span> <span class="nc">VolumeInfoError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Raised when there is a problem initializing a VolumeInfo from string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="VolumeInfo"><a class="viewcode-back" href="../../duplicity.manifest.html#duplicity.manifest.VolumeInfo">[docs]</a><span class="k">class</span> <span class="nc">VolumeInfo</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Information about a single volume</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;VolumeInfo initializer&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">volume_number</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_index</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_block</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_index</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_block</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hashes</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="VolumeInfo.set_info"><a class="viewcode-back" href="../../duplicity.manifest.html#duplicity.manifest.VolumeInfo.set_info">[docs]</a>    <span class="k">def</span> <span class="nf">set_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vol_number</span><span class="p">,</span>
+                 <span class="n">start_index</span><span class="p">,</span> <span class="n">start_block</span><span class="p">,</span>
+                 <span class="n">end_index</span><span class="p">,</span> <span class="n">end_block</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set essential VolumeInfo information, return self</span>
+
+<span class="sd">        Call with starting and ending paths stored in the volume.  If</span>
+<span class="sd">        a multivol diff gets split between volumes, count it as being</span>
+<span class="sd">        part of both volumes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">volume_number</span> <span class="o">=</span> <span class="n">vol_number</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_index</span> <span class="o">=</span> <span class="n">start_index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_block</span> <span class="o">=</span> <span class="n">start_block</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_index</span> <span class="o">=</span> <span class="n">end_index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_block</span> <span class="o">=</span> <span class="n">end_block</span>
+
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="VolumeInfo.set_hash"><a class="viewcode-back" href="../../duplicity.manifest.html#duplicity.manifest.VolumeInfo.set_hash">[docs]</a>    <span class="k">def</span> <span class="nf">set_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hash_name</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the value of hash hash_name (e.g. &quot;MD5&quot;) to data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hashes</span><span class="p">[</span><span class="n">hash_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="VolumeInfo.get_best_hash"><a class="viewcode-back" href="../../duplicity.manifest.html#duplicity.manifest.VolumeInfo.get_best_hash">[docs]</a>    <span class="k">def</span> <span class="nf">get_best_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return pair (hash_type, hash_data)</span>
+
+<span class="sd">        SHA1 is the best hash, and MD5 is the second best hash.  None</span>
+<span class="sd">        is returned if no hash is available.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashes</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;SHA1&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashes</span><span class="p">[</span><span class="s1">&#39;SHA1&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;MD5&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashes</span><span class="p">[</span><span class="s1">&#39;MD5&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashes</span><span class="o">.</span><span class="n">items</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="VolumeInfo.to_string"><a class="viewcode-back" href="../../duplicity.manifest.html#duplicity.manifest.VolumeInfo.to_string">[docs]</a>    <span class="k">def</span> <span class="nf">to_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return nicely formatted string reporting all information</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">index_to_string</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Return printable version of index without any whitespace&quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">index</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">Quote</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;.&quot;</span>
+
+        <span class="n">slist</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Volume </span><span class="si">%d</span><span class="s2">:&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">volume_number</span><span class="p">]</span>
+        <span class="n">whitespace</span> <span class="o">=</span> <span class="s2">&quot;    &quot;</span>
+        <span class="n">slist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">StartingPath   </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                     <span class="p">(</span><span class="n">whitespace</span><span class="p">,</span> <span class="n">index_to_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_index</span><span class="p">),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_block</span> <span class="ow">or</span> <span class="s2">&quot; &quot;</span><span class="p">)))</span>
+        <span class="n">slist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">EndingPath     </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                     <span class="p">(</span><span class="n">whitespace</span><span class="p">,</span> <span class="n">index_to_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">end_index</span><span class="p">),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">end_block</span> <span class="ow">or</span> <span class="s2">&quot; &quot;</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashes</span><span class="p">:</span>
+            <span class="n">slist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">Hash </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                         <span class="p">(</span><span class="n">whitespace</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashes</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">slist</span><span class="p">)</span></div>
+
+    <span class="fm">__str__</span> <span class="o">=</span> <span class="n">to_string</span>
+
+<div class="viewcode-block" id="VolumeInfo.from_string"><a class="viewcode-back" href="../../duplicity.manifest.html#duplicity.manifest.VolumeInfo.from_string">[docs]</a>    <span class="k">def</span> <span class="nf">from_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize self from string s as created by to_string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">string_to_index</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Return tuple index from string</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">Unquote</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="s2">&quot;.&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">()</span>
+            <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">))</span>
+
+        <span class="n">linelist</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Set volume number</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;^Volume ([0-9]+):&quot;</span><span class="p">,</span> <span class="n">linelist</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">m</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">VolumeInfoError</span><span class="p">(</span><span class="s2">&quot;Bad first line &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">linelist</span><span class="p">[</span><span class="mi">0</span><span class="p">],))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">volume_number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="c1"># Set other fields</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">linelist</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">line_split</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">field_name</span> <span class="o">=</span> <span class="n">line_split</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">other_fields</span> <span class="o">=</span> <span class="n">line_split</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="k">if</span> <span class="n">field_name</span> <span class="o">==</span> <span class="s2">&quot;Volume&quot;</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Warning, found extra Volume identifier&quot;</span><span class="p">))</span>
+                <span class="k">break</span>
+            <span class="k">elif</span> <span class="n">field_name</span> <span class="o">==</span> <span class="s2">&quot;startingpath&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">start_index</span> <span class="o">=</span> <span class="n">string_to_index</span><span class="p">(</span><span class="n">other_fields</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">other_fields</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">start_block</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">other_fields</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">start_block</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">elif</span> <span class="n">field_name</span> <span class="o">==</span> <span class="s2">&quot;endingpath&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">end_index</span> <span class="o">=</span> <span class="n">string_to_index</span><span class="p">(</span><span class="n">other_fields</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">other_fields</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">end_block</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">other_fields</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">end_block</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">elif</span> <span class="n">field_name</span> <span class="o">==</span> <span class="s2">&quot;hash&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_hash</span><span class="p">(</span><span class="n">other_fields</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">other_fields</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_index</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">VolumeInfoError</span><span class="p">(</span><span class="s2">&quot;Start or end index not set&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Used in test suite</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">VolumeInfo</span><span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Notice</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Other is not VolumeInfo&quot;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">volume_number</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">volume_number</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Notice</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Volume numbers don&#39;t match&quot;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_index</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">start_index</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Notice</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;start_indicies don&#39;t match&quot;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_index</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">end_index</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Notice</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;end_index don&#39;t match&quot;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">hash_list1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="n">hash_list1</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">hash_list2</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">hashes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="n">hash_list2</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">hash_list1</span> <span class="o">!=</span> <span class="n">hash_list2</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Notice</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Hashes don&#39;t match&quot;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Defines !=</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+<div class="viewcode-block" id="VolumeInfo.contains"><a class="viewcode-back" href="../../duplicity.manifest.html#duplicity.manifest.VolumeInfo.contains">[docs]</a>    <span class="k">def</span> <span class="nf">contains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index_prefix</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return true if volume might contain index</span>
+
+<span class="sd">        If recursive is true, then return true if any index starting</span>
+<span class="sd">        with index_prefix could be contained.  Otherwise, just check</span>
+<span class="sd">        if index_prefix itself is between starting and ending</span>
+<span class="sd">        indicies.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">recursive</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_index</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">index_prefix</span><span class="p">)]</span> <span class="o">&lt;=</span>
+                    <span class="n">index_prefix</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_index</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_index</span> <span class="o">&lt;=</span> <span class="n">index_prefix</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_index</span></div></div>
+
+
+<span class="n">nonnormal_char_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;(</span><span class="se">\\</span><span class="s2">s|[</span><span class="se">\\\\\&quot;</span><span class="s2">&#39;])&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Quote"><a class="viewcode-back" href="../../duplicity.manifest.html#duplicity.manifest.Quote">[docs]</a><span class="k">def</span> <span class="nf">Quote</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return quoted version of s safe to put in a manifest or volume info</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">nonnormal_char_re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">s</span>  <span class="c1"># no quoting necessary</span>
+    <span class="n">slist</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">nonnormal_char_re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">char</span><span class="p">):</span>
+            <span class="n">slist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">x</span><span class="si">%02x</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">ord</span><span class="p">(</span><span class="n">char</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">slist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s1">&#39;&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">slist</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Unquote"><a class="viewcode-back" href="../../duplicity.manifest.html#duplicity.manifest.Unquote">[docs]</a><span class="k">def</span> <span class="nf">Unquote</span><span class="p">(</span><span class="n">quoted_string</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return original string from quoted_string produced by above</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">quoted_string</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&quot;&#39;</span> <span class="ow">or</span> <span class="n">quoted_string</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">quoted_string</span>
+    <span class="k">assert</span> <span class="n">quoted_string</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">quoted_string</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">return_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># skip initial char</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">quoted_string</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">char</span> <span class="o">=</span> <span class="n">quoted_string</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">:</span>
+            <span class="c1"># quoted section</span>
+            <span class="k">assert</span> <span class="n">quoted_string</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;x&quot;</span>
+            <span class="n">return_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">chr</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">quoted_string</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">4</span><span class="p">],</span> <span class="mi">16</span><span class="p">)))</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">4</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">return_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">return_list</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

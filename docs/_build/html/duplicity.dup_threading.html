@@ -1,0 +1,266 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.dup_threading module &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="duplicity.dup_time module" href="duplicity.dup_time.html" />
+    <link rel="prev" title="duplicity.dup_temp module" href="duplicity.dup_temp.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-duplicity.dup_threading">
+<span id="duplicity-dup-threading-module"></span><h1>duplicity.dup_threading module<a class="headerlink" href="#module-duplicity.dup_threading" title="Permalink to this headline">¶</a></h1>
+<p>Duplicity specific but otherwise generic threading interfaces and
+utilities.</p>
+<p>(Not called &#8220;threading&#8221; because we do not want to conflict with
+the standard threading module, and absolute imports require
+at least python 2.5.)</p>
+<dl class="class">
+<dt id="duplicity.dup_threading.Value">
+<em class="property">class </em><code class="descclassname">duplicity.dup_threading.</code><code class="descname">Value</code><span class="sig-paren">(</span><em>value=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/dup_threading.html#Value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.dup_threading.Value" title="Permalink to this definition">¶</a></dt>
+<dd><p>A thread-safe container of a reference to an object (but not the
+object itself).</p>
+<p>In particular this means it is safe to:</p>
+<blockquote>
+<div>value.set(1)</div></blockquote>
+<p>But unsafe to:</p>
+<blockquote>
+<div>value.get()[&#8216;key&#8217;] = value</div></blockquote>
+<p>Where the latter must be done using something like:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>def _setprop():</dt>
+<dd>value.get()[&#8216;key&#8217;] = value</dd>
+</dl>
+<p>with_lock(value, _setprop)</p>
+</div></blockquote>
+<p>Operations such as increments are best done as:</p>
+<blockquote>
+<div>value.transform(lambda val: val + 1)</div></blockquote>
+<dl class="method">
+<dt id="duplicity.dup_threading.Value.acquire">
+<code class="descname">acquire</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/dup_threading.html#Value.acquire"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.dup_threading.Value.acquire" title="Permalink to this definition">¶</a></dt>
+<dd><p>Acquire this Value for mutually exclusive access. Only ever
+needed when calling code must perform operations that cannot
+be done with get(), set() or transform().</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.dup_threading.Value.get">
+<code class="descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/dup_threading.html#Value.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.dup_threading.Value.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value protected by this Value.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.dup_threading.Value.release">
+<code class="descname">release</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/dup_threading.html#Value.release"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.dup_threading.Value.release" title="Permalink to this definition">¶</a></dt>
+<dd><p>Release this Value for mutually exclusive access.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.dup_threading.Value.set">
+<code class="descname">set</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/dup_threading.html#Value.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.dup_threading.Value.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the value protected by this Value.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.dup_threading.Value.transform">
+<code class="descname">transform</code><span class="sig-paren">(</span><em>fn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/dup_threading.html#Value.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.dup_threading.Value.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call fn with the current value as the parameter, and reset the
+value to the return value of fn.</p>
+<p>During the execution of fn, all other access to this Value is
+prevented.</p>
+<p>If fn raised an exception, the value is not reset.</p>
+<p>Returns the value returned by fn, or raises the exception
+raised by fn.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.dup_threading.async_split">
+<code class="descclassname">duplicity.dup_threading.</code><code class="descname">async_split</code><span class="sig-paren">(</span><em>fn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/dup_threading.html#async_split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.dup_threading.async_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits the act of calling the given function into one front-end
+part for waiting on the result, and a back-end part for performing
+the work in another thread.</p>
+<p>Returns (waiter, caller) where waiter is a function to be called
+in order to wait for the results of an asynchronous invokation of
+fn to complete, returning fn&#8217;s result or propagating it&#8217;s
+exception.</p>
+<p>Caller is the function to call in a background thread in order to
+execute fn asynchronously. Caller will return (success, waiter)
+where success is a boolean indicating whether the function
+suceeded (did NOT raise an exception), and waiter is the waiter
+that was originally returned by the call to async_split().</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.dup_threading.interruptably_wait">
+<code class="descclassname">duplicity.dup_threading.</code><code class="descname">interruptably_wait</code><span class="sig-paren">(</span><em>cv</em>, <em>waitFor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/dup_threading.html#interruptably_wait"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.dup_threading.interruptably_wait" title="Permalink to this definition">¶</a></dt>
+<dd><p>cv   - The threading.Condition instance to wait on
+test - Callable returning a boolean to indicate whether</p>
+<blockquote>
+<div>the criteria being waited on has been satisfied.</div></blockquote>
+<p>Perform a wait on a condition such that it is keyboard
+interruptable when done in the main thread. Due to Python
+limitations as of &lt;= 2.5, lock acquisition and conditions waits
+are not interruptable when performed in the main thread.</p>
+<p>Currently, this comes at a cost additional CPU use, compared to a
+normal wait. Future implementations may be more efficient if the
+underlying python supports it.</p>
+<p>The condition must be acquired.</p>
+<p>This function should only be used on conditions that are never
+expected to be acquired for extended periods of time, or the
+lock-acquire of the underlying condition could cause an
+uninterruptable state despite the efforts of this function.</p>
+<p>There is no equivalent for acquireing a lock, as that cannot be
+done efficiently.</p>
+<p>Example:</p>
+<p>Instead of:</p>
+<blockquote>
+<div><p>cv.acquire()
+while not thing_done:</p>
+<blockquote>
+<div>cv.wait(someTimeout)</div></blockquote>
+<p>cv.release()</p>
+</div></blockquote>
+<p>do:</p>
+<blockquote>
+<div>cv.acquire()
+interruptable_condwait(cv, lambda: thing_done)
+cv.release()</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.dup_threading.require_threading">
+<code class="descclassname">duplicity.dup_threading.</code><code class="descname">require_threading</code><span class="sig-paren">(</span><em>reason=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/dup_threading.html#require_threading"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.dup_threading.require_threading" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that threading is required for operation to continue. Raise
+an appropriate exception if this is not the case.</p>
+<p>Reason specifies an optional reason why threading is required,
+which will be used for error reporting in case threading is not
+supported.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.dup_threading.thread_module">
+<code class="descclassname">duplicity.dup_threading.</code><code class="descname">thread_module</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/dup_threading.html#thread_module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.dup_threading.thread_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the thread module, or dummy_thread if threading is not
+supported.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.dup_threading.threading_module">
+<code class="descclassname">duplicity.dup_threading.</code><code class="descname">threading_module</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/dup_threading.html#threading_module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.dup_threading.threading_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the threading module, or dummy_thread if threading is not
+supported.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.dup_threading.threading_supported">
+<code class="descclassname">duplicity.dup_threading.</code><code class="descname">threading_supported</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/dup_threading.html#threading_supported"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.dup_threading.threading_supported" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether threading is supported on the system we are
+running on.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.dup_threading.with_lock">
+<code class="descclassname">duplicity.dup_threading.</code><code class="descname">with_lock</code><span class="sig-paren">(</span><em>lock</em>, <em>fn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/dup_threading.html#with_lock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.dup_threading.with_lock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call fn with lock acquired. Guarantee that lock is released upon
+the return of fn.</p>
+<p>Returns the value returned by fn, or raises the exception raised
+by fn.</p>
+<p>(Lock can actually be anything responding to acquire() and
+release().)</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="duplicity.html">duplicity package</a><ul>
+      <li>Previous: <a href="duplicity.dup_temp.html" title="previous chapter">duplicity.dup_temp module</a></li>
+      <li>Next: <a href="duplicity.dup_time.html" title="next chapter">duplicity.dup_time module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/duplicity.dup_threading.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/duplicity.dup_threading.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

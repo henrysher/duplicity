@@ -1,0 +1,504 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.collections module &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="duplicity.commandline module" href="duplicity.commandline.html" />
+    <link rel="prev" title="duplicity.cached_ops module" href="duplicity.cached_ops.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-duplicity.collections">
+<span id="duplicity-collections-module"></span><h1>duplicity.collections module<a class="headerlink" href="#module-duplicity.collections" title="Permalink to this headline">¶</a></h1>
+<p>Classes and functions on collections of backup volumes</p>
+<dl class="class">
+<dt id="duplicity.collections.BackupChain">
+<em class="property">class </em><code class="descclassname">duplicity.collections.</code><code class="descname">BackupChain</code><span class="sig-paren">(</span><em>backend</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupChain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupChain" title="Permalink to this definition">¶</a></dt>
+<dd><p>BackupChain - a number of linked BackupSets</p>
+<p>A BackupChain always starts with a full backup set and continues
+with incremental ones.</p>
+<dl class="method">
+<dt id="duplicity.collections.BackupChain.add_inc">
+<code class="descname">add_inc</code><span class="sig-paren">(</span><em>incset</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupChain.add_inc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupChain.add_inc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add incset to self.  Return False if incset does not match</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.BackupChain.delete">
+<code class="descname">delete</code><span class="sig-paren">(</span><em>keep_full=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupChain.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupChain.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete all sets in chain, in reverse order</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.BackupChain.get_all_sets">
+<code class="descname">get_all_sets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupChain.get_all_sets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupChain.get_all_sets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return list of all backup sets in chain</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.BackupChain.get_first">
+<code class="descname">get_first</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupChain.get_first"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupChain.get_first" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return first BackupSet in chain (ie the full backup)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.BackupChain.get_last">
+<code class="descname">get_last</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupChain.get_last"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupChain.get_last" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return last BackupSet in chain</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.BackupChain.get_num_volumes">
+<code class="descname">get_num_volumes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupChain.get_num_volumes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupChain.get_num_volumes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the total number of volumes in the chain</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.BackupChain.get_sets_at_time">
+<code class="descname">get_sets_at_time</code><span class="sig-paren">(</span><em>time</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupChain.get_sets_at_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupChain.get_sets_at_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of sets in chain earlier or equal to time</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.BackupChain.set_full">
+<code class="descname">set_full</code><span class="sig-paren">(</span><em>fullset</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupChain.set_full"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupChain.set_full" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add full backup set</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.BackupChain.short_desc">
+<code class="descname">short_desc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupChain.short_desc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupChain.short_desc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a short one-line description of the chain,
+suitable for log messages.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.BackupChain.to_log_info">
+<code class="descname">to_log_info</code><span class="sig-paren">(</span><em>prefix=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupChain.to_log_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupChain.to_log_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return summary, suitable for printing to log</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.collections.BackupSet">
+<em class="property">class </em><code class="descclassname">duplicity.collections.</code><code class="descname">BackupSet</code><span class="sig-paren">(</span><em>backend</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Backup set - the backup information produced by one session</p>
+<dl class="method">
+<dt id="duplicity.collections.BackupSet.add_filename">
+<code class="descname">add_filename</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupSet.add_filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupSet.add_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a filename to given set.  Return true if it fits.</p>
+<p>The filename will match the given set if it has the right
+times and is of the right type.  The information will be set
+from the first filename given.</p>
+<p>&#64;param filename: name of file to add
+&#64;type filename: string</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.BackupSet.check_manifests">
+<code class="descname">check_manifests</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupSet.check_manifests"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupSet.check_manifests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make sure remote manifest is equal to local one</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.BackupSet.delete">
+<code class="descname">delete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupSet.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupSet.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all files in set, both local and remote</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.BackupSet.get_filenames">
+<code class="descname">get_filenames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupSet.get_filenames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupSet.get_filenames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return sorted list of (remote) filenames of files in set</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.BackupSet.get_files_changed">
+<code class="descname">get_files_changed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupSet.get_files_changed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupSet.get_files_changed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.BackupSet.get_local_manifest">
+<code class="descname">get_local_manifest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupSet.get_local_manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupSet.get_local_manifest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return manifest object by reading local manifest file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.BackupSet.get_manifest">
+<code class="descname">get_manifest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupSet.get_manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupSet.get_manifest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return manifest object, showing preference for local copy</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.BackupSet.get_remote_manifest">
+<code class="descname">get_remote_manifest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupSet.get_remote_manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupSet.get_remote_manifest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return manifest by reading remote manifest on backend</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.BackupSet.get_time">
+<code class="descname">get_time</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupSet.get_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupSet.get_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return time if full backup, or end_time if incremental</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.BackupSet.get_timestr">
+<code class="descname">get_timestr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupSet.get_timestr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupSet.get_timestr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return time string suitable for log statements</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.BackupSet.is_complete">
+<code class="descname">is_complete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupSet.is_complete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupSet.is_complete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assume complete if found manifest file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.BackupSet.set_files_changed">
+<code class="descname">set_files_changed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupSet.set_files_changed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupSet.set_files_changed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.BackupSet.set_info">
+<code class="descname">set_info</code><span class="sig-paren">(</span><em>pr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupSet.set_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupSet.set_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set BackupSet information from ParseResults object</p>
+<p>&#64;param pr: parse results
+&#64;type pf: ParseResults</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.BackupSet.set_manifest">
+<code class="descname">set_manifest</code><span class="sig-paren">(</span><em>remote_filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#BackupSet.set_manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.BackupSet.set_manifest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add local and remote manifest filenames to backup set</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="duplicity.collections.CollectionsError">
+<em class="property">exception </em><code class="descclassname">duplicity.collections.</code><code class="descname">CollectionsError</code><a class="reference internal" href="_modules/duplicity/collections.html#CollectionsError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.CollectionsError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.collections.CollectionsStatus">
+<em class="property">class </em><code class="descclassname">duplicity.collections.</code><code class="descname">CollectionsStatus</code><span class="sig-paren">(</span><em>backend</em>, <em>archive_dir_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#CollectionsStatus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.CollectionsStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hold information about available chains and sets</p>
+<dl class="method">
+<dt id="duplicity.collections.CollectionsStatus.get_backup_chain_at_time">
+<code class="descname">get_backup_chain_at_time</code><span class="sig-paren">(</span><em>time</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#CollectionsStatus.get_backup_chain_at_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.CollectionsStatus.get_backup_chain_at_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return backup chain covering specified time</p>
+<p>Tries to find the backup chain covering the given time.  If
+there is none, return the earliest chain before, and failing
+that, the earliest chain.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.CollectionsStatus.get_backup_chains">
+<code class="descname">get_backup_chains</code><span class="sig-paren">(</span><em>filename_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#CollectionsStatus.get_backup_chains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.CollectionsStatus.get_backup_chains" title="Permalink to this definition">¶</a></dt>
+<dd><p>Split given filename_list into chains</p>
+<p>Return value will be tuple (list of chains, list of sets, list
+of incomplete sets), where the list of sets will comprise sets
+not fitting into any chain, and the incomplete sets are sets
+missing files.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.CollectionsStatus.get_chains_older_than">
+<code class="descname">get_chains_older_than</code><span class="sig-paren">(</span><em>t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#CollectionsStatus.get_chains_older_than"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.CollectionsStatus.get_chains_older_than" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of backup chains older than the given time t</p>
+<p>All of the times will be associated with an intact chain.
+Furthermore, none of the times will be of a chain which a newer
+set may depend on.  For instance, if set A is a full set older
+than t, and set B is an incremental based on A which is newer
+than t, then the time of set A will not be returned.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.CollectionsStatus.get_extraneous">
+<code class="descname">get_extraneous</code><span class="sig-paren">(</span><em>extra_clean</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#CollectionsStatus.get_extraneous"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.CollectionsStatus.get_extraneous" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return list of the names of extraneous duplicity files</p>
+<p>A duplicity file is considered extraneous if it is
+recognizable as a duplicity file, but isn&#8217;t part of some
+complete backup set, or current signature chain.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.CollectionsStatus.get_file_changed_record">
+<code class="descname">get_file_changed_record</code><span class="sig-paren">(</span><em>filepath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#CollectionsStatus.get_file_changed_record"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.CollectionsStatus.get_file_changed_record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns time line of specified file changed</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.CollectionsStatus.get_last_backup_chain">
+<code class="descname">get_last_backup_chain</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#CollectionsStatus.get_last_backup_chain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.CollectionsStatus.get_last_backup_chain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the last full backup of the collection,
+or None if there is no full backup chain.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.CollectionsStatus.get_last_full_backup_time">
+<code class="descname">get_last_full_backup_time</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#CollectionsStatus.get_last_full_backup_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.CollectionsStatus.get_last_full_backup_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the time of the last full backup,
+or 0 if there is none.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.CollectionsStatus.get_nth_last_backup_chain">
+<code class="descname">get_nth_last_backup_chain</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#CollectionsStatus.get_nth_last_backup_chain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.CollectionsStatus.get_nth_last_backup_chain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the nth-to-last full backup of the collection,
+or None if there is less than n backup chains.</p>
+<p>NOTE: n = 1 -&gt; time of latest available chain (n = 0 is not
+a valid input). Thus the second-to-last is obtained with n=2
+rather than n=1.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.CollectionsStatus.get_nth_last_full_backup_time">
+<code class="descname">get_nth_last_full_backup_time</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#CollectionsStatus.get_nth_last_full_backup_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.CollectionsStatus.get_nth_last_full_backup_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the time of the nth to last full backup,
+or 0 if there is none.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.CollectionsStatus.get_older_than">
+<code class="descname">get_older_than</code><span class="sig-paren">(</span><em>t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#CollectionsStatus.get_older_than"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.CollectionsStatus.get_older_than" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of backup sets older than the given time t</p>
+<p>All of the times will be associated with an intact chain.
+Furthermore, none of the times will be of a set which a newer
+set may depend on.  For instance, if set A is a full set older
+than t, and set B is an incremental based on A which is newer
+than t, then the time of set A will not be returned.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.CollectionsStatus.get_older_than_required">
+<code class="descname">get_older_than_required</code><span class="sig-paren">(</span><em>t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#CollectionsStatus.get_older_than_required"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.CollectionsStatus.get_older_than_required" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns list of old backup sets required by new sets</p>
+<p>This function is similar to the previous one, but it only
+returns the times of sets which are old but part of the chains
+where the newer end of the chain is newer than t.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.CollectionsStatus.get_signature_chain_at_time">
+<code class="descname">get_signature_chain_at_time</code><span class="sig-paren">(</span><em>time</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#CollectionsStatus.get_signature_chain_at_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.CollectionsStatus.get_signature_chain_at_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return signature chain covering specified time</p>
+<p>Tries to find the signature chain covering the given time.  If
+there is none, return the earliest chain before, and failing
+that, the earliest chain.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.CollectionsStatus.get_signature_chains">
+<code class="descname">get_signature_chains</code><span class="sig-paren">(</span><em>local</em>, <em>filelist=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#CollectionsStatus.get_signature_chains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.CollectionsStatus.get_signature_chains" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find chains in archive_dir_path (if local is true) or backend</p>
+<p>Use filelist if given, otherwise regenerate.  Return value is
+pair (list of chains, list of signature paths not in any
+chains).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.CollectionsStatus.get_signature_chains_older_than">
+<code class="descname">get_signature_chains_older_than</code><span class="sig-paren">(</span><em>t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#CollectionsStatus.get_signature_chains_older_than"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.CollectionsStatus.get_signature_chains_older_than" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of signature chains older than the given time t</p>
+<p>All of the times will be associated with an intact chain.
+Furthermore, none of the times will be of a chain which a newer
+set may depend on.  For instance, if set A is a full set older
+than t, and set B is an incremental based on A which is newer
+than t, then the time of set A will not be returned.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.CollectionsStatus.get_sorted_chains">
+<code class="descname">get_sorted_chains</code><span class="sig-paren">(</span><em>chain_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#CollectionsStatus.get_sorted_chains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.CollectionsStatus.get_sorted_chains" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return chains sorted by end_time.  If tie, local goes last</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.CollectionsStatus.get_sorted_sets">
+<code class="descname">get_sorted_sets</code><span class="sig-paren">(</span><em>set_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#CollectionsStatus.get_sorted_sets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.CollectionsStatus.get_sorted_sets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sort set list by end time, return (sorted list, incomplete)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.CollectionsStatus.set_matched_chain_pair">
+<code class="descname">set_matched_chain_pair</code><span class="sig-paren">(</span><em>sig_chains</em>, <em>backup_chains</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#CollectionsStatus.set_matched_chain_pair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.CollectionsStatus.set_matched_chain_pair" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set self.matched_chain_pair and self.other_sig/backup_chains</p>
+<p>The latest matched_chain_pair will be set.  If there are both
+remote and local signature chains capable of matching the
+latest backup chain, use the local sig chain (it does not need
+to be downloaded).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.CollectionsStatus.set_values">
+<code class="descname">set_values</code><span class="sig-paren">(</span><em>sig_chain_warning=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#CollectionsStatus.set_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.CollectionsStatus.set_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set values from archive_dir_path and backend.</p>
+<p>Returns self for convenience.  If sig_chain_warning is set to None,
+do not warn about unnecessary sig chains.  This is because there may
+naturally be some unecessary ones after a full backup.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.CollectionsStatus.sort_sets">
+<code class="descname">sort_sets</code><span class="sig-paren">(</span><em>setlist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#CollectionsStatus.sort_sets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.CollectionsStatus.sort_sets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return new list containing same elems of setlist, sorted by time</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.CollectionsStatus.to_log_info">
+<code class="descname">to_log_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#CollectionsStatus.to_log_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.CollectionsStatus.to_log_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return summary of the collection, suitable for printing to log</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.CollectionsStatus.warn">
+<code class="descname">warn</code><span class="sig-paren">(</span><em>sig_chain_warning</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#CollectionsStatus.warn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.CollectionsStatus.warn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log various error messages if find incomplete/orphaned files</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="duplicity.collections.FileChangedStatus">
+<em class="property">class </em><code class="descclassname">duplicity.collections.</code><code class="descname">FileChangedStatus</code><span class="sig-paren">(</span><em>filepath</em>, <em>fileinfo_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#FileChangedStatus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.FileChangedStatus" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="duplicity.collections.SignatureChain">
+<em class="property">class </em><code class="descclassname">duplicity.collections.</code><code class="descname">SignatureChain</code><span class="sig-paren">(</span><em>local</em>, <em>location</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#SignatureChain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.SignatureChain" title="Permalink to this definition">¶</a></dt>
+<dd><p>A number of linked SignatureSets</p>
+<p>Analog to BackupChain - start with a full-sig, and continue with
+new-sigs.</p>
+<dl class="method">
+<dt id="duplicity.collections.SignatureChain.add_filename">
+<code class="descname">add_filename</code><span class="sig-paren">(</span><em>filename</em>, <em>pr=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#SignatureChain.add_filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.SignatureChain.add_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add new sig filename to current chain.  Return true if fits</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.SignatureChain.check_times">
+<code class="descname">check_times</code><span class="sig-paren">(</span><em>time_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#SignatureChain.check_times"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.SignatureChain.check_times" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check to make sure times are in whole seconds</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.SignatureChain.delete">
+<code class="descname">delete</code><span class="sig-paren">(</span><em>keep_full=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#SignatureChain.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.SignatureChain.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all files in signature set</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.SignatureChain.get_filenames">
+<code class="descname">get_filenames</code><span class="sig-paren">(</span><em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#SignatureChain.get_filenames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.SignatureChain.get_filenames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return ordered list of filenames in set, up to a provided time</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.SignatureChain.get_fileobjs">
+<code class="descname">get_fileobjs</code><span class="sig-paren">(</span><em>time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#SignatureChain.get_fileobjs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.SignatureChain.get_fileobjs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return ordered list of signature fileobjs opened for reading,
+optionally at a certain time</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.collections.SignatureChain.islocal">
+<code class="descname">islocal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/collections.html#SignatureChain.islocal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.collections.SignatureChain.islocal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return true if represents a signature chain in archive_dir</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="duplicity.html">duplicity package</a><ul>
+      <li>Previous: <a href="duplicity.cached_ops.html" title="previous chapter">duplicity.cached_ops module</a></li>
+      <li>Next: <a href="duplicity.commandline.html" title="next chapter">duplicity.commandline module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/duplicity.collections.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/duplicity.collections.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>testing.functional.test_restart module &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="testing.functional.test_selection module" href="testing.functional.test_selection.html" />
+    <link rel="prev" title="testing.functional.test_rdiffdir module" href="testing.functional.test_rdiffdir.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-testing.functional.test_restart">
+<span id="testing-functional-test-restart-module"></span><h1>testing.functional.test_restart module<a class="headerlink" href="#module-testing.functional.test_restart" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="testing.functional.test_restart.RestartTest">
+<em class="property">class </em><code class="descclassname">testing.functional.test_restart.</code><code class="descname">RestartTest</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional/test_restart.html#RestartTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.test_restart.RestartTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="testing.functional.html#testing.functional.FunctionalTestCase" title="testing.functional.FunctionalTestCase"><code class="xref py py-class docutils literal"><span class="pre">testing.functional.FunctionalTestCase</span></code></a></p>
+<p>Test checkpoint/restart using duplicity binary</p>
+<dl class="method">
+<dt id="testing.functional.test_restart.RestartTest.make_fake_second_volume">
+<code class="descname">make_fake_second_volume</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional/test_restart.html#RestartTest.make_fake_second_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.test_restart.RestartTest.make_fake_second_volume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a successful backup and pretend that we interrupted a backup
+after two-volumes.  (This is because we want to be able to model
+restarting the second volume and duplicity deletes the last volume
+found because it may have not finished uploading.)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.test_restart.RestartTest.test_basic_checkpoint_restart">
+<code class="descname">test_basic_checkpoint_restart</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional/test_restart.html#RestartTest.test_basic_checkpoint_restart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.test_restart.RestartTest.test_basic_checkpoint_restart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test basic Checkpoint/Restart</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.test_restart.RestartTest.test_changed_source_dangling_manifest_volume">
+<code class="descname">test_changed_source_dangling_manifest_volume</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional/test_restart.html#RestartTest.test_changed_source_dangling_manifest_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.test_restart.RestartTest.test_changed_source_dangling_manifest_volume" title="Permalink to this definition">¶</a></dt>
+<dd><p>If we restart but find remote volumes missing, we can easily end up
+with a manifest that lists &#8220;vol1, vol2, vol3, vol2&#8221;, leaving a dangling
+vol3.  Make sure we can gracefully handle that.  This will only happen
+if the source data changes to be small enough to not create a vol3 on
+restart.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.test_restart.RestartTest.test_changed_source_file_disappears">
+<code class="descname">test_changed_source_file_disappears</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional/test_restart.html#RestartTest.test_changed_source_file_disappears"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.test_restart.RestartTest.test_changed_source_file_disappears" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make sure we correctly handle restarting a backup when a file
+disappears when we had been in the middle of backing it up.  It&#8217;s
+possible that the first chunk of the next file will be skipped unless
+we&#8217;re careful.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.test_restart.RestartTest.test_first_volume_failure">
+<code class="descname">test_first_volume_failure</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional/test_restart.html#RestartTest.test_first_volume_failure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.test_restart.RestartTest.test_first_volume_failure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test restart when no volumes are available on the remote.
+Caused when duplicity fails before the first transfer.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.test_restart.RestartTest.test_last_file_missing_at_end">
+<code class="descname">test_last_file_missing_at_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional/test_restart.html#RestartTest.test_last_file_missing_at_end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.test_restart.RestartTest.test_last_file_missing_at_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test restart when the last file being backed up is missing on restart.
+Caused when the user deletes a file after a failure.  This test puts
+the file at the end of the backup, with no files following.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.test_restart.RestartTest.test_last_file_missing_in_middle">
+<code class="descname">test_last_file_missing_in_middle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional/test_restart.html#RestartTest.test_last_file_missing_in_middle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.test_restart.RestartTest.test_last_file_missing_in_middle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test restart when the last file being backed up is missing on restart.
+Caused when the user deletes a file after a failure.  This test puts
+the file in the middle of the backup, with files following.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.test_restart.RestartTest.test_multi_volume_failure">
+<code class="descname">test_multi_volume_failure</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional/test_restart.html#RestartTest.test_multi_volume_failure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.test_restart.RestartTest.test_multi_volume_failure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test restart when fewer volumes are available on the remote
+than the local manifest has on record.  Caused when duplicity
+fails the last queued transfer(s).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.test_restart.RestartTest.test_multiple_checkpoint_restart">
+<code class="descname">test_multiple_checkpoint_restart</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional/test_restart.html#RestartTest.test_multiple_checkpoint_restart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.test_restart.RestartTest.test_multiple_checkpoint_restart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test multiple Checkpoint/Restart</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.test_restart.RestartTest.test_new_file">
+<code class="descname">test_new_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional/test_restart.html#RestartTest.test_new_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.test_restart.RestartTest.test_new_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>If we restart right after a volume, but there are new files that would
+have been backed up earlier in the volume, make sure we don&#8217;t wig out.
+(Expected result is to ignore new, ealier files, but pick up later
+ones.)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.test_restart.RestartTest.test_restart_incremental">
+<code class="descname">test_restart_incremental</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional/test_restart.html#RestartTest.test_restart_incremental"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.test_restart.RestartTest.test_restart_incremental" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test restarting an incremental backup</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.test_restart.RestartTest.test_restart_sign_and_encrypt">
+<code class="descname">test_restart_sign_and_encrypt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional/test_restart.html#RestartTest.test_restart_sign_and_encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.test_restart.RestartTest.test_restart_sign_and_encrypt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test restarting a backup using same key for sign and encrypt
+<a class="reference external" href="https://bugs.launchpad.net/duplicity/+bug/946988">https://bugs.launchpad.net/duplicity/+bug/946988</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.test_restart.RestartTest.test_restart_sign_and_hidden_encrypt">
+<code class="descname">test_restart_sign_and_hidden_encrypt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional/test_restart.html#RestartTest.test_restart_sign_and_hidden_encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.test_restart.RestartTest.test_restart_sign_and_hidden_encrypt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test restarting a backup using same key for sign and encrypt (hidden key id)
+<a class="reference external" href="https://bugs.launchpad.net/duplicity/+bug/946988">https://bugs.launchpad.net/duplicity/+bug/946988</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.test_restart.RestartTest.test_split_after_large">
+<code class="descname">test_split_after_large</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional/test_restart.html#RestartTest.test_split_after_large"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.test_restart.RestartTest.test_split_after_large" title="Permalink to this definition">¶</a></dt>
+<dd><p>If we restart right after a volume that ended with a large
+(multi-block) file, make sure we restart in the right place.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.test_restart.RestartTest.test_split_after_small">
+<code class="descname">test_split_after_small</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional/test_restart.html#RestartTest.test_split_after_small"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.test_restart.RestartTest.test_split_after_small" title="Permalink to this definition">¶</a></dt>
+<dd><p>If we restart right after a volume that ended with a small
+(one-block) file, make sure we restart in the right place.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.test_restart.RestartTest.test_split_inside_large">
+<code class="descname">test_split_inside_large</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional/test_restart.html#RestartTest.test_split_inside_large"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.test_restart.RestartTest.test_split_inside_large" title="Permalink to this definition">¶</a></dt>
+<dd><p>If we restart right after a volume that ended inside of a large
+(multi-block) file, make sure we restart in the right place.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="testing.functional.test_restart.RestartTestWithoutEncryption">
+<em class="property">class </em><code class="descclassname">testing.functional.test_restart.</code><code class="descname">RestartTestWithoutEncryption</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional/test_restart.html#RestartTestWithoutEncryption"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.test_restart.RestartTestWithoutEncryption" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#testing.functional.test_restart.RestartTest" title="testing.functional.test_restart.RestartTest"><code class="xref py py-class docutils literal"><span class="pre">testing.functional.test_restart.RestartTest</span></code></a></p>
+<dl class="method">
+<dt id="testing.functional.test_restart.RestartTestWithoutEncryption.setUp">
+<code class="descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional/test_restart.html#RestartTestWithoutEncryption.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.test_restart.RestartTestWithoutEncryption.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.test_restart.RestartTestWithoutEncryption.test_ignore_double_snapshot">
+<code class="descname">test_ignore_double_snapshot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional/test_restart.html#RestartTestWithoutEncryption.test_ignore_double_snapshot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.test_restart.RestartTestWithoutEncryption.test_ignore_double_snapshot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test that we gracefully ignore double snapshot entries in a signature
+file.  This winds its way through duplicity as a deleted base dir,
+which doesn&#8217;t make sense and should be ignored.  An older version of
+duplicity accidentally created such files as a result of a restart.
+<a class="reference external" href="https://launchpad.net/bugs/929067">https://launchpad.net/bugs/929067</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.functional.test_restart.RestartTestWithoutEncryption.test_no_write_double_snapshot">
+<code class="descname">test_no_write_double_snapshot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/functional/test_restart.html#RestartTestWithoutEncryption.test_no_write_double_snapshot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.functional.test_restart.RestartTestWithoutEncryption.test_no_write_double_snapshot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test that restarting a full backup does not write duplicate entries
+into the sigtar, causing problems reading it back in older
+versions.
+<a class="reference external" href="https://launchpad.net/bugs/929067">https://launchpad.net/bugs/929067</a></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="testing.html">testing package</a><ul>
+  <li><a href="testing.functional.html">testing.functional package</a><ul>
+      <li>Previous: <a href="testing.functional.test_rdiffdir.html" title="previous chapter">testing.functional.test_rdiffdir module</a></li>
+      <li>Next: <a href="testing.functional.test_selection.html" title="next chapter">testing.functional.test_selection module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/testing.functional.test_restart.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/testing.functional.test_restart.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

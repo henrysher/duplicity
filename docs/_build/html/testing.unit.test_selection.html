@@ -1,0 +1,624 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>testing.unit.test_selection module &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="testing.unit.test_statistics module" href="testing.unit.test_statistics.html" />
+    <link rel="prev" title="testing.unit.test_path module" href="testing.unit.test_path.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-testing.unit.test_selection">
+<span id="testing-unit-test-selection-module"></span><h1>testing.unit.test_selection module<a class="headerlink" href="#module-testing.unit.test_selection" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="testing.unit.test_selection.MatchingTest">
+<em class="property">class </em><code class="descclassname">testing.unit.test_selection.</code><code class="descname">MatchingTest</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#MatchingTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.MatchingTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="testing.unit.html#testing.unit.UnitTestCase" title="testing.unit.UnitTestCase"><code class="xref py py-class docutils literal"><span class="pre">testing.unit.UnitTestCase</span></code></a></p>
+<p>Test matching of file names against various selection functions</p>
+<dl class="method">
+<dt id="testing.unit.test_selection.MatchingTest.makeext">
+<code class="descname">makeext</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#MatchingTest.makeext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.MatchingTest.makeext" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.MatchingTest.setUp">
+<code class="descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#MatchingTest.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.MatchingTest.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.MatchingTest.testRegexp">
+<code class="descname">testRegexp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#MatchingTest.testRegexp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.MatchingTest.testRegexp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test regular expression selection func</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.MatchingTest.test_file_prefix_sf_exception">
+<code class="descname">test_file_prefix_sf_exception</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#MatchingTest.test_file_prefix_sf_exception"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.MatchingTest.test_file_prefix_sf_exception" title="Permalink to this definition">¶</a></dt>
+<dd><p>test_file_prefix_sf_exception - see if FilePrefix error is returned</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.MatchingTest.test_glob_sf_exception">
+<code class="descname">test_glob_sf_exception</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#MatchingTest.test_glob_sf_exception"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.MatchingTest.test_glob_sf_exception" title="Permalink to this definition">¶</a></dt>
+<dd><p>test_glob_sf_exception - see if globbing errors returned</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.MatchingTest.test_glob_star_exclude">
+<code class="descname">test_glob_star_exclude</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#MatchingTest.test_glob_star_exclude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.MatchingTest.test_glob_star_exclude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test a few glob excludes, including **</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.MatchingTest.test_glob_star_include">
+<code class="descname">test_glob_star_include</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#MatchingTest.test_glob_star_include"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.MatchingTest.test_glob_star_include" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test a few globbing patterns, including **</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.MatchingTest.test_ignore_case">
+<code class="descname">test_ignore_case</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#MatchingTest.test_ignore_case"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.MatchingTest.test_ignore_case" title="Permalink to this definition">¶</a></dt>
+<dd><p>test_ignore_case - try a few expressions with ignorecase:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.MatchingTest.test_other_filesystems">
+<code class="descname">test_other_filesystems</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#MatchingTest.test_other_filesystems"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.MatchingTest.test_other_filesystems" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test to see if &#8211;exclude-other-filesystems works correctly</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.MatchingTest.test_root">
+<code class="descname">test_root</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#MatchingTest.test_root"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.MatchingTest.test_root" title="Permalink to this definition">¶</a></dt>
+<dd><p>test_root - / may be a counterexample to several of these..</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.MatchingTest.test_scan">
+<code class="descname">test_scan</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#MatchingTest.test_scan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.MatchingTest.test_scan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests what is returned for selection tests regarding directory scanning</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.MatchingTest.test_simple_glob_double_asterisk">
+<code class="descname">test_simple_glob_double_asterisk</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#MatchingTest.test_simple_glob_double_asterisk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.MatchingTest.test_simple_glob_double_asterisk" title="Permalink to this definition">¶</a></dt>
+<dd><p>test_simple_glob_double_asterisk - primarily to check that the defaults used by the error tests work</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.MatchingTest.test_tuple_exclude">
+<code class="descname">test_tuple_exclude</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#MatchingTest.test_tuple_exclude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.MatchingTest.test_tuple_exclude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test exclude selection function made from a regular filename</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.MatchingTest.test_tuple_include">
+<code class="descname">test_tuple_include</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#MatchingTest.test_tuple_include"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.MatchingTest.test_tuple_include" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test include selection function made from a regular filename</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="testing.unit.test_selection.ParseArgsTest">
+<em class="property">class </em><code class="descclassname">testing.unit.test_selection.</code><code class="descname">ParseArgsTest</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="testing.unit.html#testing.unit.UnitTestCase" title="testing.unit.UnitTestCase"><code class="xref py py-class docutils literal"><span class="pre">testing.unit.UnitTestCase</span></code></a></p>
+<p>Test argument parsing</p>
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.ParseTest">
+<code class="descname">ParseTest</code><span class="sig-paren">(</span><em>tuplelist</em>, <em>indicies</em>, <em>filelists=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.ParseTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.ParseTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>No error if running select on tuple goes over indicies</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.remake_filelists">
+<code class="descname">remake_filelists</code><span class="sig-paren">(</span><em>filelist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.remake_filelists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.remake_filelists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turn strings in filelist into fileobjs</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.setUp">
+<code class="descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_alternate_root">
+<code class="descname">test_alternate_root</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_alternate_root"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_alternate_root" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test select with different root</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_commandline_asterisks_double_both">
+<code class="descname">test_commandline_asterisks_double_both</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_commandline_asterisks_double_both"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_commandline_asterisks_double_both" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unit test the functional test TestAsterisks.test_commandline_asterisks_double_both</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_exclude_after_scan">
+<code class="descname">test_exclude_after_scan</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_exclude_after_scan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_exclude_after_scan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test select with an exclude after a pattern that would return a scan for that file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_exclude_filelist">
+<code class="descname">test_exclude_filelist</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_exclude_filelist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_exclude_filelist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exclude version of test_filelist</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_exclude_filelist_asterisk_1">
+<code class="descname">test_exclude_filelist_asterisk_1</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_exclude_filelist_asterisk_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_exclude_filelist_asterisk_1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exclude version of test_include_filelist_asterisk</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_exclude_filelist_asterisk_2">
+<code class="descname">test_exclude_filelist_asterisk_2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_exclude_filelist_asterisk_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_exclude_filelist_asterisk_2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identical to test_exclude_filelist, but with the exclude &#8216;select&#8217; replaced with &#8216;*&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_exclude_filelist_asterisk_3">
+<code class="descname">test_exclude_filelist_asterisk_3</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_exclude_filelist_asterisk_3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_exclude_filelist_asterisk_3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identical to test_exclude_filelist, but with the include &#8216;select&#8217; replaced with &#8216;*&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_exclude_filelist_asterisk_4">
+<code class="descname">test_exclude_filelist_asterisk_4</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_exclude_filelist_asterisk_4"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_exclude_filelist_asterisk_4" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identical to test_exclude_filelist, but with numerous excluded folders replaced with &#8216;*&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_exclude_filelist_asterisk_5">
+<code class="descname">test_exclude_filelist_asterisk_5</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_exclude_filelist_asterisk_5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_exclude_filelist_asterisk_5" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identical to test_exclude_filelist, but with numerous included/excluded folders replaced with &#8216;*&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_exclude_filelist_double_asterisk">
+<code class="descname">test_exclude_filelist_double_asterisk</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_exclude_filelist_double_asterisk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_exclude_filelist_double_asterisk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identical to test_exclude_filelist, but with all included/excluded folders replaced with &#8216;**&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_exclude_filelist_single_asterisk_at_beginning">
+<code class="descname">test_exclude_filelist_single_asterisk_at_beginning</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_exclude_filelist_single_asterisk_at_beginning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_exclude_filelist_single_asterisk_at_beginning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exclude filelist testing limited functionality of functional test</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_filelist">
+<code class="descname">test_filelist</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_filelist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_filelist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filelist glob test similar to above testParse2</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_filelist2">
+<code class="descname">test_filelist2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_filelist2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_filelist2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filelist glob test similar to above testGlob</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_filelist_null_separator">
+<code class="descname">test_filelist_null_separator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_filelist_null_separator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_filelist_null_separator" title="Permalink to this definition">¶</a></dt>
+<dd><p>test_filelist, but with null_separator set</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_glob">
+<code class="descname">test_glob</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_glob"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_glob" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test globbing expression</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_glob2">
+<code class="descname">test_glob2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_glob2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_glob2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test more globbing functions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_glob3">
+<code class="descname">test_glob3</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_glob3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_glob3" title="Permalink to this definition">¶</a></dt>
+<dd><p>regression test for bug 25230</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_globbing_replacement">
+<code class="descname">test_globbing_replacement</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_globbing_replacement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_globbing_replacement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test functional test test_globbing_replacement as a unittest</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_exclude_basic">
+<code class="descname">test_include_exclude_basic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_exclude_basic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_exclude_basic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test functional test test_include_exclude_basic as a unittest</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_1_leading_whitespace">
+<code class="descname">test_include_filelist_1_leading_whitespace</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_1_leading_whitespace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_1_leading_whitespace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filelist glob test similar to globbing filelist, but with 1 leading whitespace on include</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_1_leading_whitespace_exclude">
+<code class="descname">test_include_filelist_1_leading_whitespace_exclude</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_1_leading_whitespace_exclude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_1_leading_whitespace_exclude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filelist glob test similar to globbing filelist, but with 1 leading whitespace on exclude</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_1_trailing_whitespace">
+<code class="descname">test_include_filelist_1_trailing_whitespace</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_1_trailing_whitespace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_1_trailing_whitespace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filelist glob test similar to globbing filelist, but with 1 trailing whitespace on include</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_1_trailing_whitespace_exclude">
+<code class="descname">test_include_filelist_1_trailing_whitespace_exclude</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_1_trailing_whitespace_exclude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_1_trailing_whitespace_exclude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filelist glob test similar to globbing filelist, but with 1 trailing whitespace on exclude</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_2_leading_whitespaces">
+<code class="descname">test_include_filelist_2_leading_whitespaces</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_2_leading_whitespaces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_2_leading_whitespaces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filelist glob test similar to globbing filelist, but with 2 leading whitespaces on include</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_2_leading_whitespaces_exclude">
+<code class="descname">test_include_filelist_2_leading_whitespaces_exclude</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_2_leading_whitespaces_exclude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_2_leading_whitespaces_exclude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filelist glob test similar to globbing filelist, but with 2 leading whitespaces on exclude</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_2_trailing_whitespace_exclude">
+<code class="descname">test_include_filelist_2_trailing_whitespace_exclude</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_2_trailing_whitespace_exclude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_2_trailing_whitespace_exclude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filelist glob test similar to globbing filelist, but with 2 trailing whitespaces on exclude</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_2_trailing_whitespaces">
+<code class="descname">test_include_filelist_2_trailing_whitespaces</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_2_trailing_whitespaces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_2_trailing_whitespaces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filelist glob test similar to globbing filelist, but with 2 trailing whitespaces on include</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_asterisk">
+<code class="descname">test_include_filelist_asterisk</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_asterisk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_asterisk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filelist glob test with * instead of &#8216;testfiles&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_asterisk_2">
+<code class="descname">test_include_filelist_asterisk_2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_asterisk_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_asterisk_2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identical to test_filelist, but with the exclude &#8216;select&#8217; replaced with &#8216;*&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_asterisk_3">
+<code class="descname">test_include_filelist_asterisk_3</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_asterisk_3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_asterisk_3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identical to test_filelist, but with the auto-include &#8216;select&#8217; replaced with &#8216;*&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_asterisk_4">
+<code class="descname">test_include_filelist_asterisk_4</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_asterisk_4"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_asterisk_4" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identical to test_filelist, but with a specific include &#8216;select&#8217; replaced with &#8216;*&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_asterisk_5">
+<code class="descname">test_include_filelist_asterisk_5</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_asterisk_5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_asterisk_5" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identical to test_filelist, but with all &#8216;select&#8217;s replaced with &#8216;*&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_asterisk_6">
+<code class="descname">test_include_filelist_asterisk_6</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_asterisk_6"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_asterisk_6" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identical to test_filelist, but with numerous excluded folders replaced with &#8216;*&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_asterisk_7">
+<code class="descname">test_include_filelist_asterisk_7</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_asterisk_7"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_asterisk_7" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identical to test_filelist, but with numerous included/excluded folders replaced with &#8216;*&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_check_excluded_folder_included_for_contents">
+<code class="descname">test_include_filelist_check_excluded_folder_included_for_contents</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_check_excluded_folder_included_for_contents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_check_excluded_folder_included_for_contents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filelist glob test to check excluded folder is included if contents are</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_double_asterisk_1">
+<code class="descname">test_include_filelist_double_asterisk_1</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_double_asterisk_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_double_asterisk_1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identical to test_filelist, but with the exclude &#8216;select&#8217; replaced with &#8216;**&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_double_asterisk_2">
+<code class="descname">test_include_filelist_double_asterisk_2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_double_asterisk_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_double_asterisk_2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identical to test_filelist, but with the include &#8216;select&#8217; replaced with &#8216;**&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_double_asterisk_3">
+<code class="descname">test_include_filelist_double_asterisk_3</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_double_asterisk_3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_double_asterisk_3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identical to test_filelist, but with the exclude &#8216;testfiles/select&#8217; replaced with &#8216;**&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_double_asterisk_4">
+<code class="descname">test_include_filelist_double_asterisk_4</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_double_asterisk_4"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_double_asterisk_4" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identical to test_filelist, but with the include &#8216;testfiles/select&#8217; replaced with &#8216;**&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_double_asterisk_5">
+<code class="descname">test_include_filelist_double_asterisk_5</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_double_asterisk_5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_double_asterisk_5" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identical to test_filelist, but with all &#8216;testfiles/select&#8217;s replaced with &#8216;**&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_trailing_slashes">
+<code class="descname">test_include_filelist_trailing_slashes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_trailing_slashes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_trailing_slashes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filelist glob test similar to globbing filelist, but with trailing slashes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_trailing_slashes_and_double_asterisks">
+<code class="descname">test_include_filelist_trailing_slashes_and_double_asterisks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_trailing_slashes_and_double_asterisks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_trailing_slashes_and_double_asterisks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filelist glob test similar to globbing filelist, but with trailing slashes and double asterisks</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_trailing_slashes_and_single_asterisks">
+<code class="descname">test_include_filelist_trailing_slashes_and_single_asterisks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_trailing_slashes_and_single_asterisks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_trailing_slashes_and_single_asterisks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filelist glob test similar to globbing filelist, but with trailing slashes and single asterisks</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_with_blank_line">
+<code class="descname">test_include_filelist_with_blank_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_with_blank_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_with_blank_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filelist glob test similar to globbing filelist, but with a blank line.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_with_blank_line_and_whitespace">
+<code class="descname">test_include_filelist_with_blank_line_and_whitespace</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_with_blank_line_and_whitespace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_with_blank_line_and_whitespace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filelist glob test similar to globbing filelist, but with a blank line and whitespace.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_with_full_line_comment">
+<code class="descname">test_include_filelist_with_full_line_comment</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_with_full_line_comment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_with_full_line_comment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filelist glob test similar to globbing filelist, but with a full-line comment.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_with_unnecessary_double_quotes">
+<code class="descname">test_include_filelist_with_unnecessary_double_quotes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_with_unnecessary_double_quotes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_with_unnecessary_double_quotes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filelist glob test similar to globbing filelist, but with double quotes around one of the paths.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_include_filelist_with_unnecessary_quotes">
+<code class="descname">test_include_filelist_with_unnecessary_quotes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_include_filelist_with_unnecessary_quotes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_include_filelist_with_unnecessary_quotes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filelist glob test similar to globbing filelist, but with quotes around one of the paths.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_includes_files">
+<code class="descname">test_includes_files</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_includes_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_includes_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unit test the functional test test_includes_files</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_includes_files_trailing_slash">
+<code class="descname">test_includes_files_trailing_slash</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_includes_files_trailing_slash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_includes_files_trailing_slash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unit test the functional test test_includes_files_trailing_slash</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_includes_files_trailing_slash_globbing_chars">
+<code class="descname">test_includes_files_trailing_slash_globbing_chars</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_includes_files_trailing_slash_globbing_chars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_includes_files_trailing_slash_globbing_chars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unit test functional test_includes_files_trailing_slash_globbing_chars</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_parse">
+<code class="descname">test_parse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test just one include, all exclude</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.ParseArgsTest.test_parse2">
+<code class="descname">test_parse2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#ParseArgsTest.test_parse2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.ParseArgsTest.test_parse2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test three level include/exclude</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="testing.unit.test_selection.TestGlobGetNormalSf">
+<em class="property">class </em><code class="descclassname">testing.unit.test_selection.</code><code class="descname">TestGlobGetNormalSf</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#TestGlobGetNormalSf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.TestGlobGetNormalSf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="testing.unit.html#testing.unit.UnitTestCase" title="testing.unit.UnitTestCase"><code class="xref py py-class docutils literal"><span class="pre">testing.unit.UnitTestCase</span></code></a></p>
+<p>Test glob parsing of the test_glob_get_normal_sf function. Indirectly test behaviour of glob_to_re.</p>
+<dl class="method">
+<dt id="testing.unit.test_selection.TestGlobGetNormalSf.exclude_glob_tester">
+<code class="descname">exclude_glob_tester</code><span class="sig-paren">(</span><em>path</em>, <em>glob_string</em>, <em>root_path='/'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#TestGlobGetNormalSf.exclude_glob_tester"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.TestGlobGetNormalSf.exclude_glob_tester" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.TestGlobGetNormalSf.glob_tester">
+<code class="descname">glob_tester</code><span class="sig-paren">(</span><em>path</em>, <em>glob_string</em>, <em>include_exclude</em>, <em>root_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#TestGlobGetNormalSf.glob_tester"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.TestGlobGetNormalSf.glob_tester" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a path, glob string and include_exclude value (1 = include, 0 = exclude) and returns the output
+of the selection function.
+None - means the test has nothing to say about the related file
+0 - the file is excluded by the test
+1 - the file is included
+2 - the test says the file (must be directory) should be scanned</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.TestGlobGetNormalSf.include_glob_tester">
+<code class="descname">include_glob_tester</code><span class="sig-paren">(</span><em>path</em>, <em>glob_string</em>, <em>root_path='/'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#TestGlobGetNormalSf.include_glob_tester"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.TestGlobGetNormalSf.include_glob_tester" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.TestGlobGetNormalSf.test_glob_dirs_to_scan">
+<code class="descname">test_glob_dirs_to_scan</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#TestGlobGetNormalSf.test_glob_dirs_to_scan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.TestGlobGetNormalSf.test_glob_dirs_to_scan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test parent directories are marked as needing to be scanned</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.TestGlobGetNormalSf.test_glob_dirs_to_scan_glob">
+<code class="descname">test_glob_dirs_to_scan_glob</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#TestGlobGetNormalSf.test_glob_dirs_to_scan_glob"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.TestGlobGetNormalSf.test_glob_dirs_to_scan_glob" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test parent directories are marked as needing to be scanned - globs</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.TestGlobGetNormalSf.test_glob_get_normal_sf_2">
+<code class="descname">test_glob_get_normal_sf_2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#TestGlobGetNormalSf.test_glob_get_normal_sf_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.TestGlobGetNormalSf.test_glob_get_normal_sf_2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test same behaviour as the functional test test_globbing_replacement.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.TestGlobGetNormalSf.test_glob_get_normal_sf_2_ignorecase">
+<code class="descname">test_glob_get_normal_sf_2_ignorecase</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#TestGlobGetNormalSf.test_glob_get_normal_sf_2_ignorecase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.TestGlobGetNormalSf.test_glob_get_normal_sf_2_ignorecase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test same behaviour as the functional test test_globbing_replacement, ignorecase tests.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.TestGlobGetNormalSf.test_glob_get_normal_sf_3_double_asterisks_dirs_to_scan">
+<code class="descname">test_glob_get_normal_sf_3_double_asterisks_dirs_to_scan</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#TestGlobGetNormalSf.test_glob_get_normal_sf_3_double_asterisks_dirs_to_scan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.TestGlobGetNormalSf.test_glob_get_normal_sf_3_double_asterisks_dirs_to_scan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test double asterisk (**) replacement in glob_get_normal_sf with directories that should be scanned</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.TestGlobGetNormalSf.test_glob_get_normal_sf_3_ignorecase">
+<code class="descname">test_glob_get_normal_sf_3_ignorecase</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#TestGlobGetNormalSf.test_glob_get_normal_sf_3_ignorecase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.TestGlobGetNormalSf.test_glob_get_normal_sf_3_ignorecase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test ignorecase in glob_get_normal_sf</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.TestGlobGetNormalSf.test_glob_get_normal_sf_exclude">
+<code class="descname">test_glob_get_normal_sf_exclude</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#TestGlobGetNormalSf.test_glob_get_normal_sf_exclude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.TestGlobGetNormalSf.test_glob_get_normal_sf_exclude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test simple exclude.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.TestGlobGetNormalSf.test_glob_get_normal_sf_exclude_root">
+<code class="descname">test_glob_get_normal_sf_exclude_root</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#TestGlobGetNormalSf.test_glob_get_normal_sf_exclude_root"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.TestGlobGetNormalSf.test_glob_get_normal_sf_exclude_root" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test simple exclude with / as the glob.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.TestGlobGetNormalSf.test_glob_get_normal_sf_negative_square_brackets_range">
+<code class="descname">test_glob_get_normal_sf_negative_square_brackets_range</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#TestGlobGetNormalSf.test_glob_get_normal_sf_negative_square_brackets_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.TestGlobGetNormalSf.test_glob_get_normal_sf_negative_square_brackets_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test negative square bracket (range) [!a,b,c] replacement in get_normal_sf.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_selection.TestGlobGetNormalSf.test_glob_get_normal_sf_negative_square_brackets_specified">
+<code class="descname">test_glob_get_normal_sf_negative_square_brackets_specified</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_selection.html#TestGlobGetNormalSf.test_glob_get_normal_sf_negative_square_brackets_specified"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_selection.TestGlobGetNormalSf.test_glob_get_normal_sf_negative_square_brackets_specified" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test negative square bracket (specified) [!a,b,c] replacement in get_normal_sf.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="testing.html">testing package</a><ul>
+  <li><a href="testing.unit.html">testing.unit package</a><ul>
+      <li>Previous: <a href="testing.unit.test_path.html" title="previous chapter">testing.unit.test_path module</a></li>
+      <li>Next: <a href="testing.unit.test_statistics.html" title="next chapter">testing.unit.test_statistics module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/testing.unit.test_selection.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/testing.unit.test_selection.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

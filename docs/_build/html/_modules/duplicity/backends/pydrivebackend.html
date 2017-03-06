@@ -1,0 +1,314 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.backends.pydrivebackend &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.backends.pydrivebackend</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2015 Yigal Asnis</span>
+<span class="c1">#</span>
+<span class="c1"># This file is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># It is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">duplicity.backend</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">duplicity.errors</span> <span class="k">import</span> <span class="n">BackendException</span>
+
+
+<div class="viewcode-block" id="PyDriveBackend"><a class="viewcode-back" href="../../../duplicity.backends.pydrivebackend.html#duplicity.backends.pydrivebackend.PyDriveBackend">[docs]</a><span class="k">class</span> <span class="nc">PyDriveBackend</span><span class="p">(</span><span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Backend</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Connect to remote store using PyDrive API&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_url</span><span class="p">):</span>
+        <span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Backend</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_url</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">global</span> <span class="n">pydrive</span>
+            <span class="kn">import</span> <span class="nn">httplib2</span>
+            <span class="kn">from</span> <span class="nn">apiclient.discovery</span> <span class="k">import</span> <span class="n">build</span>
+            <span class="kn">from</span> <span class="nn">pydrive.auth</span> <span class="k">import</span> <span class="n">GoogleAuth</span>
+            <span class="kn">from</span> <span class="nn">pydrive.drive</span> <span class="k">import</span> <span class="n">GoogleDrive</span>
+            <span class="kn">from</span> <span class="nn">pydrive.files</span> <span class="k">import</span> <span class="n">FileNotUploadedError</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s1">&#39;PyDrive backend requires PyDrive installation&#39;</span>
+                                   <span class="s1">&#39;Please read the manpage to fix.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># let user get by with old client while he can</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">oauth2client.client</span> <span class="k">import</span> <span class="n">SignedJwtAssertionCredentials</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">oldClient</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">oauth2client.service_account</span> <span class="k">import</span> <span class="n">ServiceAccountCredentials</span>
+            <span class="kn">from</span> <span class="nn">oauth2client</span> <span class="k">import</span> <span class="n">crypt</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">oldClient</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="s1">&#39;GOOGLE_DRIVE_ACCOUNT_KEY&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+            <span class="n">account_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;GOOGLE_DRIVE_ACCOUNT_KEY&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">oldClient</span><span class="p">:</span>
+                <span class="n">credentials</span> <span class="o">=</span> <span class="n">SignedJwtAssertionCredentials</span><span class="p">(</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">username</span> <span class="o">+</span>
+                                                            <span class="s1">&#39;@&#39;</span> <span class="o">+</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span>
+                                                            <span class="n">account_key</span><span class="p">,</span>
+                                                            <span class="n">scopes</span><span class="o">=</span><span class="s1">&#39;https://www.googleapis.com/auth/drive&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">signer</span> <span class="o">=</span> <span class="n">crypt</span><span class="o">.</span><span class="n">Signer</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">account_key</span><span class="p">)</span>
+                <span class="n">credentials</span> <span class="o">=</span> <span class="n">ServiceAccountCredentials</span><span class="p">(</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">username</span> <span class="o">+</span> <span class="s1">&#39;@&#39;</span> <span class="o">+</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span> <span class="n">signer</span><span class="p">,</span>
+                                                        <span class="n">scopes</span><span class="o">=</span><span class="s1">&#39;https://www.googleapis.com/auth/drive&#39;</span><span class="p">)</span>
+            <span class="n">credentials</span><span class="o">.</span><span class="n">authorize</span><span class="p">(</span><span class="n">httplib2</span><span class="o">.</span><span class="n">Http</span><span class="p">())</span>
+            <span class="n">gauth</span> <span class="o">=</span> <span class="n">GoogleAuth</span><span class="p">()</span>
+            <span class="n">gauth</span><span class="o">.</span><span class="n">credentials</span> <span class="o">=</span> <span class="n">credentials</span>
+        <span class="k">elif</span> <span class="s1">&#39;GOOGLE_DRIVE_SETTINGS&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+            <span class="n">gauth</span> <span class="o">=</span> <span class="n">GoogleAuth</span><span class="p">(</span><span class="n">settings_file</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;GOOGLE_DRIVE_SETTINGS&#39;</span><span class="p">])</span>
+            <span class="n">gauth</span><span class="o">.</span><span class="n">CommandLineAuth</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="s1">&#39;GOOGLE_SECRETS_FILE&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span> <span class="ow">and</span> <span class="s1">&#39;GOOGLE_CREDENTIALS_FILE&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">):</span>
+            <span class="n">gauth</span> <span class="o">=</span> <span class="n">GoogleAuth</span><span class="p">()</span>
+            <span class="n">gauth</span><span class="o">.</span><span class="n">LoadClientConfigFile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;GOOGLE_SECRETS_FILE&#39;</span><span class="p">])</span>
+            <span class="n">gauth</span><span class="o">.</span><span class="n">LoadCredentialsFile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;GOOGLE_CREDENTIALS_FILE&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">gauth</span><span class="o">.</span><span class="n">credentials</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">gauth</span><span class="o">.</span><span class="n">CommandLineAuth</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">gauth</span><span class="o">.</span><span class="n">access_token_expired</span><span class="p">:</span>
+                <span class="n">gauth</span><span class="o">.</span><span class="n">Refresh</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">gauth</span><span class="o">.</span><span class="n">Authorize</span><span class="p">()</span>
+            <span class="n">gauth</span><span class="o">.</span><span class="n">SaveCredentialsFile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;GOOGLE_CREDENTIALS_FILE&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span>
+                <span class="s1">&#39;GOOGLE_DRIVE_ACCOUNT_KEY or GOOGLE_DRIVE_SETTINGS environment &#39;</span>
+                <span class="s1">&#39;variable not set. Please read the manpage to fix.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drive</span> <span class="o">=</span> <span class="n">GoogleDrive</span><span class="p">(</span><span class="n">gauth</span><span class="p">)</span>
+
+        <span class="c1"># Dirty way to find root folder id</span>
+        <span class="n">file_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive</span><span class="o">.</span><span class="n">ListFile</span><span class="p">({</span><span class="s1">&#39;q&#39;</span><span class="p">:</span> <span class="s2">&quot;&#39;Root&#39; in parents and trashed=false&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">GetList</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">file_list</span><span class="p">:</span>
+            <span class="n">parent_folder_id</span> <span class="o">=</span> <span class="n">file_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;parents&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">file_in_root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive</span><span class="o">.</span><span class="n">CreateFile</span><span class="p">({</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;i_am_in_root&#39;</span><span class="p">})</span>
+            <span class="n">file_in_root</span><span class="o">.</span><span class="n">Upload</span><span class="p">()</span>
+            <span class="n">parent_folder_id</span> <span class="o">=</span> <span class="n">file_in_root</span><span class="p">[</span><span class="s1">&#39;parents&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Fetch destination folder entry and create hierarchy if required.</span>
+        <span class="n">folder_names</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">folder_name</span> <span class="ow">in</span> <span class="n">folder_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">folder_name</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">file_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive</span><span class="o">.</span><span class="n">ListFile</span><span class="p">({</span><span class="s1">&#39;q&#39;</span><span class="p">:</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">parent_folder_id</span> <span class="o">+</span>
+                                                  <span class="s2">&quot;&#39; in parents and trashed=false&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">GetList</span><span class="p">()</span>
+            <span class="n">folder</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">file_list</span> <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">folder_name</span> <span class="ow">and</span>
+                           <span class="n">item</span><span class="p">[</span><span class="s1">&#39;mimeType&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;application/vnd.google-apps.folder&#39;</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">folder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">folder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive</span><span class="o">.</span><span class="n">CreateFile</span><span class="p">({</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">folder_name</span><span class="p">,</span>
+                                                <span class="s1">&#39;mimeType&#39;</span><span class="p">:</span> <span class="s2">&quot;application/vnd.google-apps.folder&quot;</span><span class="p">,</span>
+                                                <span class="s1">&#39;parents&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">parent_folder_id</span><span class="p">}]})</span>
+                <span class="n">folder</span><span class="o">.</span><span class="n">Upload</span><span class="p">()</span>
+            <span class="n">parent_folder_id</span> <span class="o">=</span> <span class="n">folder</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="o">=</span> <span class="n">parent_folder_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id_cache</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="PyDriveBackend.file_by_name"><a class="viewcode-back" href="../../../duplicity.backends.pydrivebackend.html#duplicity.backends.pydrivebackend.PyDriveBackend.file_by_name">[docs]</a>    <span class="k">def</span> <span class="nf">file_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">pydrive.files</span> <span class="k">import</span> <span class="n">ApiRequestError</span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_cache</span><span class="p">:</span>
+            <span class="c1"># It might since have been locally moved, renamed or deleted, so we</span>
+            <span class="c1"># need to validate the entry.</span>
+            <span class="n">file_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_cache</span><span class="p">[</span><span class="n">filename</span><span class="p">]</span>
+            <span class="n">drive_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive</span><span class="o">.</span><span class="n">CreateFile</span><span class="p">({</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">file_id</span><span class="p">})</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">drive_file</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">filename</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">drive_file</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">][</span><span class="s1">&#39;trashed&#39;</span><span class="p">]:</span>
+                    <span class="k">for</span> <span class="n">parent</span> <span class="ow">in</span> <span class="n">drive_file</span><span class="p">[</span><span class="s1">&#39;parents&#39;</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="n">parent</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">:</span>
+                            <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;PyDrive backend: found file &#39;</span><span class="si">%s</span><span class="s2">&#39; with id </span><span class="si">%s</span><span class="s2"> in ID cache&quot;</span> <span class="o">%</span>
+                                     <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">file_id</span><span class="p">))</span>
+                            <span class="k">return</span> <span class="n">drive_file</span>
+            <span class="k">except</span> <span class="n">ApiRequestError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                <span class="c1"># A 404 occurs if the ID is no longer valid</span>
+                <span class="k">if</span> <span class="n">error</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">resp</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="mi">404</span><span class="p">:</span>
+                    <span class="k">raise</span>
+            <span class="c1"># If we get here, the cache entry is invalid</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;PyDrive backend: invalidating &#39;</span><span class="si">%s</span><span class="s2">&#39; (previously ID </span><span class="si">%s</span><span class="s2">) from ID cache&quot;</span> <span class="o">%</span>
+                     <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">file_id</span><span class="p">))</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_cache</span><span class="p">[</span><span class="n">filename</span><span class="p">]</span>
+
+        <span class="c1"># Not found in the cache, so use directory listing. This is less</span>
+        <span class="c1"># reliable because there is no strong consistency.</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="s2">&quot;title=&#39;</span><span class="si">%s</span><span class="s2">&#39; and &#39;</span><span class="si">%s</span><span class="s2">&#39; in parents and trashed=false&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">)</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="s1">&#39;items(title,id,fileSize,downloadUrl,exportLinks),nextPageToken&#39;</span>
+        <span class="n">flist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive</span><span class="o">.</span><span class="n">ListFile</span><span class="p">({</span><span class="s1">&#39;q&#39;</span><span class="p">:</span> <span class="n">q</span><span class="p">,</span> <span class="s1">&#39;fields&#39;</span><span class="p">:</span> <span class="n">fields</span><span class="p">})</span><span class="o">.</span><span class="n">GetList</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">flist</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">FatalError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;PyDrive backend: multiple files called &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">filename</span><span class="p">,))</span>
+        <span class="k">elif</span> <span class="n">flist</span><span class="p">:</span>
+            <span class="n">file_id</span> <span class="o">=</span> <span class="n">flist</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id_cache</span><span class="p">[</span><span class="n">filename</span><span class="p">]</span> <span class="o">=</span> <span class="n">flist</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;PyDrive backend: found file &#39;</span><span class="si">%s</span><span class="s2">&#39; with id </span><span class="si">%s</span><span class="s2"> on server, &quot;</span>
+                     <span class="s2">&quot;adding to cache&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">file_id</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">flist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;PyDrive backend: file &#39;</span><span class="si">%s</span><span class="s2">&#39; not found in cache or on server&quot;</span> <span class="o">%</span>
+                 <span class="p">(</span><span class="n">filename</span><span class="p">,))</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="PyDriveBackend.id_by_name"><a class="viewcode-back" href="../../../duplicity.backends.pydrivebackend.html#duplicity.backends.pydrivebackend.PyDriveBackend.id_by_name">[docs]</a>    <span class="k">def</span> <span class="nf">id_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="n">drive_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_by_name</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">drive_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">drive_file</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span></div>
+
+    <span class="k">def</span> <span class="nf">_put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_path</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">):</span>
+        <span class="n">drive_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_by_name</span><span class="p">(</span><span class="n">remote_filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">drive_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># No existing file, make a new one</span>
+            <span class="n">drive_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive</span><span class="o">.</span><span class="n">CreateFile</span><span class="p">({</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">remote_filename</span><span class="p">,</span>
+                                                <span class="s1">&#39;parents&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="s2">&quot;drive#fileLink&quot;</span><span class="p">,</span>
+                                                             <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">}]})</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;PyDrive backend: creating new file &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">remote_filename</span><span class="p">,))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;PyDrive backend: replacing existing file &#39;</span><span class="si">%s</span><span class="s2">&#39; with id &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">remote_filename</span><span class="p">,</span> <span class="n">drive_file</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]))</span>
+        <span class="n">drive_file</span><span class="o">.</span><span class="n">SetContentFile</span><span class="p">(</span><span class="n">source_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">drive_file</span><span class="o">.</span><span class="n">Upload</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id_cache</span><span class="p">[</span><span class="n">remote_filename</span><span class="p">]</span> <span class="o">=</span> <span class="n">drive_file</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">,</span> <span class="n">local_path</span><span class="p">):</span>
+        <span class="n">drive_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_by_name</span><span class="p">(</span><span class="n">remote_filename</span><span class="p">)</span>
+        <span class="n">drive_file</span><span class="o">.</span><span class="n">GetContentFile</span><span class="p">(</span><span class="n">local_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">drive_files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive</span><span class="o">.</span><span class="n">ListFile</span><span class="p">({</span>
+            <span class="s1">&#39;q&#39;</span><span class="p">:</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="o">+</span> <span class="s2">&quot;&#39; in parents and trashed=false&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;fields&#39;</span><span class="p">:</span> <span class="s1">&#39;items(title,id),nextPageToken&#39;</span><span class="p">})</span><span class="o">.</span><span class="n">GetList</span><span class="p">()</span>
+        <span class="n">filenames</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">drive_files</span><span class="p">)</span>
+        <span class="c1"># Check the cache as well. A file might have just been uploaded but</span>
+        <span class="c1"># not yet appear in the listing.</span>
+        <span class="c1"># Note: do not use iterkeys() here, because file_by_name will modify</span>
+        <span class="c1"># the cache if it finds invalid entries.</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_cache</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">filename</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_by_name</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="n">filenames</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">filenames</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="n">file_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_by_name</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">file_id</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">drive</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">files</span><span class="p">()</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">fileId</span><span class="o">=</span><span class="n">file_id</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Warn</span><span class="p">(</span><span class="s2">&quot;File &#39;</span><span class="si">%s</span><span class="s2">&#39; does not exist while trying to delete it&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filename</span><span class="p">,))</span>
+
+    <span class="k">def</span> <span class="nf">_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="n">drive_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_by_name</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">drive_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">drive_file</span><span class="p">[</span><span class="s1">&#39;fileSize&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="n">size</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">_error_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="n">error</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">pydrive.files</span> <span class="k">import</span> <span class="n">ApiRequestError</span><span class="p">,</span> <span class="n">FileNotUploadedError</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">FileNotUploadedError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">backend_not_found</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">ApiRequestError</span><span class="p">):</span>
+            <span class="n">http_status</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">resp</span><span class="o">.</span><span class="n">status</span>
+            <span class="k">if</span> <span class="n">http_status</span> <span class="o">==</span> <span class="mi">404</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">backend_not_found</span>
+            <span class="k">elif</span> <span class="n">http_status</span> <span class="o">==</span> <span class="mi">403</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">backend_permission_denied</span>
+        <span class="k">return</span> <span class="n">log</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">backend_error</span></div>
+
+
+<span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">register_backend</span><span class="p">(</span><span class="s1">&#39;pydrive&#39;</span><span class="p">,</span> <span class="n">PyDriveBackend</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot; pydrive is an alternate way to access gdocs &quot;&quot;&quot;</span>
+<span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">register_backend</span><span class="p">(</span><span class="s1">&#39;pydrive+gdocs&#39;</span><span class="p">,</span> <span class="n">PyDriveBackend</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot; register pydrive as the default way to access gdocs &quot;&quot;&quot;</span>
+<span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">register_backend</span><span class="p">(</span><span class="s1">&#39;gdocs&#39;</span><span class="p">,</span> <span class="n">PyDriveBackend</span><span class="p">)</span>
+
+<span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">uses_netloc</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;pydrive&#39;</span><span class="p">,</span> <span class="s1">&#39;pydrive+gdocs&#39;</span><span class="p">,</span> <span class="s1">&#39;gdocs&#39;</span><span class="p">])</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

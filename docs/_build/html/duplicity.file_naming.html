@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.file_naming module &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="duplicity.filechunkio module" href="duplicity.filechunkio.html" />
+    <link rel="prev" title="duplicity.errors module" href="duplicity.errors.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-duplicity.file_naming">
+<span id="duplicity-file-naming-module"></span><h1>duplicity.file_naming module<a class="headerlink" href="#module-duplicity.file_naming" title="Permalink to this headline">¶</a></h1>
+<p>Produce and parse the names of duplicity&#8217;s backup files</p>
+<dl class="class">
+<dt id="duplicity.file_naming.ParseResults">
+<em class="property">class </em><code class="descclassname">duplicity.file_naming.</code><code class="descname">ParseResults</code><span class="sig-paren">(</span><em>type</em>, <em>manifest=None</em>, <em>volume_number=None</em>, <em>time=None</em>, <em>start_time=None</em>, <em>end_time=None</em>, <em>encrypted=None</em>, <em>compressed=None</em>, <em>partial=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/file_naming.html#ParseResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.file_naming.ParseResults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hold information taken from a duplicity filename</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.file_naming.from_base36">
+<code class="descclassname">duplicity.file_naming.</code><code class="descname">from_base36</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/file_naming.html#from_base36"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.file_naming.from_base36" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert string s in base 36 to long int</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.file_naming.get">
+<code class="descclassname">duplicity.file_naming.</code><code class="descname">get</code><span class="sig-paren">(</span><em>type</em>, <em>volume_number=None</em>, <em>manifest=False</em>, <em>encrypted=False</em>, <em>gzipped=False</em>, <em>partial=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/file_naming.html#get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.file_naming.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return duplicity filename of specified type</p>
+<p>type can be &#8220;full&#8221;, &#8220;inc&#8221;, &#8220;full-sig&#8221;, or &#8220;new-sig&#8221;. volume_number
+can be given with the full and inc types.  If manifest is true the
+filename is of a full or inc manifest file.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.file_naming.get_suffix">
+<code class="descclassname">duplicity.file_naming.</code><code class="descname">get_suffix</code><span class="sig-paren">(</span><em>encrypted</em>, <em>gzipped</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/file_naming.html#get_suffix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.file_naming.get_suffix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return appropriate suffix depending on status of
+encryption, compression, and short_filenames.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.file_naming.parse">
+<code class="descclassname">duplicity.file_naming.</code><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/file_naming.html#parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.file_naming.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse duplicity filename, return None or ParseResults object</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.file_naming.prepare_regex">
+<code class="descclassname">duplicity.file_naming.</code><code class="descname">prepare_regex</code><span class="sig-paren">(</span><em>force=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/file_naming.html#prepare_regex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.file_naming.prepare_regex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="duplicity.file_naming.to_base36">
+<code class="descclassname">duplicity.file_naming.</code><code class="descname">to_base36</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/file_naming.html#to_base36"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.file_naming.to_base36" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return string representation of n in base 36 (use 0-9 and a-z)</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="duplicity.html">duplicity package</a><ul>
+      <li>Previous: <a href="duplicity.errors.html" title="previous chapter">duplicity.errors module</a></li>
+      <li>Next: <a href="duplicity.filechunkio.html" title="next chapter">duplicity.filechunkio module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/duplicity.file_naming.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/duplicity.file_naming.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

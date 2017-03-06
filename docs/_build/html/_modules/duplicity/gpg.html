@@ -1,0 +1,558 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.gpg &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.gpg</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2002 Ben Escoto &lt;ben@emerose.org&gt;</span>
+<span class="c1"># Copyright 2007 Kenneth Loafman &lt;kenneth@loafman.com&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">duplicity&#39;s gpg interface, builds upon Frank Tobin&#39;s GnuPGInterface</span>
+<span class="sd">which is now patched with some code for iterative threaded execution</span>
+<span class="sd">see duplicity&#39;s README for details</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">gzip</span>
+<span class="kn">import</span> <span class="nn">locale</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="nb">globals</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">gpginterface</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">tempdir</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">util</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">hashlib</span> <span class="k">import</span> <span class="n">sha1</span>
+    <span class="kn">from</span> <span class="nn">hashlib</span> <span class="k">import</span> <span class="n">md5</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">sha</span> <span class="k">import</span> <span class="n">new</span> <span class="k">as</span> <span class="n">sha1</span>
+    <span class="kn">from</span> <span class="nn">md5</span> <span class="k">import</span> <span class="n">new</span> <span class="k">as</span> <span class="n">md5</span>
+
+<span class="n">blocksize</span> <span class="o">=</span> <span class="mi">256</span> <span class="o">*</span> <span class="mi">1024</span>
+
+
+<div class="viewcode-block" id="GPGError"><a class="viewcode-back" href="../../duplicity.gpg.html#duplicity.gpg.GPGError">[docs]</a><span class="k">class</span> <span class="nc">GPGError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Indicate some GPG Error</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="GPGProfile"><a class="viewcode-back" href="../../duplicity.gpg.html#duplicity.gpg.GPGProfile">[docs]</a><span class="k">class</span> <span class="nc">GPGProfile</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Just hold some GPG settings, avoid passing tons of arguments</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">passphrase</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sign_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">recipients</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hidden_recipients</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set all data with initializer</span>
+
+<span class="sd">        passphrase is the passphrase.  If it is None (not &quot;&quot;), assume</span>
+<span class="sd">        it hasn&#39;t been set.  sign_key can be blank if no signing is</span>
+<span class="sd">        indicated, and recipients should be a list of keys.  For all</span>
+<span class="sd">        keys, the format should be an hex key like &#39;AA0E73D2&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">passphrase</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">passphrase</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">StringType</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">passphrase</span> <span class="o">=</span> <span class="n">passphrase</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signing_passphrase</span> <span class="o">=</span> <span class="n">passphrase</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sign_key</span> <span class="o">=</span> <span class="n">sign_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encrypt_secring</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">recipients</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">recipients</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>  <span class="c1"># must be list, not tuple</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">recipients</span> <span class="o">=</span> <span class="n">recipients</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">recipients</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">hidden_recipients</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hidden_recipients</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>  <span class="c1"># must be list, not tuple</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hidden_recipients</span> <span class="o">=</span> <span class="n">hidden_recipients</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hidden_recipients</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">gpg_major</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_gpg_major</span><span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">gpg_binary</span><span class="p">)</span>
+
+    <span class="n">_version_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^gpg.*\(GnuPG(?:\/MacGPG2)?\) (?P&lt;maj&gt;[0-9])\.[0-9]+\.[0-9]+$&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GPGProfile.get_gpg_major"><a class="viewcode-back" href="../../duplicity.gpg.html#duplicity.gpg.GPGProfile.get_gpg_major">[docs]</a>    <span class="k">def</span> <span class="nf">get_gpg_major</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">binary</span><span class="p">):</span>
+        <span class="n">gpg</span> <span class="o">=</span> <span class="n">gpginterface</span><span class="o">.</span><span class="n">GnuPG</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">binary</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">gpg</span><span class="o">.</span><span class="n">call</span> <span class="o">=</span> <span class="n">binary</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">gpg</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;--version&quot;</span><span class="p">],</span> <span class="n">create_fhs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;stdout&quot;</span><span class="p">])</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s2">&quot;stdout&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+        <span class="n">mtc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_version_re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mtc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">mtc</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;maj&quot;</span><span class="p">),</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">GPGError</span><span class="p">(</span><span class="s2">&quot;failed to determine gpg version of </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">binary</span><span class="p">,</span> <span class="n">line</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="GPGFile"><a class="viewcode-back" href="../../duplicity.gpg.html#duplicity.gpg.GPGFile">[docs]</a><span class="k">class</span> <span class="nc">GPGFile</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    File-like object that encrypts decrypts another file on the fly</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encrypt</span><span class="p">,</span> <span class="n">encrypt_path</span><span class="p">,</span> <span class="n">profile</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        GPGFile initializer</span>
+
+<span class="sd">        If recipients is set, use public key encryption and encrypt to</span>
+<span class="sd">        the given keys.  Otherwise, use symmetric encryption.</span>
+
+<span class="sd">        encrypt_path is the Path of the gpg encrypted file.  Right now</span>
+<span class="sd">        only symmetric encryption/decryption is supported.</span>
+
+<span class="sd">        If passphrase is false, do not set passphrase - GPG program</span>
+<span class="sd">        should prompt for it.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status_fp</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># used to find signature</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">closed</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># set to true after file closed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger_fp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryFile</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="n">tempdir</span><span class="o">.</span><span class="n">default</span><span class="p">()</span><span class="o">.</span><span class="n">dir</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stderr_fp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryFile</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="n">tempdir</span><span class="o">.</span><span class="n">default</span><span class="p">()</span><span class="o">.</span><span class="n">dir</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">encrypt_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">byte_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Start GPG process - copied from GnuPGInterface docstring.</span>
+        <span class="n">gnupg</span> <span class="o">=</span> <span class="n">gpginterface</span><span class="o">.</span><span class="n">GnuPG</span><span class="p">()</span>
+        <span class="c1"># overrides default gpg binary &#39;gpg&#39;</span>
+        <span class="k">if</span> <span class="nb">globals</span><span class="o">.</span><span class="n">gpg_binary</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">gnupg</span><span class="o">.</span><span class="n">call</span> <span class="o">=</span> <span class="nb">globals</span><span class="o">.</span><span class="n">gpg_binary</span>
+        <span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">meta_interactive</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">extra_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--no-secmem-warning&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">globals</span><span class="o">.</span><span class="n">use_agent</span><span class="p">:</span>
+            <span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">extra_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--use-agent&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">profile</span><span class="o">.</span><span class="n">gpg_major</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="c1"># This forces gpg2 to ignore the agent.</span>
+            <span class="c1"># Necessary to enforce truly non-interactive operation.</span>
+            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">platform</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Linux&#39;</span><span class="p">):</span>
+                <span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">extra_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--pinentry-mode=loopback&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">globals</span><span class="o">.</span><span class="n">gpg_options</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">opt</span> <span class="ow">in</span> <span class="nb">globals</span><span class="o">.</span><span class="n">gpg_options</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+                <span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">extra_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
+
+        <span class="n">cmdlist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">profile</span><span class="o">.</span><span class="n">sign_key</span><span class="p">:</span>
+            <span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">default_key</span> <span class="o">=</span> <span class="n">profile</span><span class="o">.</span><span class="n">sign_key</span>
+            <span class="n">cmdlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--sign&quot;</span><span class="p">)</span>
+        <span class="c1"># encrypt: sign key needs passphrase</span>
+        <span class="c1"># decrypt: encrypt key needs passphrase</span>
+        <span class="c1"># special case: allow different symmetric pass with empty sign pass</span>
+        <span class="k">if</span> <span class="n">encrypt</span> <span class="ow">and</span> <span class="n">profile</span><span class="o">.</span><span class="n">sign_key</span> <span class="ow">and</span> <span class="n">profile</span><span class="o">.</span><span class="n">signing_passphrase</span><span class="p">:</span>
+            <span class="n">passphrase</span> <span class="o">=</span> <span class="n">profile</span><span class="o">.</span><span class="n">signing_passphrase</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">passphrase</span> <span class="o">=</span> <span class="n">profile</span><span class="o">.</span><span class="n">passphrase</span>
+        <span class="c1"># in case the passphrase is not set, pass an empty one to prevent</span>
+        <span class="c1"># TypeError: expected a character buffer object on .write()</span>
+        <span class="k">if</span> <span class="n">passphrase</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">passphrase</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">encrypt</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">profile</span><span class="o">.</span><span class="n">recipients</span><span class="p">:</span>
+                <span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">recipients</span> <span class="o">=</span> <span class="n">profile</span><span class="o">.</span><span class="n">recipients</span>
+                <span class="n">cmdlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--encrypt&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">profile</span><span class="o">.</span><span class="n">hidden_recipients</span><span class="p">:</span>
+                <span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">hidden_recipients</span> <span class="o">=</span> <span class="n">profile</span><span class="o">.</span><span class="n">hidden_recipients</span>
+                <span class="n">cmdlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--encrypt&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">recipients</span> <span class="ow">or</span> <span class="n">profile</span><span class="o">.</span><span class="n">hidden_recipients</span><span class="p">):</span>
+                <span class="n">cmdlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--symmetric&#39;</span><span class="p">)</span>
+                <span class="c1"># use integrity protection</span>
+                <span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">extra_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--force-mdc&#39;</span><span class="p">)</span>
+            <span class="c1"># Skip the passphrase if using the agent</span>
+            <span class="k">if</span> <span class="nb">globals</span><span class="o">.</span><span class="n">use_agent</span><span class="p">:</span>
+                <span class="n">gnupg_fhs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">,</span> <span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">gnupg_fhs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">,</span> <span class="s1">&#39;passphrase&#39;</span><span class="p">]</span>
+            <span class="n">p1</span> <span class="o">=</span> <span class="n">gnupg</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmdlist</span><span class="p">,</span> <span class="n">create_fhs</span><span class="o">=</span><span class="n">gnupg_fhs</span><span class="p">,</span>
+                           <span class="n">attach_fhs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;stdout&#39;</span><span class="p">:</span> <span class="n">encrypt_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;wb&quot;</span><span class="p">),</span>
+                                       <span class="s1">&#39;stderr&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">stderr_fp</span><span class="p">,</span>
+                                       <span class="s1">&#39;logger&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger_fp</span><span class="p">})</span>
+            <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">use_agent</span><span class="p">):</span>
+                <span class="n">p1</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;passphrase&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">passphrase</span><span class="p">)</span>
+                <span class="n">p1</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;passphrase&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gpg_input</span> <span class="o">=</span> <span class="n">p1</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">recipients</span> <span class="ow">or</span> <span class="n">profile</span><span class="o">.</span><span class="n">hidden_recipients</span><span class="p">)</span> <span class="ow">and</span> <span class="n">profile</span><span class="o">.</span><span class="n">encrypt_secring</span><span class="p">:</span>
+                <span class="n">cmdlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--secret-keyring&#39;</span><span class="p">)</span>
+                <span class="n">cmdlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">encrypt_secring</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">status_fp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryFile</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="n">tempdir</span><span class="o">.</span><span class="n">default</span><span class="p">()</span><span class="o">.</span><span class="n">dir</span><span class="p">())</span>
+            <span class="c1"># Skip the passphrase if using the agent</span>
+            <span class="k">if</span> <span class="nb">globals</span><span class="o">.</span><span class="n">use_agent</span><span class="p">:</span>
+                <span class="n">gnupg_fhs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;stdout&#39;</span><span class="p">,</span> <span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">gnupg_fhs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;stdout&#39;</span><span class="p">,</span> <span class="s1">&#39;passphrase&#39;</span><span class="p">]</span>
+            <span class="n">p1</span> <span class="o">=</span> <span class="n">gnupg</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s1">&#39;--decrypt&#39;</span><span class="p">],</span> <span class="n">create_fhs</span><span class="o">=</span><span class="n">gnupg_fhs</span><span class="p">,</span>
+                           <span class="n">attach_fhs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;stdin&#39;</span><span class="p">:</span> <span class="n">encrypt_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">),</span>
+                                       <span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">status_fp</span><span class="p">,</span>
+                                       <span class="s1">&#39;stderr&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">stderr_fp</span><span class="p">,</span>
+                                       <span class="s1">&#39;logger&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger_fp</span><span class="p">})</span>
+            <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="nb">globals</span><span class="o">.</span><span class="n">use_agent</span><span class="p">):</span>
+                <span class="n">p1</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;passphrase&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">passphrase</span><span class="p">)</span>
+                <span class="n">p1</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;passphrase&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gpg_output</span> <span class="o">=</span> <span class="n">p1</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;stdout&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gpg_process</span> <span class="o">=</span> <span class="n">p1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encrypt</span> <span class="o">=</span> <span class="n">encrypt</span>
+
+<div class="viewcode-block" id="GPGFile.read"><a class="viewcode-back" href="../../duplicity.gpg.html#duplicity.gpg.GPGFile.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gpg_output</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">res</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">byte_count</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gpg_failed</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="GPGFile.write"><a class="viewcode-back" href="../../duplicity.gpg.html#duplicity.gpg.GPGFile.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buf</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gpg_input</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">res</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">byte_count</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gpg_failed</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="GPGFile.tell"><a class="viewcode-back" href="../../duplicity.gpg.html#duplicity.gpg.GPGFile.tell">[docs]</a>    <span class="k">def</span> <span class="nf">tell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">byte_count</span></div>
+
+<div class="viewcode-block" id="GPGFile.seek"><a class="viewcode-back" href="../../duplicity.gpg.html#duplicity.gpg.GPGFile.seek">[docs]</a>    <span class="k">def</span> <span class="nf">seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">encrypt</span>
+        <span class="k">assert</span> <span class="n">offset</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">byte_count</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> &lt; </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">byte_count</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">offset</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">byte_count</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">offset</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">byte_count</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GPGFile.gpg_failed"><a class="viewcode-back" href="../../duplicity.gpg.html#duplicity.gpg.GPGFile.gpg_failed">[docs]</a>    <span class="k">def</span> <span class="nf">gpg_failed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;GPG Failed, see log below:</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="sa">u</span><span class="s2">&quot;===== Begin GnuPG log =====</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">for</span> <span class="n">fp</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger_fp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stderr_fp</span><span class="p">):</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fp</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="n">unicode</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">locale</span><span class="o">.</span><span class="n">getpreferredencoding</span><span class="p">(),</span> <span class="s1">&#39;replace&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="sa">u</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="sa">u</span><span class="s2">&quot;===== End GnuPG log =====</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;invalid packet (ctb=14)&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">GPGError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="GPGFile.close"><a class="viewcode-back" href="../../duplicity.gpg.html#duplicity.gpg.GPGFile.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">encrypt</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gpg_input</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gpg_failed</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status_fp</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_signature</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gpg_process</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gpg_failed</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">while</span> <span class="n">res</span><span class="p">:</span>
+                <span class="c1"># discard remaining output to avoid GPG error</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gpg_output</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">blocksize</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">gpg_failed</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gpg_output</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gpg_failed</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status_fp</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_signature</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gpg_process</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gpg_failed</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger_fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stderr_fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">closed</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="GPGFile.set_signature"><a class="viewcode-back" href="../../duplicity.gpg.html#duplicity.gpg.GPGFile.set_signature">[docs]</a>    <span class="k">def</span> <span class="nf">set_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set self.signature to signature keyID</span>
+
+<span class="sd">        This only applies to decrypted files.  If the file was not</span>
+<span class="sd">        signed, set self.signature to None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status_fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">status_buf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">status_fp</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;^</span><span class="se">\\</span><span class="s2">[GNUPG:</span><span class="se">\\</span><span class="s2">] GOODSIG ([0-9A-F]*)&quot;</span><span class="p">,</span>
+                          <span class="n">status_buf</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">M</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signature</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="o">&gt;=</span> <span class="mi">8</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signature</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GPGFile.get_signature"><a class="viewcode-back" href="../../duplicity.gpg.html#duplicity.gpg.GPGFile.get_signature">[docs]</a>    <span class="k">def</span> <span class="nf">get_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return  keyID of signature, or None if none</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">closed</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">signature</span></div></div>
+
+
+<div class="viewcode-block" id="GPGWriteFile"><a class="viewcode-back" href="../../duplicity.gpg.html#duplicity.gpg.GPGWriteFile">[docs]</a><span class="k">def</span> <span class="nf">GPGWriteFile</span><span class="p">(</span><span class="n">block_iter</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">profile</span><span class="p">,</span>
+                 <span class="n">size</span><span class="o">=</span><span class="mi">200</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+                 <span class="n">max_footer_size</span><span class="o">=</span><span class="mi">16</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Write GPG compressed file of given size</span>
+
+<span class="sd">    This function writes a gpg compressed file by reading from the</span>
+<span class="sd">    input iter and writing to filename.  When it has read an amount</span>
+<span class="sd">    close to the size limit, it &quot;tops off&quot; the incoming data with</span>
+<span class="sd">    incompressible data, to try to hit the limit exactly.</span>
+
+<span class="sd">    block_iter should have methods .next(size), which returns the next</span>
+<span class="sd">    block of data, which should be at most size bytes long.  Also</span>
+<span class="sd">    .get_footer() returns a string to write at the end of the input</span>
+<span class="sd">    file.  The footer should have max length max_footer_size.</span>
+
+<span class="sd">    Because gpg uses compression, we don&#39;t assume that putting</span>
+<span class="sd">    bytes_in bytes into gpg will result in bytes_out = bytes_in out.</span>
+<span class="sd">    However, do assume that bytes_out &lt;= bytes_in approximately.</span>
+
+<span class="sd">    Returns true if succeeded in writing until end of block_iter.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># workaround for circular module imports</span>
+    <span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">path</span>
+
+    <span class="k">def</span> <span class="nf">top_off</span><span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add bytes of incompressible data to to_gpg_fp</span>
+
+<span class="sd">        In this case we take the incompressible data from the</span>
+<span class="sd">        beginning of filename (it should contain enough because size</span>
+<span class="sd">        &gt;&gt; largest block size).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">incompressible_fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">util</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">incompressible_fp</span><span class="p">,</span> <span class="n">file</span><span class="o">.</span><span class="n">gpg_input</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bytes</span>
+        <span class="n">incompressible_fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">get_current_size</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">st_size</span>
+
+    <span class="n">target_size</span> <span class="o">=</span> <span class="n">size</span> <span class="o">-</span> <span class="mi">50</span> <span class="o">*</span> <span class="mi">1024</span>  <span class="c1"># fudge factor, compensate for gpg buffering</span>
+    <span class="n">data_size</span> <span class="o">=</span> <span class="n">target_size</span> <span class="o">-</span> <span class="n">max_footer_size</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="n">GPGFile</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span> <span class="n">profile</span><span class="p">)</span>
+    <span class="n">at_end_of_blockiter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">bytes_to_go</span> <span class="o">=</span> <span class="n">data_size</span> <span class="o">-</span> <span class="n">get_current_size</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">bytes_to_go</span> <span class="o">&lt;</span> <span class="n">block_iter</span><span class="o">.</span><span class="n">get_read_size</span><span class="p">():</span>
+                <span class="k">break</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">block_iter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span><span class="o">.</span><span class="n">data</span>
+            <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                <span class="n">at_end_of_blockiter</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">break</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">block_iter</span><span class="o">.</span><span class="n">get_footer</span><span class="p">())</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">at_end_of_blockiter</span><span class="p">:</span>
+            <span class="c1"># don&#39;t pad last volume</span>
+            <span class="n">cursize</span> <span class="o">=</span> <span class="n">get_current_size</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">cursize</span> <span class="o">&lt;</span> <span class="n">target_size</span><span class="p">:</span>
+                <span class="n">top_off</span><span class="p">(</span><span class="n">target_size</span> <span class="o">-</span> <span class="n">cursize</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">at_end_of_blockiter</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="c1"># ensure that GPG processing terminates</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">raise</span></div>
+
+
+<div class="viewcode-block" id="GzipWriteFile"><a class="viewcode-back" href="../../duplicity.gpg.html#duplicity.gpg.GzipWriteFile">[docs]</a><span class="k">def</span> <span class="nf">GzipWriteFile</span><span class="p">(</span><span class="n">block_iter</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">200</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span> <span class="n">gzipped</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Write gzipped compressed file of given size</span>
+
+<span class="sd">    This is like the earlier GPGWriteFile except it writes a gzipped</span>
+<span class="sd">    file instead of a gpg&#39;d file.  This function is somewhat out of</span>
+<span class="sd">    place, because it doesn&#39;t deal with GPG at all, but it is very</span>
+<span class="sd">    similar to GPGWriteFile so they might as well be defined together.</span>
+
+<span class="sd">    The input requirements on block_iter and the output is the same as</span>
+<span class="sd">    GPGWriteFile (returns true if wrote until end of block_iter).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">class</span> <span class="nc">FileCounted</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wrapper around file object that counts number of bytes written</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileobj</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span> <span class="o">=</span> <span class="n">fileobj</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">byte_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buf</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">byte_count</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">result</span>
+
+        <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="n">file_counted</span> <span class="o">=</span> <span class="n">FileCounted</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">))</span>
+
+    <span class="c1"># if gzipped wrap with GzipFile else plain file out</span>
+    <span class="k">if</span> <span class="n">gzipped</span><span class="p">:</span>
+        <span class="n">outfile</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">GzipFile</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">file_counted</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">outfile</span> <span class="o">=</span> <span class="n">file_counted</span>
+    <span class="n">at_end_of_blockiter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">bytes_to_go</span> <span class="o">=</span> <span class="n">size</span> <span class="o">-</span> <span class="n">file_counted</span><span class="o">.</span><span class="n">byte_count</span>
+        <span class="k">if</span> <span class="n">bytes_to_go</span> <span class="o">&lt;</span> <span class="n">block_iter</span><span class="o">.</span><span class="n">get_read_size</span><span class="p">():</span>
+            <span class="k">break</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">new_block</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+            <span class="n">at_end_of_blockiter</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">break</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">new_block</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="ow">not</span> <span class="n">outfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">file_counted</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">at_end_of_blockiter</span></div>
+
+
+<div class="viewcode-block" id="PlainWriteFile"><a class="viewcode-back" href="../../duplicity.gpg.html#duplicity.gpg.PlainWriteFile">[docs]</a><span class="k">def</span> <span class="nf">PlainWriteFile</span><span class="p">(</span><span class="n">block_iter</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">200</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span> <span class="n">gzipped</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Write plain uncompressed file of given size</span>
+
+<span class="sd">    This is like the earlier GPGWriteFile except it writes a gzipped</span>
+<span class="sd">    file instead of a gpg&#39;d file.  This function is somewhat out of</span>
+<span class="sd">    place, because it doesn&#39;t deal with GPG at all, but it is very</span>
+<span class="sd">    similar to GPGWriteFile so they might as well be defined together.</span>
+
+<span class="sd">    The input requirements on block_iter and the output is the same as</span>
+<span class="sd">    GPGWriteFile (returns true if wrote until end of block_iter).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">GzipWriteFile</span><span class="p">(</span><span class="n">block_iter</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">gzipped</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_hash"><a class="viewcode-back" href="../../duplicity.gpg.html#duplicity.gpg.get_hash">[docs]</a><span class="k">def</span> <span class="nf">get_hash</span><span class="p">(</span><span class="nb">hash</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="nb">hex</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return hash of path</span>
+
+<span class="sd">    hash should be &quot;MD5&quot; or &quot;SHA1&quot;.  The output will be in hexadecimal</span>
+<span class="sd">    form if hex is true, and in text (base64) otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># assert path.isreg()</span>
+    <span class="n">fp</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">hash</span> <span class="o">==</span> <span class="s2">&quot;SHA1&quot;</span><span class="p">:</span>
+        <span class="n">hash_obj</span> <span class="o">=</span> <span class="n">sha1</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="nb">hash</span> <span class="o">==</span> <span class="s2">&quot;MD5&quot;</span><span class="p">:</span>
+        <span class="n">hash_obj</span> <span class="o">=</span> <span class="n">md5</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Unknown hash </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">hash</span><span class="p">,)</span>
+
+    <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">buf</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">blocksize</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">buf</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">hash_obj</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">hex</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">hash_obj</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">hash_obj</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

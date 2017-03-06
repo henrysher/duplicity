@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>testing.functional.test_rdiffdir &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for testing.functional.test_rdiffdir</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2002 Ben Escoto &lt;ben@emerose.org&gt;</span>
+<span class="c1"># Copyright 2007 Kenneth Loafman &lt;kenneth@loafman.com&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">path</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">FunctionalTestCase</span>
+
+
+<div class="viewcode-block" id="RdiffdirTest"><a class="viewcode-back" href="../../../testing.functional.test_rdiffdir.html#testing.functional.test_rdiffdir.RdiffdirTest">[docs]</a><span class="k">class</span> <span class="nc">RdiffdirTest</span><span class="p">(</span><span class="n">FunctionalTestCase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test rdiffdir command line program&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RdiffdirTest.run_cmd"><a class="viewcode-back" href="../../../testing.functional.test_rdiffdir.html#testing.functional.test_rdiffdir.RdiffdirTest.run_cmd">[docs]</a>    <span class="k">def</span> <span class="nf">run_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="n">command</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RdiffdirTest.run_rdiffdir"><a class="viewcode-back" href="../../../testing.functional.test_rdiffdir.html#testing.functional.test_rdiffdir.RdiffdirTest.run_rdiffdir">[docs]</a>    <span class="k">def</span> <span class="nf">run_rdiffdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">argstring</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run rdiffdir with given arguments&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_cmd</span><span class="p">(</span><span class="s2">&quot;rdiffdir &quot;</span> <span class="o">+</span> <span class="n">argstring</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RdiffdirTest.run_cycle"><a class="viewcode-back" href="../../../testing.functional.test_rdiffdir.html#testing.functional.test_rdiffdir.RdiffdirTest.run_cycle">[docs]</a>    <span class="k">def</span> <span class="nf">run_cycle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dirname_list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run diff/patch cycle on directories in dirname_list&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">dirname_list</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span>
+
+        <span class="n">seq_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;testfiles/output/sequence&quot;</span><span class="p">)</span>
+        <span class="n">new_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">dirname_list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">delta_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;testfiles/output/delta.tar&quot;</span><span class="p">)</span>
+        <span class="n">sig_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;testfiles/output/sig.tar&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_cmd</span><span class="p">(</span><span class="s2">&quot;cp -pR </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">new_path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">seq_path</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="n">seq_path</span><span class="o">.</span><span class="n">setdata</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_rdiffdir</span><span class="p">(</span><span class="s2">&quot;sig </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">seq_path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">sig_path</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="n">sig_path</span><span class="o">.</span><span class="n">setdata</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">sig_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+
+        <span class="c1"># FIXME: How does this work?  Path comparisons don&#39;t seem to work right</span>
+        <span class="c1"># assert new_path.compare_recursive(seq_path, verbose = 1)</span>
+
+        <span class="k">for</span> <span class="n">dirname</span> <span class="ow">in</span> <span class="n">dirname_list</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">new_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+
+            <span class="c1"># Make delta</span>
+            <span class="k">if</span> <span class="n">delta_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">delta_path</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="n">delta_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_rdiffdir</span><span class="p">(</span><span class="s2">&quot;delta </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                              <span class="p">(</span><span class="n">sig_path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">new_path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">delta_path</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="n">delta_path</span><span class="o">.</span><span class="n">setdata</span><span class="p">()</span>
+            <span class="k">assert</span> <span class="n">delta_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+
+            <span class="c1"># patch and compare</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_rdiffdir</span><span class="p">(</span><span class="s2">&quot;patch </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">seq_path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">delta_path</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="n">seq_path</span><span class="o">.</span><span class="n">setdata</span><span class="p">()</span>
+            <span class="n">new_path</span><span class="o">.</span><span class="n">setdata</span><span class="p">()</span>
+            <span class="k">assert</span> <span class="n">new_path</span><span class="o">.</span><span class="n">compare_recursive</span><span class="p">(</span><span class="n">seq_path</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1"># Make new signature</span>
+            <span class="n">sig_path</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="n">sig_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_rdiffdir</span><span class="p">(</span><span class="s2">&quot;sig </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">seq_path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">sig_path</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="n">sig_path</span><span class="o">.</span><span class="n">setdata</span><span class="p">()</span>
+            <span class="k">assert</span> <span class="n">sig_path</span><span class="o">.</span><span class="n">isreg</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="RdiffdirTest.test_dirx"><a class="viewcode-back" href="../../../testing.functional.test_rdiffdir.html#testing.functional.test_rdiffdir.RdiffdirTest.test_dirx">[docs]</a>    <span class="k">def</span> <span class="nf">test_dirx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test cycle on testfiles/dirx&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_cycle</span><span class="p">([</span><span class="s1">&#39;testfiles/empty_dir&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;testfiles/dir1&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;testfiles/dir2&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;testfiles/dir3&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;testfiles/empty_dir&#39;</span><span class="p">])</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../../testing.html">testing</a><ul>
+  <li><a href="../functional.html">testing.functional</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

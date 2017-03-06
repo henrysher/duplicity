@@ -1,0 +1,389 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>testing.unit.test_patchdir &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for testing.unit.test_patchdir</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2002 Ben Escoto &lt;ben@emerose.org&gt;</span>
+<span class="c1"># Copyright 2007 Kenneth Loafman &lt;kenneth@loafman.com&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="kn">from</span> <span class="nn">future_builtins</span> <span class="k">import</span> <span class="nb">map</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">cStringIO</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">diffdir</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">patchdir</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">log</span>  <span class="c1"># @UnusedImport</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">selection</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">tarfile</span>  <span class="c1"># @UnusedImport</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">librsync</span>  <span class="c1"># @UnusedImport</span>
+<span class="kn">from</span> <span class="nn">duplicity.path</span> <span class="k">import</span> <span class="o">*</span>  <span class="c1"># @UnusedWildImport</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">UnitTestCase</span>
+
+
+<div class="viewcode-block" id="PatchingTest"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.PatchingTest">[docs]</a><span class="k">class</span> <span class="nc">PatchingTest</span><span class="p">(</span><span class="n">UnitTestCase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test patching&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PatchingTest.setUp"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.PatchingTest.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PatchingTest</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setUp</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unpack_testfiles</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="PatchingTest.copyfileobj"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.PatchingTest.copyfileobj">[docs]</a>    <span class="k">def</span> <span class="nf">copyfileobj</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infp</span><span class="p">,</span> <span class="n">outfp</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Copy in fileobj to out, closing afterwards&quot;&quot;&quot;</span>
+        <span class="n">blocksize</span> <span class="o">=</span> <span class="mi">32</span> <span class="o">*</span> <span class="mi">1024</span>
+        <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">buf</span> <span class="o">=</span> <span class="n">infp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">blocksize</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">buf</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">outfp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">infp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">outfp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="PatchingTest.test_total"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.PatchingTest.test_total">[docs]</a>    <span class="k">def</span> <span class="nf">test_total</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test cycle on dirx&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_sequence</span><span class="p">([</span><span class="s1">&#39;testfiles/dir1&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;testfiles/dir2&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;testfiles/dir3&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="PatchingTest.get_sel"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.PatchingTest.get_sel">[docs]</a>    <span class="k">def</span> <span class="nf">get_sel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get selection iter over the given directory&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">selection</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">set_iter</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="PatchingTest.total_sequence"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.PatchingTest.total_sequence">[docs]</a>    <span class="k">def</span> <span class="nf">total_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filelist</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test signatures, diffing, and patching on directory list&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">filelist</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;testfiles/output/sig.tar&quot;</span><span class="p">)</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;testfiles/output/diff.tar&quot;</span><span class="p">)</span>
+        <span class="n">seq_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;testfiles/output/sequence&quot;</span><span class="p">)</span>
+        <span class="n">new_path</span><span class="p">,</span> <span class="n">old_path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>  <span class="c1"># set below in for loop</span>
+
+        <span class="c1"># Write initial full backup to diff.tar</span>
+        <span class="k">for</span> <span class="n">dirname</span> <span class="ow">in</span> <span class="n">filelist</span><span class="p">:</span>
+            <span class="n">old_path</span><span class="p">,</span> <span class="n">new_path</span> <span class="o">=</span> <span class="n">new_path</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">old_path</span><span class="p">:</span>
+                <span class="n">sigblock</span> <span class="o">=</span> <span class="n">diffdir</span><span class="o">.</span><span class="n">DirSig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_sel</span><span class="p">(</span><span class="n">seq_path</span><span class="p">))</span>
+                <span class="n">diffdir</span><span class="o">.</span><span class="n">write_block_iter</span><span class="p">(</span><span class="n">sigblock</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
+                <span class="n">deltablock</span> <span class="o">=</span> <span class="n">diffdir</span><span class="o">.</span><span class="n">DirDelta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_sel</span><span class="p">(</span><span class="n">new_path</span><span class="p">),</span>
+                                              <span class="n">sig</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">deltablock</span> <span class="o">=</span> <span class="n">diffdir</span><span class="o">.</span><span class="n">DirFull</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_sel</span><span class="p">(</span><span class="n">new_path</span><span class="p">))</span>
+            <span class="n">diffdir</span><span class="o">.</span><span class="n">write_block_iter</span><span class="p">(</span><span class="n">deltablock</span><span class="p">,</span> <span class="n">diff</span><span class="p">)</span>
+
+            <span class="n">patchdir</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="n">seq_path</span><span class="p">,</span> <span class="n">diff</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">))</span>
+            <span class="c1"># print &quot;#########&quot;, seq_path, new_path</span>
+            <span class="k">assert</span> <span class="n">seq_path</span><span class="o">.</span><span class="n">compare_recursive</span><span class="p">(</span><span class="n">new_path</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PatchingTest.test_block_tar"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.PatchingTest.test_block_tar">[docs]</a>    <span class="k">def</span> <span class="nf">test_block_tar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test building block tar from a number of files&quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">get_fileobjs</span><span class="p">():</span>
+            <span class="sd">&quot;&quot;&quot;Return iterator yielding open fileobjs of tar files&quot;&quot;&quot;</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;testfiles/blocktartest/test</span><span class="si">%d</span><span class="s2">.tar&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+                <span class="n">fp</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="n">fp</span>
+                <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="n">tf</span> <span class="o">=</span> <span class="n">patchdir</span><span class="o">.</span><span class="n">TarFile_FromFileobjs</span><span class="p">(</span><span class="n">get_fileobjs</span><span class="p">())</span>
+        <span class="n">namelist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">tarinfo</span> <span class="ow">in</span> <span class="n">tf</span><span class="p">:</span>
+            <span class="n">namelist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tarinfo</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="p">(</span><span class="s2">&quot;tmp/</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span> <span class="ow">in</span> <span class="n">namelist</span><span class="p">,</span> <span class="n">namelist</span></div>
+
+<div class="viewcode-block" id="PatchingTest.test_doubledot_hole"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.PatchingTest.test_doubledot_hole">[docs]</a>    <span class="k">def</span> <span class="nf">test_doubledot_hole</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test for the .. bug that lets tar overwrite parent dir&quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">make_bad_tar</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Write attack tarfile to filename&quot;&quot;&quot;</span>
+            <span class="n">tf</span> <span class="o">=</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">TarFile</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">)</span>
+
+            <span class="c1"># file object will be empty, and tarinfo will have path</span>
+            <span class="c1"># &quot;snapshot/../warning-security-error&quot;</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;cat /dev/null &gt;testfiles/output/file&quot;</span><span class="p">)</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;testfiles/output/file&quot;</span><span class="p">)</span>
+            <span class="n">path</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;diff&quot;</span><span class="p">,</span> <span class="s2">&quot;..&quot;</span><span class="p">,</span> <span class="s2">&quot;warning-security-error&quot;</span><span class="p">)</span>
+            <span class="n">ti</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">get_tarinfo</span><span class="p">()</span>
+            <span class="n">fp</span> <span class="o">=</span> <span class="n">cStringIO</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">tf</span><span class="o">.</span><span class="n">addfile</span><span class="p">(</span><span class="n">ti</span><span class="p">,</span> <span class="n">fp</span><span class="p">)</span>
+
+            <span class="n">tf</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="n">make_bad_tar</span><span class="p">(</span><span class="s2">&quot;testfiles/output/bad.tar&quot;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="s2">&quot;testfiles/output/temp&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">patchdir</span><span class="o">.</span><span class="n">PatchDirException</span><span class="p">,</span> <span class="n">patchdir</span><span class="o">.</span><span class="n">Patch</span><span class="p">,</span>
+                          <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;testfiles/output/temp&quot;</span><span class="p">),</span>
+                          <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;testfiles/output/bad.tar&quot;</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;testfiles/output/warning-security-error&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="index"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.index">[docs]</a><span class="k">class</span> <span class="nc">index</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Used below to test the iter collation&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span></div>
+
+
+<div class="viewcode-block" id="CollateItersTest"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.CollateItersTest">[docs]</a><span class="k">class</span> <span class="nc">CollateItersTest</span><span class="p">(</span><span class="n">UnitTestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="CollateItersTest.setUp"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.CollateItersTest.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CollateItersTest</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setUp</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unpack_testfiles</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CollateItersTest.test_collate"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.CollateItersTest.test_collate">[docs]</a>    <span class="k">def</span> <span class="nf">test_collate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test collate_iters function&quot;&quot;&quot;</span>
+        <span class="n">indicies</span> <span class="o">=</span> <span class="p">[</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]]</span>
+        <span class="n">helper</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="n">indicies</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="n">makeiter1</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="nb">iter</span><span class="p">(</span><span class="n">indicies</span><span class="p">)</span>
+        <span class="n">makeiter2</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="nb">map</span><span class="p">(</span><span class="n">helper</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+        <span class="n">makeiter3</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="nb">map</span><span class="p">(</span><span class="n">helper</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+
+        <span class="n">outiter</span> <span class="o">=</span> <span class="n">patchdir</span><span class="o">.</span><span class="n">collate_iters</span><span class="p">([</span><span class="n">makeiter1</span><span class="p">(),</span> <span class="n">makeiter2</span><span class="p">()])</span>
+        <span class="k">assert</span> <span class="n">Iter</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">outiter</span><span class="p">,</span>
+                          <span class="nb">iter</span><span class="p">([(</span><span class="n">indicies</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">indicies</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                                <span class="p">(</span><span class="n">indicies</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">indicies</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                                <span class="p">(</span><span class="n">indicies</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="kc">None</span><span class="p">),</span>
+                                <span class="p">(</span><span class="n">indicies</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">indicies</span><span class="p">[</span><span class="mi">3</span><span class="p">])]))</span>
+
+        <span class="k">assert</span> <span class="n">Iter</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">patchdir</span><span class="o">.</span><span class="n">collate_iters</span><span class="p">([</span><span class="n">makeiter1</span><span class="p">(),</span>
+                                                 <span class="n">makeiter2</span><span class="p">(),</span>
+                                                 <span class="n">makeiter3</span><span class="p">()]),</span>
+                          <span class="nb">iter</span><span class="p">([(</span><span class="n">indicies</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">indicies</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="kc">None</span><span class="p">),</span>
+                                <span class="p">(</span><span class="n">indicies</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">indicies</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">indicies</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                                <span class="p">(</span><span class="n">indicies</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="n">indicies</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
+                                <span class="p">(</span><span class="n">indicies</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">indicies</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="kc">None</span><span class="p">)]),</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">Iter</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">patchdir</span><span class="o">.</span><span class="n">collate_iters</span><span class="p">([</span><span class="n">makeiter1</span><span class="p">(),</span> <span class="nb">iter</span><span class="p">([])]),</span>
+                          <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">indicies</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="n">Iter</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">indicies</span><span class="p">),</span>
+                          <span class="n">patchdir</span><span class="o">.</span><span class="n">collate_iters</span><span class="p">([</span><span class="n">makeiter1</span><span class="p">(),</span> <span class="nb">iter</span><span class="p">([])]))</span></div>
+
+<div class="viewcode-block" id="CollateItersTest.test_tuple"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.CollateItersTest.test_tuple">[docs]</a>    <span class="k">def</span> <span class="nf">test_tuple</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test indexed tuple&quot;&quot;&quot;</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">patchdir</span><span class="o">.</span><span class="n">IndexedTuple</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">))</span>
+        <span class="n">i2</span> <span class="o">=</span> <span class="n">patchdir</span><span class="o">.</span><span class="n">IndexedTuple</span><span class="p">((),</span> <span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">,</span> <span class="s2">&quot;there&quot;</span><span class="p">,</span> <span class="s2">&quot;how are you&quot;</span><span class="p">))</span>
+
+        <span class="k">assert</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;a&quot;</span>
+        <span class="k">assert</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;b&quot;</span>
+        <span class="k">assert</span> <span class="n">i2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;there&quot;</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">i2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
+        <span class="k">assert</span> <span class="n">i2</span> <span class="o">&lt;</span> <span class="n">i</span><span class="p">,</span> <span class="n">i2</span> <span class="o">&lt;</span> <span class="n">i</span></div>
+
+<div class="viewcode-block" id="CollateItersTest.test_tuple_assignment"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.CollateItersTest.test_tuple_assignment">[docs]</a>    <span class="k">def</span> <span class="nf">test_tuple_assignment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">patchdir</span><span class="o">.</span><span class="n">IndexedTuple</span><span class="p">((),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="n">a</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="k">assert</span> <span class="n">b</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="k">assert</span> <span class="n">c</span> <span class="o">==</span> <span class="mi">3</span></div></div>
+
+
+<div class="viewcode-block" id="TestInnerFuncs"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.TestInnerFuncs">[docs]</a><span class="k">class</span> <span class="nc">TestInnerFuncs</span><span class="p">(</span><span class="n">UnitTestCase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test some other functions involved in patching&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="TestInnerFuncs.setUp"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.TestInnerFuncs.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestInnerFuncs</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setUp</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unpack_testfiles</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_output</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TestInnerFuncs.check_output"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.TestInnerFuncs.check_output">[docs]</a>    <span class="k">def</span> <span class="nf">check_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make sure testfiles/output exists&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;testfiles/output&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">out</span><span class="o">.</span><span class="n">isdir</span><span class="p">()):</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out</span> <span class="o">=</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="TestInnerFuncs.snapshot"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.TestInnerFuncs.snapshot">[docs]</a>    <span class="k">def</span> <span class="nf">snapshot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make a snapshot ROPath, permissions 0o600&quot;&quot;&quot;</span>
+        <span class="n">ss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;snapshot&quot;</span><span class="p">)</span>
+        <span class="n">fout</span> <span class="o">=</span> <span class="n">ss</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;wb&quot;</span><span class="p">)</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;hello, world!&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">fout</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">ss</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="mo">0o600</span><span class="p">)</span>
+        <span class="n">ss</span><span class="o">.</span><span class="n">difftype</span> <span class="o">=</span> <span class="s2">&quot;snapshot&quot;</span>
+        <span class="k">return</span> <span class="n">ss</span></div>
+
+<div class="viewcode-block" id="TestInnerFuncs.get_delta"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.TestInnerFuncs.get_delta">[docs]</a>    <span class="k">def</span> <span class="nf">get_delta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_buf</span><span class="p">,</span> <span class="n">new_buf</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return delta buffer from old to new&quot;&quot;&quot;</span>
+        <span class="n">sigfile</span> <span class="o">=</span> <span class="n">librsync</span><span class="o">.</span><span class="n">SigFile</span><span class="p">(</span><span class="n">cStringIO</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">old_buf</span><span class="p">))</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">sigfile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">sigfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="n">deltafile</span> <span class="o">=</span> <span class="n">librsync</span><span class="o">.</span><span class="n">DeltaFile</span><span class="p">(</span><span class="n">sig</span><span class="p">,</span> <span class="n">cStringIO</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">new_buf</span><span class="p">))</span>
+        <span class="n">deltabuf</span> <span class="o">=</span> <span class="n">deltafile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">deltafile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">deltabuf</span></div>
+
+<div class="viewcode-block" id="TestInnerFuncs.delta1"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.TestInnerFuncs.delta1">[docs]</a>    <span class="k">def</span> <span class="nf">delta1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make a delta ROPath, permissions 0o640&quot;&quot;&quot;</span>
+        <span class="n">delta1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;delta1&quot;</span><span class="p">)</span>
+        <span class="n">fout</span> <span class="o">=</span> <span class="n">delta1</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;wb&quot;</span><span class="p">)</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_delta</span><span class="p">(</span><span class="s2">&quot;hello, world!&quot;</span><span class="p">,</span>
+                                  <span class="s2">&quot;aonseuth aosetnuhaonsuhtansoetuhaoe&quot;</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">fout</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">delta1</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="mo">0o640</span><span class="p">)</span>
+        <span class="n">delta1</span><span class="o">.</span><span class="n">difftype</span> <span class="o">=</span> <span class="s2">&quot;diff&quot;</span>
+        <span class="k">return</span> <span class="n">delta1</span></div>
+
+<div class="viewcode-block" id="TestInnerFuncs.delta2"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.TestInnerFuncs.delta2">[docs]</a>    <span class="k">def</span> <span class="nf">delta2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make another delta ROPath, permissions 0o644&quot;&quot;&quot;</span>
+        <span class="n">delta2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;delta1&quot;</span><span class="p">)</span>
+        <span class="n">fout</span> <span class="o">=</span> <span class="n">delta2</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;wb&quot;</span><span class="p">)</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_delta</span><span class="p">(</span><span class="s2">&quot;aonseuth aosetnuhaonsuhtansoetuhaoe&quot;</span><span class="p">,</span>
+                                  <span class="s2">&quot;3499 34957839485792357 458348573&quot;</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">fout</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">delta2</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="mo">0o644</span><span class="p">)</span>
+        <span class="n">delta2</span><span class="o">.</span><span class="n">difftype</span> <span class="o">=</span> <span class="s2">&quot;diff&quot;</span>
+        <span class="k">return</span> <span class="n">delta2</span></div>
+
+<div class="viewcode-block" id="TestInnerFuncs.deleted"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.TestInnerFuncs.deleted">[docs]</a>    <span class="k">def</span> <span class="nf">deleted</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make a deleted ROPath&quot;&quot;&quot;</span>
+        <span class="n">deleted</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;deleted&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">deleted</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+        <span class="n">deleted</span><span class="o">.</span><span class="n">difftype</span> <span class="o">=</span> <span class="s2">&quot;deleted&quot;</span>
+        <span class="k">return</span> <span class="n">deleted</span></div>
+
+<div class="viewcode-block" id="TestInnerFuncs.test_normalize"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.TestInnerFuncs.test_normalize">[docs]</a>    <span class="k">def</span> <span class="nf">test_normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test normalizing a sequence of diffs&quot;&quot;&quot;</span>
+        <span class="n">ss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">snapshot</span><span class="p">()</span>
+        <span class="n">d1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta1</span><span class="p">()</span>
+        <span class="n">d2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta2</span><span class="p">()</span>
+        <span class="n">de</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deleted</span><span class="p">()</span>
+
+        <span class="n">seq1</span> <span class="o">=</span> <span class="p">[</span><span class="n">ss</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">]</span>
+        <span class="n">seq2</span> <span class="o">=</span> <span class="p">[</span><span class="n">ss</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">de</span><span class="p">]</span>
+        <span class="n">seq3</span> <span class="o">=</span> <span class="p">[</span><span class="n">de</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">]</span>
+        <span class="n">seq4</span> <span class="o">=</span> <span class="p">[</span><span class="n">de</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">ss</span><span class="p">]</span>
+        <span class="n">seq5</span> <span class="o">=</span> <span class="p">[</span><span class="n">de</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">]</span>
+
+        <span class="k">def</span> <span class="nf">try_seq</span><span class="p">(</span><span class="n">input_seq</span><span class="p">,</span> <span class="n">correct_output_seq</span><span class="p">):</span>
+            <span class="n">normed</span> <span class="o">=</span> <span class="n">patchdir</span><span class="o">.</span><span class="n">normalize_ps</span><span class="p">(</span><span class="n">input_seq</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">normed</span> <span class="o">==</span> <span class="n">correct_output_seq</span><span class="p">,</span> <span class="p">(</span><span class="n">normed</span><span class="p">,</span> <span class="n">correct_output_seq</span><span class="p">)</span>
+
+        <span class="n">try_seq</span><span class="p">(</span><span class="n">seq1</span><span class="p">,</span> <span class="n">seq1</span><span class="p">)</span>
+        <span class="n">try_seq</span><span class="p">(</span><span class="n">seq2</span><span class="p">,</span> <span class="p">[</span><span class="n">de</span><span class="p">])</span>
+        <span class="n">try_seq</span><span class="p">(</span><span class="n">seq3</span><span class="p">,</span> <span class="n">seq1</span><span class="p">)</span>
+        <span class="n">try_seq</span><span class="p">(</span><span class="n">seq4</span><span class="p">,</span> <span class="p">[</span><span class="n">ss</span><span class="p">])</span>
+        <span class="n">try_seq</span><span class="p">(</span><span class="n">seq5</span><span class="p">,</span> <span class="n">seq1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestInnerFuncs.test_patch_seq2ropath"><a class="viewcode-back" href="../../../testing.unit.test_patchdir.html#testing.unit.test_patchdir.TestInnerFuncs.test_patch_seq2ropath">[docs]</a>    <span class="k">def</span> <span class="nf">test_patch_seq2ropath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test patching sequence&quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">testseq</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">perms</span><span class="p">,</span> <span class="n">buf</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">patchdir</span><span class="o">.</span><span class="n">patch_seq2ropath</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">getperms</span><span class="p">()</span> <span class="o">==</span> <span class="n">perms</span><span class="p">,</span> <span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">getperms</span><span class="p">(),</span> <span class="n">perms</span><span class="p">)</span>
+            <span class="n">fout</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span>
+            <span class="n">contents</span> <span class="o">=</span> <span class="n">fout</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="n">fout</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">assert</span> <span class="n">contents</span> <span class="o">==</span> <span class="n">buf</span><span class="p">,</span> <span class="p">(</span><span class="n">contents</span><span class="p">,</span> <span class="n">buf</span><span class="p">)</span>
+
+        <span class="n">ids</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">:</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getuid</span><span class="p">(),</span> <span class="n">os</span><span class="o">.</span><span class="n">getgid</span><span class="p">())</span>
+
+        <span class="n">testseq</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">snapshot</span><span class="p">()],</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> 600&quot;</span> <span class="o">%</span> <span class="n">ids</span><span class="p">),</span> <span class="s2">&quot;hello, world!&quot;</span><span class="p">)</span>
+        <span class="n">testseq</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">snapshot</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta1</span><span class="p">()],</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> 640&quot;</span> <span class="o">%</span> <span class="n">ids</span><span class="p">),</span>
+                <span class="s2">&quot;aonseuth aosetnuhaonsuhtansoetuhaoe&quot;</span><span class="p">)</span>
+        <span class="n">testseq</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">snapshot</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta1</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta2</span><span class="p">()],</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> 644&quot;</span> <span class="o">%</span> <span class="n">ids</span><span class="p">),</span>
+                <span class="s2">&quot;3499 34957839485792357 458348573&quot;</span><span class="p">)</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../../testing.html">testing</a><ul>
+  <li><a href="../unit.html">testing.unit</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

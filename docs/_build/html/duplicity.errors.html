@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.errors module &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="duplicity.file_naming module" href="duplicity.file_naming.html" />
+    <link rel="prev" title="duplicity.dup_time module" href="duplicity.dup_time.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-duplicity.errors">
+<span id="duplicity-errors-module"></span><h1>duplicity.errors module<a class="headerlink" href="#module-duplicity.errors" title="Permalink to this headline">¶</a></h1>
+<p>Error/exception classes that do not fit naturally anywhere else.</p>
+<dl class="exception">
+<dt id="duplicity.errors.BackendException">
+<em class="property">exception </em><code class="descclassname">duplicity.errors.</code><code class="descname">BackendException</code><span class="sig-paren">(</span><em>msg</em>, <em>code=50</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/errors.html#BackendException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.errors.BackendException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#duplicity.errors.DuplicityError" title="duplicity.errors.DuplicityError"><code class="xref py py-class docutils literal"><span class="pre">duplicity.errors.DuplicityError</span></code></a></p>
+<p>Raised to indicate a backend specific problem.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="duplicity.errors.ConflictingScheme">
+<em class="property">exception </em><code class="descclassname">duplicity.errors.</code><code class="descname">ConflictingScheme</code><a class="reference internal" href="_modules/duplicity/errors.html#ConflictingScheme"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.errors.ConflictingScheme" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#duplicity.errors.DuplicityError" title="duplicity.errors.DuplicityError"><code class="xref py py-class docutils literal"><span class="pre">duplicity.errors.DuplicityError</span></code></a></p>
+<p>Raised to indicate an attempt was made to register a backend for a
+scheme for which there is already a backend registered.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="duplicity.errors.DuplicityError">
+<em class="property">exception </em><code class="descclassname">duplicity.errors.</code><code class="descname">DuplicityError</code><a class="reference internal" href="_modules/duplicity/errors.html#DuplicityError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.errors.DuplicityError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="duplicity.errors.FatalBackendException">
+<em class="property">exception </em><code class="descclassname">duplicity.errors.</code><code class="descname">FatalBackendException</code><span class="sig-paren">(</span><em>msg</em>, <em>code=50</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/errors.html#FatalBackendException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.errors.FatalBackendException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#duplicity.errors.BackendException" title="duplicity.errors.BackendException"><code class="xref py py-class docutils literal"><span class="pre">duplicity.errors.BackendException</span></code></a></p>
+<p>Raised to indicate a backend failed fatally.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="duplicity.errors.InvalidBackendURL">
+<em class="property">exception </em><code class="descclassname">duplicity.errors.</code><code class="descname">InvalidBackendURL</code><a class="reference internal" href="_modules/duplicity/errors.html#InvalidBackendURL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.errors.InvalidBackendURL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#duplicity.errors.UserError" title="duplicity.errors.UserError"><code class="xref py py-class docutils literal"><span class="pre">duplicity.errors.UserError</span></code></a></p>
+<p>Raised to indicate a URL was not a valid backend URL.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="duplicity.errors.NotSupported">
+<em class="property">exception </em><code class="descclassname">duplicity.errors.</code><code class="descname">NotSupported</code><a class="reference internal" href="_modules/duplicity/errors.html#NotSupported"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.errors.NotSupported" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#duplicity.errors.DuplicityError" title="duplicity.errors.DuplicityError"><code class="xref py py-class docutils literal"><span class="pre">duplicity.errors.DuplicityError</span></code></a></p>
+<p>Exception raised when an action cannot be completed because some
+particular feature is not supported by the environment.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="duplicity.errors.TemporaryLoadException">
+<em class="property">exception </em><code class="descclassname">duplicity.errors.</code><code class="descname">TemporaryLoadException</code><span class="sig-paren">(</span><em>msg</em>, <em>code=50</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/errors.html#TemporaryLoadException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.errors.TemporaryLoadException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#duplicity.errors.BackendException" title="duplicity.errors.BackendException"><code class="xref py py-class docutils literal"><span class="pre">duplicity.errors.BackendException</span></code></a></p>
+<p>Raised to indicate a temporary issue on the backend.
+Duplicity should back off for a bit and try again.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="duplicity.errors.UnsupportedBackendScheme">
+<em class="property">exception </em><code class="descclassname">duplicity.errors.</code><code class="descname">UnsupportedBackendScheme</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/errors.html#UnsupportedBackendScheme"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.errors.UnsupportedBackendScheme" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#duplicity.errors.InvalidBackendURL" title="duplicity.errors.InvalidBackendURL"><code class="xref py py-class docutils literal"><span class="pre">duplicity.errors.InvalidBackendURL</span></code></a>, <a class="reference internal" href="#duplicity.errors.UserError" title="duplicity.errors.UserError"><code class="xref py py-class docutils literal"><span class="pre">duplicity.errors.UserError</span></code></a></p>
+<p>Raised to indicate that a backend URL was parsed successfully as a
+URL, but was not supported.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="duplicity.errors.UserError">
+<em class="property">exception </em><code class="descclassname">duplicity.errors.</code><code class="descname">UserError</code><a class="reference internal" href="_modules/duplicity/errors.html#UserError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.errors.UserError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#duplicity.errors.DuplicityError" title="duplicity.errors.DuplicityError"><code class="xref py py-class docutils literal"><span class="pre">duplicity.errors.DuplicityError</span></code></a></p>
+<p>Subclasses use this in their inheritance hierarchy to signal that
+the error is a user generated one, and that it is therefore
+typically unsuitable to display a full stack trace.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="duplicity.html">duplicity package</a><ul>
+      <li>Previous: <a href="duplicity.dup_time.html" title="previous chapter">duplicity.dup_time module</a></li>
+      <li>Next: <a href="duplicity.file_naming.html" title="next chapter">duplicity.file_naming module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/duplicity.errors.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/duplicity.errors.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

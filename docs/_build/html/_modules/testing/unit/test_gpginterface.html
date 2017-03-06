@@ -1,0 +1,346 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>testing.unit.test_gpginterface &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for testing.unit.test_gpginterface</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;py-unit tests for GnuPG</span>
+
+<span class="sd">COPYRIGHT:</span>
+
+<span class="sd">Copyright (C) 2001  Frank J. Tobin, ftobin@neverending.org</span>
+
+<span class="sd">LICENSE:</span>
+
+<span class="sd">This library is free software; you can redistribute it and/or</span>
+<span class="sd">modify it under the terms of the GNU Lesser General Public</span>
+<span class="sd">License as published by the Free Software Foundation; either</span>
+<span class="sd">version 2.1 of the License, or (at your option) any later version.</span>
+
+<span class="sd">This library is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="sd">Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public</span>
+<span class="sd">License along with this library; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</span>
+<span class="sd">or see http://www.gnu.org/copyleft/lesser.html</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">gpginterface</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Frank J. Tobin, ftobin@neverending.org&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.2.2&quot;</span>
+<span class="n">__revision__</span> <span class="o">=</span> <span class="s2">&quot;$Id: GnuPGInterfacetest.py,v 1.11 2009/06/06 17:35:19 loafman Exp $&quot;</span>
+
+
+<div class="viewcode-block" id="BasicTest"><a class="viewcode-back" href="../../../testing.unit.test_gpginterface.html#testing.unit.test_gpginterface.BasicTest">[docs]</a><span class="k">class</span> <span class="nc">BasicTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;an initializer superclass&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methodName</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gnupg</span> <span class="o">=</span> <span class="n">gpginterface</span><span class="o">.</span><span class="n">GnuPG</span><span class="p">()</span>
+        <span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methodName</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GnuPGTests"><a class="viewcode-back" href="../../../testing.unit.test_gpginterface.html#testing.unit.test_gpginterface.GnuPGTests">[docs]</a><span class="k">class</span> <span class="nc">GnuPGTests</span><span class="p">(</span><span class="n">BasicTest</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tests for GnuPG class&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methodName</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">BasicTest</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methodName</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">gnupg</span><span class="o">.</span><span class="n">passphrase</span> <span class="o">=</span> <span class="s2">&quot;Three blind mice&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">armor</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">meta_interactive</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">extra_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--no-secmem-warning&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GnuPGTests.do_create_fh_operation"><a class="viewcode-back" href="../../../testing.unit.test_gpginterface.html#testing.unit.test_gpginterface.GnuPGTests.do_create_fh_operation">[docs]</a>    <span class="k">def</span> <span class="nf">do_create_fh_operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span>
+                               <span class="n">passphrase</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">creations</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">,</span> <span class="s1">&#39;stdout&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Make sure we&#39;re getting the passphrase to GnuPG</span>
+        <span class="c1"># somehow!</span>
+        <span class="k">assert</span> <span class="n">passphrase</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">gnupg</span><span class="o">.</span><span class="n">passphrase</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
+            <span class="s2">&quot;No way to send the passphrase to GnuPG!&quot;</span>
+
+        <span class="c1"># We&#39;ll handle the passphrase manually</span>
+        <span class="k">if</span> <span class="n">passphrase</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">creations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;passphrase&#39;</span><span class="p">)</span>
+
+        <span class="n">proc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gnupg</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">create_fhs</span><span class="o">=</span><span class="n">creations</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">passphrase</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">proc</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;passphrase&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">passphrase</span><span class="p">)</span>
+            <span class="n">proc</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;passphrase&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="n">proc</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+        <span class="n">proc</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="n">ciphertext</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;stdout&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">proc</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;stdout&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="c1"># Checking to make sure GnuPG exited successfully</span>
+        <span class="n">proc</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">ciphertext</span></div>
+
+<div class="viewcode-block" id="GnuPGTests.do_attach_fh_operation"><a class="viewcode-back" href="../../../testing.unit.test_gpginterface.html#testing.unit.test_gpginterface.GnuPGTests.do_attach_fh_operation">[docs]</a>    <span class="k">def</span> <span class="nf">do_attach_fh_operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">stdin</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span>
+                               <span class="n">passphrase</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="c1"># Make sure we&#39;re getting the passphrase to GnuPG</span>
+        <span class="c1"># somehow!</span>
+        <span class="k">assert</span> <span class="n">passphrase</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">gnupg</span><span class="o">.</span><span class="n">passphrase</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
+            <span class="s2">&quot;No way to send the passphrase to GnuPG!&quot;</span>
+
+        <span class="n">creations</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># We&#39;ll handle the passphrase manually</span>
+        <span class="k">if</span> <span class="n">passphrase</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">proc</span><span class="o">.</span><span class="n">handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;passphrase&#39;</span><span class="p">)</span>  <span class="c1"># @UndefinedVariable</span>
+
+        <span class="n">attachments</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;stdin&#39;</span><span class="p">:</span> <span class="n">stdin</span><span class="p">,</span> <span class="s1">&#39;stdout&#39;</span><span class="p">:</span> <span class="n">stdout</span><span class="p">}</span>
+
+        <span class="n">proc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gnupg</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">create_fhs</span><span class="o">=</span><span class="n">creations</span><span class="p">,</span>
+                              <span class="n">attach_fhs</span><span class="o">=</span><span class="n">attachments</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">passphrase</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">proc</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;passphrase&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">passphrase</span><span class="p">)</span>
+            <span class="n">proc</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="s1">&#39;passphrase&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="c1"># Checking to make sure GnuPG exited successfully</span>
+        <span class="n">proc</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GnuPGTests.test_create_fhs_solely"><a class="viewcode-back" href="../../../testing.unit.test_gpginterface.html#testing.unit.test_gpginterface.GnuPGTests.test_create_fhs_solely">[docs]</a>    <span class="k">def</span> <span class="nf">test_create_fhs_solely</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Do GnuPG operations using solely the create_fhs feature&quot;&quot;&quot;</span>
+        <span class="n">plaintext</span> <span class="o">=</span> <span class="s2">&quot;Three blind mice&quot;</span>
+
+        <span class="n">ciphertext</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_create_fh_operation</span><span class="p">([</span><span class="s1">&#39;--symmetric&#39;</span><span class="p">],</span>
+                                                 <span class="n">plaintext</span><span class="p">)</span>
+
+        <span class="n">decryption</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_create_fh_operation</span><span class="p">([</span><span class="s1">&#39;--decrypt&#39;</span><span class="p">],</span>
+                                                 <span class="n">ciphertext</span><span class="p">,</span>
+                                                 <span class="bp">self</span><span class="o">.</span><span class="n">gnupg</span><span class="o">.</span><span class="n">passphrase</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">decryption</span> <span class="o">==</span> <span class="n">plaintext</span><span class="p">,</span> \
+            <span class="s2">&quot;GnuPG decrypted output does not match original input&quot;</span></div>
+
+<div class="viewcode-block" id="GnuPGTests.test_attach_fhs"><a class="viewcode-back" href="../../../testing.unit.test_gpginterface.html#testing.unit.test_gpginterface.GnuPGTests.test_attach_fhs">[docs]</a>    <span class="k">def</span> <span class="nf">test_attach_fhs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Do GnuPG operations using the attach_fhs feature&quot;&quot;&quot;</span>
+        <span class="n">plaintext_source</span> <span class="o">=</span> <span class="vm">__file__</span>
+
+        <span class="n">plainfile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">plaintext_source</span><span class="p">)</span>
+        <span class="n">temp1</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryFile</span><span class="p">()</span>
+        <span class="n">temp2</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryFile</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_attach_fh_operation</span><span class="p">([</span><span class="s1">&#39;--symmetric&#39;</span><span class="p">],</span>
+                                    <span class="n">stdin</span><span class="o">=</span><span class="n">plainfile</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">temp1</span><span class="p">)</span>
+
+        <span class="n">temp1</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_attach_fh_operation</span><span class="p">([</span><span class="s1">&#39;--decrypt&#39;</span><span class="p">],</span>
+                                    <span class="n">stdin</span><span class="o">=</span><span class="n">temp1</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">temp2</span><span class="p">)</span>
+
+        <span class="n">plainfile</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">temp2</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">fh_cmp</span><span class="p">(</span><span class="n">plainfile</span><span class="p">,</span> <span class="n">temp2</span><span class="p">),</span> \
+            <span class="s2">&quot;GnuPG decrypted output does not match original input&quot;</span></div></div>
+
+
+<div class="viewcode-block" id="OptionsTests"><a class="viewcode-back" href="../../../testing.unit.test_gpginterface.html#testing.unit.test_gpginterface.OptionsTests">[docs]</a><span class="k">class</span> <span class="nc">OptionsTests</span><span class="p">(</span><span class="n">BasicTest</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tests for Options class&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methodName</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">BasicTest</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methodName</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset_options</span><span class="p">()</span>
+
+<div class="viewcode-block" id="OptionsTests.reset_options"><a class="viewcode-back" href="../../../testing.unit.test_gpginterface.html#testing.unit.test_gpginterface.OptionsTests.reset_options">[docs]</a>    <span class="k">def</span> <span class="nf">reset_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gnupg</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">gpginterface</span><span class="o">.</span><span class="n">Options</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="OptionsTests.option_to_arg"><a class="viewcode-back" href="../../../testing.unit.test_gpginterface.html#testing.unit.test_gpginterface.OptionsTests.option_to_arg">[docs]</a>    <span class="k">def</span> <span class="nf">option_to_arg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;--&#39;</span> <span class="o">+</span> <span class="n">option</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OptionsTests.test_boolean_args"><a class="viewcode-back" href="../../../testing.unit.test_gpginterface.html#testing.unit.test_gpginterface.OptionsTests.test_boolean_args">[docs]</a>    <span class="k">def</span> <span class="nf">test_boolean_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;test Options boolean options that they generate</span>
+<span class="sd">        proper arguments&quot;&quot;&quot;</span>
+
+        <span class="n">booleans</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;armor&#39;</span><span class="p">,</span> <span class="s1">&#39;no_greeting&#39;</span><span class="p">,</span> <span class="s1">&#39;no_verbose&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;batch&#39;</span><span class="p">,</span> <span class="s1">&#39;always_trust&#39;</span><span class="p">,</span> <span class="s1">&#39;rfc1991&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;quiet&#39;</span><span class="p">,</span> <span class="s1">&#39;openpgp&#39;</span><span class="p">,</span> <span class="s1">&#39;force_v3_sigs&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;no_options&#39;</span><span class="p">,</span> <span class="s1">&#39;textmode&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">booleans</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reset_options</span><span class="p">()</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">arg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">option_to_arg</span><span class="p">(</span><span class="n">option</span><span class="p">)</span>
+
+            <span class="n">should_be</span> <span class="o">=</span> <span class="p">[</span><span class="n">arg</span><span class="p">]</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get_args</span><span class="p">()</span>
+
+            <span class="k">assert</span> <span class="n">should_be</span> <span class="o">==</span> <span class="n">result</span><span class="p">,</span> \
+                <span class="s2">&quot;failure to set option &#39;</span><span class="si">%s</span><span class="s2">&#39;; should be </span><span class="si">%s</span><span class="s2">, but result is </span><span class="si">%s</span><span class="s2">&quot;</span> \
+                <span class="o">%</span> <span class="p">(</span><span class="n">option</span><span class="p">,</span> <span class="n">should_be</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OptionsTests.test_string_args"><a class="viewcode-back" href="../../../testing.unit.test_gpginterface.html#testing.unit.test_gpginterface.OptionsTests.test_string_args">[docs]</a>    <span class="k">def</span> <span class="nf">test_string_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;test Options string-taking options that they generate</span>
+<span class="sd">        proper arguments&quot;&quot;&quot;</span>
+
+        <span class="n">strings</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;homedir&#39;</span><span class="p">,</span> <span class="s1">&#39;default_key&#39;</span><span class="p">,</span> <span class="s1">&#39;comment&#39;</span><span class="p">,</span> <span class="s1">&#39;compress_algo&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;options&#39;</span><span class="p">]</span>
+
+        <span class="n">string_value</span> <span class="o">=</span> <span class="s1">&#39;test-argument&#39;</span>
+
+        <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">strings</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reset_options</span><span class="p">()</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">string_value</span><span class="p">)</span>
+            <span class="n">arg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">option_to_arg</span><span class="p">(</span><span class="n">option</span><span class="p">)</span>
+
+            <span class="n">should_be</span> <span class="o">=</span> <span class="p">[</span><span class="n">arg</span><span class="p">,</span> <span class="n">string_value</span><span class="p">]</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get_args</span><span class="p">()</span>
+
+            <span class="k">assert</span> <span class="n">should_be</span> <span class="o">==</span> <span class="n">result</span><span class="p">,</span> \
+                <span class="s2">&quot;failure to set option &#39;</span><span class="si">%s</span><span class="s2">&#39;; should be </span><span class="si">%s</span><span class="s2">, but result is </span><span class="si">%s</span><span class="s2">&quot;</span> \
+                <span class="o">%</span> <span class="p">(</span><span class="n">option</span><span class="p">,</span> <span class="n">should_be</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OptionsTests.test_list_args"><a class="viewcode-back" href="../../../testing.unit.test_gpginterface.html#testing.unit.test_gpginterface.OptionsTests.test_list_args">[docs]</a>    <span class="k">def</span> <span class="nf">test_list_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;test Options string-taking options that they generate</span>
+<span class="sd">        proper arguments&quot;&quot;&quot;</span>
+
+        <span class="n">lists</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;recipients&#39;</span><span class="p">,</span> <span class="s1">&#39;encrypt_to&#39;</span><span class="p">]</span>
+        <span class="n">list_value</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;test1&#39;</span><span class="p">,</span> <span class="s1">&#39;test2&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">lists</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reset_options</span><span class="p">()</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">list_value</span><span class="p">)</span>
+
+            <span class="c1"># special case for recipients, since their</span>
+            <span class="c1"># respective argument is &#39;recipient&#39;, not &#39;recipients&#39;</span>
+            <span class="k">if</span> <span class="n">option</span> <span class="o">==</span> <span class="s1">&#39;recipients&#39;</span><span class="p">:</span>
+                <span class="n">arg</span> <span class="o">=</span> <span class="s1">&#39;--recipient&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">arg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">option_to_arg</span><span class="p">(</span><span class="n">option</span><span class="p">)</span>
+
+            <span class="n">should_be</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">list_value</span><span class="p">:</span>
+                <span class="n">should_be</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">arg</span><span class="p">,</span> <span class="n">v</span><span class="p">])</span>
+
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gnupg</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get_args</span><span class="p">()</span>
+
+            <span class="k">assert</span> <span class="n">should_be</span> <span class="o">==</span> <span class="n">result</span><span class="p">,</span> \
+                <span class="s2">&quot;failure to set option &#39;</span><span class="si">%s</span><span class="s2">&#39;; should be </span><span class="si">%s</span><span class="s2">, but result is </span><span class="si">%s</span><span class="s2">&quot;</span> \
+                <span class="o">%</span> <span class="p">(</span><span class="n">option</span><span class="p">,</span> <span class="n">should_be</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="PipesTests"><a class="viewcode-back" href="../../../testing.unit.test_gpginterface.html#testing.unit.test_gpginterface.PipesTests">[docs]</a><span class="k">class</span> <span class="nc">PipesTests</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tests for Pipes class&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PipesTests.test_constructor"><a class="viewcode-back" href="../../../testing.unit.test_gpginterface.html#testing.unit.test_gpginterface.PipesTests.test_constructor">[docs]</a>    <span class="k">def</span> <span class="nf">test_constructor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipe</span> <span class="o">=</span> <span class="n">gpginterface</span><span class="o">.</span><span class="n">Pipe</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipe</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipe</span><span class="o">.</span><span class="n">child</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipe</span><span class="o">.</span><span class="n">direct</span></div></div>
+
+<span class="c1">########################################################################</span>
+
+
+<div class="viewcode-block" id="fh_cmp"><a class="viewcode-back" href="../../../testing.unit.test_gpginterface.html#testing.unit.test_gpginterface.fh_cmp">[docs]</a><span class="k">def</span> <span class="nf">fh_cmp</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">bufsize</span><span class="o">=</span><span class="mi">8192</span><span class="p">):</span>
+    <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">b1</span> <span class="o">=</span> <span class="n">f1</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">bufsize</span><span class="p">)</span>
+        <span class="n">b2</span> <span class="o">=</span> <span class="n">f2</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">bufsize</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">b1</span> <span class="o">!=</span> <span class="n">b2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">b1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span></div>
+
+<span class="c1">########################################################################</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../../testing.html">testing</a><ul>
+  <li><a href="../unit.html">testing.unit</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

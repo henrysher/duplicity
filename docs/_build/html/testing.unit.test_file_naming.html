@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>testing.unit.test_file_naming module &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="testing.unit.test_globmatch module" href="testing.unit.test_globmatch.html" />
+    <link rel="prev" title="testing.unit.test_dup_time module" href="testing.unit.test_dup_time.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-testing.unit.test_file_naming">
+<span id="testing-unit-test-file-naming-module"></span><h1>testing.unit.test_file_naming module<a class="headerlink" href="#module-testing.unit.test_file_naming" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="testing.unit.test_file_naming.FileNamingBase">
+<em class="property">class </em><code class="descclassname">testing.unit.test_file_naming.</code><code class="descname">FileNamingBase</code><a class="reference internal" href="_modules/testing/unit/test_file_naming.html#FileNamingBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_file_naming.FileNamingBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Holds file naming test functions, for use in subclasses</p>
+<dl class="method">
+<dt id="testing.unit.test_file_naming.FileNamingBase.test_basic">
+<code class="descname">test_basic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_file_naming.html#FileNamingBase.test_basic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_file_naming.FileNamingBase.test_basic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check get/parse cycle</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_file_naming.FileNamingBase.test_more">
+<code class="descname">test_more</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_file_naming.html#FileNamingBase.test_more"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_file_naming.FileNamingBase.test_more" title="Permalink to this definition">¶</a></dt>
+<dd><p>More file_parsing tests</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_file_naming.FileNamingBase.test_partial">
+<code class="descname">test_partial</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_file_naming.html#FileNamingBase.test_partial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_file_naming.FileNamingBase.test_partial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test addition of partial flag</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_file_naming.FileNamingBase.test_suffix">
+<code class="descname">test_suffix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_file_naming.html#FileNamingBase.test_suffix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_file_naming.FileNamingBase.test_suffix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test suffix (encrypt/compressed) encoding and generation</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="testing.unit.test_file_naming.FileNamingLong">
+<em class="property">class </em><code class="descclassname">testing.unit.test_file_naming.</code><code class="descname">FileNamingLong</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_file_naming.html#FileNamingLong"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_file_naming.FileNamingLong" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="testing.unit.html#testing.unit.UnitTestCase" title="testing.unit.UnitTestCase"><code class="xref py py-class docutils literal"><span class="pre">testing.unit.UnitTestCase</span></code></a>, <a class="reference internal" href="#testing.unit.test_file_naming.FileNamingBase" title="testing.unit.test_file_naming.FileNamingBase"><code class="xref py py-class docutils literal"><span class="pre">testing.unit.test_file_naming.FileNamingBase</span></code></a></p>
+<p>Test long filename parsing and generation</p>
+<dl class="method">
+<dt id="testing.unit.test_file_naming.FileNamingLong.setUp">
+<code class="descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_file_naming.html#FileNamingLong.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_file_naming.FileNamingLong.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="testing.unit.test_file_naming.FileNamingPrefixes">
+<em class="property">class </em><code class="descclassname">testing.unit.test_file_naming.</code><code class="descname">FileNamingPrefixes</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_file_naming.html#FileNamingPrefixes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_file_naming.FileNamingPrefixes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="testing.unit.html#testing.unit.UnitTestCase" title="testing.unit.UnitTestCase"><code class="xref py py-class docutils literal"><span class="pre">testing.unit.UnitTestCase</span></code></a>, <a class="reference internal" href="#testing.unit.test_file_naming.FileNamingBase" title="testing.unit.test_file_naming.FileNamingBase"><code class="xref py py-class docutils literal"><span class="pre">testing.unit.test_file_naming.FileNamingBase</span></code></a></p>
+<p>Test filename parsing and generation with prefixes</p>
+<dl class="method">
+<dt id="testing.unit.test_file_naming.FileNamingPrefixes.setUp">
+<code class="descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_file_naming.html#FileNamingPrefixes.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_file_naming.FileNamingPrefixes.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="testing.unit.test_file_naming.FileNamingShort">
+<em class="property">class </em><code class="descclassname">testing.unit.test_file_naming.</code><code class="descname">FileNamingShort</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_file_naming.html#FileNamingShort"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_file_naming.FileNamingShort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="testing.unit.html#testing.unit.UnitTestCase" title="testing.unit.UnitTestCase"><code class="xref py py-class docutils literal"><span class="pre">testing.unit.UnitTestCase</span></code></a>, <a class="reference internal" href="#testing.unit.test_file_naming.FileNamingBase" title="testing.unit.test_file_naming.FileNamingBase"><code class="xref py py-class docutils literal"><span class="pre">testing.unit.test_file_naming.FileNamingBase</span></code></a></p>
+<p>Test short filename parsing and generation</p>
+<dl class="method">
+<dt id="testing.unit.test_file_naming.FileNamingShort.setUp">
+<code class="descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_file_naming.html#FileNamingShort.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_file_naming.FileNamingShort.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="testing.unit.test_file_naming.Test36">
+<em class="property">class </em><code class="descclassname">testing.unit.test_file_naming.</code><code class="descname">Test36</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_file_naming.html#Test36"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_file_naming.Test36" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="testing.unit.html#testing.unit.UnitTestCase" title="testing.unit.UnitTestCase"><code class="xref py py-class docutils literal"><span class="pre">testing.unit.UnitTestCase</span></code></a></p>
+<dl class="method">
+<dt id="testing.unit.test_file_naming.Test36.test_base36">
+<code class="descname">test_base36</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_file_naming.html#Test36.test_base36"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_file_naming.Test36.test_base36" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test conversion to/from base 36</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="testing.html">testing package</a><ul>
+  <li><a href="testing.unit.html">testing.unit package</a><ul>
+      <li>Previous: <a href="testing.unit.test_dup_time.html" title="previous chapter">testing.unit.test_dup_time module</a></li>
+      <li>Next: <a href="testing.unit.test_globmatch.html" title="next chapter">testing.unit.test_globmatch module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/testing.unit.test_file_naming.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/testing.unit.test_file_naming.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

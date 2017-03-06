@@ -1,0 +1,453 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>testing.functional.test_restart &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for testing.functional.test_restart</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2002 Ben Escoto &lt;ben@emerose.org&gt;</span>
+<span class="c1"># Copyright 2007 Kenneth Loafman &lt;kenneth@loafman.com&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">FunctionalTestCase</span>
+
+
+<div class="viewcode-block" id="RestartTest"><a class="viewcode-back" href="../../../testing.functional.test_restart.html#testing.functional.test_restart.RestartTest">[docs]</a><span class="k">class</span> <span class="nc">RestartTest</span><span class="p">(</span><span class="n">FunctionalTestCase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Test checkpoint/restart using duplicity binary</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="RestartTest.test_basic_checkpoint_restart"><a class="viewcode-back" href="../../../testing.functional.test_restart.html#testing.functional.test_restart.RestartTest.test_basic_checkpoint_restart">[docs]</a>    <span class="k">def</span> <span class="nf">test_basic_checkpoint_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Test basic Checkpoint/Restart</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_largefiles</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">,</span> <span class="n">fail</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RestartTest.test_multiple_checkpoint_restart"><a class="viewcode-back" href="../../../testing.functional.test_restart.html#testing.functional.test_restart.RestartTest.test_multiple_checkpoint_restart">[docs]</a>    <span class="k">def</span> <span class="nf">test_multiple_checkpoint_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Test multiple Checkpoint/Restart</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_largefiles</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">,</span> <span class="n">fail</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">,</span> <span class="n">fail</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">,</span> <span class="n">fail</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RestartTest.test_first_volume_failure"><a class="viewcode-back" href="../../../testing.functional.test_restart.html#testing.functional.test_restart.RestartTest.test_first_volume_failure">[docs]</a>    <span class="k">def</span> <span class="nf">test_first_volume_failure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Test restart when no volumes are available on the remote.</span>
+<span class="sd">        Caused when duplicity fails before the first transfer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_largefiles</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">,</span> <span class="n">fail</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;rm testfiles/output/duplicity-full*difftar*&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RestartTest.test_multi_volume_failure"><a class="viewcode-back" href="../../../testing.functional.test_restart.html#testing.functional.test_restart.RestartTest.test_multi_volume_failure">[docs]</a>    <span class="k">def</span> <span class="nf">test_multi_volume_failure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Test restart when fewer volumes are available on the remote</span>
+<span class="sd">        than the local manifest has on record.  Caused when duplicity</span>
+<span class="sd">        fails the last queued transfer(s).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_largefiles</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">,</span> <span class="n">fail</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;rm testfiles/output/duplicity-full*vol[23].difftar*&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RestartTest.test_restart_sign_and_encrypt"><a class="viewcode-back" href="../../../testing.functional.test_restart.html#testing.functional.test_restart.RestartTest.test_restart_sign_and_encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">test_restart_sign_and_encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Test restarting a backup using same key for sign and encrypt</span>
+<span class="sd">        https://bugs.launchpad.net/duplicity/+bug/946988</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_largefiles</span><span class="p">()</span>
+        <span class="n">enc_opts</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;--sign-key&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sign_key</span><span class="p">,</span> <span class="s2">&quot;--encrypt-key&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sign_key</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">enc_opts</span><span class="p">,</span> <span class="n">fail</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">enc_opts</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RestartTest.test_restart_sign_and_hidden_encrypt"><a class="viewcode-back" href="../../../testing.functional.test_restart.html#testing.functional.test_restart.RestartTest.test_restart_sign_and_hidden_encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">test_restart_sign_and_hidden_encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Test restarting a backup using same key for sign and encrypt (hidden key id)</span>
+<span class="sd">        https://bugs.launchpad.net/duplicity/+bug/946988</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_largefiles</span><span class="p">()</span>
+        <span class="n">enc_opts</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;--sign-key&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sign_key</span><span class="p">,</span> <span class="s2">&quot;--hidden-encrypt-key&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sign_key</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">enc_opts</span><span class="p">,</span> <span class="n">fail</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">enc_opts</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RestartTest.test_last_file_missing_in_middle"><a class="viewcode-back" href="../../../testing.functional.test_restart.html#testing.functional.test_restart.RestartTest.test_last_file_missing_in_middle">[docs]</a>    <span class="k">def</span> <span class="nf">test_last_file_missing_in_middle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Test restart when the last file being backed up is missing on restart.</span>
+<span class="sd">        Caused when the user deletes a file after a failure.  This test puts</span>
+<span class="sd">        the file in the middle of the backup, with files following.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_largefiles</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">,</span> <span class="n">fail</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;rm testfiles/largefiles/file2&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">)</span></div>
+        <span class="c1"># TODO: we can&#39;t verify but we need to to check for other errors that might show up</span>
+        <span class="c1"># there should be 2 differences found, one missing file, one mtime change</span>
+        <span class="c1"># self.verify(&quot;testfiles/largefiles&quot;)</span>
+
+<div class="viewcode-block" id="RestartTest.test_last_file_missing_at_end"><a class="viewcode-back" href="../../../testing.functional.test_restart.html#testing.functional.test_restart.RestartTest.test_last_file_missing_at_end">[docs]</a>    <span class="k">def</span> <span class="nf">test_last_file_missing_at_end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Test restart when the last file being backed up is missing on restart.</span>
+<span class="sd">        Caused when the user deletes a file after a failure.  This test puts</span>
+<span class="sd">        the file at the end of the backup, with no files following.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_largefiles</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">,</span> <span class="n">fail</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;rm testfiles/largefiles/file3&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">)</span></div>
+        <span class="c1"># TODO: we can&#39;t verify but we need to to check for other errors that might show up</span>
+        <span class="c1"># there should be 2 differences found, one missing file, one mtime change</span>
+        <span class="c1"># self.verify(&quot;testfiles/largefiles&quot;)</span>
+
+<div class="viewcode-block" id="RestartTest.test_restart_incremental"><a class="viewcode-back" href="../../../testing.functional.test_restart.html#testing.functional.test_restart.RestartTest.test_restart_incremental">[docs]</a>    <span class="k">def</span> <span class="nf">test_restart_incremental</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Test restarting an incremental backup</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_largefiles</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/dir1&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;inc&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">,</span> <span class="n">fail</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;inc&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RestartTest.make_fake_second_volume"><a class="viewcode-back" href="../../../testing.functional.test_restart.html#testing.functional.test_restart.RestartTest.make_fake_second_volume">[docs]</a>    <span class="k">def</span> <span class="nf">make_fake_second_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes a successful backup and pretend that we interrupted a backup</span>
+<span class="sd">        after two-volumes.  (This is because we want to be able to model</span>
+<span class="sd">        restarting the second volume and duplicity deletes the last volume</span>
+<span class="sd">        found because it may have not finished uploading.)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># First, confirm that we have signs of a successful backup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;testfiles/output/*.manifest*&quot;</span><span class="p">)),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;testfiles/output/*.sigtar*&quot;</span><span class="p">)),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;testfiles/cache/</span><span class="si">%s</span><span class="s2">/*&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span>
+            <span class="s2">&quot;testfiles/cache/</span><span class="si">%s</span><span class="s2">/*.manifest*&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span>
+            <span class="s2">&quot;testfiles/cache/</span><span class="si">%s</span><span class="s2">/*.sigtar*&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># Alright, everything is in order; fake a second interrupted volume</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;rm testfiles/output/*.manifest*&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;rm testfiles/output/*.sigtar*&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;rm -f testfiles/output/*.vol[23456789].*&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;rm -f testfiles/output/*.vol1[^.]+.*&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;testfiles/output/*.difftar*&quot;</span><span class="p">)),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;rm testfiles/cache/</span><span class="si">%s</span><span class="s2">/*.sigtar*&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;cp testfiles/output/*.difftar* &quot;</span>
+                             <span class="s2">&quot;`ls testfiles/output/*.difftar* | &quot;</span>
+                             <span class="s2">&quot; sed &#39;s|vol1|vol2|&#39;`&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;head -n6 testfiles/cache/</span><span class="si">%s</span><span class="s2">/*.manifest &gt; &quot;</span>
+                             <span class="s2">&quot;testfiles/cache/</span><span class="si">%s</span><span class="s2">/&quot;</span>
+                             <span class="s2">&quot;`basename testfiles/cache/</span><span class="si">%s</span><span class="s2">/*.manifest`&quot;</span>
+                             <span class="s2">&quot;.part&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;rm testfiles/cache/</span><span class="si">%s</span><span class="s2">/*.manifest&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;echo &#39;Volume 2:</span>
+<span class="s2">    StartingPath   foo</span>
+<span class="s2">    EndingPath     bar</span>
+<span class="s2">    Hash SHA1 sha1&#39; &gt;&gt; testfiles/cache/</span><span class="si">%s</span><span class="s2">/*.manifest.part&quot;&quot;&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RestartTest.test_split_after_small"><a class="viewcode-back" href="../../../testing.functional.test_restart.html#testing.functional.test_restart.RestartTest.test_split_after_small">[docs]</a>    <span class="k">def</span> <span class="nf">test_split_after_small</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If we restart right after a volume that ended with a small</span>
+<span class="sd">        (one-block) file, make sure we restart in the right place.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="s1">&#39;testfiles/largefiles&#39;</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;mkdir -p </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">source</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;echo hello &gt; </span><span class="si">%s</span><span class="s2">/file1&quot;</span> <span class="o">%</span> <span class="n">source</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;--name=backup1&quot;</span><span class="p">])</span>
+        <span class="c1"># Fake an interruption</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_fake_second_volume</span><span class="p">(</span><span class="s2">&quot;backup1&quot;</span><span class="p">)</span>
+        <span class="c1"># Add new file</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;cp </span><span class="si">%s</span><span class="s2">/file1 </span><span class="si">%s</span><span class="s2">/newfile&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">source</span><span class="p">))</span>
+        <span class="c1"># &#39;restart&#39; the backup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;--name=backup1&quot;</span><span class="p">])</span>
+        <span class="c1"># Confirm we actually resumed the previous backup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s2">&quot;testfiles/output&quot;</span><span class="p">)),</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="c1"># Now make sure everything is byte-for-byte the same once restored</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;diff -r </span><span class="si">%s</span><span class="s2"> testfiles/restore_out&quot;</span> <span class="o">%</span> <span class="n">source</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RestartTest.test_split_after_large"><a class="viewcode-back" href="../../../testing.functional.test_restart.html#testing.functional.test_restart.RestartTest.test_split_after_large">[docs]</a>    <span class="k">def</span> <span class="nf">test_split_after_large</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If we restart right after a volume that ended with a large</span>
+<span class="sd">        (multi-block) file, make sure we restart in the right place.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="s1">&#39;testfiles/largefiles&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_largefiles</span><span class="p">(</span><span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;--volsize=5&quot;</span><span class="p">,</span> <span class="s2">&quot;--name=backup1&quot;</span><span class="p">])</span>
+        <span class="c1"># Fake an interruption</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_fake_second_volume</span><span class="p">(</span><span class="s2">&quot;backup1&quot;</span><span class="p">)</span>
+        <span class="c1"># Add new file</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;cp </span><span class="si">%s</span><span class="s2">/file1 </span><span class="si">%s</span><span class="s2">/newfile&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">source</span><span class="p">))</span>
+        <span class="c1"># &#39;restart&#39; the backup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;--volsize=5&quot;</span><span class="p">,</span> <span class="s2">&quot;--name=backup1&quot;</span><span class="p">])</span>
+        <span class="c1"># Confirm we actually resumed the previous backup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s2">&quot;testfiles/output&quot;</span><span class="p">)),</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="c1"># Now make sure everything is byte-for-byte the same once restored</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;diff -r </span><span class="si">%s</span><span class="s2"> testfiles/restore_out&quot;</span> <span class="o">%</span> <span class="n">source</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RestartTest.test_split_inside_large"><a class="viewcode-back" href="../../../testing.functional.test_restart.html#testing.functional.test_restart.RestartTest.test_split_inside_large">[docs]</a>    <span class="k">def</span> <span class="nf">test_split_inside_large</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If we restart right after a volume that ended inside of a large</span>
+<span class="sd">        (multi-block) file, make sure we restart in the right place.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="s1">&#39;testfiles/largefiles&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_largefiles</span><span class="p">(</span><span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;--name=backup1&quot;</span><span class="p">])</span>
+        <span class="c1"># Fake an interruption</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_fake_second_volume</span><span class="p">(</span><span class="s2">&quot;backup1&quot;</span><span class="p">)</span>
+        <span class="c1"># &#39;restart&#39; the backup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;--name=backup1&quot;</span><span class="p">])</span>
+        <span class="c1"># Now make sure everything is byte-for-byte the same once restored</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;diff -r </span><span class="si">%s</span><span class="s2"> testfiles/restore_out&quot;</span> <span class="o">%</span> <span class="n">source</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RestartTest.test_new_file"><a class="viewcode-back" href="../../../testing.functional.test_restart.html#testing.functional.test_restart.RestartTest.test_new_file">[docs]</a>    <span class="k">def</span> <span class="nf">test_new_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If we restart right after a volume, but there are new files that would</span>
+<span class="sd">        have been backed up earlier in the volume, make sure we don&#39;t wig out.</span>
+<span class="sd">        (Expected result is to ignore new, ealier files, but pick up later</span>
+<span class="sd">        ones.)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="s1">&#39;testfiles/largefiles&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_largefiles</span><span class="p">(</span><span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;--name=backup1&quot;</span><span class="p">])</span>
+        <span class="c1"># Fake an interruption</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_fake_second_volume</span><span class="p">(</span><span class="s2">&quot;backup1&quot;</span><span class="p">)</span>
+        <span class="c1"># Add new files, earlier and later in filename sort order</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;echo hello &gt; </span><span class="si">%s</span><span class="s2">/a&quot;</span> <span class="o">%</span> <span class="n">source</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;echo hello &gt; </span><span class="si">%s</span><span class="s2">/z&quot;</span> <span class="o">%</span> <span class="n">source</span><span class="p">)</span>
+        <span class="c1"># &#39;restart&#39; the backup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;--name=backup1&quot;</span><span class="p">])</span>
+        <span class="c1"># Now make sure everything is the same once restored, except &#39;a&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;test ! -e testfiles/restore_out/a&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;diff </span><span class="si">%s</span><span class="s2">/file1 testfiles/restore_out/file1&quot;</span> <span class="o">%</span> <span class="n">source</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;diff </span><span class="si">%s</span><span class="s2">/z testfiles/restore_out/z&quot;</span> <span class="o">%</span> <span class="n">source</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RestartTest.test_changed_source_dangling_manifest_volume"><a class="viewcode-back" href="../../../testing.functional.test_restart.html#testing.functional.test_restart.RestartTest.test_changed_source_dangling_manifest_volume">[docs]</a>    <span class="k">def</span> <span class="nf">test_changed_source_dangling_manifest_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If we restart but find remote volumes missing, we can easily end up</span>
+<span class="sd">        with a manifest that lists &quot;vol1, vol2, vol3, vol2&quot;, leaving a dangling</span>
+<span class="sd">        vol3.  Make sure we can gracefully handle that.  This will only happen</span>
+<span class="sd">        if the source data changes to be small enough to not create a vol3 on</span>
+<span class="sd">        restart.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="s1">&#39;testfiles/largefiles&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_largefiles</span><span class="p">(</span><span class="n">count</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">fail</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="c1"># now delete the last volume on remote end and some source files</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;rm testfiles/output/duplicity-full*vol3.difftar*&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;rm </span><span class="si">%s</span><span class="s2">/file[2345]&quot;</span> <span class="o">%</span> <span class="n">source</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;echo hello &gt; </span><span class="si">%s</span><span class="s2">/z&quot;</span> <span class="o">%</span> <span class="n">source</span><span class="p">)</span>
+        <span class="c1"># finish backup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span>
+        <span class="c1"># and verify we can restore</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="RestartTest.test_changed_source_file_disappears"><a class="viewcode-back" href="../../../testing.functional.test_restart.html#testing.functional.test_restart.RestartTest.test_changed_source_file_disappears">[docs]</a>    <span class="k">def</span> <span class="nf">test_changed_source_file_disappears</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Make sure we correctly handle restarting a backup when a file</span>
+<span class="sd">        disappears when we had been in the middle of backing it up.  It&#39;s</span>
+<span class="sd">        possible that the first chunk of the next file will be skipped unless</span>
+<span class="sd">        we&#39;re careful.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="s1">&#39;testfiles/largefiles&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_largefiles</span><span class="p">(</span><span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">fail</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># now remove starting source data and make sure we add something after</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;rm </span><span class="si">%s</span><span class="s2">/*&quot;</span> <span class="o">%</span> <span class="n">source</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;echo hello &gt; </span><span class="si">%s</span><span class="s2">/z&quot;</span> <span class="o">%</span> <span class="n">source</span><span class="p">)</span>
+        <span class="c1"># finish backup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span>
+        <span class="c1"># and verify we can restore</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;diff </span><span class="si">%s</span><span class="s2">/z testfiles/restore_out/z&quot;</span> <span class="o">%</span> <span class="n">source</span><span class="p">)</span></div></div>
+
+
+<span class="c1"># Note that this class duplicates all the tests in RestartTest</span>
+<div class="viewcode-block" id="RestartTestWithoutEncryption"><a class="viewcode-back" href="../../../testing.functional.test_restart.html#testing.functional.test_restart.RestartTestWithoutEncryption">[docs]</a><span class="k">class</span> <span class="nc">RestartTestWithoutEncryption</span><span class="p">(</span><span class="n">RestartTest</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RestartTestWithoutEncryption.setUp"><a class="viewcode-back" href="../../../testing.functional.test_restart.html#testing.functional.test_restart.RestartTestWithoutEncryption.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RestartTestWithoutEncryption</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setUp</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">class_args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;--no-encryption&quot;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="RestartTestWithoutEncryption.test_no_write_double_snapshot"><a class="viewcode-back" href="../../../testing.functional.test_restart.html#testing.functional.test_restart.RestartTestWithoutEncryption.test_no_write_double_snapshot">[docs]</a>    <span class="k">def</span> <span class="nf">test_no_write_double_snapshot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Test that restarting a full backup does not write duplicate entries</span>
+<span class="sd">        into the sigtar, causing problems reading it back in older</span>
+<span class="sd">        versions.</span>
+<span class="sd">        https://launchpad.net/bugs/929067</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_largefiles</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">,</span> <span class="n">fail</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/largefiles&quot;</span><span class="p">)</span>
+        <span class="c1"># Now check sigtar</span>
+        <span class="n">sigtars</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;testfiles/output/duplicity-full*.sigtar.gz&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sigtars</span><span class="p">))</span>
+        <span class="n">sigtar</span> <span class="o">=</span> <span class="n">sigtars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="s2">&quot;tar&quot;</span><span class="p">,</span> <span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="s2">&quot;--file=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">sigtar</span><span class="p">],</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span><span class="o">.</span><span class="n">communicate</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">output</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;snapshot/&quot;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="RestartTestWithoutEncryption.test_ignore_double_snapshot"><a class="viewcode-back" href="../../../testing.functional.test_restart.html#testing.functional.test_restart.RestartTestWithoutEncryption.test_ignore_double_snapshot">[docs]</a>    <span class="k">def</span> <span class="nf">test_ignore_double_snapshot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Test that we gracefully ignore double snapshot entries in a signature</span>
+<span class="sd">        file.  This winds its way through duplicity as a deleted base dir,</span>
+<span class="sd">        which doesn&#39;t make sense and should be ignored.  An older version of</span>
+<span class="sd">        duplicity accidentally created such files as a result of a restart.</span>
+<span class="sd">        https://launchpad.net/bugs/929067</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Linux&#39;</span><span class="p">):</span>
+            <span class="n">tarcmd</span> <span class="o">=</span> <span class="s2">&quot;tar&quot;</span>
+        <span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Darwin&#39;</span><span class="p">):</span>
+            <span class="n">tarcmd</span> <span class="o">=</span> <span class="s2">&quot;gtar&quot;</span>
+        <span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;BSD&#39;</span><span class="p">):</span>
+            <span class="n">tarcmd</span> <span class="o">=</span> <span class="s2">&quot;gtar&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Platform </span><span class="si">%s</span><span class="s2"> not supported by tar/gtar.&quot;</span> <span class="o">%</span> <span class="n">platform</span><span class="o">.</span><span class="n">platform</span><span class="p">())</span>
+
+        <span class="c1"># Intial normal backup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/blocktartest&quot;</span><span class="p">)</span>
+        <span class="c1"># Create an exact clone of the snapshot folder in the sigtar already.</span>
+        <span class="c1"># Permissions and mtime must match.</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="s2">&quot;testfiles/snapshot&quot;</span><span class="p">,</span> <span class="mo">0o755</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">utime</span><span class="p">(</span><span class="s2">&quot;testfiles/snapshot&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">1030384548</span><span class="p">,</span> <span class="mi">1030384548</span><span class="p">))</span>
+        <span class="c1"># Adjust the sigtar.gz file to have a bogus second snapshot/ entry</span>
+        <span class="c1"># at the beginning.</span>
+        <span class="n">sigtars</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;testfiles/output/duplicity-full*.sigtar.gz&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sigtars</span><span class="p">))</span>
+        <span class="n">sigtar</span> <span class="o">=</span> <span class="n">sigtars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> c --file=testfiles/snapshot.sigtar -C testfiles snapshot&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tarcmd</span><span class="p">,)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;gunzip -c </span><span class="si">%s</span><span class="s2"> &gt; testfiles/full.sigtar&quot;</span> <span class="o">%</span> <span class="n">sigtar</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> A --file=testfiles/snapshot.sigtar testfiles/full.sigtar&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tarcmd</span><span class="p">,)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;gzip testfiles/snapshot.sigtar&quot;</span><span class="p">))</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">sigtar</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;testfiles/snapshot.sigtar.gz&quot;</span><span class="p">,</span> <span class="n">sigtar</span><span class="p">)</span>
+        <span class="c1"># Clear cache so our adjusted sigtar will be sync&#39;d back into the cache</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;rm -r testfiles/cache&quot;</span><span class="p">))</span>
+        <span class="c1"># Try a follow on incremental (which in buggy versions, would create</span>
+        <span class="c1"># a deleted entry for the base dir)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="s2">&quot;inc&quot;</span><span class="p">,</span> <span class="s2">&quot;testfiles/blocktartest&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;testfiles/output/duplicity-new*.sigtar.gz&quot;</span><span class="p">)))</span>
+        <span class="c1"># Confirm we can restore it (which in buggy versions, would fail)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span></div></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../../testing.html">testing</a><ul>
+  <li><a href="../functional.html">testing.functional</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

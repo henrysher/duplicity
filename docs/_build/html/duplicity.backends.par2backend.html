@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.backends.par2backend module &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="duplicity.backends.pydrivebackend module" href="duplicity.backends.pydrivebackend.html" />
+    <link rel="prev" title="duplicity.backends.onedrivebackend module" href="duplicity.backends.onedrivebackend.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-duplicity.backends.par2backend">
+<span id="duplicity-backends-par2backend-module"></span><h1>duplicity.backends.par2backend module<a class="headerlink" href="#module-duplicity.backends.par2backend" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="duplicity.backends.par2backend.Par2Backend">
+<em class="property">class </em><code class="descclassname">duplicity.backends.par2backend.</code><code class="descname">Par2Backend</code><span class="sig-paren">(</span><em>parsed_url</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/par2backend.html#Par2Backend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.par2backend.Par2Backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="duplicity.backend.html#duplicity.backend.Backend" title="duplicity.backend.Backend"><code class="xref py py-class docutils literal"><span class="pre">duplicity.backend.Backend</span></code></a></p>
+<p>This backend wrap around other backends and create Par2 recovery files
+before the file and the Par2 files are transfered with the wrapped backend.</p>
+<p>If a received file is corrupt it will try to repair it on the fly.</p>
+<dl class="method">
+<dt id="duplicity.backends.par2backend.Par2Backend.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/par2backend.html#Par2Backend.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.par2backend.Par2Backend.close" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.par2backend.Par2Backend.delete">
+<code class="descname">delete</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/par2backend.html#Par2Backend.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.par2backend.Par2Backend.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>delete given filename and its .par2 files</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.par2backend.Par2Backend.delete_list">
+<code class="descname">delete_list</code><span class="sig-paren">(</span><em>filename_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/par2backend.html#Par2Backend.delete_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.par2backend.Par2Backend.delete_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>delete given filename_list and all .par2 files that belong to them</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.par2backend.Par2Backend.error_code">
+<code class="descname">error_code</code><span class="sig-paren">(</span><em>operation</em>, <em>e</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/par2backend.html#Par2Backend.error_code"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.par2backend.Par2Backend.error_code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.par2backend.Par2Backend.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>remote_filename</em>, <em>local_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/par2backend.html#Par2Backend.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.par2backend.Par2Backend.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>transfer remote_filename and the related .par2 file into
+a temp-dir. remote_filename will be renamed into local_path before
+finishing.</p>
+<p>If &#8220;par2 verify&#8221; detect an error transfer the Par2-volumes into the
+temp-dir and try to repair.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.par2backend.Par2Backend.list">
+<code class="descname">list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/par2backend.html#Par2Backend.list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.par2backend.Par2Backend.list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return list of filenames (byte strings) present in backend</p>
+<p>Files ending with &#8221;.par2&#8221; will be excluded from the list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.par2backend.Par2Backend.move">
+<code class="descname">move</code><span class="sig-paren">(</span><em>local</em>, <em>remote</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/par2backend.html#Par2Backend.move"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.par2backend.Par2Backend.move" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.par2backend.Par2Backend.put">
+<code class="descname">put</code><span class="sig-paren">(</span><em>local</em>, <em>remote</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/par2backend.html#Par2Backend.put"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.par2backend.Par2Backend.put" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.par2backend.Par2Backend.query">
+<code class="descname">query</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/par2backend.html#Par2Backend.query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.par2backend.Par2Backend.query" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.par2backend.Par2Backend.query_list">
+<code class="descname">query_list</code><span class="sig-paren">(</span><em>filename_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/par2backend.html#Par2Backend.query_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.par2backend.Par2Backend.query_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.par2backend.Par2Backend.retry_cleanup">
+<code class="descname">retry_cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/par2backend.html#Par2Backend.retry_cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.par2backend.Par2Backend.retry_cleanup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.par2backend.Par2Backend.transfer">
+<code class="descname">transfer</code><span class="sig-paren">(</span><em>method</em>, <em>source_path</em>, <em>remote_filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/par2backend.html#Par2Backend.transfer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.par2backend.Par2Backend.transfer" title="Permalink to this definition">¶</a></dt>
+<dd><p>create Par2 files and transfer the given file and the Par2 files
+with the wrapped backend.</p>
+<p>Par2 must run on the real filename or it would restore the
+temp-filename later on. So first of all create a tempdir and symlink
+the soure_path with remote_filename into this.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.backends.par2backend.Par2Backend.unfiltered_list">
+<code class="descname">unfiltered_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/backends/par2backend.html#Par2Backend.unfiltered_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.backends.par2backend.Par2Backend.unfiltered_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="duplicity.html">duplicity package</a><ul>
+  <li><a href="duplicity.backends.html">duplicity.backends package</a><ul>
+      <li>Previous: <a href="duplicity.backends.onedrivebackend.html" title="previous chapter">duplicity.backends.onedrivebackend module</a></li>
+      <li>Next: <a href="duplicity.backends.pydrivebackend.html" title="next chapter">duplicity.backends.pydrivebackend module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/duplicity.backends.par2backend.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/duplicity.backends.par2backend.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

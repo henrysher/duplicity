@@ -1,0 +1,341 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.asyncscheduler &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.asyncscheduler</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2002 Ben Escoto &lt;ben@emerose.org&gt;</span>
+<span class="c1"># Copyright 2007 Kenneth Loafman &lt;kenneth@loafman.com&gt;</span>
+<span class="c1"># Copyright 2008 Peter Schuller &lt;peter.schuller@infidyne.com&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Asynchronous job scheduler, for concurrent execution with minimalistic</span>
+<span class="sd">dependency guarantees.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">duplicity</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">duplicity.dup_threading</span> <span class="k">import</span> <span class="n">require_threading</span>
+<span class="kn">from</span> <span class="nn">duplicity.dup_threading</span> <span class="k">import</span> <span class="n">interruptably_wait</span>
+<span class="kn">from</span> <span class="nn">duplicity.dup_threading</span> <span class="k">import</span> <span class="n">async_split</span>
+<span class="kn">from</span> <span class="nn">duplicity.dup_threading</span> <span class="k">import</span> <span class="n">with_lock</span>
+
+<span class="n">thread</span> <span class="o">=</span> <span class="n">duplicity</span><span class="o">.</span><span class="n">dup_threading</span><span class="o">.</span><span class="n">thread_module</span><span class="p">()</span>
+<span class="n">threading</span> <span class="o">=</span> <span class="n">duplicity</span><span class="o">.</span><span class="n">dup_threading</span><span class="o">.</span><span class="n">threading_module</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="AsyncScheduler"><a class="viewcode-back" href="../../duplicity.asyncscheduler.html#duplicity.asyncscheduler.AsyncScheduler">[docs]</a><span class="k">class</span> <span class="nc">AsyncScheduler</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Easy-to-use scheduler of function calls to be executed</span>
+<span class="sd">    concurrently. A very simple dependency mechanism exists in the</span>
+<span class="sd">    form of barriers (see insert_barrier()).</span>
+
+<span class="sd">    Each instance has a concurrency level associated with it. A</span>
+<span class="sd">    concurrency of 0 implies that all tasks will be executed</span>
+<span class="sd">    synchronously when scheduled. A concurrency of 1 indicates that a</span>
+<span class="sd">    task will be executed asynchronously, but never concurrently with</span>
+<span class="sd">    other tasks. Both 0 and 1 guarantee strict ordering among all</span>
+<span class="sd">    tasks (i.e., they will be executed in the order scheduled).</span>
+
+<span class="sd">    At concurrency levels above 1, the tasks will end up being</span>
+<span class="sd">    executed in an order undetermined except insofar as is enforced by</span>
+<span class="sd">    calls to insert_barrier().</span>
+
+<span class="sd">    An AsynchScheduler should be created for any independent process;</span>
+<span class="sd">    the scheduler will assume that if any background job fails (raises</span>
+<span class="sd">    an exception), it makes further work moot.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concurrency</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create an asynchronous scheduler that executes jobs with the</span>
+<span class="sd">        given level of concurrency.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                             <span class="n">_</span><span class="p">(</span><span class="s2">&quot;instantiating at concurrency </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span>
+                             <span class="p">(</span><span class="n">concurrency</span><span class="p">)))</span>
+        <span class="k">assert</span> <span class="n">concurrency</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> concurrency level must be &gt;= 0&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__failed</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># has at least one task failed so far?</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__failed_waiter</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># when __failed, the waiter of the first task that failed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__concurrency</span> <span class="o">=</span> <span class="n">concurrency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__worker_count</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># number of active workers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__waiter_count</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># number of threads waiting to submit work</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__barrier</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># barrier currently in effect?</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cv</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Condition</span><span class="p">()</span>  <span class="c1"># for simplicity, we use a single cv with its lock</span>
+<span class="c1">#                                                    # for everything, even if the resulting notifyAll():s</span>
+<span class="c1">#                                                    # are not technically efficient.</span>
+
+        <span class="k">if</span> <span class="n">concurrency</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">require_threading</span><span class="p">(</span><span class="s2">&quot;concurrency &gt; 0 (</span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">concurrency</span><span class="p">,))</span>
+
+<div class="viewcode-block" id="AsyncScheduler.insert_barrier"><a class="viewcode-back" href="../../duplicity.asyncscheduler.html#duplicity.asyncscheduler.AsyncScheduler.insert_barrier">[docs]</a>    <span class="k">def</span> <span class="nf">insert_barrier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Proclaim that any tasks scheduled prior to the call to this</span>
+<span class="sd">        method MUST be executed prior to any tasks scheduled after the</span>
+<span class="sd">        call to this method.</span>
+
+<span class="sd">        The intended use case is that if task B depends on A, a</span>
+<span class="sd">        barrier must be inserted in between to guarantee that A</span>
+<span class="sd">        happens before B.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;inserting barrier&quot;</span><span class="p">)))</span>
+        <span class="c1"># With concurrency 0 it&#39;s a NOOP, and due to the special case in</span>
+        <span class="c1"># task scheduling we do not want to append to the queue (will never</span>
+        <span class="c1"># be popped).</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__concurrency</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">def</span> <span class="nf">_insert_barrier</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__barrier</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="n">with_lock</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__cv</span><span class="p">,</span> <span class="n">_insert_barrier</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AsyncScheduler.schedule_task"><a class="viewcode-back" href="../../duplicity.asyncscheduler.html#duplicity.asyncscheduler.AsyncScheduler.schedule_task">[docs]</a>    <span class="k">def</span> <span class="nf">schedule_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Schedule the given task (callable, typically function) for</span>
+<span class="sd">        execution. Pass the given parameters to the function when</span>
+<span class="sd">        calling it. Returns a callable which can optionally be used</span>
+<span class="sd">        to wait for the task to complete, either by returning its</span>
+<span class="sd">        return value or by propagating any exception raised by said</span>
+<span class="sd">        task.</span>
+
+<span class="sd">        This method may block or return immediately, depending on the</span>
+<span class="sd">        configuration and state of the scheduler.</span>
+
+<span class="sd">        This method may also raise an exception in order to trigger</span>
+<span class="sd">        failures early, if the task (if run synchronously) or a previous</span>
+<span class="sd">        task has already failed.</span>
+
+<span class="sd">        NOTE: Pay particular attention to the scope in which this is</span>
+<span class="sd">        called. In particular, since it will execute concurrently in</span>
+<span class="sd">        the background, assuming fn is a closure, any variables used</span>
+<span class="sd">        most be properly bound in the closure. This is the reason for</span>
+<span class="sd">        the convenience feature of being able to give parameters to</span>
+<span class="sd">        the call, to avoid having to wrap the call itself in a</span>
+<span class="sd">        function in order to &quot;fixate&quot; variables in, for example, an</span>
+<span class="sd">        enclosing loop.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+        <span class="c1"># Note: It is on purpose that we keep track of concurrency in</span>
+        <span class="c1"># the front end and launch threads for each task, rather than</span>
+        <span class="c1"># keep a pool of workers. The overhead is not relevant in the</span>
+        <span class="c1"># situation this will be used, and it removes complexity in</span>
+        <span class="c1"># terms of ensuring the scheduler is garbage collected/shut</span>
+        <span class="c1"># down properly when no longer referenced/needed by calling</span>
+        <span class="c1"># code.</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__concurrency</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># special case this to not require any platform support for</span>
+            <span class="c1"># threading at all</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                     <span class="n">_</span><span class="p">(</span><span class="s2">&quot;running task synchronously (asynchronicity disabled)&quot;</span><span class="p">)),</span>
+                     <span class="n">log</span><span class="o">.</span><span class="n">InfoCode</span><span class="o">.</span><span class="n">synchronous_upload_begin</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__run_synchronously</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                     <span class="n">_</span><span class="p">(</span><span class="s2">&quot;scheduling task for asynchronous execution&quot;</span><span class="p">)),</span>
+                     <span class="n">log</span><span class="o">.</span><span class="n">InfoCode</span><span class="o">.</span><span class="n">asynchronous_upload_begin</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__run_asynchronously</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AsyncScheduler.wait"><a class="viewcode-back" href="../../duplicity.asyncscheduler.html#duplicity.asyncscheduler.AsyncScheduler.wait">[docs]</a>    <span class="k">def</span> <span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wait for the scheduler to become entirely empty (i.e., all</span>
+<span class="sd">        tasks having run to completion).</span>
+
+<span class="sd">        IMPORTANT: This is only useful with a single caller scheduling</span>
+<span class="sd">        tasks, such that no call to schedule_task() is currently in</span>
+<span class="sd">        progress or may happen subsequently to the call to wait().</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">_wait</span><span class="p">():</span>
+            <span class="n">interruptably_wait</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__cv</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__worker_count</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__waiter_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">with_lock</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__cv</span><span class="p">,</span> <span class="n">_wait</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__run_synchronously</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+
+        <span class="c1"># When running synchronously, we immediately leak any exception raised</span>
+        <span class="c1"># for immediate failure reporting to calling code.</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">_waiter</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">ret</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                 <span class="n">_</span><span class="p">(</span><span class="s2">&quot;task completed successfully&quot;</span><span class="p">)),</span>
+                 <span class="n">log</span><span class="o">.</span><span class="n">InfoCode</span><span class="o">.</span><span class="n">synchronous_upload_done</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">_waiter</span>
+
+    <span class="k">def</span> <span class="nf">__run_asynchronously</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="p">(</span><span class="n">waiter</span><span class="p">,</span> <span class="n">caller</span><span class="p">)</span> <span class="o">=</span> <span class="n">async_split</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">params</span><span class="p">))</span>
+
+        <span class="k">def</span> <span class="nf">check_pending_failure</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__failed</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                         <span class="n">_</span><span class="p">(</span><span class="s2">&quot;a previously scheduled task has failed; &quot;</span>
+                           <span class="s2">&quot;propagating the result immediately&quot;</span><span class="p">)),</span>
+                         <span class="n">log</span><span class="o">.</span><span class="n">InfoCode</span><span class="o">.</span><span class="n">asynchronous_upload_done</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__failed_waiter</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: waiter should have raised an exception; &quot;</span>
+                                     <span class="s2">&quot;this is a bug&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,))</span>
+
+        <span class="k">def</span> <span class="nf">wait_for_and_register_launch</span><span class="p">():</span>
+            <span class="n">check_pending_failure</span><span class="p">()</span>  <span class="c1"># raise on fail</span>
+            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">__worker_count</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__concurrency</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">__barrier</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__worker_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">__barrier</span><span class="p">,</span> <span class="s2">&quot;barrier should be in effect&quot;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__barrier</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__cv</span><span class="o">.</span><span class="n">notifyAll</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__waiter_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__cv</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__waiter_count</span> <span class="o">-=</span> <span class="mi">1</span>
+
+                <span class="n">check_pending_failure</span><span class="p">()</span>  <span class="c1"># raise on fail</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">__worker_count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                                  <span class="n">_</span><span class="p">(</span><span class="s2">&quot;active workers = </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__worker_count</span><span class="p">,)))</span>
+
+        <span class="c1"># simply wait for an OK condition to start, then launch our worker. the worker</span>
+        <span class="c1"># never waits on us, we just wait for them.</span>
+        <span class="n">with_lock</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__cv</span><span class="p">,</span> <span class="n">wait_for_and_register_launch</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__start_worker</span><span class="p">(</span><span class="n">caller</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">waiter</span>
+
+    <span class="k">def</span> <span class="nf">__start_worker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">caller</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Start a new worker.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">trampoline</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__execute_caller</span><span class="p">(</span><span class="n">caller</span><span class="p">)</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="k">def</span> <span class="nf">complete_worker</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__worker_count</span> <span class="o">-=</span> <span class="mi">1</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">Debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                                          <span class="n">_</span><span class="p">(</span><span class="s2">&quot;active workers = </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__worker_count</span><span class="p">,)))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__cv</span><span class="o">.</span><span class="n">notifyAll</span><span class="p">()</span>
+                <span class="n">with_lock</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__cv</span><span class="p">,</span> <span class="n">complete_worker</span><span class="p">)</span>
+
+        <span class="n">thread</span><span class="o">.</span><span class="n">start_new_thread</span><span class="p">(</span><span class="n">trampoline</span><span class="p">,</span> <span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">__execute_caller</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">caller</span><span class="p">):</span>
+            <span class="c1"># The caller half that we get here will not propagate</span>
+            <span class="c1"># errors back to us, but rather propagate it back to the</span>
+            <span class="c1"># &quot;other half&quot; of the async split.</span>
+            <span class="n">succeeded</span><span class="p">,</span> <span class="n">waiter</span> <span class="o">=</span> <span class="n">caller</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">succeeded</span><span class="p">:</span>
+                <span class="k">def</span> <span class="nf">_signal_failed</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__failed</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__failed</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__failed_waiter</span> <span class="o">=</span> <span class="n">waiter</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__cv</span><span class="o">.</span><span class="n">notifyAll</span><span class="p">()</span>
+                <span class="n">with_lock</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__cv</span><span class="p">,</span> <span class="n">_signal_failed</span><span class="p">)</span>
+
+            <span class="n">log</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                     <span class="n">_</span><span class="p">(</span><span class="s2">&quot;task execution done (success: </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">succeeded</span><span class="p">),</span>
+                     <span class="n">log</span><span class="o">.</span><span class="n">InfoCode</span><span class="o">.</span><span class="n">asynchronous_upload_done</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

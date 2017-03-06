@@ -1,0 +1,445 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>testing.unit.test_lazy module &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="testing.unit.test_manifest module" href="testing.unit.test_manifest.html" />
+    <link rel="prev" title="testing.unit.test_gpginterface module" href="testing.unit.test_gpginterface.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-testing.unit.test_lazy">
+<span id="testing-unit-test-lazy-module"></span><h1>testing.unit.test_lazy module<a class="headerlink" href="#module-testing.unit.test_lazy" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="testing.unit.test_lazy.AndOrTestCase">
+<em class="property">class </em><code class="descclassname">testing.unit.test_lazy.</code><code class="descname">AndOrTestCase</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#AndOrTestCase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.AndOrTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#testing.unit.test_lazy.Iterators" title="testing.unit.test_lazy.Iterators"><code class="xref py py-class docutils literal"><span class="pre">testing.unit.test_lazy.Iterators</span></code></a></p>
+<p>Test And and Or</p>
+<dl class="method">
+<dt id="testing.unit.test_lazy.AndOrTestCase.testAndShortcut">
+<code class="descname">testAndShortcut</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#AndOrTestCase.testAndShortcut"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.AndOrTestCase.testAndShortcut" title="Permalink to this definition">¶</a></dt>
+<dd><p>And should return if any false</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.AndOrTestCase.testEmpty">
+<code class="descname">testEmpty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#AndOrTestCase.testEmpty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.AndOrTestCase.testEmpty" title="Permalink to this definition">¶</a></dt>
+<dd><p>And() -&gt; true, Or() -&gt; false</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.AndOrTestCase.testNormalAnd">
+<code class="descname">testNormalAnd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#AndOrTestCase.testNormalAnd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.AndOrTestCase.testNormalAnd" title="Permalink to this definition">¶</a></dt>
+<dd><p>And should go through true iterators, picking last</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.AndOrTestCase.testNormalOr">
+<code class="descname">testNormalOr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#AndOrTestCase.testNormalOr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.AndOrTestCase.testNormalOr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Or goes through false iterators, picking last</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.AndOrTestCase.testOrShortcut">
+<code class="descname">testOrShortcut</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#AndOrTestCase.testOrShortcut"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.AndOrTestCase.testOrShortcut" title="Permalink to this definition">¶</a></dt>
+<dd><p>Or should return if any true</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="testing.unit.test_lazy.CatTestCase">
+<em class="property">class </em><code class="descclassname">testing.unit.test_lazy.</code><code class="descname">CatTestCase</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#CatTestCase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.CatTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#testing.unit.test_lazy.Iterators" title="testing.unit.test_lazy.Iterators"><code class="xref py py-class docutils literal"><span class="pre">testing.unit.test_lazy.Iterators</span></code></a></p>
+<p>Test concatenation of iterators</p>
+<dl class="method">
+<dt id="testing.unit.test_lazy.CatTestCase.testEmpty">
+<code class="descname">testEmpty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#CatTestCase.testEmpty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.CatTestCase.testEmpty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Empty + empty = empty</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.CatTestCase.testNumbers">
+<code class="descname">testNumbers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#CatTestCase.testNumbers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.CatTestCase.testNumbers" title="Permalink to this definition">¶</a></dt>
+<dd><p>1 to 50 + 51 to 100 = 1 to 100</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.CatTestCase.testShortcut">
+<code class="descname">testShortcut</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#CatTestCase.testShortcut"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.CatTestCase.testShortcut" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process iterators in order</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="testing.unit.test_lazy.FilterTestCase">
+<em class="property">class </em><code class="descclassname">testing.unit.test_lazy.</code><code class="descname">FilterTestCase</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#FilterTestCase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.FilterTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#testing.unit.test_lazy.Iterators" title="testing.unit.test_lazy.Iterators"><code class="xref py py-class docutils literal"><span class="pre">testing.unit.test_lazy.Iterators</span></code></a></p>
+<p>Tests for lazy_filter function</p>
+<dl class="method">
+<dt id="testing.unit.test_lazy.FilterTestCase.testEmpty">
+<code class="descname">testEmpty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#FilterTestCase.testEmpty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.FilterTestCase.testEmpty" title="Permalink to this definition">¶</a></dt>
+<dd><p>empty iterators -&gt; empty iterators</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.FilterTestCase.testError">
+<code class="descname">testError</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#FilterTestCase.testError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.FilterTestCase.testError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Should raise appropriate error</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.FilterTestCase.testNum1">
+<code class="descname">testNum1</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#FilterTestCase.testNum1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.FilterTestCase.testNum1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test numbers 1 - 100 #1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="testing.unit.test_lazy.FoldingTest">
+<em class="property">class </em><code class="descclassname">testing.unit.test_lazy.</code><code class="descname">FoldingTest</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#FoldingTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.FoldingTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#testing.unit.test_lazy.Iterators" title="testing.unit.test_lazy.Iterators"><code class="xref py py-class docutils literal"><span class="pre">testing.unit.test_lazy.Iterators</span></code></a></p>
+<p>Test folding operations</p>
+<dl class="method">
+<dt id="testing.unit.test_lazy.FoldingTest.f">
+<code class="descname">f</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#FoldingTest.f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.FoldingTest.f" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.FoldingTest.testAddition">
+<code class="descname">testAddition</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#FoldingTest.testAddition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.FoldingTest.testAddition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use folds to sum lists</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.FoldingTest.testEmpty">
+<code class="descname">testEmpty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#FoldingTest.testEmpty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.FoldingTest.testEmpty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Folds of empty iterators should produce defaults</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.FoldingTest.testLargeAddition">
+<code class="descname">testLargeAddition</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#FoldingTest.testLargeAddition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.FoldingTest.testLargeAddition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Folds on 10000 element iterators</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.FoldingTest.testLen">
+<code class="descname">testLen</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#FoldingTest.testLen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.FoldingTest.testLen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use folds to calculate length of lists</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="testing.unit.test_lazy.ITRBadder">
+<em class="property">class </em><code class="descclassname">testing.unit.test_lazy.</code><code class="descname">ITRBadder</code><a class="reference internal" href="_modules/testing/unit/test_lazy.html#ITRBadder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.ITRBadder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="duplicity.lazy.html#duplicity.lazy.ITRBranch" title="duplicity.lazy.ITRBranch"><code class="xref py py-class docutils literal"><span class="pre">duplicity.lazy.ITRBranch</span></code></a></p>
+<dl class="method">
+<dt id="testing.unit.test_lazy.ITRBadder.branch_process">
+<code class="descname">branch_process</code><span class="sig-paren">(</span><em>subinstance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#ITRBadder.branch_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.ITRBadder.branch_process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.ITRBadder.end_process">
+<code class="descname">end_process</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#ITRBadder.end_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.ITRBadder.end_process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.ITRBadder.start_process">
+<code class="descname">start_process</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#ITRBadder.start_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.ITRBadder.start_process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="testing.unit.test_lazy.ITRBadder2">
+<em class="property">class </em><code class="descclassname">testing.unit.test_lazy.</code><code class="descname">ITRBadder2</code><a class="reference internal" href="_modules/testing/unit/test_lazy.html#ITRBadder2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.ITRBadder2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="duplicity.lazy.html#duplicity.lazy.ITRBranch" title="duplicity.lazy.ITRBranch"><code class="xref py py-class docutils literal"><span class="pre">duplicity.lazy.ITRBranch</span></code></a></p>
+<dl class="method">
+<dt id="testing.unit.test_lazy.ITRBadder2.branch_process">
+<code class="descname">branch_process</code><span class="sig-paren">(</span><em>subinstance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#ITRBadder2.branch_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.ITRBadder2.branch_process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.ITRBadder2.can_fast_process">
+<code class="descname">can_fast_process</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#ITRBadder2.can_fast_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.ITRBadder2.can_fast_process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.ITRBadder2.end_process">
+<code class="descname">end_process</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#ITRBadder2.end_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.ITRBadder2.end_process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.ITRBadder2.fast_process">
+<code class="descname">fast_process</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#ITRBadder2.fast_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.ITRBadder2.fast_process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.ITRBadder2.start_process">
+<code class="descname">start_process</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#ITRBadder2.start_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.ITRBadder2.start_process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="testing.unit.test_lazy.IterEqualTestCase">
+<em class="property">class </em><code class="descclassname">testing.unit.test_lazy.</code><code class="descname">IterEqualTestCase</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#IterEqualTestCase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.IterEqualTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#testing.unit.test_lazy.Iterators" title="testing.unit.test_lazy.Iterators"><code class="xref py py-class docutils literal"><span class="pre">testing.unit.test_lazy.Iterators</span></code></a></p>
+<p>Tests for iter_equal function</p>
+<dl class="method">
+<dt id="testing.unit.test_lazy.IterEqualTestCase.testEmpty">
+<code class="descname">testEmpty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#IterEqualTestCase.testEmpty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.IterEqualTestCase.testEmpty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Empty iterators should be equal</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.IterEqualTestCase.testGenerators">
+<code class="descname">testGenerators</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#IterEqualTestCase.testGenerators"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.IterEqualTestCase.testGenerators" title="Permalink to this definition">¶</a></dt>
+<dd><p>equals works for generators</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.IterEqualTestCase.testLength">
+<code class="descname">testLength</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#IterEqualTestCase.testLength"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.IterEqualTestCase.testLength" title="Permalink to this definition">¶</a></dt>
+<dd><p>Differently sized iterators</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.IterEqualTestCase.testNormal">
+<code class="descname">testNormal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#IterEqualTestCase.testNormal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.IterEqualTestCase.testNormal" title="Permalink to this definition">¶</a></dt>
+<dd><p>See if normal iterators are equal</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.IterEqualTestCase.testNormalInequality">
+<code class="descname">testNormalInequality</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#IterEqualTestCase.testNormalInequality"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.IterEqualTestCase.testNormalInequality" title="Permalink to this definition">¶</a></dt>
+<dd><p>See if normal unequals work</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="testing.unit.test_lazy.Iterators">
+<em class="property">class </em><code class="descclassname">testing.unit.test_lazy.</code><code class="descname">Iterators</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#Iterators"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.Iterators" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="testing.unit.html#testing.unit.UnitTestCase" title="testing.unit.UnitTestCase"><code class="xref py py-class docutils literal"><span class="pre">testing.unit.UnitTestCase</span></code></a></p>
+<dl class="method">
+<dt id="testing.unit.test_lazy.Iterators.alwayserror">
+<code class="descname">alwayserror</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#Iterators.alwayserror"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.Iterators.alwayserror" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.Iterators.empty">
+<code class="descname">empty</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#testing.unit.test_lazy.Iterators.empty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.Iterators.emptygen_maker">
+<code class="descname">emptygen_maker</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#Iterators.emptygen_maker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.Iterators.emptygen_maker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.Iterators.evens">
+<code class="descname">evens</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#testing.unit.test_lazy.Iterators.evens" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.Iterators.falseerror_maker">
+<code class="descname">falseerror_maker</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#Iterators.falseerror_maker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.Iterators.falseerror_maker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.Iterators.nameerror_maker">
+<code class="descname">nameerror_maker</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#Iterators.nameerror_maker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.Iterators.nameerror_maker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.Iterators.odds">
+<code class="descname">odds</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#testing.unit.test_lazy.Iterators.odds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.Iterators.one_to_100">
+<code class="descname">one_to_100</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#testing.unit.test_lazy.Iterators.one_to_100" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.Iterators.trueerror_maker">
+<code class="descname">trueerror_maker</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#Iterators.trueerror_maker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.Iterators.trueerror_maker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.Iterators.typeerror_maker">
+<code class="descname">typeerror_maker</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#Iterators.typeerror_maker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.Iterators.typeerror_maker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="testing.unit.test_lazy.MapTestCase">
+<em class="property">class </em><code class="descclassname">testing.unit.test_lazy.</code><code class="descname">MapTestCase</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#MapTestCase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.MapTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#testing.unit.test_lazy.Iterators" title="testing.unit.test_lazy.Iterators"><code class="xref py py-class docutils literal"><span class="pre">testing.unit.test_lazy.Iterators</span></code></a></p>
+<p>Test mapping of iterators</p>
+<dl class="method">
+<dt id="testing.unit.test_lazy.MapTestCase.testEmpty">
+<code class="descname">testEmpty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#MapTestCase.testEmpty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.MapTestCase.testEmpty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map of an empty iterator is empty</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.MapTestCase.testNumbers">
+<code class="descname">testNumbers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#MapTestCase.testNumbers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.MapTestCase.testNumbers" title="Permalink to this definition">¶</a></dt>
+<dd><p>1 to 100 * 2 = 2 to 200</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.MapTestCase.testShortcut">
+<code class="descname">testShortcut</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#MapTestCase.testShortcut"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.MapTestCase.testShortcut" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map should go in order</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="testing.unit.test_lazy.MultiplexTest">
+<em class="property">class </em><code class="descclassname">testing.unit.test_lazy.</code><code class="descname">MultiplexTest</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#MultiplexTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.MultiplexTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#testing.unit.test_lazy.Iterators" title="testing.unit.test_lazy.Iterators"><code class="xref py py-class docutils literal"><span class="pre">testing.unit.test_lazy.Iterators</span></code></a></p>
+<dl class="method">
+<dt id="testing.unit.test_lazy.MultiplexTest.testDouble">
+<code class="descname">testDouble</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#MultiplexTest.testDouble"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.MultiplexTest.testDouble" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test splitting into two...</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.MultiplexTest.testSingle">
+<code class="descname">testSingle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#MultiplexTest.testSingle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.MultiplexTest.testSingle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test multiplex single stream</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.MultiplexTest.testTrible">
+<code class="descname">testTrible</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#MultiplexTest.testTrible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.MultiplexTest.testTrible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test splitting iterator into three</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="testing.unit.test_lazy.TreeReducerTest">
+<em class="property">class </em><code class="descclassname">testing.unit.test_lazy.</code><code class="descname">TreeReducerTest</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#TreeReducerTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.TreeReducerTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="testing.unit.html#testing.unit.UnitTestCase" title="testing.unit.UnitTestCase"><code class="xref py py-class docutils literal"><span class="pre">testing.unit.UnitTestCase</span></code></a></p>
+<dl class="method">
+<dt id="testing.unit.test_lazy.TreeReducerTest.setUp">
+<code class="descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#TreeReducerTest.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.TreeReducerTest.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.TreeReducerTest.testTreeReducer">
+<code class="descname">testTreeReducer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#TreeReducerTest.testTreeReducer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.TreeReducerTest.testTreeReducer" title="Permalink to this definition">¶</a></dt>
+<dd><p>testing IterTreeReducer</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="testing.unit.test_lazy.TreeReducerTest.testTreeReducerState">
+<code class="descname">testTreeReducerState</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/testing/unit/test_lazy.html#TreeReducerTest.testTreeReducerState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#testing.unit.test_lazy.TreeReducerTest.testTreeReducerState" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test saving and recreation of an IterTreeReducer</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="testing.html">testing package</a><ul>
+  <li><a href="testing.unit.html">testing.unit package</a><ul>
+      <li>Previous: <a href="testing.unit.test_gpginterface.html" title="previous chapter">testing.unit.test_gpginterface module</a></li>
+      <li>Next: <a href="testing.unit.test_manifest.html" title="next chapter">testing.unit.test_manifest module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/testing.unit.test_lazy.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/testing.unit.test_lazy.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

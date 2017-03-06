@@ -1,0 +1,254 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>testing.unit.test_dup_time &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for testing.unit.test_dup_time</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2002 Ben Escoto &lt;ben@emerose.org&gt;</span>
+<span class="c1"># Copyright 2007 Kenneth Loafman &lt;kenneth@loafman.com&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">dup_time</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">UnitTestCase</span>
+
+<span class="c1"># For type testing against both int and long types that works in python 2/3</span>
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,):</span>
+    <span class="n">integer_types</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">LongType</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">integer_types</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">,)</span>
+
+
+<div class="viewcode-block" id="TimeTest"><a class="viewcode-back" href="../../../testing.unit.test_dup_time.html#testing.unit.test_dup_time.TimeTest">[docs]</a><span class="k">class</span> <span class="nc">TimeTest</span><span class="p">:</span>
+<div class="viewcode-block" id="TimeTest.testConversion"><a class="viewcode-back" href="../../../testing.unit.test_dup_time.html#testing.unit.test_dup_time.TimeTest.testConversion">[docs]</a>    <span class="k">def</span> <span class="nf">testConversion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;test timetostring and stringtotime&quot;&quot;&quot;</span>
+        <span class="n">dup_time</span><span class="o">.</span><span class="n">setcurtime</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">dup_time</span><span class="o">.</span><span class="n">curtime</span><span class="p">)</span> <span class="ow">in</span> <span class="n">integer_types</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dup_time</span><span class="o">.</span><span class="n">curtimestr</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">StringType</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">dup_time</span><span class="o">.</span><span class="n">cmp</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">dup_time</span><span class="o">.</span><span class="n">curtime</span><span class="p">),</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">curtimestr</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span>
+                <span class="n">dup_time</span><span class="o">.</span><span class="n">cmp</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">dup_time</span><span class="o">.</span><span class="n">curtime</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">curtimestr</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">1.05</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">cmp</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">curtime</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="k">assert</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">cmp</span><span class="p">(</span><span class="n">dup_time</span><span class="o">.</span><span class="n">timetostring</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()),</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">curtimestr</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="TimeTest.testConversion_separator"><a class="viewcode-back" href="../../../testing.unit.test_dup_time.html#testing.unit.test_dup_time.TimeTest.testConversion_separator">[docs]</a>    <span class="k">def</span> <span class="nf">testConversion_separator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Same as testConversion, but change time Separator&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_global</span><span class="p">(</span><span class="s1">&#39;time_separator&#39;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">testConversion</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TimeTest.testCmp"><a class="viewcode-back" href="../../../testing.unit.test_dup_time.html#testing.unit.test_dup_time.TimeTest.testCmp">[docs]</a>    <span class="k">def</span> <span class="nf">testCmp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test time comparisons&quot;&quot;&quot;</span>
+        <span class="nb">cmp</span> <span class="o">=</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">cmp</span>
+        <span class="k">assert</span> <span class="nb">cmp</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">assert</span> <span class="nb">cmp</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="k">assert</span> <span class="nb">cmp</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="k">assert</span> <span class="nb">cmp</span><span class="p">(</span><span class="s2">&quot;2001-09-01T21:49:04Z&quot;</span><span class="p">,</span> <span class="s2">&quot;2001-08-01T21:49:04Z&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="k">assert</span> <span class="nb">cmp</span><span class="p">(</span><span class="s2">&quot;2001-09-01T04:49:04+03:23&quot;</span><span class="p">,</span> <span class="s2">&quot;2001-09-01T21:49:04Z&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">assert</span> <span class="nb">cmp</span><span class="p">(</span><span class="s2">&quot;2001-09-01T12:00:00Z&quot;</span><span class="p">,</span> <span class="s2">&quot;2001-09-01T04:00:00-08:00&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="k">assert</span> <span class="nb">cmp</span><span class="p">(</span><span class="s2">&quot;2001-09-01T12:00:00-08:00&quot;</span><span class="p">,</span> <span class="s2">&quot;2001-09-01T12:00:00-07:00&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="k">assert</span> <span class="nb">cmp</span><span class="p">(</span><span class="s2">&quot;2001-09-01T11:00:00Z&quot;</span><span class="p">,</span> <span class="s2">&quot;20010901T120000Z&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">assert</span> <span class="nb">cmp</span><span class="p">(</span><span class="s2">&quot;2001-09-01T12:00:00Z&quot;</span><span class="p">,</span> <span class="s2">&quot;20010901T120000Z&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="k">assert</span> <span class="nb">cmp</span><span class="p">(</span><span class="s2">&quot;2001-09-01T13:00:00Z&quot;</span><span class="p">,</span> <span class="s2">&quot;20010901T120000Z&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="TimeTest.testCmp_separator"><a class="viewcode-back" href="../../../testing.unit.test_dup_time.html#testing.unit.test_dup_time.TimeTest.testCmp_separator">[docs]</a>    <span class="k">def</span> <span class="nf">testCmp_separator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Like testCmp but with new separator&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_global</span><span class="p">(</span><span class="s1">&#39;time_separator&#39;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+        <span class="nb">cmp</span> <span class="o">=</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">cmp</span>
+        <span class="k">assert</span> <span class="nb">cmp</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">assert</span> <span class="nb">cmp</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="k">assert</span> <span class="nb">cmp</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="k">assert</span> <span class="nb">cmp</span><span class="p">(</span><span class="s2">&quot;2001-09-01T21_49_04Z&quot;</span><span class="p">,</span> <span class="s2">&quot;2001-08-01T21_49_04Z&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="k">assert</span> <span class="nb">cmp</span><span class="p">(</span><span class="s2">&quot;2001-09-01T04_49_04+03_23&quot;</span><span class="p">,</span> <span class="s2">&quot;2001-09-01T21_49_04Z&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">assert</span> <span class="nb">cmp</span><span class="p">(</span><span class="s2">&quot;2001-09-01T12_00_00Z&quot;</span><span class="p">,</span> <span class="s2">&quot;2001-09-01T04_00_00-08_00&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="k">assert</span> <span class="nb">cmp</span><span class="p">(</span><span class="s2">&quot;2001-09-01T12_00_00-08_00&quot;</span><span class="p">,</span> <span class="s2">&quot;2001-09-01T12_00_00-07_00&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="TimeTest.testStringtotime"><a class="viewcode-back" href="../../../testing.unit.test_dup_time.html#testing.unit.test_dup_time.TimeTest.testStringtotime">[docs]</a>    <span class="k">def</span> <span class="nf">testStringtotime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test converting string to time&quot;&quot;&quot;</span>
+        <span class="n">timesec</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+        <span class="k">assert</span> <span class="n">timesec</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">dup_time</span><span class="o">.</span><span class="n">stringtotime</span><span class="p">(</span><span class="n">dup_time</span><span class="o">.</span><span class="n">timetostring</span><span class="p">(</span><span class="n">timesec</span><span class="p">)))</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">stringtotime</span><span class="p">(</span><span class="s2">&quot;2001-18-83T03:03:03Z&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">stringtotime</span><span class="p">(</span><span class="s2">&quot;2001-01-23L03:03:03L&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">stringtotime</span><span class="p">(</span><span class="s2">&quot;2001_01_23T03:03:03Z&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TimeTest.testIntervals"><a class="viewcode-back" href="../../../testing.unit.test_dup_time.html#testing.unit.test_dup_time.TimeTest.testIntervals">[docs]</a>    <span class="k">def</span> <span class="nf">testIntervals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test converting strings to intervals&quot;&quot;&quot;</span>
+        <span class="n">i2s</span> <span class="o">=</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">intstringtoseconds</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;32&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;231I&quot;</span><span class="p">,</span> <span class="s2">&quot;MM&quot;</span><span class="p">,</span> <span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="s2">&quot;-2h&quot;</span><span class="p">]:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">i2s</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">TimeException</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="mi">0</span><span class="p">,</span> <span class="n">s</span>
+        <span class="k">assert</span> <span class="n">i2s</span><span class="p">(</span><span class="s2">&quot;7D&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">7</span> <span class="o">*</span> <span class="mi">86400</span>
+        <span class="k">assert</span> <span class="n">i2s</span><span class="p">(</span><span class="s2">&quot;232s&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">232</span>
+        <span class="k">assert</span> <span class="n">i2s</span><span class="p">(</span><span class="s2">&quot;2M&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">30</span> <span class="o">*</span> <span class="mi">86400</span>
+        <span class="k">assert</span> <span class="n">i2s</span><span class="p">(</span><span class="s2">&quot;400m&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">400</span> <span class="o">*</span> <span class="mi">60</span>
+        <span class="k">assert</span> <span class="n">i2s</span><span class="p">(</span><span class="s2">&quot;1Y&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">365</span> <span class="o">*</span> <span class="mi">86400</span>
+        <span class="k">assert</span> <span class="n">i2s</span><span class="p">(</span><span class="s2">&quot;30h&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">30</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span>
+        <span class="k">assert</span> <span class="n">i2s</span><span class="p">(</span><span class="s2">&quot;3W&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="o">*</span> <span class="mi">7</span> <span class="o">*</span> <span class="mi">86400</span></div>
+
+<div class="viewcode-block" id="TimeTest.testIntervalsComposite"><a class="viewcode-back" href="../../../testing.unit.test_dup_time.html#testing.unit.test_dup_time.TimeTest.testIntervalsComposite">[docs]</a>    <span class="k">def</span> <span class="nf">testIntervalsComposite</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Like above, but allow composite intervals&quot;&quot;&quot;</span>
+        <span class="n">i2s</span> <span class="o">=</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">intstringtoseconds</span>
+        <span class="k">assert</span> <span class="n">i2s</span><span class="p">(</span><span class="s2">&quot;7D2h&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">7</span> <span class="o">*</span> <span class="mi">86400</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">3600</span>
+        <span class="k">assert</span> <span class="n">i2s</span><span class="p">(</span><span class="s2">&quot;2Y3s&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">365</span> <span class="o">*</span> <span class="mi">86400</span> <span class="o">+</span> <span class="mi">3</span>
+        <span class="k">assert</span> <span class="n">i2s</span><span class="p">(</span><span class="s2">&quot;1M2W4D2h5m20s&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="mi">30</span> <span class="o">*</span> <span class="mi">86400</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">7</span> <span class="o">*</span> <span class="mi">86400</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="mi">86400</span> <span class="o">+</span>
+                                        <span class="mi">2</span> <span class="o">*</span> <span class="mi">3600</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="mi">20</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TimeTest.testPrettyIntervals"><a class="viewcode-back" href="../../../testing.unit.test_dup_time.html#testing.unit.test_dup_time.TimeTest.testPrettyIntervals">[docs]</a>    <span class="k">def</span> <span class="nf">testPrettyIntervals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test printable interval conversion&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">inttopretty</span><span class="p">(</span><span class="mi">3600</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;1 hour&quot;</span>
+        <span class="k">assert</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">inttopretty</span><span class="p">(</span><span class="mi">7220</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;2 hours 20 seconds&quot;</span>
+        <span class="k">assert</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">inttopretty</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;0 seconds&quot;</span>
+        <span class="k">assert</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">inttopretty</span><span class="p">(</span><span class="mi">353</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;5 minutes 53 seconds&quot;</span>
+        <span class="k">assert</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">inttopretty</span><span class="p">(</span><span class="mi">3661</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;1 hour 1 minute 1 second&quot;</span>
+        <span class="k">assert</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">inttopretty</span><span class="p">(</span><span class="mf">353.234234</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;5 minutes 53.23 seconds&quot;</span></div>
+
+<div class="viewcode-block" id="TimeTest.testGenericString"><a class="viewcode-back" href="../../../testing.unit.test_dup_time.html#testing.unit.test_dup_time.TimeTest.testGenericString">[docs]</a>    <span class="k">def</span> <span class="nf">testGenericString</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test genstrtotime, conversion of arbitrary string to time&quot;&quot;&quot;</span>
+        <span class="n">g2t</span> <span class="o">=</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">genstrtotime</span>
+        <span class="k">assert</span> <span class="n">g2t</span><span class="p">(</span><span class="s1">&#39;now&#39;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1000</span>
+        <span class="k">assert</span> <span class="n">g2t</span><span class="p">(</span><span class="s1">&#39;2h3s&#39;</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10000</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">3600</span> <span class="o">-</span> <span class="mi">3</span>
+        <span class="k">assert</span> <span class="n">g2t</span><span class="p">(</span><span class="s1">&#39;2001-09-01T21:49:04Z&#39;</span><span class="p">)</span> <span class="o">==</span> \
+            <span class="n">dup_time</span><span class="o">.</span><span class="n">stringtotime</span><span class="p">(</span><span class="s1">&#39;2001-09-01T21:49:04Z&#39;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">g2t</span><span class="p">(</span><span class="s1">&#39;2002-04-26T04:22:01&#39;</span><span class="p">)</span> <span class="o">==</span> \
+            <span class="n">dup_time</span><span class="o">.</span><span class="n">stringtotime</span><span class="p">(</span><span class="s1">&#39;2002-04-26T04:22:01&#39;</span> <span class="o">+</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">gettzd</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">stringtotime</span><span class="p">(</span><span class="s1">&#39;2001-05-12T00:00:00&#39;</span> <span class="o">+</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">gettzd</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="n">g2t</span><span class="p">(</span><span class="s1">&#39;2001-05-12&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">t</span>
+        <span class="k">assert</span> <span class="n">g2t</span><span class="p">(</span><span class="s1">&#39;2001/05/12&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">t</span>
+        <span class="k">assert</span> <span class="n">g2t</span><span class="p">(</span><span class="s1">&#39;5/12/2001&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">t</span>
+        <span class="k">assert</span> <span class="n">g2t</span><span class="p">(</span><span class="s1">&#39;123456&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">123456</span></div>
+
+<div class="viewcode-block" id="TimeTest.testGenericStringErrors"><a class="viewcode-back" href="../../../testing.unit.test_dup_time.html#testing.unit.test_dup_time.TimeTest.testGenericStringErrors">[docs]</a>    <span class="k">def</span> <span class="nf">testGenericStringErrors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test genstrtotime on some bad strings&quot;&quot;&quot;</span>
+        <span class="n">g2t</span> <span class="o">=</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">genstrtotime</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">dup_time</span><span class="o">.</span><span class="n">TimeException</span><span class="p">,</span> <span class="n">g2t</span><span class="p">,</span> <span class="s2">&quot;hello&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">dup_time</span><span class="o">.</span><span class="n">TimeException</span><span class="p">,</span> <span class="n">g2t</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">dup_time</span><span class="o">.</span><span class="n">TimeException</span><span class="p">,</span> <span class="n">g2t</span><span class="p">,</span> <span class="s2">&quot;3q&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TimeTest.testConvertion"><a class="viewcode-back" href="../../../testing.unit.test_dup_time.html#testing.unit.test_dup_time.TimeTest.testConvertion">[docs]</a>    <span class="k">def</span> <span class="nf">testConvertion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+        <span class="k">assert</span> <span class="n">dup_time</span><span class="o">.</span><span class="n">stringtotime</span><span class="p">(</span><span class="n">dup_time</span><span class="o">.</span><span class="n">timetostring</span><span class="p">(</span><span class="n">t</span><span class="p">))</span> <span class="o">==</span> <span class="n">t</span></div></div>
+
+
+<div class="viewcode-block" id="TimeTest1"><a class="viewcode-back" href="../../../testing.unit.test_dup_time.html#testing.unit.test_dup_time.TimeTest1">[docs]</a><span class="k">class</span> <span class="nc">TimeTest1</span><span class="p">(</span><span class="n">TimeTest</span><span class="p">,</span> <span class="n">UnitTestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TimeTest1.setUp"><a class="viewcode-back" href="../../../testing.unit.test_dup_time.html#testing.unit.test_dup_time.TimeTest1.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TimeTest1</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setUp</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_global</span><span class="p">(</span><span class="s1">&#39;old_filenames&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="TimeTest2"><a class="viewcode-back" href="../../../testing.unit.test_dup_time.html#testing.unit.test_dup_time.TimeTest2">[docs]</a><span class="k">class</span> <span class="nc">TimeTest2</span><span class="p">(</span><span class="n">TimeTest</span><span class="p">,</span> <span class="n">UnitTestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TimeTest2.setUp"><a class="viewcode-back" href="../../../testing.unit.test_dup_time.html#testing.unit.test_dup_time.TimeTest2.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TimeTest2</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setUp</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_global</span><span class="p">(</span><span class="s1">&#39;old_filenames&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span></div></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../../testing.html">testing</a><ul>
+  <li><a href="../unit.html">testing.unit</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

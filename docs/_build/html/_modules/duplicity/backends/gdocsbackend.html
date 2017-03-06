@@ -1,0 +1,278 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.backends.gdocsbackend &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for duplicity.backends.gdocsbackend</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2011 Carlos Abalde &lt;carlos.abalde@gmail.com&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
+
+<span class="kn">import</span> <span class="nn">duplicity.backend</span>
+<span class="kn">from</span> <span class="nn">duplicity.errors</span> <span class="k">import</span> <span class="n">BackendException</span>
+
+
+<div class="viewcode-block" id="GDocsBackend"><a class="viewcode-back" href="../../../duplicity.backends.gdocsbackend.html#duplicity.backends.gdocsbackend.GDocsBackend">[docs]</a><span class="k">class</span> <span class="nc">GDocsBackend</span><span class="p">(</span><span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Backend</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Connect to remote store using Google Google Documents List API&quot;&quot;&quot;</span>
+
+    <span class="n">ROOT_FOLDER_ID</span> <span class="o">=</span> <span class="s1">&#39;folder%3Aroot&#39;</span>
+    <span class="n">BACKUP_DOCUMENT_TYPE</span> <span class="o">=</span> <span class="s1">&#39;application/binary&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_url</span><span class="p">):</span>
+        <span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Backend</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_url</span><span class="p">)</span>
+
+        <span class="c1"># Import Google Data APIs libraries.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">global</span> <span class="n">atom</span>
+            <span class="k">global</span> <span class="n">gdata</span>
+            <span class="kn">import</span> <span class="nn">atom.data</span>
+            <span class="kn">import</span> <span class="nn">gdata.client</span>
+            <span class="kn">import</span> <span class="nn">gdata.docs.client</span>
+            <span class="kn">import</span> <span class="nn">gdata.docs.data</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s1">&#39;Google Docs backend requires Google Data APIs Python &#39;</span>
+                                   <span class="s1">&#39;Client Library (see http://code.google.com/p/gdata-python-client/).&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Setup client instance.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">gdata</span><span class="o">.</span><span class="n">docs</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">DocsClient</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s1">&#39;duplicity $version&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">ssl</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">http_client</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_authorize</span><span class="p">(</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">username</span> <span class="o">+</span> <span class="s1">&#39;@&#39;</span> <span class="o">+</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_password</span><span class="p">())</span>
+
+        <span class="c1"># Fetch destination folder entry (and crete hierarchy if required).</span>
+        <span class="n">folder_names</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+        <span class="n">parent_folder</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">parent_folder_id</span> <span class="o">=</span> <span class="n">GDocsBackend</span><span class="o">.</span><span class="n">ROOT_FOLDER_ID</span>
+        <span class="k">for</span> <span class="n">folder_name</span> <span class="ow">in</span> <span class="n">folder_names</span><span class="p">:</span>
+            <span class="n">entries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_entries</span><span class="p">(</span><span class="n">parent_folder_id</span><span class="p">,</span> <span class="s1">&#39;folder&#39;</span><span class="p">,</span> <span class="n">folder_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">entries</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">parent_folder</span> <span class="o">=</span> <span class="n">entries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">folder</span> <span class="o">=</span> <span class="n">gdata</span><span class="o">.</span><span class="n">docs</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Resource</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;folder&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">folder_name</span><span class="p">)</span>
+                    <span class="n">parent_folder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">create_resource</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">collection</span><span class="o">=</span><span class="n">parent_folder</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">parent_folder</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">parent_folder</span><span class="p">:</span>
+                    <span class="n">parent_folder_id</span> <span class="o">=</span> <span class="n">parent_folder</span><span class="o">.</span><span class="n">resource_id</span><span class="o">.</span><span class="n">text</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;Error while creating destination folder &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="n">folder_name</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;Error while fetching destination folder &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="n">folder_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="o">=</span> <span class="n">parent_folder</span>
+
+    <span class="k">def</span> <span class="nf">_put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_path</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_delete</span><span class="p">(</span><span class="n">remote_filename</span><span class="p">)</span>
+
+        <span class="c1"># Set uploader instance. Note that resumable uploads are required in order to</span>
+        <span class="c1"># enable uploads for all file types.</span>
+        <span class="c1"># (see http://googleappsdeveloper.blogspot.com/2011/05/upload-all-file-types-to-any-google.html)</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="n">source_path</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+        <span class="n">uploader</span> <span class="o">=</span> <span class="n">gdata</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">ResumableUploader</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span>
+            <span class="n">GDocsBackend</span><span class="o">.</span><span class="n">BACKUP_DOCUMENT_TYPE</span><span class="p">,</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+            <span class="n">chunk_size</span><span class="o">=</span><span class="n">gdata</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">ResumableUploader</span><span class="o">.</span><span class="n">DEFAULT_CHUNK_SIZE</span><span class="p">,</span>
+            <span class="n">desired_class</span><span class="o">=</span><span class="n">gdata</span><span class="o">.</span><span class="n">docs</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Resource</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">uploader</span><span class="p">:</span>
+            <span class="c1"># Chunked upload.</span>
+            <span class="n">entry</span> <span class="o">=</span> <span class="n">gdata</span><span class="o">.</span><span class="n">docs</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Resource</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">atom</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Title</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">remote_filename</span><span class="p">))</span>
+            <span class="n">uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="o">.</span><span class="n">get_resumable_create_media_link</span><span class="p">()</span><span class="o">.</span><span class="n">href</span> <span class="o">+</span> <span class="s1">&#39;?convert=false&#39;</span>
+            <span class="n">entry</span> <span class="o">=</span> <span class="n">uploader</span><span class="o">.</span><span class="n">UploadFile</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">entry</span><span class="o">=</span><span class="n">entry</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">entry</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;Failed to upload file &#39;</span><span class="si">%s</span><span class="s2">&#39; to remote folder &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span>
+                                       <span class="o">%</span> <span class="p">(</span><span class="n">source_path</span><span class="o">.</span><span class="n">get_filename</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;Failed to initialize upload of file &#39;</span><span class="si">%s</span><span class="s2">&#39; to remote folder &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span>
+                                   <span class="o">%</span> <span class="p">(</span><span class="n">source_path</span><span class="o">.</span><span class="n">get_filename</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_filename</span><span class="p">,</span> <span class="n">local_path</span><span class="p">):</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_entries</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="o">.</span><span class="n">resource_id</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+                                      <span class="n">GDocsBackend</span><span class="o">.</span><span class="n">BACKUP_DOCUMENT_TYPE</span><span class="p">,</span>
+                                      <span class="n">remote_filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">entry</span> <span class="o">=</span> <span class="n">entries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">DownloadResource</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">local_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;Failed to find file &#39;</span><span class="si">%s</span><span class="s2">&#39; in remote folder &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span>
+                                   <span class="o">%</span> <span class="p">(</span><span class="n">remote_filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_entries</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="o">.</span><span class="n">resource_id</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+                                      <span class="n">GDocsBackend</span><span class="o">.</span><span class="n">BACKUP_DOCUMENT_TYPE</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">entry</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_entries</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="o">.</span><span class="n">resource_id</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+                                      <span class="n">GDocsBackend</span><span class="o">.</span><span class="n">BACKUP_DOCUMENT_TYPE</span><span class="p">,</span>
+                                      <span class="n">filename</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">get_edit_link</span><span class="p">()</span><span class="o">.</span><span class="n">href</span> <span class="o">+</span> <span class="s1">&#39;?delete=true&#39;</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_authorize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">captcha_token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">captcha_response</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">client_login</span><span class="p">(</span><span class="n">email</span><span class="p">,</span>
+                                     <span class="n">password</span><span class="p">,</span>
+                                     <span class="n">source</span><span class="o">=</span><span class="s1">&#39;duplicity $version&#39;</span><span class="p">,</span>
+                                     <span class="n">service</span><span class="o">=</span><span class="s1">&#39;writely&#39;</span><span class="p">,</span>
+                                     <span class="n">captcha_token</span><span class="o">=</span><span class="n">captcha_token</span><span class="p">,</span>
+                                     <span class="n">captcha_response</span><span class="o">=</span><span class="n">captcha_response</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">gdata</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">CaptchaChallenge</span> <span class="k">as</span> <span class="n">challenge</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;A captcha challenge in required. Please visit &#39;</span> <span class="o">+</span> <span class="n">challenge</span><span class="o">.</span><span class="n">captcha_url</span><span class="p">)</span>
+            <span class="n">answer</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="n">answer</span><span class="p">:</span>
+                <span class="n">answer</span> <span class="o">=</span> <span class="n">raw_input</span><span class="p">(</span><span class="s1">&#39;Answer to the challenge? &#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_authorize</span><span class="p">(</span><span class="n">email</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">challenge</span><span class="o">.</span><span class="n">captcha_token</span><span class="p">,</span> <span class="n">answer</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">gdata</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">BadAuthentication</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span>
+                <span class="s1">&#39;Invalid user credentials given. Be aware that accounts &#39;</span>
+                <span class="s1">&#39;that use 2-step verification require creating an application specific &#39;</span>
+                <span class="s1">&#39;access code for using this Duplicity backend. Follow the instruction in &#39;</span>
+                <span class="s1">&#39;http://www.google.com/support/accounts/bin/static.py?page=guide.cs&amp;guide=1056283&amp;topic=1056286 &#39;</span>
+                <span class="s1">&#39;and create your application-specific password to run duplicity backups.&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_fetch_entries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folder_id</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Build URI.</span>
+        <span class="n">uri</span> <span class="o">=</span> <span class="s1">&#39;/feeds/default/private/full/</span><span class="si">%s</span><span class="s1">/contents&#39;</span> <span class="o">%</span> <span class="n">folder_id</span>
+        <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;folder&#39;</span><span class="p">:</span>
+            <span class="n">uri</span> <span class="o">+=</span> <span class="s1">&#39;/-/folder?showfolders=true&#39;</span>
+        <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="n">GDocsBackend</span><span class="o">.</span><span class="n">BACKUP_DOCUMENT_TYPE</span><span class="p">:</span>
+            <span class="n">uri</span> <span class="o">+=</span> <span class="s1">&#39;?showfolders=false&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">uri</span> <span class="o">+=</span> <span class="s1">&#39;?showfolders=true&#39;</span>
+        <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
+            <span class="n">uri</span> <span class="o">+=</span> <span class="s1">&#39;&amp;title=&#39;</span> <span class="o">+</span> <span class="n">urllib</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">title</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&amp;title-exact=true&#39;</span>
+
+        <span class="c1"># Fetch entries.</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get_all_resources</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">)</span>
+
+        <span class="c1"># When filtering by entry title, API is returning (don&#39;t know why) documents in other</span>
+        <span class="c1"># folders (apart from folder_id) matching the title, so some extra filtering is required.</span>
+        <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
+                <span class="n">resource_type</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get_resource_type</span><span class="p">()</span>
+                <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">type</span><span class="p">)</span> \
+                   <span class="ow">or</span> <span class="p">(</span><span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;folder&#39;</span> <span class="ow">and</span> <span class="n">resource_type</span> <span class="o">==</span> <span class="s1">&#39;folder&#39;</span><span class="p">)</span> \
+                   <span class="ow">or</span> <span class="p">(</span><span class="nb">type</span> <span class="o">==</span> <span class="n">GDocsBackend</span><span class="o">.</span><span class="n">BACKUP_DOCUMENT_TYPE</span> <span class="ow">and</span> <span class="n">resource_type</span> <span class="o">!=</span> <span class="s1">&#39;folder&#39;</span><span class="p">):</span>
+
+                    <span class="k">if</span> <span class="n">folder_id</span> <span class="o">!=</span> <span class="n">GDocsBackend</span><span class="o">.</span><span class="n">ROOT_FOLDER_ID</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">link</span> <span class="ow">in</span> <span class="n">entry</span><span class="o">.</span><span class="n">in_collections</span><span class="p">():</span>
+                            <span class="n">folder_entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get_entry</span><span class="p">(</span><span class="n">link</span><span class="o">.</span><span class="n">href</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
+                                                                 <span class="n">desired_class</span><span class="o">=</span><span class="n">gdata</span><span class="o">.</span><span class="n">docs</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Resource</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">folder_entry</span> <span class="ow">and</span> <span class="p">(</span><span class="n">folder_entry</span><span class="o">.</span><span class="n">resource_id</span><span class="o">.</span><span class="n">text</span> <span class="o">==</span> <span class="n">folder_id</span><span class="p">):</span>
+                                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">in_collections</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">entries</span>
+
+        <span class="c1"># Done!</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+<span class="sd">&quot;&quot;&quot; gdata is an alternate way to access gdocs, currently 05/2015 lacking OAuth support &quot;&quot;&quot;</span>
+<span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">register_backend</span><span class="p">(</span><span class="s1">&#39;gdata+gdocs&#39;</span><span class="p">,</span> <span class="n">GDocsBackend</span><span class="p">)</span>
+<span class="n">duplicity</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">uses_netloc</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;gdata+gdocs&#39;</span><span class="p">])</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

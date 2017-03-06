@@ -1,0 +1,213 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>duplicity.tempdir module &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="duplicity.util module" href="duplicity.util.html" />
+    <link rel="prev" title="duplicity.tarfile module" href="duplicity.tarfile.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-duplicity.tempdir">
+<span id="duplicity-tempdir-module"></span><h1>duplicity.tempdir module<a class="headerlink" href="#module-duplicity.tempdir" title="Permalink to this headline">¶</a></h1>
+<p>Provides temporary file handling cenetered around a single top-level
+securely created temporary directory.</p>
+<p>The public interface of this module is thread-safe.</p>
+<dl class="class">
+<dt id="duplicity.tempdir.TemporaryDirectory">
+<em class="property">class </em><code class="descclassname">duplicity.tempdir.</code><code class="descname">TemporaryDirectory</code><span class="sig-paren">(</span><em>temproot=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/tempdir.html#TemporaryDirectory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tempdir.TemporaryDirectory" title="Permalink to this definition">¶</a></dt>
+<dd><p>A temporary directory.</p>
+<p>An instance of this class is backed by a directory in the file
+system created securely by the use of tempfile.mkdtemp(). Said
+instance can be used to obtain unique filenames inside of this
+directory for cases where mktemp()-like semantics is desired, or
+(recommended) an fd,filename pair for mkstemp()-like semantics.</p>
+<p>See further below for the security implications of using it.</p>
+<p>Each instance will keep a list of all files ever created by it, to
+faciliate deletion of such files and rmdir() of the directory
+itself. It does this in order to be able to clean out the
+directory without resorting to a recursive delete (ala rm -rf),
+which would be risky. Calling code can optionally (recommended)
+notify an instance of the fact that a tempfile was deleted, and
+thus need not be kept track of anymore.</p>
+<p>This class serves two primary purposes:</p>
+<p>Firstly, it provides a convenient single top-level directory in
+which all the clutter ends up, rather than cluttering up the root
+of the system temp directory itself with many files.</p>
+<p>Secondly, it provides a way to get mktemp() style semantics for
+temporary file creation, with most of the risks
+gone. Specifically, since the directory itself is created
+securely, files in this directory can be (mostly) safely created
+non-atomically without the usual mktemp() security
+implications. However, in the presence of tmpwatch, tmpreaper, or
+similar mechanisms that will cause files in the system tempdir to
+expire, a security risk is still present because the removal of
+the TemporaryDirectory managed directory removes all protection it
+offers.</p>
+<p>For this reason, use of mkstemp() is greatly preferred above use
+of mktemp().</p>
+<p>In addition, since cleanup is in the form of deletion based on a
+list of filenames, completely independently of whether someone
+else already deleted the file, there exists a race here as
+well. The impact should however be limited to the removal of an
+&#8216;attackers&#8217; file.</p>
+<dl class="method">
+<dt id="duplicity.tempdir.TemporaryDirectory.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/tempdir.html#TemporaryDirectory.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tempdir.TemporaryDirectory.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleanup any files created in the temporary directory (that
+have not been forgotten), and clean up the temporary directory
+itself.</p>
+<p>On failure they are logged, but this method will not raise an
+exception.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tempdir.TemporaryDirectory.dir">
+<code class="descname">dir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/tempdir.html#TemporaryDirectory.dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tempdir.TemporaryDirectory.dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the absolute pathname of the temp folder.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tempdir.TemporaryDirectory.forget">
+<code class="descname">forget</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/tempdir.html#TemporaryDirectory.forget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tempdir.TemporaryDirectory.forget" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forget about the given filename previously obtained through
+mktemp() or mkstemp(). This should be called <em>after</em> the file
+has been deleted, to stop a future cleanup() from trying to
+delete it.</p>
+<p>Forgetting is only needed for scaling purposes; that is, to
+avoid n timefile creations from implying that n filenames are
+kept in memory. Typically this whould never matter in
+duplicity, but for niceness sake callers are recommended to
+use this method whenever possible.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tempdir.TemporaryDirectory.mkstemp">
+<code class="descname">mkstemp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/tempdir.html#TemporaryDirectory.mkstemp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tempdir.TemporaryDirectory.mkstemp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a filedescriptor and a filename, as per os.mkstemp(),
+but located in the temporary directory and subject to tracking
+and automatic cleanup.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tempdir.TemporaryDirectory.mkstemp_file">
+<code class="descname">mkstemp_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/tempdir.html#TemporaryDirectory.mkstemp_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tempdir.TemporaryDirectory.mkstemp_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience wrapper around mkstemp(), with the file descriptor
+converted into a file object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="duplicity.tempdir.TemporaryDirectory.mktemp">
+<code class="descname">mktemp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/tempdir.html#TemporaryDirectory.mktemp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tempdir.TemporaryDirectory.mktemp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a unique filename suitable for use for a temporary
+file. The file is not created.</p>
+<p>Subsequent calls to this method are guaranteed to never return
+the same filename again. As a result, it is safe to use under
+concurrent conditions.</p>
+<p>NOTE: mkstemp() is greatly preferred.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="duplicity.tempdir.default">
+<code class="descclassname">duplicity.tempdir.</code><code class="descname">default</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/duplicity/tempdir.html#default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#duplicity.tempdir.default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain the global default instance of TemporaryDirectory, creating
+it first if necessary. Failures are propagated to caller. Most
+callers are expected to use this function rather than
+instantiating TemporaryDirectory directly, unless they explicitly
+desdire to have their &#8220;own&#8221; directory for some reason.</p>
+<p>This function is thread-safe.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="duplicity.html">duplicity package</a><ul>
+      <li>Previous: <a href="duplicity.tarfile.html" title="previous chapter">duplicity.tarfile module</a></li>
+      <li>Next: <a href="duplicity.util.html" title="next chapter">duplicity.util module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/duplicity.tempdir.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/duplicity.tempdir.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

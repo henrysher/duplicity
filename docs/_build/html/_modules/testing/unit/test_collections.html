@@ -1,0 +1,335 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>testing.unit.test_collections &#8212; duplicity  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for testing.unit.test_collections</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+<span class="c1"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2002 Ben Escoto &lt;ben@emerose.org&gt;</span>
+<span class="c1"># Copyright 2007 Kenneth Loafman &lt;kenneth@loafman.com&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of duplicity.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is free software; you can redistribute it and/or modify it</span>
+<span class="c1"># under the terms of the GNU General Public License as published by the</span>
+<span class="c1"># Free Software Foundation; either version 2 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Duplicity is distributed in the hope that it will be useful, but</span>
+<span class="c1"># WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with duplicity; if not, write to the Free Software Foundation,</span>
+<span class="c1"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">collections</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">backend</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="nb">globals</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">path</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">gpg</span>
+<span class="kn">from</span> <span class="nn">duplicity</span> <span class="k">import</span> <span class="n">dup_time</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">UnitTestCase</span>
+
+<span class="n">filename_list1</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;duplicity-full.2002-08-17T16:17:01-07:00.manifest.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;duplicity-full.2002-08-17T16:17:01-07:00.vol1.difftar.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;duplicity-full.2002-08-17T16:17:01-07:00.vol2.difftar.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;duplicity-full.2002-08-17T16:17:01-07:00.vol3.difftar.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;duplicity-full.2002-08-17T16:17:01-07:00.vol4.difftar.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;duplicity-full.2002-08-17T16:17:01-07:00.vol5.difftar.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;duplicity-full.2002-08-17T16:17:01-07:00.vol6.difftar.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;duplicity-inc.2002-08-17T16:17:01-07:00.to.2002-08-18T00:04:30-07:00.manifest.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;duplicity-inc.2002-08-17T16:17:01-07:00.to.2002-08-18T00:04:30-07:00.vol1.difftar.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;Extra stuff to be ignored&quot;</span><span class="p">]</span>
+
+<span class="n">remote_sigchain_filename_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;duplicity-full-signatures.2002-08-17T16:17:01-07:00.sigtar.gpg&quot;</span><span class="p">,</span>
+                                 <span class="s2">&quot;duplicity-new-signatures.2002-08-17T16:17:01-07:00.to.2002-08-18T00:04:30-07:00.sigtar.gpg&quot;</span><span class="p">,</span>
+                                 <span class="s2">&quot;duplicity-new-signatures.2002-08-18T00:04:30-07:00.to.2002-08-20T00:00:00-07:00.sigtar.gpg&quot;</span><span class="p">]</span>
+
+<span class="n">local_sigchain_filename_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;duplicity-full-signatures.2002-08-17T16:17:01-07:00.sigtar.gz&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;duplicity-new-signatures.2002-08-17T16:17:01-07:00.to.2002-08-18T00:04:30-07:00.sigtar.gz&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;duplicity-new-signatures.2002-08-18T00:04:30-07:00.to.2002-08-20T00:00:00-07:00.sigtar.gz&quot;</span><span class="p">]</span>
+
+<span class="c1"># A filename list with some incomplete volumes, an older full volume,</span>
+<span class="c1"># and a complete chain.</span>
+<span class="n">filename_list2</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;duplicity-full.2001-01-01T16:17:01-07:00.manifest.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;duplicity-full.2001-01-01T16:17:01-07:00.vol1.difftar.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;duplicity-full.2002-08-17T16:17:01-07:00.manifest.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;duplicity-full.2002-08-17T16:17:01-07:00.vol1.difftar.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;duplicity-full.2002-08-17T16:17:01-07:00.vol2.difftar.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;duplicity-full.2002-08-17T16:17:01-07:00.vol3.difftar.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;duplicity-full.2002-08-17T16:17:01-07:00.vol4.difftar.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;duplicity-full.2002-08-17T16:17:01-07:00.vol5.difftar.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;duplicity-full.2002-08-17T16:17:01-07:00.vol6.difftar.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;duplicity-inc.2002-08-17T16:17:01-07:00.to.2002-08-18T00:04:30-07:00.manifest.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;duplicity-inc.2002-08-17T16:17:01-07:00.to.2002-08-18T00:04:30-07:00.vol1.difftar.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;The following are extraneous duplicity files&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;duplicity-new-signatures.2001-08-17T02:05:13-05:00.to.2002-08-17T05:05:14-05:00.sigtar.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;duplicity-full.2002-08-15T01:01:01-07:00.vol1.difftar.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;duplicity-inc.2000-08-17T16:17:01-07:00.to.2000-08-18T00:04:30-07:00.manifest.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;duplicity-inc.2000-08-17T16:17:01-07:00.to.2000-08-18T00:04:30-07:00.vol1.difftar.gpg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;Extra stuff to be ignored&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="CollectionTest"><a class="viewcode-back" href="../../../testing.unit.test_collections.html#testing.unit.test_collections.CollectionTest">[docs]</a><span class="k">class</span> <span class="nc">CollectionTest</span><span class="p">(</span><span class="n">UnitTestCase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test collections&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CollectionTest.setUp"><a class="viewcode-back" href="../../../testing.unit.test_collections.html#testing.unit.test_collections.CollectionTest.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CollectionTest</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setUp</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">unpack_testfiles</span><span class="p">()</span>
+
+        <span class="n">col_test_dir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;testfiles/collectionstest&quot;</span><span class="p">)</span>
+        <span class="n">archive_dir_path</span> <span class="o">=</span> <span class="n">col_test_dir</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;archive_dir&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_global</span><span class="p">(</span><span class="s1">&#39;archive_dir_path&#39;</span><span class="p">,</span> <span class="n">archive_dir_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">archive_dir_backend</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">get_backend</span><span class="p">(</span><span class="s2">&quot;file://testfiles/collectionstest&quot;</span>
+                                                       <span class="s2">&quot;/archive_dir&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">real_backend</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">get_backend</span><span class="p">(</span><span class="s2">&quot;file://</span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                                                <span class="p">(</span><span class="n">col_test_dir</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;remote_dir&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;testfiles/output&quot;</span><span class="p">)</span>  <span class="c1"># used as a temp directory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_dir_backend</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">get_backend</span><span class="p">(</span><span class="s2">&quot;file://testfiles/output&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CollectionTest.set_gpg_profile"><a class="viewcode-back" href="../../../testing.unit.test_collections.html#testing.unit.test_collections.CollectionTest.set_gpg_profile">[docs]</a>    <span class="k">def</span> <span class="nf">set_gpg_profile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set gpg profile to standard &quot;foobar&quot; sym&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_global</span><span class="p">(</span><span class="s1">&#39;gpg_profile&#39;</span><span class="p">,</span> <span class="n">gpg</span><span class="o">.</span><span class="n">GPGProfile</span><span class="p">(</span><span class="n">passphrase</span><span class="o">=</span><span class="s2">&quot;foobar&quot;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="CollectionTest.test_backup_chains"><a class="viewcode-back" href="../../../testing.unit.test_collections.html#testing.unit.test_collections.CollectionTest.test_backup_chains">[docs]</a>    <span class="k">def</span> <span class="nf">test_backup_chains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test basic backup chain construction&quot;&quot;&quot;</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">filename_list1</span><span class="p">)</span>
+        <span class="n">cs</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">CollectionsStatus</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="nb">globals</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="p">)</span>
+        <span class="n">chains</span><span class="p">,</span> <span class="n">orphaned</span><span class="p">,</span> <span class="n">incomplete</span> <span class="o">=</span> <span class="n">cs</span><span class="o">.</span><span class="n">get_backup_chains</span><span class="p">(</span><span class="n">filename_list1</span><span class="p">)</span>  <span class="c1"># @UnusedVariable</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chains</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">orphaned</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">chains</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">orphaned</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="mi">0</span>
+
+        <span class="n">chain</span> <span class="o">=</span> <span class="n">chains</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">chain</span><span class="o">.</span><span class="n">end_time</span> <span class="o">==</span> <span class="mi">1029654270</span>
+        <span class="k">assert</span> <span class="n">chain</span><span class="o">.</span><span class="n">fullset</span><span class="o">.</span><span class="n">time</span> <span class="o">==</span> <span class="mi">1029626221</span></div>
+
+<div class="viewcode-block" id="CollectionTest.test_collections_status"><a class="viewcode-back" href="../../../testing.unit.test_collections.html#testing.unit.test_collections.CollectionTest.test_collections_status">[docs]</a>    <span class="k">def</span> <span class="nf">test_collections_status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test CollectionStatus object&#39;s set_values()&quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">check_cs</span><span class="p">(</span><span class="n">cs</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Check values of collections status&quot;&quot;&quot;</span>
+            <span class="k">assert</span> <span class="n">cs</span><span class="o">.</span><span class="n">values_set</span>
+
+            <span class="k">assert</span> <span class="n">cs</span><span class="o">.</span><span class="n">matched_chain_pair</span>
+            <span class="k">assert</span> <span class="n">cs</span><span class="o">.</span><span class="n">matched_chain_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">end_time</span> <span class="o">==</span> <span class="mi">1029826800</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cs</span><span class="o">.</span><span class="n">all_backup_chains</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="n">cs</span><span class="o">.</span><span class="n">all_backup_chains</span>
+
+        <span class="n">cs</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">CollectionsStatus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">real_backend</span><span class="p">,</span> <span class="nb">globals</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="p">)</span><span class="o">.</span><span class="n">set_values</span><span class="p">()</span>
+        <span class="n">check_cs</span><span class="p">(</span><span class="n">cs</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">cs</span><span class="o">.</span><span class="n">matched_chain_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">islocal</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CollectionTest.test_sig_chain"><a class="viewcode-back" href="../../../testing.unit.test_collections.html#testing.unit.test_collections.CollectionTest.test_sig_chain">[docs]</a>    <span class="k">def</span> <span class="nf">test_sig_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test a single signature chain&quot;&quot;&quot;</span>
+        <span class="n">chain</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">SignatureChain</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">globals</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">local_sigchain_filename_list</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">chain</span><span class="o">.</span><span class="n">add_filename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">chain</span><span class="o">.</span><span class="n">add_filename</span><span class="p">(</span><span class="s2">&quot;duplicity-new-signatures.2002-08-18T00:04:30-07:00.to.2002-08-20T00:00:00-07:00.sigtar.gpg&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CollectionTest.test_sig_chains"><a class="viewcode-back" href="../../../testing.unit.test_collections.html#testing.unit.test_collections.CollectionTest.test_sig_chains">[docs]</a>    <span class="k">def</span> <span class="nf">test_sig_chains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test making signature chains from filename list&quot;&quot;&quot;</span>
+        <span class="n">cs</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">CollectionsStatus</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="nb">globals</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="p">)</span>
+        <span class="n">chains</span><span class="p">,</span> <span class="n">orphaned_paths</span> <span class="o">=</span> <span class="n">cs</span><span class="o">.</span><span class="n">get_signature_chains</span><span class="p">(</span><span class="n">local</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sig_chains_helper</span><span class="p">(</span><span class="n">chains</span><span class="p">,</span> <span class="n">orphaned_paths</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CollectionTest.test_sig_chains2"><a class="viewcode-back" href="../../../testing.unit.test_collections.html#testing.unit.test_collections.CollectionTest.test_sig_chains2">[docs]</a>    <span class="k">def</span> <span class="nf">test_sig_chains2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test making signature chains from filename list on backend&quot;&quot;&quot;</span>
+        <span class="n">cs</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">CollectionsStatus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">archive_dir_backend</span><span class="p">,</span> <span class="nb">globals</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="p">)</span>
+        <span class="n">chains</span><span class="p">,</span> <span class="n">orphaned_paths</span> <span class="o">=</span> <span class="n">cs</span><span class="o">.</span><span class="n">get_signature_chains</span><span class="p">(</span><span class="n">local</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sig_chains_helper</span><span class="p">(</span><span class="n">chains</span><span class="p">,</span> <span class="n">orphaned_paths</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CollectionTest.sig_chains_helper"><a class="viewcode-back" href="../../../testing.unit.test_collections.html#testing.unit.test_collections.CollectionTest.sig_chains_helper">[docs]</a>    <span class="k">def</span> <span class="nf">sig_chains_helper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chains</span><span class="p">,</span> <span class="n">orphaned_paths</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test chains and orphaned_paths values for two above tests&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">orphaned_paths</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">orphaned_paths</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="mi">0</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">chains</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="n">chains</span>
+        <span class="k">assert</span> <span class="n">chains</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">end_time</span> <span class="o">==</span> <span class="mi">1029826800</span></div>
+
+<div class="viewcode-block" id="CollectionTest.sigchain_fileobj_get"><a class="viewcode-back" href="../../../testing.unit.test_collections.html#testing.unit.test_collections.CollectionTest.sigchain_fileobj_get">[docs]</a>    <span class="k">def</span> <span class="nf">sigchain_fileobj_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return chain, local if local is true with filenames added&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">local</span><span class="p">:</span>
+            <span class="n">chain</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">SignatureChain</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">globals</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">local_sigchain_filename_list</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">chain</span><span class="o">.</span><span class="n">add_filename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">chain</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">SignatureChain</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">real_backend</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">remote_sigchain_filename_list</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">chain</span><span class="o">.</span><span class="n">add_filename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">chain</span></div>
+
+<div class="viewcode-block" id="CollectionTest.sigchain_fileobj_check_list"><a class="viewcode-back" href="../../../testing.unit.test_collections.html#testing.unit.test_collections.CollectionTest.sigchain_fileobj_check_list">[docs]</a>    <span class="k">def</span> <span class="nf">sigchain_fileobj_check_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chain</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make sure the list of file objects in chain has right contents</span>
+
+<span class="sd">        The contents of the testfiles/collectiontest/remote_dir have</span>
+<span class="sd">        to be coordinated with this test.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fileobjlist</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">get_fileobjs</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">fileobjlist</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
+
+        <span class="k">def</span> <span class="nf">test_fileobj</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+            <span class="n">buf</span> <span class="o">=</span> <span class="n">fileobjlist</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">fileobjlist</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">assert</span> <span class="n">buf</span> <span class="o">==</span> <span class="n">s</span><span class="p">,</span> <span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+
+        <span class="n">test_fileobj</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Hello, world!&quot;</span><span class="p">)</span>
+        <span class="n">test_fileobj</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;hello 1&quot;</span><span class="p">)</span>
+        <span class="n">test_fileobj</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Hello 2&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CollectionTest.test_sigchain_fileobj"><a class="viewcode-back" href="../../../testing.unit.test_collections.html#testing.unit.test_collections.CollectionTest.test_sigchain_fileobj">[docs]</a>    <span class="k">def</span> <span class="nf">test_sigchain_fileobj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test getting signature chain fileobjs from archive_dir_path&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_gpg_profile</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigchain_fileobj_check_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sigchain_fileobj_get</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigchain_fileobj_check_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sigchain_fileobj_get</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="CollectionTest.get_filelist2_cs"><a class="viewcode-back" href="../../../testing.unit.test_collections.html#testing.unit.test_collections.CollectionTest.get_filelist2_cs">[docs]</a>    <span class="k">def</span> <span class="nf">get_filelist2_cs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return set CollectionsStatus object from filelist 2&quot;&quot;&quot;</span>
+        <span class="c1"># Set up testfiles/output with files from filename_list2</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">filename_list2</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">touch</span><span class="p">()</span>
+
+        <span class="n">cs</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">CollectionsStatus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir_backend</span><span class="p">,</span> <span class="nb">globals</span><span class="o">.</span><span class="n">archive_dir_path</span><span class="p">)</span>
+        <span class="n">cs</span><span class="o">.</span><span class="n">set_values</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">cs</span></div>
+
+<div class="viewcode-block" id="CollectionTest.test_get_extraneous"><a class="viewcode-back" href="../../../testing.unit.test_collections.html#testing.unit.test_collections.CollectionTest.test_get_extraneous">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_extraneous</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test the listing of extraneous files&quot;&quot;&quot;</span>
+        <span class="n">cs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_filelist2_cs</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cs</span><span class="o">.</span><span class="n">orphaned_backup_sets</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="n">cs</span><span class="o">.</span><span class="n">orphaned_backup_sets</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cs</span><span class="o">.</span><span class="n">local_orphaned_sig_names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">cs</span><span class="o">.</span><span class="n">local_orphaned_sig_names</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cs</span><span class="o">.</span><span class="n">remote_orphaned_sig_names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="n">cs</span><span class="o">.</span><span class="n">remote_orphaned_sig_names</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cs</span><span class="o">.</span><span class="n">incomplete_backup_sets</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="n">cs</span><span class="o">.</span><span class="n">incomplete_backup_sets</span>
+
+        <span class="n">right_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;duplicity-new-signatures.2001-08-17T02:05:13-05:00.to.2002-08-17T05:05:14-05:00.sigtar.gpg&quot;</span><span class="p">,</span>
+                      <span class="s2">&quot;duplicity-full.2002-08-15T01:01:01-07:00.vol1.difftar.gpg&quot;</span><span class="p">,</span>
+                      <span class="s2">&quot;duplicity-inc.2000-08-17T16:17:01-07:00.to.2000-08-18T00:04:30-07:00.manifest.gpg&quot;</span><span class="p">,</span>
+                      <span class="s2">&quot;duplicity-inc.2000-08-17T16:17:01-07:00.to.2000-08-18T00:04:30-07:00.vol1.difftar.gpg&quot;</span><span class="p">]</span>
+        <span class="n">local_received_list</span><span class="p">,</span> <span class="n">remote_received_list</span> <span class="o">=</span> <span class="n">cs</span><span class="o">.</span><span class="n">get_extraneous</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># @UnusedVariable</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">remote_received_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">filename</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">right_list</span><span class="p">:</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;### Got bad extraneous filename &quot;</span> <span class="o">+</span> <span class="n">filename</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">right_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">right_list</span><span class="p">:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;### Didn&#39;t receive extraneous filename &quot;</span> <span class="o">+</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">errors</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CollectionTest.test_get_olderthan"><a class="viewcode-back" href="../../../testing.unit.test_collections.html#testing.unit.test_collections.CollectionTest.test_get_olderthan">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_olderthan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test getting list of files older than a certain time&quot;&quot;&quot;</span>
+        <span class="n">cs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_filelist2_cs</span><span class="p">()</span>
+        <span class="n">oldsets</span> <span class="o">=</span> <span class="n">cs</span><span class="o">.</span><span class="n">get_older_than</span><span class="p">(</span>
+            <span class="n">dup_time</span><span class="o">.</span><span class="n">genstrtotime</span><span class="p">(</span><span class="s2">&quot;2002-05-01T16:17:01-07:00&quot;</span><span class="p">))</span>
+        <span class="n">oldset_times</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">get_time</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">oldsets</span><span class="p">]</span>
+        <span class="n">right_times</span> <span class="o">=</span> <span class="p">[</span><span class="n">dup_time</span><span class="o">.</span><span class="n">genstrtotime</span><span class="p">(</span><span class="s1">&#39;2001-01-01T16:17:01-07:00&#39;</span><span class="p">)]</span>
+        <span class="k">assert</span> <span class="n">oldset_times</span> <span class="o">==</span> <span class="n">right_times</span><span class="p">,</span> \
+            <span class="p">[</span><span class="n">oldset_times</span><span class="p">,</span> <span class="n">right_times</span><span class="p">]</span>
+
+        <span class="n">oldsets_required</span> <span class="o">=</span> <span class="n">cs</span><span class="o">.</span><span class="n">get_older_than_required</span><span class="p">(</span>
+            <span class="n">dup_time</span><span class="o">.</span><span class="n">genstrtotime</span><span class="p">(</span><span class="s2">&quot;2002-08-17T20:00:00-07:00&quot;</span><span class="p">))</span>
+        <span class="n">oldset_times</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">get_time</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">oldsets_required</span><span class="p">]</span>
+        <span class="n">right_times_required</span> <span class="o">=</span> <span class="p">[</span><span class="n">dup_time</span><span class="o">.</span><span class="n">genstrtotime</span><span class="p">(</span><span class="s1">&#39;2002-08-17T16:17:01-07:00&#39;</span><span class="p">)]</span>
+        <span class="k">assert</span> <span class="n">oldset_times</span> <span class="o">==</span> <span class="n">right_times_required</span><span class="p">,</span> \
+            <span class="p">[</span><span class="n">oldset_times</span><span class="p">,</span> <span class="n">right_times_required</span><span class="p">]</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../../testing.html">testing</a><ul>
+  <li><a href="../unit.html">testing.unit</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Kenneth Loafman and Duplicity Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
