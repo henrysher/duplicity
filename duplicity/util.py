@@ -95,7 +95,7 @@ def maybe_ignore_errors(fn):
     except Exception as e:
         if globals.ignore_errors:
             log.Warn(_("IGNORED_ERROR: Warning: ignoring error as requested: %s: %s")
-                     % (e.__class__.__name__, util.uexc(e)))
+                     % (e.__class__.__name__, uexc(e)))
             return None
         else:
             raise

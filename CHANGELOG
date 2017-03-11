@@ -124,6 +124,8 @@ New in v0.8.00 (2016/07/??)
     in the case of a path, uses globals.archive_dir_path
 * Merged in p:~aaron-whitehouse/duplicity/pep8_E402_fixes
   - Fixed PEP8 errors: E402 module level import not at top of file
+* Fixed bug #1671852 - Code regression caused by revision 1108
+  - change util.uexc() back to bare uexc()
 
 
 New in v0.7.08 (2016/07/02)

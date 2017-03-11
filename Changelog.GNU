@@ -1,3 +1,8 @@
+2017-03-11  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1671852 - Code regression caused by revision 1108
+      - change util.uexc() back to bare uexc()
+
 2017-03-05  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in p:~aaron-whitehouse/duplicity/pep8_E402_fixes
