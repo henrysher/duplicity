@@ -1,3 +1,8 @@
+2017-03-11  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1671852 - Code regression caused by revision 1108
+      - change util.uexc() back to bare uexc()
+
 2017-02-21  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1367675 - IMAP Backend does not work with Yahoo server

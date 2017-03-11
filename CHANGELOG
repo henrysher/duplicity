@@ -26,6 +26,8 @@ New in v0.7.12 (2017/01/??)
 * Fixed bug #1367675 - IMAP Backend does not work with Yahoo server
   - added the split() as needed in 'nums=list[0].strip().split(" ")'
   - the other fixes mentioned in the bug report comments were already done
+* Fixed bug #1671852 - Code regression caused by revision 1108
+  - change util.uexc() back to bare uexc()
 
 
 New in v0.7.11 (2016/12/31)
