@@ -1,5 +1,6 @@
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 # pylint: skip-file
+# pylint: skip-file
 #
 # Copyright 2013 jno <jno@pisem.net>
 # Copyright 2016 Dmitry Nezhevenko <dion@dion.org.ua>

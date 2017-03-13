@@ -34,9 +34,10 @@ class SwiftBackend(duplicity.backend.Backend):
         try:
             from swiftclient import Connection
             from swiftclient import ClientException
-        except ImportError:
-            raise BackendException("This backend requires "
-                                   "the python-swiftclient library.")
+        except ImportError as e:
+            raise BackendException("""\
+Swift backend requires the python-swiftclient library.
+Exception: %s""" % str(e))
 
         self.resp_exc = ClientException
         conn_kwargs = {}

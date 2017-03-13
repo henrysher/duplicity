@@ -36,9 +36,10 @@ class PyDriveBackend(duplicity.backend.Backend):
             from pydrive.auth import GoogleAuth
             from pydrive.drive import GoogleDrive
             from pydrive.files import FileNotUploadedError
-        except ImportError:
-            raise BackendException('PyDrive backend requires PyDrive installation'
-                                   'Please read the manpage to fix.')
+        except ImportError as e:
+            raise BackendException("""\
+PyDrive backend requires PyDrive installation.  Please read the manpage for setup details.
+Exception: %s""" % str(e))
 
         # let user get by with old client while he can
         try:
