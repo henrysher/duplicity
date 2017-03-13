@@ -47,9 +47,10 @@ class AzureBackend(duplicity.backend.Backend):
                 from azure.storage.blob import BlobService
                 self.AzureMissingResourceError = azure.common.AzureMissingResourceHttpError
                 self.AzureConflictError = azure.common.AzureConflictHttpError
-        except ImportError:
-            raise BackendException('Azure backend requires Microsoft Azure Storage SDK for Python '
-                                   '(https://pypi.python.org/pypi/azure-storage/).')
+        except ImportError as e:
+            raise BackendException("""\
+Azure backend requires Microsoft Azure Storage SDK for Python (https://pypi.python.org/pypi/azure-storage/).
+Exception: %s""" % str(e))
 
         if 'AZURE_ACCOUNT_NAME' not in os.environ:
             raise BackendException('AZURE_ACCOUNT_NAME environment variable not set.')

@@ -28,6 +28,8 @@ New in v0.7.12 (2017/01/??)
   - the other fixes mentioned in the bug report comments were already done
 * Fixed bug #1671852 - Code regression caused by revision 1108
   - change util.uexc() back to bare uexc()
+* Fixed bug #1668750 - Don't mask backend errors
+  - added exception prints to module import errors
 
 
 New in v0.7.11 (2016/12/31)

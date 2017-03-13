@@ -35,9 +35,10 @@ class CloudFilesBackend(duplicity.backend.Backend):
             from cloudfiles import Connection
             from cloudfiles.errors import ResponseError
             from cloudfiles import consts
-        except ImportError:
-            raise BackendException("This backend requires the cloudfiles "
-                                   "library available from Rackspace.")
+        except ImportError as e:
+            raise BackendException("""\
+Cloudfiles backend requires the cloudfiles library available from Rackspace.
+Exception: %s""" % str(e))
 
         self.resp_exc = ResponseError
         conn_kwargs = {}

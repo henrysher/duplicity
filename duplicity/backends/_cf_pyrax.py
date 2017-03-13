@@ -35,9 +35,10 @@ class PyraxBackend(duplicity.backend.Backend):
 
         try:
             import pyrax
-        except ImportError:
-            raise BackendException("This backend requires the pyrax "
-                                   "library available from Rackspace.")
+        except ImportError as e:
+            raise BackendException("""\
+Pyrax backend requires the pyrax library available from Rackspace.
+Exception: %s""" % str(e))
 
         # Inform Pyrax that we're talking to Rackspace
         # per Jesus Monzon (gsusmonzon)
