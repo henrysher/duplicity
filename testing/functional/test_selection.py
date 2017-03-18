@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
 # Copyright 2014 Aaron Whitehouse <aaron@whitehouse.kiwi.nz>
@@ -1118,6 +1119,30 @@ class TestAbsolutePaths(IncludeExcludeFunctionalTest):
         restore_dir = 'testfiles/restore_out'
         restored = self.directory_tree_to_list_of_lists(restore_dir)
         self.assertEqual(restored, self.expected_restored_tree)
+
+
+@unittest.skipUnless(sys.getfilesystemencoding() == "UTF-8",
+                     "Skipping TestUnicode -- Only tested to work on UTF-8 systems")
+class TestUnicode(IncludeExcludeFunctionalTest):
+    """ Tests include/exclude options with unicode paths"""
+
+    def test_unicode_paths_non_globbing(self):
+        """ Test --include and --exclude work with unicode paths"""
+        p = "testfiles/select-unicode/"
+        self.backup("full", "testfiles/select-unicode",
+                    options=["--exclude", p + "прыклад/пример/例/Παράδειγμα/उदाहरण.txt",
+                             "--exclude", p + "прыклад/пример/例/Παράδειγμα/דוגמא.txt",
+                             "--exclude", p + "прыклад/пример/例/მაგალითი/",
+                             "--include", p + "прыклад/пример/例/",
+                             "--exclude", p + "прыклад/пример/",
+                             "--include", p + "прыклад/",
+                             "--include", p + "օրինակ.txt",
+                             "--exclude", p + "**"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, [['прыклад', 'օրինակ.txt'],
+                                    ['пример', 'উদাহরণ'], ['例'], ['Παράδειγμα'], ['ઉદાહરણ.log']])
 
 if __name__ == "__main__":
     unittest.main()
