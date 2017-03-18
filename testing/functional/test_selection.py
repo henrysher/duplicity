@@ -1144,5 +1144,44 @@ class TestUnicode(IncludeExcludeFunctionalTest):
         self.assertEqual(restored, [['прыклад', 'օրինակ.txt'],
                                     ['пример', 'উদাহরণ'], ['例'], ['Παράδειγμα'], ['ઉદાહરણ.log']])
 
+    def test_unicode_paths_asterisks(self):
+        """ Test --include and --exclude work with unicode paths and globs containing * and **"""
+        p = "testfiles/select-unicode/"
+        self.backup("full", "testfiles/select-unicode",
+                    options=["--exclude", p + "прыклад/пример/例/Παρά*ειγμα/उदाहरण.txt",  # Note *
+                             "--exclude", p + "прыклад/пример/例/Παράδειγμα/דוגמא.txt",
+                             "--exclude", p + "прыклад/пример/例/მაგალითი/",
+                             "--include", p + "пр**/例/",  # Note **
+                             "--exclude", p + "прыклад/пример/",
+                             "--include", p + "прыкла*/",  # Note *
+                             "--include", p + "օր*ակ.txt",  # Note *
+                             "--exclude", p + "**"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, [['прыклад', 'օրինակ.txt'],
+                                    ['пример', 'উদাহরণ'], ['例'], ['Παράδειγμα'], ['ઉદાહરણ.log']])
+
+    def test_unicode_filelist(self):
+        """Test that exclude filelist works with unicode filenames"""
+        # As this is an exclude filelist any lines with no +/- modifier should be treated as if they have a -.
+        path = "testfiles/select-unicode/"
+        # Create a filelist
+        with open('testfiles/exclude.txt', 'w') as f:
+            f.write('- ' + path + 'прыклад/пример/例/Παράδειγμα/उदाहरण.txt\n'
+                    '- ' + path + 'прыклад/пример/例/Παράδειγμα/דוגמא.txt\n'
+                    '- ' + path + 'прыклад/пример/例/მაგალითი/\n'
+                    '+ ' + path + 'прыклад/пример/例/\n'
+                    '- ' + path + 'прыклад/пример/\n'
+                    '+ ' + path + 'прыклад/\n'
+                    '+ ' + path + 'օրինակ.txt\n'
+                    '- ' + path + '**')
+        self.backup("full", path, options=["--exclude-filelist=testfiles/exclude.txt"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, [['прыклад', 'օրինակ.txt'],
+                                    ['пример', 'উদাহরণ'], ['例'], ['Παράδειγμα'], ['ઉદાહરણ.log']])
+
 if __name__ == "__main__":
     unittest.main()
