@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
 # Copyright 2002 Ben Escoto <ben@emerose.org>
@@ -19,6 +20,8 @@
 # You should have received a copy of the GNU General Public License
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+import unittest
 
 from duplicity.globmatch import *
 from duplicity.path import *
@@ -229,6 +232,15 @@ class TestDoubleAsterisk(UnitTestCase):
         self.assertEqual(inc_sel_dir("fold*/**", "folder"), 2)
 
 
+class TestSimpleUnicode(UnitTestCase):
+    """Test simple unicode comparison"""
+
+    def test_simple_unicode(self):
+        """Test simple unicode comparison"""
+        self.assertEqual(inc_sel_file("прыклад/пример/例/Παράδειγμα/उदाहरण.txt",
+                                      "прыклад/пример/例/Παράδειγμα/उदाहरण.txt"), 1)
+
+
 class TestSquareBrackets(UnitTestCase):
     """Test glob matching where the glob includes []s and [!]s"""
 
@@ -240,6 +252,14 @@ class TestSquareBrackets(UnitTestCase):
                                       "/test/folder/foo.txt"), None)
         self.assertEqual(inc_sel_file("/test/f[s,o,p]lder/foo.txt",
                                       "/test/folder/foo.txt"), 1)
+
+    @unittest.expectedFailure
+    def test_square_bracket_options_unicode(self):
+        """Test file including options in []s"""
+        self.assertEqual(inc_sel_file("прыклад/пр[и,j,l]мер/例/Παράδειγμα/उदाहरण.txt",
+                                      "прыклад/пример/例/Παράδειγμα/उदाहरण.txt"), 1)
+        self.assertEqual(inc_sel_file("прыклад/п[a,b,c]имер/例/Παράδειγμα/उदाहरण.txt",
+                                      "прыклад/пример/例/Παράδειγμα/उदाहरण.txt"), None)
 
     def test_not_square_bracket_options(self):
         """Test file including options in [!]s"""
