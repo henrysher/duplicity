@@ -227,3 +227,43 @@ class TestDoubleAsterisk(UnitTestCase):
     def test_asterisk_slash_double_asterisk(self):
         """Test folder string ending in */**"""
         self.assertEqual(inc_sel_dir("fold*/**", "folder"), 2)
+
+
+class TestSquareBrackets(UnitTestCase):
+    """Test glob matching where the glob includes []s and [!]s"""
+
+    def test_square_bracket_options(self):
+        """Test file including options in []s"""
+        self.assertEqual(inc_sel_file("/test/f[o,s,p]lder/foo.txt",
+                                      "/test/folder/foo.txt"), 1)
+        self.assertEqual(inc_sel_file("/test/f[i,s,p]lder/foo.txt",
+                                      "/test/folder/foo.txt"), None)
+        self.assertEqual(inc_sel_file("/test/f[s,o,p]lder/foo.txt",
+                                      "/test/folder/foo.txt"), 1)
+
+    def test_not_square_bracket_options(self):
+        """Test file including options in [!]s"""
+        self.assertEqual(inc_sel_file("/test/f[!o,s,p]lder/foo.txt",
+                                      "/test/folder/foo.txt"), None)
+        self.assertEqual(inc_sel_file("/test/f[!i,s,p]lder/foo.txt",
+                                      "/test/folder/foo.txt"), 1)
+        self.assertEqual(inc_sel_file("/test/f[!s,o,p]lder/foo.txt",
+                                      "/test/folder/foo.txt"), None)
+
+    def test_square_bracket_range(self):
+        """Test file including range in []s"""
+        self.assertEqual(inc_sel_file("/test/folder[1-5]/foo.txt",
+                                      "/test/folder4/foo.txt"), 1)
+        self.assertEqual(inc_sel_file("/test/folder[5-9]/foo.txt",
+                                      "/test/folder4/foo.txt"), None)
+        self.assertEqual(inc_sel_file("/test/folder[1-5]/foo.txt",
+                                      "/test/folder6/foo.txt"), None)
+
+    def test_square_bracket_not_range(self):
+        """Test file including range in [!]s"""
+        self.assertEqual(inc_sel_file("/test/folder[!1-5]/foo.txt",
+                                      "/test/folder4/foo.txt"), None)
+        self.assertEqual(inc_sel_file("/test/folder[!5-9]/foo.txt",
+                                      "/test/folder4/foo.txt"), 1)
+        self.assertEqual(inc_sel_file("/test/folder[!1-5]/foo.txt",
+                                      "/test/folder6/foo.txt"), 1)

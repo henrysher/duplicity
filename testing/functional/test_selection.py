@@ -1162,6 +1162,25 @@ class TestUnicode(IncludeExcludeFunctionalTest):
         self.assertEqual(restored, [['прыклад', 'օրինակ.txt'],
                                     ['пример', 'উদাহরণ'], ['例'], ['Παράδειγμα'], ['ઉદાહરણ.log']])
 
+    @unittest.expectedFailure
+    def test_unicode_paths_square_brackets(self):
+        """ Test --include and --exclude work with unicode paths with character options in []s and [!]s"""
+        p = "testfiles/select-unicode/"
+        self.backup("full", "testfiles/select-unicode",
+                    options=["--exclude", p + "прыклад/пример/例/Παράδειγμα/उदाहरण.txt",
+                             "--exclude", p + "пры[к,и,р]лад/пример/例/Παράδειγμα/דוגמא.txt",
+                             "--exclude", p + "прыклад/пр[!a,b,c]мер/例/მაგალითი/",
+                             "--include", p + "прыклад/при[g,м,д]ер/例/",
+                             "--exclude", p + "прыклад/пример/",
+                             "--include", p + "прыклад/",
+                             "--include", p + "օրինակ.txt",
+                             "--exclude", p + "**"])
+        self.restore()
+        restore_dir = 'testfiles/restore_out'
+        restored = self.directory_tree_to_list_of_lists(restore_dir)
+        self.assertEqual(restored, [['прыклад', 'օրինակ.txt'],
+                                    ['пример', 'উদাহরণ'], ['例'], ['Παράδειγμα'], ['ઉદાહરણ.log']])
+
     def test_unicode_filelist(self):
         """Test that exclude filelist works with unicode filenames"""
         # As this is an exclude filelist any lines with no +/- modifier should be treated as if they have a -.
