@@ -1,4 +1,4 @@
-New in v0.7.12 (2017/01/??)
+New in v0.7.12 (2017/03/21)
 ---------------------------
 * Fixed bug #1623342 with patch supplied by Daniel Jakots
   - Failing test on OpenBSD because tar/gtar not found

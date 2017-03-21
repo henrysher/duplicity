@@ -1,3 +1,7 @@
+2017-03-21  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Prep for 0.7.12
+
 2017-03-13  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1668750 - Don't mask backend errors
