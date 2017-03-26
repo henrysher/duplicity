@@ -1,3 +1,8 @@
+2017-03-13  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1668750 - Don't mask backend errors
+      - added exception prints to module import errors
+
 2017-03-11  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1671852 - Code regression caused by revision 1108

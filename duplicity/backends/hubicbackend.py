@@ -36,9 +36,10 @@ class HubicBackend(PyraxBackend):
 
         try:
             import pyrax
-        except ImportError:
-            raise BackendException("This backend requires the pyrax "
-                                   "library available from Rackspace.")
+        except ImportError as e:
+            raise BackendException("""\
+Hubic backend requires the pyrax library available from Rackspace.
+Exception: %s""" % str(e))
 
         # Inform Pyrax that we're talking to Hubic
         pyrax.set_setting("identity_type", "duplicity.backends.pyrax_identity.hubic.HubicIdentity")

@@ -37,9 +37,10 @@ class MediafireBackend(duplicity.backend.Backend):
     def __init__(self, parsed_url):
         try:
             import mediafire.client
-        except ImportError:
-            raise BackendException("This backend requires "
-                                   "the mediafire library")
+        except ImportError as e:
+            raise BackendException("""\
+Mediafire backend requires the mediafire library.
+Exception: %s""" % str(e))
 
         duplicity.backend.Backend.__init__(self, parsed_url)
 

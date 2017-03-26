@@ -51,9 +51,10 @@ class AzureBackend(duplicity.backend.Backend):
                     from azure.storage.blob.blockblobservice import BlockBlobService as BlobService
                 self.AzureMissingResourceError = azure.common.AzureMissingResourceHttpError
                 self.AzureConflictError = azure.common.AzureConflictHttpError
-        except ImportError:
-            raise BackendException('Azure backend requires Microsoft Azure Storage SDK for Python '
-                                   '(https://pypi.python.org/pypi/azure-storage/).')
+        except ImportError as e:
+            raise BackendException("""\
+Azure backend requires Microsoft Azure Storage SDK for Python (https://pypi.python.org/pypi/azure-storage/).
+Exception: %s""" % str(e))
 
         # TODO: validate container name
         self.container = parsed_url.path.lstrip('/')

@@ -43,9 +43,10 @@ class GDocsBackend(duplicity.backend.Backend):
             import gdata.client
             import gdata.docs.client
             import gdata.docs.data
-        except ImportError:
-            raise BackendException('Google Docs backend requires Google Data APIs Python '
-                                   'Client Library (see http://code.google.com/p/gdata-python-client/).')
+        except ImportError as e:
+            raise BackendException("""\
+Google Docs backend requires Google Data APIs Python Client Library (see http://code.google.com/p/gdata-python-client/).
+Exception: %s""" % str(e))
 
         # Setup client instance.
         self.client = gdata.docs.client.DocsClient(source='duplicity $version')
