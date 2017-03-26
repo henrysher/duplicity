@@ -154,34 +154,37 @@ def glob_to_regex(pat):
 
     """
     # Internal. Used by glob_get_normal_sf, glob_get_prefix_res and unit tests.
+
+    assert isinstance(pat, unicode)
+
     i, n, res = 0, len(pat), ''
     while i < n:
         c, s = pat[i], pat[i:i + 2]
         i = i + 1
-        if s == '**':
-            res = res + '.*'
+        if s == u'**':
+            res = res + u'.*'
             i = i + 1
-        elif c == '*':
-            res = res + '[^/]*'
-        elif c == '?':
-            res = res + '[^/]'
-        elif c == '[':
+        elif c == u'*':
+            res = res + u'[^/]*'
+        elif c == u'?':
+            res = res + u'[^/]'
+        elif c == u'[':
             j = i
-            if j < n and pat[j] in '!^':
+            if j < n and pat[j] in u'!^':
                 j = j + 1
-            if j < n and pat[j] == ']':
+            if j < n and pat[j] == u']':
                 j = j + 1
-            while j < n and pat[j] != ']':
+            while j < n and pat[j] != u']':
                 j = j + 1
             if j >= n:
-                res = res + '\\['  # interpret the [ literally
+                res = res + u'\\['  # interpret the [ literally
             else:
                 # Deal with inside of [..]
-                stuff = pat[i:j].replace('\\', '\\\\')
+                stuff = pat[i:j].replace(u'\\', u'\\\\')
                 i = j + 1
-                if stuff[0] in '!^':
-                    stuff = '^' + stuff[1:]
-                res = res + '[' + stuff + ']'
+                if stuff[0] in u'!^':
+                    stuff = u'^' + stuff[1:]
+                res = res + u'[' + stuff + u']'
         else:
             res = res + re.escape(c)
     return res

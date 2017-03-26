@@ -78,14 +78,14 @@ class TestGlobToRegex(UnitTestCase):
 
     def test_glob_to_regex(self):
         """test_glob_re - test translation of shell pattern to regular exp"""
-        self.assertEqual(glob_to_regex("hello"), "hello")
-        self.assertEqual(glob_to_regex(".e?ll**o"), "\\.e[^/]ll.*o")
-        self.assertEqual(glob_to_regex("[abc]el[^de][!fg]h"),
-                         "[abc]el[^de][^fg]h")
-        self.assertEqual(glob_to_regex("/usr/*/bin/"),
-                         "\\/usr\\/[^/]*\\/bin\\/")
-        self.assertEqual(glob_to_regex("[a.b/c]"), "[a.b/c]")
-        self.assertEqual(glob_to_regex("[a*b-c]e[!]]"), "[a*b-c]e[^]]")
+        self.assertEqual(glob_to_regex(u"hello"), u"hello")
+        self.assertEqual(glob_to_regex(u".e?ll**o"), u"\\.e[^/]ll.*o")
+        self.assertEqual(glob_to_regex(u"[abc]el[^de][!fg]h"),
+                         u"[abc]el[^de][^fg]h")
+        self.assertEqual(glob_to_regex(u"/usr/*/bin/"),
+                         u"\\/usr\\/[^/]*\\/bin\\/")
+        self.assertEqual(glob_to_regex(u"[a.b/c]"), u"[a.b/c]")
+        self.assertEqual(glob_to_regex(u"[a*b-c]e[!]]"), u"[a*b-c]e[^]]")
 
 
 class TestSelectValuesFromGlobs(UnitTestCase):
