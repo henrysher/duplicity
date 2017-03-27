@@ -21,9 +21,12 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import re
+import sys
 
 from builtins import map
 from builtins import range
+
+FILESYSTEM_ENCODING = sys.getfilesystemencoding()
 
 
 class GlobbingError(Exception):
@@ -65,7 +68,9 @@ def select_fn_from_glob(glob_str, include, ignore_case=False):
 
     Note: including a folder implicitly includes everything within it.
     """
-    assert isinstance(glob_str, unicode)
+    if not isinstance(glob_str, unicode) and isinstance(glob_str, str):
+        # ToDo: only necessary as a stop-gap until all code is converted to use unicode
+        glob_str = unicode(glob_str, FILESYSTEM_ENCODING)
     glob_ends_w_slash = False
 
     if glob_str == u"/":
@@ -111,20 +116,21 @@ def select_fn_from_glob(glob_str, include, ignore_case=False):
                            u"|".join(_glob_get_prefix_regexs(glob_str)))
 
     def test_fn(path):
-        assert isinstance(path.name, unicode)
-        assert not path.name[-1] == u"/" or path.name == u"/", \
+        assert isinstance(path.uc_name, unicode)
+
+        assert not path.uc_name[-1] == u"/" or path.uc_name == u"/", \
             u"path.name should never end in '/' during normal operation for " \
             u"normal paths (except '/' alone)\n" \
-            u"path.name here is " + unicode(path.name) + u" and glob is " + glob_str
+            u"path.name here is " + path.uc_name + u" and glob is " + glob_str
 
-        if glob_comp_re.match(path.name):
+        if glob_comp_re.match(path.uc_name):
             # Path matches glob, or is contained within a matching folder
             if not glob_ends_w_slash:
                 return include
             else:
                 # Glob ended with a /, so we need to check any exact match was
                 # a folder
-                if glob_comp_re_exact.match(path.name):
+                if glob_comp_re_exact.match(path.uc_name):
                     # Not an included file/folder, so must be a folder to match
                     if path.isdir():
                         # Is a directory, so all is well
@@ -136,7 +142,7 @@ def select_fn_from_glob(glob_str, include, ignore_case=False):
                     # An included file/folder, so normal approach is fine
                     return include
 
-        elif include == 1 and scan_comp_re.match(path.name):
+        elif include == 1 and scan_comp_re.match(path.uc_name):
             return 2
         else:
             return None

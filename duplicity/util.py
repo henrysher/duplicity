@@ -59,9 +59,10 @@ def escape(string):
 
 
 def ufn(filename):
-    "Convert a (bytes) filename to unicode for printing"
-    assert not isinstance(filename, unicode)
-    return filename.decode(sys.getfilesystemencoding(), 'replace')
+    """Convert a (bytes) filename to unicode for printing"""
+    if not isinstance(filename, unicode) and isinstance(filename, str):
+        filename = filename.decode(sys.getfilesystemencoding(), 'replace')
+    return filename
 
 
 def uindex(index):

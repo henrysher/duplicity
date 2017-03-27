@@ -34,6 +34,7 @@ import socket
 import time
 import re
 import gzip
+import sys
 
 from duplicity import tarfile
 from duplicity import file_naming
@@ -48,6 +49,8 @@ from duplicity.lazy import *  # @UnusedWildImport
 
 _copy_blocksize = 64 * 1024
 _tmp_path_counter = 1
+
+FILESYSTEM_ENCODING = sys.getfilesystemencoding()
 
 
 class StatResult:
@@ -512,7 +515,18 @@ class Path(ROPath):
         self.opened, self.fileobj = None, None
         self.base = base
         self.index = self.rename_index(index)
+
+        # While we transition everything to unicode, it is helpful to
+        # know that path.name is always not unicode and path.uc_name
+        # always is
+        # ToDo: only necessary as a stop-gap until all code is converted to use unicode
         self.name = os.path.join(base, *self.index)
+        if isinstance(self.name, unicode):
+            self.uc_name = self.name
+            self.name = self.name.encode(FILESYSTEM_ENCODING)
+        else:
+            self.uc_name = unicode(self.name, FILESYSTEM_ENCODING)
+
         self.setdata()
 
     def setdata(self):
