@@ -516,16 +516,17 @@ class Path(ROPath):
         self.base = base
         self.index = self.rename_index(index)
 
+        self.name = os.path.join(base, *self.index)
+
         # While we transition everything to unicode, it is helpful to
         # know that path.name is always not unicode and path.uc_name
-        # always is
+        # always is. To avoid unexpected encoding/decoding errors, it
+        # is good to know we are always starting with a unicode base
         # ToDo: only necessary as a stop-gap until all code is converted to use unicode
-        self.name = os.path.join(base, *self.index)
-        if isinstance(self.name, unicode):
-            self.uc_name = self.name
-            self.name = self.name.encode(FILESYSTEM_ENCODING)
-        else:
-            self.uc_name = unicode(self.name, FILESYSTEM_ENCODING)
+        assert isinstance(self.name, unicode), self.name + " is not unicode"
+
+        self.uc_name = self.name
+        self.name = self.name.encode(FILESYSTEM_ENCODING)
 
         self.setdata()
 
