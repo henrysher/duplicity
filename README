@@ -23,6 +23,8 @@ REQUIREMENTS:
  * librsync v0.9.6 or later
  * GnuPG v1.x for encryption
  * python-lockfile v0.9 or later for concurrency locking
+
+ REQUIREMENTS for certain backends:
  * for scp/sftp -- python-paramiko and python-pycryptopp
  * for ftp -- lftp version 3.7.15 or later
  * Boto 2.0 or later for single-processing S3 or GCS access (default)
@@ -30,11 +32,17 @@ REQUIREMENTS:
  * Boto 2.7.0 or later for Glacier S3 access
  * python-urllib3 for Copy.com access
 
-If you install from the source package, you will also need:
+If you install from the SOURCE PACKAGE, you will also need:
 
  * Python development files, normally found in module 'python-dev'.
  * librsync development files, normally found in module 'librsync-dev'.
 
+For the case that you are devloping under OSX, please make sure that you have the following formulas installed via homebrew (brew.sh):
+* intltool
+* gettext
+* bzr
+* lftp
+* par2
 
 A NOTE ON GnuPGInterface.py AND MULTIPLE GPG PROCESSES:
 
