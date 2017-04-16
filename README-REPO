@@ -62,3 +62,15 @@ You can test against a single environment, e.g.
 tox -e py27
 for example if you are working on fixing a bug, but please do a full run-tests
 before submitting a merge request.
+
+---------------------
+Developing under OSX:
+---------------------
+For the case that you are devloping under OSX, please make sure that you have the following formulas installed via homebrew (brew.sh):
+ * intltool
+ * gettext
+ * bzr
+ * lftp
+ * par2
+
+

@@ -2,3 +2,8 @@ dropbox
 lockfile
 pexpect
 pyrax
+pycryptopp
+paramiko
+urllib3
+boto
+lftp

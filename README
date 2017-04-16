@@ -23,6 +23,8 @@ REQUIREMENTS:
  * librsync v0.9.6 or later
  * GnuPG v1.x for encryption
  * python-lockfile v0.9 or later for concurrency locking
+ * pexpect
+ * pyrax
 
  REQUIREMENTS for certain backends:
  * for scp/sftp -- python-paramiko and python-pycryptopp
@@ -38,11 +40,13 @@ If you install from the SOURCE PACKAGE, you will also need:
  * librsync development files, normally found in module 'librsync-dev'.
 
 For the case that you are devloping under OSX, please make sure that you have the following formulas installed via homebrew (brew.sh):
-* intltool
-* gettext
-* bzr
-* lftp
-* par2
+ * intltool
+ * gettext
+ * bzr
+ * lftp
+ * par2
+
+ You may also want to install tox (via pip intall tox) in order to be able to execute all tests for duplicity. 
 
 A NOTE ON GnuPGInterface.py AND MULTIPLE GPG PROCESSES:
 
