@@ -70,7 +70,9 @@ For the case that you are devloping under OSX, please make sure that you have th
  * intltool
  * gettext
  * bzr
- * lftp
  * par2
+ * python
+ * tox
+ * librsync
 
 
