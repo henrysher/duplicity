@@ -1,0 +1,953 @@
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
+    <title>Coverage for duplicity/log.py: 66%</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+    
+    <script type="text/javascript" src="jquery.min.js"></script>
+    <script type="text/javascript" src="jquery.hotkeys.js"></script>
+    <script type="text/javascript" src="jquery.isonscreen.js"></script>
+    <script type="text/javascript" src="coverage_html.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(coverage.pyfile_ready);
+    </script>
+</head>
+<body class="pyfile">
+
+<div id="header">
+    <div class="content">
+        <h1>Coverage for <b>duplicity/log.py</b> :
+            <span class="pc_cov">66%</span>
+        </h1>
+
+        <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
+
+        <h2 class="stats">
+            255 statements &nbsp;
+            <span class="run hide_run shortkey_r button_toggle_run">169 run</span>
+            <span class="mis shortkey_m button_toggle_mis">86 missing</span>
+            <span class="exc shortkey_x button_toggle_exc">0 excluded</span>
+
+            
+        </h2>
+    </div>
+</div>
+
+<div class="help_panel">
+    <img id="panel_icon" src="keybd_open.png" alt="Hide keyboard shortcuts" />
+    <p class="legend">Hot-keys on this page</p>
+    <div>
+    <p class="keyhelp">
+        <span class="key">r</span>
+        <span class="key">m</span>
+        <span class="key">x</span>
+        <span class="key">p</span> &nbsp; toggle line displays
+    </p>
+    <p class="keyhelp">
+        <span class="key">j</span>
+        <span class="key">k</span> &nbsp; next/prev highlighted chunk
+    </p>
+    <p class="keyhelp">
+        <span class="key">0</span> &nbsp; (zero) top of page
+    </p>
+    <p class="keyhelp">
+        <span class="key">1</span> &nbsp; (one) first highlighted chunk
+    </p>
+    </div>
+</div>
+
+<div id="source">
+    <table>
+        <tr>
+            <td class="linenos">
+<p id="n1" class="pln"><a href="#n1">1</a></p>
+<p id="n2" class="pln"><a href="#n2">2</a></p>
+<p id="n3" class="pln"><a href="#n3">3</a></p>
+<p id="n4" class="pln"><a href="#n4">4</a></p>
+<p id="n5" class="pln"><a href="#n5">5</a></p>
+<p id="n6" class="pln"><a href="#n6">6</a></p>
+<p id="n7" class="pln"><a href="#n7">7</a></p>
+<p id="n8" class="pln"><a href="#n8">8</a></p>
+<p id="n9" class="pln"><a href="#n9">9</a></p>
+<p id="n10" class="pln"><a href="#n10">10</a></p>
+<p id="n11" class="pln"><a href="#n11">11</a></p>
+<p id="n12" class="pln"><a href="#n12">12</a></p>
+<p id="n13" class="pln"><a href="#n13">13</a></p>
+<p id="n14" class="pln"><a href="#n14">14</a></p>
+<p id="n15" class="pln"><a href="#n15">15</a></p>
+<p id="n16" class="pln"><a href="#n16">16</a></p>
+<p id="n17" class="pln"><a href="#n17">17</a></p>
+<p id="n18" class="pln"><a href="#n18">18</a></p>
+<p id="n19" class="pln"><a href="#n19">19</a></p>
+<p id="n20" class="pln"><a href="#n20">20</a></p>
+<p id="n21" class="pln"><a href="#n21">21</a></p>
+<p id="n22" class="pln"><a href="#n22">22</a></p>
+<p id="n23" class="pln"><a href="#n23">23</a></p>
+<p id="n24" class="stm run hide_run"><a href="#n24">24</a></p>
+<p id="n25" class="pln"><a href="#n25">25</a></p>
+<p id="n26" class="stm run hide_run"><a href="#n26">26</a></p>
+<p id="n27" class="stm run hide_run"><a href="#n27">27</a></p>
+<p id="n28" class="stm run hide_run"><a href="#n28">28</a></p>
+<p id="n29" class="stm run hide_run"><a href="#n29">29</a></p>
+<p id="n30" class="pln"><a href="#n30">30</a></p>
+<p id="n31" class="stm run hide_run"><a href="#n31">31</a></p>
+<p id="n32" class="stm run hide_run"><a href="#n32">32</a></p>
+<p id="n33" class="stm run hide_run"><a href="#n33">33</a></p>
+<p id="n34" class="stm run hide_run"><a href="#n34">34</a></p>
+<p id="n35" class="stm run hide_run"><a href="#n35">35</a></p>
+<p id="n36" class="stm run hide_run"><a href="#n36">36</a></p>
+<p id="n37" class="stm run hide_run"><a href="#n37">37</a></p>
+<p id="n38" class="pln"><a href="#n38">38</a></p>
+<p id="n39" class="stm run hide_run"><a href="#n39">39</a></p>
+<p id="n40" class="pln"><a href="#n40">40</a></p>
+<p id="n41" class="pln"><a href="#n41">41</a></p>
+<p id="n42" class="stm run hide_run"><a href="#n42">42</a></p>
+<p id="n43" class="pln"><a href="#n43">43</a></p>
+<p id="n44" class="pln"><a href="#n44">44</a></p>
+<p id="n45" class="stm run hide_run"><a href="#n45">45</a></p>
+<p id="n46" class="pln"><a href="#n46">46</a></p>
+<p id="n47" class="pln"><a href="#n47">47</a></p>
+<p id="n48" class="stm run hide_run"><a href="#n48">48</a></p>
+<p id="n49" class="pln"><a href="#n49">49</a></p>
+<p id="n50" class="pln"><a href="#n50">50</a></p>
+<p id="n51" class="stm run hide_run"><a href="#n51">51</a></p>
+<p id="n52" class="pln"><a href="#n52">52</a></p>
+<p id="n53" class="pln"><a href="#n53">53</a></p>
+<p id="n54" class="stm run hide_run"><a href="#n54">54</a></p>
+<p id="n55" class="stm run hide_run"><a href="#n55">55</a></p>
+<p id="n56" class="stm run hide_run"><a href="#n56">56</a></p>
+<p id="n57" class="stm run hide_run"><a href="#n57">57</a></p>
+<p id="n58" class="stm run hide_run"><a href="#n58">58</a></p>
+<p id="n59" class="stm run hide_run"><a href="#n59">59</a></p>
+<p id="n60" class="stm run hide_run"><a href="#n60">60</a></p>
+<p id="n61" class="stm run hide_run"><a href="#n61">61</a></p>
+<p id="n62" class="stm run hide_run"><a href="#n62">62</a></p>
+<p id="n63" class="pln"><a href="#n63">63</a></p>
+<p id="n64" class="stm run hide_run"><a href="#n64">64</a></p>
+<p id="n65" class="pln"><a href="#n65">65</a></p>
+<p id="n66" class="pln"><a href="#n66">66</a></p>
+<p id="n67" class="stm run hide_run"><a href="#n67">67</a></p>
+<p id="n68" class="pln"><a href="#n68">68</a></p>
+<p id="n69" class="pln"><a href="#n69">69</a></p>
+<p id="n70" class="stm run hide_run"><a href="#n70">70</a></p>
+<p id="n71" class="stm run hide_run"><a href="#n71">71</a></p>
+<p id="n72" class="pln"><a href="#n72">72</a></p>
+<p id="n73" class="stm run hide_run"><a href="#n73">73</a></p>
+<p id="n74" class="stm run hide_run"><a href="#n74">74</a></p>
+<p id="n75" class="stm mis"><a href="#n75">75</a></p>
+<p id="n76" class="pln"><a href="#n76">76</a></p>
+<p id="n77" class="stm run hide_run"><a href="#n77">77</a></p>
+<p id="n78" class="stm mis"><a href="#n78">78</a></p>
+<p id="n79" class="stm mis"><a href="#n79">79</a></p>
+<p id="n80" class="pln"><a href="#n80">80</a></p>
+<p id="n81" class="pln"><a href="#n81">81</a></p>
+<p id="n82" class="pln"><a href="#n82">82</a></p>
+<p id="n83" class="pln"><a href="#n83">83</a></p>
+<p id="n84" class="pln"><a href="#n84">84</a></p>
+<p id="n85" class="stm run hide_run"><a href="#n85">85</a></p>
+<p id="n86" class="stm run hide_run"><a href="#n86">86</a></p>
+<p id="n87" class="pln"><a href="#n87">87</a></p>
+<p id="n88" class="stm run hide_run"><a href="#n88">88</a></p>
+<p id="n89" class="pln"><a href="#n89">89</a></p>
+<p id="n90" class="pln"><a href="#n90">90</a></p>
+<p id="n91" class="pln"><a href="#n91">91</a></p>
+<p id="n92" class="stm run hide_run"><a href="#n92">92</a></p>
+<p id="n93" class="stm mis"><a href="#n93">93</a></p>
+<p id="n94" class="pln"><a href="#n94">94</a></p>
+<p id="n95" class="pln"><a href="#n95">95</a></p>
+<p id="n96" class="stm run hide_run"><a href="#n96">96</a></p>
+<p id="n97" class="pln"><a href="#n97">97</a></p>
+<p id="n98" class="stm run hide_run"><a href="#n98">98</a></p>
+<p id="n99" class="pln"><a href="#n99">99</a></p>
+<p id="n100" class="pln"><a href="#n100">100</a></p>
+<p id="n101" class="stm run hide_run"><a href="#n101">101</a></p>
+<p id="n102" class="pln"><a href="#n102">102</a></p>
+<p id="n103" class="pln"><a href="#n103">103</a></p>
+<p id="n104" class="pln"><a href="#n104">104</a></p>
+<p id="n105" class="stm run hide_run"><a href="#n105">105</a></p>
+<p id="n106" class="stm run hide_run"><a href="#n106">106</a></p>
+<p id="n107" class="stm run hide_run"><a href="#n107">107</a></p>
+<p id="n108" class="stm run hide_run"><a href="#n108">108</a></p>
+<p id="n109" class="stm run hide_run"><a href="#n109">109</a></p>
+<p id="n110" class="stm run hide_run"><a href="#n110">110</a></p>
+<p id="n111" class="stm run hide_run"><a href="#n111">111</a></p>
+<p id="n112" class="stm run hide_run"><a href="#n112">112</a></p>
+<p id="n113" class="pln"><a href="#n113">113</a></p>
+<p id="n114" class="stm run hide_run"><a href="#n114">114</a></p>
+<p id="n115" class="stm run hide_run"><a href="#n115">115</a></p>
+<p id="n116" class="stm run hide_run"><a href="#n116">116</a></p>
+<p id="n117" class="stm run hide_run"><a href="#n117">117</a></p>
+<p id="n118" class="stm run hide_run"><a href="#n118">118</a></p>
+<p id="n119" class="stm run hide_run"><a href="#n119">119</a></p>
+<p id="n120" class="stm run hide_run"><a href="#n120">120</a></p>
+<p id="n121" class="pln"><a href="#n121">121</a></p>
+<p id="n122" class="pln"><a href="#n122">122</a></p>
+<p id="n123" class="stm run hide_run"><a href="#n123">123</a></p>
+<p id="n124" class="pln"><a href="#n124">124</a></p>
+<p id="n125" class="stm run hide_run"><a href="#n125">125</a></p>
+<p id="n126" class="pln"><a href="#n126">126</a></p>
+<p id="n127" class="pln"><a href="#n127">127</a></p>
+<p id="n128" class="stm run hide_run"><a href="#n128">128</a></p>
+<p id="n129" class="pln"><a href="#n129">129</a></p>
+<p id="n130" class="stm mis"><a href="#n130">130</a></p>
+<p id="n131" class="stm mis"><a href="#n131">131</a></p>
+<p id="n132" class="pln"><a href="#n132">132</a></p>
+<p id="n133" class="stm mis"><a href="#n133">133</a></p>
+<p id="n134" class="stm mis"><a href="#n134">134</a></p>
+<p id="n135" class="pln"><a href="#n135">135</a></p>
+<p id="n136" class="pln"><a href="#n136">136</a></p>
+<p id="n137" class="stm run hide_run"><a href="#n137">137</a></p>
+<p id="n138" class="stm mis"><a href="#n138">138</a></p>
+<p id="n139" class="stm mis"><a href="#n139">139</a></p>
+<p id="n140" class="stm mis"><a href="#n140">140</a></p>
+<p id="n141" class="stm mis"><a href="#n141">141</a></p>
+<p id="n142" class="stm mis"><a href="#n142">142</a></p>
+<p id="n143" class="stm mis"><a href="#n143">143</a></p>
+<p id="n144" class="stm mis"><a href="#n144">144</a></p>
+<p id="n145" class="stm mis"><a href="#n145">145</a></p>
+<p id="n146" class="pln"><a href="#n146">146</a></p>
+<p id="n147" class="pln"><a href="#n147">147</a></p>
+<p id="n148" class="stm run hide_run"><a href="#n148">148</a></p>
+<p id="n149" class="stm mis"><a href="#n149">149</a></p>
+<p id="n150" class="stm mis"><a href="#n150">150</a></p>
+<p id="n151" class="stm mis"><a href="#n151">151</a></p>
+<p id="n152" class="stm mis"><a href="#n152">152</a></p>
+<p id="n153" class="stm mis"><a href="#n153">153</a></p>
+<p id="n154" class="stm mis"><a href="#n154">154</a></p>
+<p id="n155" class="stm mis"><a href="#n155">155</a></p>
+<p id="n156" class="stm mis"><a href="#n156">156</a></p>
+<p id="n157" class="stm mis"><a href="#n157">157</a></p>
+<p id="n158" class="stm mis"><a href="#n158">158</a></p>
+<p id="n159" class="stm mis"><a href="#n159">159</a></p>
+<p id="n160" class="stm mis"><a href="#n160">160</a></p>
+<p id="n161" class="stm mis"><a href="#n161">161</a></p>
+<p id="n162" class="stm mis"><a href="#n162">162</a></p>
+<p id="n163" class="stm mis"><a href="#n163">163</a></p>
+<p id="n164" class="stm mis"><a href="#n164">164</a></p>
+<p id="n165" class="stm mis"><a href="#n165">165</a></p>
+<p id="n166" class="stm mis"><a href="#n166">166</a></p>
+<p id="n167" class="stm mis"><a href="#n167">167</a></p>
+<p id="n168" class="stm mis"><a href="#n168">168</a></p>
+<p id="n169" class="stm mis"><a href="#n169">169</a></p>
+<p id="n170" class="stm mis"><a href="#n170">170</a></p>
+<p id="n171" class="stm mis"><a href="#n171">171</a></p>
+<p id="n172" class="stm mis"><a href="#n172">172</a></p>
+<p id="n173" class="stm mis"><a href="#n173">173</a></p>
+<p id="n174" class="stm mis"><a href="#n174">174</a></p>
+<p id="n175" class="pln"><a href="#n175">175</a></p>
+<p id="n176" class="stm mis"><a href="#n176">176</a></p>
+<p id="n177" class="stm mis"><a href="#n177">177</a></p>
+<p id="n178" class="pln"><a href="#n178">178</a></p>
+<p id="n179" class="pln"><a href="#n179">179</a></p>
+<p id="n180" class="stm run hide_run"><a href="#n180">180</a></p>
+<p id="n181" class="pln"><a href="#n181">181</a></p>
+<p id="n182" class="stm mis"><a href="#n182">182</a></p>
+<p id="n183" class="stm mis"><a href="#n183">183</a></p>
+<p id="n184" class="stm mis"><a href="#n184">184</a></p>
+<p id="n185" class="stm mis"><a href="#n185">185</a></p>
+<p id="n186" class="stm mis"><a href="#n186">186</a></p>
+<p id="n187" class="stm mis"><a href="#n187">187</a></p>
+<p id="n188" class="stm mis"><a href="#n188">188</a></p>
+<p id="n189" class="stm mis"><a href="#n189">189</a></p>
+<p id="n190" class="stm mis"><a href="#n190">190</a></p>
+<p id="n191" class="stm mis"><a href="#n191">191</a></p>
+<p id="n192" class="stm mis"><a href="#n192">192</a></p>
+<p id="n193" class="stm mis"><a href="#n193">193</a></p>
+<p id="n194" class="stm mis"><a href="#n194">194</a></p>
+<p id="n195" class="pln"><a href="#n195">195</a></p>
+<p id="n196" class="stm mis"><a href="#n196">196</a></p>
+<p id="n197" class="stm mis"><a href="#n197">197</a></p>
+<p id="n198" class="stm mis"><a href="#n198">198</a></p>
+<p id="n199" class="stm mis"><a href="#n199">199</a></p>
+<p id="n200" class="stm mis"><a href="#n200">200</a></p>
+<p id="n201" class="stm mis"><a href="#n201">201</a></p>
+<p id="n202" class="stm mis"><a href="#n202">202</a></p>
+<p id="n203" class="stm mis"><a href="#n203">203</a></p>
+<p id="n204" class="stm mis"><a href="#n204">204</a></p>
+<p id="n205" class="stm mis"><a href="#n205">205</a></p>
+<p id="n206" class="pln"><a href="#n206">206</a></p>
+<p id="n207" class="pln"><a href="#n207">207</a></p>
+<p id="n208" class="pln"><a href="#n208">208</a></p>
+<p id="n209" class="pln"><a href="#n209">209</a></p>
+<p id="n210" class="pln"><a href="#n210">210</a></p>
+<p id="n211" class="pln"><a href="#n211">211</a></p>
+<p id="n212" class="pln"><a href="#n212">212</a></p>
+<p id="n213" class="stm mis"><a href="#n213">213</a></p>
+<p id="n214" class="stm mis"><a href="#n214">214</a></p>
+<p id="n215" class="pln"><a href="#n215">215</a></p>
+<p id="n216" class="pln"><a href="#n216">216</a></p>
+<p id="n217" class="stm run hide_run"><a href="#n217">217</a></p>
+<p id="n218" class="pln"><a href="#n218">218</a></p>
+<p id="n219" class="stm mis"><a href="#n219">219</a></p>
+<p id="n220" class="pln"><a href="#n220">220</a></p>
+<p id="n221" class="pln"><a href="#n221">221</a></p>
+<p id="n222" class="pln"><a href="#n222">222</a></p>
+<p id="n223" class="stm run hide_run"><a href="#n223">223</a></p>
+<p id="n224" class="pln"><a href="#n224">224</a></p>
+<p id="n225" class="stm mis"><a href="#n225">225</a></p>
+<p id="n226" class="pln"><a href="#n226">226</a></p>
+<p id="n227" class="pln"><a href="#n227">227</a></p>
+<p id="n228" class="stm run hide_run"><a href="#n228">228</a></p>
+<p id="n229" class="pln"><a href="#n229">229</a></p>
+<p id="n230" class="stm run hide_run"><a href="#n230">230</a></p>
+<p id="n231" class="pln"><a href="#n231">231</a></p>
+<p id="n232" class="pln"><a href="#n232">232</a></p>
+<p id="n233" class="stm run hide_run"><a href="#n233">233</a></p>
+<p id="n234" class="pln"><a href="#n234">234</a></p>
+<p id="n235" class="pln"><a href="#n235">235</a></p>
+<p id="n236" class="pln"><a href="#n236">236</a></p>
+<p id="n237" class="stm run hide_run"><a href="#n237">237</a></p>
+<p id="n238" class="stm run hide_run"><a href="#n238">238</a></p>
+<p id="n239" class="stm run hide_run"><a href="#n239">239</a></p>
+<p id="n240" class="stm run hide_run"><a href="#n240">240</a></p>
+<p id="n241" class="stm run hide_run"><a href="#n241">241</a></p>
+<p id="n242" class="stm run hide_run"><a href="#n242">242</a></p>
+<p id="n243" class="stm run hide_run"><a href="#n243">243</a></p>
+<p id="n244" class="stm run hide_run"><a href="#n244">244</a></p>
+<p id="n245" class="stm run hide_run"><a href="#n245">245</a></p>
+<p id="n246" class="stm run hide_run"><a href="#n246">246</a></p>
+<p id="n247" class="stm run hide_run"><a href="#n247">247</a></p>
+<p id="n248" class="stm run hide_run"><a href="#n248">248</a></p>
+<p id="n249" class="stm run hide_run"><a href="#n249">249</a></p>
+<p id="n250" class="pln"><a href="#n250">250</a></p>
+<p id="n251" class="pln"><a href="#n251">251</a></p>
+<p id="n252" class="stm run hide_run"><a href="#n252">252</a></p>
+<p id="n253" class="pln"><a href="#n253">253</a></p>
+<p id="n254" class="stm run hide_run"><a href="#n254">254</a></p>
+<p id="n255" class="pln"><a href="#n255">255</a></p>
+<p id="n256" class="pln"><a href="#n256">256</a></p>
+<p id="n257" class="stm run hide_run"><a href="#n257">257</a></p>
+<p id="n258" class="pln"><a href="#n258">258</a></p>
+<p id="n259" class="pln"><a href="#n259">259</a></p>
+<p id="n260" class="pln"><a href="#n260">260</a></p>
+<p id="n261" class="pln"><a href="#n261">261</a></p>
+<p id="n262" class="stm run hide_run"><a href="#n262">262</a></p>
+<p id="n263" class="stm run hide_run"><a href="#n263">263</a></p>
+<p id="n264" class="stm run hide_run"><a href="#n264">264</a></p>
+<p id="n265" class="stm run hide_run"><a href="#n265">265</a></p>
+<p id="n266" class="stm run hide_run"><a href="#n266">266</a></p>
+<p id="n267" class="stm run hide_run"><a href="#n267">267</a></p>
+<p id="n268" class="stm run hide_run"><a href="#n268">268</a></p>
+<p id="n269" class="stm run hide_run"><a href="#n269">269</a></p>
+<p id="n270" class="stm run hide_run"><a href="#n270">270</a></p>
+<p id="n271" class="stm run hide_run"><a href="#n271">271</a></p>
+<p id="n272" class="stm run hide_run"><a href="#n272">272</a></p>
+<p id="n273" class="stm run hide_run"><a href="#n273">273</a></p>
+<p id="n274" class="stm run hide_run"><a href="#n274">274</a></p>
+<p id="n275" class="stm run hide_run"><a href="#n275">275</a></p>
+<p id="n276" class="stm run hide_run"><a href="#n276">276</a></p>
+<p id="n277" class="stm run hide_run"><a href="#n277">277</a></p>
+<p id="n278" class="stm run hide_run"><a href="#n278">278</a></p>
+<p id="n279" class="stm run hide_run"><a href="#n279">279</a></p>
+<p id="n280" class="stm run hide_run"><a href="#n280">280</a></p>
+<p id="n281" class="stm run hide_run"><a href="#n281">281</a></p>
+<p id="n282" class="stm run hide_run"><a href="#n282">282</a></p>
+<p id="n283" class="stm run hide_run"><a href="#n283">283</a></p>
+<p id="n284" class="stm run hide_run"><a href="#n284">284</a></p>
+<p id="n285" class="stm run hide_run"><a href="#n285">285</a></p>
+<p id="n286" class="stm run hide_run"><a href="#n286">286</a></p>
+<p id="n287" class="stm run hide_run"><a href="#n287">287</a></p>
+<p id="n288" class="stm run hide_run"><a href="#n288">288</a></p>
+<p id="n289" class="stm run hide_run"><a href="#n289">289</a></p>
+<p id="n290" class="pln"><a href="#n290">290</a></p>
+<p id="n291" class="stm run hide_run"><a href="#n291">291</a></p>
+<p id="n292" class="stm run hide_run"><a href="#n292">292</a></p>
+<p id="n293" class="stm run hide_run"><a href="#n293">293</a></p>
+<p id="n294" class="stm run hide_run"><a href="#n294">294</a></p>
+<p id="n295" class="stm run hide_run"><a href="#n295">295</a></p>
+<p id="n296" class="stm run hide_run"><a href="#n296">296</a></p>
+<p id="n297" class="stm run hide_run"><a href="#n297">297</a></p>
+<p id="n298" class="stm run hide_run"><a href="#n298">298</a></p>
+<p id="n299" class="stm run hide_run"><a href="#n299">299</a></p>
+<p id="n300" class="stm run hide_run"><a href="#n300">300</a></p>
+<p id="n301" class="stm run hide_run"><a href="#n301">301</a></p>
+<p id="n302" class="stm run hide_run"><a href="#n302">302</a></p>
+<p id="n303" class="stm run hide_run"><a href="#n303">303</a></p>
+<p id="n304" class="stm run hide_run"><a href="#n304">304</a></p>
+<p id="n305" class="stm run hide_run"><a href="#n305">305</a></p>
+<p id="n306" class="stm run hide_run"><a href="#n306">306</a></p>
+<p id="n307" class="pln"><a href="#n307">307</a></p>
+<p id="n308" class="stm run hide_run"><a href="#n308">308</a></p>
+<p id="n309" class="pln"><a href="#n309">309</a></p>
+<p id="n310" class="stm run hide_run"><a href="#n310">310</a></p>
+<p id="n311" class="pln"><a href="#n311">311</a></p>
+<p id="n312" class="pln"><a href="#n312">312</a></p>
+<p id="n313" class="stm run hide_run"><a href="#n313">313</a></p>
+<p id="n314" class="stm run hide_run"><a href="#n314">314</a></p>
+<p id="n315" class="stm run hide_run"><a href="#n315">315</a></p>
+<p id="n316" class="stm run hide_run"><a href="#n316">316</a></p>
+<p id="n317" class="stm run hide_run"><a href="#n317">317</a></p>
+<p id="n318" class="stm run hide_run"><a href="#n318">318</a></p>
+<p id="n319" class="pln"><a href="#n319">319</a></p>
+<p id="n320" class="pln"><a href="#n320">320</a></p>
+<p id="n321" class="pln"><a href="#n321">321</a></p>
+<p id="n322" class="pln"><a href="#n322">322</a></p>
+<p id="n323" class="pln"><a href="#n323">323</a></p>
+<p id="n324" class="pln"><a href="#n324">324</a></p>
+<p id="n325" class="stm run hide_run"><a href="#n325">325</a></p>
+<p id="n326" class="pln"><a href="#n326">326</a></p>
+<p id="n327" class="stm mis"><a href="#n327">327</a></p>
+<p id="n328" class="pln"><a href="#n328">328</a></p>
+<p id="n329" class="pln"><a href="#n329">329</a></p>
+<p id="n330" class="stm run hide_run"><a href="#n330">330</a></p>
+<p id="n331" class="pln"><a href="#n331">331</a></p>
+<p id="n332" class="stm run hide_run"><a href="#n332">332</a></p>
+<p id="n333" class="stm run hide_run"><a href="#n333">333</a></p>
+<p id="n334" class="stm run hide_run"><a href="#n334">334</a></p>
+<p id="n335" class="pln"><a href="#n335">335</a></p>
+<p id="n336" class="pln"><a href="#n336">336</a></p>
+<p id="n337" class="stm run hide_run"><a href="#n337">337</a></p>
+<p id="n338" class="pln"><a href="#n338">338</a></p>
+<p id="n339" class="stm run hide_run"><a href="#n339">339</a></p>
+<p id="n340" class="stm run hide_run"><a href="#n340">340</a></p>
+<p id="n341" class="pln"><a href="#n341">341</a></p>
+<p id="n342" class="pln"><a href="#n342">342</a></p>
+<p id="n343" class="stm run hide_run"><a href="#n343">343</a></p>
+<p id="n344" class="pln"><a href="#n344">344</a></p>
+<p id="n345" class="stm run hide_run"><a href="#n345">345</a></p>
+<p id="n346" class="stm run hide_run"><a href="#n346">346</a></p>
+<p id="n347" class="pln"><a href="#n347">347</a></p>
+<p id="n348" class="pln"><a href="#n348">348</a></p>
+<p id="n349" class="stm run hide_run"><a href="#n349">349</a></p>
+<p id="n350" class="pln"><a href="#n350">350</a></p>
+<p id="n351" class="pln"><a href="#n351">351</a></p>
+<p id="n352" class="stm run hide_run"><a href="#n352">352</a></p>
+<p id="n353" class="stm run hide_run"><a href="#n353">353</a></p>
+<p id="n354" class="pln"><a href="#n354">354</a></p>
+<p id="n355" class="stm run hide_run"><a href="#n355">355</a></p>
+<p id="n356" class="pln"><a href="#n356">356</a></p>
+<p id="n357" class="pln"><a href="#n357">357</a></p>
+<p id="n358" class="stm run hide_run"><a href="#n358">358</a></p>
+<p id="n359" class="pln"><a href="#n359">359</a></p>
+<p id="n360" class="pln"><a href="#n360">360</a></p>
+<p id="n361" class="stm run hide_run"><a href="#n361">361</a></p>
+<p id="n362" class="stm run hide_run"><a href="#n362">362</a></p>
+<p id="n363" class="stm run hide_run"><a href="#n363">363</a></p>
+<p id="n364" class="pln"><a href="#n364">364</a></p>
+<p id="n365" class="stm run hide_run"><a href="#n365">365</a></p>
+<p id="n366" class="stm run hide_run"><a href="#n366">366</a></p>
+<p id="n367" class="stm run hide_run"><a href="#n367">367</a></p>
+<p id="n368" class="pln"><a href="#n368">368</a></p>
+<p id="n369" class="pln"><a href="#n369">369</a></p>
+<p id="n370" class="stm run hide_run"><a href="#n370">370</a></p>
+<p id="n371" class="pln"><a href="#n371">371</a></p>
+<p id="n372" class="pln"><a href="#n372">372</a></p>
+<p id="n373" class="stm run hide_run"><a href="#n373">373</a></p>
+<p id="n374" class="pln"><a href="#n374">374</a></p>
+<p id="n375" class="pln"><a href="#n375">375</a></p>
+<p id="n376" class="pln"><a href="#n376">376</a></p>
+<p id="n377" class="pln"><a href="#n377">377</a></p>
+<p id="n378" class="pln"><a href="#n378">378</a></p>
+<p id="n379" class="stm mis"><a href="#n379">379</a></p>
+<p id="n380" class="pln"><a href="#n380">380</a></p>
+<p id="n381" class="stm run hide_run"><a href="#n381">381</a></p>
+<p id="n382" class="stm mis"><a href="#n382">382</a></p>
+<p id="n383" class="pln"><a href="#n383">383</a></p>
+<p id="n384" class="pln"><a href="#n384">384</a></p>
+<p id="n385" class="pln"><a href="#n385">385</a></p>
+<p id="n386" class="stm mis"><a href="#n386">386</a></p>
+<p id="n387" class="stm mis"><a href="#n387">387</a></p>
+<p id="n388" class="pln"><a href="#n388">388</a></p>
+<p id="n389" class="pln"><a href="#n389">389</a></p>
+<p id="n390" class="stm mis"><a href="#n390">390</a></p>
+<p id="n391" class="pln"><a href="#n391">391</a></p>
+<p id="n392" class="pln"><a href="#n392">392</a></p>
+<p id="n393" class="stm run hide_run"><a href="#n393">393</a></p>
+<p id="n394" class="pln"><a href="#n394">394</a></p>
+<p id="n395" class="stm run hide_run"><a href="#n395">395</a></p>
+<p id="n396" class="pln"><a href="#n396">396</a></p>
+<p id="n397" class="stm mis"><a href="#n397">397</a></p>
+<p id="n398" class="pln"><a href="#n398">398</a></p>
+<p id="n399" class="pln"><a href="#n399">399</a></p>
+<p id="n400" class="stm run hide_run"><a href="#n400">400</a></p>
+<p id="n401" class="pln"><a href="#n401">401</a></p>
+<p id="n402" class="pln"><a href="#n402">402</a></p>
+<p id="n403" class="stm mis"><a href="#n403">403</a></p>
+<p id="n404" class="stm mis"><a href="#n404">404</a></p>
+<p id="n405" class="stm mis"><a href="#n405">405</a></p>
+<p id="n406" class="stm mis"><a href="#n406">406</a></p>
+<p id="n407" class="pln"><a href="#n407">407</a></p>
+<p id="n408" class="pln"><a href="#n408">408</a></p>
+<p id="n409" class="stm run hide_run"><a href="#n409">409</a></p>
+<p id="n410" class="pln"><a href="#n410">410</a></p>
+<p id="n411" class="pln"><a href="#n411">411</a></p>
+<p id="n412" class="stm mis"><a href="#n412">412</a></p>
+<p id="n413" class="stm mis"><a href="#n413">413</a></p>
+<p id="n414" class="stm mis"><a href="#n414">414</a></p>
+<p id="n415" class="stm mis"><a href="#n415">415</a></p>
+<p id="n416" class="pln"><a href="#n416">416</a></p>
+<p id="n417" class="pln"><a href="#n417">417</a></p>
+<p id="n418" class="stm run hide_run"><a href="#n418">418</a></p>
+<p id="n419" class="pln"><a href="#n419">419</a></p>
+<p id="n420" class="pln"><a href="#n420">420</a></p>
+<p id="n421" class="stm run hide_run"><a href="#n421">421</a></p>
+<p id="n422" class="pln"><a href="#n422">422</a></p>
+<p id="n423" class="pln"><a href="#n423">423</a></p>
+<p id="n424" class="stm run hide_run"><a href="#n424">424</a></p>
+<p id="n425" class="pln"><a href="#n425">425</a></p>
+<p id="n426" class="pln"><a href="#n426">426</a></p>
+<p id="n427" class="stm run hide_run"><a href="#n427">427</a></p>
+<p id="n428" class="pln"><a href="#n428">428</a></p>
+<p id="n429" class="pln"><a href="#n429">429</a></p>
+<p id="n430" class="stm run hide_run"><a href="#n430">430</a></p>
+<p id="n431" class="pln"><a href="#n431">431</a></p>
+<p id="n432" class="stm run hide_run"><a href="#n432">432</a></p>
+
+            </td>
+            <td class="text">
+<p id="t1" class="pln"><span class="com"># -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-</span><span class="strut">&nbsp;</span></p>
+<p id="t2" class="pln"><span class="com">#</span><span class="strut">&nbsp;</span></p>
+<p id="t3" class="pln"><span class="com"># Copyright 2002 Ben Escoto &lt;ben@emerose.org></span><span class="strut">&nbsp;</span></p>
+<p id="t4" class="pln"><span class="com"># Copyright 2007 Kenneth Loafman &lt;kenneth@loafman.com></span><span class="strut">&nbsp;</span></p>
+<p id="t5" class="pln"><span class="com"># Copyright 2008 Michael Terry &lt;mike@mterry.name></span><span class="strut">&nbsp;</span></p>
+<p id="t6" class="pln"><span class="com"># Copyright 2011 Canonical Ltd</span><span class="strut">&nbsp;</span></p>
+<p id="t7" class="pln"><span class="com">#</span><span class="strut">&nbsp;</span></p>
+<p id="t8" class="pln"><span class="com"># This file is part of duplicity.</span><span class="strut">&nbsp;</span></p>
+<p id="t9" class="pln"><span class="com">#</span><span class="strut">&nbsp;</span></p>
+<p id="t10" class="pln"><span class="com"># Duplicity is free software; you can redistribute it and/or modify it</span><span class="strut">&nbsp;</span></p>
+<p id="t11" class="pln"><span class="com"># under the terms of the GNU General Public License as published by the</span><span class="strut">&nbsp;</span></p>
+<p id="t12" class="pln"><span class="com"># Free Software Foundation; either version 2 of the License, or (at your</span><span class="strut">&nbsp;</span></p>
+<p id="t13" class="pln"><span class="com"># option) any later version.</span><span class="strut">&nbsp;</span></p>
+<p id="t14" class="pln"><span class="com">#</span><span class="strut">&nbsp;</span></p>
+<p id="t15" class="pln"><span class="com"># Duplicity is distributed in the hope that it will be useful, but</span><span class="strut">&nbsp;</span></p>
+<p id="t16" class="pln"><span class="com"># WITHOUT ANY WARRANTY; without even the implied warranty of</span><span class="strut">&nbsp;</span></p>
+<p id="t17" class="pln"><span class="com"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span><span class="strut">&nbsp;</span></p>
+<p id="t18" class="pln"><span class="com"># General Public License for more details.</span><span class="strut">&nbsp;</span></p>
+<p id="t19" class="pln"><span class="com">#</span><span class="strut">&nbsp;</span></p>
+<p id="t20" class="pln"><span class="com"># You should have received a copy of the GNU General Public License</span><span class="strut">&nbsp;</span></p>
+<p id="t21" class="pln"><span class="com"># along with duplicity; if not, write to the Free Software Foundation,</span><span class="strut">&nbsp;</span></p>
+<p id="t22" class="pln"><span class="com"># Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span><span class="strut">&nbsp;</span></p>
+<p id="t23" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t24" class="stm run hide_run"><span class="str">"""Log various messages depending on verbosity level"""</span><span class="strut">&nbsp;</span></p>
+<p id="t25" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t26" class="stm run hide_run"><span class="key">import</span> <span class="nam">os</span><span class="strut">&nbsp;</span></p>
+<p id="t27" class="stm run hide_run"><span class="key">import</span> <span class="nam">sys</span><span class="strut">&nbsp;</span></p>
+<p id="t28" class="stm run hide_run"><span class="key">import</span> <span class="nam">logging</span><span class="strut">&nbsp;</span></p>
+<p id="t29" class="stm run hide_run"><span class="key">import</span> <span class="nam">datetime</span><span class="strut">&nbsp;</span></p>
+<p id="t30" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t31" class="stm run hide_run"><span class="nam">MIN</span> <span class="op">=</span> <span class="num">0</span><span class="strut">&nbsp;</span></p>
+<p id="t32" class="stm run hide_run"><span class="nam">ERROR</span> <span class="op">=</span> <span class="num">0</span><span class="strut">&nbsp;</span></p>
+<p id="t33" class="stm run hide_run"><span class="nam">WARNING</span> <span class="op">=</span> <span class="num">2</span><span class="strut">&nbsp;</span></p>
+<p id="t34" class="stm run hide_run"><span class="nam">NOTICE</span> <span class="op">=</span> <span class="num">3</span><span class="strut">&nbsp;</span></p>
+<p id="t35" class="stm run hide_run"><span class="nam">INFO</span> <span class="op">=</span> <span class="num">5</span><span class="strut">&nbsp;</span></p>
+<p id="t36" class="stm run hide_run"><span class="nam">DEBUG</span> <span class="op">=</span> <span class="num">9</span><span class="strut">&nbsp;</span></p>
+<p id="t37" class="stm run hide_run"><span class="nam">MAX</span> <span class="op">=</span> <span class="num">9</span><span class="strut">&nbsp;</span></p>
+<p id="t38" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t39" class="stm run hide_run"><span class="nam">_logger</span> <span class="op">=</span> <span class="nam">None</span><span class="strut">&nbsp;</span></p>
+<p id="t40" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t41" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t42" class="stm run hide_run"><span class="key">def</span> <span class="nam">DupToLoggerLevel</span><span class="op">(</span><span class="nam">verb</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t43" class="pln">    <span class="str">"""Convert duplicity level to the logging module's system, where higher is</span><span class="strut">&nbsp;</span></p>
+<p id="t44" class="pln"><span class="str">       more severe"""</span><span class="strut">&nbsp;</span></p>
+<p id="t45" class="stm run hide_run">    <span class="key">return</span> <span class="nam">MAX</span> <span class="op">-</span> <span class="nam">verb</span> <span class="op">+</span> <span class="num">1</span><span class="strut">&nbsp;</span></p>
+<p id="t46" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t47" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t48" class="stm run hide_run"><span class="key">def</span> <span class="nam">LoggerToDupLevel</span><span class="op">(</span><span class="nam">verb</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t49" class="pln">    <span class="str">"""Convert logging module level to duplicity's system, where lowere is</span><span class="strut">&nbsp;</span></p>
+<p id="t50" class="pln"><span class="str">       more severe"""</span><span class="strut">&nbsp;</span></p>
+<p id="t51" class="stm run hide_run">    <span class="key">return</span> <span class="nam">DupToLoggerLevel</span><span class="op">(</span><span class="nam">verb</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t52" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t53" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t54" class="stm run hide_run"><span class="key">def</span> <span class="nam">LevelName</span><span class="op">(</span><span class="nam">level</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t55" class="stm run hide_run">    <span class="key">if</span> <span class="nam">level</span> <span class="op">>=</span> <span class="num">9</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t56" class="stm run hide_run">        <span class="key">return</span> <span class="str">"DEBUG"</span><span class="strut">&nbsp;</span></p>
+<p id="t57" class="stm run hide_run">    <span class="key">elif</span> <span class="nam">level</span> <span class="op">>=</span> <span class="num">5</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t58" class="stm run hide_run">        <span class="key">return</span> <span class="str">"INFO"</span><span class="strut">&nbsp;</span></p>
+<p id="t59" class="stm run hide_run">    <span class="key">elif</span> <span class="nam">level</span> <span class="op">>=</span> <span class="num">3</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t60" class="stm run hide_run">        <span class="key">return</span> <span class="str">"NOTICE"</span><span class="strut">&nbsp;</span></p>
+<p id="t61" class="stm run hide_run">    <span class="key">elif</span> <span class="nam">level</span> <span class="op">>=</span> <span class="num">1</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t62" class="stm run hide_run">        <span class="key">return</span> <span class="str">"WARNING"</span><span class="strut">&nbsp;</span></p>
+<p id="t63" class="pln">    <span class="key">else</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t64" class="stm run hide_run">        <span class="key">return</span> <span class="str">"ERROR"</span><span class="strut">&nbsp;</span></p>
+<p id="t65" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t66" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t67" class="stm run hide_run"><span class="key">def</span> <span class="nam">Log</span><span class="op">(</span><span class="nam">s</span><span class="op">,</span> <span class="nam">verb_level</span><span class="op">,</span> <span class="nam">code</span><span class="op">=</span><span class="num">1</span><span class="op">,</span> <span class="nam">extra</span><span class="op">=</span><span class="nam">None</span><span class="op">,</span> <span class="nam">force_print</span><span class="op">=</span><span class="nam">False</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t68" class="pln">    <span class="str">"""Write s to stderr if verbosity level low enough"""</span><span class="strut">&nbsp;</span></p>
+<p id="t69" class="pln">    <span class="key">global</span> <span class="nam">_logger</span><span class="strut">&nbsp;</span></p>
+<p id="t70" class="stm run hide_run">    <span class="key">if</span> <span class="nam">extra</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t71" class="stm run hide_run">        <span class="nam">controlLine</span> <span class="op">=</span> <span class="str">'%d %s'</span> <span class="op">%</span> <span class="op">(</span><span class="nam">code</span><span class="op">,</span> <span class="nam">extra</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t72" class="pln">    <span class="key">else</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t73" class="stm run hide_run">        <span class="nam">controlLine</span> <span class="op">=</span> <span class="str">'%d'</span> <span class="op">%</span> <span class="op">(</span><span class="nam">code</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t74" class="stm run hide_run">    <span class="key">if</span> <span class="key">not</span> <span class="nam">s</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t75" class="stm mis">        <span class="nam">s</span> <span class="op">=</span> <span class="str">''</span>  <span class="com"># If None is passed, standard logging would render it as 'None'</span><span class="strut">&nbsp;</span></p>
+<p id="t76" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t77" class="stm run hide_run">    <span class="key">if</span> <span class="nam">force_print</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t78" class="stm mis">        <span class="nam">initial_level</span> <span class="op">=</span> <span class="nam">_logger</span><span class="op">.</span><span class="nam">getEffectiveLevel</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t79" class="stm mis">        <span class="nam">_logger</span><span class="op">.</span><span class="nam">setLevel</span><span class="op">(</span><span class="nam">DupToLoggerLevel</span><span class="op">(</span><span class="nam">MAX</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t80" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t81" class="pln">    <span class="com"># If all the backends kindly gave us unicode, we could enable this next</span><span class="strut">&nbsp;</span></p>
+<p id="t82" class="pln">    <span class="com"># assert line.  As it is, we'll attempt to convert s to unicode if we</span><span class="strut">&nbsp;</span></p>
+<p id="t83" class="pln">    <span class="com"># are handed bytes.  One day we should update the backends.</span><span class="strut">&nbsp;</span></p>
+<p id="t84" class="pln">    <span class="com"># assert isinstance(s, unicode)</span><span class="strut">&nbsp;</span></p>
+<p id="t85" class="stm run hide_run">    <span class="key">if</span> <span class="key">not</span> <span class="nam">isinstance</span><span class="op">(</span><span class="nam">s</span><span class="op">,</span> <span class="nam">unicode</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t86" class="stm run hide_run">        <span class="nam">s</span> <span class="op">=</span> <span class="nam">s</span><span class="op">.</span><span class="nam">decode</span><span class="op">(</span><span class="str">"utf8"</span><span class="op">,</span> <span class="str">"replace"</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t87" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t88" class="stm run hide_run">    <span class="nam">_logger</span><span class="op">.</span><span class="nam">log</span><span class="op">(</span><span class="nam">DupToLoggerLevel</span><span class="op">(</span><span class="nam">verb_level</span><span class="op">)</span><span class="op">,</span> <span class="nam">s</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t89" class="pln">                <span class="nam">extra</span><span class="op">=</span><span class="op">{</span><span class="str">'levelName'</span><span class="op">:</span> <span class="nam">LevelName</span><span class="op">(</span><span class="nam">verb_level</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t90" class="pln">                       <span class="str">'controlLine'</span><span class="op">:</span> <span class="nam">controlLine</span><span class="op">}</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t91" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t92" class="stm run hide_run">    <span class="key">if</span> <span class="nam">force_print</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t93" class="stm mis">        <span class="nam">_logger</span><span class="op">.</span><span class="nam">setLevel</span><span class="op">(</span><span class="nam">initial_level</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t94" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t95" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t96" class="stm run hide_run"><span class="key">def</span> <span class="nam">Debug</span><span class="op">(</span><span class="nam">s</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t97" class="pln">    <span class="str">"""Shortcut used for debug message (verbosity 9)."""</span><span class="strut">&nbsp;</span></p>
+<p id="t98" class="stm run hide_run">    <span class="nam">Log</span><span class="op">(</span><span class="nam">s</span><span class="op">,</span> <span class="nam">DEBUG</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t99" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t100" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t101" class="stm run hide_run"><span class="key">class</span> <span class="nam">InfoCode</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t102" class="pln">    <span class="str">"""Enumeration class to hold info code values.</span><span class="strut">&nbsp;</span></p>
+<p id="t103" class="pln"><span class="str">       These values should never change, as frontends rely upon them.</span><span class="strut">&nbsp;</span></p>
+<p id="t104" class="pln"><span class="str">       Don't use 0 or negative numbers."""</span><span class="strut">&nbsp;</span></p>
+<p id="t105" class="stm run hide_run">    <span class="nam">generic</span> <span class="op">=</span> <span class="num">1</span><span class="strut">&nbsp;</span></p>
+<p id="t106" class="stm run hide_run">    <span class="nam">progress</span> <span class="op">=</span> <span class="num">2</span><span class="strut">&nbsp;</span></p>
+<p id="t107" class="stm run hide_run">    <span class="nam">collection_status</span> <span class="op">=</span> <span class="num">3</span><span class="strut">&nbsp;</span></p>
+<p id="t108" class="stm run hide_run">    <span class="nam">diff_file_new</span> <span class="op">=</span> <span class="num">4</span><span class="strut">&nbsp;</span></p>
+<p id="t109" class="stm run hide_run">    <span class="nam">diff_file_changed</span> <span class="op">=</span> <span class="num">5</span><span class="strut">&nbsp;</span></p>
+<p id="t110" class="stm run hide_run">    <span class="nam">diff_file_deleted</span> <span class="op">=</span> <span class="num">6</span><span class="strut">&nbsp;</span></p>
+<p id="t111" class="stm run hide_run">    <span class="nam">patch_file_writing</span> <span class="op">=</span> <span class="num">7</span><span class="strut">&nbsp;</span></p>
+<p id="t112" class="stm run hide_run">    <span class="nam">patch_file_patching</span> <span class="op">=</span> <span class="num">8</span><span class="strut">&nbsp;</span></p>
+<p id="t113" class="pln">    <span class="com"># file_list = 9 # 9 isn't used anymore.  It corresponds to an older syntax for listing files</span><span class="strut">&nbsp;</span></p>
+<p id="t114" class="stm run hide_run">    <span class="nam">file_list</span> <span class="op">=</span> <span class="num">10</span><span class="strut">&nbsp;</span></p>
+<p id="t115" class="stm run hide_run">    <span class="nam">synchronous_upload_begin</span> <span class="op">=</span> <span class="num">11</span><span class="strut">&nbsp;</span></p>
+<p id="t116" class="stm run hide_run">    <span class="nam">asynchronous_upload_begin</span> <span class="op">=</span> <span class="num">12</span><span class="strut">&nbsp;</span></p>
+<p id="t117" class="stm run hide_run">    <span class="nam">synchronous_upload_done</span> <span class="op">=</span> <span class="num">13</span><span class="strut">&nbsp;</span></p>
+<p id="t118" class="stm run hide_run">    <span class="nam">asynchronous_upload_done</span> <span class="op">=</span> <span class="num">14</span><span class="strut">&nbsp;</span></p>
+<p id="t119" class="stm run hide_run">    <span class="nam">skipping_socket</span> <span class="op">=</span> <span class="num">15</span><span class="strut">&nbsp;</span></p>
+<p id="t120" class="stm run hide_run">    <span class="nam">upload_progress</span> <span class="op">=</span> <span class="num">16</span><span class="strut">&nbsp;</span></p>
+<p id="t121" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t122" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t123" class="stm run hide_run"><span class="key">def</span> <span class="nam">Info</span><span class="op">(</span><span class="nam">s</span><span class="op">,</span> <span class="nam">code</span><span class="op">=</span><span class="nam">InfoCode</span><span class="op">.</span><span class="nam">generic</span><span class="op">,</span> <span class="nam">extra</span><span class="op">=</span><span class="nam">None</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t124" class="pln">    <span class="str">"""Shortcut used for info messages (verbosity 5)."""</span><span class="strut">&nbsp;</span></p>
+<p id="t125" class="stm run hide_run">    <span class="nam">Log</span><span class="op">(</span><span class="nam">s</span><span class="op">,</span> <span class="nam">INFO</span><span class="op">,</span> <span class="nam">code</span><span class="op">,</span> <span class="nam">extra</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t126" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t127" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t128" class="stm run hide_run"><span class="key">def</span> <span class="nam">Progress</span><span class="op">(</span><span class="nam">s</span><span class="op">,</span> <span class="nam">current</span><span class="op">,</span> <span class="nam">total</span><span class="op">=</span><span class="nam">None</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t129" class="pln">    <span class="str">"""Shortcut used for progress messages (verbosity 5)."""</span><span class="strut">&nbsp;</span></p>
+<p id="t130" class="stm mis">    <span class="key">if</span> <span class="nam">total</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t131" class="stm mis">        <span class="nam">controlLine</span> <span class="op">=</span> <span class="str">'%d %d'</span> <span class="op">%</span> <span class="op">(</span><span class="nam">current</span><span class="op">,</span> <span class="nam">total</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t132" class="pln">    <span class="key">else</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t133" class="stm mis">        <span class="nam">controlLine</span> <span class="op">=</span> <span class="str">'%d'</span> <span class="op">%</span> <span class="nam">current</span><span class="strut">&nbsp;</span></p>
+<p id="t134" class="stm mis">    <span class="nam">Log</span><span class="op">(</span><span class="nam">s</span><span class="op">,</span> <span class="nam">INFO</span><span class="op">,</span> <span class="nam">InfoCode</span><span class="op">.</span><span class="nam">progress</span><span class="op">,</span> <span class="nam">controlLine</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t135" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t136" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t137" class="stm run hide_run"><span class="key">def</span> <span class="nam">_ElapsedSecs2Str</span><span class="op">(</span><span class="nam">secs</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t138" class="stm mis">    <span class="nam">tdelta</span> <span class="op">=</span> <span class="nam">datetime</span><span class="op">.</span><span class="nam">timedelta</span><span class="op">(</span><span class="nam">seconds</span><span class="op">=</span><span class="nam">secs</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t139" class="stm mis">    <span class="nam">hours</span><span class="op">,</span> <span class="nam">rem</span> <span class="op">=</span> <span class="nam">divmod</span><span class="op">(</span><span class="nam">tdelta</span><span class="op">.</span><span class="nam">seconds</span><span class="op">,</span> <span class="num">3600</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t140" class="stm mis">    <span class="nam">minutes</span><span class="op">,</span> <span class="nam">seconds</span> <span class="op">=</span> <span class="nam">divmod</span><span class="op">(</span><span class="nam">rem</span><span class="op">,</span> <span class="num">60</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t141" class="stm mis">    <span class="nam">fmt</span> <span class="op">=</span> <span class="str">""</span><span class="strut">&nbsp;</span></p>
+<p id="t142" class="stm mis">    <span class="key">if</span> <span class="nam">tdelta</span><span class="op">.</span><span class="nam">days</span> <span class="op">></span> <span class="num">0</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t143" class="stm mis">        <span class="nam">fmt</span> <span class="op">=</span> <span class="str">"%dd,"</span> <span class="op">%</span> <span class="op">(</span><span class="nam">tdelta</span><span class="op">.</span><span class="nam">days</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t144" class="stm mis">    <span class="nam">fmt</span> <span class="op">=</span> <span class="str">"%s%02d:%02d:%02d"</span> <span class="op">%</span> <span class="op">(</span><span class="nam">fmt</span><span class="op">,</span> <span class="nam">hours</span><span class="op">,</span> <span class="nam">minutes</span><span class="op">,</span> <span class="nam">seconds</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t145" class="stm mis">    <span class="key">return</span> <span class="nam">fmt</span><span class="strut">&nbsp;</span></p>
+<p id="t146" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t147" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t148" class="stm run hide_run"><span class="key">def</span> <span class="nam">_RemainingSecs2Str</span><span class="op">(</span><span class="nam">secs</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t149" class="stm mis">    <span class="nam">tdelta</span> <span class="op">=</span> <span class="nam">datetime</span><span class="op">.</span><span class="nam">timedelta</span><span class="op">(</span><span class="nam">seconds</span><span class="op">=</span><span class="nam">secs</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t150" class="stm mis">    <span class="nam">hours</span><span class="op">,</span> <span class="nam">rem</span> <span class="op">=</span> <span class="nam">divmod</span><span class="op">(</span><span class="nam">tdelta</span><span class="op">.</span><span class="nam">seconds</span><span class="op">,</span> <span class="num">3600</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t151" class="stm mis">    <span class="nam">minutes</span><span class="op">,</span> <span class="nam">seconds</span> <span class="op">=</span> <span class="nam">divmod</span><span class="op">(</span><span class="nam">rem</span><span class="op">,</span> <span class="num">60</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t152" class="stm mis">    <span class="nam">fmt</span> <span class="op">=</span> <span class="str">""</span><span class="strut">&nbsp;</span></p>
+<p id="t153" class="stm mis">    <span class="key">if</span> <span class="nam">tdelta</span><span class="op">.</span><span class="nam">days</span> <span class="op">></span> <span class="num">0</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t154" class="stm mis">        <span class="nam">fmt</span> <span class="op">=</span> <span class="str">"%dd"</span> <span class="op">%</span> <span class="op">(</span><span class="nam">tdelta</span><span class="op">.</span><span class="nam">days</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t155" class="stm mis">        <span class="key">if</span> <span class="nam">hours</span> <span class="op">></span> <span class="num">0</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t156" class="stm mis">            <span class="nam">fmt</span> <span class="op">=</span> <span class="str">"%s %dh"</span> <span class="op">%</span> <span class="op">(</span><span class="nam">fmt</span><span class="op">,</span> <span class="nam">hours</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t157" class="stm mis">        <span class="key">if</span> <span class="nam">minutes</span> <span class="op">></span> <span class="num">0</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t158" class="stm mis">            <span class="nam">fmt</span> <span class="op">=</span> <span class="str">"%s %dmin"</span> <span class="op">%</span> <span class="op">(</span><span class="nam">fmt</span><span class="op">,</span> <span class="nam">minutes</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t159" class="stm mis">    <span class="key">elif</span> <span class="nam">hours</span> <span class="op">></span> <span class="num">0</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t160" class="stm mis">        <span class="nam">fmt</span> <span class="op">=</span> <span class="str">"%dh"</span> <span class="op">%</span> <span class="nam">hours</span><span class="strut">&nbsp;</span></p>
+<p id="t161" class="stm mis">        <span class="key">if</span> <span class="nam">minutes</span> <span class="op">></span> <span class="num">0</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t162" class="stm mis">            <span class="nam">fmt</span> <span class="op">=</span> <span class="str">"%s %dmin"</span> <span class="op">%</span> <span class="op">(</span><span class="nam">fmt</span><span class="op">,</span> <span class="nam">minutes</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t163" class="stm mis">    <span class="key">elif</span> <span class="nam">minutes</span> <span class="op">></span> <span class="num">5</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t164" class="stm mis">        <span class="nam">fmt</span> <span class="op">=</span> <span class="str">"%dmin"</span> <span class="op">%</span> <span class="nam">minutes</span><span class="strut">&nbsp;</span></p>
+<p id="t165" class="stm mis">    <span class="key">elif</span> <span class="nam">minutes</span> <span class="op">></span> <span class="num">0</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t166" class="stm mis">        <span class="nam">fmt</span> <span class="op">=</span> <span class="str">"%dmin"</span> <span class="op">%</span> <span class="nam">minutes</span><span class="strut">&nbsp;</span></p>
+<p id="t167" class="stm mis">        <span class="key">if</span> <span class="nam">seconds</span> <span class="op">>=</span> <span class="num">30</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t168" class="stm mis">            <span class="nam">fmt</span> <span class="op">=</span> <span class="str">"%s 30sec"</span> <span class="op">%</span> <span class="nam">fmt</span><span class="strut">&nbsp;</span></p>
+<p id="t169" class="stm mis">    <span class="key">elif</span> <span class="nam">seconds</span> <span class="op">></span> <span class="num">45</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t170" class="stm mis">        <span class="nam">fmt</span> <span class="op">=</span> <span class="str">"&lt; 1min"</span><span class="strut">&nbsp;</span></p>
+<p id="t171" class="stm mis">    <span class="key">elif</span> <span class="nam">seconds</span> <span class="op">></span> <span class="num">30</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t172" class="stm mis">        <span class="nam">fmt</span> <span class="op">=</span> <span class="str">"&lt; 45sec"</span><span class="strut">&nbsp;</span></p>
+<p id="t173" class="stm mis">    <span class="key">elif</span> <span class="nam">seconds</span> <span class="op">></span> <span class="num">15</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t174" class="stm mis">        <span class="nam">fmt</span> <span class="op">=</span> <span class="str">"&lt; 30sec"</span><span class="strut">&nbsp;</span></p>
+<p id="t175" class="pln">    <span class="key">else</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t176" class="stm mis">        <span class="nam">fmt</span> <span class="op">=</span> <span class="str">"%dsec"</span> <span class="op">%</span> <span class="nam">seconds</span><span class="strut">&nbsp;</span></p>
+<p id="t177" class="stm mis">    <span class="key">return</span> <span class="nam">fmt</span><span class="strut">&nbsp;</span></p>
+<p id="t178" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t179" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t180" class="stm run hide_run"><span class="key">def</span> <span class="nam">TransferProgress</span><span class="op">(</span><span class="nam">progress</span><span class="op">,</span> <span class="nam">eta</span><span class="op">,</span> <span class="nam">changed_bytes</span><span class="op">,</span> <span class="nam">elapsed</span><span class="op">,</span> <span class="nam">speed</span><span class="op">,</span> <span class="nam">stalled</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t181" class="pln">    <span class="str">"""Shortcut used for upload progress messages (verbosity 5)."""</span><span class="strut">&nbsp;</span></p>
+<p id="t182" class="stm mis">    <span class="nam">dots</span> <span class="op">=</span> <span class="nam">int</span><span class="op">(</span><span class="num">0.4</span> <span class="op">*</span> <span class="nam">progress</span><span class="op">)</span>  <span class="com"># int(40.0 * progress / 100.0) -- for 40 chars</span><span class="strut">&nbsp;</span></p>
+<p id="t183" class="stm mis">    <span class="nam">data_amount</span> <span class="op">=</span> <span class="nam">float</span><span class="op">(</span><span class="nam">changed_bytes</span><span class="op">)</span> <span class="op">/</span> <span class="num">1024.0</span><span class="strut">&nbsp;</span></p>
+<p id="t184" class="stm mis">    <span class="nam">data_scale</span> <span class="op">=</span> <span class="str">"KB"</span><span class="strut">&nbsp;</span></p>
+<p id="t185" class="stm mis">    <span class="key">if</span> <span class="nam">data_amount</span> <span class="op">></span> <span class="num">1000.0</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t186" class="stm mis">        <span class="nam">data_amount</span> <span class="op">/=</span> <span class="num">1024.0</span><span class="strut">&nbsp;</span></p>
+<p id="t187" class="stm mis">        <span class="nam">data_scale</span> <span class="op">=</span> <span class="str">"MB"</span><span class="strut">&nbsp;</span></p>
+<p id="t188" class="stm mis">    <span class="key">if</span> <span class="nam">data_amount</span> <span class="op">></span> <span class="num">1000.0</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t189" class="stm mis">        <span class="nam">data_amount</span> <span class="op">/=</span> <span class="num">1024.0</span><span class="strut">&nbsp;</span></p>
+<p id="t190" class="stm mis">        <span class="nam">data_scale</span> <span class="op">=</span> <span class="str">"GB"</span><span class="strut">&nbsp;</span></p>
+<p id="t191" class="stm mis">    <span class="key">if</span> <span class="nam">stalled</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t192" class="stm mis">        <span class="nam">eta_str</span> <span class="op">=</span> <span class="str">"Stalled!"</span><span class="strut">&nbsp;</span></p>
+<p id="t193" class="stm mis">        <span class="nam">speed_amount</span> <span class="op">=</span> <span class="num">0</span><span class="strut">&nbsp;</span></p>
+<p id="t194" class="stm mis">        <span class="nam">speed_scale</span> <span class="op">=</span> <span class="str">"B"</span><span class="strut">&nbsp;</span></p>
+<p id="t195" class="pln">    <span class="key">else</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t196" class="stm mis">        <span class="nam">eta_str</span> <span class="op">=</span> <span class="nam">_RemainingSecs2Str</span><span class="op">(</span><span class="nam">eta</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t197" class="stm mis">        <span class="nam">speed_amount</span> <span class="op">=</span> <span class="nam">float</span><span class="op">(</span><span class="nam">speed</span><span class="op">)</span> <span class="op">/</span> <span class="num">1024.0</span><span class="strut">&nbsp;</span></p>
+<p id="t198" class="stm mis">        <span class="nam">speed_scale</span> <span class="op">=</span> <span class="str">"KB"</span><span class="strut">&nbsp;</span></p>
+<p id="t199" class="stm mis">        <span class="key">if</span> <span class="nam">speed_amount</span> <span class="op">></span> <span class="num">1000.0</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t200" class="stm mis">            <span class="nam">speed_amount</span> <span class="op">/=</span> <span class="num">1024.0</span><span class="strut">&nbsp;</span></p>
+<p id="t201" class="stm mis">            <span class="nam">speed_scale</span> <span class="op">=</span> <span class="str">"MB"</span><span class="strut">&nbsp;</span></p>
+<p id="t202" class="stm mis">        <span class="key">if</span> <span class="nam">speed_amount</span> <span class="op">></span> <span class="num">1000.0</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t203" class="stm mis">            <span class="nam">speed_amount</span> <span class="op">/=</span> <span class="num">1024.0</span><span class="strut">&nbsp;</span></p>
+<p id="t204" class="stm mis">            <span class="nam">speed_scale</span> <span class="op">=</span> <span class="str">"GB"</span><span class="strut">&nbsp;</span></p>
+<p id="t205" class="stm mis">    <span class="nam">s</span> <span class="op">=</span> <span class="str">"%.1f%s %s [%.1f%s/s] [%s>%s] %d%% ETA %s"</span> <span class="op">%</span> <span class="op">(</span><span class="nam">data_amount</span><span class="op">,</span> <span class="nam">data_scale</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t206" class="pln">                                                      <span class="nam">_ElapsedSecs2Str</span><span class="op">(</span><span class="nam">elapsed</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t207" class="pln">                                                      <span class="nam">speed_amount</span><span class="op">,</span> <span class="nam">speed_scale</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t208" class="pln">                                                      <span class="str">'='</span> <span class="op">*</span> <span class="nam">dots</span><span class="op">,</span> <span class="str">' '</span> <span class="op">*</span> <span class="op">(</span><span class="num">40</span> <span class="op">-</span> <span class="nam">dots</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t209" class="pln">                                                      <span class="nam">progress</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t210" class="pln">                                                      <span class="nam">eta_str</span><span class="strut">&nbsp;</span></p>
+<p id="t211" class="pln">                                                      <span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t212" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t213" class="stm mis">    <span class="nam">controlLine</span> <span class="op">=</span> <span class="str">"%d %d %d %d %d %d"</span> <span class="op">%</span> <span class="op">(</span><span class="nam">changed_bytes</span><span class="op">,</span> <span class="nam">elapsed</span><span class="op">,</span> <span class="nam">progress</span><span class="op">,</span> <span class="nam">eta</span><span class="op">,</span> <span class="nam">speed</span><span class="op">,</span> <span class="nam">stalled</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t214" class="stm mis">    <span class="nam">Log</span><span class="op">(</span><span class="nam">s</span><span class="op">,</span> <span class="nam">NOTICE</span><span class="op">,</span> <span class="nam">InfoCode</span><span class="op">.</span><span class="nam">upload_progress</span><span class="op">,</span> <span class="nam">controlLine</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t215" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t216" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t217" class="stm run hide_run"><span class="key">def</span> <span class="nam">PrintCollectionStatus</span><span class="op">(</span><span class="nam">col_stats</span><span class="op">,</span> <span class="nam">force_print</span><span class="op">=</span><span class="nam">False</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t218" class="pln">    <span class="str">"""Prints a collection status to the log"""</span><span class="strut">&nbsp;</span></p>
+<p id="t219" class="stm mis">    <span class="nam">Log</span><span class="op">(</span><span class="nam">unicode</span><span class="op">(</span><span class="nam">col_stats</span><span class="op">)</span><span class="op">,</span> <span class="num">8</span><span class="op">,</span> <span class="nam">InfoCode</span><span class="op">.</span><span class="nam">collection_status</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t220" class="pln">        <span class="str">'\n'</span> <span class="op">+</span> <span class="str">'\n'</span><span class="op">.</span><span class="nam">join</span><span class="op">(</span><span class="nam">col_stats</span><span class="op">.</span><span class="nam">to_log_info</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">,</span> <span class="nam">force_print</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t221" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t222" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t223" class="stm run hide_run"><span class="key">def</span> <span class="nam">PrintCollectionFileChangedStatus</span><span class="op">(</span><span class="nam">col_stats</span><span class="op">,</span> <span class="nam">filepath</span><span class="op">,</span> <span class="nam">force_print</span><span class="op">=</span><span class="nam">False</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t224" class="pln">    <span class="str">"""Prints a collection status to the log"""</span><span class="strut">&nbsp;</span></p>
+<p id="t225" class="stm mis">    <span class="nam">Log</span><span class="op">(</span><span class="nam">unicode</span><span class="op">(</span><span class="nam">col_stats</span><span class="op">.</span><span class="nam">get_file_changed_record</span><span class="op">(</span><span class="nam">filepath</span><span class="op">)</span><span class="op">)</span><span class="op">,</span> <span class="num">8</span><span class="op">,</span> <span class="nam">InfoCode</span><span class="op">.</span><span class="nam">collection_status</span><span class="op">,</span> <span class="nam">None</span><span class="op">,</span> <span class="nam">force_print</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t226" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t227" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t228" class="stm run hide_run"><span class="key">def</span> <span class="nam">Notice</span><span class="op">(</span><span class="nam">s</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t229" class="pln">    <span class="str">"""Shortcut used for notice messages (verbosity 3, the default)."""</span><span class="strut">&nbsp;</span></p>
+<p id="t230" class="stm run hide_run">    <span class="nam">Log</span><span class="op">(</span><span class="nam">s</span><span class="op">,</span> <span class="nam">NOTICE</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t231" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t232" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t233" class="stm run hide_run"><span class="key">class</span> <span class="nam">WarningCode</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t234" class="pln">    <span class="str">"""Enumeration class to hold warning code values.</span><span class="strut">&nbsp;</span></p>
+<p id="t235" class="pln"><span class="str">       These values should never change, as frontends rely upon them.</span><span class="strut">&nbsp;</span></p>
+<p id="t236" class="pln"><span class="str">       Don't use 0 or negative numbers."""</span><span class="strut">&nbsp;</span></p>
+<p id="t237" class="stm run hide_run">    <span class="nam">generic</span> <span class="op">=</span> <span class="num">1</span><span class="strut">&nbsp;</span></p>
+<p id="t238" class="stm run hide_run">    <span class="nam">orphaned_sig</span> <span class="op">=</span> <span class="num">2</span><span class="strut">&nbsp;</span></p>
+<p id="t239" class="stm run hide_run">    <span class="nam">unnecessary_sig</span> <span class="op">=</span> <span class="num">3</span><span class="strut">&nbsp;</span></p>
+<p id="t240" class="stm run hide_run">    <span class="nam">unmatched_sig</span> <span class="op">=</span> <span class="num">4</span><span class="strut">&nbsp;</span></p>
+<p id="t241" class="stm run hide_run">    <span class="nam">incomplete_backup</span> <span class="op">=</span> <span class="num">5</span><span class="strut">&nbsp;</span></p>
+<p id="t242" class="stm run hide_run">    <span class="nam">orphaned_backup</span> <span class="op">=</span> <span class="num">6</span><span class="strut">&nbsp;</span></p>
+<p id="t243" class="stm run hide_run">    <span class="nam">ftp_ncftp_v320</span> <span class="op">=</span> <span class="num">7</span>  <span class="com"># moved from error</span><span class="strut">&nbsp;</span></p>
+<p id="t244" class="stm run hide_run">    <span class="nam">cannot_iterate</span> <span class="op">=</span> <span class="num">8</span><span class="strut">&nbsp;</span></p>
+<p id="t245" class="stm run hide_run">    <span class="nam">cannot_stat</span> <span class="op">=</span> <span class="num">9</span><span class="strut">&nbsp;</span></p>
+<p id="t246" class="stm run hide_run">    <span class="nam">cannot_read</span> <span class="op">=</span> <span class="num">10</span><span class="strut">&nbsp;</span></p>
+<p id="t247" class="stm run hide_run">    <span class="nam">no_sig_for_time</span> <span class="op">=</span> <span class="num">11</span><span class="strut">&nbsp;</span></p>
+<p id="t248" class="stm run hide_run">    <span class="nam">cannot_process</span> <span class="op">=</span> <span class="num">12</span><span class="strut">&nbsp;</span></p>
+<p id="t249" class="stm run hide_run">    <span class="nam">process_skipped</span> <span class="op">=</span> <span class="num">13</span><span class="strut">&nbsp;</span></p>
+<p id="t250" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t251" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t252" class="stm run hide_run"><span class="key">def</span> <span class="nam">Warn</span><span class="op">(</span><span class="nam">s</span><span class="op">,</span> <span class="nam">code</span><span class="op">=</span><span class="nam">WarningCode</span><span class="op">.</span><span class="nam">generic</span><span class="op">,</span> <span class="nam">extra</span><span class="op">=</span><span class="nam">None</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t253" class="pln">    <span class="str">"""Shortcut used for warning messages (verbosity 2)"""</span><span class="strut">&nbsp;</span></p>
+<p id="t254" class="stm run hide_run">    <span class="nam">Log</span><span class="op">(</span><span class="nam">s</span><span class="op">,</span> <span class="nam">WARNING</span><span class="op">,</span> <span class="nam">code</span><span class="op">,</span> <span class="nam">extra</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t255" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t256" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t257" class="stm run hide_run"><span class="key">class</span> <span class="nam">ErrorCode</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t258" class="pln">    <span class="str">"""Enumeration class to hold error code values.</span><span class="strut">&nbsp;</span></p>
+<p id="t259" class="pln"><span class="str">       These values should never change, as frontends rely upon them.</span><span class="strut">&nbsp;</span></p>
+<p id="t260" class="pln"><span class="str">       Don't use 0 or negative numbers.  This code is returned by duplicity</span><span class="strut">&nbsp;</span></p>
+<p id="t261" class="pln"><span class="str">       to indicate which error occurred via both exit code and log."""</span><span class="strut">&nbsp;</span></p>
+<p id="t262" class="stm run hide_run">    <span class="nam">generic</span> <span class="op">=</span> <span class="num">1</span>  <span class="com"># Don't use if possible, please create a new code and use it</span><span class="strut">&nbsp;</span></p>
+<p id="t263" class="stm run hide_run">    <span class="nam">command_line</span> <span class="op">=</span> <span class="num">2</span><span class="strut">&nbsp;</span></p>
+<p id="t264" class="stm run hide_run">    <span class="nam">hostname_mismatch</span> <span class="op">=</span> <span class="num">3</span><span class="strut">&nbsp;</span></p>
+<p id="t265" class="stm run hide_run">    <span class="nam">no_manifests</span> <span class="op">=</span> <span class="num">4</span><span class="strut">&nbsp;</span></p>
+<p id="t266" class="stm run hide_run">    <span class="nam">mismatched_manifests</span> <span class="op">=</span> <span class="num">5</span><span class="strut">&nbsp;</span></p>
+<p id="t267" class="stm run hide_run">    <span class="nam">unreadable_manifests</span> <span class="op">=</span> <span class="num">6</span><span class="strut">&nbsp;</span></p>
+<p id="t268" class="stm run hide_run">    <span class="nam">cant_open_filelist</span> <span class="op">=</span> <span class="num">7</span><span class="strut">&nbsp;</span></p>
+<p id="t269" class="stm run hide_run">    <span class="nam">bad_url</span> <span class="op">=</span> <span class="num">8</span><span class="strut">&nbsp;</span></p>
+<p id="t270" class="stm run hide_run">    <span class="nam">bad_archive_dir</span> <span class="op">=</span> <span class="num">9</span><span class="strut">&nbsp;</span></p>
+<p id="t271" class="stm run hide_run">    <span class="nam">bad_sign_key</span> <span class="op">=</span> <span class="num">10</span><span class="strut">&nbsp;</span></p>
+<p id="t272" class="stm run hide_run">    <span class="nam">restore_dir_exists</span> <span class="op">=</span> <span class="num">11</span><span class="strut">&nbsp;</span></p>
+<p id="t273" class="stm run hide_run">    <span class="nam">verify_dir_doesnt_exist</span> <span class="op">=</span> <span class="num">12</span><span class="strut">&nbsp;</span></p>
+<p id="t274" class="stm run hide_run">    <span class="nam">backup_dir_doesnt_exist</span> <span class="op">=</span> <span class="num">13</span><span class="strut">&nbsp;</span></p>
+<p id="t275" class="stm run hide_run">    <span class="nam">file_prefix_error</span> <span class="op">=</span> <span class="num">14</span><span class="strut">&nbsp;</span></p>
+<p id="t276" class="stm run hide_run">    <span class="nam">globbing_error</span> <span class="op">=</span> <span class="num">15</span><span class="strut">&nbsp;</span></p>
+<p id="t277" class="stm run hide_run">    <span class="nam">redundant_inclusion</span> <span class="op">=</span> <span class="num">16</span><span class="strut">&nbsp;</span></p>
+<p id="t278" class="stm run hide_run">    <span class="nam">inc_without_sigs</span> <span class="op">=</span> <span class="num">17</span><span class="strut">&nbsp;</span></p>
+<p id="t279" class="stm run hide_run">    <span class="nam">no_sigs</span> <span class="op">=</span> <span class="num">18</span><span class="strut">&nbsp;</span></p>
+<p id="t280" class="stm run hide_run">    <span class="nam">restore_dir_not_found</span> <span class="op">=</span> <span class="num">19</span><span class="strut">&nbsp;</span></p>
+<p id="t281" class="stm run hide_run">    <span class="nam">no_restore_files</span> <span class="op">=</span> <span class="num">20</span><span class="strut">&nbsp;</span></p>
+<p id="t282" class="stm run hide_run">    <span class="nam">mismatched_hash</span> <span class="op">=</span> <span class="num">21</span><span class="strut">&nbsp;</span></p>
+<p id="t283" class="stm run hide_run">    <span class="nam">unsigned_volume</span> <span class="op">=</span> <span class="num">22</span><span class="strut">&nbsp;</span></p>
+<p id="t284" class="stm run hide_run">    <span class="nam">user_error</span> <span class="op">=</span> <span class="num">23</span><span class="strut">&nbsp;</span></p>
+<p id="t285" class="stm run hide_run">    <span class="nam">boto_old_style</span> <span class="op">=</span> <span class="num">24</span><span class="strut">&nbsp;</span></p>
+<p id="t286" class="stm run hide_run">    <span class="nam">boto_lib_too_old</span> <span class="op">=</span> <span class="num">25</span><span class="strut">&nbsp;</span></p>
+<p id="t287" class="stm run hide_run">    <span class="nam">boto_calling_format</span> <span class="op">=</span> <span class="num">26</span><span class="strut">&nbsp;</span></p>
+<p id="t288" class="stm run hide_run">    <span class="nam">ftp_ncftp_missing</span> <span class="op">=</span> <span class="num">27</span><span class="strut">&nbsp;</span></p>
+<p id="t289" class="stm run hide_run">    <span class="nam">ftp_ncftp_too_old</span> <span class="op">=</span> <span class="num">28</span><span class="strut">&nbsp;</span></p>
+<p id="t290" class="pln">    <span class="com"># ftp_ncftp_v320 = 29 # moved to warning</span><span class="strut">&nbsp;</span></p>
+<p id="t291" class="stm run hide_run">    <span class="nam">exception</span> <span class="op">=</span> <span class="num">30</span><span class="strut">&nbsp;</span></p>
+<p id="t292" class="stm run hide_run">    <span class="nam">gpg_failed</span> <span class="op">=</span> <span class="num">31</span><span class="strut">&nbsp;</span></p>
+<p id="t293" class="stm run hide_run">    <span class="nam">s3_bucket_not_style</span> <span class="op">=</span> <span class="num">32</span><span class="strut">&nbsp;</span></p>
+<p id="t294" class="stm run hide_run">    <span class="nam">not_implemented</span> <span class="op">=</span> <span class="num">33</span><span class="strut">&nbsp;</span></p>
+<p id="t295" class="stm run hide_run">    <span class="nam">get_freespace_failed</span> <span class="op">=</span> <span class="num">34</span><span class="strut">&nbsp;</span></p>
+<p id="t296" class="stm run hide_run">    <span class="nam">not_enough_freespace</span> <span class="op">=</span> <span class="num">35</span><span class="strut">&nbsp;</span></p>
+<p id="t297" class="stm run hide_run">    <span class="nam">get_ulimit_failed</span> <span class="op">=</span> <span class="num">36</span><span class="strut">&nbsp;</span></p>
+<p id="t298" class="stm run hide_run">    <span class="nam">maxopen_too_low</span> <span class="op">=</span> <span class="num">37</span><span class="strut">&nbsp;</span></p>
+<p id="t299" class="stm run hide_run">    <span class="nam">connection_failed</span> <span class="op">=</span> <span class="num">38</span><span class="strut">&nbsp;</span></p>
+<p id="t300" class="stm run hide_run">    <span class="nam">restart_file_not_found</span> <span class="op">=</span> <span class="num">39</span><span class="strut">&nbsp;</span></p>
+<p id="t301" class="stm run hide_run">    <span class="nam">gio_not_available</span> <span class="op">=</span> <span class="num">40</span><span class="strut">&nbsp;</span></p>
+<p id="t302" class="stm run hide_run">    <span class="nam">source_dir_mismatch</span> <span class="op">=</span> <span class="num">42</span>  <span class="com"># 41 is reserved for par2</span><span class="strut">&nbsp;</span></p>
+<p id="t303" class="stm run hide_run">    <span class="nam">ftps_lftp_missing</span> <span class="op">=</span> <span class="num">43</span><span class="strut">&nbsp;</span></p>
+<p id="t304" class="stm run hide_run">    <span class="nam">volume_wrong_size</span> <span class="op">=</span> <span class="num">44</span><span class="strut">&nbsp;</span></p>
+<p id="t305" class="stm run hide_run">    <span class="nam">enryption_mismatch</span> <span class="op">=</span> <span class="num">45</span><span class="strut">&nbsp;</span></p>
+<p id="t306" class="stm run hide_run">    <span class="nam">pythonoptimize_set</span> <span class="op">=</span> <span class="num">46</span><span class="strut">&nbsp;</span></p>
+<p id="t307" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t308" class="stm run hide_run">    <span class="nam">dpbx_nologin</span> <span class="op">=</span> <span class="num">47</span><span class="strut">&nbsp;</span></p>
+<p id="t309" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t310" class="stm run hide_run">    <span class="nam">bad_request</span> <span class="op">=</span> <span class="num">48</span><span class="strut">&nbsp;</span></p>
+<p id="t311" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t312" class="pln">    <span class="com"># 50->69 reserved for backend errors</span><span class="strut">&nbsp;</span></p>
+<p id="t313" class="stm run hide_run">    <span class="nam">backend_error</span> <span class="op">=</span> <span class="num">50</span><span class="strut">&nbsp;</span></p>
+<p id="t314" class="stm run hide_run">    <span class="nam">backend_permission_denied</span> <span class="op">=</span> <span class="num">51</span><span class="strut">&nbsp;</span></p>
+<p id="t315" class="stm run hide_run">    <span class="nam">backend_not_found</span> <span class="op">=</span> <span class="num">52</span><span class="strut">&nbsp;</span></p>
+<p id="t316" class="stm run hide_run">    <span class="nam">backend_no_space</span> <span class="op">=</span> <span class="num">53</span><span class="strut">&nbsp;</span></p>
+<p id="t317" class="stm run hide_run">    <span class="nam">backend_command_error</span> <span class="op">=</span> <span class="num">54</span><span class="strut">&nbsp;</span></p>
+<p id="t318" class="stm run hide_run">    <span class="nam">backend_code_error</span> <span class="op">=</span> <span class="num">55</span><span class="strut">&nbsp;</span></p>
+<p id="t319" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t320" class="pln">    <span class="com"># Reserve 126 because it is used as an error code for pkexec</span><span class="strut">&nbsp;</span></p>
+<p id="t321" class="pln">    <span class="com"># Reserve 127 because it is used as an error code for pkexec</span><span class="strut">&nbsp;</span></p>
+<p id="t322" class="pln">    <span class="com"># Reserve 255 because it is used as an error code for gksu</span><span class="strut">&nbsp;</span></p>
+<p id="t323" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t324" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t325" class="stm run hide_run"><span class="key">def</span> <span class="nam">Error</span><span class="op">(</span><span class="nam">s</span><span class="op">,</span> <span class="nam">code</span><span class="op">=</span><span class="nam">ErrorCode</span><span class="op">.</span><span class="nam">generic</span><span class="op">,</span> <span class="nam">extra</span><span class="op">=</span><span class="nam">None</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t326" class="pln">    <span class="str">"""Write error message"""</span><span class="strut">&nbsp;</span></p>
+<p id="t327" class="stm mis">    <span class="nam">Log</span><span class="op">(</span><span class="nam">s</span><span class="op">,</span> <span class="nam">ERROR</span><span class="op">,</span> <span class="nam">code</span><span class="op">,</span> <span class="nam">extra</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t328" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t329" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t330" class="stm run hide_run"><span class="key">def</span> <span class="nam">FatalError</span><span class="op">(</span><span class="nam">s</span><span class="op">,</span> <span class="nam">code</span><span class="op">=</span><span class="nam">ErrorCode</span><span class="op">.</span><span class="nam">generic</span><span class="op">,</span> <span class="nam">extra</span><span class="op">=</span><span class="nam">None</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t331" class="pln">    <span class="str">"""Write fatal error message and exit"""</span><span class="strut">&nbsp;</span></p>
+<p id="t332" class="stm run hide_run">    <span class="nam">Log</span><span class="op">(</span><span class="nam">s</span><span class="op">,</span> <span class="nam">ERROR</span><span class="op">,</span> <span class="nam">code</span><span class="op">,</span> <span class="nam">extra</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t333" class="stm run hide_run">    <span class="nam">shutdown</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t334" class="stm run hide_run">    <span class="nam">sys</span><span class="op">.</span><span class="nam">exit</span><span class="op">(</span><span class="nam">code</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t335" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t336" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t337" class="stm run hide_run"><span class="key">class</span> <span class="nam">OutFilter</span><span class="op">(</span><span class="nam">logging</span><span class="op">.</span><span class="nam">Filter</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t338" class="pln">    <span class="str">"""Filter that only allows warning or less important messages"""</span><span class="strut">&nbsp;</span></p>
+<p id="t339" class="stm run hide_run">    <span class="key">def</span> <span class="nam">filter</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">record</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t340" class="stm run hide_run">        <span class="key">return</span> <span class="nam">record</span><span class="op">.</span><span class="nam">msg</span> <span class="key">and</span> <span class="nam">record</span><span class="op">.</span><span class="nam">levelno</span> <span class="op">&lt;=</span> <span class="nam">DupToLoggerLevel</span><span class="op">(</span><span class="nam">WARNING</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t341" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t342" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t343" class="stm run hide_run"><span class="key">class</span> <span class="nam">ErrFilter</span><span class="op">(</span><span class="nam">logging</span><span class="op">.</span><span class="nam">Filter</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t344" class="pln">    <span class="str">"""Filter that only allows messages more important than warnings"""</span><span class="strut">&nbsp;</span></p>
+<p id="t345" class="stm run hide_run">    <span class="key">def</span> <span class="nam">filter</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">record</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t346" class="stm run hide_run">        <span class="key">return</span> <span class="nam">record</span><span class="op">.</span><span class="nam">msg</span> <span class="key">and</span> <span class="nam">record</span><span class="op">.</span><span class="nam">levelno</span> <span class="op">></span> <span class="nam">DupToLoggerLevel</span><span class="op">(</span><span class="nam">WARNING</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t347" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t348" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t349" class="stm run hide_run"><span class="key">def</span> <span class="nam">setup</span><span class="op">(</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t350" class="pln">    <span class="str">"""Initialize logging"""</span><span class="strut">&nbsp;</span></p>
+<p id="t351" class="pln">    <span class="key">global</span> <span class="nam">_logger</span><span class="strut">&nbsp;</span></p>
+<p id="t352" class="stm run hide_run">    <span class="key">if</span> <span class="nam">_logger</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t353" class="stm run hide_run">        <span class="key">return</span><span class="strut">&nbsp;</span></p>
+<p id="t354" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t355" class="stm run hide_run">    <span class="nam">_logger</span> <span class="op">=</span> <span class="nam">logging</span><span class="op">.</span><span class="nam">getLogger</span><span class="op">(</span><span class="str">"duplicity"</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t356" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t357" class="pln">    <span class="com"># Default verbosity allows notices and above</span><span class="strut">&nbsp;</span></p>
+<p id="t358" class="stm run hide_run">    <span class="nam">setverbosity</span><span class="op">(</span><span class="nam">NOTICE</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t359" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t360" class="pln">    <span class="com"># stdout and stderr are for different logging levels</span><span class="strut">&nbsp;</span></p>
+<p id="t361" class="stm run hide_run">    <span class="nam">outHandler</span> <span class="op">=</span> <span class="nam">logging</span><span class="op">.</span><span class="nam">StreamHandler</span><span class="op">(</span><span class="nam">sys</span><span class="op">.</span><span class="nam">stdout</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t362" class="stm run hide_run">    <span class="nam">outHandler</span><span class="op">.</span><span class="nam">addFilter</span><span class="op">(</span><span class="nam">OutFilter</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t363" class="stm run hide_run">    <span class="nam">_logger</span><span class="op">.</span><span class="nam">addHandler</span><span class="op">(</span><span class="nam">outHandler</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t364" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t365" class="stm run hide_run">    <span class="nam">errHandler</span> <span class="op">=</span> <span class="nam">logging</span><span class="op">.</span><span class="nam">StreamHandler</span><span class="op">(</span><span class="nam">sys</span><span class="op">.</span><span class="nam">stderr</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t366" class="stm run hide_run">    <span class="nam">errHandler</span><span class="op">.</span><span class="nam">addFilter</span><span class="op">(</span><span class="nam">ErrFilter</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t367" class="stm run hide_run">    <span class="nam">_logger</span><span class="op">.</span><span class="nam">addHandler</span><span class="op">(</span><span class="nam">errHandler</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t368" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t369" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t370" class="stm run hide_run"><span class="key">class</span> <span class="nam">MachineFormatter</span><span class="op">(</span><span class="nam">logging</span><span class="op">.</span><span class="nam">Formatter</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t371" class="pln">    <span class="str">"""Formatter that creates messages in a syntax easily consumable by other</span><span class="strut">&nbsp;</span></p>
+<p id="t372" class="pln"><span class="str">       processes."""</span><span class="strut">&nbsp;</span></p>
+<p id="t373" class="stm run hide_run">    <span class="key">def</span> <span class="nam">__init__</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t374" class="pln">        <span class="com"># 'message' will be appended by format()</span><span class="strut">&nbsp;</span></p>
+<p id="t375" class="pln">        <span class="com"># Note that we use our own, custom-created 'levelName' instead of the</span><span class="strut">&nbsp;</span></p>
+<p id="t376" class="pln">        <span class="com"># standard 'levelname'.  This is because the standard 'levelname' can</span><span class="strut">&nbsp;</span></p>
+<p id="t377" class="pln">        <span class="com"># be adjusted by any library anywhere in our stack without us knowing.</span><span class="strut">&nbsp;</span></p>
+<p id="t378" class="pln">        <span class="com"># But we control 'levelName'.</span><span class="strut">&nbsp;</span></p>
+<p id="t379" class="stm mis">        <span class="nam">logging</span><span class="op">.</span><span class="nam">Formatter</span><span class="op">.</span><span class="nam">__init__</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="str">"%(levelName)s %(controlLine)s"</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t380" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t381" class="stm run hide_run">    <span class="key">def</span> <span class="nam">format</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">record</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t382" class="stm mis">        <span class="nam">s</span> <span class="op">=</span> <span class="nam">logging</span><span class="op">.</span><span class="nam">Formatter</span><span class="op">.</span><span class="nam">format</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">record</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t383" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t384" class="pln">        <span class="com"># Add user-text hint of 'message' back in, with each line prefixed by a</span><span class="strut">&nbsp;</span></p>
+<p id="t385" class="pln">        <span class="com"># dot, so consumers know it's not part of 'controlLine'</span><span class="strut">&nbsp;</span></p>
+<p id="t386" class="stm mis">        <span class="key">if</span> <span class="nam">record</span><span class="op">.</span><span class="nam">message</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t387" class="stm mis">            <span class="nam">s</span> <span class="op">+=</span> <span class="op">(</span><span class="str">'\n'</span> <span class="op">+</span> <span class="nam">record</span><span class="op">.</span><span class="nam">message</span><span class="op">)</span><span class="op">.</span><span class="nam">replace</span><span class="op">(</span><span class="str">'\n'</span><span class="op">,</span> <span class="str">'\n. '</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t388" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t389" class="pln">        <span class="com"># Add a newline so consumers know the message is over.</span><span class="strut">&nbsp;</span></p>
+<p id="t390" class="stm mis">        <span class="key">return</span> <span class="nam">s</span> <span class="op">+</span> <span class="str">'\n'</span><span class="strut">&nbsp;</span></p>
+<p id="t391" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t392" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t393" class="stm run hide_run"><span class="key">class</span> <span class="nam">MachineFilter</span><span class="op">(</span><span class="nam">logging</span><span class="op">.</span><span class="nam">Filter</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t394" class="pln">    <span class="str">"""Filter that only allows levels that are consumable by other processes."""</span><span class="strut">&nbsp;</span></p>
+<p id="t395" class="stm run hide_run">    <span class="key">def</span> <span class="nam">filter</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">record</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t396" class="pln">        <span class="com"># We only want to allow records that have our custom level names</span><span class="strut">&nbsp;</span></p>
+<p id="t397" class="stm mis">        <span class="key">return</span> <span class="nam">hasattr</span><span class="op">(</span><span class="nam">record</span><span class="op">,</span> <span class="str">'levelName'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t398" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t399" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t400" class="stm run hide_run"><span class="key">def</span> <span class="nam">add_fd</span><span class="op">(</span><span class="nam">fd</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t401" class="pln">    <span class="str">"""Add stream to which to write machine-readable logging"""</span><span class="strut">&nbsp;</span></p>
+<p id="t402" class="pln">    <span class="key">global</span> <span class="nam">_logger</span><span class="strut">&nbsp;</span></p>
+<p id="t403" class="stm mis">    <span class="nam">handler</span> <span class="op">=</span> <span class="nam">logging</span><span class="op">.</span><span class="nam">StreamHandler</span><span class="op">(</span><span class="nam">os</span><span class="op">.</span><span class="nam">fdopen</span><span class="op">(</span><span class="nam">fd</span><span class="op">,</span> <span class="str">'w'</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t404" class="stm mis">    <span class="nam">handler</span><span class="op">.</span><span class="nam">setFormatter</span><span class="op">(</span><span class="nam">MachineFormatter</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t405" class="stm mis">    <span class="nam">handler</span><span class="op">.</span><span class="nam">addFilter</span><span class="op">(</span><span class="nam">MachineFilter</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t406" class="stm mis">    <span class="nam">_logger</span><span class="op">.</span><span class="nam">addHandler</span><span class="op">(</span><span class="nam">handler</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t407" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t408" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t409" class="stm run hide_run"><span class="key">def</span> <span class="nam">add_file</span><span class="op">(</span><span class="nam">filename</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t410" class="pln">    <span class="str">"""Add file to which to write machine-readable logging"""</span><span class="strut">&nbsp;</span></p>
+<p id="t411" class="pln">    <span class="key">global</span> <span class="nam">_logger</span><span class="strut">&nbsp;</span></p>
+<p id="t412" class="stm mis">    <span class="nam">handler</span> <span class="op">=</span> <span class="nam">logging</span><span class="op">.</span><span class="nam">FileHandler</span><span class="op">(</span><span class="nam">filename</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t413" class="stm mis">    <span class="nam">handler</span><span class="op">.</span><span class="nam">setFormatter</span><span class="op">(</span><span class="nam">MachineFormatter</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t414" class="stm mis">    <span class="nam">handler</span><span class="op">.</span><span class="nam">addFilter</span><span class="op">(</span><span class="nam">MachineFilter</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t415" class="stm mis">    <span class="nam">_logger</span><span class="op">.</span><span class="nam">addHandler</span><span class="op">(</span><span class="nam">handler</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t416" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t417" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t418" class="stm run hide_run"><span class="key">def</span> <span class="nam">setverbosity</span><span class="op">(</span><span class="nam">verb</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t419" class="pln">    <span class="str">"""Set the verbosity level"""</span><span class="strut">&nbsp;</span></p>
+<p id="t420" class="pln">    <span class="key">global</span> <span class="nam">_logger</span><span class="strut">&nbsp;</span></p>
+<p id="t421" class="stm run hide_run">    <span class="nam">_logger</span><span class="op">.</span><span class="nam">setLevel</span><span class="op">(</span><span class="nam">DupToLoggerLevel</span><span class="op">(</span><span class="nam">verb</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t422" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t423" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t424" class="stm run hide_run"><span class="key">def</span> <span class="nam">getverbosity</span><span class="op">(</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t425" class="pln">    <span class="str">"""Get the verbosity level"""</span><span class="strut">&nbsp;</span></p>
+<p id="t426" class="pln">    <span class="key">global</span> <span class="nam">_logger</span><span class="strut">&nbsp;</span></p>
+<p id="t427" class="stm run hide_run">    <span class="key">return</span> <span class="nam">LoggerToDupLevel</span><span class="op">(</span><span class="nam">_logger</span><span class="op">.</span><span class="nam">getEffectiveLevel</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t428" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t429" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t430" class="stm run hide_run"><span class="key">def</span> <span class="nam">shutdown</span><span class="op">(</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t431" class="pln">    <span class="str">"""Cleanup and flush loggers"""</span><span class="strut">&nbsp;</span></p>
+<p id="t432" class="stm run hide_run">    <span class="nam">logging</span><span class="op">.</span><span class="nam">shutdown</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div id="footer">
+    <div class="content">
+        <p>
+            <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v4.3.4</a>,
+            created at 2017-04-16 21:32
+        </p>
+    </div>
+</div>
+
+</body>
+</html>
