@@ -436,3 +436,12 @@ class ParseResults:
         self.encrypted = encrypted  # true if gpg encrypted
 
         self.partial = partial
+
+    def __eq__(self, other):
+        return self.type == other.type and \
+            self.manifest == other.manifest and \
+            self.time == other.time and \
+            self.start_time == other.start_time and \
+            self.end_time == other.end_time and \
+            self.partial == other.partial
+    

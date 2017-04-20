@@ -48,6 +48,10 @@ target_url
 .I [options] [--force] [--extra-clean]
 target_url
 
+.B duplicity replicate
+.I [options] [--time time]
+source_url target_url
+
 .SH DESCRIPTION
 Duplicity incrementally backs up files and folders into
 tar-format volumes encrypted with GnuPG and places them to a
@@ -242,6 +246,19 @@ deleted.  This should only be necessary after a duplicity session
 fails or is aborted prematurely.  Note that
 .I --force
 will be needed to delete the files instead of just listing them.
+
+.TP
+.BI "replicate " "[--time time] <source_url> <target_url>"
+Replicate backup sets from source to target backend. Files will be
+(re)-encrypted and (re)-compressed depending on normal backend
+options. Signatures and volumes will not get recomputed, thus options like
+.BI --volsize
+or
+.BI --max-blocksize
+have no effect.
+When
+.I --time time
+is given, only backup sets older than time will be replicated.
 
 .SH OPTIONS
 
