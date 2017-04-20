@@ -23,6 +23,7 @@
 
 import os
 import sys
+import shutil
 
 from duplicity import log
 from duplicity import util
@@ -184,7 +185,7 @@ class FileobjHooked:
         elif pr.encrypted:
             gpg.GPGWriteFile(src_iter, tgt.name, globals.gpg_profile, size=sys.maxsize)
         else:
-            os.system("cp -p \"%s\" \"%s\"" % (src.name, tgt.name))
+            shutil.copyfile(src.name, tgt.name)
         globals.backend.move(tgt)  # @UndefinedVariable
 
     def to_final(self):
