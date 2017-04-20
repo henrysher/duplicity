@@ -26,6 +26,7 @@ see duplicity's README for details
 """
 
 import os
+import sys
 import types
 import tempfile
 import re
@@ -35,6 +36,7 @@ import platform
 
 from duplicity import globals
 from duplicity import gpginterface
+from duplicity import log
 from duplicity import tempdir
 from duplicity import util
 
@@ -134,13 +136,26 @@ class GPGFile:
             gnupg.call = globals.gpg_binary
         gnupg.options.meta_interactive = 0
         gnupg.options.extra_args.append('--no-secmem-warning')
-        if globals.use_agent and profile.gpg_version < (2, 0, 0):
-            # gpg2 always requires the agent where gpg1 does not
-            gnupg.options.extra_args.append('--use-agent')
-        if profile.gpg_version >= (2, 1, 0):
-            # This forces gpg2 to ignore the agent.
-            # Necessary to enforce truly non-interactive operation.
-            gnupg.options.extra_args.append('--pinentry-mode=loopback')
+
+        # Support three versions of gpg present 1.x, 2.0.x, 2.1.x
+        if profile.gpg_version[:1] == (1):
+            if globals.use_agent:
+                # gpg1 agent use is optional
+                gnupg.options.extra_args.append('--use-agent')
+
+        elif profile.gpg_version[:2] == (2, 0):
+            pass
+
+        elif profile.gpg_version[:2] >= (2, 1):
+            if not globals.use_agent:
+                # This forces gpg2 to ignore the agent.
+                # Necessary to enforce truly non-interactive operation.
+                gnupg.options.extra_args.append('--pinentry-mode=loopback')
+
+        else:
+            raise GPGError("Unsupported GNUPG version, %s" % profile.gpg_version)
+
+        # User supplied options added later, can override ours
         if globals.gpg_options:
             for opt in globals.gpg_options.split():
                 gnupg.options.extra_args.append(opt)
@@ -181,7 +196,7 @@ class GPGFile:
                            attach_fhs={'stdout': encrypt_path.open("wb"),
                                        'stderr': self.stderr_fp,
                                        'logger': self.logger_fp})
-            if not(globals.use_agent):
+            if not globals.use_agent:
                 p1.handles['passphrase'].write(passphrase)
                 p1.handles['passphrase'].close()
             self.gpg_input = p1.handles['stdin']
@@ -240,7 +255,10 @@ class GPGFile:
         for fp in (self.logger_fp, self.stderr_fp):
             fp.seek(0)
             for line in fp:
-                msg += unicode(line.strip(), locale.getpreferredencoding(), 'replace') + u"\n"
+                try:
+                    msg += unicode(line.strip(), locale.getpreferredencoding(), 'replace') + u"\n"
+                except Exception as e:
+                    msg += line.strip() + u"\n"
         msg += u"===== End GnuPG log =====\n"
         if not (msg.find(u"invalid packet (ctb=14)") > -1):
             raise GPGError(msg)

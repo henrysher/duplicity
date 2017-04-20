@@ -1,7 +1,7 @@
 *.egg
 *.log
-._.DS_Store
 .DS_Store
+._.DS_Store
 .eggs
 .idea
 .project
@@ -17,4 +17,5 @@ duplicity.spec
 po/duplicity.pot-e
 random_seed
 testfiles
+testing/gnupg/.gpg-v21-migrated
 testing/gnupg/private-keys-v1.d

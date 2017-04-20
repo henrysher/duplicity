@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2017-02-11 10:19-0600\n"
+"POT-Creation-Date: 2017-04-20 15:59-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1309,7 +1309,7 @@ msgid ""
 "succeeded"
 msgstr ""
 
-#: ../duplicity/backends/pydrivebackend.py:142
+#: ../duplicity/backends/pydrivebackend.py:143
 #, python-format
 msgid "PyDrive backend: multiple files called '%s'."
 msgstr ""

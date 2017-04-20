@@ -34,6 +34,7 @@ If you install from the source package, you will also need:
 
  * Python development files, normally found in module 'python-dev'.
  * librsync development files, normally found in module 'librsync-dev'.
+ * internationalization tools, normally found in module 'intltool'.
 
 
 A NOTE ON GnuPGInterface.py AND MULTIPLE GPG PROCESSES:

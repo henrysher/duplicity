@@ -1,3 +1,9 @@
+2017-04-20  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1680682 with patch supplied from Dave Allan
+      - Only specify --pinentry-mode=loopback when --use-agent is not specified
+    * Fixed man page that had 'cancel' instead of 'loopback' for pinentry mode
+
 2017-03-21  Kenneth Loafman  <kenneth@loafman.com>
 
     * Prep for 0.7.12
