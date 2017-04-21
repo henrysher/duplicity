@@ -6,3 +6,4 @@ pycryptopp
 paramiko
 urllib3
 boto
+tox
