@@ -1,4 +1,4 @@
-dropbox
+dropbox=6.9.0
 lockfile
 pexpect
 pyrax
@@ -6,4 +6,3 @@ pycryptopp
 paramiko
 urllib3
 boto
-lftp
