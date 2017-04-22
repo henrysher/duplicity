@@ -7,3 +7,4 @@ paramiko
 urllib3
 boto
 tox
+coverage
