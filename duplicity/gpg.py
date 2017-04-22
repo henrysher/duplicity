@@ -26,6 +26,7 @@ see duplicity's README for details
 """
 
 import os
+import sys
 import types
 import tempfile
 import re
@@ -35,6 +36,7 @@ import platform
 
 from duplicity import globals
 from duplicity import gpginterface
+from duplicity import log
 from duplicity import tempdir
 from duplicity import util
 
@@ -76,30 +78,30 @@ class GPGProfile:
         self.sign_key = sign_key
         self.encrypt_secring = None
         if recipients is not None:
-            assert isinstance(recipients, list)  # must be list, not tuple
+            assert isinstance(recipients, types.ListType)  # must be list, not tuple
             self.recipients = recipients
         else:
             self.recipients = []
 
         if hidden_recipients is not None:
-            assert isinstance(hidden_recipients, list)  # must be list, not tuple
+            assert isinstance(hidden_recipients, types.ListType)  # must be list, not tuple
             self.hidden_recipients = hidden_recipients
         else:
             self.hidden_recipients = []
 
-        self.gpg_major = self.get_gpg_major(globals.gpg_binary)
+        self.gpg_version = self.get_gpg_version(globals.gpg_binary)
 
-    _version_re = re.compile(r'^gpg.*\(GnuPG(?:\/MacGPG2)?\) (?P<maj>[0-9])\.[0-9]+\.[0-9]+$')
+    _version_re = re.compile(r'^gpg.*\(GnuPG(?:/MacGPG2)?\) (?P<maj>[0-9]+)\.(?P<min>[0-9]+)\.(?P<bug>[0-9]+)$')
 
-    def get_gpg_major(self, binary):
+    def get_gpg_version(self, binary):
         gpg = gpginterface.GnuPG()
         if binary is not None:
             gpg.call = binary
         res = gpg.run(["--version"], create_fhs=["stdout"])
         line = res.handles["stdout"].readline().rstrip()
-        mtc = self._version_re.search(line)
-        if mtc is not None:
-            return int(mtc.group("maj"), 10)
+        m = self._version_re.search(line)
+        if m is not None:
+            return (int(m.group("maj")), int(m.group("min")), int(m.group("bug")))
         raise GPGError("failed to determine gpg version of %s from %s" % (binary, line))
 
 
@@ -134,13 +136,26 @@ class GPGFile:
             gnupg.call = globals.gpg_binary
         gnupg.options.meta_interactive = 0
         gnupg.options.extra_args.append('--no-secmem-warning')
-        if globals.use_agent:
-            gnupg.options.extra_args.append('--use-agent')
-        elif profile.gpg_major == 2:
-            # This forces gpg2 to ignore the agent.
-            # Necessary to enforce truly non-interactive operation.
-            if platform.platform().startswith('Linux'):
+
+        # Support three versions of gpg present 1.x, 2.0.x, 2.1.x
+        if profile.gpg_version[:1] == (1):
+            if globals.use_agent:
+                # gpg1 agent use is optional
+                gnupg.options.extra_args.append('--use-agent')
+
+        elif profile.gpg_version[:2] == (2, 0):
+            pass
+
+        elif profile.gpg_version[:2] >= (2, 1):
+            if not globals.use_agent:
+                # This forces gpg2 to ignore the agent.
+                # Necessary to enforce truly non-interactive operation.
                 gnupg.options.extra_args.append('--pinentry-mode=loopback')
+
+        else:
+            raise GPGError("Unsupported GNUPG version, %s" % profile.gpg_version)
+
+        # User supplied options added later, can override ours
         if globals.gpg_options:
             for opt in globals.gpg_options.split():
                 gnupg.options.extra_args.append(opt)
@@ -181,7 +196,7 @@ class GPGFile:
                            attach_fhs={'stdout': encrypt_path.open("wb"),
                                        'stderr': self.stderr_fp,
                                        'logger': self.logger_fp})
-            if not(globals.use_agent):
+            if not globals.use_agent:
                 p1.handles['passphrase'].write(passphrase)
                 p1.handles['passphrase'].close()
             self.gpg_input = p1.handles['stdin']
@@ -240,7 +255,10 @@ class GPGFile:
         for fp in (self.logger_fp, self.stderr_fp):
             fp.seek(0)
             for line in fp:
-                msg += unicode(line.strip(), locale.getpreferredencoding(), 'replace') + u"\n"
+                try:
+                    msg += unicode(line.strip(), locale.getpreferredencoding(), 'replace') + u"\n"
+                except Exception as e:
+                    msg += line.strip() + u"\n"
         msg += u"===== End GnuPG log =====\n"
         if not (msg.find(u"invalid packet (ctb=14)") > -1):
             raise GPGError(msg)
@@ -418,7 +436,7 @@ def GzipWriteFile(block_iter, filename, size=200 * 1024 * 1024, gzipped=True):
         if bytes_to_go < block_iter.get_read_size():
             break
         try:
-            new_block = next(block_iter)
+            new_block = block_iter.next()
         except StopIteration:
             at_end_of_blockiter = 1
             break

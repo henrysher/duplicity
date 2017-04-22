@@ -1,3 +1,12 @@
+2017-04-22  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1680682 with patch supplied from Dave Allan
+      - Only specify --pinentry-mode=loopback when --use-agent is not specified
+    * Fixed man page that had 'cancel' instead of 'loopback' for pinentry mode
+    * Fixed bug #1684312 with suggestion from Wade Rossman
+      - Use shutil.copyfile instead of os.system('cp ...')
+      - Should reduce overhead of os.system() memory usage.
+
 2017-03-13  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1668750 - Don't mask backend errors
