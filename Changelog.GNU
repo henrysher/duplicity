@@ -1,3 +1,11 @@
+2017-04-23  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~dernils/duplicity/testing
+      - Fixed minor stuff in requirements.txt.
+      - Added a Dockerfile for testing.
+      - Minor changes to README files.
+      - Added README-TESTING with some information on testing.
+
 2017-04-22  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1680682 with patch supplied from Dave Allan

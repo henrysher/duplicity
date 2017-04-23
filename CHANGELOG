@@ -134,6 +134,11 @@ New in v0.8.00 (2016/07/??)
 * Fixed bug #1684312 with suggestion from Wade Rossman
   - Use shutil.copyfile instead of os.system('cp ...')
   - Should reduce overhead of os.system() memory usage.
+* Merged in lp:~dernils/duplicity/testing
+  - Fixed minor stuff in requirements.txt.
+  - Added a Dockerfile for testing.
+  - Minor changes to README files.
+  - Added README-TESTING with some information on testing.
 
 
 New in v0.7.08 (2016/07/02)
