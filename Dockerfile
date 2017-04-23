@@ -20,6 +20,9 @@
 
 FROM ubuntu:16.04
 
+#Setting a working directory for everything else
+WORKDIR /duplicty 
+
 # Installing some pre-requisites
 RUN apt-get update && apt-get install -y sudo && rm -rf /var/lib/apt/lists/*
 RUN sudo apt-get update
@@ -47,5 +50,5 @@ RUN pip install --upgrade pip
 RUN bzr branch lp:~dernils/duplicity/testing
 
 # Installing requirements for pip 
-RUN pip install -r /testing/requirements.txt
+RUN pip install -r ./testing/requirements.txt
 
