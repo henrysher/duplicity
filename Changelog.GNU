@@ -5,6 +5,9 @@
       - Added a Dockerfile for testing.
       - Minor changes to README files.
       - Added README-TESTING with some information on testing.
+    * Merged in lp:~dernils/duplicity/documentation
+      - Minor changes to README-REPO, README-TESTING
+      - Also redo the changes to requirements.txt and Dockerfile
 
 2017-04-22  Kenneth Loafman  <kenneth@loafman.com>
 

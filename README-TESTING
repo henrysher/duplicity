@@ -30,16 +30,41 @@ Assuming that your machine has all the required dependencies installed, you can 
 
 ‘setup.py test‘ 
 
-
 2. Using __tox__
 Tox is a generic virtualenv management and test command line tool that is used for checking your package installs correctly with different Python versions and interpreters. It 
 runs the tests in each of the environments that are configured in the tox.ini file (see root folder of the repository)
+
+Duplicity uses tox to make it easy to test your code against multiple
+environments. Running tests using the commands above will automatically test
+code against different supported environments, including the versions of
+dependencies used by the Launchpad build system.
+
 
 A tox run can be started simply by typing 
 
 ‘tox‘
 
 from the main duplicity folder. 
+
+You can run specific tests using:
+‘tox -- -s [folder].[folder].[file].[class].[test]‘
+For example:
+‘tox -- -s testing.unit.test_selection‘
+or:
+‘tox -- -s testing.unit.test_selection.MatchingTest.test_tuple_include‘
+
+You can test against a single environment, e.g.
+‘tox -e py27‘
+for example if you are working on fixing a bug, but please do a full run-tests
+before submitting a merge request.
+
+Note: some tests require rdiff and pylint to be installed on the system for
+them to pass.
+
+Please run all tests on your branch (run-tests) before proposing a merge, to
+ensure that all tests pass. The decorator @unittest.expectedFailure can be used
+to commit a known-failing test case without breaking the test suite, for
+example to exhibit the behaviour in a bug report before it has been fixed.
 
 3. Via a __docker__ image 
 Testing on a developer's machine can be tricky. Testing duplicity requires a set of dependencies being installed and reacts sensitiviely to changes of the local python configuration. In order to make sure that such interactions do not pose any influence on executing the tests, docker is the technology of choice. 
