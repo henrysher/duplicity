@@ -26,39 +26,3 @@ PYTHONPATH=$DUP_ROOT bin/duplicity
 or
 
 PYTHONPATH=$DUP_ROOT bin/rdiffdir
-
------------------------
-Running the unit tests:
------------------------
-
-To run all tests:
-cd testing; ./run-tests
-
-You can run specific tests using:
-tox -- -s [folder].[folder].[file].[class].[test]
-For example:
-tox -- -s testing.unit.test_selection
-or:
-tox -- -s testing.unit.test_selection.MatchingTest.test_tuple_include
-
-Note: some tests require rdiff and pylint to be installed on the system for
-them to pass.
-
-Please run all tests on your branch (run-tests) before proposing a merge, to
-ensure that all tests pass. The decorator @unittest.expectedFailure can be used
-to commit a known-failing test case without breaking the test suite, for
-example to exhibit the behaviour in a bug report before it has been fixed.
-
------------------------------------------
-Testing against multiple Python versions:
------------------------------------------
-
-Duplicity uses tox to make it easy to test your code against multiple
-environments. Running tests using the commands above will automatically test
-code against different supported environments, including the versions of
-dependencies used by the Launchpad build system.
-
-You can test against a single environment, e.g.
-tox -e py27
-for example if you are working on fixing a bug, but please do a full run-tests
-before submitting a merge request.

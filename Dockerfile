@@ -47,8 +47,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install intltool
 RUN pip install --upgrade pip
 
 # Branch the dupllicity repo for testing 
-RUN bzr branch lp:~dernils/duplicity/testing
+RUN bzr branch lp:duplicity
 
 # Installing requirements for pip 
-RUN pip install -r ./testing/requirements.txt
+RUN pip install -r ./duplicity/requirements.txt
 
