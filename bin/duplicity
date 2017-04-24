@@ -1054,8 +1054,10 @@ def replicate():
             tdp = dup_temp.new_tempduppath(file_naming.parse(filename))
             tmpobj = tdp.filtered_open(mode='wb')
             util.copyfileobj(fileobj, tmpobj) # decrypt, compress, (re)-encrypt
+            fileobj.close()
             tmpobj.close()
             globals.backend.put(tdp, filename)
+            tdp.delete()
 
     src_chainlist = src_stats.get_backup_chains(filename_list = src_list)[0]
     tgt_chainlist = tgt_stats.get_backup_chains(filename_list = tgt_list)[0]
@@ -1091,6 +1093,7 @@ def replicate():
                 tdp = dup_temp.new_tempduppath(file_naming.parse(filename))
                 tmpobj = tdp.filtered_open(mode='wb')
                 util.copyfileobj(fileobj, tmpobj) # decrypt, compress, (re)-encrypt
+                fileobj.close()
                 tmpobj.close()
                 globals.backend.put(tdp, filename)
 
@@ -1098,14 +1101,19 @@ def replicate():
                 vi.set_hash("SHA1", gpg.get_hash("SHA1", tdp))
                 mf.add_volume_info(vi)
 
+                tdp.delete()
+
             mf.fh.close()
             # incremental GPG writes hang on close, so do any encryption here at once
+            mf_fileobj = mf_tdp.filtered_open_with_delete(mode='rb')
             mf_final_filename = file_naming.get(src_set.type, manifest=True, encrypted=globals.encryption, gzipped=globals.compression)
             mf_final_tdp = dup_temp.new_tempduppath(file_naming.parse(mf_final_filename))
             mf_final_fileobj = mf_final_tdp.filtered_open(mode='wb')
-            util.copyfileobj(mf_tdp.filtered_open(mode='rb'), mf_final_fileobj) # compress, encrypt
+            util.copyfileobj(mf_fileobj, mf_final_fileobj) # compress, encrypt
+            mf_fileobj.close()
             mf_final_fileobj.close()
             globals.backend.put(mf_final_tdp, mf_final_filename)
+            mf_final_tdp.delete()
 
     globals.src_backend.close()
     globals.backend.close()
