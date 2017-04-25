@@ -9,3 +9,4 @@ boto
 tox
 coverage
 pylint
+pep8
