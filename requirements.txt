@@ -8,4 +8,4 @@ urllib3
 boto
 tox
 coverage
-pylint 
+pylint

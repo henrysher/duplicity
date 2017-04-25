@@ -21,7 +21,7 @@
 FROM ubuntu:16.04
 
 #Setting a working directory for everything else
-WORKDIR /duplicty 
+WORKDIR /duplicty
 
 # Installing some pre-requisites
 RUN apt-get update && apt-get install -y sudo && rm -rf /var/lib/apt/lists/*
@@ -33,8 +33,8 @@ RUN apt-get install -y software-properties-common python-software-properties
 
 # The following packages are needed for testing duplicity
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python2.7
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python-dev 
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install librsync-dev 
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python-dev
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install librsync-dev
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install lftp
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install par2
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install bzr
@@ -43,12 +43,12 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python-pip
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install openssl
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install libssl-dev
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install intltool
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install rdiff
 
 RUN pip install --upgrade pip
 
-# Branch the dupllicity repo for testing 
+# Branch the dupllicity repo for testing
 RUN bzr branch lp:duplicity
 
-# Installing requirements for pip 
+# Installing requirements for pip
 RUN pip install -r ./duplicity/requirements.txt
-
