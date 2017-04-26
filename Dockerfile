@@ -21,7 +21,7 @@
 FROM ubuntu:16.04
 
 #Setting a working directory for everything else
-WORKDIR /duplicty
+WORKDIR /duplicity
 
 # Installing some pre-requisites
 RUN apt-get update && apt-get install -y sudo && rm -rf /var/lib/apt/lists/*
@@ -45,10 +45,15 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install libssl-dev
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install intltool
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install rdiff
 
+#Need to make gpg2 the default gpg
+RUN rm /usr/bin/gpg
+RUN ln -s /usr/bin/gpg2 /usr/bin/gpg
+
+#Installing pip
 RUN pip install --upgrade pip
 
 # Branch the dupllicity repo for testing
-RUN bzr branch lp:duplicity
+RUN bzr branch --use-existing-dir lp:duplicity /duplicity
 
 # Installing requirements for pip
-RUN pip install -r ./duplicity/requirements.txt
+RUN pip install -r requirements.txt

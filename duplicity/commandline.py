@@ -1105,8 +1105,8 @@ def ProcessCommandLine(cmdline_list):
             sign_key=src.sign_key,
             recipients=src.recipients,
             hidden_recipients=src.hidden_recipients)
-    log.Debug(_("GPG binary is %s, version %d") %
-              ((globals.gpg_binary or 'gpg'), globals.gpg_profile.gpg_major))
+    log.Debug(_("GPG binary is %s, version %s") %
+              ((globals.gpg_binary or 'gpg'), globals.gpg_profile.gpg_version))
 
     # we can now try to import all the backends
     backend.import_backends()
