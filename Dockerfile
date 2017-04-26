@@ -43,6 +43,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python-pip
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install openssl
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install libssl-dev
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install intltool
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install rdiff
 
 RUN pip install --upgrade pip
 
