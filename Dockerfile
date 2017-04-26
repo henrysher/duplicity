@@ -45,6 +45,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install libssl-dev
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install intltool
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install rdiff
 
+#Need to make gpg2 the default gpg
+RUN rm /usr/bin/gpg
+RUN ln -s /usr/bin/gpg2 /usr/bin/gpg
+
+#Installing pip
 RUN pip install --upgrade pip
 
 # Branch the dupllicity repo for testing
