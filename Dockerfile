@@ -49,11 +49,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install rdiff
 RUN mv /usr/bin/gpg /usr/bin/gpg1
 RUN ln -s /usr/bin/gpg2 /usr/bin/gpg
 
+# Branch the duplicity repo for testing
+RUN bzr branch --use-existing-dir lp:duplicity /duplicity
+
 #Installing pip
 RUN pip install --upgrade pip
-
-# Branch the dupllicity repo for testing
-RUN bzr branch --use-existing-dir lp:duplicity /duplicity
 
 # Installing requirements for pip
 RUN pip install -r requirements.txt
