@@ -46,7 +46,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install intltool
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install rdiff
 
 #Need to make gpg2 the default gpg
-RUN rm /usr/bin/gpg
+RUN mv /usr/bin/gpg /usr/bin/gpg1
 RUN ln -s /usr/bin/gpg2 /usr/bin/gpg
 
 #Installing pip
