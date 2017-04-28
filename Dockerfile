@@ -20,9 +20,6 @@
 
 FROM ubuntu:16.04
 
-#Setting a working directory for everything else
-WORKDIR /duplicity
-
 # Installing some pre-requisites and some
 # packages needed for testing duplicity
 RUN apt-get update && apt-get install -y \
@@ -42,11 +39,22 @@ RUN apt-get update && apt-get install -y \
 # Need to make gpg2 the default gpg
 RUN mv /usr/bin/gpg /usr/bin/gpg1 && ln -s /usr/bin/gpg2 /usr/bin/gpg
 
-# Branch the duplicity repo for testing
-RUN bzr branch --use-existing-dir lp:duplicity /duplicity
-
 # Installing pip
 RUN curl https://bootstrap.pypa.io/get-pip.py | python
 
 # Installing requirements for pip
-RUN pip install --requirement requirements.txt
+COPY requirements.txt /tmp
+RUN pip install --requirement /tmp/requirements.txt
+
+# Install test user and swap to it
+RUN groupadd test && useradd -m -g test test
+USER test
+
+# Setting a working directory to home
+WORKDIR /home/test
+
+# Branch the duplicity repo for testing
+RUN bzr branch lp:duplicity duplicity
+
+# Set final workdir to duplicity
+WORKDIR duplicity
