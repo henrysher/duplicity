@@ -23,37 +23,30 @@ FROM ubuntu:16.04
 #Setting a working directory for everything else
 WORKDIR /duplicity
 
-# Installing some pre-requisites
-RUN apt-get update && apt-get install -y sudo && rm -rf /var/lib/apt/lists/*
-RUN sudo apt-get update
+# Installing some pre-requisites and some
+# packages needed for testing duplicity
+RUN apt-get update && apt-get install -y \
+            build-essential \
+            bzr \
+            intltool \
+            lftp \
+            libffi-dev \
+            librsync-dev \
+            libssl-dev \
+            openssl \
+            par2 \
+            python-dev \
+            rdiff \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends apt-utils
+# Need to make gpg2 the default gpg
+RUN mv /usr/bin/gpg /usr/bin/gpg1 && ln -s /usr/bin/gpg2 /usr/bin/gpg
 
-RUN apt-get install -y software-properties-common python-software-properties
+# Installing pip
+RUN curl https://bootstrap.pypa.io/get-pip.py | python
 
-# The following packages are needed for testing duplicity
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python2.7
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python-dev
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install librsync-dev
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install lftp
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install par2
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install bzr
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python-setuptools
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python-pip
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install openssl
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install libssl-dev
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install intltool
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install rdiff
-
-#Need to make gpg2 the default gpg
-RUN mv /usr/bin/gpg /usr/bin/gpg1
-RUN ln -s /usr/bin/gpg2 /usr/bin/gpg
+# Installing requirements for pip
+RUN pip install --requirement requirements.txt
 
 # Branch the duplicity repo for testing
 RUN bzr branch --use-existing-dir lp:duplicity /duplicity
-
-#Installing pip
-RUN pip install --upgrade pip
-
-# Installing requirements for pip
-RUN pip install -r requirements.txt
