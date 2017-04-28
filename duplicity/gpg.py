@@ -138,7 +138,7 @@ class GPGFile:
         gnupg.options.extra_args.append('--no-secmem-warning')
 
         # Support three versions of gpg present 1.x, 2.0.x, 2.1.x
-        if profile.gpg_version[:1] == (1):
+        if profile.gpg_version[:1] == (1,):
             if globals.use_agent:
                 # gpg1 agent use is optional
                 gnupg.options.extra_args.append('--use-agent')
