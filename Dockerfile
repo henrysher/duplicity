@@ -42,11 +42,11 @@ RUN apt-get update && apt-get install -y \
 # Need to make gpg2 the default gpg
 RUN mv /usr/bin/gpg /usr/bin/gpg1 && ln -s /usr/bin/gpg2 /usr/bin/gpg
 
+# Branch the duplicity repo for testing
+RUN bzr branch --use-existing-dir lp:duplicity /duplicity
+
 # Installing pip
 RUN curl https://bootstrap.pypa.io/get-pip.py | python
 
 # Installing requirements for pip
 RUN pip install --requirement requirements.txt
-
-# Branch the duplicity repo for testing
-RUN bzr branch --use-existing-dir lp:duplicity /duplicity
