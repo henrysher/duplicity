@@ -22,12 +22,12 @@ FROM ubuntu:16.04
 
 # Installing some pre-requisites and some
 # packages needed for testing duplicity
-RUN apt-get update && apt-get install -y \
+RUN apt-get update \
+    && apt-get install -y \
             build-essential \
             bzr \
             intltool \
             lftp \
-            libffi-dev \
             librsync-dev \
             libssl-dev \
             openssl \
@@ -45,6 +45,9 @@ RUN curl https://bootstrap.pypa.io/get-pip.py | python
 # Installing requirements for pip
 COPY requirements.txt /tmp
 RUN pip install --requirement /tmp/requirements.txt
+
+# Delete root's password so we can do 'su -'
+RUN passwd --delete root
 
 # Install test user and swap to it
 RUN groupadd test && useradd -m -g test test

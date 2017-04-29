@@ -5,7 +5,6 @@ lockfile
 paramiko
 pep8
 pexpect
-pycryptopp
 pydrive
 pylint
 pyrax
