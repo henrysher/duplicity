@@ -1,13 +1,11 @@
 boto
-coverage
 dropbox==6.9.0
 lockfile
 paramiko
 pep8
 pexpect
 pydrive
-pylint
 pyrax
 python-cloudfiles
-tox
 urllib3
+
