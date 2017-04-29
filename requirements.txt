@@ -2,7 +2,6 @@ boto
 dropbox==6.9.0
 lockfile
 paramiko
-pep8
 pexpect
 pydrive
 pyrax
