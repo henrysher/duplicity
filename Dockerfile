@@ -29,6 +29,7 @@ RUN apt-get update \
             intltool \
             lftp \
             librsync-dev \
+            libffi-dev \
             libssl-dev \
             openssl \
             par2 \
