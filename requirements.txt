@@ -6,4 +6,5 @@ pexpect
 pydrive
 pyrax
 python-cloudfiles
+tox
 urllib3
