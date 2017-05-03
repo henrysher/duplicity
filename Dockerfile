@@ -35,6 +35,7 @@ RUN apt-get update \
             par2 \
             python-dev \
             rdiff \
+            tzdata \
     && rm -rf /var/lib/apt/lists/*
 
 # Need to make gpg2 the default gpg
