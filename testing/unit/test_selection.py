@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
 # Copyright 2002 Ben Escoto <ben@emerose.org>
@@ -215,6 +216,11 @@ class ParseArgsTest(UnitTestCase):
                                        (u"3", u"3sub3", u"3sub3sub2", u"3sub3sub2_file.txt"),
                                        (u"3", u"3sub3", u"3sub3sub3")]
 
+    def uc_index_from_path(self, path):
+        """Takes a path type and returns path.index, with each element converted into unicode"""
+        uindex = tuple([util.bytes_to_uc(element) for element in path.index])
+        return uindex
+
     def ParseTest(self, tuplelist, indicies, filelists=[]):
         """No error if running select on tuple goes over indicies"""
         if not self.root:
@@ -222,7 +228,10 @@ class ParseArgsTest(UnitTestCase):
         self.Select = Select(self.root)
         self.Select.ParseArgs(tuplelist, self.remake_filelists(filelists))
         self.Select.set_iter()
-        results_as_list = list(Iter.map(lambda path: path.index, self.Select))
+
+        # Create a list of the paths returned by the select function, converted
+        # into path.index styled tuples
+        results_as_list = list(Iter.map(self.uc_index_from_path, self.Select))
         # print(results_as_list)
         self.assertEqual(indicies, results_as_list)
 
@@ -860,6 +869,22 @@ testfiles/select**/2
                         (u"--include", u"**/select2/1"),
                         (u"--exclude", u"testfiles/select2/**")],
                        self.expected_restored_tree)
+
+    def test_unicode_paths_non_globbing(self):
+        """Test functional test test_unicode_paths_non_globbing as a unittest"""
+        self.root = Path(u"testfiles/select-unicode")
+        self.ParseTest([(u"--exclude", u"testfiles/select-unicode/прыклад/пример/例/Παράδειγμα/उदाहरण.txt"),
+                        (u"--exclude", u"testfiles/select-unicode/прыклад/пример/例/Παράδειγμα/דוגמא.txt"),
+                        (u"--exclude", u"testfiles/select-unicode/прыклад/пример/例/მაგალითი/"),
+                        (u"--include", u"testfiles/select-unicode/прыклад/пример/例/"),
+                        (u"--exclude", u"testfiles/select-unicode/прыклад/пример/"),
+                        (u"--include", u"testfiles/select-unicode/прыклад/"),
+                        (u"--include", u"testfiles/select-unicode/օրինակ.txt"),
+                        (u"--exclude", u"testfiles/select-unicode/**")],
+                       [(), (u"прыклад",), (u"прыклад", u"пример"), (u"прыклад", u"пример", u"例"),
+                        (u"прыклад", u"пример", u"例", u"Παράδειγμα"),
+                        (u"прыклад", u"пример", u"例", u"Παράδειγμα", u"ઉદાહરણ.log"),
+                        (u"прыклад", u"উদাহরণ"), (u"օրինակ.txt",)])
 
 
 class TestGlobGetNormalSf(UnitTestCase):

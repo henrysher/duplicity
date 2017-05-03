@@ -93,7 +93,7 @@ class IncludeExcludeFunctionalTest(FunctionalTestCase):
     # --------- trailing_space sub2_file.txt (ea)  # Excluded until trailing_space test, when (is)
 
     complete_directory_tree = [
-        [u"1", u"2", u"3", u"trailing_space u", u"1.doc", u"1.py"],
+        [u"1", u"2", u"3", u"trailing_space ", u"1.doc", u"1.py"],
         [u"1sub1", u"1sub2", u"1sub3"],
         [u"1sub1sub1", u"1sub1sub2", u"1sub1sub3"],
         [u"1sub1sub1_file.txt"],
@@ -439,7 +439,7 @@ class TestIncludeFilelistTest(IncludeExcludeFunctionalTest):
         # See test_exclude_filelist above for explanation of what is expected. As this is an include filelist
         # any lines with no +/- modifier should be treated as if they have a +.
         # Create a filelist
-        with io.open(u"testfiles/exclude.txt", u"w") as f:
+        with io.open(u"testfiles/include.txt", u"w") as f:
             f.write(u"testfiles/select2/3/3sub3/3sub3sub2/3sub3sub2_file.txt\n"
                     u"- testfiles/select2/3/3sub3/3sub3sub2\n"
                     u"testfiles/select2/3/3sub2/3sub2sub2\n"
@@ -477,7 +477,7 @@ class TestIncludeFilelistTest(IncludeExcludeFunctionalTest):
         # * Full-line comments with # as the first character and with leading/trailing spaces
         # * Unnecessarily quoted filenames with/without modifier  (both " and ')
         # Create a filelist
-        with io.open(u"testfiles/exclude.txt", u"w") as f:
+        with io.open(u"testfiles/include.txt", u"w") as f:
             f.write(u"testfiles/select2/3/3sub3/3sub3sub2/3sub3sub2_file.txt\n"
                     u"- testfiles/select2/3/3sub3/3sub3sub2\n"
                     u'"testfiles/select2/3/3sub2/3sub2sub2"\n'
@@ -521,7 +521,7 @@ class TestIncludeFilelistTest(IncludeExcludeFunctionalTest):
         # * Full-line comments with # as the first character and with leading/trailing spaces
         # * Unnecessarily quoted filenames with/without modifier  (both " and ')
         # Create a filelist
-        with io.open(u"testfiles/exclude.txt", u"w") as f:
+        with io.open(u"testfiles/include.txt", u"w") as f:
             f.write(u"testfiles/select2/3/3sub3/3sub3sub2/3sub3sub2_file.txt\n"
                     u"testfiles/select2/3/3sub2/3sub2sub2 \n"
                     u"  + testfiles/select2/3/3sub3\n"  # + added to ensure it makes no difference
@@ -569,7 +569,7 @@ class TestIncludeFilelistTest(IncludeExcludeFunctionalTest):
         # * Full-line comments with # as the first character and with leading/trailing spaces
         # * Unnecessarily quoted filenames with/without modifier  (both " and ')
         # Create a filelist
-        with io.open(u"testfiles/exclude.txt", u"w") as f:
+        with io.open(u"testfiles/include.txt", u"w") as f:
             f.write(u"testfiles/select2/3/3sub3/3sub3sub2/3sub3sub2_file.txt\n"
                     u"- testfiles/select2/3/3sub3/3sub3sub2\n"
                     u'"testfiles/select2/3/3sub2/3sub2sub2"\n'
@@ -1129,16 +1129,15 @@ class TestUnicode(IncludeExcludeFunctionalTest):
 
     def test_unicode_paths_non_globbing(self):
         """ Test --include and --exclude work with unicode paths"""
-        p = u"testfiles/select-unicode/"
         self.backup(u"full", u"testfiles/select-unicode",
-                    options=[u"--exclude", p + u"прыклад/пример/例/Παράδειγμα/उदाहरण.txt",
-                             u"--exclude", p + u"прыклад/пример/例/Παράδειγμα/דוגמא.txt",
-                             u"--exclude", p + u"прыклад/пример/例/მაგალითი/",
-                             u"--include", p + u"прыклад/пример/例/",
-                             u"--exclude", p + u"прыклад/пример/",
-                             u"--include", p + u"прыклад/",
-                             u"--include", p + u"օրինակ.txt",
-                             u"--exclude", p + u"**"])
+                    options=[u"--exclude", u"testfiles/select-unicode/прыклад/пример/例/Παράδειγμα/उदाहरण.txt",
+                             u"--exclude", u"testfiles/select-unicode/прыклад/пример/例/Παράδειγμα/דוגמא.txt",
+                             u"--exclude", u"testfiles/select-unicode/прыклад/пример/例/მაგალითი/",
+                             u"--include", u"testfiles/select-unicode/прыклад/пример/例/",
+                             u"--exclude", u"testfiles/select-unicode/прыклад/пример/",
+                             u"--include", u"testfiles/select-unicode/прыклад/",
+                             u"--include", u"testfiles/select-unicode/օրինակ.txt",
+                             u"--exclude", u"testfiles/select-unicode/**"])
         self.restore()
         restore_dir = u"testfiles/restore_out"
         restored = self.directory_tree_to_list_of_lists(restore_dir)
@@ -1163,7 +1162,6 @@ class TestUnicode(IncludeExcludeFunctionalTest):
         self.assertEqual(restored, [[u"прыклад", u"օրինակ.txt"],
                                     [u"пример", u"উদাহরণ"], [u"例"], [u"Παράδειγμα"], [u"ઉદાહરણ.log"]])
 
-    @unittest.expectedFailure
     def test_unicode_paths_square_brackets(self):
         """ Test --include and --exclude work with unicode paths with character options in []s and [!]s"""
         p = u"testfiles/select-unicode/"
@@ -1187,7 +1185,7 @@ class TestUnicode(IncludeExcludeFunctionalTest):
         # As this is an exclude filelist any lines with no +/- modifier should be treated as if they have a -.
         path = u"testfiles/select-unicode/"
         # Create a filelist
-        with io.open(u"testfiles/exclude.txt", u"w") as f:
+        with io.open(u"testfiles/exclude.txt", u"w", encoding="UTF-8") as f:
             f.write(u"- " + path + u"прыклад/пример/例/Παράδειγμα/उदाहरण.txt\n"
                     u"- " + path + u"прыклад/пример/例/Παράδειγμα/דוגמא.txt\n"
                     u"- " + path + u"прыклад/пример/例/მაგალითი/\n"

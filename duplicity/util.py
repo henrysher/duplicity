@@ -60,9 +60,29 @@ def escape(string):
 
 def ufn(filename):
     """Convert a (bytes) filename to unicode for printing"""
-    if not isinstance(filename, unicode) and isinstance(filename, str):
-        filename = filename.decode(sys.getfilesystemencoding(), 'replace')
-    return filename
+    # This should be phased out, as path.uc_name is preferable for paths and
+    # bytes_to_uc is clearer for everything else
+    # ToDo: Delete when no longer used
+    return bytes_to_uc(filename)
+
+
+def bytes_to_uc(bytes_str):
+    """Convert a bytes string to unicode, using filesystem encoding."""
+    # This should not be used filenames, as path.uc_name is preferable
+    # Note that this is similar to, but distinct from, fsdecode, because
+    # fsdecode assumes a path-like string and has special handling for
+    # strange (Linux) filename quirks.
+    if isinstance(bytes_str, unicode):
+        # "bytes_str" is actually already unicode and does not need converting
+        unicode_str = bytes_str
+    elif isinstance(bytes_str, str):
+        # bytes_str is not already unicode and is a str, so convert to unicode
+        # unicode_str = bytes_str.decode(sys.getfilesystemencoding(), 'replace')
+        # ToDo: the above is conceptually better, but seems to return ascii even when UTF-8 is supported
+        unicode_str = bytes_str.decode('utf-8', 'replace')
+    else:
+        raise TypeError(u"bytes_to_uc must be passed either unicode or str")
+    return unicode_str
 
 
 def uindex(index):

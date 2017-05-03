@@ -64,7 +64,7 @@ class FunctionalTestCase(DuplicityTestCase):
         self.unpack_testfiles()
 
         self.class_args = []
-        self.backend_url = "file://testfiles/output"
+        self.backend_url = u"file://testfiles/output"
         self.last_backup = None
         self.set_environ('PASSPHRASE', self.sign_passphrase)
         self.set_environ("SIGN_PASSPHRASE", self.sign_passphrase)
@@ -84,30 +84,44 @@ class FunctionalTestCase(DuplicityTestCase):
         # We run under setsid and take input from /dev/null (below) because
         # this way we force a failure if duplicity tries to read from the
         # console unexpectedly (like for gpg password or such).
-        if platform.platform().startswith('Linux'):
-            cmd_list = ['setsid']
+
+        # Check all inputs are unicode -- we will convert to system encoding before running the command
+        if current_time:
+            assert isinstance(current_time, unicode), "current_time is not unicode"
+
+        if fail:
+            assert isinstance(fail, unicode), "fail is not unicode"
+
+        for item in options:
+            assert isinstance(item, unicode), "item " + unicode(item) + " in options is not unicode"
+
+        for item in passphrase_input:
+            assert isinstance(item, unicode), "item " + unicode(item) + " in passphrase_input is not unicode"
+
+        if platform.platform().startswith(u'Linux'):
+            cmd_list = [u'setsid']
             if self._setsid_w:
-                cmd_list.extend(["-w"])
+                cmd_list.extend([u"-w"])
         else:
             cmd_list = []
-        cmd_list.extend(["duplicity"])
+        cmd_list.extend([u"duplicity"])
         cmd_list.extend(options)
-        cmd_list.extend(["-v0"])
-        cmd_list.extend(["--no-print-statistics"])
-        cmd_list.extend(["--allow-source-mismatch"])
-        cmd_list.extend(["--archive-dir=testfiles/cache"])
+        cmd_list.extend([u"-v0"])
+        cmd_list.extend([u"--no-print-statistics"])
+        cmd_list.extend([u"--allow-source-mismatch"])
+        cmd_list.extend([u"--archive-dir=testfiles/cache"])
         if current_time:
-            cmd_list.extend(["--current-time", current_time])
+            cmd_list.extend([u"--current-time", current_time])
         cmd_list.extend(self.class_args)
         if fail:
-            cmd_list.extend(["--fail", str(fail)])
-        cmdline = " ".join(map(lambda x: '"%s"' % x, cmd_list))
+            cmd_list.extend([u"--fail", str(fail)])
+        cmdline = u" ".join(map(lambda x: u'"%s"' % x, cmd_list))
 
         if not passphrase_input:
-            cmdline += " < /dev/null"
-        child = pexpect.spawn('/bin/sh', ['-c', cmdline], timeout=None)
+            cmdline += u" < /dev/null"
+        child = pexpect.spawn(u'/bin/sh', [u'-c', cmdline], timeout=None, encoding=sys.getfilesystemencoding())
         for passphrase in passphrase_input:
-            child.expect('passphrase.*:')
+            child.expect(u'passphrase.*:')
             child.sendline(passphrase)
 
         # if the command fails, we need to clear its output
@@ -131,7 +145,7 @@ class FunctionalTestCase(DuplicityTestCase):
 
     def backup(self, type, input_dir, options=[], **kwargs):
         """Run duplicity backup to default directory"""
-        options = [type, input_dir, self.backend_url, "--volsize", "1"] + options
+        options = [type, input_dir, self.backend_url, u"--volsize", u"1"] + options
         before_files = self.get_backend_files()
 
         # If a chain ends with time X and the next full chain begins at time X,
@@ -148,27 +162,27 @@ class FunctionalTestCase(DuplicityTestCase):
 
     def restore(self, file_to_restore=None, time=None, options=[], **kwargs):
         assert not os.system("rm -rf testfiles/restore_out")
-        options = [self.backend_url, "testfiles/restore_out"] + options
+        options = [self.backend_url, u"testfiles/restore_out"] + options
         if file_to_restore:
-            options.extend(['--file-to-restore', file_to_restore])
+            options.extend([u'--file-to-restore', file_to_restore])
         if time:
-            options.extend(['--restore-time', str(time)])
+            options.extend([u'--restore-time', str(time)])
         self.run_duplicity(options=options, **kwargs)
 
     def verify(self, dirname, file_to_verify=None, time=None, options=[],
                **kwargs):
-        options = ["verify", self.backend_url, dirname] + options
+        options = [u"verify", self.backend_url, dirname] + options
         if file_to_verify:
-            options.extend(['--file-to-restore', file_to_verify])
+            options.extend([u'--file-to-restore', file_to_verify])
         if time:
-            options.extend(['--restore-time', str(time)])
+            options.extend([u'--restore-time', str(time)])
         self.run_duplicity(options=options, **kwargs)
 
     def cleanup(self, options=[]):
         """
         Run duplicity cleanup to default directory
         """
-        options = ["cleanup", self.backend_url, "--force"] + options
+        options = [u"cleanup", self.backend_url, u"--force"] + options
         self.run_duplicity(options=options)
 
     def get_backend_files(self):
@@ -182,6 +196,6 @@ class FunctionalTestCase(DuplicityTestCase):
         Makes a number of large files in testfiles/largefiles that each are
         the specified number of megabytes.
         """
-        assert not os.system("mkdir testfiles/largefiles")
+        assert not os.system(u"mkdir testfiles/largefiles")
         for n in range(count):
-            assert not os.system("dd if=/dev/urandom of=testfiles/largefiles/file%d bs=1024 count=%d > /dev/null 2>&1" % (n + 1, size * 1024))
+            assert not os.system(u"dd if=/dev/urandom of=testfiles/largefiles/file%d bs=1024 count=%d > /dev/null 2>&1" % (n + 1, size * 1024))

@@ -19,14 +19,14 @@
 # You should have received a copy of the GNU General Public License
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+#
+# All functions in this module only accept unicode. Any byte strings should
+# be converted to unicode before sending them into this.
 
 import re
-import sys
 
 from builtins import map
 from builtins import range
-
-FILESYSTEM_ENCODING = sys.getfilesystemencoding()
 
 
 class GlobbingError(Exception):
@@ -68,9 +68,7 @@ def select_fn_from_glob(glob_str, include, ignore_case=False):
 
     Note: including a folder implicitly includes everything within it.
     """
-    if not isinstance(glob_str, unicode) and isinstance(glob_str, str):
-        # ToDo: only necessary as a stop-gap until all code is converted to use unicode
-        glob_str = unicode(glob_str, FILESYSTEM_ENCODING)
+    assert isinstance(glob_str, unicode)
     glob_ends_w_slash = False
 
     if glob_str == u"/":

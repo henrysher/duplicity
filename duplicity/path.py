@@ -47,10 +47,37 @@ from duplicity import dup_time
 from duplicity import cached_ops
 from duplicity.lazy import *  # @UnusedWildImport
 
+try:
+    from os import fsencode, fsdecode
+except ImportError:
+    # Most likely Python version < 3.2, so define our own fsencode/fsdecode.
+    # These are functions that encode/decode unicode paths to filesystem encoding,
+    # but the cleverness is that they handle non-unicode characters on Linux
+    # There is a *partial* backport to Python2 available here:
+    # https://github.com/pjdelport/backports.os/blob/master/src/backports/os.py
+    # but if it cannot be trusted for full-circle translation, then we may as well
+    # just read and store the bytes version of the path as path.name before
+    # creating the unicode version (for path matching etc) and ensure that in
+    # real-world usage (as opposed to testing) we create the path objects from a
+    # bytes string.
+    # ToDo: Revisit this once we drop Python 2 support/the backport is complete
+
+    def fsencode(unicode_filename):
+        """Convert a unicode filename to a filename encoded in the system encoding"""
+        # bytes_filename = unicode_filename.encode(sys.getfilesystemencoding(), 'replace')
+        # ToDo: the above is conceptually better, but seems to return ascii even when UTF-8 is supported
+        bytes_filename = unicode_filename.encode('utf-8', 'replace')
+        return bytes_filename
+
+    def fsdecode(bytes_filename):
+        """Convert a filename encoded in the system encoding to unicode"""
+        # If we are not doing any cleverness with non-unicode filename bytes,
+        # bytes_to_unicode is good enough
+        return util.bytes_to_uc(bytes_filename)
+
+
 _copy_blocksize = 64 * 1024
 _tmp_path_counter = 1
-
-FILESYSTEM_ENCODING = sys.getfilesystemencoding()
 
 
 class StatResult:
@@ -513,20 +540,25 @@ class Path(ROPath):
         # self.opened should be true if the file has been opened, and
         # self.fileobj can override returned fileobj
         self.opened, self.fileobj = None, None
+        if isinstance(base, unicode):
+            # For now, it is helpful to know that all paths are starting with bytes
+            base = fsencode(base)
         self.base = base
+
+        # Create self.index, which is the path as a tuple
         self.index = self.rename_index(index)
 
         self.name = os.path.join(base, *self.index)
 
         # While we transition everything to unicode, it is helpful to
         # know that path.name is always not unicode and path.uc_name
-        # always is. To avoid unexpected encoding/decoding errors, it
-        # is good to know we are always starting with a unicode base
-        # ToDo: only necessary as a stop-gap until all code is converted to use unicode
-        assert isinstance(self.name, unicode), self.name + " is not unicode"
-
-        self.uc_name = self.name
-        self.name = self.name.encode(FILESYSTEM_ENCODING)
+        # always is.
+        if isinstance(self.name, unicode):
+            self.uc_name = self.name
+            self.name = fsencode(self.uc_name)
+        else:
+            # self.name is still in filesystem encoding, so does not need to change
+            self.uc_name = fsdecode(self.name)
 
         self.setdata()
 
