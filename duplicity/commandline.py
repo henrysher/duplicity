@@ -561,6 +561,21 @@ def parse_cmdline_options(arglist):
     # Option to allow use of server side encryption in s3
     parser.add_option("--s3-use-server-side-encryption", action="store_true", dest="s3_use_sse")
 
+    # Number of the largest supported upload size where the Azure library makes only one put call.
+    # This is used to upload a single block if the content length is known and is less than this value.
+    # The default is 67108864 (64MiB)
+    parser.add_option("--azure-max-single-put-size", type="int", metavar=_("number"))
+
+    # Number for the block size used by the Azure library to upload a blob if the length is unknown
+    # or is larger than the value set by --azure-max-single-put-size".
+    # The maximum block size the service supports is 100MiB.
+    # The default is 4 * 1024 * 1024 (4MiB)
+    parser.add_option("--azure-max-block-size", type="int", metavar=_("number"))
+
+    # The number for the maximum parallel connections to use when the blob size exceeds 64MB.
+    # max_connections (int) – Maximum number of parallel connections to use when the blob size exceeds 64MB.
+    parser.add_option("--azure-max-connections", type="int", metavar=_("number"))
+
     # scp command to use (ssh pexpect backend)
     parser.add_option("--scp-command", metavar=_("command"))
 

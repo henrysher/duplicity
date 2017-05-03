@@ -782,6 +782,25 @@ hanging on multipart uploads or if you'd like to control the time variance
 when uploading to S3 to ensure you kill connections to slow S3 endpoints.
 
 .TP
+.BI "--azure-max-single-put-size"
+Specify the number of the largest supported upload size where the Azure
+library makes only one put call. If the content size is known and below this
+value the Azure library will only perform one put request to upload one block.
+The number is expected to be in bytes.
+
+.TP
+.BI "--azure-max-block-size"
+Specify the number for the block size used by the Azure library to upload
+blobs if it is split into multiple blocks.
+The maximum block size the service supports is 104857600 (100MiB) and the
+default is 4194304 (4MiB)
+
+.TP
+.BI ""--azure-max-connections"
+Specify the number of maximum connections to transfer one blob to Azure
+blob size exceeds 64MB. The default values is 2.
+
+.TP
 .BI "--scp-command " command
 .B (only ssh pexpect backend with --use-scp enabled)
 The
