@@ -37,20 +37,20 @@ class RestartTest(FunctionalTestCase):
         Test basic Checkpoint/Restart
         """
         self.make_largefiles()
-        self.backup("full", "testfiles/largefiles", fail=1)
-        self.backup("full", "testfiles/largefiles")
-        self.verify("testfiles/largefiles")
+        self.backup(u"full", u"testfiles/largefiles", fail=1)
+        self.backup(u"full", u"testfiles/largefiles")
+        self.verify(u"testfiles/largefiles")
 
     def test_multiple_checkpoint_restart(self):
         """
         Test multiple Checkpoint/Restart
         """
         self.make_largefiles()
-        self.backup("full", "testfiles/largefiles", fail=1)
-        self.backup("full", "testfiles/largefiles", fail=2)
-        self.backup("full", "testfiles/largefiles", fail=3)
-        self.backup("full", "testfiles/largefiles")
-        self.verify("testfiles/largefiles")
+        self.backup(u"full", u"testfiles/largefiles", fail=1)
+        self.backup(u"full", u"testfiles/largefiles", fail=2)
+        self.backup(u"full", u"testfiles/largefiles", fail=3)
+        self.backup(u"full", u"testfiles/largefiles")
+        self.verify(u"testfiles/largefiles")
 
     def test_first_volume_failure(self):
         """
@@ -58,10 +58,10 @@ class RestartTest(FunctionalTestCase):
         Caused when duplicity fails before the first transfer.
         """
         self.make_largefiles()
-        self.backup("full", "testfiles/largefiles", fail=1)
-        assert not os.system("rm testfiles/output/duplicity-full*difftar*")
-        self.backup("full", "testfiles/largefiles")
-        self.verify("testfiles/largefiles")
+        self.backup(u"full", u"testfiles/largefiles", fail=1)
+        assert not os.system(u"rm testfiles/output/duplicity-full*difftar*")
+        self.backup(u"full", u"testfiles/largefiles")
+        self.verify(u"testfiles/largefiles")
 
     def test_multi_volume_failure(self):
         """
@@ -70,10 +70,10 @@ class RestartTest(FunctionalTestCase):
         fails the last queued transfer(s).
         """
         self.make_largefiles()
-        self.backup("full", "testfiles/largefiles", fail=3)
-        assert not os.system("rm testfiles/output/duplicity-full*vol[23].difftar*")
-        self.backup("full", "testfiles/largefiles")
-        self.verify("testfiles/largefiles")
+        self.backup(u"full", u"testfiles/largefiles", fail=3)
+        assert not os.system(u"rm testfiles/output/duplicity-full*vol[23].difftar*")
+        self.backup(u"full", u"testfiles/largefiles")
+        self.verify(u"testfiles/largefiles")
 
     def test_restart_sign_and_encrypt(self):
         """
@@ -81,10 +81,10 @@ class RestartTest(FunctionalTestCase):
         https://bugs.launchpad.net/duplicity/+bug/946988
         """
         self.make_largefiles()
-        enc_opts = ["--sign-key", self.sign_key, "--encrypt-key", self.sign_key]
-        self.backup("full", "testfiles/largefiles", options=enc_opts, fail=2)
-        self.backup("full", "testfiles/largefiles", options=enc_opts)
-        self.verify("testfiles/largefiles")
+        enc_opts = [u"--sign-key", self.sign_key, u"--encrypt-key", self.sign_key]
+        self.backup(u"full", u"testfiles/largefiles", options=enc_opts, fail=2)
+        self.backup(u"full", u"testfiles/largefiles", options=enc_opts)
+        self.verify(u"testfiles/largefiles")
 
     def test_restart_sign_and_hidden_encrypt(self):
         """
@@ -92,10 +92,10 @@ class RestartTest(FunctionalTestCase):
         https://bugs.launchpad.net/duplicity/+bug/946988
         """
         self.make_largefiles()
-        enc_opts = ["--sign-key", self.sign_key, "--hidden-encrypt-key", self.sign_key]
-        self.backup("full", "testfiles/largefiles", options=enc_opts, fail=2)
-        self.backup("full", "testfiles/largefiles", options=enc_opts)
-        self.verify("testfiles/largefiles")
+        enc_opts = [u"--sign-key", self.sign_key, u"--hidden-encrypt-key", self.sign_key]
+        self.backup(u"full", u"testfiles/largefiles", options=enc_opts, fail=2)
+        self.backup(u"full", u"testfiles/largefiles", options=enc_opts)
+        self.verify(u"testfiles/largefiles")
 
     def test_last_file_missing_in_middle(self):
         """
@@ -104,12 +104,12 @@ class RestartTest(FunctionalTestCase):
         the file in the middle of the backup, with files following.
         """
         self.make_largefiles()
-        self.backup("full", "testfiles/largefiles", fail=3)
-        assert not os.system("rm testfiles/largefiles/file2")
-        self.backup("full", "testfiles/largefiles")
+        self.backup(u"full", u"testfiles/largefiles", fail=3)
+        assert not os.system(u"rm testfiles/largefiles/file2")
+        self.backup(u"full", u"testfiles/largefiles")
         # TODO: we can't verify but we need to to check for other errors that might show up
         # there should be 2 differences found, one missing file, one mtime change
-        # self.verify("testfiles/largefiles")
+        # self.verify(u"testfiles/largefiles")
 
     def test_last_file_missing_at_end(self):
         """
@@ -118,22 +118,22 @@ class RestartTest(FunctionalTestCase):
         the file at the end of the backup, with no files following.
         """
         self.make_largefiles()
-        self.backup("full", "testfiles/largefiles", fail=6)
-        assert not os.system("rm testfiles/largefiles/file3")
-        self.backup("full", "testfiles/largefiles")
+        self.backup(u"full", u"testfiles/largefiles", fail=6)
+        assert not os.system(u"rm testfiles/largefiles/file3")
+        self.backup(u"full", u"testfiles/largefiles")
         # TODO: we can't verify but we need to to check for other errors that might show up
         # there should be 2 differences found, one missing file, one mtime change
-        # self.verify("testfiles/largefiles")
+        # self.verify(u"testfiles/largefiles")
 
     def test_restart_incremental(self):
         """
         Test restarting an incremental backup
         """
         self.make_largefiles()
-        self.backup("full", "testfiles/dir1")
-        self.backup("inc", "testfiles/largefiles", fail=2)
-        self.backup("inc", "testfiles/largefiles")
-        self.verify("testfiles/largefiles")
+        self.backup(u"full", u"testfiles/dir1")
+        self.backup(u"inc", u"testfiles/largefiles", fail=2)
+        self.backup(u"inc", u"testfiles/largefiles")
+        self.verify(u"testfiles/largefiles")
 
     def make_fake_second_volume(self, name):
         """
@@ -175,16 +175,16 @@ class RestartTest(FunctionalTestCase):
         If we restart right after a volume that ended with a small
         (one-block) file, make sure we restart in the right place.
         """
-        source = 'testfiles/largefiles'
+        source = u'testfiles/largefiles'
         assert not os.system("mkdir -p %s" % source)
         assert not os.system("echo hello > %s/file1" % source)
-        self.backup("full", source, options=["--name=backup1"])
+        self.backup(u"full", source, options=[u"--name=backup1"])
         # Fake an interruption
-        self.make_fake_second_volume("backup1")
+        self.make_fake_second_volume(u"backup1")
         # Add new file
         assert not os.system("cp %s/file1 %s/newfile" % (source, source))
         # 'restart' the backup
-        self.backup("full", source, options=["--name=backup1"])
+        self.backup(u"full", source, options=[u"--name=backup1"])
         # Confirm we actually resumed the previous backup
         self.assertEqual(len(os.listdir("testfiles/output")), 4)
         # Now make sure everything is byte-for-byte the same once restored
@@ -196,15 +196,15 @@ class RestartTest(FunctionalTestCase):
         If we restart right after a volume that ended with a large
         (multi-block) file, make sure we restart in the right place.
         """
-        source = 'testfiles/largefiles'
+        source = u'testfiles/largefiles'
         self.make_largefiles(count=1, size=1)
-        self.backup("full", source, options=["--volsize=5", "--name=backup1"])
+        self.backup(u"full", source, options=[u"--volsize=5", u"--name=backup1"])
         # Fake an interruption
-        self.make_fake_second_volume("backup1")
+        self.make_fake_second_volume(u"backup1")
         # Add new file
         assert not os.system("cp %s/file1 %s/newfile" % (source, source))
         # 'restart' the backup
-        self.backup("full", source, options=["--volsize=5", "--name=backup1"])
+        self.backup(u"full", source, options=[u"--volsize=5", u"--name=backup1"])
         # Confirm we actually resumed the previous backup
         self.assertEqual(len(os.listdir("testfiles/output")), 4)
         # Now make sure everything is byte-for-byte the same once restored
@@ -216,13 +216,13 @@ class RestartTest(FunctionalTestCase):
         If we restart right after a volume that ended inside of a large
         (multi-block) file, make sure we restart in the right place.
         """
-        source = 'testfiles/largefiles'
+        source = u'testfiles/largefiles'
         self.make_largefiles(count=1, size=3)
-        self.backup("full", source, options=["--name=backup1"])
+        self.backup(u"full", source, options=[u"--name=backup1"])
         # Fake an interruption
-        self.make_fake_second_volume("backup1")
+        self.make_fake_second_volume(u"backup1")
         # 'restart' the backup
-        self.backup("full", source, options=["--name=backup1"])
+        self.backup(u"full", source, options=[u"--name=backup1"])
         # Now make sure everything is byte-for-byte the same once restored
         self.restore()
         assert not os.system("diff -r %s testfiles/restore_out" % source)
@@ -234,16 +234,16 @@ class RestartTest(FunctionalTestCase):
         (Expected result is to ignore new, ealier files, but pick up later
         ones.)
         """
-        source = 'testfiles/largefiles'
+        source = u'testfiles/largefiles'
         self.make_largefiles(count=1, size=1)
-        self.backup("full", source, options=["--name=backup1"])
+        self.backup(u"full", source, options=[u"--name=backup1"])
         # Fake an interruption
-        self.make_fake_second_volume("backup1")
+        self.make_fake_second_volume(u"backup1")
         # Add new files, earlier and later in filename sort order
         assert not os.system("echo hello > %s/a" % source)
         assert not os.system("echo hello > %s/z" % source)
         # 'restart' the backup
-        self.backup("full", source, options=["--name=backup1"])
+        self.backup(u"full", source, options=[u"--name=backup1"])
         # Now make sure everything is the same once restored, except 'a'
         self.restore()
         assert not os.system("test ! -e testfiles/restore_out/a")
@@ -258,15 +258,15 @@ class RestartTest(FunctionalTestCase):
         if the source data changes to be small enough to not create a vol3 on
         restart.
         """
-        source = 'testfiles/largefiles'
+        source = u'testfiles/largefiles'
         self.make_largefiles(count=5, size=1)
-        self.backup("full", source, fail=3)
+        self.backup(u"full", source, fail=3)
         # now delete the last volume on remote end and some source files
         assert not os.system("rm testfiles/output/duplicity-full*vol3.difftar*")
         assert not os.system("rm %s/file[2345]" % source)
         assert not os.system("echo hello > %s/z" % source)
         # finish backup
-        self.backup("full", source)
+        self.backup(u"full", source)
         # and verify we can restore
         self.restore()
 
@@ -277,14 +277,14 @@ class RestartTest(FunctionalTestCase):
         possible that the first chunk of the next file will be skipped unless
         we're careful.
         """
-        source = 'testfiles/largefiles'
+        source = u'testfiles/largefiles'
         self.make_largefiles(count=1)
-        self.backup("full", source, fail=2)
+        self.backup(u"full", source, fail=2)
         # now remove starting source data and make sure we add something after
         assert not os.system("rm %s/*" % source)
         assert not os.system("echo hello > %s/z" % source)
         # finish backup
-        self.backup("full", source)
+        self.backup(u"full", source)
         # and verify we can restore
         self.restore()
         assert not os.system("diff %s/z testfiles/restore_out/z" % source)
@@ -295,7 +295,7 @@ class RestartTestWithoutEncryption(RestartTest):
 
     def setUp(self):
         super(RestartTestWithoutEncryption, self).setUp()
-        self.class_args.extend(["--no-encryption"])
+        self.class_args.extend([u"--no-encryption"])
 
     def test_no_write_double_snapshot(self):
         """
@@ -305,8 +305,8 @@ class RestartTestWithoutEncryption(RestartTest):
         https://launchpad.net/bugs/929067
         """
         self.make_largefiles()
-        self.backup("full", "testfiles/largefiles", fail=2)
-        self.backup("full", "testfiles/largefiles")
+        self.backup(u"full", u"testfiles/largefiles", fail=2)
+        self.backup(u"full", u"testfiles/largefiles")
         # Now check sigtar
         sigtars = glob.glob("testfiles/output/duplicity-full*.sigtar.gz")
         self.assertEqual(1, len(sigtars))
@@ -333,7 +333,7 @@ class RestartTestWithoutEncryption(RestartTest):
             raise Exception("Platform %s not supported by tar/gtar." % platform.platform())
 
         # Intial normal backup
-        self.backup("full", "testfiles/blocktartest")
+        self.backup(u"full", u"testfiles/blocktartest")
         # Create an exact clone of the snapshot folder in the sigtar already.
         # Permissions and mtime must match.
         os.mkdir("testfiles/snapshot", 0o755)
@@ -353,7 +353,7 @@ class RestartTestWithoutEncryption(RestartTest):
         self.assertEqual(0, os.system("rm -r testfiles/cache"))
         # Try a follow on incremental (which in buggy versions, would create
         # a deleted entry for the base dir)
-        self.backup("inc", "testfiles/blocktartest")
+        self.backup(u"inc", u"testfiles/blocktartest")
         self.assertEqual(1, len(glob.glob("testfiles/output/duplicity-new*.sigtar.gz")))
         # Confirm we can restore it (which in buggy versions, would fail)
         self.restore()

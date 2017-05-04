@@ -85,15 +85,9 @@ class FunctionalTestCase(DuplicityTestCase):
         # this way we force a failure if duplicity tries to read from the
         # console unexpectedly (like for gpg password or such).
 
-        # Check all inputs are unicode -- we will convert to system encoding before running the command
-        if current_time:
-            assert isinstance(current_time, unicode), "current_time is not unicode"
-
-        if fail:
-            assert isinstance(fail, unicode), "fail is not unicode"
-
+        # Check all string inputs are unicode -- we will convert to system encoding before running the command
         for item in options:
-            assert isinstance(item, unicode), "item " + unicode(item) + " in options is not unicode"
+            assert not isinstance(item, str), "item " + unicode(item) + " in options is not unicode"
 
         for item in passphrase_input:
             assert isinstance(item, unicode), "item " + unicode(item) + " in passphrase_input is not unicode"
@@ -114,7 +108,7 @@ class FunctionalTestCase(DuplicityTestCase):
             cmd_list.extend([u"--current-time", current_time])
         cmd_list.extend(self.class_args)
         if fail:
-            cmd_list.extend([u"--fail", str(fail)])
+            cmd_list.extend([u"--fail", unicode(fail)])
         cmdline = u" ".join(map(lambda x: u'"%s"' % x, cmd_list))
 
         if not passphrase_input:
@@ -166,7 +160,7 @@ class FunctionalTestCase(DuplicityTestCase):
         if file_to_restore:
             options.extend([u'--file-to-restore', file_to_restore])
         if time:
-            options.extend([u'--restore-time', str(time)])
+            options.extend([u'--restore-time', unicode(time)])
         self.run_duplicity(options=options, **kwargs)
 
     def verify(self, dirname, file_to_verify=None, time=None, options=[],
@@ -175,7 +169,7 @@ class FunctionalTestCase(DuplicityTestCase):
         if file_to_verify:
             options.extend([u'--file-to-restore', file_to_verify])
         if time:
-            options.extend([u'--restore-time', str(time)])
+            options.extend([u'--restore-time', unicode(time)])
         self.run_duplicity(options=options, **kwargs)
 
     def cleanup(self, options=[]):

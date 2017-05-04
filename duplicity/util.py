@@ -54,7 +54,8 @@ def exception_traceback(limit=50):
 
 def escape(string):
     "Convert a (bytes) filename to a format suitable for logging (quoted utf8)"
-    string = ufn(string).encode('unicode-escape', 'replace')
+    if isinstance(string, str) or isinstance(string, unicode):
+        string = bytes_to_uc(string).encode('unicode-escape', 'replace')
     return u"'%s'" % string.decode('utf8', 'replace')
 
 
@@ -81,7 +82,7 @@ def bytes_to_uc(bytes_str):
         # ToDo: the above is conceptually better, but seems to return ascii even when UTF-8 is supported
         unicode_str = bytes_str.decode('utf-8', 'replace')
     else:
-        raise TypeError(u"bytes_to_uc must be passed either unicode or str")
+        raise TypeError(u"bytes_to_uc must be passed either unicode or str, but passed " + unicode(type(bytes_str)))
     return unicode_str
 
 
