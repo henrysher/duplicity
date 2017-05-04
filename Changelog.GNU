@@ -12,6 +12,7 @@
         allowing to push write performance towards Azure above 1 Gb/s for large
         back-ups. If a user does not provide the parameters the defaults of the
         Azure storage library will continue to be used.
+    * Replace incoming non-ASCII chars in commandline.py
 
 2017-04-23  Kenneth Loafman  <kenneth@loafman.com>
 
