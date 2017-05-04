@@ -13,6 +13,8 @@
         back-ups. If a user does not provide the parameters the defaults of the
         Azure storage library will continue to be used.
     * Replace incoming non-ASCII chars in commandline.py
+    * bzr does not honor perms so fix the perms at the start of the testing and
+      avoid annoying error regarding testing/gnupg having too lenient perms
 
 2017-04-23  Kenneth Loafman  <kenneth@loafman.com>
 
