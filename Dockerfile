@@ -43,6 +43,7 @@ RUN apt-get install -y \
             mc \
             iputils-ping \
             net-tools \
+            ftp \
     && rm -rf /var/lib/apt/lists/*
 
 # Need to make gpg2 the default gpg
