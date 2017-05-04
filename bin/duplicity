@@ -28,6 +28,7 @@
 # any suggestions.
 
 import duplicity.errors
+import copy
 import gzip
 import os
 import platform
@@ -1007,6 +1008,121 @@ def remove_old(col_stats):
                    _("Rerun command with --force option to actually delete."))
 
 
+def replicate():
+    """
+    Replicate backup files from one remote to another, possibly encrypting or adding parity.
+
+    @rtype: void
+    @return: void
+    """
+    time = globals.restore_time or dup_time.curtime
+    src_stats = collections.CollectionsStatus(globals.src_backend, None).set_values(sig_chain_warning=None)
+    tgt_stats = collections.CollectionsStatus(globals.backend, None).set_values(sig_chain_warning=None)
+
+    src_list = globals.src_backend.list()
+    tgt_list = globals.backend.list()
+
+    src_chainlist = src_stats.get_signature_chains(local=False, filelist=src_list)[0]
+    tgt_chainlist = tgt_stats.get_signature_chains(local=False, filelist=tgt_list)[0]
+    sorted(src_chainlist, key=lambda chain: chain.start_time)
+    sorted(tgt_chainlist, key=lambda chain: chain.start_time)
+    if not src_chainlist:
+        log.Notice(_("No old backup sets found."))
+        return
+    for src_chain in src_chainlist:
+        try:
+            tgt_chain = filter(lambda chain: chain.start_time == src_chain.start_time, tgt_chainlist)[0]
+        except IndexError:
+            tgt_chain = None
+
+        tgt_sigs = list(map(file_naming.parse, tgt_chain.get_filenames())) if tgt_chain else []
+        for src_sig_filename in src_chain.get_filenames():
+            src_sig = file_naming.parse(src_sig_filename)
+            if not (src_sig.time or src_sig.end_time) < time:
+                continue
+            try:
+                tgt_sigs.remove(src_sig)
+                log.Info(_("Signature %s already replicated") % (src_sig_filename,))
+                continue
+            except ValueError:
+                pass
+            if src_sig.type == 'new-sig':
+                dup_time.setprevtime(src_sig.start_time)
+            dup_time.setcurtime(src_sig.time or src_sig.end_time)
+            log.Notice(_("Replicating %s.") % (src_sig_filename,))
+            fileobj = globals.src_backend.get_fileobj_read(src_sig_filename)
+            filename = file_naming.get(src_sig.type, encrypted=globals.encryption, gzipped=globals.compression)
+            tdp = dup_temp.new_tempduppath(file_naming.parse(filename))
+            tmpobj = tdp.filtered_open(mode='wb')
+            util.copyfileobj(fileobj, tmpobj)  # decrypt, compress, (re)-encrypt
+            fileobj.close()
+            tmpobj.close()
+            globals.backend.put(tdp, filename)
+            tdp.delete()
+
+    src_chainlist = src_stats.get_backup_chains(filename_list=src_list)[0]
+    tgt_chainlist = tgt_stats.get_backup_chains(filename_list=tgt_list)[0]
+    sorted(src_chainlist, key=lambda chain: chain.start_time)
+    sorted(tgt_chainlist, key=lambda chain: chain.start_time)
+    for src_chain in src_chainlist:
+        try:
+            tgt_chain = filter(lambda chain: chain.start_time == src_chain.start_time, tgt_chainlist)[0]
+        except IndexError:
+            tgt_chain = None
+
+        tgt_sets = tgt_chain.get_all_sets() if tgt_chain else []
+        for src_set in src_chain.get_all_sets():
+            if not src_set.get_time() < time:
+                continue
+            try:
+                tgt_sets.remove(src_set)
+                log.Info(_("Backupset %s already replicated") % (src_set.remote_manifest_name,))
+                continue
+            except ValueError:
+                pass
+            if src_set.type == 'inc':
+                dup_time.setprevtime(src_set.start_time)
+            dup_time.setcurtime(src_set.get_time())
+            rmf = src_set.get_remote_manifest()
+            mf_filename = file_naming.get(src_set.type, manifest=True)
+            mf_tdp = dup_temp.new_tempduppath(file_naming.parse(mf_filename))
+            mf = manifest.Manifest(fh=mf_tdp.filtered_open(mode='wb'))
+            for i, filename in src_set.volume_name_dict.iteritems():
+                log.Notice(_("Replicating %s.") % (filename,))
+                fileobj = restore_get_enc_fileobj(globals.src_backend, filename, rmf.volume_info_dict[i])
+                filename = file_naming.get(src_set.type, i, encrypted=globals.encryption, gzipped=globals.compression)
+                tdp = dup_temp.new_tempduppath(file_naming.parse(filename))
+                tmpobj = tdp.filtered_open(mode='wb')
+                util.copyfileobj(fileobj, tmpobj)  # decrypt, compress, (re)-encrypt
+                fileobj.close()
+                tmpobj.close()
+                globals.backend.put(tdp, filename)
+
+                vi = copy.copy(rmf.volume_info_dict[i])
+                vi.set_hash("SHA1", gpg.get_hash("SHA1", tdp))
+                mf.add_volume_info(vi)
+
+                tdp.delete()
+
+            mf.fh.close()
+            # incremental GPG writes hang on close, so do any encryption here at once
+            mf_fileobj = mf_tdp.filtered_open_with_delete(mode='rb')
+            mf_final_filename = file_naming.get(src_set.type,
+                                                manifest=True,
+                                                encrypted=globals.encryption,
+                                                gzipped=globals.compression)
+            mf_final_tdp = dup_temp.new_tempduppath(file_naming.parse(mf_final_filename))
+            mf_final_fileobj = mf_final_tdp.filtered_open(mode='wb')
+            util.copyfileobj(mf_fileobj, mf_final_fileobj)  # compress, encrypt
+            mf_fileobj.close()
+            mf_final_fileobj.close()
+            globals.backend.put(mf_final_tdp, mf_final_filename)
+            mf_final_tdp.delete()
+
+    globals.src_backend.close()
+    globals.backend.close()
+
+
 def sync_archive(decrypt):
     """
     Synchronize local archive manifest file and sig chains to remote archives.
@@ -1408,8 +1524,9 @@ def do_backup(action):
     check_resources(action)
 
     # check archive synch with remote, fix if needed
-    decrypt = action not in ["collection-status"]
-    sync_archive(decrypt)
+    if not action == "replicate":
+        decrypt = action not in ["collection-status"]
+        sync_archive(decrypt)
 
     # get current collection status
     col_stats = collections.CollectionsStatus(globals.backend,
@@ -1483,6 +1600,8 @@ def do_backup(action):
         remove_all_but_n_full(col_stats)
     elif action == "sync":
         sync_archive(True)
+    elif action == "replicate":
+        replicate()
     else:
         assert action == "inc" or action == "full", action
         # the passphrase for full and inc is used by --sign-key

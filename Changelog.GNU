@@ -1,3 +1,11 @@
+2017-05-04  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~dawgfoto/duplicity/replicate
+      - Add replicate command to replicate a backup (or backup
+        sets older than a given time) to another backend, leveraging
+        duplicity's backend and compression/encryption infrastructure.
+    * Fixed some incoming PyLint and PEP-8 errors.
+
 2017-04-23  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~dernils/duplicity/testing

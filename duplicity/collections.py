@@ -294,6 +294,16 @@ class BackupSet:
         """
         return len(self.volume_name_dict.keys())
 
+    def __eq__(self, other):
+        """
+        Return whether this backup set is equal to other
+        """
+        return self.type == other.type and \
+            self.time == other.time and \
+            self.start_time == other.start_time and \
+            self.end_time == other.end_time and \
+            len(self) == len(other)
+
 
 class BackupChain:
     """
@@ -642,7 +652,7 @@ class CollectionsStatus:
              u"-----------------",
              _("Connecting with backend: %s") %
              (self.backend.__class__.__name__,),
-             _("Archive dir: %s") % (util.ufn(self.archive_dir_path.name),)]
+             _("Archive dir: %s") % (util.ufn(self.archive_dir_path.name if self.archive_dir_path else 'None'),)]
 
         l.append("\n" +
                  ngettext("Found %d secondary backup chain.",
@@ -697,7 +707,7 @@ class CollectionsStatus:
                   len(backend_filename_list))
 
         # get local filename list
-        local_filename_list = self.archive_dir_path.listdir()
+        local_filename_list = self.archive_dir_path.listdir() if self.archive_dir_path else []
         log.Debug(ngettext("%d file exists in cache",
                            "%d files exist in cache",
                            len(local_filename_list)) %
@@ -894,7 +904,7 @@ class CollectionsStatus:
             if filelist is not None:
                 return filelist
             elif local:
-                return self.archive_dir_path.listdir()
+                return self.archive_dir_path.listdir() if self.archive_dir_path else []
             else:
                 return self.backend.list()
 

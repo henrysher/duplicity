@@ -142,6 +142,11 @@ New in v0.8.00 (2016/07/??)
 * Merged in lp:~dernils/duplicity/documentation
   - Minor changes to README-REPO, README-TESTING
   - Also redo the changes to requirements.txt and Dockerfile
+* Merged in lp:~dawgfoto/duplicity/replicate
+  - Add replicate command to replicate a backup (or backup
+    sets older than a given time) to another backend, leveraging
+    duplicity's backend and compression/encryption infrastructure.
+* Fixed some incoming PyLint and PEP-8 errors.
 
 
 New in v0.7.08 (2016/07/02)
