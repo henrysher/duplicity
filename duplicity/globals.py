@@ -215,6 +215,15 @@ s3_multipart_max_timeout = None
 # Use server side encryption in s3
 s3_use_sse = False
 
+# The largest size upload supported in a single put call for azure
+azure_max_single_put_size = None
+
+# The size of the blocks put to azure blob storage if bigger than azure_max_single_put_size
+azure_max_block_size = None
+
+# Maximum number of parallel connections to use when the blob size for azure exceeds 64MB
+azure_max_connections = None
+
 # Whether to use the full email address as the user name when
 # logging into an imap server. If false just the user name
 # part of the email address is used.

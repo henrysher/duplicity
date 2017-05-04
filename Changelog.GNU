@@ -5,6 +5,13 @@
         sets older than a given time) to another backend, leveraging
         duplicity's backend and compression/encryption infrastructure.
     * Fixed some incoming PyLint and PEP-8 errors.
+    * Merged in lp:~marix/duplicity/add-azure-arguments
+      - Using the Azure backend to store large amounts of data we found that
+        performance is sub-optimal. The changes on this branch add command line
+        parameters to fine-tune some parameters of the Azure storage library,
+        allowing to push write performance towards Azure above 1 Gb/s for large
+        back-ups. If a user does not provide the parameters the defaults of the
+        Azure storage library will continue to be used.
 
 2017-04-23  Kenneth Loafman  <kenneth@loafman.com>
 
