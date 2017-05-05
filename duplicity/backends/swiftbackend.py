@@ -138,7 +138,7 @@ Exception: %s""" % str(e))
                              file(source_path.name))
 
     def _get(self, remote_filename, local_path):
-        headers, body = self.conn.get_object(self.container, self.prefix + remote_filename)
+        headers, body = self.conn.get_object(self.container, self.prefix + remote_filename, resp_chunk_size=1024)
         with open(local_path.name, 'wb') as f:
             for chunk in body:
                 f.write(chunk)

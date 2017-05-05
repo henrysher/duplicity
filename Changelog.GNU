@@ -2,6 +2,8 @@
 
     * Merged in lp:~dernils/duplicity/DockerfileConvenience
       - Added a few tools to the Dockerfile that make life easier
+    * Fixed bug #1320832 with suggestion from Oskar Wycislak
+      - Use chunks instead of reading it all in swiftbackend
 
 2017-05-04  Kenneth Loafman  <kenneth@loafman.com>
 
