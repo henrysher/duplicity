@@ -45,6 +45,9 @@ os.environ['PATH'] = _bin_dir + ":" + os.environ.get('PATH', '')
 os.environ['LANG'] = ''
 os.environ['GNUPGHOME'] = os.path.join(_testing_dir, 'gnupg')
 
+# bzr does not honor perms so fix the perms and avoid annoying error
+os.system("chmod 700 %s" % os.path.join(_testing_dir, 'gnupg'))
+
 # Standardize time
 os.environ['TZ'] = 'US/Central'
 time.tzset()

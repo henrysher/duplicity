@@ -22,6 +22,7 @@
 import os
 
 import duplicity.backend
+from duplicity import globals
 from duplicity import log
 from duplicity.errors import BackendException
 
@@ -73,6 +74,24 @@ Exception: %s""" % str(e))
             raise BackendException(
                 'Neither AZURE_ACCOUNT_KEY nor AZURE_SHARED_ACCESS_SIGNATURE environment variable not set.')
 
+        if globals.azure_max_single_put_size:
+            # check if we use azure-storage>=0.30.0
+            try:
+                _ = self.blob_service.MAX_SINGLE_PUT_SIZE
+                self.blob_service.MAX_SINGLE_PUT_SIZE = globals.azure_max_single_put_size
+            # fallback for azure-storage<0.30.0
+            except AttributeError:
+                self.blob_service._BLOB_MAX_DATA_SIZE = globals.azure_max_single_put_size
+
+        if globals.azure_max_block_size:
+            # check if we use azure-storage>=0.30.0
+            try:
+                _ = self.blob_service.MAX_BLOCK_SIZE
+                self.blob_service.MAX_BLOCK_SIZE = globals.azure_max_block_size
+            # fallback for azure-storage<0.30.0
+            except AttributeError:
+                self.blob_service._BLOB_MAX_CHUNK_DATA_SIZE = globals.azure_max_block_size
+
     def _create_container(self):
         try:
             self.blob_service.create_container(self.container, fail_on_exist=True)
@@ -85,11 +104,15 @@ Exception: %s""" % str(e))
                            log.ErrorCode.connection_failed)
 
     def _put(self, source_path, remote_filename):
+        kwargs = {}
+        if globals.azure_max_connections:
+            kwargs['max_connections'] = globals.azure_max_connections
+
         # https://azure.microsoft.com/en-us/documentation/articles/storage-python-how-to-use-blob-storage/#upload-a-blob-into-a-container
         try:
-            self.blob_service.create_blob_from_path(self.container, remote_filename, source_path.name)
+            self.blob_service.create_blob_from_path(self.container, remote_filename, source_path.name, **kwargs)
         except AttributeError:  # Old versions use a different method name
-            self.blob_service.put_block_blob_from_path(self.container, remote_filename, source_path.name)
+            self.blob_service.put_block_blob_from_path(self.container, remote_filename, source_path.name, **kwargs)
 
     def _get(self, remote_filename, local_path):
         # https://azure.microsoft.com/en-us/documentation/articles/storage-python-how-to-use-blob-storage/#download-blobs

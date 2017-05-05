@@ -125,16 +125,17 @@ class FunctionalTestCase(DuplicityTestCase):
             lines.append(child.readline())
         return_val = child.exitstatus
 
-#         print >>sys.stderr, "duplicity command:", cmdline
-#         print >>sys.stderr, "current dir:", os.getcwd()
-#         print >>sys.stderr, "....output:"
-#         for line in lines:
-#             print >>sys.stderr, line,
-#         print >>sys.stderr, "....return_val:", return_val
-
         if fail:
             self.assertEqual(30, return_val)
         elif return_val:
+            print >>sys.stderr, "\n...command:", cmdline
+            print >>sys.stderr, "...cwd:", os.getcwd()
+            print >>sys.stderr, "...output:"
+            for line in lines:
+                line = line.rstrip()
+                if line:
+                    print >>sys.stderr, line
+            print >>sys.stderr, "...return_val:", return_val
             raise CmdError(return_val)
 
     def backup(self, type, input_dir, options=[], **kwargs):

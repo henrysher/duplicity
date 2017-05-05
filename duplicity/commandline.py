@@ -55,6 +55,7 @@ list_current = None  # Will be set to true if list-current command given
 collection_status = None  # Will be set to true if collection-status command given
 cleanup = None  # Set to true if cleanup command given
 verify = None  # Set to true if verify command given
+replicate = None  # Set to true if replicate command given
 
 commands = ["cleanup",
             "collection-status",
@@ -66,6 +67,7 @@ commands = ["cleanup",
             "remove-all-inc-of-but-n-full",
             "restore",
             "verify",
+            "replicate"
             ]
 
 
@@ -237,7 +239,7 @@ class OPHelpFix(optparse.OptionParser):
 def parse_cmdline_options(arglist):
     """Parse argument list"""
     global select_opts, select_files, full_backup
-    global list_current, collection_status, cleanup, remove_time, verify
+    global list_current, collection_status, cleanup, remove_time, verify, replicate
 
     def set_log_fd(fd):
         if fd < 1:
@@ -562,6 +564,21 @@ def parse_cmdline_options(arglist):
     # Option to allow use of server side encryption in s3
     parser.add_option("--s3-use-server-side-encryption", action="store_true", dest="s3_use_sse")
 
+    # Number of the largest supported upload size where the Azure library makes only one put call.
+    # This is used to upload a single block if the content length is known and is less than this value.
+    # The default is 67108864 (64MiB)
+    parser.add_option("--azure-max-single-put-size", type="int", metavar=_("number"))
+
+    # Number for the block size used by the Azure library to upload a blob if the length is unknown
+    # or is larger than the value set by --azure-max-single-put-size".
+    # The maximum block size the service supports is 100MiB.
+    # The default is 4 * 1024 * 1024 (4MiB)
+    parser.add_option("--azure-max-block-size", type="int", metavar=_("number"))
+
+    # The number for the maximum parallel connections to use when the blob size exceeds 64MB.
+    # max_connections (int) - Maximum number of parallel connections to use when the blob size exceeds 64MB.
+    parser.add_option("--azure-max-connections", type="int", metavar=_("number"))
+
     # scp command to use (ssh pexpect backend)
     parser.add_option("--scp-command", metavar=_("command"))
 
@@ -707,6 +724,9 @@ def parse_cmdline_options(arglist):
         num_expect = 1
     elif cmd == "verify":
         verify = True
+    elif cmd == "replicate":
+        replicate = True
+        num_expect = 2
 
     if len(args) != num_expect:
         command_line_error("Expected %d args, got %d" % (num_expect, len(args)))
@@ -725,7 +745,12 @@ def parse_cmdline_options(arglist):
     elif len(args) == 1:
         backend_url = args[0]
     elif len(args) == 2:
-        lpath, backend_url = args_to_path_backend(args[0], args[1])  # @UnusedVariable
+        if replicate:
+            if not backend.is_backend_url(args[0]) or not backend.is_backend_url(args[1]):
+                command_line_error("Two URLs expected for replicate.")
+            src_backend_url, backend_url = args[0], args[1]
+        else:
+            lpath, backend_url = args_to_path_backend(args[0], args[1])  # @UnusedVariable
     else:
         command_line_error("Too many arguments")
 
@@ -900,6 +925,7 @@ def usage():
   duplicity remove-older-than %(time)s [%(options)s] %(target_url)s
   duplicity remove-all-but-n-full %(count)s [%(options)s] %(target_url)s
   duplicity remove-all-inc-of-but-n-full %(count)s [%(options)s] %(target_url)s
+  duplicity replicate %(source_url)s %(target_url)s
 
 """ % dict
 
@@ -945,7 +971,8 @@ def usage():
   remove-older-than <%(time)s> <%(target_url)s>
   remove-all-but-n-full <%(count)s> <%(target_url)s>
   remove-all-inc-of-but-n-full <%(count)s> <%(target_url)s>
-  verify <%(target_url)s> <%(source_dir)s>""" % dict
+  verify <%(target_url)s> <%(source_dir)s>
+  replicate <%(source_url)s> <%(target_url)s>""" % dict
 
     return msg
 
@@ -1048,7 +1075,7 @@ def process_local_dir(action, local_pathname):
 
 def check_consistency(action):
     """Final consistency check, see if something wrong with command line"""
-    global full_backup, select_opts, list_current
+    global full_backup, select_opts, list_current, collection_status, cleanup, replicate
 
     def assert_only_one(arglist):
         """Raises error if two or more of the elements of arglist are true"""
@@ -1059,8 +1086,8 @@ def check_consistency(action):
         assert n <= 1, "Invalid syntax, two conflicting modes specified"
 
     if action in ["list-current", "collection-status",
-                  "cleanup", "remove-old", "remove-all-but-n-full", "remove-all-inc-of-but-n-full"]:
-        assert_only_one([list_current, collection_status, cleanup,
+                  "cleanup", "remove-old", "remove-all-but-n-full", "remove-all-inc-of-but-n-full", "replicate"]:
+        assert_only_one([list_current, collection_status, cleanup, replicate,
                          globals.remove_time is not None])
     elif action == "restore" or action == "verify":
         if full_backup:
@@ -1106,8 +1133,8 @@ def ProcessCommandLine(cmdline_list):
             sign_key=src.sign_key,
             recipients=src.recipients,
             hidden_recipients=src.hidden_recipients)
-    log.Debug(_("GPG binary is %s, version %d") %
-              ((globals.gpg_binary or 'gpg'), globals.gpg_profile.gpg_major))
+    log.Debug(_("GPG binary is %s, version %s") %
+              ((globals.gpg_binary or 'gpg'), globals.gpg_profile.gpg_version))
 
     # we can now try to import all the backends
     backend.import_backends()
@@ -1138,22 +1165,27 @@ Examples of URL strings are "scp://user@host.net:1234/path" and
 "file:///usr/local".  See the man page for more information.""") % (args[0],),
                            log.ErrorCode.bad_url)
     elif len(args) == 2:
-        # Figure out whether backup or restore
-        backup, local_pathname = set_backend(args[0], args[1])
-        if backup:
-            if full_backup:
-                action = "full"
-            else:
-                action = "inc"
+        if replicate:
+            globals.src_backend = backend.get_backend(args[0])
+            globals.backend = backend.get_backend(args[1])
+            action = "replicate"
         else:
-            if verify:
-                action = "verify"
+            # Figure out whether backup or restore
+            backup, local_pathname = set_backend(args[0], args[1])
+            if backup:
+                if full_backup:
+                    action = "full"
+                else:
+                    action = "inc"
             else:
-                action = "restore"
+                if verify:
+                    action = "verify"
+                else:
+                    action = "restore"
 
-        process_local_dir(action, local_pathname)
-        if action in ['full', 'inc', 'verify']:
-            set_selection()
+            process_local_dir(action, local_pathname)
+            if action in ['full', 'inc', 'verify']:
+                set_selection()
     elif len(args) > 2:
         raise AssertionError("this code should not be reachable")
 

@@ -1,4 +1,10 @@
-dropbox
+boto
+dropbox==6.9.0
 lockfile
+paramiko
 pexpect
+pydrive
 pyrax
+python-cloudfiles
+tox
+urllib3

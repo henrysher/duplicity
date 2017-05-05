@@ -128,6 +128,35 @@ New in v0.8.00 (2016/07/??)
   - change util.uexc() back to bare uexc()
 * Fixed bug #1668750 - Don't mask backend errors
   - added exception prints to module import errors
+* Fixed bug #1680682 with patch supplied from Dave Allan
+  - Only specify --pinentry-mode=loopback when --use-agent is not specified
+* Fixed man page that had 'cancel' instead of 'loopback' for pinentry mode
+* Fixed bug #1684312 with suggestion from Wade Rossman
+  - Use shutil.copyfile instead of os.system('cp ...')
+  - Should reduce overhead of os.system() memory usage.
+* Merged in lp:~dernils/duplicity/testing
+  - Fixed minor stuff in requirements.txt.
+  - Added a Dockerfile for testing.
+  - Minor changes to README files.
+  - Added README-TESTING with some information on testing.
+* Merged in lp:~dernils/duplicity/documentation
+  - Minor changes to README-REPO, README-TESTING
+  - Also redo the changes to requirements.txt and Dockerfile
+* Merged in lp:~dawgfoto/duplicity/replicate
+  - Add replicate command to replicate a backup (or backup
+    sets older than a given time) to another backend, leveraging
+    duplicity's backend and compression/encryption infrastructure.
+* Fixed some incoming PyLint and PEP-8 errors.
+* Merged in lp:~marix/duplicity/add-azure-arguments
+  - Using the Azure backend to store large amounts of data we found that
+    performance is sub-optimal. The changes on this branch add command line
+    parameters to fine-tune some parameters of the Azure storage library,
+    allowing to push write performance towards Azure above 1 Gb/s for large
+    back-ups. If a user does not provide the parameters the defaults of the
+    Azure storage library will continue to be used.
+* Replace incoming non-ASCII chars in commandline.py
+* bzr does not honor perms so fix the perms at the start of the testing and 
+  avoid annoying error regarding testing/gnupg having too lenient perms
 
 
 New in v0.7.08 (2016/07/02)
