@@ -155,8 +155,10 @@ New in v0.8.00 (2016/07/??)
     back-ups. If a user does not provide the parameters the defaults of the
     Azure storage library will continue to be used.
 * Replace incoming non-ASCII chars in commandline.py
-* bzr does not honor perms so fix the perms at the start of the testing and 
+* bzr does not honor perms so fix the perms at the start of the testing and
   avoid annoying error regarding testing/gnupg having too lenient perms
+* Merged in lp:~dernils/duplicity/DockerfileConvenience
+  - Added a few tools to the Dockerfile that make life easier
 
 
 New in v0.7.08 (2016/07/02)

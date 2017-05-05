@@ -1,3 +1,8 @@
+2017-05-05  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~dernils/duplicity/DockerfileConvenience
+      - Added a few tools to the Dockerfile that make life easier
+
 2017-05-04  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~dawgfoto/duplicity/replicate
