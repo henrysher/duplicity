@@ -35,7 +35,7 @@ RUN apt-get update \
             par2 \
             python-dev \
             rdiff \
-            tzdata 
+            tzdata
 
 # The following packages are not necessary for testing but make life easier or support debugging
 RUN apt-get install -y \
