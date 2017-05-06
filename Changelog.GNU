@@ -6,6 +6,7 @@
         backend testing) and a setup script that can be used to set up the
         complete test environment.
     * Moved Dockerfile for duplicitytest into testinfrastructure/duplicity_test
+    * Moved some things around in testing/infrastructure to clean up
 
 2017-05-05  Kenneth Loafman  <kenneth@loafman.com>
 
