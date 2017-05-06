@@ -1,3 +1,11 @@
+2017-05-06  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~dernils/duplicity/DockerfileConvenience
+      - Add a few files that are the beginning of further infrastructure based
+        on docker. It contains a Dockerfile for a simple ftp server (used for
+        backend testing) and a setup script that can be used to set up the
+        complete test environment.
+
 2017-05-05  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~dernils/duplicity/DockerfileConvenience
