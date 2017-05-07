@@ -1,3 +1,8 @@
+2017-05-07  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1320832 with suggestion from Oskar Wycislak
+      - Use chunks instead of reading it all in swiftbackend
+
 2017-04-20  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1680682 with patch supplied from Dave Allan

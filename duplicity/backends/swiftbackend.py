@@ -138,7 +138,7 @@ Exception: %s""" % str(e))
                              file(source_path.name))
 
     def _get(self, remote_filename, local_path):
-        headers, body = self.conn.get_object(self.container, self.prefix + remote_filename)
+        headers, body = self.conn.get_object(self.container, self.prefix + remote_filename, resp_chunk_size=1024)
         with open(local_path.name, 'wb') as f:
             for chunk in body:
                 f.write(chunk)
@@ -154,5 +154,6 @@ Exception: %s""" % str(e))
     def _query(self, filename):
         sobject = self.conn.head_object(self.container, self.prefix + filename)
         return {'size': int(sobject['content-length'])}
+
 
 duplicity.backend.register_backend("swift", SwiftBackend)
