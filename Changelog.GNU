@@ -1,3 +1,10 @@
+2017-05-09  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1689632 with patch from Howard Kaye
+      - On MacOS, the tempfile.TemporaryFile call erroneously raises an
+        IOError exception saying that too many files are open. This causes
+        restores to fail randomly, after thousands of files have been restored.
+
 2017-05-06  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~dernils/duplicity/DockerfileConvenience
