@@ -8,6 +8,10 @@ New in v0.7.13 (2017/??/??)
   - Should reduce overhead of os.system() memory usage.
 * Fixed bug #1320832 with suggestion from Oskar Wycislak
   - Use chunks instead of reading it all in swiftbackend
+* Fixed bug #1689632 with patch from Howard Kaye
+  - On MacOS, the tempfile.TemporaryFile call erroneously raises an
+    IOError exception saying that too many files are open. This causes
+    restores to fail randomly, after thousands of files have been restored.
 
 
 New in v0.7.12 (2017/03/21)
