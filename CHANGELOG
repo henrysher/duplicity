@@ -12,6 +12,10 @@ New in v0.7.13 (2017/??/??)
   - On MacOS, the tempfile.TemporaryFile call erroneously raises an
     IOError exception saying that too many files are open. This causes
     restores to fail randomly, after thousands of files have been restored.
+* Fixed bug #1320641 and others regarding lockfile
+  - swap from lockfile to fasteners module
+  - use an fcntl() style lock for process lock of duplicity cache
+  - lockfile will now clear if duplicity is killed or crashes
 
 
 New in v0.7.12 (2017/03/21)

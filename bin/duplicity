@@ -39,29 +39,7 @@ import resource
 import re
 import threading
 from datetime import datetime
-try:
-    from lockfile import FileLock
-except:
-    from lockfile import LockFile as FileLock
-
-if '--pydevd' in sys.argv or os.getenv('PYDEVD', None):
-    # The following is for starting remote debugging in Eclipse with Pydev.
-    # Adjust the path to your location and version of Eclipse and Pydev.
-    if platform.platform().startswith('Linux'):
-        pysrc = "/opt/liclipse/plugins/org.python.pydev_5.4.0.201611281405/pysrc"
-    elif platform.platform().startswith('Darwin'):
-        pysrc = "/Applications/LiClipse.app/Contents/liclipse/plugins/org.python.pydev_5.4.0.201611281405/pysrc"
-    else:
-        raise Exception("Platform %s not supported by pydevd." % platform.platform())
-    sys.path.append(pysrc)
-    import pydevd  # @UnresolvedImport
-    pydevd.settrace()
-    # In a dev environment the path is screwed so fix it.
-    base = sys.path.pop(0)
-    base = base.split(os.path.sep)[:-1]
-    base = os.path.sep.join(base)
-    sys.path.insert(0, base)
-# end remote debugger startup
+import fasteners
 
 from duplicity import log
 log.setup()
@@ -84,6 +62,25 @@ from duplicity import tempdir
 from duplicity import asyncscheduler
 from duplicity import util
 from duplicity import progress
+
+if '--pydevd' in sys.argv or os.getenv('PYDEVD', None):
+    # The following is for starting remote debugging in Eclipse with Pydev.
+    # Adjust the path to your location and version of Eclipse and Pydev.
+    if platform.platform().startswith('Linux'):
+        pysrc = "/opt/liclipse/plugins/org.python.pydev_5.4.0.201611281405/pysrc"
+    elif platform.platform().startswith('Darwin'):
+        pysrc = "/Applications/LiClipse.app/Contents/liclipse/plugins/org.python.pydev_5.4.0.201611281405/pysrc"
+    else:
+        raise Exception("Platform %s not supported by pydevd." % platform.platform())
+    sys.path.append(pysrc)
+    import pydevd  # @UnresolvedImport
+    pydevd.settrace()
+    # In a dev environment the path is screwed so fix it.
+    base = sys.path.pop(0)
+    base = base.split(os.path.sep)[:-1]
+    base = os.path.sep.join(base)
+    sys.path.insert(0, base)
+# end remote debugger startup
 
 # If exit_val is not None, exit with given value at end.
 exit_val = None
@@ -1374,18 +1371,15 @@ See https://bugs.launchpad.net/duplicity/+bug/931175
     # determine what action we're performing and process command line
     action = commandline.ProcessCommandLine(sys.argv[1:])
 
-    globals.lockfile = FileLock(os.path.join(globals.archive_dir.name, "lockfile"), threaded=False)
-    if globals.lockfile.is_locked():
+    globals.lockpath = os.path.join(globals.archive_dir.name, "lockfile")
+    globals.lockfile = fasteners.process_lock.InterProcessLock(globals.lockpath)
+    log.Debug(_("Acquiring lockfile %s") % globals.lockpath)
+    if not globals.lockfile.acquire(blocking=False):
         log.FatalError(
-            "Another instance is already running with this archive directory\n"
-            "If you are sure that this is the  only instance running you may delete\n"
-            "the following lockfile and run the command again :\n"
-            "\t%s" % os.path.join(globals.archive_dir.name, "lockfile.lock"),
+            "Another duplicity instance is already running with this archive directory\n",
             log.ErrorCode.user_error)
         log.shutdown()
         sys.exit(2)
-
-    globals.lockfile.acquire(timeout=0)
 
     try:
         do_backup(action)

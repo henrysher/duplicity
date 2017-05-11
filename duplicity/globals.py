@@ -107,6 +107,7 @@ pydevd = False
 time_separator = ":"
 
 # Global lockfile used to manage concurrency
+lockpath = ""
 lockfile = None
 
 # If this is true, only warn and don't raise fatal error when backup

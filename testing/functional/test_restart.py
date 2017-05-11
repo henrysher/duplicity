@@ -145,7 +145,7 @@ class RestartTest(FunctionalTestCase):
         # First, confirm that we have signs of a successful backup
         self.assertEqual(len(glob.glob("testfiles/output/*.manifest*")), 1)
         self.assertEqual(len(glob.glob("testfiles/output/*.sigtar*")), 1)
-        self.assertEqual(len(glob.glob("testfiles/cache/%s/*" % name)), 2)
+        self.assertEqual(len(glob.glob("testfiles/cache/%s/*" % name)), 3)
         self.assertEqual(len(glob.glob(
             "testfiles/cache/%s/*.manifest*" % name)), 1)
         self.assertEqual(len(glob.glob(

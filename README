@@ -21,8 +21,8 @@ REQUIREMENTS:
 
  * Python v2.6 or later
  * librsync v0.9.6 or later
- * GnuPG v1.x for encryption
- * python-lockfile v0.9 or later for concurrency locking
+ * GnuPG for encryption
+ * fasteners 0.14.1 or later for concurrency locking
  * for scp/sftp -- python-paramiko and python-pycryptopp
  * for ftp -- lftp version 3.7.15 or later
  * Boto 2.0 or later for single-processing S3 or GCS access (default)
