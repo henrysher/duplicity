@@ -28,8 +28,7 @@ import os
 import string
 import sys
 import traceback
-
-from lockfile import UnlockError
+import atexit
 
 from duplicity import tarfile
 import duplicity.globals as globals
@@ -158,12 +157,13 @@ def ignore_missing(fn, filename):
             raise
 
 
+@atexit.register
 def release_lockfile():
-    if globals.lockfile and globals.lockfile.is_locked():
-        log.Debug(_("Releasing lockfile %s") % globals.lockfile.lock_file)
+    if globals.lockfile:
+        log.Debug(_("Releasing lockfile %s") % globals.lockpath)
         try:
             globals.lockfile.release()
-        except UnlockError:
+        except Exception:
             pass
 
 

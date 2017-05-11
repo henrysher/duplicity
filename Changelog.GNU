@@ -1,3 +1,10 @@
+2017-05-11  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1320641 and others regarding lockfile
+      - swap from lockfile to fasteners module
+      - use an fcntl() style lock for process lock of duplicity cache
+      - lockfile will now clear if duplicity is killed or crashes
+
 2017-05-09  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1689632 with patch from Howard Kaye

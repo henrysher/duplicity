@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2017-05-09 15:30-0500\n"
+"POT-Creation-Date: 2017-05-10 15:36-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,313 +18,313 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: ../bin/duplicity:136
+#: ../bin/duplicity:132
 msgid "Reuse configured PASSPHRASE as SIGN_PASSPHRASE"
 msgstr ""
 
-#: ../bin/duplicity:143
+#: ../bin/duplicity:139
 msgid "Reuse configured SIGN_PASSPHRASE as PASSPHRASE"
 msgstr ""
 
-#: ../bin/duplicity:182
+#: ../bin/duplicity:178
 msgid "PASSPHRASE variable not set, asking user."
 msgstr ""
 
-#: ../bin/duplicity:197
+#: ../bin/duplicity:193
 msgid "GnuPG passphrase for signing key:"
 msgstr ""
 
-#: ../bin/duplicity:202
+#: ../bin/duplicity:198
 msgid "GnuPG passphrase:"
 msgstr ""
 
-#: ../bin/duplicity:207
+#: ../bin/duplicity:203
 msgid "Retype passphrase for signing key to confirm: "
 msgstr ""
 
-#: ../bin/duplicity:209
+#: ../bin/duplicity:205
 msgid "Retype passphrase to confirm: "
 msgstr ""
 
-#: ../bin/duplicity:212
+#: ../bin/duplicity:208
 msgid "First and second passphrases do not match!  Please try again."
 msgstr ""
 
-#: ../bin/duplicity:219
+#: ../bin/duplicity:215
 msgid ""
 "Cannot use empty passphrase with symmetric encryption!  Please try again."
 msgstr ""
 
-#: ../bin/duplicity:276
+#: ../bin/duplicity:272
 #, python-format
 msgid ""
 "File %s complete in backup set.\n"
 "Continuing restart on file %s."
 msgstr ""
 
-#: ../bin/duplicity:285
+#: ../bin/duplicity:281
 #, python-format
 msgid ""
 "File %s missing in backup set.\n"
 "Continuing restart on file %s."
 msgstr ""
 
-#: ../bin/duplicity:334
+#: ../bin/duplicity:330
 #, python-format
 msgid "File %s was corrupted during upload."
 msgstr ""
 
-#: ../bin/duplicity:367
+#: ../bin/duplicity:363
 msgid ""
 "Restarting backup, but current encryption settings do not match original "
 "settings"
 msgstr ""
 
-#: ../bin/duplicity:390
+#: ../bin/duplicity:386
 #, python-format
 msgid "Restarting after volume %s, file %s, block %s"
 msgstr ""
 
-#: ../bin/duplicity:460
+#: ../bin/duplicity:456
 #, python-format
 msgid "Processed volume %d"
 msgstr ""
 
-#: ../bin/duplicity:610
+#: ../bin/duplicity:606
 msgid ""
 "Fatal Error: Unable to start incremental backup.  Old signatures not found "
 "and incremental specified"
 msgstr ""
 
-#: ../bin/duplicity:614
+#: ../bin/duplicity:610
 msgid "No signatures found, switching to full backup."
 msgstr ""
 
-#: ../bin/duplicity:628
+#: ../bin/duplicity:624
 msgid "Backup Statistics"
 msgstr ""
 
-#: ../bin/duplicity:734
+#: ../bin/duplicity:730
 #, python-format
 msgid "%s not found in archive - no files restored."
 msgstr ""
 
-#: ../bin/duplicity:738
+#: ../bin/duplicity:734
 msgid "No files found in archive - nothing restored."
 msgstr ""
 
-#: ../bin/duplicity:771
+#: ../bin/duplicity:767
 #, python-format
 msgid "Processed volume %d of %d"
 msgstr ""
 
-#: ../bin/duplicity:805
+#: ../bin/duplicity:801
 #, python-format
 msgid "Invalid data - %s hash mismatch for file:"
 msgstr ""
 
-#: ../bin/duplicity:808
+#: ../bin/duplicity:804
 #, python-format
 msgid "Calculated hash: %s"
 msgstr ""
 
-#: ../bin/duplicity:809
+#: ../bin/duplicity:805
 #, python-format
 msgid "Manifest hash: %s"
 msgstr ""
 
-#: ../bin/duplicity:848
+#: ../bin/duplicity:844
 #, python-format
 msgid "Volume was signed by key %s, not %s"
 msgstr ""
 
-#: ../bin/duplicity:880
+#: ../bin/duplicity:876
 #, python-format
 msgid "Verify complete: %s, %s."
 msgstr ""
 
-#: ../bin/duplicity:881
+#: ../bin/duplicity:877
 #, python-format
 msgid "%d file compared"
 msgid_plural "%d files compared"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../bin/duplicity:883
+#: ../bin/duplicity:879
 #, python-format
 msgid "%d difference found"
 msgid_plural "%d differences found"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../bin/duplicity:902
+#: ../bin/duplicity:898
 msgid "No extraneous files found, nothing deleted in cleanup."
 msgstr ""
 
-#: ../bin/duplicity:907
+#: ../bin/duplicity:903
 msgid "Deleting this file from backend:"
 msgid_plural "Deleting these files from backend:"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../bin/duplicity:918
+#: ../bin/duplicity:914
 msgid "Found the following file to delete:"
 msgid_plural "Found the following files to delete:"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../bin/duplicity:921
+#: ../bin/duplicity:917
 msgid "Run duplicity again with the --force option to actually delete."
 msgstr ""
 
-#: ../bin/duplicity:964
+#: ../bin/duplicity:960
 msgid "There are backup set(s) at time(s):"
 msgstr ""
 
-#: ../bin/duplicity:966
+#: ../bin/duplicity:962
 msgid "Which can't be deleted because newer sets depend on them."
 msgstr ""
 
-#: ../bin/duplicity:970
+#: ../bin/duplicity:966
 msgid ""
 "Current active backup chain is older than specified time.  However, it will "
 "not be deleted.  To remove all your backups, manually purge the repository."
 msgstr ""
 
-#: ../bin/duplicity:976
+#: ../bin/duplicity:972
 msgid "No old backup sets found, nothing deleted."
 msgstr ""
 
-#: ../bin/duplicity:979
+#: ../bin/duplicity:975
 msgid "Deleting backup chain at time:"
 msgid_plural "Deleting backup chains at times:"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../bin/duplicity:991
+#: ../bin/duplicity:987
 #, python-format
 msgid "Deleting any incremental signature chain rooted at %s"
 msgstr ""
 
-#: ../bin/duplicity:993
+#: ../bin/duplicity:989
 #, python-format
 msgid "Deleting any incremental backup chain rooted at %s"
 msgstr ""
 
-#: ../bin/duplicity:996
+#: ../bin/duplicity:992
 #, python-format
 msgid "Deleting complete signature chain %s"
 msgstr ""
 
-#: ../bin/duplicity:998
+#: ../bin/duplicity:994
 #, python-format
 msgid "Deleting complete backup chain %s"
 msgstr ""
 
-#: ../bin/duplicity:1004
+#: ../bin/duplicity:1000
 msgid "Found old backup chain at the following time:"
 msgid_plural "Found old backup chains at the following times:"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../bin/duplicity:1008
+#: ../bin/duplicity:1004
 msgid "Rerun command with --force option to actually delete."
 msgstr ""
 
-#: ../bin/duplicity:1030
+#: ../bin/duplicity:1026
 msgid "No old backup sets found."
 msgstr ""
 
-#: ../bin/duplicity:1045
+#: ../bin/duplicity:1041
 #, python-format
 msgid "Signature %s already replicated"
 msgstr ""
 
-#: ../bin/duplicity:1052 ../bin/duplicity:1091
+#: ../bin/duplicity:1048 ../bin/duplicity:1087
 #, python-format
 msgid "Replicating %s."
 msgstr ""
 
-#: ../bin/duplicity:1079
+#: ../bin/duplicity:1075
 #, python-format
 msgid "Backupset %s already replicated"
 msgstr ""
 
-#: ../bin/duplicity:1200
+#: ../bin/duplicity:1196
 #, python-format
 msgid "Deleting local %s (not authoritative at backend)."
 msgstr ""
 
-#: ../bin/duplicity:1205
+#: ../bin/duplicity:1201
 #, python-format
 msgid "Unable to delete %s: %s"
 msgstr ""
 
-#: ../bin/duplicity:1236 ../duplicity/dup_temp.py:266
+#: ../bin/duplicity:1232 ../duplicity/dup_temp.py:266
 #, python-format
 msgid "Failed to read %s: %s"
 msgstr ""
 
-#: ../bin/duplicity:1250
+#: ../bin/duplicity:1246
 #, python-format
 msgid "Copying %s to local cache."
 msgstr ""
 
-#: ../bin/duplicity:1298
+#: ../bin/duplicity:1294
 msgid "Local and Remote metadata are synchronized, no sync needed."
 msgstr ""
 
-#: ../bin/duplicity:1303
+#: ../bin/duplicity:1299
 msgid "Synchronizing remote metadata to local cache..."
 msgstr ""
 
-#: ../bin/duplicity:1318
+#: ../bin/duplicity:1314
 msgid "Sync would copy the following from remote to local:"
 msgstr ""
 
-#: ../bin/duplicity:1321
+#: ../bin/duplicity:1317
 msgid "Sync would remove the following spurious local files:"
 msgstr ""
 
-#: ../bin/duplicity:1364
+#: ../bin/duplicity:1360
 msgid "Unable to get free space on temp."
 msgstr ""
 
-#: ../bin/duplicity:1372
+#: ../bin/duplicity:1368
 #, python-format
 msgid "Temp space has %d available, backup needs approx %d."
 msgstr ""
 
-#: ../bin/duplicity:1375
+#: ../bin/duplicity:1371
 #, python-format
 msgid "Temp has %d available, backup will use approx %d."
 msgstr ""
 
-#: ../bin/duplicity:1383
+#: ../bin/duplicity:1379
 msgid "Unable to get max open files."
 msgstr ""
 
-#: ../bin/duplicity:1387
+#: ../bin/duplicity:1383
 #, python-format
 msgid ""
 "Max open files of %s is too low, should be >= 1024.\n"
 "Use 'ulimit -n 1024' or higher to correct.\n"
 msgstr ""
 
-#: ../bin/duplicity:1438
+#: ../bin/duplicity:1434
 msgid ""
 "RESTART: The first volume failed to upload before termination.\n"
 "         Restart is impossible...starting backup from beginning."
 msgstr ""
 
-#: ../bin/duplicity:1444
+#: ../bin/duplicity:1440
 #, python-format
 msgid ""
 "RESTART: Volumes %d to %d failed to upload before termination.\n"
 "         Restarting backup at volume %d."
 msgstr ""
 
-#: ../bin/duplicity:1451
+#: ../bin/duplicity:1447
 #, python-format
 msgid ""
 "RESTART: Impossible backup state: manifest has %d vols, remote has %d vols.\n"
@@ -333,7 +333,7 @@ msgid ""
 "         backup then restart the backup from the beginning."
 msgstr ""
 
-#: ../bin/duplicity:1472
+#: ../bin/duplicity:1468
 msgid ""
 "\n"
 "PYTHONOPTIMIZE in the environment causes duplicity to fail to\n"
@@ -343,49 +343,54 @@ msgid ""
 "See https://bugs.launchpad.net/duplicity/+bug/931175\n"
 msgstr ""
 
-#: ../bin/duplicity:1556
+#: ../bin/duplicity:1491
+#, python-format
+msgid "Acquiring lockfile %s"
+msgstr ""
+
+#: ../bin/duplicity:1549
 #, python-format
 msgid "Last %s backup left a partial set, restarting."
 msgstr ""
 
-#: ../bin/duplicity:1560
+#: ../bin/duplicity:1553
 #, python-format
 msgid "Cleaning up previous partial %s backup set, restarting."
 msgstr ""
 
-#: ../bin/duplicity:1571
+#: ../bin/duplicity:1564
 msgid "Last full backup date:"
 msgstr ""
 
-#: ../bin/duplicity:1573
+#: ../bin/duplicity:1566
 msgid "Last full backup date: none"
 msgstr ""
 
-#: ../bin/duplicity:1575
+#: ../bin/duplicity:1568
 msgid "Last full backup is too old, forcing full backup"
 msgstr ""
 
-#: ../bin/duplicity:1624
+#: ../bin/duplicity:1617
 msgid ""
 "When using symmetric encryption, the signing passphrase must equal the "
 "encryption passphrase."
 msgstr ""
 
-#: ../bin/duplicity:1680
+#: ../bin/duplicity:1673
 msgid "INT intercepted...exiting."
 msgstr ""
 
-#: ../bin/duplicity:1688
+#: ../bin/duplicity:1681
 #, python-format
 msgid "GPG error detail: %s"
 msgstr ""
 
-#: ../bin/duplicity:1698
+#: ../bin/duplicity:1691
 #, python-format
 msgid "User error detail: %s"
 msgstr ""
 
-#: ../bin/duplicity:1708
+#: ../bin/duplicity:1701
 #, python-format
 msgid "Backend error detail: %s"
 msgstr ""
@@ -1685,7 +1690,7 @@ msgstr ""
 msgid "Cleanup of temporary directory %s failed - this is probably a bug."
 msgstr ""
 
-#: ../duplicity/util.py:97
+#: ../duplicity/util.py:96
 #, python-format
 msgid "IGNORED_ERROR: Warning: ignoring error as requested: %s: %s"
 msgstr ""

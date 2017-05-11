@@ -40,6 +40,7 @@ import threading
 import time
 import traceback
 import types
+import fasteners
 
 from datetime import datetime
 from duplicity import asyncscheduler
@@ -59,11 +60,6 @@ from duplicity import progress
 from duplicity import robust
 from duplicity import tempdir
 from duplicity import util
-
-try:
-    from lockfile import FileLock
-except:
-    from lockfile import LockFile as FileLock
 
 if '--pydevd' in sys.argv or os.getenv('PYDEVD', None):
     # The following is for starting remote debugging in Eclipse with Pydev.
@@ -1490,18 +1486,15 @@ See https://bugs.launchpad.net/duplicity/+bug/931175
     # determine what action we're performing and process command line
     action = commandline.ProcessCommandLine(sys.argv[1:])
 
-    globals.lockfile = FileLock(os.path.join(globals.archive_dir_path.name, "lockfile"), threaded=False)
-    if globals.lockfile.is_locked():
+    globals.lockpath = os.path.join(globals.archive_dir_path.name, "lockfile")
+    globals.lockfile = fasteners.process_lock.InterProcessLock(globals.lockpath)
+    log.Debug(_("Acquiring lockfile %s") % globals.lockpath)
+    if not globals.lockfile.acquire(blocking=False):
         log.FatalError(
-            "Another instance is already running with this archive directory\n"
-            "If you are sure that this is the  only instance running you may delete\n"
-            "the following lockfile and run the command again :\n"
-            "\t%s" % os.path.join(globals.archive_dir_path.name, "lockfile.lock"),
+            "Another duplicity instance is already running with this archive directory\n",
             log.ErrorCode.user_error)
         log.shutdown()
         sys.exit(2)
-
-    globals.lockfile.acquire(timeout=0)
 
     try:
         do_backup(action)
