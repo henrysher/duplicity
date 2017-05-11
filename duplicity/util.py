@@ -75,6 +75,7 @@ def bytes_to_uc(bytes_str):
     # strange (Linux) filename quirks.
     if isinstance(bytes_str, unicode):
         # "bytes_str" is actually already unicode and does not need converting
+        # ToDo: we shouldn't be passing any unicode strings to this
         unicode_str = bytes_str
     elif isinstance(bytes_str, str):
         # bytes_str is not already unicode and is a str, so convert to unicode
@@ -84,6 +85,16 @@ def bytes_to_uc(bytes_str):
     else:
         raise TypeError(u"bytes_to_uc must be passed either unicode or str, but passed " + unicode(type(bytes_str)))
     return unicode_str
+
+
+def uc_to_bytes(unicode_str):
+    """Convert a unicode string to bytes, using filesystem encoding"""
+    # This should not be used filenames, as path.name is preferable
+    # Note that this is similar to, but distinct from, fsencode, because
+    # fsencode assumes a path-like string and has special handling for
+    # strange (Linux) filename quirks.
+    bytes_str = unicode_str.encode(sys.getfilesystemencoding(), 'replace')
+    return bytes_str
 
 
 def uindex(index):

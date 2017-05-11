@@ -25,10 +25,11 @@ import pexpect
 import platform
 import sys
 import time
-import unittest
 
 from duplicity import backend
+from duplicity import util
 from .. import DuplicityTestCase
+from pkg_resources import parse_version
 
 
 class CmdError(Exception):
@@ -113,10 +114,23 @@ class FunctionalTestCase(DuplicityTestCase):
 
         if not passphrase_input:
             cmdline += u" < /dev/null"
-        child = pexpect.spawn(u'/bin/sh', [u'-c', cmdline], timeout=None, encoding=sys.getfilesystemencoding())
-        for passphrase in passphrase_input:
-            child.expect(u'passphrase.*:')
-            child.sendline(passphrase)
+
+        if parse_version(pexpect.__version__) >= parse_version("4.0"):
+            # pexpect.spawn only supports unicode from version 4.0
+            # there was a separate pexpect.spawnu in 3.x, but it has an error on readline
+            child = pexpect.spawn(u'/bin/sh', [u'-c', cmdline], timeout=None, encoding=sys.getfilesystemencoding())
+
+            for passphrase in passphrase_input:
+                child.expect(u'passphrase.*:')
+                child.sendline(passphrase)
+        else:
+            # Manually encode to filesystem encoding and send to spawn as bytes
+            # ToDo: Remove this once we no longer have to support systems with pexpect < 4.0
+            child = pexpect.spawn(b'/bin/sh', [b'-c', util.uc_to_bytes(cmdline)], timeout=None)
+
+            for passphrase in passphrase_input:
+                child.expect(b'passphrase.*:')
+                child.sendline(passphrase)
 
         # if the command fails, we need to clear its output
         # so it will terminate cleanly.
