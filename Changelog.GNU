@@ -1,3 +1,8 @@
+2017-05-12  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/tox_pylint_fixes
+      - Changes needed to run-tests without pylint E0401(import-error) errors
+
 2017-05-11  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1320641 and others regarding lockfile
