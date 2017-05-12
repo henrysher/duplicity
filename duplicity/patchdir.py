@@ -496,7 +496,7 @@ def patch_seq2ropath(patch_seq):
             See https://bugs.launchpad.net/duplicity/+bug/670891 for discussion
             of os.tmpfile() vs tempfile.TemporaryFile() w.r.t. Windows / Linux.
             """
-            if sys.platform.startswith(('cygwin', 'windows')):
+            if sys.platform.startswith(('cygwin', 'windows', 'darwin')):
                 tempfp = os.tmpfile()
             else:
                 tempfp = tempfile.TemporaryFile(dir=tempdir.default().dir())

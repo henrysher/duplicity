@@ -1,3 +1,34 @@
+2017-05-11  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1320641 and others regarding lockfile
+      - swap from lockfile to fasteners module
+      - use an fcntl() style lock for process lock of duplicity cache
+      - lockfile will now clear if duplicity is killed or crashes
+
+2017-05-09  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1689632 with patch from Howard Kaye
+      - On MacOS, the tempfile.TemporaryFile call erroneously raises an
+        IOError exception saying that too many files are open. This causes
+        restores to fail randomly, after thousands of files have been restored.
+
+2017-05-06  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~dernils/duplicity/DockerfileConvenience
+      - Add a few files that are the beginning of further infrastructure based
+        on docker. It contains a Dockerfile for a simple ftp server (used for
+        backend testing) and a setup script that can be used to set up the
+        complete test environment.
+    * Moved Dockerfile for duplicitytest into testinfrastructure/duplicity_test
+    * Moved some things around in testing/infrastructure to clean up
+
+2017-05-05  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~dernils/duplicity/DockerfileConvenience
+      - Added a few tools to the Dockerfile that make life easier
+    * Fixed bug #1320832 with suggestion from Oskar Wycislak
+      - Use chunks instead of reading it all in swiftbackend
+
 2017-05-04  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~dawgfoto/duplicity/replicate

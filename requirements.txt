@@ -1,6 +1,6 @@
 boto
 dropbox==6.9.0
-lockfile
+fasteners
 paramiko
 pexpect
 pydrive
