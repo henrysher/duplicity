@@ -81,7 +81,9 @@ def bytes_to_uc(bytes_str):
         # bytes_str is not already unicode and is a str, so convert to unicode
         # unicode_str = bytes_str.decode(sys.getfilesystemencoding(), 'replace')
         # ToDo: the above is conceptually better, but seems to return ascii even when UTF-8 is supported
-        unicode_str = bytes_str.decode('utf-8', 'replace')
+        # system_encoding = sys.getfilesystemencoding()
+        # print(system_encoding)
+        unicode_str = bytes_str.decode("UTF-8", 'replace')
     else:
         raise TypeError(u"bytes_to_uc must be passed either unicode or str, but passed " + unicode(type(bytes_str)))
     return unicode_str
