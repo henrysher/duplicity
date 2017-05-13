@@ -176,6 +176,8 @@ New in v0.8.00 (2016/07/??)
   - swap from lockfile to fasteners module
   - use an fcntl() style lock for process lock of duplicity cache
   - lockfile will now clear if duplicity is killed or crashes
+* Merged in lp:~aaron-whitehouse/duplicity/tox_pylint_fixes
+  - Changes needed to run-tests without pylint E0401(import-error) errors
 
 
 New in v0.7.08 (2016/07/02)
