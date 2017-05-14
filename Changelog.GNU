@@ -4,6 +4,9 @@
       - This brings support for Swift storage policies: when using a Swift
         backend, you can specify the policy containers should be operating on.
       - This is similar to AWS Cloud Storage classes (ia, rrs, glacier and so on).
+    * Merged in lp:~dernils/duplicity/Dockerfile
+      - Added another backend to the docker test infrastructure, updated the setup
+        for testing and updated the documentation.
 
 2017-05-12  Kenneth Loafman  <kenneth@loafman.com>
 

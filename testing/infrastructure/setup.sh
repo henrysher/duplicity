@@ -34,10 +34,12 @@ fi
 
 # Remove all running instances of the test system and also remove the containers. This ensure
 # that the test infrastructure is frehshly started.
-docker rm $(docker stop $(docker ps -a -q --filter name=ftpd_server --format="{{.ID}}"))
-docker rm $(docker stop $(docker ps -a -q --filter name=duplicity_test --format="{{.ID}}"))
+docker rm -f $(docker stop $(docker ps -a -q --filter name=d70c0e18-37d5-11e7-a919-92ebcb67fe33-ftpd_server --format="{{.ID}}"))
+docker rm -f $(docker stop $(docker ps -a -q --filter name=ee681ee4-37d5-11e7-a919-92ebcb67fe33-duplicity_ssh_server --format="{{.ID}}"))
+docker rm -f $(docker stop $(docker ps -a -q --filter name=f3c09128-37d5-11e7-a919-92ebcb67fe33-duplicity_test --format="{{.ID}}"))
 
 
 # Start the containers. Docker run will automatically download the image if necessary
-docker run -d --net testnetwork --ip 10.10.10.3 --name ftpd_server -p 21:21 -p 30000-30009:30000-30009 -e "PUBLICHOST=localhost" dernils/duplicity_testinfrastructure_ftp
-docker run --name duplicity_test --net testnetwork --ip 10.10.10.2 -it  dernils/duplicitytest:latest
+docker run -d --net testnetwork --ip 10.10.10.3 --name d70c0e18-37d5-11e7-a919-92ebcb67fe33-ftpd_server -p 21:21 -p 30000-30009:30000-30009 -e "PUBLICHOST=localhost" dernils/duplicity_testinfrastructure_ftp
+docker run -d --net testnetwork --ip 10.10.10.4 --name ee681ee4-37d5-11e7-a919-92ebcb67fe33-duplicity_ssh_server  -p 22:22 -e "PUBLICHOST=localhost" dernils/duplicity_testinfrastructure_ssh:latest 
+docker run --name f3c09128-37d5-11e7-a919-92ebcb67fe33-duplicity_test --net testnetwork --ip 10.10.10.2 -it  dernils/duplicitytest:latest

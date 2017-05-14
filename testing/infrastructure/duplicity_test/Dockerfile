@@ -66,6 +66,14 @@ USER test
 # Setting a working directory to home
 WORKDIR /home/test
 
+# Copy a SSH key to the users folder that is used for some test cases
+USER root
+COPY ./id_rsa /home/test/.ssh/
+COPY ./id_rsa.pub /home/test/.ssh/
+RUN chown -R test:test /home/test/.ssh
+RUN chmod 400 /home/test/.ssh/id_rsa
+USER test 
+
 # Branch the duplicity repo for testing
 RUN bzr branch lp:duplicity duplicity
 
