@@ -178,6 +178,10 @@ New in v0.8.00 (2016/07/??)
   - lockfile will now clear if duplicity is killed or crashes
 * Merged in lp:~aaron-whitehouse/duplicity/tox_pylint_fixes
   - Changes needed to run-tests without pylint E0401(import-error) errors
+* Merged in lp:~xlucas/duplicity/swift-storage-policies
+  - This brings support for Swift storage policies: when using a Swift
+    backend, you can specify the policy containers should be operating on.
+  - This is similar to AWS Cloud Storage classes (ia, rrs, glacier and so on).
 
 
 New in v0.7.08 (2016/07/02)

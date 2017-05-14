@@ -21,6 +21,7 @@
 import os
 
 import duplicity.backend
+from duplicity import globals
 from duplicity import log
 from duplicity import util
 from duplicity.errors import BackendException
@@ -108,6 +109,9 @@ Exception: %s""" % str(e))
         else:
             self.prefix = ''
 
+        policy = globals.swift_storage_policy
+        policy_header = 'X-Storage-Policy'
+
         container_metadata = None
         try:
             self.conn = Connection(**conn_kwargs)
@@ -122,11 +126,15 @@ Exception: %s""" % str(e))
         if container_metadata is None:
             log.Info("Creating container %s" % self.container)
             try:
-                self.conn.put_container(self.container)
+                headers = dict([[policy_header, policy]]) if policy else None
+                self.conn.put_container(self.container, headers=headers)
             except Exception as e:
                 log.FatalError("Container creation failed: %s %s"
                                % (e.__class__.__name__, str(e)),
                                log.ErrorCode.connection_failed)
+        elif policy and container_metadata[policy_header.lower()] != policy:
+            log.FatalError("Container '%s' exists but its storage policy is '%s' not '%s'."
+                           % (self.container, container_metadata[policy_header.lower()], policy))
 
     def _error_code(self, operation, e):
         if isinstance(e, self.resp_exc):
