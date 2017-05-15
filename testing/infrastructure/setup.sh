@@ -22,18 +22,23 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 
+# Define the subnet and the name of the testnetwork that should be used for testing 
+subnet=10.10.10.0/24
+testnetwork=testnetwork
+
 
 # Check whether a specific docker network for testing is already exisitng. If not, create it.
 docker network inspect testnetwork &> /dev/null
 
 if [ $? -ne 0 ]; then
     echo "docker testnetwork not found. Creating network."
-    docker network create --subnet=10.10.10.0/24 testnetwork
+    docker network create --subnet=$subnet $testnetwork
 fi
 
 
 # Remove all running instances of the test system and also remove the containers. This ensure
 # that the test infrastructure is frehshly started.
+# We are using UUIDs as part of the names of the docker container to ensure that we do not accidentially touch other containers
 docker rm -f $(docker stop $(docker ps -a -q --filter name=d70c0e18-37d5-11e7-a919-92ebcb67fe33-ftpd_server --format="{{.ID}}"))
 docker rm -f $(docker stop $(docker ps -a -q --filter name=ee681ee4-37d5-11e7-a919-92ebcb67fe33-duplicity_ssh_server --format="{{.ID}}"))
 docker rm -f $(docker stop $(docker ps -a -q --filter name=f3c09128-37d5-11e7-a919-92ebcb67fe33-duplicity_test --format="{{.ID}}"))
