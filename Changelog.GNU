@@ -1,3 +1,8 @@
+2017-05-15  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~dernils/duplicity/Dockerfile
+      - Now have subnet name and IP of the subnet for testing as a variable.
+
 2017-05-14  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~xlucas/duplicity/swift-storage-policies
