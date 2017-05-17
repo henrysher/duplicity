@@ -23,6 +23,7 @@
  * ----------------------------------------------------------------------- */
 
 #include <Python.h>
+#include <errno.h>
 #include <librsync.h>
 #define RS_JOB_BLOCKSIZE 65536
 
@@ -287,6 +288,7 @@ typedef struct {
   PyObject_HEAD
   rs_job_t *patch_job;
   PyObject *basis_file;
+  FILE *cfile;
 } _librsync_PatchMakerObject;
 
 /* Call with the basis file */
@@ -296,7 +298,6 @@ _librsync_new_patchmaker(PyObject* self, PyObject* args)
   _librsync_PatchMakerObject* pm;
   PyObject *python_file;
   int fd;
-  FILE *cfile;
 
   if (!PyArg_ParseTuple(args, "O:new_patchmaker", &python_file))
     return NULL;
@@ -305,14 +306,22 @@ _librsync_new_patchmaker(PyObject* self, PyObject* args)
     PyErr_SetString(PyExc_TypeError, "Need true file object");
     return NULL;
   }
+  /* get our own private copy of the file, so we can close it later. */
+  fd = dup(fd);
+  if (fd == -1) {
+    char buf[256];
+    strerror_r(errno, buf, sizeof(buf));
+    PyErr_SetString(PyExc_TypeError, buf);
+    return NULL;
+  }
   Py_INCREF(python_file);
 
   pm = PyObject_New(_librsync_PatchMakerObject, &_librsync_PatchMakerType);
   if (pm == NULL) return NULL;
 
   pm->basis_file = python_file;
-  cfile = fdopen(fd, "rb");
-  pm->patch_job = rs_patch_begin(rs_file_copy_cb, cfile);
+  pm->cfile = fdopen(fd, "rb");
+  pm->patch_job = rs_patch_begin(rs_file_copy_cb, pm->cfile);
 
   return (PyObject*)pm;
 }
@@ -323,6 +332,9 @@ _librsync_patchmaker_dealloc(PyObject* self)
   _librsync_PatchMakerObject *pm = (_librsync_PatchMakerObject *)self;
   Py_DECREF(pm->basis_file);
   rs_job_free(pm->patch_job);
+  if (pm->cfile) {
+    fclose(pm->cfile);
+  }
   PyObject_Del(self);
 }
 
