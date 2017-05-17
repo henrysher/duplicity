@@ -6,5 +6,10 @@ pexpect
 pydrive
 pyrax
 python-cloudfiles
-tox
 urllib3
+
+### uncomment below for testing
+# coverage
+# pycodestyle
+# pylint
+# tox
