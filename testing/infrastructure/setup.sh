@@ -22,31 +22,39 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 
-# Define the subnet and the name of the testnetwork that should be used for testing 
-subnet=10.10.10.0/24
-testnetwork=testnetwork
-ip_ssh_server=10.10.10.4
-ip_ftp_server=10.10.10.3
-ip_duplicity_test=10.10.10.2
+# Define the subnet and the name of the testnetwork that should be used for testing
+SUBNET=10.20.0.0/24
+SUBNET_BASE=10.20.0
+TESTNETWORK=testnetwork
+IP_DUPLICITY_SSH=${SUBNET_BASE}.4
+IP_DUPLICITY_FTP=${SUBNET_BASE}.3
+IP_DUPLICITY_TEST=${SUBNET_BASE}.2
 
-# Check whether a specific docker network for testing is already exisitng. If not, create it.
-docker network inspect $testnetwork &> /dev/null
-
-if [ $? -ne 0 ]; then
-    echo "docker testnetwork not found. Creating network."
-    docker network create --subnet=$subnet $testnetwork
-fi
-
-# Remove all running instances of the test system and also remove the containers. This ensure
+# Remove all running instances of the test system and also remove the containers. This ensures
 # that the test infrastructure is frehshly started.
-# We are using UUIDs as part of the names of the docker container to ensure that we do not accidentially touch other containers
-docker rm -f $(docker stop $(docker ps  -a -q --filter name=d70c0e18-37d5-11e7-a919-92ebcb67fe33-ftpd_server --format="{{.ID}}"))
-docker rm -f $(docker stop $(docker ps  -a -q --filter name=ee681ee4-37d5-11e7-a919-92ebcb67fe33-duplicity_ssh_server --format="{{.ID}}"))
-docker rm -f $(docker stop $(docker ps  -a -q --filter name=f3c09128-37d5-11e7-a919-92ebcb67fe33-duplicity_test --format="{{.ID}}"))
+# We kill only containers nameed beginning with "duplicity_test_" to ensure that we do not
+# accidentially touch other containers
 
+echo "Removing any running instances of duplicity_test_*"
+docker rm -f $(docker ps  -a -q --filter name=duplicity_test_) &> /dev/null
+
+echo "(Re)create docker testnetwork."
+docker network rm ${TESTNETWORK} &> /dev/null
+docker network create --subnet=${SUBNET} ${TESTNETWORK}
 
 # Start the containers. Docker run will automatically download the image if necessary
-# Hand over the parameters for testing to the main docker container 
-docker run -d --net $testnetwork --ip $ip_ftp_server --name d70c0e18-37d5-11e7-a919-92ebcb67fe33-ftpd_server -p 21:21 -p 30000-30009:30000-30009  dernils/duplicity_testinfrastructure_ftp
-docker run -d --net $testnetwork --ip $ip_ssh_server --name ee681ee4-37d5-11e7-a919-92ebcb67fe33-duplicity_ssh_server  -p 22:22 dernils/duplicity_testinfrastructure_ssh:latest 
-docker run --name f3c09128-37d5-11e7-a919-92ebcb67fe33-duplicity_test --net $testnetwork --ip $ip_duplicity_test -e DUPLICITY_TESTNETWORK=$testnetwork -e DUPLICITY_SUBNET=$subnet -e "PUBLICHOST=localhost" -e DUPLICITY_IP_SSH_SERVER=$ip_ssh_server -e DUPLICITY_IP_FTP_SERVER=$ip_ftp_server -it  dernils/duplicitytest:latest
+# Hand over the parameters for testing to the main docker container
+
+echo "Starting duplicity_test_ftp..."
+docker run -d --net ${TESTNETWORK} --ip ${IP_DUPLICITY_FTP} --name duplicity_test_ftp \
+    -p 21:21 -p 30000-30009:30000-30009 -t firstprime/duplicity_ftp
+
+echo "Starting duplicity_test_ssh..."
+docker run -d --net ${TESTNETWORK} --ip ${IP_DUPLICITY_SSH} --name duplicity_test_ssh \
+    -p 2222:22 -t firstprime/duplicity_ssh:latest
+
+echo "Starting duplicity_test_main..."
+docker run --net ${TESTNETWORK} --ip ${IP_DUPLICITY_TEST} --name duplicity_test_main \
+    -e DUPLICITY_TESTNETWORK=${TESTNETWORK} -e DUPLICITY_SUBNET=${SUBNET} -e "PUBLICHOST=localhost" \
+    -e DUPLICITY_IP_SSH_SERVER=${IP_DUPLICITY_SSH} -e DUPLICITY_IP_FTP_SERVER=${IP_DUPLICITY_FTP} \
+    -it firstprime/duplicity_test:latest

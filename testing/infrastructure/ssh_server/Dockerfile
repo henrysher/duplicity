@@ -4,7 +4,7 @@
 # Thanks to Aleksandar Diklic "https://github.com/rastasheep"
 #
 # This file is part of duplicity.
-# It is the Dockerfile of a simple ftp server that is used for backend testing 
+# It is the Dockerfile of a simple ftp server that is used for backend testing
 #
 # Duplicity is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the
@@ -19,18 +19,23 @@
 # You should have received a copy of the GNU General Public License
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-# 
+#
 FROM ubuntu:16.04
 
-RUN apt-get update
+RUN apt-get update \
+    && apt-get install -y \
+            mc \
+            nano \
+            openssh-server\
+    && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get install -y openssh-server
 RUN mkdir /var/run/sshd
 
 RUN echo 'root:root' |chpasswd
 
 RUN sed -ri 's/^PermitRootLogin\s+.*/PermitRootLogin yes/' /etc/ssh/sshd_config
-RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
+RUN sed -ri "s/UsePAM yes/#UsePAM yes/g" /etc/ssh/sshd_config
+RUN sed -ri "s/#Port 22/Port 2222/g" /etc/ssh/sshd_config
 RUN echo "Match User userWithOnlyKeyAccess" >> /etc/ssh/sshd_config
 RUN echo "     PasswordAuthentication no" >> /etc/ssh/sshd_config
 
@@ -49,7 +54,7 @@ COPY ./id_rsa.pub /home/userWithOnlyKeyAccess/.ssh/authorized_keys
 USER userWithPasswordAccess
 WORKDIR /home/userWithPasswordAccess
 
-USER root 
+USER root
 
 RUN echo 'userWithKeyAccess:userWithKeyAccess' |chpasswd
 RUN echo 'userWithPasswordAccess:userWithPasswordAccess' |chpasswd
@@ -57,7 +62,4 @@ RUN echo 'userWithPasswordAccess:userWithPasswordAccess' |chpasswd
 RUN chown -R userWithKeyAccess:userWithKeyAccess /home/userWithKeyAccess/.ssh
 RUN chown -R userWithOnlyKeyAccess:userWithOnlyKeyAccess /home/userWithOnlyKeyAccess/.ssh/
 
-
-EXPOSE 22
-
-CMD ["/usr/sbin/sshd", "-D"]
+RUN ["service", "ssh", "restart"]
