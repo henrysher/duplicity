@@ -564,6 +564,9 @@ def parse_cmdline_options(arglist):
     # Option to allow use of server side encryption in s3
     parser.add_option("--s3-use-server-side-encryption", action="store_true", dest="s3_use_sse")
 
+    # Option to specify a Swift container storage policy.
+    parser.add_option("--swift-storage-policy", type="string", metavar=_("policy"))
+
     # Number of the largest supported upload size where the Azure library makes only one put call.
     # This is used to upload a single block if the content length is known and is less than this value.
     # The default is 67108864 (64MiB)

@@ -1,3 +1,29 @@
+2017-05-17  Kenneth Loafman  <kenneth@loafman.com>
+
+    * May have finally fixed bug #1556553, "Too many open files...".
+      - Applied patch from Howard Kaye, question #631423.  The fix is to dup
+        the file descriptor, and then close the file in the deallocator
+        routine in the glue code. Duping the file lets the C code and the Python
+        code each close the file when they are done with it.
+      - Invalidated and removed the fix put in for bug #1320832.
+      - Caveat: long incremental chains will still eat up a large number of file
+        descriptors.  It's a very risky practice, so I'm not inclined to fix it.
+
+2017-05-15  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~dernils/duplicity/Dockerfile
+      - Now have subnet name and IP of the subnet for testing as a variable.
+
+2017-05-14  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~xlucas/duplicity/swift-storage-policies
+      - This brings support for Swift storage policies: when using a Swift
+        backend, you can specify the policy containers should be operating on.
+      - This is similar to AWS Cloud Storage classes (ia, rrs, glacier and so on).
+    * Merged in lp:~dernils/duplicity/Dockerfile
+      - Added another backend to the docker test infrastructure, updated the setup
+        for testing and updated the documentation.
+
 2017-05-12  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~aaron-whitehouse/duplicity/tox_pylint_fixes

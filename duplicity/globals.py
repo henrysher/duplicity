@@ -216,6 +216,9 @@ s3_multipart_max_timeout = None
 # Use server side encryption in s3
 s3_use_sse = False
 
+# Which storage policy to use for Swift containers
+swift_storage_policy = ""
+
 # The largest size upload supported in a single put call for azure
 azure_max_single_put_size = None
 

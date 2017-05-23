@@ -1,9 +1,12 @@
 boto
+coverage
 dropbox==6.9.0
 fasteners
 paramiko
 pexpect
+pycodestyle
 pydrive
+pylint
 pyrax
 python-cloudfiles
 tox
