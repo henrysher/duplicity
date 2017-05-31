@@ -1,3 +1,11 @@
+2017-05-31  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Revisited bug #670891 with patch from Edgar Soldin
+      - Forced librsync.PatchedFile() to extract file object from TemporaryFile()
+        object when on Windows or Cygwin systems.  This allows us to avoid the
+        problem of tmpfile() use which creates temp files in the wrong place.
+      - See discussion at https://bugs.launchpad.net/duplicity/+bug/670891
+
 2017-05-17  Kenneth Loafman  <kenneth@loafman.com>
 
     * May have finally fixed bug #1556553, "Too many open files...".

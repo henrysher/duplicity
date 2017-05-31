@@ -1,7 +1,7 @@
 *.egg
 *.log
-._.DS_Store
 .DS_Store
+._.DS_Store
 .eggs
 .idea
 .project
@@ -9,6 +9,7 @@
 .settings
 .tox
 __pycache__
+docs/_build
 build
 config.py
 duplicity.egg-info
@@ -16,5 +17,5 @@ duplicity.spec
 po/duplicity.pot-e
 random_seed
 testfiles
-testing/gnupg/private-keys-v1.d
 testing/gnupg/.gpg-v21-migrated
+testing/gnupg/private-keys-v1.d
