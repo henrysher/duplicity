@@ -24,6 +24,11 @@ New in v0.7.13 (2017/??/??)
   - Invalidated and removed the fix put in for bug #1320832.
   - Caveat: long incremental chains will still eat up a large number of file
     descriptors.  It's a very risky practice, so I'm not inclined to fix it.
+* Revisited bug #670891 with patch from Edgar Soldin
+  - Forced librsync.PatchedFile() to extract file object from TemporaryFile()
+    object when on Windows or Cygwin systems.  This allows us to avoid the
+    problem of tmpfile() use which creates temp files in the wrong place.
+  - See discussion at https://bugs.launchpad.net/duplicity/+bug/670891
 
 
 New in v0.7.12 (2017/03/21)
