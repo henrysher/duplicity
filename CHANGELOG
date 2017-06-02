@@ -200,6 +200,9 @@ New in v0.8.00 (2016/07/??)
     object when on Windows or Cygwin systems.  This allows us to avoid the
     problem of tmpfile() use which creates temp files in the wrong place.
   - See discussion at https://bugs.launchpad.net/duplicity/+bug/670891
+* Fix bug #1672540 with patch from Benoit Nadeau
+  - Rename would fail to move par files when moving across filesystems.
+  - Patch uses shutil.move() to do the rename instead.
 
 
 New in v0.7.08 (2016/07/02)

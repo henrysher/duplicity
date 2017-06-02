@@ -34,6 +34,7 @@ import socket
 import time
 import re
 import gzip
+import shutil
 
 from duplicity import tarfile
 from duplicity import file_naming
@@ -633,7 +634,7 @@ class Path(ROPath):
 
     def rename(self, new_path):
         """Rename file at current path to new_path."""
-        os.rename(self.name, new_path.name)
+        shutil.move(self.name, new_path.name)
         self.setdata()
         new_path.setdata()
 
