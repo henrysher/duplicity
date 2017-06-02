@@ -18,7 +18,6 @@
 # You should have received a copy of the GNU General Public License
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-from __builtin__ import isinstance
 
 """Provides a high-level interface to some librsync functions
 
@@ -27,9 +26,15 @@ which is written in C.  The goal was to use C as little as possible...
 
 """
 
+import os
 from . import _librsync
 import types
 import array
+
+if os.environ.get('READTHEDOCS') == 'True':
+    import mock
+    import duplicity
+    duplicity._librsync = mock.MagicMock()
 
 blocksize = _librsync.RS_JOB_BLOCKSIZE
 
@@ -176,7 +181,8 @@ class PatchedFile(LikeFile):
             if hasattr(basis_file, 'file') and isinstance(basis_file.file, types.FileType):
                 basis_file = basis_file.file
             else:
-                raise TypeError("basis_file must be a (true) file or an object whose file attribute is the underlying true file object")
+                raise TypeError(_("basis_file must be a (true) file or an object whose "
+                                  "file attribute is the underlying true file object"))
         try:
             self.maker = _librsync.new_patchmaker(basis_file)
         except _librsync.librsyncError as e:

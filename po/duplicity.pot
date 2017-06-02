@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2017-05-31 11:16-0500\n"
+"POT-Creation-Date: 2017-06-01 08:46-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1452,6 +1452,12 @@ msgstr ""
 #: ../duplicity/backends/webdavbackend.py:464
 #, python-format
 msgid "WebDAV DEL Bad status code %s reason %s."
+msgstr ""
+
+#: ../duplicity/librsync.py:183
+msgid ""
+"basis_file must be a (true) file or an object whose file attribute is the "
+"underlying true file object"
 msgstr ""
 
 #: ../duplicity/manifest.py:91
