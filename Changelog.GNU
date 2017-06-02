@@ -1,3 +1,9 @@
+2017-06-02  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fix bug #1672540 with patch from Benoit Nadeau
+      - Rename would fail to move par files when moving across filesystems.
+      - Patch uses shutil.move() to do the rename instead.
+
 2017-05-31  Kenneth Loafman  <kenneth@loafman.com>
 
     * Revisited bug #670891 with patch from Edgar Soldin
