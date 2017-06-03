@@ -1,3 +1,8 @@
+2017-06-03  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~dernils/duplicity/docker-compose
+      - Test Infrastructure now utilizing docker-compose
+
 2017-06-02  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fix bug #1672540 with patch from Benoit Nadeau
