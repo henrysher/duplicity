@@ -1,3 +1,11 @@
+2017-06-04  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/08-fix-man-verify
+      - Fix description of --verify and --compare-data in the man page. Now
+        clarifies that verify compares the restored files to hashes stored at
+        backup date, while --compare-data compares restored files to files
+        in target_path.
+
 2017-06-03  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~dernils/duplicity/docker-compose

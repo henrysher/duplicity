@@ -205,6 +205,11 @@ New in v0.8.00 (2016/07/??)
   - Patch uses shutil.move() to do the rename instead.
 * Merged in lp:~dernils/duplicity/docker-compose
   - Test Infrastructure now utilizing docker-compose
+* Merged in lp:~aaron-whitehouse/duplicity/08-fix-man-verify
+  - Fix description of --verify and --compare-data in the man page. Now
+    clarifies that verify compares the restored files to hashes stored at
+    backup date, while --compare-data compares restored files to files
+    in target_path.
 
 
 New in v0.7.08 (2016/07/02)
