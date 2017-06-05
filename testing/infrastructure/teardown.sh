@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Copyright 2017 Nils Tekampe <nils@tekampe.org>
 #
@@ -21,53 +22,5 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 
-version: "3"
 
-services:
-  duplicity_test:
-    image: firstprime/duplicity_test
-    ports:
-      - "30000-30009:30000-30009"
-    entrypoint: /bin/bash
-    depends_on:
-      - duplicity_ftp
-      - duplicity_ssh
-    stdin_open: true
-    tty: true
-    networks:
-      duplicity_test_net:
-        ipv4_address: ${DUPLICITY_TEST_SUBNET}.2
-    environment:
-      - DUPLICITY_IP_SSH_SERVER=${DUPLICITY_TEST_SUBNET}.3
-      - DUPLICITY_IP_FTP_SERVER=${DUPLICITY_TEST_SUBNET}.4
-
-
-  duplicity_ftp:
-    image: firstprime/duplicity_ftp
-    ports:
-      - "2222:22"
-    networks:
-      duplicity_test_net:
-        ipv4_address: ${DUPLICITY_TEST_SUBNET}.3
-
-
-  duplicity_ssh:
-    image: firstprime/duplicity_ssh
-    ports:
-      - "21:21"
-    tty: true
-    networks:
-      duplicity_test_net:
-        ipv4_address: ${DUPLICITY_TEST_SUBNET}.4
-
-
-networks:
-  duplicity_test_net:
-    ipam:
-      driver: default
-      config:
-        - subnet: ${DUPLICITY_TEST_SUBNET}.0/24
-
-
-
-
+docker-compose down
