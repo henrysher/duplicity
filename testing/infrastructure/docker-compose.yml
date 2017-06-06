@@ -40,6 +40,8 @@ services:
     environment:
       - DUPLICITY_IP_SSH_SERVER=${DUPLICITY_TEST_SUBNET}.3
       - DUPLICITY_IP_FTP_SERVER=${DUPLICITY_TEST_SUBNET}.4
+    volumes:
+      - ${USER_WORKSPACE}:/home/test/workspace
 
 
   duplicity_ftp:
