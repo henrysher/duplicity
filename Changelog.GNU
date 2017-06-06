@@ -1,3 +1,30 @@
+2017-06-04  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/08-fix-man-verify
+      - Fix description of --verify and --compare-data in the man page. Now
+        clarifies that verify compares the restored files to hashes stored at
+        backup date, while --compare-data compares restored files to files
+        in target_path.
+
+2017-06-03  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~dernils/duplicity/docker-compose
+      - Test Infrastructure now utilizing docker-compose
+
+2017-06-02  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fix bug #1672540 with patch from Benoit Nadeau
+      - Rename would fail to move par files when moving across filesystems.
+      - Patch uses shutil.move() to do the rename instead.
+
+2017-05-31  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Revisited bug #670891 with patch from Edgar Soldin
+      - Forced librsync.PatchedFile() to extract file object from TemporaryFile()
+        object when on Windows or Cygwin systems.  This allows us to avoid the
+        problem of tmpfile() use which creates temp files in the wrong place.
+      - See discussion at https://bugs.launchpad.net/duplicity/+bug/670891
+
 2017-05-17  Kenneth Loafman  <kenneth@loafman.com>
 
     * May have finally fixed bug #1556553, "Too many open files...".

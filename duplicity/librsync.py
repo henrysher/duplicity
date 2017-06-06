@@ -25,6 +25,7 @@ This is a python wrapper around the lower-level _librsync module,
 which is written in C.  The goal was to use C as little as possible...
 
 """
+
 import os
 from . import _librsync
 import types
@@ -172,7 +173,16 @@ class PatchedFile(LikeFile):
         """
         LikeFile.__init__(self, delta_file)
         if not isinstance(basis_file, types.FileType):
-            raise TypeError("basis_file must be a (true) file")
+            """ tempfile.TemporaryFile() only guarantees a true file
+            object on posix platforms. on cygwin/windows a file-like
+            object whose file attribute is the underlying true file
+            object is returned.
+            """
+            if hasattr(basis_file, 'file') and isinstance(basis_file.file, types.FileType):
+                basis_file = basis_file.file
+            else:
+                raise TypeError(_("basis_file must be a (true) file or an object whose "
+                                  "file attribute is the underlying true file object"))
         try:
             self.maker = _librsync.new_patchmaker(basis_file)
         except _librsync.librsyncError as e:

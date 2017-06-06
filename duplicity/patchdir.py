@@ -494,12 +494,10 @@ def patch_seq2ropath(patch_seq):
             by using the duplicity.tempdir to tell us where.
 
             See https://bugs.launchpad.net/duplicity/+bug/670891 for discussion
-            of os.tmpfile() vs tempfile.TemporaryFile() w.r.t. Windows / Linux.
+            of os.tmpfile() vs tempfile.TemporaryFile() w.r.t. Windows / Posix,
+            which is worked around in librsync.PatchedFile() now.
             """
-            if sys.platform.startswith(('cygwin', 'windows')):
-                tempfp = os.tmpfile()
-            else:
-                tempfp = tempfile.TemporaryFile(dir=tempdir.default().dir())
+            tempfp = tempfile.TemporaryFile(dir=tempdir.default().dir())
             util.copyfileobj(current_file, tempfp)
             assert not current_file.close()
             tempfp.seek(0)

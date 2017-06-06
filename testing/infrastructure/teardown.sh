@@ -23,5 +23,4 @@
 #
 
 
-docker-compose up -d
-docker-compose exec duplicity_test /bin/bash
+docker-compose down

@@ -168,17 +168,22 @@ Duplicity will abort if no old signatures can be found.
 
 .TP
 .BI "verify " "[--compare-data] [--time <time>] [--file-to-restore <rel_path>] <url> <local_path>"
-Restore backup contents temporarily file by file and compare against the local path's contents.
-duplicity will exit with a non-zero error level if any files are different.
-On verbosity level info (4) or higher, a message for each file that has
-changed will be logged.
+Verify tests the integrity of the backup archives at the remote location by downloading each file
+and checking both that it can restore the archive and that the restored file matches the signature
+of that file stored in the backup, i.e. compares the archived file with its hash value from archival
+time. Verify does not actually restore and will not overwrite any local files. Duplicity
+will exit with a non-zero error level if any files do not match the signature stored in the archive
+for that file. On verbosity level 4 or higher, it will log a message for each file that differs
+from the stored signature. Files must be downloaded to the local machine in order to compare them.
+Verify does not compare the backed-up version of the file to the current local copy of the files
+unless the --compare-data option is used (see below).
 .br
 The
 .I --file-to-restore
 option restricts verify to that file or folder.
 The
 .I --time
-option allows to select a backup to verify against.
+option allows to select a backup to verify.
 The
 .I --compare-data
 option enables data comparison (see below).
@@ -344,8 +349,14 @@ Alternatively you might choose
 
 .TP
 .BI --compare-data
-Enable data comparison of regular files on action verify.
-This is disabled by default for performance reasons.
+Enable data comparison of regular files on action verify. This conducts a
+verify as described above to verify the integrity of the backup archives,
+but additionally compares restored files to those in target_directory.
+Duplicity will not replace any files in target_directory. Duplicity will
+exit with a non-zero error level if the files do not correctly verify or
+if any files from the archive differ from those in target_directory. On
+verbosity level 4 or higher, it will log a message for each file that
+differs from its equivalent in target_directory.
 
 .TP
 .BI --copy-links
