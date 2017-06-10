@@ -31,6 +31,8 @@ class SwiftBackend(duplicity.backend.Backend):
     Backend for Swift
     """
     def __init__(self, parsed_url):
+        duplicity.backend.Backend.__init__(self, parsed_url)
+
         try:
             from swiftclient import Connection
             from swiftclient import ClientException

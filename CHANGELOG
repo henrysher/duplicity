@@ -36,6 +36,8 @@ New in v0.7.13 (2017/??/??)
   - SSH Paramiko backend now uses BufferedFile implementation to enable
     collecting the entire list of files on the backend.
 * Copy.com is gone so remove copycombackend.py.
+* Merged in lp:~xlucas/duplicity/swift-multibackend-bug
+  - Fix a bug when swift backend is used in a multibackend configuration.
 
 
 New in v0.7.12 (2017/03/21)
