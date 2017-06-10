@@ -379,17 +379,13 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname,
         command and returns stdout of command. throws an exception if exit
         code!=0 and not ignored"""
         try:
-            chan = self.client.get_transport().open_session()
-            chan.settimeout(globals.timeout)
-            chan.exec_command(cmd)
+            ch_in, ch_out, ch_err = self.client.exec_command(cmd, -1, globals.timeout)
+            output = ch_out.read(-1)
+            return output
         except Exception as e:
-            raise BackendException("%sexecution failed: %s" % (errorprefix, e))
-        output = chan.recv(-1)
-        res = chan.recv_exit_status()
-        if (res != 0 and not ignoreexitcode):
-            raise BackendException("%sfailed(%d): %s" % (errorprefix, res,
-                                                         chan.recv_stderr(4096)))
-        return output
+            if not ignoreexitcode:
+                raise BackendException("%sfailed: %s \n %s" % (
+                    errorprefix, ch_err.read(-1), e))
 
     def gethostconfig(self, file, host):
         import paramiko
