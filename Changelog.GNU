@@ -1,3 +1,9 @@
+2017-06-10  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1265765 with patches from Matthias Larisch and Edgar Soldin
+      - SSH Paramiko backend now uses BufferedFile implementation to enable
+        collecting the entire list of files on the backend.
+
 2017-06-02  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fix bug #1672540 with patch from Benoit Nadeau
