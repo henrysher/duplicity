@@ -1,3 +1,12 @@
+2017-06-10  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1265765 with patches from Matthias Larisch and Edgar Soldin
+      - SSH Paramiko backend now uses BufferedFile implementation to enable
+        collecting the entire list of files on the backend.
+    * Copy.com is gone so remove copycombackend.py.
+    * Merged in lp:~xlucas/duplicity/swift-multibackend-bug
+      - Fix a bug when swift backend is used in a multibackend configuration.
+
 2017-06-04  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~aaron-whitehouse/duplicity/08-fix-man-verify
