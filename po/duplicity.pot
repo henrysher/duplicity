@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2017-06-01 08:46-0500\n"
+"POT-Creation-Date: 2017-06-12 09:47-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1454,7 +1454,7 @@ msgstr ""
 msgid "WebDAV DEL Bad status code %s reason %s."
 msgstr ""
 
-#: ../duplicity/librsync.py:183
+#: ../duplicity/librsync.py:184
 msgid ""
 "basis_file must be a (true) file or an object whose file attribute is the "
 "underlying true file object"
@@ -1530,76 +1530,76 @@ msgstr ""
 msgid "Hashes don't match"
 msgstr ""
 
-#: ../duplicity/path.py:109
+#: ../duplicity/path.py:110
 #, python-format
 msgid "Warning: %s invalid devnums (0x%X), treating as (0, 0)."
 msgstr ""
 
-#: ../duplicity/path.py:236 ../duplicity/path.py:295
+#: ../duplicity/path.py:237 ../duplicity/path.py:296
 #, python-format
 msgid "Warning: %s has negative mtime, treating as 0."
 msgstr ""
 
-#: ../duplicity/path.py:359
+#: ../duplicity/path.py:360
 msgid "Difference found:"
 msgstr ""
 
-#: ../duplicity/path.py:368
+#: ../duplicity/path.py:369
 #, python-format
 msgid "New file %s"
 msgstr ""
 
-#: ../duplicity/path.py:371
+#: ../duplicity/path.py:372
 #, python-format
 msgid "File %s is missing"
 msgstr ""
 
-#: ../duplicity/path.py:374
+#: ../duplicity/path.py:375
 #, python-format
 msgid "File %%s has type %s, expected %s"
 msgstr ""
 
-#: ../duplicity/path.py:380 ../duplicity/path.py:406
+#: ../duplicity/path.py:381 ../duplicity/path.py:407
 #, python-format
 msgid "File %%s has permissions %s, expected %s"
 msgstr ""
 
-#: ../duplicity/path.py:385
+#: ../duplicity/path.py:386
 #, python-format
 msgid "File %%s has mtime %s, expected %s"
 msgstr ""
 
-#: ../duplicity/path.py:393
+#: ../duplicity/path.py:394
 #, python-format
 msgid "Data for file %s is different"
 msgstr ""
 
-#: ../duplicity/path.py:401
+#: ../duplicity/path.py:402
 #, python-format
 msgid "Symlink %%s points to %s, expected %s"
 msgstr ""
 
-#: ../duplicity/path.py:410
+#: ../duplicity/path.py:411
 #, python-format
 msgid "Device file %%s has numbers %s, expected %s"
 msgstr ""
 
-#: ../duplicity/path.py:578
+#: ../duplicity/path.py:579
 #, python-format
 msgid "Making directory %s"
 msgstr ""
 
-#: ../duplicity/path.py:588
+#: ../duplicity/path.py:589
 #, python-format
 msgid "Deleting %s"
 msgstr ""
 
-#: ../duplicity/path.py:597
+#: ../duplicity/path.py:598
 #, python-format
 msgid "Touching %s"
 msgstr ""
 
-#: ../duplicity/path.py:604
+#: ../duplicity/path.py:605
 #, python-format
 msgid "Deleting tree %s"
 msgstr ""

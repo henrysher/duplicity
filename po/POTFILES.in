@@ -23,7 +23,6 @@ duplicity/backends/_boto_single.py
 duplicity/backends/cfbackend.py
 duplicity/backends/_cf_cloudfiles.py
 duplicity/backends/_cf_pyrax.py
-duplicity/backends/copycombackend.py
 duplicity/backends/dpbxbackend.py
 duplicity/backends/gdocsbackend.py
 duplicity/backends/giobackend.py
