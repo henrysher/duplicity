@@ -248,8 +248,11 @@ class Select:
             for opt, arg in argtuples:
                 # assert isinstance(opt, unicode), u"option " + util.bytes_to_uc(opt) + u" is not unicode"
                 # assert isinstance(arg, unicode), u"option " + util.bytes_to_uc(arg) + u" is not unicode"
-                opt = util.bytes_to_uc(opt)  # ToDo: replace once we can make commandline return unicode
-                arg = util.bytes_to_uc(arg)  # ToDo: replace once we can make commandline return unicode
+                # ToDo: replace the next three lines once we can make commandline return unicode
+                opt = opt.decode(sys.getfilesystemencoding(), "strict")
+                if not isinstance(arg, unicode):
+                    # ToDo: use sys.getfilesystemencoding() once figure out why this is not working.
+                    arg = arg.decode("UTF-8", "strict")  # ToDo: Change from "strict" once found problems
 
                 if opt == u"--exclude":
                     self.add_selection_func(self.glob_get_sf(arg, 0))
@@ -494,7 +497,8 @@ probably isn't what you meant.""") %
         things similar to this.
 
         """
-        assert isinstance(glob_str, unicode), u"The glob string " + util.bytes_to_uc(glob_str) + u" is not unicode"
+        assert isinstance(glob_str, unicode), \
+            u"The glob string " + glob_str.decode(sys.getfilesystemencoding(), "ignore") + u" is not unicode"
         ignore_case = False
 
         if glob_str.lower().startswith("ignorecase:"):

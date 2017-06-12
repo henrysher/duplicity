@@ -218,7 +218,7 @@ class ParseArgsTest(UnitTestCase):
 
     def uc_index_from_path(self, path):
         """Takes a path type and returns path.index, with each element converted into unicode"""
-        uindex = tuple([util.bytes_to_uc(element) for element in path.index])
+        uindex = tuple([element.decode(sys.getfilesystemencoding(), "strict") for element in path.index])
         return uindex
 
     def ParseTest(self, tuplelist, indicies, filelists=[]):

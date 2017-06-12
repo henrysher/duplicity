@@ -66,14 +66,15 @@ except ImportError:
     def fsencode(unicode_filename):
         """Convert a unicode filename to a filename encoded in the system encoding"""
         # If we are not doing any cleverness with non-unicode filename bytes,
-        # bytes_to_unicode is good enough
-        return util.uc_to_bytes(unicode_filename)
+        # encoding to system encoding is good enough
+        return unicode_filename.encode(sys.getfilesystemencoding(), "replace")
 
     def fsdecode(bytes_filename):
         """Convert a filename encoded in the system encoding to unicode"""
         # If we are not doing any cleverness with non-unicode filename bytes,
-        # bytes_to_unicode is good enough
-        return util.bytes_to_uc(bytes_filename)
+        # decoding using system encoding is good enough
+        # ToDo: use sys.getfilesystemencoding() once figure out why this is not working.
+        return bytes_filename.decode("UTF-8", "ignore")
 
 
 _copy_blocksize = 64 * 1024

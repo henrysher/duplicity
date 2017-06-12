@@ -54,7 +54,7 @@ def exception_traceback(limit=50):
 def escape(string):
     "Convert a (bytes) filename to a format suitable for logging (quoted utf8)"
     if isinstance(string, str) or isinstance(string, unicode):
-        string = bytes_to_uc(string).encode('unicode-escape', 'replace')
+        string = string.decode(sys.getfilesystemencoding(), 'replace').encode('unicode-escape', 'replace')
     return u"'%s'" % string.decode('utf8', 'replace')
 
 
@@ -63,7 +63,7 @@ def ufn(filename):
     # This should be phased out, as path.uc_name is preferable for paths and
     # bytes_to_uc is clearer for everything else
     # ToDo: Delete when no longer used
-    return bytes_to_uc(filename)
+    return filename.decode(sys.getfilesystemencoding(), "replace")
 
 
 def bytes_to_uc(bytes_str):
@@ -86,16 +86,6 @@ def bytes_to_uc(bytes_str):
     else:
         raise TypeError(u"bytes_to_uc must be passed either unicode or str, but passed " + unicode(type(bytes_str)))
     return unicode_str
-
-
-def uc_to_bytes(unicode_str):
-    """Convert a unicode string to bytes, using filesystem encoding"""
-    # This should not be used filenames, as path.name is preferable
-    # Note that this is similar to, but distinct from, fsencode, because
-    # fsencode assumes a path-like string and has special handling for
-    # strange (Linux) filename quirks.
-    bytes_str = unicode_str.encode(sys.getfilesystemencoding(), 'replace')
-    return bytes_str
 
 
 def uindex(index):

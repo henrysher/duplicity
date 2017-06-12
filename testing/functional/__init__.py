@@ -126,7 +126,8 @@ class FunctionalTestCase(DuplicityTestCase):
         else:
             # Manually encode to filesystem encoding and send to spawn as bytes
             # ToDo: Remove this once we no longer have to support systems with pexpect < 4.0
-            child = pexpect.spawn(b'/bin/sh', [b'-c', util.uc_to_bytes(cmdline)], timeout=None)
+            child = pexpect.spawn(b'/bin/sh', [b'-c', cmdline.encode(sys.getfilesystemencoding(),
+                                                                     'replace')], timeout=None)
 
             for passphrase in passphrase_input:
                 child.expect(b'passphrase.*:')
