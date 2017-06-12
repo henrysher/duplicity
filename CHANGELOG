@@ -1,4 +1,4 @@
-New in v0.7.13 (2017/??/??)
+New in v0.7.13 (2017/06/12)
 ---------------------------
 * Fixed bug #1680682 with patch supplied from Dave Allan
   - Only specify --pinentry-mode=loopback when --use-agent is not specified
@@ -38,6 +38,7 @@ New in v0.7.13 (2017/??/??)
 * Copy.com is gone so remove copycombackend.py.
 * Merged in lp:~xlucas/duplicity/swift-multibackend-bug
   - Fix a bug when swift backend is used in a multibackend configuration.
+* Merged in lp:~duplicity-team/duplicity/po-updates
 
 
 New in v0.7.12 (2017/03/21)

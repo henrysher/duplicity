@@ -1,5 +1,10 @@
 2017-06-10  Kenneth Loafman  <kenneth@loafman.com>
 
+    * Merged in lp:~duplicity-team/duplicity/po-updates
+    * Prep for 0.7.13
+
+2017-06-10  Kenneth Loafman  <kenneth@loafman.com>
+
     * Fixed bug #1265765 with patches from Matthias Larisch and Edgar Soldin
       - SSH Paramiko backend now uses BufferedFile implementation to enable
         collecting the entire list of files on the backend.
