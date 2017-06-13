@@ -252,12 +252,14 @@ def parse_cmdline_options(arglist):
         globals.time_separator = sep
         old_fn_deprecation(opt)
 
-    def add_selection(o, s, v, p):
-        select_opts.append((s, v))
+    def add_selection(o, option, additional_arg, p):
+        option = util.fsdecode(option)
+        additional_arg = util.fsdecode(additional_arg)
+        select_opts.append((option, additional_arg))
 
     def add_filelist(o, s, v, p):
-        filename = v
-        select_opts.append((s, filename))
+        filename = util.fsdecode(v)
+        select_opts.append((util.fsdecode(s), filename))
         try:
             select_files.append(io.open(filename, "rt", encoding="UTF-8"))
         except IOError:
