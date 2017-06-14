@@ -1262,6 +1262,15 @@ See also
 .B "A NOTE ON SWIFT (OPENSTACK OBJECT STORAGE) ACCESS"
 .RE
 .PP
+.BR "Public Cloud Archive" " (OVH)"
+.PP
+.RS
+pca://container_name[/prefix]
+.PP
+See also
+.B "A NOTE ON PCA ACCESS"
+.RE
+.PP
 .B "Tahoe-LAFS"
 .PP
 .RS
@@ -2073,6 +2082,40 @@ variables can be used instead:
 If
 .B SWIFT_AUTHVERSION
 is unspecified, it will default to version 1.
+
+.SH A NOTE ON PCA ACCESS
+PCA is a long-term data archival solution by OVH. It runs a slightly modified
+version of Openstack Swift introducing latency in the data retrieval process.
+It is a good pick for a
+.BR "multi backend "
+configuration where receiving volumes while an other backend is used to store
+manifests and signatures.
+
+.br
+The backend requires python-switclient to be installed on the system.
+python-keystoneclient is also needed to interact with OpenStack's Keystone
+Identity service.
+See
+.B REQUIREMENTS
+above.
+
+It uses following environment variables for authentification:
+.BR PCA_USERNAME " (required),"
+.BR PCA_PASSWORD " (required),"
+.BR PCA_AUTHURL " (required),"
+.BR PCA_USERID " (optional),"
+.BR PCA_TENANTID " (optional, but either the tenant name or tenant id must be supplied)"
+.BR PCA_REGIONNAME " (optional),"
+.BR PCA_TENANTNAME " (optional, but either the tenant name or tenant id must be supplied)"
+
+If the user was previously authenticated, the following environment
+variables can be used instead:
+.BR PCA_PREAUTHURL " (required),"
+.BR PCA_PREAUTHTOKEN " (required)"
+
+If
+.B PCA_AUTHVERSION
+is unspecified, it will default to version 2.
 
 .SH A NOTE ON MEDIAFIRE BACKEND
 This backend requires
