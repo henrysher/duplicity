@@ -1,3 +1,10 @@
+2017-06-18  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed problem in dist/makedist when building on Mac where AppleDouble
+      files were being created in the tarball.  See:
+      https://superuser.com/questions/61185/why-do-i-get-files-like-foo-in-my-tarball-on-os-x
+    * Prep for 0.17.13.1
+
 2017-06-10  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~duplicity-team/duplicity/po-updates
