@@ -9,9 +9,9 @@
 .settings
 .tox
 __pycache__
-docs/_build
 build
 config.py
+docs/_build
 duplicity.egg-info
 duplicity.spec
 po/duplicity.pot-e
