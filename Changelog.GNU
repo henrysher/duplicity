@@ -1,3 +1,9 @@
+2017-06-23  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~dawgfoto/duplicity/replicate
+      - Add integration test for newly added replicate command.
+      - Also see https://code.launchpad.net/~dawgfoto/duplicity/replicate/+merge/322836.
+
 2017-06-19  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed problem in dist/makedist when building on Mac where AppleDouble
