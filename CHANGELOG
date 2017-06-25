@@ -216,6 +216,12 @@ New in v0.8.00 (2016/07/??)
 * Copy.com is gone so remove copycombackend.py.
 * Merged in lp:~xlucas/duplicity/swift-multibackend-bug
   - Fix a bug when swift backend is used in a multibackend configuration.
+* Fixed problem in dist/makedist when building on Mac where AppleDouble
+  files were being created in the tarball.  See:
+  https://superuser.com/questions/61185/why-do-i-get-files-like-foo-in-my-tarball-on-os-x
+* Merged in lp:~dawgfoto/duplicity/replicate
+  - Add integration test for newly added replicate command.
+  - Also see https://code.launchpad.net/~dawgfoto/duplicity/replicate/+merge/322836.
 
 
 New in v0.7.08 (2016/07/02)

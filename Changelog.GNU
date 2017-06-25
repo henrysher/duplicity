@@ -1,3 +1,15 @@
+2017-06-23  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~dawgfoto/duplicity/replicate
+      - Add integration test for newly added replicate command.
+      - Also see https://code.launchpad.net/~dawgfoto/duplicity/replicate/+merge/322836.
+
+2017-06-19  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed problem in dist/makedist when building on Mac where AppleDouble
+      files were being created in the tarball.  See:
+      https://superuser.com/questions/61185/why-do-i-get-files-like-foo-in-my-tarball-on-os-x
+
 2017-06-10  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1265765 with patches from Matthias Larisch and Edgar Soldin
