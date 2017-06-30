@@ -1740,8 +1740,13 @@ bucket. Give it a few minutes and the bucket should function normally.
 
 .SH A NOTE ON FILENAME PREFIXES
 
-Filename prefixes can be used in conjunction with S3 lifecycle rules to transition
-archive files to Glacier, while keeping metadata (signature and manifest files) on S3.
+Filename prefixes can be used in
+.B "multi backend "
+with
+.B "mirror "
+mode to define affinity rules. They can also be used in conjunction with
+S3 lifecycle rules to transition archive files to Glacier, while keeping
+metadata (signature and manifest files) on S3.
 
 Duplicity does not require access to archive files except when restoring from backup.
 
@@ -1858,7 +1863,8 @@ will try with the next backend on failure.
      "name" : "FOO",
      "value" : "bar"
     }
-   ]
+   ],
+   "prefixes": ["prefix1_", "prefix2_"]
  },
  {
   "url": "file:///path/to/dir"

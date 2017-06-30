@@ -41,6 +41,7 @@ class MultiBackend(duplicity.backend.Backend):
 
     # the stores we are managing
     __stores = []
+    __affinities = {}
 
     # Set of known query paramaters
     __knownQueryParameters = frozenset([
@@ -184,24 +185,53 @@ class MultiBackend(duplicity.backend.Backend):
 
             store = duplicity.backend.get_backend(url)
             self.__stores.append(store)
+
+            # Prefix affinity
+            if 'prefixes' in config:
+                if self.__mode == 'stripe':
+                    raise BackendException("Multibackend: stripe mode not supported with prefix affinity.")
+                for prefix in config['prefixes']:
+                    log.Log(_("Multibackend: register affinity for prefix %s")
+                            % prefix, log.INFO)
+                if prefix in self.__affinities:
+                    self.__affinities[prefix].append(store)
+                else:
+                    self.__affinities[prefix] = [store]
+
             # store_list = store.list()
             # log.Log(_("MultiBackend: at init, store %s has %s files")
             #         % (url, len(store_list)),
             #         log.INFO)
 
+    def _eligible_stores(self, filename):
+        if self.__affinities:
+            matching_prefixes = filter(lambda k: filename.startswith(k), self.__affinities.keys())
+            matching_stores = {store for prefix in matching_prefixes for store in self.__affinities[prefix]}
+            if matching_stores:
+                # Distinct stores with matching prefix
+                return list(matching_stores)
+
+        # No affinity rule or no matching store for that prefix
+        return self.__stores
+        
+
     def _put(self, source_path, remote_filename):
         # Store an indication of whether any of these passed
         passed = False
+
+        # Eligibile stores for this action
+        stores = self._eligible_stores(remote_filename)
+
         # Mirror mode always starts at zero
         if self.__mode == 'mirror':
             self.__write_cursor = 0
 
         first = self.__write_cursor
         while True:
-            store = self.__stores[self.__write_cursor]
+            store = stores[self.__write_cursor]
             try:
                 next = self.__write_cursor + 1
-                if (next > len(self.__stores) - 1):
+                if (next > len(stores) - 1):
                     next = 0
                 log.Log(_("MultiBackend: _put: write to store #%s (%s)")
                         % (self.__write_cursor, store.backend.parsed_url.url_string),
@@ -242,7 +272,9 @@ class MultiBackend(duplicity.backend.Backend):
         # before finally giving up).  So we need to get the list first
         # before we try to fetch
         # ENHANCEME: maintain a cached list for each store
-        for s in self.__stores:
+        stores = self._eligible_stores(remote_filename)
+
+        for s in stores:
             list = s.list()
             if remote_filename in list:
                 s.get(remote_filename, local_path)
@@ -273,13 +305,16 @@ class MultiBackend(duplicity.backend.Backend):
     def _delete(self, filename):
         # Store an indication on whether any passed
         passed = False
+
+        stores = self._eligible_stores(filename)
+
         # since the backend operations will be retried, we can't
         # simply try to get from the store, if not found, move to the
         # next store (since each failure will be retried n times
         # before finally giving up).  So we need to get the list first
         # before we try to delete
         # ENHANCEME: maintain a cached list for each store
-        for s in self.__stores:
+        for s in stores:
             list = s.list()
             if filename in list:
                 s._do_delete(filename)

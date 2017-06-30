@@ -1,3 +1,8 @@
+2017-06-30  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~xlucas/duplicity/multibackend-prefix-affinity
+      - Support prefix affinity in multibackend.
+
 2017-06-23  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~dawgfoto/duplicity/replicate
