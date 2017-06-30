@@ -191,7 +191,7 @@ Exception: %s""" % str(e))
                                            resp_chunk_size=1024)
             log.Info("File %s was successfully unsealed." % remote_filename)
             return body
-        except self.resp_exc, e:
+        except self.resp_exc as e:
             # The object is sealed but being released.
             if e.http_status == 429:
                 # The retry-after header contains the remaining duration before

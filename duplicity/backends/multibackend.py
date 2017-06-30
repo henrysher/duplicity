@@ -205,7 +205,7 @@ class MultiBackend(duplicity.backend.Backend):
 
     def _eligible_stores(self, filename):
         if self.__affinities:
-            matching_prefixes = filter(lambda k: filename.startswith(k), self.__affinities.keys())
+            matching_prefixes = [k for k in self.__affinities.keys() if filename.startswith(k)]
             matching_stores = {store for prefix in matching_prefixes for store in self.__affinities[prefix]}
             if matching_stores:
                 # Distinct stores with matching prefix
@@ -213,7 +213,6 @@ class MultiBackend(duplicity.backend.Backend):
 
         # No affinity rule or no matching store for that prefix
         return self.__stores
-        
 
     def _put(self, source_path, remote_filename):
         # Store an indication of whether any of these passed

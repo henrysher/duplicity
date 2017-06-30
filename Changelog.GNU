@@ -4,6 +4,7 @@
       - Support prefix affinity in multibackend.
     * Merged in lp:~xlucas/duplicity/pca-backend
       - Add support for OVH Public Cloud Archive backend.
+    * Fixed PEP8 and 2to3 issues.
 
 2017-06-23  Kenneth Loafman  <kenneth@loafman.com>
 
