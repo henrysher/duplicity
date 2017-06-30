@@ -224,6 +224,8 @@ New in v0.8.00 (2016/07/??)
   - Also see https://code.launchpad.net/~dawgfoto/duplicity/replicate/+merge/322836.
 * Merged in lp:~xlucas/duplicity/multibackend-prefix-affinity
   - Support prefix affinity in multibackend.
+* Merged in lp:~xlucas/duplicity/pca-backend
+  - Add support for OVH Public Cloud Archive backend.
 
 
 New in v0.7.08 (2016/07/02)

@@ -947,6 +947,7 @@ def usage():
   scp://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]/%(some_dir)s
   ssh://%(user)s[:%(password)s]@%(other_host)s[:%(port)s]/%(some_dir)s
   swift://%(container_name)s
+  pca://%(container_name)s
   tahoe://%(alias)s/%(directory)s
   webdav://%(user)s[:%(password)s]@%(other_host)s/%(some_dir)s
   webdavs://%(user)s[:%(password)s]@%(other_host)s/%(some_dir)s
