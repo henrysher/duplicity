@@ -1119,7 +1119,7 @@ def replicate():
     globals.backend.close()
 
 
-def sync_archive(decrypt):
+def sync_archive():
     """
     Synchronize local archive manifest file and sig chains to remote archives.
     Copy missing files from remote to local as needed to make sure the local
@@ -1298,11 +1298,8 @@ def sync_archive(decrypt):
         if not globals.dry_run:
             log.Notice(_("Synchronizing remote metadata to local cache..."))
             if local_missing and (rem_needpass or loc_needpass):
-                if decrypt:
-                    # password for the --encrypt-key
-                    globals.gpg_profile.passphrase = get_passphrase(1, "sync")
-                else:
-                    local_missing = []  # don't download if we can't decrypt
+                # password for the --encrypt-key
+                globals.gpg_profile.passphrase = get_passphrase(1, "sync")
             for fn in local_spurious:
                 remove_local(fn)
             if hasattr(globals.backend, 'pre_process_download'):
@@ -1517,9 +1514,8 @@ def do_backup(action):
     check_resources(action)
 
     # check archive synch with remote, fix if needed
-    if not action == "replicate":
-        decrypt = action not in ["collection-status"]
-        sync_archive(decrypt)
+    if action not in ["collection-status", "replicate"]:
+        sync_archive()
 
     # get current collection status
     col_stats = collections.CollectionsStatus(globals.backend,
@@ -1592,7 +1588,7 @@ def do_backup(action):
     elif action == "remove-all-but-n-full" or action == "remove-all-inc-of-but-n-full":
         remove_all_but_n_full(col_stats)
     elif action == "sync":
-        sync_archive(True)
+        sync_archive()
     elif action == "replicate":
         replicate()
     else:
