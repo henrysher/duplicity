@@ -1,6 +1,6 @@
 2017-07-11  Kenneth Loafman  <kenneth@loafman.com>
 
-    * Merged in lp:~dawgfoto/duplicity/skip_sync_collection_status
+    * Patched in lp:~dawgfoto/duplicity/skip_sync_collection_status
       - collection-status should not sync metadata
       - up-to-date local metadata is not needed as collection-status is
         generated from remote file list
