@@ -1,3 +1,19 @@
+2017-07-11  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Patched in lp:~dawgfoto/duplicity/skip_sync_collection_status
+      - collection-status should not sync metadata
+      - up-to-date local metadata is not needed as collection-status is
+        generated from remote file list
+      - syncing metadata might require to download several GBs
+
+2017-06-30  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~xlucas/duplicity/multibackend-prefix-affinity
+      - Support prefix affinity in multibackend.
+    * Merged in lp:~xlucas/duplicity/pca-backend
+      - Add support for OVH Public Cloud Archive backend.
+    * Fixed PEP8 and 2to3 issues.
+
 2017-06-23  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~dawgfoto/duplicity/replicate
