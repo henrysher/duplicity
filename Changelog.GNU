@@ -1,3 +1,8 @@
+2017-07-19  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed slowness in 'collection-status' by basing the status on the
+      remote system only.  The local cache is treated as empty.
+
 2017-07-11  Kenneth Loafman  <kenneth@loafman.com>
 
     * Patched in lp:~dawgfoto/duplicity/skip_sync_collection_status
