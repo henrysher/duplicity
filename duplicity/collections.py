@@ -52,7 +52,7 @@ class BackupSet:
     """
     Backup set - the backup information produced by one session
     """
-    def __init__(self, backend):
+    def __init__(self, backend, action):
         """
         Initialize new backup set, only backend is required at first
         """
@@ -67,6 +67,7 @@ class BackupSet:
         self.partial = False  # true if a partial backup
         self.encrypted = False  # true if an encrypted backup
         self.files_changed = []
+        self.action = action
 
     def is_complete(self):
         """
@@ -142,7 +143,11 @@ class BackupSet:
                                                remote_filename)
         self.remote_manifest_name = remote_filename
 
-        for local_filename in globals.archive_dir_path.listdir():
+        if self.action not in ["collection-status", "replicate"]:
+            local_filename_list = globals.archive_dir_path.listdir()
+        else:
+            local_filename_list = []
+        for local_filename in local_filename_list:
             pr = file_naming.parse(local_filename)
             if (pr and pr.manifest and pr.type == self.type and
                     pr.time == self.time and
@@ -165,7 +170,11 @@ class BackupSet:
         except Exception:
             log.Debug(_("BackupSet.delete: missing %s") % [util.ufn(f) for f in rfn])
             pass
-        for lfn in globals.archive_dir_path.listdir():
+        if self.action not in ["collection-status", "replicate"]:
+            local_filename_list = globals.archive_dir_path.listdir()
+        else:
+            local_filename_list = []
+        for lfn in local_filename_list:
             pr = file_naming.parse(lfn)
             if (pr and pr.time == self.time and
                     pr.start_time == self.start_time and
@@ -234,17 +243,12 @@ class BackupSet:
         Return manifest by reading remote manifest on backend
         """
         assert self.remote_manifest_name
-        # Following by MDR.  Should catch if remote encrypted with
-        # public key w/o secret key
         try:
             manifest_buffer = self.backend.get_data(self.remote_manifest_name)
         except GPGError as message:
-            # TODO: We check for gpg v1 and v2 messages, should be an error code
-            if ("secret key not available" in message.args[0] or
-                    "No secret key" in message.args[0]):
-                return None
-            else:
-                raise
+            log.Error(_("Error processing remote manifest (%s): %s") %
+                      (self.remote_manifest_name, str(message)))
+            return None
         log.Info(_("Processing remote manifest %s (%s)") % (self.remote_manifest_name, len(manifest_buffer)))
         return manifest.Manifest().from_string(manifest_buffer)
 
@@ -293,16 +297,6 @@ class BackupSet:
         Return the number of volumes in the set
         """
         return len(self.volume_name_dict.keys())
-
-    def __eq__(self, other):
-        """
-        Return whether this backup set is equal to other
-        """
-        return self.type == other.type and \
-            self.time == other.time and \
-            self.start_time == other.start_time and \
-            self.end_time == other.end_time and \
-            len(self) == len(other)
 
 
 class BackupChain:
@@ -510,7 +504,7 @@ class SignatureChain:
 
     def islocal(self):
         """
-        Return true if represents a signature chain in archive_dir
+        Return true if represents a signature chain in archive_dir_path
         """
         if self.archive_dir_path:
             return True
@@ -598,12 +592,13 @@ class CollectionsStatus:
     """
     Hold information about available chains and sets
     """
-    def __init__(self, backend, archive_dir_path):
+    def __init__(self, backend, archive_dir_path, action):
         """
         Make new object.  Does not set values
         """
         self.backend = backend
         self.archive_dir_path = archive_dir_path
+        self.action = action
 
         # Will hold (signature chain, backup chain) pair of active
         # (most recent) chains
@@ -707,7 +702,10 @@ class CollectionsStatus:
                   len(backend_filename_list))
 
         # get local filename list
-        local_filename_list = self.archive_dir_path.listdir() if self.archive_dir_path else []
+        if self.action not in ["collection-status", "replicate"]:
+            local_filename_list = self.archive_dir_path.listdir()
+        else:
+            local_filename_list = []
         log.Debug(ngettext("%d file exists in cache",
                            "%d files exist in cache",
                            len(local_filename_list)) %
@@ -842,7 +840,7 @@ class CollectionsStatus:
                     break
             else:
                 log.Debug(_("File %s is not part of a known set; creating new set") % (util.ufn(filename),))
-                new_set = BackupSet(self.backend)
+                new_set = BackupSet(self.backend, self.action)
                 if new_set.add_filename(filename):
                     sets.append(new_set)
                 else:
@@ -904,7 +902,10 @@ class CollectionsStatus:
             if filelist is not None:
                 return filelist
             elif local:
-                return self.archive_dir_path.listdir() if self.archive_dir_path else []
+                if self.action not in ["collection-status", "replicate"]:
+                    return self.archive_dir_path.listdir()
+                else:
+                    return []
             else:
                 return self.backend.list()
 

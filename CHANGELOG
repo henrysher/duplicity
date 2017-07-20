@@ -232,6 +232,10 @@ New in v0.8.00 (2016/07/??)
   - up-to-date local metadata is not needed as collection-status is
     generated from remote file list
   - syncing metadata might require to download several GBs
+* Fixed slowness in 'collection-status' by basing the status on the
+  remote system only.  The local cache is treated as empty.
+* Fixed encrypted remote manifest handling to merely put out a non-fatal
+  error message and continue if the private key is not available.
 
 
 New in v0.7.08 (2016/07/02)

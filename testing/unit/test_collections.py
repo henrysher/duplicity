@@ -98,7 +98,7 @@ class CollectionTest(UnitTestCase):
     def test_backup_chains(self):
         """Test basic backup chain construction"""
         random.shuffle(filename_list1)
-        cs = collections.CollectionsStatus(None, globals.archive_dir_path)
+        cs = collections.CollectionsStatus(None, globals.archive_dir_path, "full")
         chains, orphaned, incomplete = cs.get_backup_chains(filename_list1)  # @UnusedVariable
         if len(chains) != 1 or len(orphaned) != 0:
             print(chains)
@@ -119,7 +119,7 @@ class CollectionTest(UnitTestCase):
             assert cs.matched_chain_pair[0].end_time == 1029826800
             assert len(cs.all_backup_chains) == 1, cs.all_backup_chains
 
-        cs = collections.CollectionsStatus(self.real_backend, globals.archive_dir_path).set_values()
+        cs = collections.CollectionsStatus(self.real_backend, globals.archive_dir_path, "full").set_values()
         check_cs(cs)
         assert cs.matched_chain_pair[0].islocal()
 
@@ -132,13 +132,13 @@ class CollectionTest(UnitTestCase):
 
     def test_sig_chains(self):
         """Test making signature chains from filename list"""
-        cs = collections.CollectionsStatus(None, globals.archive_dir_path)
+        cs = collections.CollectionsStatus(None, globals.archive_dir_path, "full")
         chains, orphaned_paths = cs.get_signature_chains(local=1)
         self.sig_chains_helper(chains, orphaned_paths)
 
     def test_sig_chains2(self):
         """Test making signature chains from filename list on backend"""
-        cs = collections.CollectionsStatus(self.archive_dir_backend, globals.archive_dir_path)
+        cs = collections.CollectionsStatus(self.archive_dir_backend, globals.archive_dir_path, "full")
         chains, orphaned_paths = cs.get_signature_chains(local=None)
         self.sig_chains_helper(chains, orphaned_paths)
 
@@ -195,7 +195,7 @@ class CollectionTest(UnitTestCase):
             p = self.output_dir.append(filename)
             p.touch()
 
-        cs = collections.CollectionsStatus(self.output_dir_backend, globals.archive_dir_path)
+        cs = collections.CollectionsStatus(self.output_dir_backend, globals.archive_dir_path, "full")
         cs.set_values()
         return cs
 

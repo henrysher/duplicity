@@ -1011,9 +1011,10 @@ def replicate():
     @rtype: void
     @return: void
     """
+    action = "replicate"
     time = globals.restore_time or dup_time.curtime
-    src_stats = collections.CollectionsStatus(globals.src_backend, None).set_values(sig_chain_warning=None)
-    tgt_stats = collections.CollectionsStatus(globals.backend, None).set_values(sig_chain_warning=None)
+    src_stats = collections.CollectionsStatus(globals.src_backend, None, action).set_values(sig_chain_warning=None)
+    tgt_stats = collections.CollectionsStatus(globals.backend, None, action).set_values(sig_chain_warning=None)
 
     src_list = globals.src_backend.list()
     tgt_list = globals.backend.list()
@@ -1519,7 +1520,8 @@ def do_backup(action):
 
     # get current collection status
     col_stats = collections.CollectionsStatus(globals.backend,
-                                              globals.archive_dir_path).set_values()
+                                              globals.archive_dir_path,
+                                              action).set_values()
 
     while True:
         # if we have to clean up the last partial, then col_stats are invalidated
@@ -1549,7 +1551,8 @@ def do_backup(action):
                     log.Notice(_("Cleaning up previous partial %s backup set, restarting." % action))
                     last_backup.delete()
                     col_stats = collections.CollectionsStatus(globals.backend,
-                                                              globals.archive_dir_path).set_values()
+                                                              globals.archive_dir_path,
+                                                              action).set_values()
                     continue
             break
         break
@@ -1652,7 +1655,20 @@ def with_tempdir(fn):
 
 if __name__ == "__main__":
     try:
+
+        # import cProfile
+        # import pstats
+        # import StringIO
+        # prof = cProfile.Profile()
+        # prof.enable(subcalls=True, builtins=True)
+
         with_tempdir(main)
+
+#         prof.disable()
+#         s = StringIO.StringIO()
+#         ps = pstats.Stats(prof, stream=s).sort_stats('cumulative')
+#         ps.print_stats(20)
+#         print s.getvalue()
 
     # Don't move this lower.  In order to get an exit
     # status out of the system, you have to call the
@@ -1662,7 +1678,7 @@ if __name__ == "__main__":
     except SystemExit as e:
         # No traceback, just get out
         util.release_lockfile()
-        sys.exit(e)
+        sys.exit(e.code)
 
     except KeyboardInterrupt as e:
         # No traceback, just get out
