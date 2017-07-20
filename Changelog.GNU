@@ -1,3 +1,8 @@
+2017-07-20  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed encrypted remote manifest handling to merely put out a non-fatal
+      error message and continue if the private key is not available.
+
 2017-07-19  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed slowness in 'collection-status' by basing the status on the

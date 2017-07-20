@@ -243,17 +243,12 @@ class BackupSet:
         Return manifest by reading remote manifest on backend
         """
         assert self.remote_manifest_name
-        # Following by MDR.  Should catch if remote encrypted with
-        # public key w/o secret key
         try:
             manifest_buffer = self.backend.get_data(self.remote_manifest_name)
         except GPGError as message:
-            # TODO: We check for gpg v1 and v2 messages, should be an error code
-            if ("secret key not available" in message.args[0] or
-                    "No secret key" in message.args[0]):
-                return None
-            else:
-                raise
+            log.Error(_("Error processing remote manifest (%s): %s") %
+                      (self.remote_manifest_name, str(message)))
+            return None
         log.Info(_("Processing remote manifest %s (%s)") % (self.remote_manifest_name, len(manifest_buffer)))
         return manifest.Manifest().from_string(manifest_buffer)
 
