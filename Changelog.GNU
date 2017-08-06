@@ -1,3 +1,9 @@
+2017-08-06  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~mterry/duplicity/giobackend-display-name
+      - giobackend: handle a wider variety of gio backends by making less assumptions;
+        in particular, this fixes the google-drive: backend
+
 2017-07-20  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed encrypted remote manifest handling to merely put out a non-fatal
