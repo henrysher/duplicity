@@ -141,12 +141,12 @@ class GIOBackend(duplicity.backend.Backend):
     def _put(self, source_path, remote_filename):
         from gi.repository import Gio  # @UnresolvedImport
         source_file = Gio.File.new_for_path(source_path.name)
-        target_file = self.remote_file.get_child(remote_filename)
+        target_file = self.remote_file.get_child_for_display_name(remote_filename)
         self.__copy_file(source_file, target_file)
 
     def _get(self, filename, local_path):
         from gi.repository import Gio  # @UnresolvedImport
-        source_file = self.remote_file.get_child(filename)
+        source_file = self.remote_file.get_child_for_display_name(filename)
         target_file = Gio.File.new_for_path(local_path.name)
         self.__copy_file(source_file, target_file)
 
@@ -156,9 +156,7 @@ class GIOBackend(duplicity.backend.Backend):
         # We grab display name, rather than file name because some backends
         # (e.g. google-drive:) use filesystem-specific IDs as file names and
         # only expose the "normal" name as display names. We need the display
-        # name, because we try to parse them. If the backend does this sort of
-        # trickery, it will accept both versions of the filename, so we
-        # shouldn't get into any trouble doing this.
+        # name, because we try to parse them.
         enum = self.remote_file.enumerate_children(Gio.FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME,
                                                    Gio.FileQueryInfoFlags.NONE,
                                                    None)
@@ -169,12 +167,12 @@ class GIOBackend(duplicity.backend.Backend):
         return files
 
     def _delete(self, filename):
-        target_file = self.remote_file.get_child(filename)
+        target_file = self.remote_file.get_child_for_display_name(filename)
         target_file.delete(None)
 
     def _query(self, filename):
         from gi.repository import Gio  # @UnresolvedImport
-        target_file = self.remote_file.get_child(filename)
+        target_file = self.remote_file.get_child_for_display_name(filename)
         info = target_file.query_info(Gio.FILE_ATTRIBUTE_STANDARD_SIZE,
                                       Gio.FileQueryInfoFlags.NONE, None)
         return {'size': info.get_size()}
