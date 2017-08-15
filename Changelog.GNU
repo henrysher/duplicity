@@ -3,6 +3,8 @@
     * Fixed bug #1709047 with suggestion from Gary Hasson
       - fixed so default was to use original filename
     * Fixed PEP8 errors in bin/duplicity
+    * Merged in lp:~mterry/duplicity/gio_child_for_display_name
+      - gio: be slightly more correct and get child GFiles based on display name
 
 2017-08-06  Kenneth Loafman  <kenneth@loafman.com>
 
