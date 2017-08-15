@@ -1191,7 +1191,7 @@ class CollectionsStatus:
         Returns time line of specified file changed
         """
         # quick fix to spaces in filepath
-        modified_filepath = ""
+        modified_filepath = filepath
         if " " in filepath:
             modified_filepath = '"' + filepath.replace(" ", r"\x20") + '"'
 
