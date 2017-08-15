@@ -1,7 +1,8 @@
 2017-08-15  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1709047 with suggestion from Gary Hasson
-      * fixed so default was to use original filename
+      - fixed so default was to use original filename
+    * Fixed PEP8 errors in bin/duplicity
 
 2017-08-06  Kenneth Loafman  <kenneth@loafman.com>
 
