@@ -1,3 +1,7 @@
+2017-08-28  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fix errors where log.Warn was invoked with log.warn in webdavbackend.py
+
 2017-08-15  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1709047 with suggestion from Gary Hasson

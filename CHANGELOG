@@ -244,6 +244,7 @@ New in v0.8.00 (2016/07/??)
 * Fixed PEP8 errors in bin/duplicity
 * Merged in lp:~mterry/duplicity/gio_child_for_display_name
   - gio: be slightly more correct and get child GFiles based on display name
+* Fix errors where log.Warn was invoked with log.warn in webdavbackend.py
 
 
 New in v0.7.08 (2016/07/02)
