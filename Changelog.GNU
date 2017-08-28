@@ -1,6 +1,10 @@
 2017-08-28  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fix errors where log.Warn was invoked with log.warn in webdavbackend.py
+    * Merged in lp:~mterry/duplicity/gpg-tag-versions
+      - Support gpg versions numbers that have tags on them.
+      - This can happen if you build gpg from git trunk (e.g. 2.1.15-beta20). Or if you run
+        against the freedesktop flatpak runtime (e.g. 2.1.14-unknown).
 
 2017-08-15  Kenneth Loafman  <kenneth@loafman.com>
 
