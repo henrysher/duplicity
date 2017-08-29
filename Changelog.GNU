@@ -1,6 +1,14 @@
+2017-08-29  Kenneth Loafman  <kenneth@loafman.com>
+
+    # Fixed bug #1394386 with new module megabackend.py from Tomas Vondra
+      - uses megatools from https://megatools.megous.com/ instead of mega.py library
+        which has been deprecated
+      - fixed copyright and PEP8 issues
+
 2017-08-28  Kenneth Loafman  <kenneth@loafman.com>
 
-    * Fix errors where log.Warn was invoked with log.warn in webdavbackend.py
+    * Fixed bug #1711905 with suggestion from Schneider
+      - log.Warn was invoked with log.warn in webdavbackend.py
     * Merged in lp:~mterry/duplicity/gpg-tag-versions
       - Support gpg versions numbers that have tags on them.
       - This can happen if you build gpg from git trunk (e.g. 2.1.15-beta20). Or if you run

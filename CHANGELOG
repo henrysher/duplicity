@@ -244,11 +244,16 @@ New in v0.8.00 (2016/07/??)
 * Fixed PEP8 errors in bin/duplicity
 * Merged in lp:~mterry/duplicity/gio_child_for_display_name
   - gio: be slightly more correct and get child GFiles based on display name
-* Fix errors where log.Warn was invoked with log.warn in webdavbackend.py
+* Fixed bug #1711905 with suggestion from Schneider
+  - log.Warn was invoked with log.warn in webdavbackend.py
 * Merged in lp:~mterry/duplicity/gpg-tag-versions
   - Support gpg versions numbers that have tags on them.
   - This can happen if you build gpg from git trunk (e.g. 2.1.15-beta20). Or if you run
     against the freedesktop flatpak runtime (e.g. 2.1.14-unknown).
+# Fixed bug #1394386 with new module megabackend.py from Tomas Vondra
+  - uses megatools from https://megatools.megous.com/ instead of mega.py library
+    which has been deprecated
+  - fixed copyright and PEP8 issues
 
 
 New in v0.7.08 (2016/07/02)

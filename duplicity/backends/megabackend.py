@@ -1,9 +1,7 @@
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
 #
-# Copyright 2011 Carlos Abalde <carlos.abalde@gmail.com>
-# for gdocsbackend.py on which megabackend.py is based on
-#
-# Copyright 2013 Christian Kornacker <christian.kornacker@gmail.com>
+# Copyright 2017 Tomas Vondra (Launchpad id: tomas-v)
+# Copyright 2017 Kenneth Loafman <kenneth@loafman.com>
 #
 # This file is part of duplicity.
 #
@@ -25,6 +23,9 @@ import duplicity.backend
 from duplicity import log
 from duplicity.errors import BackendException
 
+import os
+import subprocess
+
 
 class MegaBackend(duplicity.backend.Backend):
     """Connect to remote store using Mega.co.nz API"""
@@ -32,95 +33,161 @@ class MegaBackend(duplicity.backend.Backend):
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
 
+        # ensure all the necessary megatools binaries exist
+        self._check_binary_exists('megals')
+        self._check_binary_exists('megamkdir')
+        self._check_binary_exists('megaget')
+        self._check_binary_exists('megaput')
+        self._check_binary_exists('megarm')
+
+        # store some basic info
+        self._hostname = parsed_url.hostname
+
+        if parsed_url.password is None:
+            self._megarc = os.getenv('HOME') + '/.megarc'
+        else:
+            self._megarc = False
+            self._username = parsed_url.username
+            self._password = self.get_password()
+
+        # remote folder (Can we assume /Root prefix?)
+        self._root = '/Root'
+        self._folder = self._root + '/' + parsed_url.path[1:]
+
+        # make sure the remote folder exists (the whole path)
+        self._makedir_recursive(parsed_url.path[1:].split('/'))
+
+    def _check_binary_exists(self, cmd):
+        'checks that a specified command exists in the current path'
+
         try:
-            from mega import Mega
-        except ImportError:
-            raise BackendException('Mega.co.nz backend requires Mega.co.nz APIs Python Module'
-                                   '(see https://github.com/richardasaurus/mega.py).')
+            # ignore the output, we only need the return code
+            subprocess.check_output(['which', cmd])
+        except Exception as e:
+            raise BackendException("command '%s' not found, make sure megatools are installed" % (cmd,))
 
-        # Setup client instance.
-        self.client = Mega()
-        self.client.domain = parsed_url.hostname
-        self.__authorize(parsed_url.username, self.get_password())
+    def _makedir(self, path):
+        'creates a remote directory'
 
-        # Fetch destination folder entry (and crete hierarchy if required).
-        folder_names = parsed_url.path[1:].split('/')
-        files = self.client.get_files()
+        if self._megarc:
+            cmd = ['megamkdir', '--config', self._megarc, path]
+        else:
+            cmd = ['megamkdir', '-u', self._username, '-p', self._password, path]
 
-        parent_folder = self.client.root_id
-        for folder_name in folder_names:
-            entries = self.__filter_entries(files, parent_folder, folder_name, 'folder')
-            if len(entries):
-                # use first matching folder as new parent
-                parent_folder = entries.keys()[0]
-            else:
-                # create subfolder if folder doesn't exist and use its handle as parent
-                folder_node = self.client.create_folder(folder_name, parent_folder)
-                parent_folder = self.client.get_id_from_obj(folder_node)
-                # update filelist after creating new folder
-                files = self.client.get_files()
+        try:
+            subprocess.call(cmd)
+        except Exception as e:
+            raise BackendException("megamkdir failed when creating folder '%s'" % (path,))
 
-        self.folder = parent_folder
+    def _makedir_recursive(self, path):
+        'creates a remote directory (recursively the whole path), ingores errors'
+
+        print ("mkdir: %s" % ('/'.join(path),))
+
+        p = self._root
+
+        for folder in path:
+            p = p + '/' + folder
+            try:
+                self._make_dir(p)
+            except:
+                pass
 
     def _put(self, source_path, remote_filename):
+        'uploads file to Mega (deletes it first, to ensure it does not exist)'
+
         try:
-            self._delete(remote_filename)
+            self.delete(remote_filename)
         except Exception:
             pass
-        self.client.upload(source_path.get_canonical(), self.folder, dest_filename=remote_filename)
+
+        self.upload(local_file=source_path.get_canonical(), remote_file=remote_filename)
 
     def _get(self, remote_filename, local_path):
-        files = self.client.get_files()
-        entries = self.__filter_entries(files, self.folder, remote_filename, 'file')
-        if len(entries):
-            # get first matching remote file
-            entry = entries.keys()[0]
-            self.client.download((entry, entries[entry]), dest_filename=local_path.name)
-        else:
-            raise BackendException("Failed to find file '%s' in remote folder '%s'"
-                                   % (remote_filename, self.__get_node_name(self.folder)),
-                                   code=log.ErrorCode.backend_not_found)
+        'downloads file from Mega'
+
+        self.download(remote_file=remote_filename, local_file=local_path.name)
 
     def _list(self):
-        entries = self.client.get_files_in_node(self.folder)
-        return [self.client.get_name_from_file({entry: entries[entry]}) for entry in entries]
+        'list files in the backup folder'
+
+        return self.folder_contents(files_only=True)
 
     def _delete(self, filename):
-        files = self.client.get_files()
-        entries = self.__filter_entries(files, self.folder, filename, 'file')
-        if len(entries):
-            self.client.destroy(entries.keys()[0])
+        'deletes remote '
+
+        self.delete(remote_file=filename)
+
+    def folder_contents(self, files_only=False):
+        'lists contents of a folder, optionally ignoring subdirectories'
+
+        print ("megals: %s" % (self._folder,))
+
+        if self._megarc:
+            cmd = ['megals', '--config', self._megarc, self._folder]
         else:
-            raise BackendException("Failed to find file '%s' in remote folder '%s'"
-                                   % (filename, self.__get_node_name(self.folder)),
-                                   code=log.ErrorCode.backend_not_found)
+            cmd = ['megals', '-u', self._username, '-p', self._password, self._folder]
 
-    def __get_node_name(self, handle):
-        """get node name from public handle"""
-        files = self.client.get_files()
-        return self.client.get_name_from_file({handle: files[handle]})
+        files = subprocess.check_output(cmd)
+        files = files.strip().split('\n')
 
-    def __authorize(self, email, password):
-        self.client.login(email, password)
+        # remove the folder name, including the path separator
+        files = [f[len(self._folder) + 1:] for f in files]
 
-    def __filter_entries(self, entries, parent_id=None, title=None, type=None):
-        result = {}
-        type_map = {'folder': 1, 'file': 0}
+        # optionally ignore entries containing path separator (i.e. not files)
+        if files_only:
+            files = [f for f in files if '/' not in f]
 
-        for k, v in entries.items():
-            try:
-                if parent_id is not None:
-                    assert(v['p'] == parent_id)
-                if title is not None:
-                    assert(v['a']['n'] == title)
-                if type is not None:
-                    assert(v['t'] == type_map[type])
-            except AssertionError:
-                continue
+        return files
 
-            result.update({k: v})
+    def download(self, remote_file, local_file):
 
-        return result
+        print ("megaget: %s" % (remote_file,))
+
+        if self._megarc:
+            cmd = ['megaget', '--config', self._megarc, '--no-progress',
+                   '--path', local_file, self._folder + '/' + remote_file]
+        else:
+            cmd = ['megaget', '-u', self._username, '-p', self._password, '--no-progress',
+                   '--path', local_file, self._folder + '/' + remote_file]
+
+        try:
+            subprocess.call(cmd)
+        except Exception as e:
+            raise BackendException("megaget failed when downloading file '%s' to '%s'" % (
+                self._folder + '/' + remote_file, local_file))
+
+    def upload(self, local_file, remote_file):
+
+        print ("megaput: %s" % (remote_file,))
+
+        if self._megarc:
+            cmd = ['megaput', '--config', self._megarc, '--no-progress',
+                   '--path', self._folder + '/' + remote_file, local_file]
+        else:
+            cmd = ['megaput', '-u', self._username, '-p', self._password, '--no-progress',
+                   '--path', self._folder + '/' + remote_file, local_file]
+
+        try:
+            subprocess.call(cmd)
+        except Exception as e:
+            raise BackendException("megaput failed when uploading file '%s' to '%s'" % (
+                local_file, self._folder + '/' + remote_file))
+
+    def delete(self, remote_file):
+
+        print ("megarm: %s" % (remote_file,))
+
+        if self._megarc:
+            cmd = ['megarm', '--config', self._megarc, self._folder + '/' + remote_file]
+        else:
+            cmd = ['megarm', '-u', self._username, '-p', self._password, self._folder + '/' + remote_file]
+
+        try:
+            subprocess.call(cmd)
+        except Exception as e:
+            raise BackendException("megarm failed when deleting file '%s'" % (
+                self._folder + '/' + remote_file,))
 
 
 duplicity.backend.register_backend('mega', MegaBackend)
