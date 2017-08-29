@@ -4,6 +4,7 @@
       - uses megatools from https://megatools.megous.com/ instead of mega.py library
         which has been deprecated
       - fixed copyright and PEP8 issues
+      - replaced subprocess.call() with self.subprocess_popen() to standardize
 
 2017-08-28  Kenneth Loafman  <kenneth@loafman.com>
 

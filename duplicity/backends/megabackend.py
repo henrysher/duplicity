@@ -74,10 +74,7 @@ class MegaBackend(duplicity.backend.Backend):
         else:
             cmd = ['megamkdir', '-u', self._username, '-p', self._password, path]
 
-        try:
-            subprocess.call(cmd)
-        except Exception as e:
-            raise BackendException("megamkdir failed when creating folder '%s'" % (path,))
+        self.subprocess_popen(cmd)
 
     def _makedir_recursive(self, path):
         'creates a remote directory (recursively the whole path), ingores errors'
@@ -151,11 +148,7 @@ class MegaBackend(duplicity.backend.Backend):
             cmd = ['megaget', '-u', self._username, '-p', self._password, '--no-progress',
                    '--path', local_file, self._folder + '/' + remote_file]
 
-        try:
-            subprocess.call(cmd)
-        except Exception as e:
-            raise BackendException("megaget failed when downloading file '%s' to '%s'" % (
-                self._folder + '/' + remote_file, local_file))
+        self.subprocess_popen(cmd)
 
     def upload(self, local_file, remote_file):
 
@@ -168,11 +161,7 @@ class MegaBackend(duplicity.backend.Backend):
             cmd = ['megaput', '-u', self._username, '-p', self._password, '--no-progress',
                    '--path', self._folder + '/' + remote_file, local_file]
 
-        try:
-            subprocess.call(cmd)
-        except Exception as e:
-            raise BackendException("megaput failed when uploading file '%s' to '%s'" % (
-                local_file, self._folder + '/' + remote_file))
+        self.subprocess_popen(cmd)
 
     def delete(self, remote_file):
 
@@ -183,11 +172,7 @@ class MegaBackend(duplicity.backend.Backend):
         else:
             cmd = ['megarm', '-u', self._username, '-p', self._password, self._folder + '/' + remote_file]
 
-        try:
-            subprocess.call(cmd)
-        except Exception as e:
-            raise BackendException("megarm failed when deleting file '%s'" % (
-                self._folder + '/' + remote_file,))
+        self.subprocess_popen(cmd)
 
 
 duplicity.backend.register_backend('mega', MegaBackend)

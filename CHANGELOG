@@ -254,6 +254,7 @@ New in v0.8.00 (2016/07/??)
   - uses megatools from https://megatools.megous.com/ instead of mega.py library
     which has been deprecated
   - fixed copyright and PEP8 issues
+  - replaced subprocess.call() with self.subprocess_popen() to standardize
 
 
 New in v0.7.08 (2016/07/02)
