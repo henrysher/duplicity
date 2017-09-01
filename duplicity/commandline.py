@@ -387,7 +387,7 @@ def parse_cmdline_options(arglist):
     # --archive-dir <path>
     parser.add_option("--file-to-restore", "-r", action="callback", type="file",
                       metavar=_("path"), dest="restore_dir",
-                      callback=lambda o, s, v, p: setattr(p.values, "restore_dir", v.rstrip('/')))
+                      callback=lambda o, s, v, p: setattr(p.values, "restore_dir", v.strip('/')))
 
     # Used to confirm certain destructive operations like deleting old files.
     parser.add_option("--force", action="store_true")

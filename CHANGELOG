@@ -263,6 +263,8 @@ New in v0.8.00 (2016/07/??)
     functions.  Interactive options like --list-files-changed and --file-changed will not
     work correctly for this backup set, so it is advised to run a full backup as soon as
     possible after this error occurs.
+* Fixed bug #1638033 Remove leading slash on --file-to-restore
+  - code already used rstrip('/') so change to just strip('/')
 
 
 New in v0.7.08 (2016/07/02)

@@ -8,10 +8,12 @@
         functions.  Interactive options like --list-files-changed and --file-changed will not
         work correctly for this backup set, so it is advised to run a full backup as soon as
         possible after this error occurs.
+    * Fixed bug #1638033 Remove leading slash on --file-to-restore
+      - code already used rstrip('/') so change to just strip('/')
 
 2017-08-29  Kenneth Loafman  <kenneth@loafman.com>
 
-    # Fixed bug #1394386 with new module megabackend.py from Tomas Vondra
+    * Fixed bug #1394386 with new module megabackend.py from Tomas Vondra
       - uses megatools from https://megatools.megous.com/ instead of mega.py library
         which has been deprecated
       - fixed copyright and PEP8 issues
