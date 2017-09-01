@@ -205,7 +205,11 @@ class Manifest:
                 return (fileinfo[0], ''.join(fileinfo[1:]))
 
             self.files_changed = list(map(parse_fileinfo, match.group(3).split('\n')))
-        assert filecount == len(self.files_changed)
+
+        if filecount != len(self.files_changed):
+            log.Error(_("Manifest file '%s' is corrupt: File count says %d, File list contains %d" %
+                        (self.fh.base if self.fh else "", filecount, len(self.files_changed))))
+            self.corrupt_filelist = True
 
         highest_vol = 0
         latest_vol = 0

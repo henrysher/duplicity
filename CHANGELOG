@@ -250,11 +250,19 @@ New in v0.8.00 (2016/07/??)
   - Support gpg versions numbers that have tags on them.
   - This can happen if you build gpg from git trunk (e.g. 2.1.15-beta20). Or if you run
     against the freedesktop flatpak runtime (e.g. 2.1.14-unknown).
-# Fixed bug #1394386 with new module megabackend.py from Tomas Vondra
+* Fixed bug #1394386 with new module megabackend.py from Tomas Vondra
   - uses megatools from https://megatools.megous.com/ instead of mega.py library
     which has been deprecated
   - fixed copyright and PEP8 issues
   - replaced subprocess.call() with self.subprocess_popen() to standardize
+* Fixed bug #1538333 Assertion error in manifest.py: assert filecount == ...
+  - Made sure to never pass .part files as true manifest files
+  - Changed assert to log.Error to warn about truncated/corrupt filelist
+  - Added unit test to make sure detection works
+  - Note: while this condition is serious, it will not affect the basic backup and restore
+    functions.  Interactive options like --list-files-changed and --file-changed will not
+    work correctly for this backup set, so it is advised to run a full backup as soon as
+    possible after this error occurs.
 
 
 New in v0.7.08 (2016/07/02)
