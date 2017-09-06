@@ -1691,7 +1691,7 @@ if __name__ == "__main__":
         # default. But do with sufficient verbosity.
         util.release_lockfile()
         log.Info(_("GPG error detail: %s")
-                 % (u''.join(traceback.format_exception(*sys.exc_info()))))
+                 % util.exception_traceback())
         log.FatalError(u"%s: %s" % (e.__class__.__name__, e.args[0]),
                        log.ErrorCode.gpg_failed,
                        e.__class__.__name__)
@@ -1701,7 +1701,7 @@ if __name__ == "__main__":
         # For user errors, don't show an ugly stack trace by
         # default. But do with sufficient verbosity.
         log.Info(_("User error detail: %s")
-                 % (u''.join(traceback.format_exception(*sys.exc_info()))))
+                 % util.exception_traceback())
         log.FatalError(u"%s: %s" % (e.__class__.__name__, util.uexc(e)),
                        log.ErrorCode.user_error,
                        e.__class__.__name__)
@@ -1711,19 +1711,19 @@ if __name__ == "__main__":
         # For backend errors, don't show an ugly stack trace by
         # default. But do with sufficient verbosity.
         log.Info(_("Backend error detail: %s")
-                 % (u''.join(traceback.format_exception(*sys.exc_info()))))
+                 % util.exception_traceback())
         log.FatalError(u"%s: %s" % (e.__class__.__name__, util.uexc(e)),
                        log.ErrorCode.user_error,
                        e.__class__.__name__)
 
     except Exception as e:
         util.release_lockfile()
-        if "Forced assertion for testing" in str(e):
+        if "Forced assertion for testing" in util.uexc(e):
             log.FatalError(u"%s: %s" % (e.__class__.__name__, util.uexc(e)),
                            log.ErrorCode.exception,
                            e.__class__.__name__)
         else:
             # Traceback and that mess
-            log.FatalError(u''.join(traceback.format_exception(*sys.exc_info())),
+            log.FatalError(util.exception_traceback(),
                            log.ErrorCode.exception,
                            e.__class__.__name__)

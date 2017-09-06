@@ -29,6 +29,7 @@ import re
 import calendar
 import sys
 from duplicity import globals
+from duplicity import util
 
 # For type testing against both int and long types that works in python 2/3
 if sys.version_info < (3,):
@@ -199,7 +200,7 @@ def inttopretty(seconds):
 def intstringtoseconds(interval_string):
     """Convert a string expressing an interval (e.g. "4D2s") to seconds"""
     def error():
-        raise TimeException(bad_interval_string % interval_string)
+        raise TimeException(bad_interval_string % util.escape(interval_string))
 
     if len(interval_string) < 2:
         error()
@@ -282,7 +283,7 @@ def genstrtotime(timestr, override_curtime=None):
         return override_curtime
 
     def error():
-        raise TimeException(bad_time_string % timestr)
+        raise TimeException(bad_time_string % util.escape(timestr))
 
     # Test for straight integer
     if _integer_regexp.search(timestr):
