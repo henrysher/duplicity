@@ -476,6 +476,8 @@ class Backend(object):
 
         Raise a BackendException on failure.
         """
+        if isinstance(commandline, (list, tuple)):
+            commandline = ' '.join(commandline)
         private = self.munge_password(commandline)
         log.Info(_("Reading results of '%s'") % private)
         result, stdout, stderr = self.__subprocess_popen(commandline)

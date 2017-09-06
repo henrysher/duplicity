@@ -1,3 +1,9 @@
+2017-09-06  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug introduced in new megabackend.py where process_commandline()
+      takes a string not a list.  Now it takes both.
+    * Updated web page for new megabackend requirements.
+
 2017-09-01  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1538333 Assertion error in manifest.py: assert filecount == ...
