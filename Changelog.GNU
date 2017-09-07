@@ -1,3 +1,16 @@
+2017-09-07  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~mterry/duplicity/more-decode-issues
+      - Here's some fixes for another couple UnicodeDecodeErrors.
+      - The duplicity/dup_time.py fixes when a user passes a utf8 date string (or a string with bogus
+        utf8 characters, but they have to really try to do that). This is bug 1334436.
+      - The bin/duplicity change from str(e) to util.uexc(e) fixes bug 1324188.
+      - The rest of the changes (util.exception_traceback and bin/duplicity changes to use it) are to
+        make the printing of exceptions prettier. Without this, if you see a French exception, you see
+        "accept\xe9es" instead of "acceptées".
+      - You can test all of these changes in one simple line:
+        $ LANGUAGE=fr duplicity remove-older-than $'accept\xffées'
+
 2017-09-06  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug introduced in new megabackend.py where process_commandline()

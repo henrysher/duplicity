@@ -48,7 +48,7 @@ def exception_traceback(limit=50):
     msg = "Traceback (innermost last):\n"
     msg = msg + "%-20s %s" % (string.join(lines[:-1], ""), lines[-1])
 
-    return uexc(msg)
+    return msg.decode('unicode-escape', 'replace')
 
 
 def escape(string):
