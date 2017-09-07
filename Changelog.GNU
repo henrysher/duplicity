@@ -10,6 +10,7 @@
         "accept\xe9es" instead of "acceptées".
       - You can test all of these changes in one simple line:
         $ LANGUAGE=fr duplicity remove-older-than $'accept\xffées'
+    * Fix backend.py to allow string, list, and tuple types to support megabackend.py.
 
 2017-09-06  Kenneth Loafman  <kenneth@loafman.com>
 

@@ -476,10 +476,13 @@ class Backend(object):
 
         Raise a BackendException on failure.
         """
-        if isinstance(commandline, (list, tuple)):
-            commandline = ' '.join(commandline)
-        private = self.munge_password(commandline)
-        log.Info(_("Reading results of '%s'") % private)
+        if isinstance(commandline, (types.ListType, types.TupleType)):
+            logstr = ' '.join(commandline)
+        else:
+            logstr = commandline
+        logstr = self.munge_password(logstr)
+        log.Info(_("Reading results of '%s'") % logstr)
+
         result, stdout, stderr = self.__subprocess_popen(commandline)
         if result != 0:
             try:
