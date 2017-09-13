@@ -1,3 +1,9 @@
+2017-09-13  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1715650 with patch from Mattheww S
+      - Fix to make duplicity attempt a get first, then create, a container
+        in order to support container ACLs.
+
 2017-09-07  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~mterry/duplicity/more-decode-issues
