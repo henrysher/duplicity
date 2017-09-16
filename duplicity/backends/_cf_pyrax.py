@@ -70,7 +70,25 @@ Exception: %s""" % str(e))
 
         self.client_exc = pyrax.exceptions.ClientException
         self.nso_exc = pyrax.exceptions.NoSuchObject
-        self.container = pyrax.cloudfiles.create_container(container)
+
+        # query rackspace for the specified container name
+        try:
+            self.container = pyrax.cloudfiles.get_container(container)
+        except pyrax.exceptions.Forbidden as e:
+            log.FatalError("%s : %s \n" % (e.__class__.__name__, util.uexc(e)) +
+                           "Container may exist, but access was denied.\n" +
+                           "If this container exists, please check its X-Container-Read/Write headers.\n" +
+                           "Otherwise, please check your credentials and permissions.",
+                           log.ErrorCode.backend_permission_denied)
+        except pyrax.exceptions.NoSuchContainer as e:
+            try:
+                self.container = pyrax.cloudfiles.create_container(container)
+            except pyrax.exceptions.Forbidden as e:
+                log.FatalError("%s : %s \n" % (e.__class__.__name__, util.uexc(e)) +
+                               "Container does not exist, but creation was denied.\n" +
+                               "You may be using a read-only user that can view but not create containers.\n" +
+                               "Please check your credentials and permissions.",
+                               log.ErrorCode.backend_permission_denied)
 
     def _error_code(self, operation, e):
         if isinstance(e, self.nso_exc):

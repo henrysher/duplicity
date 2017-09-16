@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2017-07-20 06:56-0500\n"
+"POT-Creation-Date: 2017-09-07 06:46-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -376,21 +376,21 @@ msgid ""
 "encryption passphrase."
 msgstr ""
 
-#: ../bin/duplicity:1684
+#: ../bin/duplicity:1685
 msgid "INT intercepted...exiting."
 msgstr ""
 
-#: ../bin/duplicity:1692
+#: ../bin/duplicity:1693
 #, python-format
 msgid "GPG error detail: %s"
 msgstr ""
 
-#: ../bin/duplicity:1702
+#: ../bin/duplicity:1703
 #, python-format
 msgid "User error detail: %s"
 msgstr ""
 
-#: ../bin/duplicity:1712
+#: ../bin/duplicity:1713
 #, python-format
 msgid "Backend error detail: %s"
 msgstr ""
@@ -875,17 +875,17 @@ msgstr ""
 msgid "Attempt %s failed. %s: %s"
 msgstr ""
 
-#: ../duplicity/backend.py:480
+#: ../duplicity/backend.py:482
 #, python-format
 msgid "Reading results of '%s'"
 msgstr ""
 
-#: ../duplicity/backend.py:507
+#: ../duplicity/backend.py:509
 #, python-format
 msgid "Writing %s"
 msgstr ""
 
-#: ../duplicity/backend.py:548
+#: ../duplicity/backend.py:550
 #, python-format
 msgid "File %s not found locally after get from backend"
 msgstr ""
@@ -1518,49 +1518,55 @@ msgid ""
 "seeing this message"
 msgstr ""
 
-#: ../duplicity/manifest.py:219
+#: ../duplicity/manifest.py:210
+#, python-format
+msgid ""
+"Manifest file '%s' is corrupt: File count says %d, File list contains %d"
+msgstr ""
+
+#: ../duplicity/manifest.py:223
 #, python-format
 msgid "Found manifest volume %s"
 msgstr ""
 
-#: ../duplicity/manifest.py:226
+#: ../duplicity/manifest.py:230
 #, python-format
 msgid "Found %s volumes in manifest"
 msgstr ""
 
-#: ../duplicity/manifest.py:242
+#: ../duplicity/manifest.py:246
 msgid "Manifests not equal because different volume numbers"
 msgstr ""
 
-#: ../duplicity/manifest.py:247
+#: ../duplicity/manifest.py:251
 msgid "Manifests not equal because volume lists differ"
 msgstr ""
 
-#: ../duplicity/manifest.py:252
+#: ../duplicity/manifest.py:256
 msgid "Manifests not equal because hosts or directories differ"
 msgstr ""
 
-#: ../duplicity/manifest.py:399
+#: ../duplicity/manifest.py:403
 msgid "Warning, found extra Volume identifier"
 msgstr ""
 
-#: ../duplicity/manifest.py:425
+#: ../duplicity/manifest.py:429
 msgid "Other is not VolumeInfo"
 msgstr ""
 
-#: ../duplicity/manifest.py:428
+#: ../duplicity/manifest.py:432
 msgid "Volume numbers don't match"
 msgstr ""
 
-#: ../duplicity/manifest.py:431
+#: ../duplicity/manifest.py:435
 msgid "start_indicies don't match"
 msgstr ""
 
-#: ../duplicity/manifest.py:434
+#: ../duplicity/manifest.py:438
 msgid "end_index don't match"
 msgstr ""
 
-#: ../duplicity/manifest.py:441
+#: ../duplicity/manifest.py:445
 msgid "Hashes don't match"
 msgstr ""
 
@@ -1647,7 +1653,7 @@ msgstr ""
 msgid "GPG process %d terminated before wait()"
 msgstr ""
 
-#: ../duplicity/dup_time.py:60
+#: ../duplicity/dup_time.py:61
 #, python-format
 msgid ""
 "Bad interval string \"%s\"\n"
@@ -1657,7 +1663,7 @@ msgid ""
 "page for more information."
 msgstr ""
 
-#: ../duplicity/dup_time.py:66
+#: ../duplicity/dup_time.py:67
 #, python-format
 msgid ""
 "Bad time string \"%s\"\n"

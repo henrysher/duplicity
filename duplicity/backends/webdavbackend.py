@@ -255,11 +255,11 @@ class WebDAVBackend(duplicity.backend.Backend):
             try:
                 return self.get_kerberos_authorization()
             except ImportError:
-                log.warn(_("python-kerberos needed to use kerberos \
+                log.Warn(_("python-kerberos needed to use kerberos \
                           authorization, falling back to basic auth."))
                 return self.get_basic_authorization()
             except Exception as e:
-                log.warn(_("Kerberos authorization failed: %s.\
+                log.Warn(_("Kerberos authorization failed: %s.\
                           Falling back to basic auth.") % e)
                 return self.get_basic_authorization()
         elif token.lower() == 'basic':

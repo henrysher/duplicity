@@ -450,15 +450,14 @@ class Backend(object):
         else:
             return commandline
 
-    def __subprocess_popen(self, commandline):
+    def __subprocess_popen(self, args):
         """
         For internal use.
         Execute the given command line, interpreted as a shell command.
         Returns int Exitcode, string StdOut, string StdErr
         """
-        import shlex
         from subprocess import Popen, PIPE
-        args = shlex.split(commandline)
+
         args[0] = util.which(args[0])
         p = Popen(args, stdout=PIPE, stderr=PIPE)
         stdout, stderr = p.communicate()
@@ -476,20 +475,28 @@ class Backend(object):
 
         Raise a BackendException on failure.
         """
-        private = self.munge_password(commandline)
-        log.Info(_("Reading results of '%s'") % private)
-        result, stdout, stderr = self.__subprocess_popen(commandline)
+        import shlex
+
+        if isinstance(commandline, (types.ListType, types.TupleType)):
+            logstr = ' '.join(commandline)
+            args = commandline
+        else:
+            logstr = commandline
+            args = shlex.split(commandline)
+
+        logstr = self.munge_password(logstr)
+        log.Info(_("Reading results of '%s'") % logstr)
+
+        result, stdout, stderr = self.__subprocess_popen(args)
         if result != 0:
             try:
-                m = re.search("^\s*([\S]+)", commandline)
-                cmd = m.group(1)
-                ignores = self.popen_breaks[cmd]
+                ignores = self.popen_breaks[args[0]]
                 ignores.index(result)
                 """ ignore a predefined set of error codes """
                 return 0, '', ''
             except (KeyError, ValueError):
                 raise BackendException("Error running '%s': returned %d, with output:\n%s" %
-                                       (private, result, stdout + '\n' + stderr))
+                                       (logstr, result, stdout + '\n' + stderr))
         return result, stdout, stderr
 
 

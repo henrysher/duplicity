@@ -116,8 +116,11 @@ class GIOBackend(duplicity.backend.Backend):
 
     def __copy_file(self, source, target):
         from gi.repository import Gio  # @UnresolvedImport
+        # Don't pass NOFOLLOW_SYMLINKS here. Some backends (e.g. google-drive:)
+        # use symlinks internally for all files. In the normal course of
+        # events, we never deal with symlinks anyway, just tarballs.
         source.copy(target,
-                    Gio.FileCopyFlags.OVERWRITE | Gio.FileCopyFlags.NOFOLLOW_SYMLINKS,
+                    Gio.FileCopyFlags.OVERWRITE,
                     None, self.__copy_progress, None)
 
     def _error_code(self, operation, e):
@@ -138,34 +141,38 @@ class GIOBackend(duplicity.backend.Backend):
     def _put(self, source_path, remote_filename):
         from gi.repository import Gio  # @UnresolvedImport
         source_file = Gio.File.new_for_path(source_path.name)
-        target_file = self.remote_file.get_child(remote_filename)
+        target_file = self.remote_file.get_child_for_display_name(remote_filename)
         self.__copy_file(source_file, target_file)
 
     def _get(self, filename, local_path):
         from gi.repository import Gio  # @UnresolvedImport
-        source_file = self.remote_file.get_child(filename)
+        source_file = self.remote_file.get_child_for_display_name(filename)
         target_file = Gio.File.new_for_path(local_path.name)
         self.__copy_file(source_file, target_file)
 
     def _list(self):
         from gi.repository import Gio  # @UnresolvedImport
         files = []
-        enum = self.remote_file.enumerate_children(Gio.FILE_ATTRIBUTE_STANDARD_NAME,
-                                                   Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS,
+        # We grab display name, rather than file name because some backends
+        # (e.g. google-drive:) use filesystem-specific IDs as file names and
+        # only expose the "normal" name as display names. We need the display
+        # name, because we try to parse them.
+        enum = self.remote_file.enumerate_children(Gio.FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME,
+                                                   Gio.FileQueryInfoFlags.NONE,
                                                    None)
         info = enum.next_file(None)
         while info:
-            files.append(info.get_name())
+            files.append(info.get_display_name())
             info = enum.next_file(None)
         return files
 
     def _delete(self, filename):
-        target_file = self.remote_file.get_child(filename)
+        target_file = self.remote_file.get_child_for_display_name(filename)
         target_file.delete(None)
 
     def _query(self, filename):
         from gi.repository import Gio  # @UnresolvedImport
-        target_file = self.remote_file.get_child(filename)
+        target_file = self.remote_file.get_child_for_display_name(filename)
         info = target_file.query_info(Gio.FILE_ATTRIBUTE_STANDARD_SIZE,
                                       Gio.FileQueryInfoFlags.NONE, None)
         return {'size': info.get_size()}

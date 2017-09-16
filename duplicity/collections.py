@@ -275,7 +275,7 @@ class BackupSet:
             # when specifically asked for a list of remote filenames, we
             # should not include it.
             pr = file_naming.parse(self.remote_manifest_name)
-            if not pr or not pr.partial:
+            if pr and not pr.partial:
                 volume_filenames.append(self.remote_manifest_name)
         return volume_filenames
 
@@ -1191,7 +1191,7 @@ class CollectionsStatus:
         Returns time line of specified file changed
         """
         # quick fix to spaces in filepath
-        modified_filepath = ""
+        modified_filepath = filepath
         if " " in filepath:
             modified_filepath = '"' + filepath.replace(" ", r"\x20") + '"'
 

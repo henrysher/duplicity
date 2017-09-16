@@ -236,6 +236,52 @@ New in v0.8.00 (2016/07/??)
   remote system only.  The local cache is treated as empty.
 * Fixed encrypted remote manifest handling to merely put out a non-fatal
   error message and continue if the private key is not available.
+* Merged in lp:~mterry/duplicity/giobackend-display-name
+  - giobackend: handle a wider variety of gio backends by making less assumptions;
+    in particular, this fixes the google-drive: backend
+* Fixed bug #1709047 with suggestion from Gary Hasson
+  - fixed so default was to use original filename
+* Fixed PEP8 errors in bin/duplicity
+* Merged in lp:~mterry/duplicity/gio_child_for_display_name
+  - gio: be slightly more correct and get child GFiles based on display name
+* Fixed bug #1711905 with suggestion from Schneider
+  - log.Warn was invoked with log.warn in webdavbackend.py
+* Merged in lp:~mterry/duplicity/gpg-tag-versions
+  - Support gpg versions numbers that have tags on them.
+  - This can happen if you build gpg from git trunk (e.g. 2.1.15-beta20). Or if you run
+    against the freedesktop flatpak runtime (e.g. 2.1.14-unknown).
+* Fixed bug #1394386 with new module megabackend.py from Tomas Vondra
+  - uses megatools from https://megatools.megous.com/ instead of mega.py library
+    which has been deprecated
+  - fixed copyright and PEP8 issues
+  - replaced subprocess.call() with self.subprocess_popen() to standardize
+* Fixed bug #1538333 Assertion error in manifest.py: assert filecount == ...
+  - Made sure to never pass .part files as true manifest files
+  - Changed assert to log.Error to warn about truncated/corrupt filelist
+  - Added unit test to make sure detection works
+  - Note: while this condition is serious, it will not affect the basic backup and restore
+    functions.  Interactive options like --list-files-changed and --file-changed will not
+    work correctly for this backup set, so it is advised to run a full backup as soon as
+    possible after this error occurs.
+* Fixed bug #1638033 Remove leading slash on --file-to-restore
+  - code already used rstrip('/') so change to just strip('/')
+* Fixed bug introduced in new megabackend.py where process_commandline()
+  takes a string not a list.  Now it takes both.
+* Updated web page for new megabackend requirements.
+* Merged in lp:~mterry/duplicity/more-decode-issues
+  - Here's some fixes for another couple UnicodeDecodeErrors.
+  - The duplicity/dup_time.py fixes when a user passes a utf8 date string (or a string with bogus
+    utf8 characters, but they have to really try to do that). This is bug 1334436.
+  - The bin/duplicity change from str(e) to util.uexc(e) fixes bug 1324188.
+  - The rest of the changes (util.exception_traceback and bin/duplicity changes to use it) are to
+    make the printing of exceptions prettier. Without this, if you see a French exception, you see
+    "accept\xe9es" instead of "acceptées".
+  - You can test all of these changes in one simple line:
+    $ LANGUAGE=fr duplicity remove-older-than $'accept\xffées'
+* Fix backend.py to allow string, list, and tuple types to support megabackend.py.
+* Fixed bug #1715650 with patch from Mattheww S
+  - Fix to make duplicity attempt a get first, then create, a container
+    in order to support container ACLs.
 
 
 New in v0.7.08 (2016/07/02)

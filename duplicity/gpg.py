@@ -91,7 +91,7 @@ class GPGProfile:
 
         self.gpg_version = self.get_gpg_version(globals.gpg_binary)
 
-    _version_re = re.compile(r'^gpg.*\(GnuPG(?:/MacGPG2)?\) (?P<maj>[0-9]+)\.(?P<min>[0-9]+)\.(?P<bug>[0-9]+)$')
+    _version_re = re.compile(r'^gpg.*\(GnuPG(?:/MacGPG2)?\) (?P<maj>[0-9]+)\.(?P<min>[0-9]+)\.(?P<bug>[0-9]+)(-.+)?$')
 
     def get_gpg_version(self, binary):
         gpg = gpginterface.GnuPG()
