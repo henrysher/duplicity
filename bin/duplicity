@@ -840,9 +840,13 @@ def restore_add_sig_check(fileobj):
     def check_signature():
         """Thunk run when closing volume file"""
         actual_sig = fileobj.fileobj.get_signature()
-        if actual_sig != globals.gpg_profile.sign_key:
+        actual_sig = "None" if actual_sig is None else actual_sig
+        sign_key = globals.gpg_profile.sign_key
+        sign_key = "None" if sign_key is None else sign_key
+        ofs = -min(len(actual_sig), len(sign_key))
+        if actual_sig[ofs:] != sign_key[ofs:]:
             log.FatalError(_("Volume was signed by key %s, not %s") %
-                           (actual_sig, globals.gpg_profile.sign_key),
+                           (actual_sig[ofs:], sign_key[ofs:]),
                            log.ErrorCode.unsigned_volume)
 
     fileobj.addhook(check_signature)

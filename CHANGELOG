@@ -282,6 +282,9 @@ New in v0.8.00 (2016/07/??)
 * Fixed bug #1715650 with patch from Mattheww S
   - Fix to make duplicity attempt a get first, then create, a container
     in order to support container ACLs.
+* Fixed bug #1714663 "Volume signed by XXXXXXXXXXXXXXXX, not XXXXXXXX"
+  - Normalized comparison length to min length of compared keys before comparison
+  - Avoids comparing mix of short, long, or fingerprint size keys.
 
 
 New in v0.7.08 (2016/07/02)
