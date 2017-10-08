@@ -1,3 +1,9 @@
+2017-09-22  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1714663 "Volume signed by XXXXXXXXXXXXXXXX, not XXXXXXXX"
+      - Normalized comparison length to min length of compared keys before comparison
+      - Avoids comparing mix of short, long, or fingerprint size keys.
+
 2017-09-13  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1715650 with patch from Mattheww S
