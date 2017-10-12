@@ -115,23 +115,28 @@ class FunctionalTestCase(DuplicityTestCase):
         if not passphrase_input:
             cmdline += u" < /dev/null"
 
-        if parse_version(pexpect.__version__) >= parse_version("4.0"):
-            # pexpect.spawn only supports unicode from version 4.0
-            # there was a separate pexpect.spawnu in 3.x, but it has an error on readline
-            child = pexpect.spawn(u'/bin/sh', [u'-c', cmdline], timeout=None, encoding=sys.getfilesystemencoding())
+        # The immediately following block is the nicer way to execute pexpect with
+        # unicode strings, but we need to have the pre-4.0 version for some time yet,
+        # so for now this is commented out so tests execute the same way on all systems.
 
-            for passphrase in passphrase_input:
-                child.expect(u'passphrase.*:')
-                child.sendline(passphrase)
-        else:
-            # Manually encode to filesystem encoding and send to spawn as bytes
-            # ToDo: Remove this once we no longer have to support systems with pexpect < 4.0
-            child = pexpect.spawn(b'/bin/sh', [b'-c', cmdline.encode(sys.getfilesystemencoding(),
-                                                                     'replace')], timeout=None)
+        # if parse_version(pexpect.__version__) >= parse_version("4.0"):
+        #     # pexpect.spawn only supports unicode from version 4.0
+        #     # there was a separate pexpect.spawnu in 3.x, but it has an error on readline
+        #     child = pexpect.spawn(u'/bin/sh', [u'-c', cmdline], timeout=None, encoding=sys.getfilesystemencoding())
+        #
+        #     for passphrase in passphrase_input:
+        #         child.expect(u'passphrase.*:')
+        #         child.sendline(passphrase)
+        # else:
 
-            for passphrase in passphrase_input:
-                child.expect(b'passphrase.*:')
-                child.sendline(passphrase)
+        # Manually encode to filesystem encoding and send to spawn as bytes
+        # ToDo: Remove this once we no longer have to support systems with pexpect < 4.0
+        child = pexpect.spawn(b'/bin/sh', [b'-c', cmdline.encode(sys.getfilesystemencoding(),
+                                                                 'replace')], timeout=None)
+
+        for passphrase in passphrase_input:
+            child.expect(b'passphrase.*:')
+            child.sendline(passphrase)
 
         # if the command fails, we need to clear its output
         # so it will terminate cleanly.
