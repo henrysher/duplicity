@@ -1,3 +1,8 @@
+2017-10-12  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Patched in lp:~mterry/duplicity/rename-dep
+      - Make rename command a dependency for LP build
+
 2017-09-22  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1714663 "Volume signed by XXXXXXXXXXXXXXXX, not XXXXXXXX"

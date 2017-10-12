@@ -15,6 +15,7 @@ Build-Depends: debhelper (>= 7),
                python-pexpect,
                python-setuptools,
                rdiff,
+               rename,
                rsync,
 Homepage: https://launchpad.net/duplicity
 Standards-Version: 3.9.5
