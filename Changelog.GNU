@@ -1,3 +1,9 @@
+2017-10-16  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1654756 with new b2backend.py module from Vincent Rouille
+      - Faster (big files are uploaded in chunks)
+      - Added upload progress reporting support
+
 2017-10-12  Kenneth Loafman  <kenneth@loafman.com>
 
     * Patched in lp:~mterry/duplicity/rename-dep

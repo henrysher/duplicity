@@ -24,15 +24,22 @@
 
 import os
 import hashlib
-from sys import version_info
 
 import duplicity.backend
 from duplicity.errors import BackendException, FatalBackendException
 from duplicity import log
+from duplicity import progress
 
-import json
-import urllib2
-import base64
+
+class B2ProgressListener:
+    def set_total_bytes(self, total_byte_count):
+        self.total_byte_count = total_byte_count
+
+    def bytes_completed(self, byte_count):
+        progress.report_transfer(byte_count, self.total_byte_count)
+
+    def close(self):
+        pass
 
 
 class B2Backend(duplicity.backend.Backend):
@@ -46,10 +53,21 @@ class B2Backend(duplicity.backend.Backend):
         """
         duplicity.backend.Backend.__init__(self, parsed_url)
 
-        # for prettier password prompt only
+        # Import B2 API
+        try:
+            global b2
+            import b2
+            import b2.api
+            import b2.account_info
+            import b2.download_dest
+            import b2.file_version
+        except ImportError:
+            raise BackendException('B2 backend requires B2 Python APIs (pip install b2)')
+
+        self.service = b2.api.B2Api(b2.account_info.InMemoryAccountInfo())
         self.parsed_url.hostname = 'B2'
 
-        self.account_id = parsed_url.username
+        account_id = parsed_url.username
         account_key = self.get_password()
 
         self.url_parts = [
@@ -57,324 +75,71 @@ class B2Backend(duplicity.backend.Backend):
         ]
         if self.url_parts:
             self.username = self.url_parts.pop(0)
-            self.bucket_name = self.url_parts.pop(0)
+            bucket_name = self.url_parts.pop(0)
         else:
             raise BackendException("B2 requires a bucket name")
-        self.path = "/".join(self.url_parts)
+        self.path = "".join([url_part + "/" for url_part in self.url_parts])
+        self.service.authorize_account('production', account_id, account_key)
 
-        self.id_and_key = self.account_id + ":" + account_key
-        self._authorize()
-        self.upload_info = None
-
+        log.Log("B2 Backend (path= %s, bucket= %s, minimum_part_size= %s)" %
+                (self.path, bucket_name, self.service.account_info.get_minimum_part_size()), log.INFO)
         try:
-            self.find_or_create_bucket(self.bucket_name)
-        except urllib2.HTTPError:
-            raise FatalBackendException("Bucket cannot be created")
-
-    def _authorize(self):
-        basic_auth_string = 'Basic ' + base64.b64encode(self.id_and_key)
-        v = version_info
-        headers = {
-            'Authorization': basic_auth_string,
-            'User-Agent': 'duplicity version $version, python %s.%s.%s' % (
-                v[0], v[1], v[2]),
-        }
-
-        request = urllib2.Request(
-            'https://api.backblazeb2.com/b2api/v1/b2_authorize_account',
-            headers=headers
-        )
-
-        response = urllib2.urlopen(request)
-        response_data = json.loads(response.read())
-        response.close()
-
-        self.auth_token = response_data['authorizationToken']
-        self.api_url = response_data['apiUrl']
-        self.download_url = response_data['downloadUrl']
+            self.bucket = self.service.get_bucket_by_name(bucket_name)
+            log.Log("Bucket found", log.INFO)
+        except b2.exception.NonExistentBucket:
+            try:
+                log.Log("Bucket not found, creating one", log.INFO)
+                self.bucket = self.service.create_bucket(bucket_name, 'allPrivate')
+            except:
+                raise FatalBackendException("Bucket cannot be created")
 
     def _get(self, remote_filename, local_path):
         """
         Download remote_filename to local_path
         """
-        log.Log("Getting file %s" % remote_filename, 9)
-        remote_filename = self.full_filename(remote_filename)
-        url = self.download_url + \
-            '/file/' + self.bucket_name + '/' + \
-            remote_filename
-        resp = self.get_or_post(url, None)
-
-        to_file = open(local_path.name, 'wb')
-        to_file.write(resp)
-        to_file.close()
+        log.Log("Get: %s -> %s" % (self.path + remote_filename, local_path.name), log.INFO)
+        self.bucket.download_file_by_name(self.path + remote_filename,
+                                          b2.download_dest.DownloadDestLocalFile(local_path.name))
 
     def _put(self, source_path, remote_filename):
         """
         Copy source_path to remote_filename
         """
-        log.Log("Putting file to %s" % remote_filename, 9)
-        self._delete(remote_filename)
-        digest = self.hex_sha1_of_file(source_path)
-        content_type = 'application/pgp-encrypted'
-        remote_filename = self.full_filename(remote_filename)
-
-        info = self.get_upload_info(self.bucket_id)
-        url = info['uploadUrl']
-
-        headers = {
-            'Authorization': info['authorizationToken'],
-            'X-Bz-File-Name': remote_filename,
-            'Content-Type': content_type,
-            'X-Bz-Content-Sha1': digest,
-            'Content-Length': str(os.path.getsize(source_path.name)),
-        }
-        data_file = source_path.open()
-        self.get_or_post(url, None, headers, data_file=data_file)
+        log.Log("Put: %s -> %s" % (source_path.name, self.path + remote_filename), log.INFO)
+        self.bucket.upload_local_file(source_path.name, self.path + remote_filename,
+                                      content_type='application/pgp-encrypted',
+                                      progress_listener=B2ProgressListener())
 
     def _list(self):
         """
         List files on remote server
         """
-        log.Log("Listing files", 9)
-        endpoint = 'b2_list_file_names'
-        url = self.formatted_url(endpoint)
-        params = {
-            'bucketId': self.bucket_id,
-            'maxFileCount': 1000,
-            'prefix': self.path,
-        }
-        try:
-            resp = self.get_or_post(url, params)
-        except urllib2.HTTPError:
-            return []
-
-        files = [x['fileName'].split('/')[-1] for x in resp['files']
-                 if os.path.dirname(x['fileName']) == self.path]
-
-        next_file = resp['nextFileName']
-        while next_file:
-            log.Log("There are still files, getting next list", 9)
-            params['startFileName'] = next_file
-            try:
-                resp = self.get_or_post(url, params)
-            except urllib2.HTTPError:
-                return files
-
-            files += [x['fileName'].split('/')[-1] for x in resp['files']
-                      if os.path.dirname(x['fileName']) == self.path]
-            next_file = resp['nextFileName']
-
-        return files
+        return [file_version_info.file_name[len(self.path):]
+                for (file_version_info, folder_name) in self.bucket.ls(self.path)]
 
     def _delete(self, filename):
         """
         Delete filename from remote server
         """
-        log.Log("Deleting file %s" % filename, 9)
-        endpoint = 'b2_delete_file_version'
-        url = self.formatted_url(endpoint)
-        fileid = self.get_file_id(filename)
-        if fileid is None:
-            return
-        filename = self.full_filename(filename)
-        params = {'fileName': filename, 'fileId': fileid}
-        try:
-            self.get_or_post(url, params)
-        except urllib2.HTTPError as e:
-            if e.code == 400:
-                return
-            else:
-                raise e
+        log.Log("Delete: %s" % self.path + filename, log.INFO)
+        file_version_info = self.file_info(self.path + filename)
+        self.bucket.delete_file_version(file_version_info.id_, file_version_info.file_name)
 
     def _query(self, filename):
         """
         Get size info of filename
         """
-        log.Log("Querying file %s" % filename, 9)
-        info = self.get_file_info(filename)
-        if not info:
-            return {'size': -1}
+        log.Log("Query: %s" % self.path + filename, log.INFO)
+        file_version_info = self.file_info(self.path + filename)
+        return {'size': file_version_info.size
+                if file_version_info is not None and file_version_info.size is not None else -1}
 
-        return {'size': info['size']}
-
-    def _error_code(self, operation, e):
-        if isinstance(e, urllib2.HTTPError):
-            if e.code == 400:
-                return log.ErrorCode.bad_request
-            if e.code == 500:
-                return log.ErrorCode.backend_error
-            if e.code == 403:
-                return log.ErrorCode.backend_permission_denied
-
-    def find_or_create_bucket(self, bucket_name):
-        """
-        Find a bucket with name bucket_name and save its id.
-        If it doesn't exist, create it
-        """
-        endpoint = 'b2_list_buckets'
-        url = self.formatted_url(endpoint)
-
-        params = {'accountId': self.account_id}
-        resp = self.get_or_post(url, params)
-
-        bucket_names = [x['bucketName'] for x in resp['buckets']]
-
-        if bucket_name not in bucket_names:
-            self.create_bucket(bucket_name)
-        else:
-            self.bucket_id = {
-                x[
-                    'bucketName'
-                ]: x['bucketId'] for x in resp['buckets']
-            }[bucket_name]
-
-    def create_bucket(self, bucket_name):
-        """
-        Create a bucket with name bucket_name and save its id
-        """
-        endpoint = 'b2_create_bucket'
-        url = self.formatted_url(endpoint)
-        params = {
-            'accountId': self.account_id,
-            'bucketName': bucket_name,
-            'bucketType': 'allPrivate'
-        }
-        resp = self.get_or_post(url, params)
-
-        self.bucket_id = resp['bucketId']
-
-    def formatted_url(self, endpoint):
-        """
-        Return the full api endpoint from just the last part
-        """
-        return '%s/b2api/v1/%s' % (self.api_url, endpoint)
-
-    def get_upload_info(self, bucket_id):
-        """
-        Get an upload url for a bucket
-        """
-        if self.upload_info is None:
-            endpoint = 'b2_get_upload_url'
-            url = self.formatted_url(endpoint)
-            self.upload_info = self.get_or_post(url, {'bucketId': bucket_id})
-        return self.upload_info
-
-    def get_or_post(self, url, data, headers=None, data_file=None):
-        """
-        Sends the request, either get or post.
-        If data and data_file are None, send a get request.
-        data_file takes precedence over data.
-        If headers are not supplied, just send with an auth key
-        """
-        if headers is None:
-            if self.auth_token is None:
-                self._authorize()
-            headers = {'Authorization': self.auth_token}
-        if data_file is not None:
-            data = data_file
-        else:
-            data = json.dumps(data) if data else None
-        v = version_info
-        headers['User-Agent'] = "duplicity version $version, " + \
-            "python %s.%s.%s" % (v[0], v[1], v[2])
-
-        encoded_headers = dict(
-            (k, urllib2.quote(v.encode('utf-8')))
-            for (k, v) in headers.iteritems()
-        )
-
-        try:
-            with OpenUrl(url, data, encoded_headers) as resp:
-                out = resp.read()
-            try:
-                return json.loads(out)
-            except ValueError:
-                return out
-        except urllib2.HTTPError as e:
-            self.upload_info = None
-            if e.code == 401:
-                self.auth_token = None
-                log.Warn("Authtoken expired, will reauthenticate with next attempt")
-            raise e
-
-    def get_file_info(self, filename):
-        """
-        Get a file info from filename
-        """
-        endpoint = 'b2_list_file_names'
-        url = self.formatted_url(endpoint)
-        filename = self.full_filename(filename)
-        params = {
-            'bucketId': self.bucket_id,
-            'maxFileCount': 1,
-            'startFileName': filename,
-        }
-        resp = self.get_or_post(url, params)
-
-        try:
-            return resp['files'][0]
-        except IndexError:
-            return None
-        except TypeError:
-            return None
-
-    def get_file_id(self, filename):
-        """
-        Get a file id form filename
-        """
-        try:
-            return self.get_file_info(filename)['fileId']
-        except IndexError:
-            return None
-        except TypeError:
-            return None
-
-    def full_filename(self, filename):
-        if self.path:
-            return self.path + '/' + filename
-        else:
-            return filename
-
-    @staticmethod
-    def hex_sha1_of_file(path):
-        """
-        Calculate the sha1 of a file to upload
-        """
-        f = path.open()
-        block_size = 1024 * 1024
-        digest = hashlib.sha1()
-        while True:
-            data = f.read(block_size)
-            if len(data) == 0:
-                break
-            digest.update(data)
-        f.close()
-        return digest.hexdigest()
-
-
-class OpenUrl(object):
-    """
-    Context manager that handles an open urllib2.Request, and provides
-    the file-like object that is the response.
-    """
-
-    def __init__(self, url, data, headers):
-        log.Log("Getting %s" % url, 9)
-        self.url = url
-        self.data = data
-        self.headers = headers
-        self.file = None
-
-    def __enter__(self):
-        request = urllib2.Request(self.url, self.data, self.headers)
-        self.file = urllib2.urlopen(request)
-        log.Log("Request of %s returned with status %s" %
-                (self.url, self.file.code), 9)
-        return self.file
-
-    def __exit__(self, exception_type, exception, traceback):
-        if self.file is not None:
-            self.file.close()
-
+    def file_info(self, filename):
+        response = self.bucket.list_file_names(filename, 1)
+        for entry in response['files']:
+            file_version_info = b2.file_version.FileVersionInfoFactory.from_api_response(entry)
+            if file_version_info.file_name == filename:
+                return file_version_info
+        raise BackendException('File not found')
 
 duplicity.backend.register_backend("b2", B2Backend)
