@@ -94,15 +94,22 @@ class GPGProfile:
     _version_re = re.compile(r'^gpg.*\(GnuPG(?:/MacGPG2)?\) (?P<maj>[0-9]+)\.(?P<min>[0-9]+)\.(?P<bug>[0-9]+)(-.+)?$')
 
     def get_gpg_version(self, binary):
-        gpg = gpginterface.GnuPG()
+        gnupg = gpginterface.GnuPG()
         if binary is not None:
-            gpg.call = binary
-        res = gpg.run(["--version"], create_fhs=["stdout"])
+            gnupg.call = binary
+
+        # user supplied options
+        if globals.gpg_options:
+            for opt in globals.gpg_options.split():
+                gnupg.options.extra_args.append(opt)
+
+        # get gpg version
+        res = gnupg.run(["--version"], create_fhs=["stdout"])
         line = res.handles["stdout"].readline().rstrip()
         m = self._version_re.search(line)
         if m is not None:
             return (int(m.group("maj")), int(m.group("min")), int(m.group("bug")))
-        raise GPGError("failed to determine gpg version of %s from %s" % (binary, line))
+        raise GPGError("failed to determine gnupg version of %s from %s" % (binary, line))
 
 
 class GPGFile:
@@ -155,7 +162,7 @@ class GPGFile:
         else:
             raise GPGError("Unsupported GNUPG version, %s" % profile.gpg_version)
 
-        # User supplied options added later, can override ours
+        # user supplied options
         if globals.gpg_options:
             for opt in globals.gpg_options.split():
                 gnupg.options.extra_args.append(opt)

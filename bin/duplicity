@@ -976,8 +976,8 @@ def remove_old(col_stats):
     if globals.remove_all_inc_of_but_n_full_mode:
         # ignore chains without incremental backups:
         chainlist = list(x for x in chainlist if
-           (isinstance(x, collections.SignatureChain) and x.inclist) or
-           (isinstance(x, collections.BackupChain) and x.incset_list))
+                         (isinstance(x, collections.SignatureChain) and x.inclist) or
+                         (isinstance(x, collections.BackupChain) and x.incset_list))
 
     if not chainlist:
         log.Notice(_("No old backup sets found, nothing deleted."))

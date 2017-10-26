@@ -2,6 +2,8 @@
 
     * Fixed bug #1448094 with patch from Tomáš Zvala
       - Don't log incremental deletes for chains that have no incrementals
+    * Fixed bug #1724144 "--gpg-options unused with some commands"
+      - Add --gpg-options to get version run command
 
 2017-10-16  Kenneth Loafman  <kenneth@loafman.com>
 
