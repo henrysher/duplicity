@@ -1,3 +1,8 @@
+2017-10-26  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1448094 with patch from Tomáš Zvala
+      - Don't log incremental deletes for chains that have no incrementals
+
 2017-10-16  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1654756 with new b2backend.py module from Vincent Rouille
