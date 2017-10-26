@@ -142,4 +142,5 @@ class B2Backend(duplicity.backend.Backend):
                 return file_version_info
         raise BackendException('File not found')
 
+
 duplicity.backend.register_backend("b2", B2Backend)
