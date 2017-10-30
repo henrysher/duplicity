@@ -580,6 +580,9 @@ def parse_cmdline_options(arglist):
     # The number for the maximum parallel connections to use when the blob size exceeds 64MB.
     # max_connections (int) - Maximum number of parallel connections to use when the blob size exceeds 64MB.
     parser.add_option("--azure-max-connections", type="int", metavar=_("number"))
+    
+    # The used Azure region, for Azure Germany and Azure China they used different storage endpoints
+    parser.add_option("--azure-region", metavar=_("global|germany|china"))
 
     # scp command to use (ssh pexpect backend)
     parser.add_option("--scp-command", metavar=_("command"))
