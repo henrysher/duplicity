@@ -59,17 +59,26 @@ Exception: %s""" % str(e))
 
         # TODO: validate container name
         self.container = parsed_url.path.lstrip('/')
+        
+        if globals.azure_region == 'global':
+            suffix = "core.windows.net"
+        elif globals.azure_region == 'germany':
+            suffix = "core.cloudapi.de"
+        elif globals.azure_region == 'china':
+            suffix = "core.chinacloudapi.cn"
 
         if 'AZURE_ACCOUNT_NAME' not in os.environ:
             raise BackendException('AZURE_ACCOUNT_NAME environment variable not set.')
 
         if 'AZURE_ACCOUNT_KEY' in os.environ:
             self.blob_service = BlobService(account_name=os.environ['AZURE_ACCOUNT_NAME'],
-                                            account_key=os.environ['AZURE_ACCOUNT_KEY'])
+                                            account_key=os.environ['AZURE_ACCOUNT_KEY'],
+                                            endpoint_suffix=suffix)
             self._create_container()
         elif 'AZURE_SHARED_ACCESS_SIGNATURE' in os.environ:
             self.blob_service = BlobService(account_name=os.environ['AZURE_ACCOUNT_NAME'],
-                                            sas_token=os.environ['AZURE_SHARED_ACCESS_SIGNATURE'])
+                                            sas_token=os.environ['AZURE_SHARED_ACCESS_SIGNATURE'],
+                                            endpoint_suffix=suffix)
         else:
             raise BackendException(
                 'Neither AZURE_ACCOUNT_KEY nor AZURE_SHARED_ACCESS_SIGNATURE environment variable not set.')
