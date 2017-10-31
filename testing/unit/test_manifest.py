@@ -25,6 +25,7 @@ import sys
 import types
 import unittest
 
+from duplicity import globals
 from duplicity import manifest
 from duplicity import path
 
@@ -80,6 +81,15 @@ class VolumeInfoTest(UnitTestCase):
 
 class ManifestTest(UnitTestCase):
     """Test Manifest class"""
+
+    def setUp(self):
+        UnitTestCase.setUp(self)
+        self.old_files_changed = globals.file_changed
+        globals.file_changed = 'testing'
+
+    def tearDown(self):
+        globals.file_changed = self.old_files_changed
+
     def test_basic(self):
         vi1 = manifest.VolumeInfo()
         vi1.set_info(3, ("hello",), None, (), None)

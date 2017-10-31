@@ -1,3 +1,9 @@
+2017-10-31  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1720159 - Cannot allocate memory with large manifest file since 0.7.03
+      - filelist is not read if --file-changed option in collection-status not present
+      - This will keep memory usage lower in non collection-status operations
+
 2017-10-26  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1448094 with patch from Tomáš Zvala
