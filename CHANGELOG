@@ -297,6 +297,8 @@ New in v0.8.00 (2016/07/??)
 * Fixed bug #1720159 - Cannot allocate memory with large manifest file since 0.7.03
   - filelist is not read if --file-changed option in collection-status not present
   - This will keep memory usage lower in non collection-status operations
+* Fixed bug #1723890 with patch from Killian Lackhove
+  - Fixes error handling in pydrivebackend.py
 
 
 New in v0.7.08 (2016/07/02)

@@ -1,3 +1,8 @@
+2017-11-01  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1723890 with patch from Killian Lackhove
+      - Fixes error handling in pydrivebackend.py
+
 2017-10-31  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1720159 - Cannot allocate memory with large manifest file since 0.7.03
