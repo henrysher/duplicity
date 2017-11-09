@@ -1,3 +1,8 @@
+2017-11-09  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1730902 GPG Error Handling
+      - use util.ufn() not str() to handle encoding
+
 2017-11-01  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1723890 with patch from Killian Lackhove

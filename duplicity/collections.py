@@ -235,7 +235,8 @@ class BackupSet:
         """
         assert self.local_manifest_path
         manifest_buffer = self.local_manifest_path.get_data()
-        log.Info(_("Processing local manifest %s (%s)") % (self.local_manifest_path.name, len(manifest_buffer)))
+        log.Info(_("Processing local manifest %s (%s)") % (
+            self.local_manifest_path.name, len(manifest_buffer)))
         return manifest.Manifest().from_string(manifest_buffer)
 
     def get_remote_manifest(self):
@@ -247,9 +248,10 @@ class BackupSet:
             manifest_buffer = self.backend.get_data(self.remote_manifest_name)
         except GPGError as message:
             log.Error(_("Error processing remote manifest (%s): %s") %
-                      (self.remote_manifest_name, str(message)))
+                      (util.ufn(self.remote_manifest_name), util.ufn(message)))
             return None
-        log.Info(_("Processing remote manifest %s (%s)") % (self.remote_manifest_name, len(manifest_buffer)))
+        log.Info(_("Processing remote manifest %s (%s)") % (
+            util.ufn(self.remote_manifest_name), len(manifest_buffer)))
         return manifest.Manifest().from_string(manifest_buffer)
 
     def get_manifest(self):
