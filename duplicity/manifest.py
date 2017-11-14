@@ -25,6 +25,7 @@ from future_builtins import filter
 
 import re
 
+from duplicity import globals
 from duplicity import log
 from duplicity import globals
 from duplicity import util
@@ -193,24 +194,6 @@ class Manifest:
         self.hostname = get_field("hostname")
         self.local_dirname = get_field("localdir")
 
-        # Get file changed list
-        filelist_regexp = re.compile("(^|\\n)filelist\\s([0-9]+)\\n(.*?)(\\nvolume\\s|$)", re.I | re.S)
-        match = filelist_regexp.search(s)
-        filecount = 0
-        if match:
-            filecount = int(match.group(2))
-        if filecount > 0:
-            def parse_fileinfo(line):
-                fileinfo = line.strip().split()
-                return (fileinfo[0], ''.join(fileinfo[1:]))
-
-            self.files_changed = list(map(parse_fileinfo, match.group(3).split('\n')))
-
-        if filecount != len(self.files_changed):
-            log.Error(_("Manifest file '%s' is corrupt: File count says %d, File list contains %d" %
-                        (self.fh.base if self.fh else "", filecount, len(self.files_changed))))
-            self.corrupt_filelist = True
-
         highest_vol = 0
         latest_vol = 0
         vi_regexp = re.compile("(?:^|\\n)(volume\\s.*(?:\\n.*)*?)(?=\\nvolume\\s|$)", re.I)
@@ -228,6 +211,26 @@ class Manifest:
         for i in range(latest_vol + 1, highest_vol + 1):
             self.del_volume_info(i)
         log.Info(_("Found %s volumes in manifest") % latest_vol)
+
+        # Get file changed list - not needed if --file-changed not present
+        filecount = 0
+        if globals.file_changed is not None:
+            filelist_regexp = re.compile("(^|\\n)filelist\\s([0-9]+)\\n(.*?)(\\nvolume\\s|$)", re.I | re.S)
+            match = filelist_regexp.search(s)
+            if match:
+                filecount = int(match.group(2))
+            if filecount > 0:
+                def parse_fileinfo(line):
+                    fileinfo = line.strip().split()
+                    return (fileinfo[0], ''.join(fileinfo[1:]))
+
+                self.files_changed = list(map(parse_fileinfo, match.group(3).split('\n')))
+
+            if filecount != len(self.files_changed):
+                log.Error(_("Manifest file '%s' is corrupt: File count says %d, File list contains %d" %
+                            (self.fh.base if self.fh else "", filecount, len(self.files_changed))))
+                self.corrupt_filelist = True
+
         return self
 
     def get_files_changed(self):

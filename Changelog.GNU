@@ -1,3 +1,37 @@
+2017-11-09  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1730902 GPG Error Handling
+      - use util.ufn() not str() to handle encoding
+
+2017-11-01  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1723890 with patch from Killian Lackhove
+      - Fixes error handling in pydrivebackend.py
+
+2017-10-31  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1720159 - Cannot allocate memory with large manifest file since 0.7.03
+      - filelist is not read if --file-changed option in collection-status not present
+      - This will keep memory usage lower in non collection-status operations
+
+2017-10-26  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1448094 with patch from Tomáš Zvala
+      - Don't log incremental deletes for chains that have no incrementals
+    * Fixed bug #1724144 "--gpg-options unused with some commands"
+      - Add --gpg-options to get version run command
+
+2017-10-16  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1654756 with new b2backend.py module from Vincent Rouille
+      - Faster (big files are uploaded in chunks)
+      - Added upload progress reporting support
+
+2017-10-12  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Patched in lp:~mterry/duplicity/rename-dep
+      - Make rename command a dependency for LP build
+
 2017-09-22  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1714663 "Volume signed by XXXXXXXXXXXXXXXX, not XXXXXXXX"

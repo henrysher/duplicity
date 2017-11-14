@@ -972,6 +972,13 @@ def remove_old(col_stats):
                    "manually purge the repository."))
 
     chainlist = col_stats.get_chains_older_than(globals.remove_time)
+
+    if globals.remove_all_inc_of_but_n_full_mode:
+        # ignore chains without incremental backups:
+        chainlist = list(x for x in chainlist if
+                         (isinstance(x, collections.SignatureChain) and x.inclist) or
+                         (isinstance(x, collections.BackupChain) and x.incset_list))
+
     if not chainlist:
         log.Notice(_("No old backup sets found, nothing deleted."))
         return

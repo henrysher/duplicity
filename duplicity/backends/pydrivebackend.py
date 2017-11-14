@@ -211,11 +211,7 @@ Exception: %s""" % str(e))
         if isinstance(error, FileNotUploadedError):
             return log.ErrorCode.backend_not_found
         elif isinstance(error, ApiRequestError):
-            http_status = error.args[0].resp.status
-            if http_status == 404:
-                return log.ErrorCode.backend_not_found
-            elif http_status == 403:
-                return log.ErrorCode.backend_permission_denied
+            return log.ErrorCode.backend_permission_denied
         return log.ErrorCode.backend_error
 
 
