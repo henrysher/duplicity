@@ -214,6 +214,7 @@ Exception: %s""" % str(e))
             return log.ErrorCode.backend_permission_denied
         return log.ErrorCode.backend_error
 
+
 duplicity.backend.register_backend('pydrive', PyDriveBackend)
 """ pydrive is an alternate way to access gdocs """
 duplicity.backend.register_backend('pydrive+gdocs', PyDriveBackend)
