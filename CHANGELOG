@@ -290,7 +290,7 @@ New in v0.8.00 (2016/07/??)
 * Fixed bug #1654756 with new b2backend.py module from Vincent Rouille
   - Faster (big files are uploaded in chunks)
   - Added upload progress reporting support
-* Fixed bug #1448094 with patch from Tomáš Zvala
+* Fixed bug #1448094 with patch from Wolfgang Rohdewald
   - Don't log incremental deletes for chains that have no incrementals
 * Fixed bug #1724144 "--gpg-options unused with some commands"
   - Add --gpg-options to get version run command
