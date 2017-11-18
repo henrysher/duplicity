@@ -248,7 +248,7 @@ class BackupSet:
             manifest_buffer = self.backend.get_data(self.remote_manifest_name)
         except GPGError as message:
             log.Error(_("Error processing remote manifest (%s): %s") %
-                      (util.ufn(self.remote_manifest_name), util.ufn(message)))
+                      (util.ufn(self.remote_manifest_name), util.uexc(message)))
             return None
         log.Info(_("Processing remote manifest %s (%s)") % (
             util.ufn(self.remote_manifest_name), len(manifest_buffer)))

@@ -1,3 +1,8 @@
+2017-11-18  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1733057 AttributeError: 'GPGError' object has no attribute 'decode'
+      - Replaced call to util.ufn() with call to util.uexc().  Stupid typo!
+
 2017-11-09  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1730902 GPG Error Handling

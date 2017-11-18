@@ -301,6 +301,8 @@ New in v0.8.00 (2016/07/??)
   - Fixes error handling in pydrivebackend.py
 * Fixed bug #1730902 GPG Error Handling
   - use util.ufn() not str() to handle encoding
+* Fixed bug #1733057 AttributeError: 'GPGError' object has no attribute 'decode'
+  - Replaced call to util.ufn() with call to util.uexc().  Stupid typo!
 
 
 New in v0.7.08 (2016/07/02)
