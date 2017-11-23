@@ -60,7 +60,7 @@ def escape(string):
 def ufn(filename):
     "Convert a (bytes) filename to unicode for printing"
     assert not isinstance(filename, unicode)
-    return filename.decode(sys.getfilesystemencoding(), 'replace')
+    return filename.decode(globals.fsencoding, 'replace')
 
 
 def uindex(index):
@@ -76,8 +76,7 @@ def uexc(e):
     # non-ascii will cause a UnicodeDecodeError when implicitly decoding to
     # unicode.  So we decode manually, using the filesystem encoding.
     # 99.99% of the time, this will be a fine encoding to use.
-    e = unicode(e).encode('utf-8')
-    return ufn(str(e))
+    return ufn(unicode(e).encode('utf-8'))
 
 
 def maybe_ignore_errors(fn):

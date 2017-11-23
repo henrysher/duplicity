@@ -303,6 +303,9 @@ New in v0.8.00 (2016/07/??)
   - use util.ufn() not str() to handle encoding
 * Fixed bug #1733057 AttributeError: 'GPGError' object has no attribute 'decode'
   - Replaced call to util.ufn() with call to util.uexc().  Stupid typo!
+* More fixes for Unicode handling
+  - Default to 'utf-8' if sys.getfilesystemencoding() returns 'ascii' or None
+  - Fixed bug #1386373 with suggestion from Eugene Morozov
 
 
 New in v0.7.08 (2016/07/02)

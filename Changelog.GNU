@@ -1,3 +1,9 @@
+2017-11-23  Kenneth Loafman  <kenneth@loafman.com>
+
+    * More fixes for Unicode handling
+      - Default to 'utf-8' if sys.getfilesystemencoding() returns 'ascii' or None
+      - Fixed bug #1386373 with suggestion from Eugene Morozov
+
 2017-11-18  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1733057 AttributeError: 'GPGError' object has no attribute 'decode'
