@@ -2,6 +2,7 @@ boto
 coverage
 dropbox==6.9.0
 fasteners
+future
 paramiko
 pexpect
 pycodestyle
