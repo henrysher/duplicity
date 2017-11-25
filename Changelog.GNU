@@ -1,3 +1,8 @@
+2017-11-25  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~crosser/duplicity/fix-oauth-flow
+      - Fixed bug #1638236 "BackendException with oauth2client 4.0.0"
+
 2017-11-23  Kenneth Loafman  <kenneth@loafman.com>
 
     * More fixes for Unicode handling

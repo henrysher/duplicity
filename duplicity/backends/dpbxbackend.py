@@ -142,11 +142,11 @@ class DPBXBackend(duplicity.backend.Backend):
         auth_code = raw_input("Enter the authorization code here: ").strip()
         try:
             log.Debug('dpbx,auth_flow.finish(%s)' % auth_code)
-            access_token, _ = auth_flow.finish(auth_code)
+            authresult = auth_flow.finish(auth_code)
         except Exception as e:
             raise BackendException('dpbx: Unable to obtain access token: %s' % e)
         log.Info("dpbx: Authentication successfull")
-        self.save_access_token(access_token)
+        self.save_access_token(authresult.access_token)
 
     def login(self):
         if self.load_access_token() is None:
