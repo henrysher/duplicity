@@ -41,7 +41,7 @@ import re
 from dropbox import Dropbox
 from dropbox.exceptions import AuthError, BadInputError, ApiError
 from dropbox.files import UploadSessionCursor, CommitInfo, WriteMode, \
-    GetMetadataError, DeleteError, UploadSessionLookupError
+    GetMetadataError, DeleteError, UploadSessionLookupError, ListFolderError
 from dropbox.oauth import DropboxOAuth2FlowNoRedirect
 from requests.exceptions import ConnectionError
 import time
@@ -383,15 +383,22 @@ class DPBXBackend(duplicity.backend.Backend):
         remote_dir = '/' + urllib.unquote(self.parsed_url.path.lstrip('/')).rstrip()
 
         log.Debug('dpbx.files_list_folder(%s)' % remote_dir)
-        resp = self.api_client.files_list_folder(remote_dir)
-        log.Debug('dpbx.list(%s): %s' % (remote_dir, resp))
-
         res = []
-        while True:
-            res.extend([entry.name for entry in resp.entries])
-            if not resp.has_more:
-                break
-            resp = self.api_client.files_list_folder_continue(resp.cursor)
+        try:
+            resp = self.api_client.files_list_folder(remote_dir)
+            log.Debug('dpbx.list(%s): %s' % (remote_dir, resp))
+
+            while True:
+                res.extend([entry.name for entry in resp.entries])
+                if not resp.has_more:
+                    break
+                resp = self.api_client.files_list_folder_continue(resp.cursor)
+        except ApiError as e:
+            if (isinstance(e.error, ListFolderError) and e.error.is_path()
+                and e.error.get_path().is_not_found()):
+                log.Debug('dpbx.list(%s): ignore missing folder (%s)' % (remote_dir, e))
+            else:
+                raise
 
         # Warn users of old version dpbx about automatically renamed files
         self.check_renamed_files(res)
