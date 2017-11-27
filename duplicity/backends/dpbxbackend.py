@@ -215,7 +215,7 @@ class DPBXBackend(duplicity.backend.Backend):
         try:
             log.Debug('dpbx,files_upload(%s, [%d bytes])' % (remote_path, file_size))
 
-            res_metadata = self.api_client.files_upload(f, remote_path,
+            res_metadata = self.api_client.files_upload(f.read(), remote_path,
                                                         mode=WriteMode.overwrite,
                                                         autorename=False,
                                                         client_modified=None,
