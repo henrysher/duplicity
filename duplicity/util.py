@@ -84,8 +84,7 @@ def exception_traceback(limit=50):
 
 def escape(string):
     "Convert a (bytes) filename to a format suitable for logging (quoted utf8)"
-    if isinstance(string, str) or isinstance(string, unicode):
-        string = string.decode(sys.getfilesystemencoding(), 'replace').encode('unicode-escape', 'replace')
+    string = ufn(string).encode('unicode-escape', 'replace')
     return u"'%s'" % string.decode('utf8', 'replace')
 
 
@@ -93,7 +92,7 @@ def ufn(filename):
     """Convert a (bytes) filename to unicode for printing"""
     # Note: path.uc_name is preferable for paths and using .decode(sys.getfilesystemencoding)
     # is normally clearer for everything else
-    return filename.decode(sys.getfilesystemencoding(), "replace")
+    return filename.decode(globals.fsencoding, "replace")
 
 
 def uindex(index):
@@ -109,8 +108,7 @@ def uexc(e):
     # non-ascii will cause a UnicodeDecodeError when implicitly decoding to
     # unicode.  So we decode manually, using the filesystem encoding.
     # 99.99% of the time, this will be a fine encoding to use.
-    e = unicode(e).encode('utf-8')
-    return ufn(str(e))
+    return ufn(unicode(e).encode('utf-8'))
 
 
 def maybe_ignore_errors(fn):
