@@ -394,8 +394,8 @@ class DPBXBackend(duplicity.backend.Backend):
                     break
                 resp = self.api_client.files_list_folder_continue(resp.cursor)
         except ApiError as e:
-            if (isinstance(e.error, ListFolderError) and e.error.is_path()
-                and e.error.get_path().is_not_found()):
+            if (isinstance(e.error, ListFolderError) and e.error.is_path() and
+                    e.error.get_path().is_not_found()):
                 log.Debug('dpbx.list(%s): ignore missing folder (%s)' % (remote_dir, e))
             else:
                 raise
