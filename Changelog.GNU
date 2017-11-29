@@ -1,3 +1,10 @@
+2017-11-25  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~crosser/duplicity/fix-oauth-flow
+      - Fixed bug #1638236 "BackendException with oauth2client 4.0.0"
+    * Merged in lp:~crosser/duplicity/dpbx-fix-file-listing
+      - Fixed bug #1639664 "Dropbox support needs to be updated for Dropbox SDK v7.1"
+
 2017-11-23  Kenneth Loafman  <kenneth@loafman.com>
 
     * More fixes for Unicode handling
