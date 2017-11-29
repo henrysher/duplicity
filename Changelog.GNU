@@ -1,3 +1,8 @@
+2017-11-28  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~crosser/duplicity/fix-small-file-upload
+      - Fixed small file upload changes made in Dropbox SDK v7.1
+
 2017-11-25  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~crosser/duplicity/fix-oauth-flow
