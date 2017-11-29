@@ -61,9 +61,9 @@ except ImportError:
         """Convert a filename encoded in the system encoding to unicode"""
         # For paths, just use path.uname rather than converting with this
         # If we are not doing any cleverness with non-unicode filename bytes,
-        # decoding using system encoding is good enough
-        # ToDo: use sys.getfilesystemencoding() once figure out why this is not working.
-        return bytes_filename.decode("UTF-8", "ignore")
+        # decoding using system encoding is good enough. Use "ignore" as
+        # Linux paths can contain non-Unicode characters
+        return bytes_filename.decode(globals.fsencoding, "ignore")
 
 
 def exception_traceback(limit=50):

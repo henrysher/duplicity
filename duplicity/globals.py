@@ -321,4 +321,4 @@ backend_retry_delay = 30
 # 'utf-8' or some other sane encoding, but will sometimes fail and return
 # either 'ascii' or None.  Both are bogus, so default to 'utf-8' if it does.
 fsencoding = sys.getfilesystemencoding()
-fsencoding = fsencoding if fsencoding not in ['ascii', None] else 'utf-8'
+fsencoding = fsencoding if fsencoding not in ['ascii', 'ANSI_X3.4-1968', None] else 'utf-8'
