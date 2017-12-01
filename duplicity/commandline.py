@@ -253,13 +253,10 @@ def parse_cmdline_options(arglist):
         old_fn_deprecation(opt)
 
     def add_selection(o, option, additional_arg, p):
-        option = util.fsdecode(option)
-        additional_arg = util.fsdecode(additional_arg)
-        select_opts.append((option, additional_arg))
+        select_opts.append((util.fsdecode(option), util.fsdecode(additional_arg)))
 
-    def add_filelist(o, s, v, p):
-        filename = util.fsdecode(v)
-        select_opts.append((util.fsdecode(s), filename))
+    def add_filelist(o, s, filename, p):
+        select_opts.append((util.fsdecode(s), util.fsdecode(filename)))
         try:
             select_files.append(io.open(filename, "rt", encoding="UTF-8"))
         except IOError:

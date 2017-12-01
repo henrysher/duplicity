@@ -90,8 +90,7 @@ def escape(string):
 
 def ufn(filename):
     """Convert a (bytes) filename to unicode for printing"""
-    # Note: path.uc_name is preferable for paths and using .decode(sys.getfilesystemencoding)
-    # is normally clearer for everything else
+    # Note: path.uc_name is preferable for paths
     return filename.decode(globals.fsencoding, "replace")
 
 

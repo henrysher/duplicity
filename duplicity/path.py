@@ -513,7 +513,8 @@ class Path(ROPath):
         # self.fileobj can override returned fileobj
         self.opened, self.fileobj = None, None
         if isinstance(base, unicode):
-            # For now, it is helpful to know that all paths are starting with bytes
+            # For now (Python 2), it is helpful to know that all paths
+            # are starting with bytes -- see note above util.fsencode definition
             base = util.fsencode(base)
         self.base = base
 
@@ -522,15 +523,9 @@ class Path(ROPath):
 
         self.name = os.path.join(base, *self.index)
 
-        # While we transition everything to unicode, it is helpful to
-        # know that path.name is always not unicode and path.uc_name
-        # always is.
-        if isinstance(self.name, unicode):
-            self.uc_name = self.name
-            self.name = util.fsencode(self.uc_name)
-        else:
-            # self.name is still in filesystem encoding, so does not need to change
-            self.uc_name = util.fsdecode(self.name)
+        # We converted any unicode base to filesystem encoding, so self.name should
+        # be in filesystem encoding already and does not need to change
+        self.uc_name = util.fsdecode(self.name)
 
         self.setdata()
 

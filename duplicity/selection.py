@@ -250,11 +250,6 @@ class Select:
                                                  u" is not unicode"
                 assert isinstance(arg, unicode), u"option " + arg.decode(sys.getfilesystemencoding(), "ignore") + \
                                                  u" is not unicode"
-                # ToDo: replace the next three lines once we can make commandline return unicode
-                # opt = opt.decode(sys.getfilesystemencoding(), "strict")
-                # if not isinstance(arg, unicode):
-                #     # ToDo: use sys.getfilesystemencoding() once figure out why this is not working.
-                #     arg = arg.decode("UTF-8", "strict")  # ToDo: Change from "strict" once found problems
 
                 if opt == u"--exclude":
                     self.add_selection_func(self.glob_get_sf(arg, 0))

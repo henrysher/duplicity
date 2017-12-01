@@ -114,8 +114,6 @@ def select_fn_from_glob(glob_str, include, ignore_case=False):
                            u"|".join(_glob_get_prefix_regexs(glob_str)))
 
     def test_fn(path):
-        assert isinstance(path.uc_name, unicode)
-
         assert not path.uc_name[-1] == u"/" or path.uc_name == u"/", \
             u"path.name should never end in '/' during normal operation for " \
             u"normal paths (except '/' alone)\n" \
