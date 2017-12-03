@@ -30,6 +30,7 @@ import os
 import re
 import sys
 import socket
+import io
 
 try:
     from hashlib import md5
@@ -251,14 +252,13 @@ def parse_cmdline_options(arglist):
         globals.time_separator = sep
         old_fn_deprecation(opt)
 
-    def add_selection(o, s, v, p):
-        select_opts.append((s, v))
+    def add_selection(o, option, additional_arg, p):
+        select_opts.append((util.fsdecode(option), util.fsdecode(additional_arg)))
 
-    def add_filelist(o, s, v, p):
-        filename = v
-        select_opts.append((s, filename))
+    def add_filelist(o, s, filename, p):
+        select_opts.append((util.fsdecode(s), util.fsdecode(filename)))
         try:
-            select_files.append(open(filename, "r"))
+            select_files.append(io.open(filename, "rt", encoding="UTF-8"))
         except IOError:
             log.FatalError(_("Error opening file %s") % filename,
                            log.ErrorCode.cant_open_filelist)

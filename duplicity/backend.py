@@ -383,7 +383,7 @@ def retry(operation, fatal=True):
                     if at_end and fatal:
                         def make_filename(f):
                             if isinstance(f, path.ROPath):
-                                return util.escape(f.name)
+                                return util.escape(f.uc_name)
                             else:
                                 return util.escape(f)
                         extra = ' '.join([operation] + [make_filename(x) for x in args if x])

@@ -34,6 +34,37 @@ from duplicity import tarfile
 import duplicity.globals as globals
 import duplicity.log as log
 
+try:
+    # For paths, just use path.name/uname rather than converting with these
+    from os import fsencode, fsdecode
+except ImportError:
+    # Most likely Python version < 3.2, so define our own fsencode/fsdecode.
+    # These are functions that encode/decode unicode paths to filesystem encoding,
+    # but the cleverness is that they handle non-unicode characters on Linux
+    # There is a *partial* backport to Python2 available here:
+    # https://github.com/pjdelport/backports.os/blob/master/src/backports/os.py
+    # but if it cannot be trusted for full-circle translation, then we may as well
+    # just read and store the bytes version of the path as path.name before
+    # creating the unicode version (for path matching etc) and ensure that in
+    # real-world usage (as opposed to testing) we create the path objects from a
+    # bytes string.
+    # ToDo: Revisit this once we drop Python 2 support/the backport is complete
+
+    def fsencode(unicode_filename):
+        """Convert a unicode filename to a filename encoded in the system encoding"""
+        # For paths, just use path.name rather than converting with this
+        # If we are not doing any cleverness with non-unicode filename bytes,
+        # encoding to system encoding is good enough
+        return unicode_filename.encode(sys.getfilesystemencoding(), "replace")
+
+    def fsdecode(bytes_filename):
+        """Convert a filename encoded in the system encoding to unicode"""
+        # For paths, just use path.uname rather than converting with this
+        # If we are not doing any cleverness with non-unicode filename bytes,
+        # decoding using system encoding is good enough. Use "ignore" as
+        # Linux paths can contain non-Unicode characters
+        return bytes_filename.decode(globals.fsencoding, "ignore")
+
 
 def exception_traceback(limit=50):
     """
@@ -58,9 +89,9 @@ def escape(string):
 
 
 def ufn(filename):
-    "Convert a (bytes) filename to unicode for printing"
-    assert not isinstance(filename, unicode)
-    return filename.decode(globals.fsencoding, 'replace')
+    """Convert a (bytes) filename to unicode for printing"""
+    # Note: path.uc_name is preferable for paths
+    return filename.decode(globals.fsencoding, "replace")
 
 
 def uindex(index):

@@ -55,10 +55,12 @@ time.tzset()
 
 class DuplicityTestCase(unittest.TestCase):
 
-    sign_key = '839E6A2856538CCF'
-    sign_passphrase = 'test'
-    encrypt_key1 = '839E6A2856538CCF'
-    encrypt_key2 = '453005CE9B736B2A'
+    sign_key = u'839E6A2856538CCF'
+    sign_passphrase = u'test'
+    # ToDo: remove the below when gpg code (and test_gpg) is converted to unicode
+    sign_passphrase_bytes = b'test'
+    encrypt_key1 = u'839E6A2856538CCF'
+    encrypt_key2 = u'453005CE9B736B2A'
 
     def setUp(self):
         super(DuplicityTestCase, self).setUp()

@@ -1498,11 +1498,11 @@ The
 and
 .BI --exclude-filelist ,
 options also introduce file selection conditions.  They direct
-duplicity to read in a file, each line of which is a file
-specification, and to include or exclude the matching files.  Lines
-are separated by newlines or nulls, depending on whether the
---null-separator switch was given.  Each line in the filelist will be
-interpreted as a globbing pattern the way
+duplicity to read in a text file (either ASCII or UTF-8), each line
+of which is a file specification, and to include or exclude the
+matching files.  Lines are separated by newlines or nulls, depending
+on whether the --null-separator switch was given.  Each line in the
+filelist will be interpreted as a globbing pattern the way
 .BI --include
 and
 .BI --exclude

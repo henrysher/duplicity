@@ -34,17 +34,17 @@ class ReplicateTest(FunctionalTestCase):
     def runtest(self, dirlist, backup_options=[], replicate_options=[], restore_options=[]):
         # Back up directories to local backend
         current_time = 100000
-        self.backup("full", dirlist[0], current_time=current_time,
+        self.backup(u"full", dirlist[0], current_time=current_time,
                     options=backup_options)
         for new_dir in dirlist[1:]:
             current_time += 100000
-            self.backup("inc", new_dir, current_time=current_time,
+            self.backup(u"inc", new_dir, current_time=current_time,
                         options=backup_options)
 
         # Replicate to other backend
         source_url = self.backend_url
-        target_url = "file://testfiles/replicate_out"
-        self.run_duplicity(options=["replicate"] +
+        target_url = u"file://testfiles/replicate_out"
+        self.run_duplicity(options=[u"replicate"] +
                            replicate_options + [source_url, target_url])
 
         self.backend_url = target_url
@@ -54,7 +54,7 @@ class ReplicateTest(FunctionalTestCase):
             dirname = dirlist[i]
             current_time = 100000 * (i + 1)
             self.restore(time=current_time, options=restore_options)
-            self.check_same(dirname, "testfiles/restore_out")
+            self.check_same(dirname, u"testfiles/restore_out")
             self.verify(dirname,
                         time=current_time, options=restore_options)
 
@@ -65,15 +65,15 @@ class ReplicateTest(FunctionalTestCase):
 
     def test_replicate(self):
         """Test replication"""
-        self.runtest(["testfiles/dir1", "testfiles/dir2"])
+        self.runtest([u"testfiles/dir1", u"testfiles/dir2"])
 
     def test_replicate_noencryption(self):
         """Test replication with decryption"""
-        self.runtest(["testfiles/dir1", "testfiles/dir2"],
-                     replicate_options=["--no-encryption"])
+        self.runtest([u"testfiles/dir1", u"testfiles/dir2"],
+                     replicate_options=[u"--no-encryption"])
 
     def test_replicate_asym(self):
         """Test replication with reencryption"""
-        asym_options = ["--encrypt-key", self.encrypt_key1]
-        self.runtest(["testfiles/dir1", "testfiles/dir2"],
+        asym_options = [u"--encrypt-key", self.encrypt_key1]
+        self.runtest([u"testfiles/dir1", u"testfiles/dir2"],
                      replicate_options=asym_options, restore_options=asym_options)

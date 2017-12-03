@@ -35,6 +35,7 @@ import time
 import re
 import gzip
 import shutil
+import sys
 
 from duplicity import tarfile
 from duplicity import file_naming
@@ -511,9 +512,21 @@ class Path(ROPath):
         # self.opened should be true if the file has been opened, and
         # self.fileobj can override returned fileobj
         self.opened, self.fileobj = None, None
+        if isinstance(base, unicode):
+            # For now (Python 2), it is helpful to know that all paths
+            # are starting with bytes -- see note above util.fsencode definition
+            base = util.fsencode(base)
         self.base = base
+
+        # Create self.index, which is the path as a tuple
         self.index = self.rename_index(index)
+
         self.name = os.path.join(base, *self.index)
+
+        # We converted any unicode base to filesystem encoding, so self.name should
+        # be in filesystem encoding already and does not need to change
+        self.uc_name = util.fsdecode(self.name)
+
         self.setdata()
 
     def setdata(self):

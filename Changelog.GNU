@@ -1,3 +1,11 @@
+2017-12-03  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/08-unicode
+      - Many strings have been changed to unicode for better handling of international
+        characters and to make the transition to Python 3 significantly easier, primarily
+        on the 'local' side of duplicity (selection, commandline arguments etc) rather
+        than any backends etc.
+
 2017-11-28  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~crosser/duplicity/fix-small-file-upload

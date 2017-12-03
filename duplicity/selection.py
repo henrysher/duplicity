@@ -90,7 +90,7 @@ class Select:
         assert isinstance(path, Path), str(path)
         self.selection_functions = []
         self.rootpath = path
-        self.prefix = self.rootpath.name
+        self.prefix = self.rootpath.uc_name
 
     def set_iter(self):
         """Initialize generator, prepare to iterate."""
@@ -164,10 +164,10 @@ class Select:
 
         if not path.type:
             # base doesn't exist
-            log.Warn(_("Warning: base %s doesn't exist, continuing") %
-                     util.ufn(path.name))
+            log.Warn(_(u"Warning: base %s doesn't exist, continuing") %
+                     path.uc_name)
             return
-        log.Debug(_("Selecting %s") % util.ufn(path.name))
+        log.Debug(_(u"Selecting %s") % path.uc_name)
         yield path
         if not path.isdir():
             return
@@ -185,10 +185,10 @@ class Select:
             if val == 0:
                 if delayed_path_stack:
                     for delayed_path in delayed_path_stack:
-                        log.Log(_("Selecting %s") % util.ufn(delayed_path.name), 6)
+                        log.Log(_(u"Selecting %s") % delayed_path.uc_name, 6)
                         yield delayed_path
                     del delayed_path_stack[:]
-                log.Debug(_("Selecting %s") % util.ufn(subpath.name))
+                log.Debug(_(u"Selecting %s") % subpath.uc_name)
                 yield subpath
                 if subpath.isdir():
                     diryield_stack.append(diryield(subpath))
@@ -199,14 +199,14 @@ class Select:
     def Select(self, path):
         """Run through the selection functions and return dominant val 0/1/2"""
         # Only used by diryield and tests. Internal.
-        log.Debug("Selection: examining path %s" % util.ufn(path.name))
+        log.Debug(u"Selection: examining path %s" % path.uc_name)
         if not self.selection_functions:
-            log.Debug("Selection:     + no selection functions found. Including")
+            log.Debug(u"Selection:     + no selection functions found. Including")
             return 1
         scan_pending = False
         for sf in self.selection_functions:
             result = sf(path)
-            log.Debug("Selection:     result: %4s from function: %s" %
+            log.Debug(u"Selection:     result: %4s from function: %s" %
                       (str(result), sf.name))
             if result is 2:
                 # Selection function says that the path should be scanned for matching files, but keep going
@@ -224,12 +224,12 @@ class Select:
             result = 1
 
         if result == 0:
-            log.Debug("Selection:     - excluding file")
+            log.Debug(u"Selection:     - excluding file")
         elif result == 1:
-            log.Debug("Selection:     + including file")
+            log.Debug(u"Selection:     + including file")
         else:
             assert result == 2
-            log.Debug("Selection:     ? scanning directory for matches")
+            log.Debug(u"Selection:     ? scanning directory for matches")
 
         return result
 
@@ -246,36 +246,41 @@ class Select:
         filelists_index = 0
         try:
             for opt, arg in argtuples:
-                if opt == "--exclude":
+                assert isinstance(opt, unicode), u"option " + opt.decode(sys.getfilesystemencoding(), "ignore") + \
+                                                 u" is not unicode"
+                assert isinstance(arg, unicode), u"option " + arg.decode(sys.getfilesystemencoding(), "ignore") + \
+                                                 u" is not unicode"
+
+                if opt == u"--exclude":
                     self.add_selection_func(self.glob_get_sf(arg, 0))
-                elif opt == "--exclude-if-present":
+                elif opt == u"--exclude-if-present":
                     self.add_selection_func(self.present_get_sf(arg, 0))
-                elif opt == "--exclude-device-files":
+                elif opt == u"--exclude-device-files":
                     self.add_selection_func(self.devfiles_get_sf())
-                elif (opt == "--exclude-filelist") or (opt == "--exclude-globbing-filelist"):
+                elif (opt == u"--exclude-filelist") or (opt == u"--exclude-globbing-filelist"):
                     # --exclude-globbing-filelist is now deprecated, as all filelists are globbing
                     # but keep this here for the short term for backwards-compatibility
                     for sf in self.filelist_globbing_get_sfs(filelists[filelists_index], 0, arg):
                         self.add_selection_func(sf)
                     filelists_index += 1
-                elif opt == "--exclude-other-filesystems":
+                elif opt == u"--exclude-other-filesystems":
                     self.add_selection_func(self.other_filesystems_get_sf(0))
-                elif opt == "--exclude-regexp":
+                elif opt == u"--exclude-regexp":
                     self.add_selection_func(self.regexp_get_sf(arg, 0))
-                elif opt == "--exclude-older-than":
+                elif opt == u"--exclude-older-than":
                     self.add_selection_func(self.exclude_older_get_sf(arg))
-                elif opt == "--include":
+                elif opt == u"--include":
                     self.add_selection_func(self.glob_get_sf(arg, 1))
-                elif (opt == "--include-filelist") or (opt == "--include-globbing-filelist"):
+                elif (opt == u"--include-filelist") or (opt == u"--include-globbing-filelist"):
                     # --include-globbing-filelist is now deprecated, as all filelists are globbing
                     # but keep this here for the short term for backwards-compatibility
                     for sf in self.filelist_globbing_get_sfs(filelists[filelists_index], 1, arg):
                         self.add_selection_func(sf)
                     filelists_index += 1
-                elif opt == "--include-regexp":
+                elif opt == u"--include-regexp":
                     self.add_selection_func(self.regexp_get_sf(arg, 1))
                 else:
-                    assert 0, "Bad selection option %s" % opt
+                    assert 0, u"Bad selection option %s" % opt
         except SelectError as e:
             self.parse_catch_error(e)
         assert filelists_index == len(filelists)
@@ -285,16 +290,16 @@ class Select:
         """Deal with selection error exc"""
         # Internal, used by ParseArgs.
         if isinstance(exc, FilePrefixError):
-            log.FatalError(_("""\
+            log.FatalError(_(u"""\
 Fatal Error: The file specification
     %s
 cannot match any files in the base directory
     %s
 Useful file specifications begin with the base directory or some
 pattern (such as '**') which matches the base directory.""") %
-                           (exc, util.ufn(self.prefix)), log.ErrorCode.file_prefix_error)
+                           (exc, self.prefix), log.ErrorCode.file_prefix_error)
         elif isinstance(exc, GlobbingError):
-            log.FatalError(_("Fatal Error while processing expression\n"
+            log.FatalError(_(u"Fatal Error while processing expression\n"
                              "%s") % exc, log.ErrorCode.globbing_error)
         else:
             raise  # pylint: disable=misplaced-bare-raise
@@ -304,7 +309,7 @@ pattern (such as '**') which matches the base directory.""") %
         # Internal. Used by ParseArgs.
         if (self.selection_functions and
                 not self.selection_functions[-1].exclude):
-            log.FatalError(_("""\
+            log.FatalError(_(u"""\
 Last selection expression:
     %s
 only specifies that files be included.  Because the default is to
@@ -333,19 +338,19 @@ probably isn't what you meant.""") %
         line = line.strip()
         if not line:  # skip blanks
             return None, include_default
-        if line[0] == "#":  # skip full-line comments
+        if line.startswith(u"#"):  # skip full-line comments
             return None, include_default
 
         include = include_default
-        if line[:2] == "+ ":
+        if line.startswith(u"+ "):
             # Check for "+ " or "- " syntax
             include = 1
             line = line[2:]
-        elif line[:2] == "- ":
+        elif line.startswith(u"- "):
             include = 0
             line = line[2:]
 
-        if (line[:1] == "'" and line[-1:] == "'") or (line[:1] == '"' and line[-1:] == '"'):
+        if (line.startswith(u"'") and line.endswith(u"'")) or (line.startswith(u'"') and line.endswith(u'"')):
             line = line[1:-1]
 
         return line, include
@@ -360,8 +365,8 @@ probably isn't what you meant.""") %
 
         """
         # Internal. Used by ParseArgs.
-        log.Notice(_("Reading globbing filelist %s") % list_name)
-        separator = globals.null_separator and "\0" or "\n"
+        log.Notice(_(u"Reading globbing filelist %s") % list_name)
+        separator = globals.null_separator and u"\0" or u"\n"
         filelist_fp.seek(0)
         for line in filelist_fp.read().split(separator):
             line, include = self.filelist_sanitise_line(line, inc_default)
@@ -383,7 +388,7 @@ probably isn't what you meant.""") %
                 return None
 
         sel_func.exclude = not include
-        sel_func.name = "Match other filesystems"
+        sel_func.name = u"Match other filesystems"
         return sel_func
 
     def regexp_get_sf(self, regexp_string, include):
@@ -393,24 +398,24 @@ probably isn't what you meant.""") %
         try:
             regexp = re.compile(regexp_string)
         except Exception:
-            log.Warn(_("Error compiling regular expression %s") % regexp_string)
+            log.Warn(_(u"Error compiling regular expression %s") % regexp_string)
             raise
 
         def sel_func(path):
-            if regexp.search(path.name):
+            if regexp.search(path.uc_name):
                 return include
             else:
                 return None
 
         sel_func.exclude = not include
-        sel_func.name = "Regular expression: %s" % regexp_string
+        sel_func.name = u"Regular expression: %s" % regexp_string
         return sel_func
 
     def devfiles_get_sf(self):
         """Return a selection function to exclude all dev files"""
         # Internal. Used by ParseArgs.
         if self.selection_functions:
-            log.Warn(_("Warning: exclude-device-files is not the first "
+            log.Warn(_(u"Warning: exclude-device-files is not the first "
                        "selector.\nThis may not be what you intended"))
 
         def sel_func(path):
@@ -420,21 +425,22 @@ probably isn't what you meant.""") %
                 return None
 
         sel_func.exclude = 1
-        sel_func.name = "Exclude device files"
+        sel_func.name = u"Exclude device files"
         return sel_func
 
     def glob_get_sf(self, glob_str, include):
         """Return selection function given by glob string"""
         # Internal. Used by ParseArgs, filelist_globbing_get_sfs and unit tests.
         assert include == 0 or include == 1
-        if glob_str == "**":
+        assert isinstance(glob_str, unicode)
+        if glob_str == u"**":
             sel_func = lambda path: include
         else:
             sel_func = self.glob_get_normal_sf(glob_str, include)
 
         sel_func.exclude = not include
-        sel_func.name = "Command-line %s glob: %s" % \
-                        (include and "include" or "exclude", glob_str)
+        sel_func.name = u"Command-line %s glob: %s" % \
+                        (include and u"include" or u"exclude", glob_str)
         return sel_func
 
     def present_get_sf(self, filename, include):
@@ -453,9 +459,8 @@ probably isn't what you meant.""") %
                     # functions. Currently this will give an error for any
                     # locked directory within the folder being backed up.
                     log.Warn(_(
-                        "Error accessing possibly locked file %s") % util.ufn(
-                        path.name),
-                        log.WarningCode.cannot_read, util.escape(path.name))
+                        u"Error accessing possibly locked file %s") % path.uc_name,
+                        log.WarningCode.cannot_read, util.escape(path.uc_name))
                     if diffdir.stats:
                         diffdir.stats.Errors += 1
                 elif path.append(filename).exists():
@@ -470,8 +475,8 @@ probably isn't what you meant.""") %
                            log.ErrorCode.not_implemented)
 
         sel_func.exclude = not include
-        sel_func.name = "Command-line %s filename: %s" % \
-                        (include and "include-if-present" or "exclude-if-present", filename)
+        sel_func.name = u"Command-line %s filename: %s" % \
+                        (include and u"include-if-present" or u"exclude-if-present", filename)
         return sel_func
 
     def glob_get_normal_sf(self, glob_str, include):
@@ -489,8 +494,8 @@ probably isn't what you meant.""") %
         things similar to this.
 
         """
-        # Internal. Used by glob_get_sf and unit tests.
-
+        assert isinstance(glob_str, unicode), \
+            u"The glob string " + glob_str.decode(sys.getfilesystemencoding(), "ignore") + u" is not unicode"
         ignore_case = False
 
         if glob_str.lower().startswith("ignorecase:"):

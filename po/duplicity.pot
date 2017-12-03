@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2017-11-28 08:11-0600\n"
+"POT-Creation-Date: 2017-12-03 07:53-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -416,7 +416,7 @@ msgid "Error initializing file %s"
 msgstr ""
 
 #: ../duplicity/selection.py:127 ../duplicity/selection.py:152
-#: ../duplicity/selection.py:456
+#: ../duplicity/selection.py:462
 #, python-format
 msgid "Error accessing possibly locked file %s"
 msgstr ""
@@ -432,7 +432,7 @@ msgstr ""
 msgid "Selecting %s"
 msgstr ""
 
-#: ../duplicity/selection.py:288
+#: ../duplicity/selection.py:293
 #, python-format
 msgid ""
 "Fatal Error: The file specification\n"
@@ -443,14 +443,14 @@ msgid ""
 "pattern (such as '**') which matches the base directory."
 msgstr ""
 
-#: ../duplicity/selection.py:297
+#: ../duplicity/selection.py:302
 #, python-format
 msgid ""
 "Fatal Error while processing expression\n"
 "%s"
 msgstr ""
 
-#: ../duplicity/selection.py:307
+#: ../duplicity/selection.py:312
 #, python-format
 msgid ""
 "Last selection expression:\n"
@@ -460,23 +460,23 @@ msgid ""
 "probably isn't what you meant."
 msgstr ""
 
-#: ../duplicity/selection.py:363
+#: ../duplicity/selection.py:368
 #, python-format
 msgid "Reading globbing filelist %s"
 msgstr ""
 
-#: ../duplicity/selection.py:396
+#: ../duplicity/selection.py:401
 #, python-format
 msgid "Error compiling regular expression %s"
 msgstr ""
 
-#: ../duplicity/selection.py:413
+#: ../duplicity/selection.py:418
 msgid ""
 "Warning: exclude-device-files is not the first selector.\n"
 "This may not be what you intended"
 msgstr ""
 
-#: ../duplicity/commandline.py:74
+#: ../duplicity/commandline.py:75
 #, python-format
 msgid ""
 "Warning: Option %s is pending deprecation and will be removed in a future "
@@ -484,7 +484,7 @@ msgid ""
 "Use of default filenames is strongly suggested."
 msgstr ""
 
-#: ../duplicity/commandline.py:81
+#: ../duplicity/commandline.py:82
 #, python-format
 msgid ""
 "Warning: Option %s is pending deprecation and will be removed in a future "
@@ -493,7 +493,7 @@ msgid ""
 "should be used instead."
 msgstr ""
 
-#: ../duplicity/commandline.py:91
+#: ../duplicity/commandline.py:92
 #, python-format
 msgid ""
 "Warning: Option %s is pending deprecation and will be removed in a future "
@@ -1570,76 +1570,76 @@ msgstr ""
 msgid "Hashes don't match"
 msgstr ""
 
-#: ../duplicity/path.py:110
+#: ../duplicity/path.py:111
 #, python-format
 msgid "Warning: %s invalid devnums (0x%X), treating as (0, 0)."
 msgstr ""
 
-#: ../duplicity/path.py:237 ../duplicity/path.py:296
+#: ../duplicity/path.py:238 ../duplicity/path.py:297
 #, python-format
 msgid "Warning: %s has negative mtime, treating as 0."
 msgstr ""
 
-#: ../duplicity/path.py:360
+#: ../duplicity/path.py:361
 msgid "Difference found:"
 msgstr ""
 
-#: ../duplicity/path.py:369
+#: ../duplicity/path.py:370
 #, python-format
 msgid "New file %s"
 msgstr ""
 
-#: ../duplicity/path.py:372
+#: ../duplicity/path.py:373
 #, python-format
 msgid "File %s is missing"
 msgstr ""
 
-#: ../duplicity/path.py:375
+#: ../duplicity/path.py:376
 #, python-format
 msgid "File %%s has type %s, expected %s"
 msgstr ""
 
-#: ../duplicity/path.py:381 ../duplicity/path.py:407
+#: ../duplicity/path.py:382 ../duplicity/path.py:408
 #, python-format
 msgid "File %%s has permissions %s, expected %s"
 msgstr ""
 
-#: ../duplicity/path.py:386
+#: ../duplicity/path.py:387
 #, python-format
 msgid "File %%s has mtime %s, expected %s"
 msgstr ""
 
-#: ../duplicity/path.py:394
+#: ../duplicity/path.py:395
 #, python-format
 msgid "Data for file %s is different"
 msgstr ""
 
-#: ../duplicity/path.py:402
+#: ../duplicity/path.py:403
 #, python-format
 msgid "Symlink %%s points to %s, expected %s"
 msgstr ""
 
-#: ../duplicity/path.py:411
+#: ../duplicity/path.py:412
 #, python-format
 msgid "Device file %%s has numbers %s, expected %s"
 msgstr ""
 
-#: ../duplicity/path.py:579
+#: ../duplicity/path.py:592
 #, python-format
 msgid "Making directory %s"
 msgstr ""
 
-#: ../duplicity/path.py:589
+#: ../duplicity/path.py:602
 #, python-format
 msgid "Deleting %s"
 msgstr ""
 
-#: ../duplicity/path.py:598
+#: ../duplicity/path.py:611
 #, python-format
 msgid "Touching %s"
 msgstr ""
 
-#: ../duplicity/path.py:605
+#: ../duplicity/path.py:618
 #, python-format
 msgid "Deleting tree %s"
 msgstr ""
@@ -1716,12 +1716,12 @@ msgstr ""
 msgid "Cleanup of temporary directory %s failed - this is probably a bug."
 msgstr ""
 
-#: ../duplicity/util.py:95
+#: ../duplicity/util.py:126
 #, python-format
 msgid "IGNORED_ERROR: Warning: ignoring error as requested: %s: %s"
 msgstr ""
 
-#: ../duplicity/util.py:162
+#: ../duplicity/util.py:193
 #, python-format
 msgid "Releasing lockfile %s"
 msgstr ""
