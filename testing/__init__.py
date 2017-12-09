@@ -21,6 +21,7 @@
 import os
 import sys
 import time
+import pytest
 import unittest
 
 from duplicity import backend

@@ -9,6 +9,8 @@ pycodestyle
 pydrive
 pylint
 pyrax
+pytest
+pytest-runner
 python-cloudfiles
 tox
 urllib3
