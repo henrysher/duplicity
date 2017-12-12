@@ -23,6 +23,7 @@ from __future__ import print_function
 import os
 import sys
 import random
+import pytest
 import unittest
 
 from duplicity import collections
@@ -182,6 +183,7 @@ class CollectionTest(UnitTestCase):
         test_fileobj(1, "hello 1")
         test_fileobj(2, "Hello 2")
 
+    @pytest.mark.nocapture
     def test_sigchain_fileobj(self):
         """Test getting signature chain fileobjs from archive_dir_path"""
         self.set_gpg_profile()
