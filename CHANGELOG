@@ -316,7 +316,10 @@ New in v0.8.00 (2016/07/??)
   - We use @pytest.mark.nocapture to mark the tests (gpg) that require
     no capture of file streams (currently 10 tests).
   - The rest of the tests are run normally
-
+* More pytest changes
+  - Use requirements.txt for dependencies
+  - Run unit tests first, then functional
+  - Some general cleanup
 
 New in v0.7.08 (2016/07/02)
 ---------------------------

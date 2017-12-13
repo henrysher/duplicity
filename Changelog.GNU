@@ -1,3 +1,10 @@
+2017-12-13  Kenneth Loafman  <kenneth@loafman.com>
+
+    * More pytest changes
+      - Use requirements.txt for dependencies
+      - Run unit tests first, then functional
+      - Some general cleanup
+
 2017-12-12  Kenneth Loafman  <kenneth@loafman.com>
 
     * Converted to use pytest instead of unittest (setup.py test is now discouraged)
