@@ -312,7 +312,14 @@ New in v0.8.00 (2016/07/??)
   - Fixed bug #1639664 "Dropbox support needs to be updated for Dropbox SDK v7.1"
 * Merged in lp:~crosser/duplicity/fix-small-file-upload
   - Fixed small file upload changes made in Dropbox SDK v7.1
-
+* Converted to use pytest instead of unittest (setup.py test is now discouraged)
+  - We use @pytest.mark.nocapture to mark the tests (gpg) that require
+    no capture of file streams (currently 10 tests).
+  - The rest of the tests are run normally
+* More pytest changes
+  - Use requirements.txt for dependencies
+  - Run unit tests first, then functional
+  - Some general cleanup
 
 New in v0.7.08 (2016/07/02)
 ---------------------------

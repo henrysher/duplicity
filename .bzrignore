@@ -19,3 +19,4 @@ random_seed
 testfiles
 testing/gnupg/.gpg-v21-migrated
 testing/gnupg/private-keys-v1.d
+.cache

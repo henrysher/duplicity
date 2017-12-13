@@ -21,6 +21,7 @@
 
 import sys
 import os
+import pytest
 import unittest
 import random
 
@@ -29,6 +30,7 @@ from duplicity import path
 from . import UnitTestCase
 
 
+@pytest.mark.nocapture
 class GPGTest(UnitTestCase):
     """Test GPGFile"""
     def setUp(self):

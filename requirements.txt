@@ -3,12 +3,16 @@ coverage
 dropbox==6.9.0
 fasteners
 future
+jottalib
+mock
 paramiko
 pexpect
 pycodestyle
 pydrive
 pylint
 pyrax
+pytest
+pytest-runner
 python-cloudfiles
 tox
 urllib3
