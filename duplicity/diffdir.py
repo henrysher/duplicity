@@ -395,7 +395,7 @@ class FileWithReadCounter:
             buf = self.infile.read(length)
         except IOError as ex:
             buf = ""
-            log.Warn(_("Error %s getting delta for %s") % (str(ex), util.ufn(self.infile.name)))
+            log.Warn(_("Error %s getting delta for %s") % (str(ex), self.infile.uc_name))
         if stats:
             stats.SourceFileSize += len(buf)
         return buf

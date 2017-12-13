@@ -763,7 +763,7 @@ def parse_cmdline_options(arglist):
     set_archive_dir(expand_archive_dir(globals.archive_dir,
                                        globals.backup_name))
 
-    log.Info(_("Using archive dir: %s") % (util.ufn(globals.archive_dir_path.name),))
+    log.Info(_("Using archive dir: %s") % (globals.archive_dir_path.uc_name,))
     log.Info(_("Using backup name: %s") % (globals.backup_name,))
 
     return args
@@ -990,7 +990,7 @@ def set_archive_dir(dirstring):
     archive_dir_path = path.Path(dirstring)
     if not archive_dir_path.isdir():
         log.FatalError(_("Specified archive directory '%s' does not exist, "
-                         "or is not a directory") % (util.ufn(archive_dir_path.name),),
+                         "or is not a directory") % (archive_dir_path.uc_name,),
                        log.ErrorCode.bad_archive_dir)
     globals.archive_dir_path = archive_dir_path
 
@@ -1059,18 +1059,18 @@ def process_local_dir(action, local_pathname):
     if action == "restore":
         if (local_path.exists() and not local_path.isemptydir()) and not globals.force:
             log.FatalError(_("Restore destination directory %s already "
-                             "exists.\nWill not overwrite.") % (util.ufn(local_path.name),),
+                             "exists.\nWill not overwrite.") % (local_path.uc_name,),
                            log.ErrorCode.restore_dir_exists)
     elif action == "verify":
         if not local_path.exists():
             log.FatalError(_("Verify directory %s does not exist") %
-                           (util.ufn(local_path.name),),
+                           (local_path.uc_name,),
                            log.ErrorCode.verify_dir_doesnt_exist)
     else:
         assert action == "full" or action == "inc"
         if not local_path.exists():
             log.FatalError(_("Backup source directory %s does not exist.")
-                           % (util.ufn(local_path.name),),
+                           % (local_path.uc_name,),
                            log.ErrorCode.backup_dir_doesnt_exist)
 
     globals.local_path = local_path

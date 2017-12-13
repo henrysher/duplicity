@@ -236,7 +236,7 @@ class ROPath:
         self.stat.st_mtime = int(tarinfo.mtime)
         if self.stat.st_mtime < 0:
             log.Warn(_("Warning: %s has negative mtime, treating as 0.")
-                     % (util.ufn(tarinfo.name)))
+                     % (tarinfo.uc_name))
             self.stat.st_mtime = 0
         self.stat.st_size = tarinfo.size
 
@@ -589,17 +589,17 @@ class Path(ROPath):
 
     def mkdir(self):
         """Make directory(s) at specified path"""
-        log.Info(_("Making directory %s") % util.ufn(self.name))
+        log.Info(_("Making directory %s") % self.uc_name)
         try:
             os.makedirs(self.name)
         except OSError:
             if (not globals.force):
-                raise PathException("Error creating directory %s" % util.ufn(self.name), 7)
+                raise PathException("Error creating directory %s" % self.uc_name, 7)
         self.setdata()
 
     def delete(self):
         """Remove this file"""
-        log.Info(_("Deleting %s") % util.ufn(self.name))
+        log.Info(_("Deleting %s") % self.uc_name)
         if self.isdir():
             util.ignore_missing(os.rmdir, self.name)
         else:
@@ -608,14 +608,14 @@ class Path(ROPath):
 
     def touch(self):
         """Open the file, write 0 bytes, close"""
-        log.Info(_("Touching %s") % util.ufn(self.name))
+        log.Info(_("Touching %s") % self.uc_name)
         fp = self.open("wb")
         fp.close()
 
     def deltree(self):
         """Remove self by recursively deleting files under it"""
         from duplicity import selection  # todo: avoid circ. dep. issue
-        log.Info(_("Deleting tree %s") % util.ufn(self.name))
+        log.Info(_("Deleting tree %s") % self.uc_name)
         itr = IterTreeReducer(PathDeleter, [])
         for path in selection.Select(self).set_iter():
             itr(path.index, path)
@@ -685,7 +685,7 @@ class Path(ROPath):
                 return temp_path
             _tmp_path_counter += 1
             assert _tmp_path_counter < 10000, \
-                u"Warning too many temp files created for " + util.ufn(self.name)
+                u"Warning too many temp files created for " + self.uc_name
 
     def compare_recursive(self, other, verbose=None):
         """Compare self to other Path, descending down directories"""
