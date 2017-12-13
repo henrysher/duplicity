@@ -20,7 +20,7 @@
 
 import os
 import subprocess
-import unittest
+import pytest
 
 if os.getenv('RUN_CODE_TESTS', None) == '1':
     # Make conditional so that we do not have to import in environments that
@@ -28,6 +28,9 @@ if os.getenv('RUN_CODE_TESTS', None) == '1':
     import pycodestyle
 
 from . import _top_dir, DuplicityTestCase  # @IgnorePep8
+
+skipCodeTest = pytest.mark.skipif(not os.getenv('RUN_CODE_TESTS', None) == '1',
+                                  reason='Must set environment var RUN_CODE_TESTS=1')
 
 
 class CodeTest(DuplicityTestCase):
@@ -40,8 +43,7 @@ class CodeTest(DuplicityTestCase):
         self.assertTrue(process.returncode in returncodes, output)
         self.assertEqual("", output, output)
 
-    @unittest.skipUnless(os.getenv('RUN_CODE_TESTS', None) == '1',
-                         'Must set environment var RUN_CODE_TESTS=1')
+    @skipCodeTest
     def test_2to3(self):
         # As we modernize the source code, we can remove more and more nofixes
         self.run_checker([
@@ -62,8 +64,7 @@ class CodeTest(DuplicityTestCase):
             "--nofix=xrange",
             _top_dir])
 
-    @unittest.skipUnless(os.getenv('RUN_CODE_TESTS', None) == '1',
-                         'Must set environment var RUN_CODE_TESTS=1')
+    @skipCodeTest
     def test_pylint(self):
         """Pylint test (requires pylint to be installed to pass)"""
         self.run_checker([
@@ -85,8 +86,7 @@ class CodeTest(DuplicityTestCase):
             # --msg-template
             [0, 32])
 
-    @unittest.skipUnless(os.getenv('RUN_CODE_TESTS', None) == '1',
-                         'Must set environment var RUN_CODE_TESTS=1')
+    @skipCodeTest
     def test_pep8(self):
         """Test that we conform to PEP-8 using pycodestyle."""
         # Note that the settings, ignores etc for pycodestyle are set in tox.ini, not here
