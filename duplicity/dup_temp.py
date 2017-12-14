@@ -264,7 +264,7 @@ class SrcIter:
             res = Block(self.fp.read(self.get_read_size()))
         except Exception:
             log.FatalError(_("Failed to read %s: %s") %
-                           (util.ufn(self.src.name), sys.exc_info()),
+                           (self.src.uc_name, sys.exc_info()),
                            log.ErrorCode.generic)
         if not res.data:
             self.fp.close()

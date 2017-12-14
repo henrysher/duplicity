@@ -649,7 +649,7 @@ class CollectionsStatus:
              u"-----------------",
              _("Connecting with backend: %s") %
              (self.backend.__class__.__name__,),
-             _("Archive dir: %s") % (util.ufn(self.archive_dir_path.name if self.archive_dir_path else 'None'),)]
+             _("Archive dir: %s") % (self.archive_dir_path.uc_name if self.archive_dir_path else 'None',)]
 
         l.append("\n" +
                  ngettext("Found %d secondary backup chain.",

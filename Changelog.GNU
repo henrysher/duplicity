@@ -1,3 +1,8 @@
+2017-12-14  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/08-ufn-to-uc_name
+      - Replace util.ufn(path.name) with path.uc_name throughout.
+
 2017-12-13  Kenneth Loafman  <kenneth@loafman.com>
 
     * More pytest changes
