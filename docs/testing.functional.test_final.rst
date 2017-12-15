@@ -1,5 +1,5 @@
-testing.functional.test_final module
-====================================
+testing\.functional\.test\_final module
+=======================================
 
 .. automodule:: testing.functional.test_final
     :members:

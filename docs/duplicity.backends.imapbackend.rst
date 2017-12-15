@@ -1,5 +1,5 @@
-duplicity.backends.imapbackend module
-=====================================
+duplicity\.backends\.imapbackend module
+=======================================
 
 .. automodule:: duplicity.backends.imapbackend
     :members:

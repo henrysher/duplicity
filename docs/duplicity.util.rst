@@ -1,5 +1,5 @@
-duplicity.util module
-=====================
+duplicity\.util module
+======================
 
 .. automodule:: duplicity.util
     :members:

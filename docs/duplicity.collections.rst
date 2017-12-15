@@ -1,5 +1,5 @@
-duplicity.collections module
-============================
+duplicity\.collections module
+=============================
 
 .. automodule:: duplicity.collections
     :members:

@@ -1,5 +1,5 @@
-duplicity.backends.pyrax_identity package
-=========================================
+duplicity\.backends\.pyrax\_identity package
+============================================
 
 Submodules
 ----------

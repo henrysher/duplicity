@@ -1,5 +1,5 @@
-duplicity.progress module
-=========================
+duplicity\.progress module
+==========================
 
 .. automodule:: duplicity.progress
     :members:

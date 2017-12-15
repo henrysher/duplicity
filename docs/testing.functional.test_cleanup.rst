@@ -1,5 +1,5 @@
-testing.functional.test_cleanup module
-======================================
+testing\.functional\.test\_cleanup module
+=========================================
 
 .. automodule:: testing.functional.test_cleanup
     :members:

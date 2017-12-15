@@ -1,5 +1,5 @@
-testing.unit.test_manifest module
-=================================
+testing\.unit\.test\_manifest module
+====================================
 
 .. automodule:: testing.unit.test_manifest
     :members:

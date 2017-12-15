@@ -1,5 +1,5 @@
-duplicity.backends.pyrax_identity.hubic module
-==============================================
+duplicity\.backends\.pyrax\_identity\.hubic module
+==================================================
 
 .. automodule:: duplicity.backends.pyrax_identity.hubic
     :members:

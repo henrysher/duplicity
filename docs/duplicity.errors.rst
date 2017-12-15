@@ -1,5 +1,5 @@
-duplicity.errors module
-=======================
+duplicity\.errors module
+========================
 
 .. automodule:: duplicity.errors
     :members:

@@ -1,5 +1,5 @@
-duplicity.backends.hubicbackend module
-======================================
+duplicity\.backends\.hubicbackend module
+========================================
 
 .. automodule:: duplicity.backends.hubicbackend
     :members:

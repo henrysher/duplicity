@@ -1,5 +1,5 @@
-testing.functional.test_badupload module
-========================================
+testing\.functional\.test\_badupload module
+===========================================
 
 .. automodule:: testing.functional.test_badupload
     :members:

@@ -1,5 +1,5 @@
-duplicity.backends.par2backend module
-=====================================
+duplicity\.backends\.par2backend module
+=======================================
 
 .. automodule:: duplicity.backends.par2backend
     :members:

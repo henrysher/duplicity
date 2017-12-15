@@ -1,5 +1,5 @@
-testing.unit.test_diffdir module
-================================
+testing\.unit\.test\_diffdir module
+===================================
 
 .. automodule:: testing.unit.test_diffdir
     :members:

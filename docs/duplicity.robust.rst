@@ -1,5 +1,5 @@
-duplicity.robust module
-=======================
+duplicity\.robust module
+========================
 
 .. automodule:: duplicity.robust
     :members:

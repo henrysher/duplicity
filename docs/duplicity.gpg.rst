@@ -1,5 +1,5 @@
-duplicity.gpg module
-====================
+duplicity\.gpg module
+=====================
 
 .. automodule:: duplicity.gpg
     :members:

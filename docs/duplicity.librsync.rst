@@ -1,5 +1,5 @@
-duplicity.librsync module
-=========================
+duplicity\.librsync module
+==========================
 
 .. automodule:: duplicity.librsync
     :members:

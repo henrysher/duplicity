@@ -1,5 +1,5 @@
-duplicity.backends.multibackend module
-======================================
+duplicity\.backends\.multibackend module
+========================================
 
 .. automodule:: duplicity.backends.multibackend
     :members:

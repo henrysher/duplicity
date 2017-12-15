@@ -1,5 +1,5 @@
-duplicity.globals module
-========================
+duplicity\.globals module
+=========================
 
 .. automodule:: duplicity.globals
     :members:

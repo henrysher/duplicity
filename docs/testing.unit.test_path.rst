@@ -1,5 +1,5 @@
-testing.unit.test_path module
-=============================
+testing\.unit\.test\_path module
+================================
 
 .. automodule:: testing.unit.test_path
     :members:

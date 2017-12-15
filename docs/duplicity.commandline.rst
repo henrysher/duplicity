@@ -1,5 +1,5 @@
-duplicity.commandline module
-============================
+duplicity\.commandline module
+=============================
 
 .. automodule:: duplicity.commandline
     :members:

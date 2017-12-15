@@ -1,5 +1,5 @@
-testing.functional.test_verify module
-=====================================
+testing\.functional\.test\_verify module
+========================================
 
 .. automodule:: testing.functional.test_verify
     :members:

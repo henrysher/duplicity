@@ -1,5 +1,5 @@
-testing.functional.test_rdiffdir module
-=======================================
+testing\.functional\.test\_rdiffdir module
+==========================================
 
 .. automodule:: testing.functional.test_rdiffdir
     :members:

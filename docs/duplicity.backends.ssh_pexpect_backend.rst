@@ -1,5 +1,5 @@
-duplicity.backends.ssh_pexpect_backend module
-=============================================
+duplicity\.backends\.ssh\_pexpect\_backend module
+=================================================
 
 .. automodule:: duplicity.backends.ssh_pexpect_backend
     :members:

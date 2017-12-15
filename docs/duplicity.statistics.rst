@@ -1,5 +1,5 @@
-duplicity.statistics module
-===========================
+duplicity\.statistics module
+============================
 
 .. automodule:: duplicity.statistics
     :members:

@@ -1,5 +1,5 @@
-duplicity.diffdir module
-========================
+duplicity\.diffdir module
+=========================
 
 .. automodule:: duplicity.diffdir
     :members:

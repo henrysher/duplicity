@@ -1,5 +1,5 @@
-duplicity.backends.swiftbackend module
-======================================
+duplicity\.backends\.swiftbackend module
+========================================
 
 .. automodule:: duplicity.backends.swiftbackend
     :members:

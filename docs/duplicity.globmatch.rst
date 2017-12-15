@@ -1,5 +1,5 @@
-duplicity.globmatch module
-==========================
+duplicity\.globmatch module
+===========================
 
 .. automodule:: duplicity.globmatch
     :members:

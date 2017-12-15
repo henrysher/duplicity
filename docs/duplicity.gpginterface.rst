@@ -1,5 +1,5 @@
-duplicity.gpginterface module
-=============================
+duplicity\.gpginterface module
+==============================
 
 .. automodule:: duplicity.gpginterface
     :members:

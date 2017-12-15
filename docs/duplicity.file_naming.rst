@@ -1,5 +1,5 @@
-duplicity.file_naming module
-============================
+duplicity\.file\_naming module
+==============================
 
 .. automodule:: duplicity.file_naming
     :members:

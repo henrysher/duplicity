@@ -1,5 +1,5 @@
-testing.unit.test_gpg module
-============================
+testing\.unit\.test\_gpg module
+===============================
 
 .. automodule:: testing.unit.test_gpg
     :members:

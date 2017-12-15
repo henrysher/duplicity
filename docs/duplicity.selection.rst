@@ -1,5 +1,5 @@
-duplicity.selection module
-==========================
+duplicity\.selection module
+===========================
 
 .. automodule:: duplicity.selection
     :members:

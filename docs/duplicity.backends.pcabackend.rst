@@ -1,7 +1,7 @@
-duplicity\.backends\.hsibackend module
+duplicity\.backends\.pcabackend module
 ======================================
 
-.. automodule:: duplicity.backends.hsibackend
+.. automodule:: duplicity.backends.pcabackend
     :members:
     :undoc-members:
     :show-inheritance:

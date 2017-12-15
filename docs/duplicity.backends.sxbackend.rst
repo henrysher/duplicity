@@ -1,5 +1,5 @@
-duplicity.backends.sxbackend module
-===================================
+duplicity\.backends\.sxbackend module
+=====================================
 
 .. automodule:: duplicity.backends.sxbackend
     :members:

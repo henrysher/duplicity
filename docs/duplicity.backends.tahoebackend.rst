@@ -1,5 +1,5 @@
-duplicity.backends.tahoebackend module
-======================================
+duplicity\.backends\.tahoebackend module
+========================================
 
 .. automodule:: duplicity.backends.tahoebackend
     :members:

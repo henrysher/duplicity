@@ -1,5 +1,5 @@
-testing.overrides.gettext module
-================================
+testing\.overrides\.gettext module
+==================================
 
 .. automodule:: testing.overrides.gettext
     :members:

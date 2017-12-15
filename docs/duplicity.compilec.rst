@@ -1,7 +1,7 @@
-duplicity\.manifest module
+duplicity\.compilec module
 ==========================
 
-.. automodule:: duplicity.manifest
+.. automodule:: duplicity.compilec
     :members:
     :undoc-members:
     :show-inheritance:

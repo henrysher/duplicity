@@ -1,5 +1,5 @@
-duplicity.backends package
-==========================
+duplicity\.backends package
+===========================
 
 Subpackages
 -----------
@@ -14,17 +14,18 @@ Submodules
 .. toctree::
 
    duplicity.backends.acdclibackend
+   duplicity.backends.adbackend
    duplicity.backends.azurebackend
    duplicity.backends.b2backend
    duplicity.backends.botobackend
    duplicity.backends.cfbackend
-   duplicity.backends.copycombackend
    duplicity.backends.dpbxbackend
    duplicity.backends.gdocsbackend
    duplicity.backends.giobackend
    duplicity.backends.hsibackend
    duplicity.backends.hubicbackend
    duplicity.backends.imapbackend
+   duplicity.backends.jottacloudbackend
    duplicity.backends.lftpbackend
    duplicity.backends.localbackend
    duplicity.backends.mediafirebackend
@@ -33,6 +34,7 @@ Submodules
    duplicity.backends.ncftpbackend
    duplicity.backends.onedrivebackend
    duplicity.backends.par2backend
+   duplicity.backends.pcabackend
    duplicity.backends.pydrivebackend
    duplicity.backends.rsyncbackend
    duplicity.backends.ssh_paramiko_backend

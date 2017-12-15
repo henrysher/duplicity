@@ -1,5 +1,5 @@
-duplicity.backends.gdocsbackend module
-======================================
+duplicity\.backends\.gdocsbackend module
+========================================
 
 .. automodule:: duplicity.backends.gdocsbackend
     :members:

@@ -1,5 +1,5 @@
-duplicity.backends.ncftpbackend module
-======================================
+duplicity\.backends\.ncftpbackend module
+========================================
 
 .. automodule:: duplicity.backends.ncftpbackend
     :members:

@@ -1,5 +1,5 @@
-testing.unit.test_selection module
-==================================
+testing\.unit\.test\_selection module
+=====================================
 
 .. automodule:: testing.unit.test_selection
     :members:

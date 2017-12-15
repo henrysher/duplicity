@@ -1,5 +1,5 @@
-duplicity.path module
-=====================
+duplicity\.path module
+======================
 
 .. automodule:: duplicity.path
     :members:

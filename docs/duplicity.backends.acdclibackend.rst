@@ -1,5 +1,5 @@
-duplicity.backends.acdclibackend module
-=======================================
+duplicity\.backends\.acdclibackend module
+=========================================
 
 .. automodule:: duplicity.backends.acdclibackend
     :members:

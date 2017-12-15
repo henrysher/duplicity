@@ -1,5 +1,5 @@
-duplicity.backends.mediafirebackend module
-==========================================
+duplicity\.backends\.mediafirebackend module
+============================================
 
 .. automodule:: duplicity.backends.mediafirebackend
     :members:

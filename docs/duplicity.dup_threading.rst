@@ -1,5 +1,5 @@
-duplicity.dup_threading module
-==============================
+duplicity\.dup\_threading module
+================================
 
 .. automodule:: duplicity.dup_threading
     :members:

@@ -1,5 +1,5 @@
-duplicity.tarfile module
-========================
+duplicity\.tarfile module
+=========================
 
 .. automodule:: duplicity.tarfile
     :members:

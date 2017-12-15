@@ -18,6 +18,7 @@ Submodules
    duplicity.cached_ops
    duplicity.collections
    duplicity.commandline
+   duplicity.compilec
    duplicity.diffdir
    duplicity.dup_temp
    duplicity.dup_threading

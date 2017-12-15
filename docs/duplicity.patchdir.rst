@@ -1,5 +1,5 @@
-duplicity.patchdir module
-=========================
+duplicity\.patchdir module
+==========================
 
 .. automodule:: duplicity.patchdir
     :members:

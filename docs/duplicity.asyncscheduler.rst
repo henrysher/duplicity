@@ -1,5 +1,5 @@
-duplicity.asyncscheduler module
-===============================
+duplicity\.asyncscheduler module
+================================
 
 .. automodule:: duplicity.asyncscheduler
     :members:

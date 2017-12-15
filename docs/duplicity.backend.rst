@@ -1,5 +1,5 @@
-duplicity.backend module
-========================
+duplicity\.backend module
+=========================
 
 .. automodule:: duplicity.backend
     :members:

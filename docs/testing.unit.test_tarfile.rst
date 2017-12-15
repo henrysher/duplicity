@@ -1,5 +1,5 @@
-testing.unit.test_tarfile module
-================================
+testing\.unit\.test\_tarfile module
+===================================
 
 .. automodule:: testing.unit.test_tarfile
     :members:

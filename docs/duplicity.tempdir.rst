@@ -1,5 +1,5 @@
-duplicity.tempdir module
-========================
+duplicity\.tempdir module
+=========================
 
 .. automodule:: duplicity.tempdir
     :members:

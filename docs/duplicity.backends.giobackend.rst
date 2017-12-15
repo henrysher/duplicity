@@ -1,5 +1,5 @@
-duplicity.backends.giobackend module
-====================================
+duplicity\.backends\.giobackend module
+======================================
 
 .. automodule:: duplicity.backends.giobackend
     :members:

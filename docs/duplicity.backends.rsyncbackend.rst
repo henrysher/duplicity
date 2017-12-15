@@ -1,5 +1,5 @@
-duplicity.backends.rsyncbackend module
-======================================
+duplicity\.backends\.rsyncbackend module
+========================================
 
 .. automodule:: duplicity.backends.rsyncbackend
     :members:

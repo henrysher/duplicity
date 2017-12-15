@@ -1,7 +1,7 @@
-testing\.functional\.test\_log module
+duplicity\.backends\.adbackend module
 =====================================
 
-.. automodule:: testing.functional.test_log
+.. automodule:: duplicity.backends.adbackend
     :members:
     :undoc-members:
     :show-inheritance:

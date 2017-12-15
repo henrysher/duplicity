@@ -1,5 +1,5 @@
-duplicity.lazy module
-=====================
+duplicity\.lazy module
+======================
 
 .. automodule:: duplicity.lazy
     :members:

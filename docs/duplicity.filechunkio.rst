@@ -1,5 +1,5 @@
-duplicity.filechunkio module
-============================
+duplicity\.filechunkio module
+=============================
 
 .. automodule:: duplicity.filechunkio
     :members:

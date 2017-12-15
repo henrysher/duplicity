@@ -1,5 +1,5 @@
-duplicity.backends.azurebackend module
-======================================
+duplicity\.backends\.azurebackend module
+========================================
 
 .. automodule:: duplicity.backends.azurebackend
     :members:

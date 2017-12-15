@@ -1,5 +1,5 @@
-duplicity.backends.lftpbackend module
-=====================================
+duplicity\.backends\.lftpbackend module
+=======================================
 
 .. automodule:: duplicity.backends.lftpbackend
     :members:

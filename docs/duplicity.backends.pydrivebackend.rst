@@ -1,5 +1,5 @@
-duplicity.backends.pydrivebackend module
-========================================
+duplicity\.backends\.pydrivebackend module
+==========================================
 
 .. automodule:: duplicity.backends.pydrivebackend
     :members:

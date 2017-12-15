@@ -1,5 +1,5 @@
-duplicity.dup_temp module
-=========================
+duplicity\.dup\_temp module
+===========================
 
 .. automodule:: duplicity.dup_temp
     :members:

@@ -1,5 +1,5 @@
-testing.test_code module
-========================
+testing\.test\_code module
+==========================
 
 .. automodule:: testing.test_code
     :members:

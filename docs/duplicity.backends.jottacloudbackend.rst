@@ -1,7 +1,7 @@
-testing\.unit\.test\_backend\_instance module
+duplicity\.backends\.jottacloudbackend module
 =============================================
 
-.. automodule:: testing.unit.test_backend_instance
+.. automodule:: duplicity.backends.jottacloudbackend
     :members:
     :undoc-members:
     :show-inheritance:

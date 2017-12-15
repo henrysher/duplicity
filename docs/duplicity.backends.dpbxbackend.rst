@@ -1,5 +1,5 @@
-duplicity.backends.dpbxbackend module
-=====================================
+duplicity\.backends\.dpbxbackend module
+=======================================
 
 .. automodule:: duplicity.backends.dpbxbackend
     :members:

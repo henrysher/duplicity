@@ -1,5 +1,5 @@
-testing.unit.test_lazy module
-=============================
+testing\.unit\.test\_lazy module
+================================
 
 .. automodule:: testing.unit.test_lazy
     :members:

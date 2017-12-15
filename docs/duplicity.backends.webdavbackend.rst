@@ -1,5 +1,5 @@
-duplicity.backends.webdavbackend module
-=======================================
+duplicity\.backends\.webdavbackend module
+=========================================
 
 .. automodule:: duplicity.backends.webdavbackend
     :members:

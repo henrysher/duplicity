@@ -1,5 +1,5 @@
-testing.unit package
-====================
+testing\.unit package
+=====================
 
 Submodules
 ----------

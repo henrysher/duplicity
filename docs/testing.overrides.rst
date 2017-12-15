@@ -1,5 +1,5 @@
-testing.overrides package
-=========================
+testing\.overrides package
+==========================
 
 Submodules
 ----------

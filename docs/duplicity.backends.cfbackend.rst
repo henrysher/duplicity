@@ -1,5 +1,5 @@
-duplicity.backends.cfbackend module
-===================================
+duplicity\.backends\.cfbackend module
+=====================================
 
 .. automodule:: duplicity.backends.cfbackend
     :members:

@@ -1,5 +1,5 @@
-duplicity.log module
-====================
+duplicity\.log module
+=====================
 
 .. automodule:: duplicity.log
     :members:

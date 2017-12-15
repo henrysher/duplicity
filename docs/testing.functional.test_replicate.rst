@@ -1,7 +1,7 @@
-duplicity\.backends\.onedrivebackend module
+testing\.functional\.test\_replicate module
 ===========================================
 
-.. automodule:: duplicity.backends.onedrivebackend
+.. automodule:: testing.functional.test_replicate
     :members:
     :undoc-members:
     :show-inheritance:

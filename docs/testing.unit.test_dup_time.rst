@@ -1,5 +1,5 @@
-testing.unit.test_dup_time module
-=================================
+testing\.unit\.test\_dup\_time module
+=====================================
 
 .. automodule:: testing.unit.test_dup_time
     :members:
