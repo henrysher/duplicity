@@ -18,8 +18,6 @@
 # along with duplicity; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-# pylint: skip-file
-
 import os
 import subprocess
 import atexit
@@ -51,8 +49,8 @@ class GIOBackend(duplicity.backend.Backend):
        URLs look like schema://user@server/path.
     """
     def __init__(self, parsed_url):
-        from gi.repository import Gio  # @UnresolvedImport
-        from gi.repository import GLib  # @UnresolvedImport
+        from gi.repository import Gio  # @UnresolvedImport  # pylint: disable=import-error
+        from gi.repository import GLib  # @UnresolvedImport  # pylint: disable=import-error
 
         class DupMountOperation(Gio.MountOperation):
             """A simple MountOperation that grabs the password from the environment
@@ -100,8 +98,8 @@ class GIOBackend(duplicity.backend.Backend):
                 raise
 
     def __done_with_mount(self, fileobj, result, loop):
-        from gi.repository import Gio  # @UnresolvedImport
-        from gi.repository import GLib  # @UnresolvedImport
+        from gi.repository import Gio  # @UnresolvedImport  # pylint: disable=import-error
+        from gi.repository import GLib  # @UnresolvedImport  # pylint: disable=import-error
         try:
             fileobj.mount_enclosing_volume_finish(result)
         except GLib.GError as e:
@@ -115,7 +113,7 @@ class GIOBackend(duplicity.backend.Backend):
         pass
 
     def __copy_file(self, source, target):
-        from gi.repository import Gio  # @UnresolvedImport
+        from gi.repository import Gio  # @UnresolvedImport  # pylint: disable=import-error
         # Don't pass NOFOLLOW_SYMLINKS here. Some backends (e.g. google-drive:)
         # use symlinks internally for all files. In the normal course of
         # events, we never deal with symlinks anyway, just tarballs.
@@ -124,8 +122,8 @@ class GIOBackend(duplicity.backend.Backend):
                     None, self.__copy_progress, None)
 
     def _error_code(self, operation, e):
-        from gi.repository import Gio  # @UnresolvedImport
-        from gi.repository import GLib  # @UnresolvedImport
+        from gi.repository import Gio  # @UnresolvedImport  # pylint: disable=import-error
+        from gi.repository import GLib  # @UnresolvedImport  # pylint: disable=import-error
         if isinstance(e, GLib.GError):
             if e.code == Gio.IOErrorEnum.FAILED and operation == 'delete':
                 # Sometimes delete will return a generic failure on a file not
@@ -139,19 +137,19 @@ class GIOBackend(duplicity.backend.Backend):
                 return log.ErrorCode.backend_no_space
 
     def _put(self, source_path, remote_filename):
-        from gi.repository import Gio  # @UnresolvedImport
+        from gi.repository import Gio  # @UnresolvedImport  # pylint: disable=import-error
         source_file = Gio.File.new_for_path(source_path.name)
         target_file = self.remote_file.get_child_for_display_name(remote_filename)
         self.__copy_file(source_file, target_file)
 
     def _get(self, filename, local_path):
-        from gi.repository import Gio  # @UnresolvedImport
+        from gi.repository import Gio  # @UnresolvedImport  # pylint: disable=import-error
         source_file = self.remote_file.get_child_for_display_name(filename)
         target_file = Gio.File.new_for_path(local_path.name)
         self.__copy_file(source_file, target_file)
 
     def _list(self):
-        from gi.repository import Gio  # @UnresolvedImport
+        from gi.repository import Gio  # @UnresolvedImport  # pylint: disable=import-error
         files = []
         # We grab display name, rather than file name because some backends
         # (e.g. google-drive:) use filesystem-specific IDs as file names and
@@ -171,7 +169,7 @@ class GIOBackend(duplicity.backend.Backend):
         target_file.delete(None)
 
     def _query(self, filename):
-        from gi.repository import Gio  # @UnresolvedImport
+        from gi.repository import Gio  # @UnresolvedImport  # pylint: disable=import-error
         target_file = self.remote_file.get_child_for_display_name(filename)
         info = target_file.query_info(Gio.FILE_ATTRIBUTE_STANDARD_SIZE,
                                       Gio.FileQueryInfoFlags.NONE, None)
