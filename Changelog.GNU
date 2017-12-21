@@ -1,3 +1,9 @@
+2017-12-20  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixes so pylint 1.8.1 does not complain about missing conditional imports.
+      - Fix dpbxbackend so that imports require instantiation of the class.
+      - Added pylint: disable=import-error to a couple of conditional imports
+
 2017-12-14  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~aaron-whitehouse/duplicity/08-ufn-to-uc_name

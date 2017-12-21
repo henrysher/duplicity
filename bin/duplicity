@@ -62,23 +62,13 @@ from duplicity import tempdir
 from duplicity import util
 
 if '--pydevd' in sys.argv or os.getenv('PYDEVD', None):
-    # The following is for starting remote debugging in Eclipse with Pydev.
-    # Adjust the path to your location and version of Eclipse and Pydev.
-    if platform.platform().startswith('Linux'):
-        pysrc = "/opt/liclipse/plugins/org.python.pydev_5.7.0.201704111135/pysrc"
-    elif platform.platform().startswith('Darwin'):
-        pysrc = "/Applications/LiClipse.app/Contents/liclipse/plugins/org.python.pydev_5.7.0.201704111135/pysrc"
-    else:
-        raise Exception("Platform %s not supported by pydevd." % platform.platform())
-    sys.path.append(pysrc)
-    import pydevd  # @UnresolvedImport
+    import pydevd  # @UnresolvedImport  # pylint: disable=import-error
     pydevd.settrace()
     # In a dev environment the path is screwed so fix it.
     base = sys.path.pop(0)
     base = base.split(os.path.sep)[:-1]
     base = os.path.sep.join(base)
     sys.path.insert(0, base)
-# end remote debugger startup
 
 log.setup()
 

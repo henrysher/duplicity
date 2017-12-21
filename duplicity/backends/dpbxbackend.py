@@ -1,6 +1,4 @@
 # -*- Mode:Python; indent-tabs-mode:nil; tab-width:4 -*-
-# pylint: skip-file
-# pylint: skip-file
 #
 # Copyright 2013 jno <jno@pisem.net>
 # Copyright 2016 Dmitry Nezhevenko <dion@dion.org.ua>
@@ -28,24 +26,20 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import StringIO
-from duplicity import log, globals
-from duplicity import progress
-import duplicity.backend
-from duplicity.errors import BackendException
 import os
+import re
 import sys
+import time
 import traceback
 import urllib
-import re
 
-from dropbox import Dropbox
-from dropbox.exceptions import AuthError, BadInputError, ApiError
-from dropbox.files import UploadSessionCursor, CommitInfo, WriteMode, \
-    GetMetadataError, DeleteError, UploadSessionLookupError, ListFolderError
-from dropbox.oauth import DropboxOAuth2FlowNoRedirect
-from requests.exceptions import ConnectionError
-import time
+from duplicity import log, globals
+from duplicity import progress
+from duplicity.errors import BackendException
 from duplicity.globals import num_retries
+from requests.exceptions import ConnectionError
+import duplicity.backend
+
 
 # This is chunk size for upload using Dpbx chumked API v2. It doesn't
 # make sense to make it much large since Dpbx SDK uses connection pool
@@ -94,6 +88,22 @@ class DPBXBackend(duplicity.backend.Backend):
 
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
+
+        global Dropbox
+        global AuthError, BadInputError, ApiError
+        global UploadSessionCursor, CommitInfo
+        global WriteMode, GetMetadataError
+        global DeleteError, UploadSessionLookupError
+        global ListFolderError
+        global DropboxOAuth2FlowNoRedirect
+
+        from dropbox import Dropbox  # pylint: disable=import-error
+        from dropbox.exceptions import AuthError, BadInputError, ApiError  # pylint: disable=import-error
+        from dropbox.files import (UploadSessionCursor, CommitInfo,  # pylint: disable=import-error
+                                   WriteMode, GetMetadataError,  # pylint: disable=import-error
+                                   DeleteError, UploadSessionLookupError,  # pylint: disable=import-error
+                                   ListFolderError)  # pylint: disable=import-error
+        from dropbox.oauth import DropboxOAuth2FlowNoRedirect  # pylint: disable=import-error
 
         self.api_account = None
         self.api_client = None

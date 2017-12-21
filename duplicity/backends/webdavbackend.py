@@ -272,7 +272,7 @@ class WebDAVBackend(duplicity.backend.Backend):
         return urllib2.parse_keqv_list(urllib2.parse_http_list(challenge_string))
 
     def get_kerberos_authorization(self):
-        import kerberos
+        import kerberos  # pylint: disable=import-error
         _, ctx = kerberos.authGSSClientInit("HTTP@%s" % self.conn.host)
         kerberos.authGSSClientStep(ctx, "")
         tgt = kerberos.authGSSClientResponse(ctx)
