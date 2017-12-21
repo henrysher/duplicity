@@ -568,7 +568,7 @@ class BackendWrapper(object):
                 # There shouldn't be any encoding errors for files we care
                 # about, since duplicity filenames are ascii.  But user files
                 # may be in the same directory.  So just replace characters.
-                return filename.encode(globals.fsencoding, 'replace')
+                return util.fsencode(filename)
             else:
                 return filename
 
