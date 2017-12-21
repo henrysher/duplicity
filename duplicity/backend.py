@@ -511,7 +511,7 @@ class BackendWrapper(object):
 
     def __do_put(self, source_path, remote_filename):
         if hasattr(self.backend, '_put'):
-            log.Info(_("Writing %s") % util.ufn(remote_filename))
+            log.Info(_("Writing %s") % util.fsdecode(remote_filename))
             self.backend._put(source_path, remote_filename)
         else:
             raise NotImplementedError()

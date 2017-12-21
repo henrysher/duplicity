@@ -59,11 +59,11 @@ except ImportError:
 
     def fsdecode(bytes_filename):
         """Convert a filename encoded in the system encoding to unicode"""
-        # For paths, just use path.uname rather than converting with this
+        # For paths, just use path.uc_name rather than converting with this
         # If we are not doing any cleverness with non-unicode filename bytes,
         # decoding using system encoding is good enough. Use "ignore" as
         # Linux paths can contain non-Unicode characters
-        return bytes_filename.decode(globals.fsencoding, "ignore")
+        return bytes_filename.decode(globals.fsencoding, "replace")
 
 
 def exception_traceback(limit=50):
@@ -84,20 +84,14 @@ def exception_traceback(limit=50):
 
 def escape(string):
     "Convert a (bytes) filename to a format suitable for logging (quoted utf8)"
-    string = ufn(string).encode('unicode-escape', 'replace')
+    string = fsdecode(string).encode('unicode-escape', 'replace')
     return u"'%s'" % string.decode('utf8', 'replace')
-
-
-def ufn(filename):
-    """Convert a (bytes) filename to unicode for printing"""
-    # Note: path.uc_name is preferable for paths
-    return filename.decode(globals.fsencoding, "replace")
 
 
 def uindex(index):
     "Convert an index (a tuple of path parts) to unicode for printing"
     if index:
-        return os.path.join(*list(map(ufn, index)))
+        return os.path.join(*list(map(fsdecode, index)))
     else:
         return u'.'
 
@@ -107,7 +101,7 @@ def uexc(e):
     # non-ascii will cause a UnicodeDecodeError when implicitly decoding to
     # unicode.  So we decode manually, using the filesystem encoding.
     # 99.99% of the time, this will be a fine encoding to use.
-    return ufn(unicode(e).encode('utf-8'))
+    return fsdecode(unicode(e).encode('utf-8'))
 
 
 def maybe_ignore_errors(fn):

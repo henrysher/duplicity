@@ -410,7 +410,7 @@ class ITRBranch:
             filename = os.path.join(*self.index)  # pylint: disable=not-an-iterable
         else:
             filename = "."
-        log.Warn(_("Error '%s' processing %s") % (exc, util.ufn(filename)),
+        log.Warn(_("Error '%s' processing %s") % (exc, util.fsdecode(filename)),
                  log.WarningCode.cannot_process,
                  util.escape(filename))
 
@@ -420,6 +420,6 @@ class ITRBranch:
             index_str = "."
         else:
             index_str = os.path.join(*index)
-        log.Warn(_("Skipping %s because of previous error") % util.ufn(index_str),
+        log.Warn(_("Skipping %s because of previous error") % util.fsdecode(index_str),
                  log.WarningCode.process_skipped,
                  util.escape(index_str))

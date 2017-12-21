@@ -105,7 +105,7 @@ def delta_iter_error_handler(exc, new_path, sig_path, sig_tar=None):
         index_string = sig_path.get_relative_path()
     else:
         assert 0, "Both new and sig are None for some reason"
-    log.Warn(_("Error %s getting delta for %s") % (str(exc), util.ufn(index_string)))
+    log.Warn(_("Error %s getting delta for %s") % (str(exc), util.fsdecode(index_string)))
     return None
 
 
@@ -165,14 +165,14 @@ def log_delta_path(delta_path, new_path=None, stats=None):
         if new_path and stats:
             stats.add_new_file(new_path)
         log.Info(_("A %s") %
-                 (util.ufn(delta_path.get_relative_path())),
+                 (util.fsdecode(delta_path.get_relative_path())),
                  log.InfoCode.diff_file_new,
                  util.escape(delta_path.get_relative_path()))
     else:
         if new_path and stats:
             stats.add_changed_file(new_path)
         log.Info(_("M %s") %
-                 (util.ufn(delta_path.get_relative_path())),
+                 (util.fsdecode(delta_path.get_relative_path())),
                  log.InfoCode.diff_file_changed,
                  util.escape(delta_path.get_relative_path()))
 
@@ -202,7 +202,7 @@ def get_delta_iter(new_iter, sig_iter, sig_fileobj=None):
             if sig_path and sig_path.exists() and sig_path.index != ():
                 # but signature says it did
                 log.Info(_("D %s") %
-                         (util.ufn(sig_path.get_relative_path())),
+                         (util.fsdecode(sig_path.get_relative_path())),
                          log.InfoCode.diff_file_deleted,
                          util.escape(sig_path.get_relative_path()))
                 if sigTarFile:
