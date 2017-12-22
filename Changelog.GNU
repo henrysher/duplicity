@@ -1,3 +1,10 @@
+2017-12-22  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/08-ufn-to-fsdecode
+      - Change util.fsdecode to use "replace" instead of "ignore" (matching behaviour of util.ufn)
+      - Replace all uses of ufn with fsdecode
+      - Make backend.tobytes use util.fsencode rather than reimplementing
+
 2017-12-20  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixes so pylint 1.8.1 does not complain about missing conditional imports.

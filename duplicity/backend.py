@@ -511,7 +511,7 @@ class BackendWrapper(object):
 
     def __do_put(self, source_path, remote_filename):
         if hasattr(self.backend, '_put'):
-            log.Info(_("Writing %s") % util.ufn(remote_filename))
+            log.Info(_("Writing %s") % util.fsdecode(remote_filename))
             self.backend._put(source_path, remote_filename)
         else:
             raise NotImplementedError()
@@ -568,7 +568,7 @@ class BackendWrapper(object):
                 # There shouldn't be any encoding errors for files we care
                 # about, since duplicity filenames are ascii.  But user files
                 # may be in the same directory.  So just replace characters.
-                return filename.encode(globals.fsencoding, 'replace')
+                return util.fsencode(filename)
             else:
                 return filename
 

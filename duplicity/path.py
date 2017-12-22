@@ -92,7 +92,7 @@ class ROPath:
         elif stat.S_ISFIFO(st_mode):
             self.type = "fifo"
         elif stat.S_ISSOCK(st_mode):
-            raise PathException(util.ufn(self.get_relative_path()) +
+            raise PathException(util.fsdecode(self.get_relative_path()) +
                                 u"is a socket, unsupported by tar")
             self.type = "sock"
         elif stat.S_ISCHR(st_mode):
@@ -109,7 +109,7 @@ class ROPath:
                                 os.minor(self.stat.st_rdev))
             except:
                 log.Warn(_("Warning: %s invalid devnums (0x%X), treating as (0, 0).")
-                         % (util.ufn(self.get_relative_path()), self.stat.st_rdev))
+                         % (util.fsdecode(self.get_relative_path()), self.stat.st_rdev))
                 self.devnums = (0, 0)
 
     def blank(self):
@@ -295,7 +295,7 @@ class ROPath:
             ti.uid, ti.gid = self.stat.st_uid, self.stat.st_gid
             if self.stat.st_mtime < 0:
                 log.Warn(_("Warning: %s has negative mtime, treating as 0.")
-                         % (util.ufn(self.get_relative_path())))
+                         % (util.fsdecode(self.get_relative_path())))
                 ti.mtime = 0
             else:
                 ti.mtime = int(self.stat.st_mtime)
@@ -359,7 +359,7 @@ class ROPath:
         """
         def log_diff(log_string):
             log_str = _("Difference found:") + u" " + log_string
-            log.Notice(log_str % (util.ufn(self.get_relative_path())))
+            log.Notice(log_str % (util.fsdecode(self.get_relative_path())))
 
         if include_data is False:
             return True

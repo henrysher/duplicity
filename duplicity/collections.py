@@ -168,7 +168,7 @@ class BackupSet:
         try:
             self.backend.delete(rfn)
         except Exception:
-            log.Debug(_("BackupSet.delete: missing %s") % [util.ufn(f) for f in rfn])
+            log.Debug(_("BackupSet.delete: missing %s") % [util.fsdecode(f) for f in rfn])
             pass
         if self.action not in ["collection-status", "replicate"]:
             local_filename_list = globals.archive_dir_path.listdir()
@@ -182,7 +182,7 @@ class BackupSet:
                 try:
                     globals.archive_dir_path.append(lfn).delete()
                 except Exception:
-                    log.Debug(_("BackupSet.delete: missing %s") % [util.ufn(f) for f in lfn])
+                    log.Debug(_("BackupSet.delete: missing %s") % [util.fsdecode(f) for f in lfn])
                     pass
         util.release_lockfile()
 
@@ -194,7 +194,7 @@ class BackupSet:
         if self.remote_manifest_name:
             filelist.append(self.remote_manifest_name)
         filelist.extend(self.volume_name_dict.values())
-        return u"[%s]" % u", ".join(map(util.ufn, filelist))
+        return u"[%s]" % u", ".join(map(util.fsdecode, filelist))
 
     def get_timestr(self):
         """
@@ -248,10 +248,10 @@ class BackupSet:
             manifest_buffer = self.backend.get_data(self.remote_manifest_name)
         except GPGError as message:
             log.Error(_("Error processing remote manifest (%s): %s") %
-                      (util.ufn(self.remote_manifest_name), util.uexc(message)))
+                      (util.fsdecode(self.remote_manifest_name), util.uexc(message)))
             return None
         log.Info(_("Processing remote manifest %s (%s)") % (
-            util.ufn(self.remote_manifest_name), len(manifest_buffer)))
+            util.fsdecode(self.remote_manifest_name), len(manifest_buffer)))
         return manifest.Manifest().from_string(manifest_buffer)
 
     def get_manifest(self):
@@ -789,7 +789,7 @@ class CollectionsStatus:
                               "Warning, found the following local orphaned "
                               "signature files:",
                               len(self.local_orphaned_sig_names)) + u"\n" +
-                     u"\n".join(map(util.ufn, self.local_orphaned_sig_names)),
+                     u"\n".join(map(util.fsdecode, self.local_orphaned_sig_names)),
                      log.WarningCode.orphaned_sig)
 
         if self.remote_orphaned_sig_names:
@@ -798,7 +798,7 @@ class CollectionsStatus:
                               "Warning, found the following remote orphaned "
                               "signature files:",
                               len(self.remote_orphaned_sig_names)) + u"\n" +
-                     u"\n".join(map(util.ufn, self.remote_orphaned_sig_names)),
+                     u"\n".join(map(util.fsdecode, self.remote_orphaned_sig_names)),
                      log.WarningCode.orphaned_sig)
 
         if self.all_sig_chains and sig_chain_warning and not self.matched_chain_pair:
@@ -828,7 +828,7 @@ class CollectionsStatus:
         missing files.
         """
         log.Debug(_("Extracting backup chains from list of files: %s")
-                  % [util.ufn(f) for f in filename_list])
+                  % [util.fsdecode(f) for f in filename_list])
         # First put filenames in set form
         sets = []
 
@@ -838,15 +838,15 @@ class CollectionsStatus:
             """
             for set in sets:
                 if set.add_filename(filename):
-                    log.Debug(_("File %s is part of known set") % (util.ufn(filename),))
+                    log.Debug(_("File %s is part of known set") % (util.fsdecode(filename),))
                     break
             else:
-                log.Debug(_("File %s is not part of a known set; creating new set") % (util.ufn(filename),))
+                log.Debug(_("File %s is not part of a known set; creating new set") % (util.fsdecode(filename),))
                 new_set = BackupSet(self.backend, self.action)
                 if new_set.add_filename(filename):
                     sets.append(new_set)
                 else:
-                    log.Debug(_("Ignoring file (rejected by backup set) '%s'") % util.ufn(filename))
+                    log.Debug(_("Ignoring file (rejected by backup set) '%s'") % util.fsdecode(filename))
 
         for f in filename_list:
             add_to_sets(f)

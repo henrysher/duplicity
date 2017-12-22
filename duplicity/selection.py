@@ -116,15 +116,15 @@ class Select:
             try:
                 mode = os.stat(fullpath)[stat.ST_MODE]
                 if stat.S_ISSOCK(mode):
-                    log.Info(_("Skipping socket %s") % util.ufn(fullpath),
+                    log.Info(_("Skipping socket %s") % util.fsdecode(fullpath),
                              log.InfoCode.skipping_socket,
                              util.escape(fullpath))
                 else:
-                    log.Warn(_("Error initializing file %s") % util.ufn(fullpath),
+                    log.Warn(_("Error initializing file %s") % util.fsdecode(fullpath),
                              log.WarningCode.cannot_iterate,
                              util.escape(fullpath))
             except OSError:
-                log.Warn(_("Error accessing possibly locked file %s") % util.ufn(fullpath),
+                log.Warn(_("Error accessing possibly locked file %s") % util.fsdecode(fullpath),
                          log.WarningCode.cannot_stat, util.escape(fullpath))
             return None
 
