@@ -81,6 +81,10 @@ class BotoBackend(BotoSingleBackend):
 
     def __init__(self, parsed_url):
         BotoSingleBackend.__init__(self, parsed_url)
+        try:
+            import boto
+        except ImportError:
+            raise
         self._setup_pool()
 
     def _setup_pool(self):
@@ -105,7 +109,6 @@ class BotoBackend(BotoSingleBackend):
         self._pool.join()
 
     def upload(self, filename, key, headers=None):
-        import boto
         chunk_size = globals.s3_multipart_chunk_size
 
         # Check minimum chunk size for S3

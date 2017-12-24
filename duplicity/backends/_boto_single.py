@@ -127,9 +127,13 @@ class BotoBackend(duplicity.backend.Backend):
     """
 
     def __init__(self, parsed_url):
-        import boto
-        from boto.s3.connection import Location
         duplicity.backend.Backend.__init__(self, parsed_url)
+
+        try:
+            import boto
+            from boto.s3.connection import Location
+        except ImportError:
+            raise
 
         assert boto.Version >= BOTO_MIN_VERSION
 
@@ -176,7 +180,6 @@ class BotoBackend(duplicity.backend.Backend):
         del self.storage_uri
 
     def resetConnection(self):
-        import boto
         if getattr(self, 'conn', False):
             self.conn.close()
         self.bucket = None

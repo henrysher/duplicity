@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Kenneth Loafman <kenneth@loafman.com>\n"
-"POT-Creation-Date: 2017-12-20 06:52-0600\n"
+"POT-Creation-Date: 2017-12-22 08:53-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1348,7 +1348,7 @@ msgid ""
 "succeeded"
 msgstr ""
 
-#: ../duplicity/backends/pydrivebackend.py:143
+#: ../duplicity/backends/pydrivebackend.py:142
 #, python-format
 msgid "PyDrive backend: multiple files called '%s'."
 msgstr ""
@@ -1716,12 +1716,12 @@ msgstr ""
 msgid "Cleanup of temporary directory %s failed - this is probably a bug."
 msgstr ""
 
-#: ../duplicity/util.py:126
+#: ../duplicity/util.py:120
 #, python-format
 msgid "IGNORED_ERROR: Warning: ignoring error as requested: %s: %s"
 msgstr ""
 
-#: ../duplicity/util.py:193
+#: ../duplicity/util.py:187
 #, python-format
 msgid "Releasing lockfile %s"
 msgstr ""

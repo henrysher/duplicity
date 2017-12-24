@@ -3,16 +3,14 @@
 # Copyright (c) 2014 Gu1
 # Licensed under the MIT license
 
-import os
-import pyrax
-import pyrax.exceptions as exc
-import requests
-import re
-import urlparse
 import ConfigParser
+import os
+import re
 import time
-from pyrax.base_identity import BaseIdentity, Service
+import urlparse
+
 from requests.compat import quote, quote_plus
+import requests
 
 
 OAUTH_ENDPOINT = "https://api.hubic.com/oauth/"
@@ -30,6 +28,15 @@ class BearerTokenAuth(requests.auth.AuthBase):
 
 
 class HubicIdentity(BaseIdentity):
+    def __init__(self):
+        try:
+            from pyrax.base_identity import BaseIdentity, Service
+            import pyrax
+            import pyrax.exceptions as exc
+        except ImportError as e:
+            raise BackendException("""\
+Hubic backend requires the pyrax library available from Rackspace.
+Exception: %s""" % str(e))
 
     def _get_auth_endpoint(self):
         return ""

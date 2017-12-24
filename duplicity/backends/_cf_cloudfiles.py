@@ -35,6 +35,7 @@ class CloudFilesBackend(duplicity.backend.Backend):
             from cloudfiles import Connection
             from cloudfiles.errors import ResponseError
             from cloudfiles import consts
+            from cloudfiles.errors import NoSuchObject
         except ImportError as e:
             raise BackendException("""\
 Cloudfiles backend requires the cloudfiles library available from Rackspace.
@@ -69,7 +70,6 @@ Exception: %s""" % str(e))
         self.container = conn.create_container(container)
 
     def _error_code(self, operation, e):
-        from cloudfiles.errors import NoSuchObject
         if isinstance(e, NoSuchObject):
             return log.ErrorCode.backend_not_found
         elif isinstance(e, self.resp_exc):

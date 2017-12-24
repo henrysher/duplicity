@@ -43,6 +43,11 @@ class SSHPExpectBackend(duplicity.backend.Backend):
         """scpBackend initializer"""
         duplicity.backend.Backend.__init__(self, parsed_url)
 
+        try:
+            import pexpect
+        except ImportError:
+            raise
+
         self.retry_delay = 10
 
         self.scp_command = "scp"
@@ -83,7 +88,6 @@ class SSHPExpectBackend(duplicity.backend.Backend):
 
     def run_scp_command(self, commandline):
         """ Run an scp command, responding to password prompts """
-        import pexpect
         log.Info("Running '%s'" % commandline)
         child = pexpect.spawn(commandline, timeout=None)
         if globals.ssh_askpass:
@@ -148,7 +152,6 @@ class SSHPExpectBackend(duplicity.backend.Backend):
 
     def run_sftp_command(self, commandline, commands):
         """ Run an sftp command, responding to password prompts, passing commands from list """
-        import pexpect
         maxread = 2000  # expected read buffer size
         responses = [pexpect.EOF,
                      "(?i)timeout, server not responding",

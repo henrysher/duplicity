@@ -1,18 +1,35 @@
-boto
-coverage
-dropbox==6.9.0
+##### basic requirements #####
+
 fasteners
 future
-jottalib
 mock
-paramiko
+requests
+urllib3
+
+
+##### testing libraries #####
+
+coverage
 pexpect
 pycodestyle
-pydrive
 pylint
-pyrax
 pytest
 pytest-runner
-python-cloudfiles
 tox
-urllib3
+
+
+##### backend libraries #####
+
+# azure
+# b2
+# boto
+# dropbox==6.9.0
+# gdata
+# jottalib
+# mediafire
+# paramiko
+# pydrive
+# pyrax
+# python-cloudfiles
+# python-swiftclient
+# requests_oauthlib

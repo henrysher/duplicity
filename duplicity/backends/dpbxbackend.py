@@ -89,21 +89,19 @@ class DPBXBackend(duplicity.backend.Backend):
     def __init__(self, parsed_url):
         duplicity.backend.Backend.__init__(self, parsed_url)
 
-        global Dropbox
-        global AuthError, BadInputError, ApiError
-        global UploadSessionCursor, CommitInfo
-        global WriteMode, GetMetadataError
-        global DeleteError, UploadSessionLookupError
-        global ListFolderError
-        global DropboxOAuth2FlowNoRedirect
-
-        from dropbox import Dropbox  # pylint: disable=import-error
-        from dropbox.exceptions import AuthError, BadInputError, ApiError  # pylint: disable=import-error
-        from dropbox.files import (UploadSessionCursor, CommitInfo,  # pylint: disable=import-error
-                                   WriteMode, GetMetadataError,  # pylint: disable=import-error
-                                   DeleteError, UploadSessionLookupError,  # pylint: disable=import-error
-                                   ListFolderError)  # pylint: disable=import-error
-        from dropbox.oauth import DropboxOAuth2FlowNoRedirect  # pylint: disable=import-error
+        try:
+            from dropbox import Dropbox
+            from dropbox.exceptions import AuthError, BadInputError, ApiError
+            from dropbox.files import (UploadSessionCursor, CommitInfo,
+                                       WriteMode, GetMetadataError,
+                                       DeleteError, UploadSessionLookupError,
+                                       ListFolderError)
+            from dropbox.oauth import DropboxOAuth2FlowNoRedirect
+        except ImportError as e:
+            raise BackendException("""\
+This backend requires the dropbox package version 6.9.0
+To install use "sudo pip install dropbox==6.9.0"
+Exception: %s""" % str(e))
 
         self.api_account = None
         self.api_client = None

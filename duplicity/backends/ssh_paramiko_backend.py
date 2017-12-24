@@ -77,7 +77,10 @@ class SSHParamikoBackend(duplicity.backend.Backend):
         # squeeze's paramiko only if done with DES, not AES
         import warnings
         warnings.simplefilter("ignore")
-        import paramiko
+        try:
+            import paramiko
+        except ImportError:
+            raise
         warnings.resetwarnings()
 
         class AgreedAddPolicy (paramiko.AutoAddPolicy):
@@ -388,8 +391,6 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname,
                     errorprefix, ch_err.read(-1), e))
 
     def gethostconfig(self, file, host):
-        import paramiko
-
         file = os.path.expanduser(file)
         if not os.path.isfile(file):
             return {}

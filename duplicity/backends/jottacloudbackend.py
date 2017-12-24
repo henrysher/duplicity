@@ -77,6 +77,7 @@ class JottaCloudBackend(duplicity.backend.Backend):
         # Import JottaCloud libraries.
         try:
             from jottalib import JFS
+            from jottalib.JFS import JFSNotFoundError, JFSIncompleteFile
         except ImportError:
             raise BackendException('JottaCloud backend requires jottalib'
                                    ' (see https://pypi.python.org/pypi/jottalib).')
@@ -95,7 +96,6 @@ class JottaCloudBackend(duplicity.backend.Backend):
         log.Debug("Jottacloud folder for duplicity: %r" % self.folder.path)
 
     def get_or_create_directory(self, directory_name):
-        from jottalib.JFS import JFSNotFoundError
         root_directory = get_root_dir(self.client)
         full_path = posixpath.join(root_directory.path, directory_name)
         try:
@@ -139,7 +139,6 @@ class JottaCloudBackend(duplicity.backend.Backend):
         #  - Return a dict with a 'size' key, and a file size value (-1 for not found)
         #  - Retried if an exception is thrown
         log.Info('Querying size of %s' % filename)
-        from jottalib.JFS import JFSNotFoundError, JFSIncompleteFile
         remote_path = posixpath.join(self.folder.path, filename)
         try:
             remote_file = self.client.getObject(remote_path)

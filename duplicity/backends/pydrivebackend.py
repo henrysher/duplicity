@@ -35,7 +35,7 @@ class PyDriveBackend(duplicity.backend.Backend):
             from apiclient.discovery import build
             from pydrive.auth import GoogleAuth
             from pydrive.drive import GoogleDrive
-            from pydrive.files import FileNotUploadedError
+            from pydrive.files import ApiRequestError, FileNotUploadedError
         except ImportError as e:
             raise BackendException("""\
 PyDrive backend requires PyDrive installation.  Please read the manpage for setup details.
@@ -112,7 +112,6 @@ Exception: %s""" % str(e))
         self.id_cache = {}
 
     def file_by_name(self, filename):
-        from pydrive.files import ApiRequestError
         if filename in self.id_cache:
             # It might since have been locally moved, renamed or deleted, so we
             # need to validate the entry.
@@ -207,7 +206,6 @@ Exception: %s""" % str(e))
         return {'size': size}
 
     def _error_code(self, operation, error):
-        from pydrive.files import ApiRequestError, FileNotUploadedError
         if isinstance(error, FileNotUploadedError):
             return log.ErrorCode.backend_not_found
         elif isinstance(error, ApiRequestError):

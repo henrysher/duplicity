@@ -20,10 +20,11 @@
 
 import os
 
-import duplicity.backend
 from duplicity import log
 from duplicity import util
 from duplicity.errors import BackendException
+import duplicity.backend
+
 from ._cf_pyrax import PyraxBackend
 
 

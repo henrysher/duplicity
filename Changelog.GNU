@@ -1,3 +1,10 @@
+2017-12-24  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Reduce dependencies on backend libraries
+      - Moved backend imports into backend class __init__ method
+      - Surrounded imports with try/except to allow better errors
+      - Put all library dependencies in requirements.txt
+
 2017-12-22  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~aaron-whitehouse/duplicity/08-ufn-to-fsdecode
