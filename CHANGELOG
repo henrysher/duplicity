@@ -330,6 +330,9 @@ New in v0.8.00 (2016/07/??)
   - Moved backend imports into backend class __init__ method
   - Surrounded imports with try/except to allow better errors
   - Put all library dependencies in requirements.txt
+* Merged in lp:~dawgfoto/duplicity/fixup1251
+  - Avoid redundant replication of already present backup sets.
+  - Fixed by adding back BackupSet.__eq__ which was accidentally(?) removed in 1251.
 
 
 New in v0.7.08 (2016/07/02)

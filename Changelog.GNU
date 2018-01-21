@@ -1,3 +1,9 @@
+2018-01-21  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~dawgfoto/duplicity/fixup1251
+      - Avoid redundant replication of already present backup sets.
+      - Fixed by adding back BackupSet.__eq__ which was accidentally(?) removed in 1251.
+
 2017-12-24  Kenneth Loafman  <kenneth@loafman.com>
 
     * Reduce dependencies on backend libraries

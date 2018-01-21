@@ -300,6 +300,16 @@ class BackupSet:
         """
         return len(self.volume_name_dict.keys())
 
+    def __eq__(self, other):
+        """
+        Return whether this backup set is equal to other
+        """
+        return self.type == other.type and \
+            self.time == other.time and \
+            self.start_time == other.start_time and \
+            self.end_time == other.end_time and \
+            len(self) == len(other)
+
 
 class BackupChain:
     """
