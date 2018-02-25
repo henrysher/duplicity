@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2017-12-22 08:53-0600\n"
+"POT-Creation-Date: 2018-02-24 06:05+0000\n"
 "PO-Revision-Date: 2018-02-23 13:10+0000\n"
 "Last-Translator: Łukasz Cieliński <lukasc@mp.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2018-02-24 06:03+0000\n"
+"X-Launchpad-Export-Date: 2018-02-25 05:44+0000\n"
 "X-Generator: Launchpad (build 18561)\n"
 
 #: ../bin/duplicity:133
@@ -1281,17 +1281,17 @@ msgid ""
 "starting at time %s."
 msgstr ""
 
-#: ../duplicity/collections.py:1225
+#: ../duplicity/collections.py:1235
 #, python-format
 msgid "File: %s"
 msgstr "Plik: %s"
 
-#: ../duplicity/collections.py:1226
+#: ../duplicity/collections.py:1236
 #, python-format
 msgid "Total number of backup: %d"
 msgstr "Łączna ilość kopii zapasowych: %d"
 
-#: ../duplicity/collections.py:1227
+#: ../duplicity/collections.py:1237
 msgid "Type of file change:"
 msgstr ""
 

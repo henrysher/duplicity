@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duplicity\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2017-12-22 08:53-0600\n"
+"POT-Creation-Date: 2018-02-24 06:05+0000\n"
 "PO-Revision-Date: 2018-02-23 13:10+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Slovenian <sl@li.org>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || "
 "n%100==4 ? 3 : 0);\n"
-"X-Launchpad-Export-Date: 2018-02-24 06:03+0000\n"
+"X-Launchpad-Export-Date: 2018-02-25 05:44+0000\n"
 "X-Generator: Launchpad (build 18561)\n"
 
 #: ../bin/duplicity:133
@@ -1317,17 +1317,17 @@ msgid ""
 "starting at time %s."
 msgstr ""
 
-#: ../duplicity/collections.py:1225
+#: ../duplicity/collections.py:1235
 #, python-format
 msgid "File: %s"
 msgstr "Datoteka: %s"
 
-#: ../duplicity/collections.py:1226
+#: ../duplicity/collections.py:1236
 #, python-format
 msgid "Total number of backup: %d"
 msgstr "Skupno število varnostne kopije: %d"
 
-#: ../duplicity/collections.py:1227
+#: ../duplicity/collections.py:1237
 msgid "Type of file change:"
 msgstr "Tip spremembe datoteke:"
 
