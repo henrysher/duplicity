@@ -202,7 +202,7 @@ class BackupSet:
         """
         return dup_time.timetopretty(self.time or self.end_time)
 
-    def check_manifests(self):
+    def check_manifests(self, check_remote=True):
         """
         Make sure remote manifest is equal to local one
         """
@@ -211,7 +211,7 @@ class BackupSet:
                            log.ErrorCode.no_manifests)
         assert self.remote_manifest_name, "if only one, should be remote"
 
-        remote_manifest = self.get_remote_manifest()
+        remote_manifest = self.get_remote_manifest() if check_remote else None
         if self.local_manifest_path:
             local_manifest = self.get_local_manifest()
         if remote_manifest and self.local_manifest_path and local_manifest:
