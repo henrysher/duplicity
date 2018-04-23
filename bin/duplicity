@@ -1327,8 +1327,7 @@ def check_last_manifest(col_stats):
     @rtype: void
     @return: void
     """
-    if not col_stats.all_backup_chains:
-        return
+    assert col_stats.all_backup_chains
     last_backup_set = col_stats.all_backup_chains[-1].get_last()
     last_backup_set.check_manifests()
 
@@ -1630,7 +1629,7 @@ def do_backup(action):
                     # only ask for a passphrase if there was a previous backup
                     if col_stats.all_backup_chains:
                         globals.gpg_profile.passphrase = get_passphrase(1, action)
-                    check_last_manifest(col_stats)  # not needed for full backup
+                        check_last_manifest(col_stats)  # not needed for full backup
                 incremental_backup(sig_chain)
     globals.backend.close()
     log.shutdown()
