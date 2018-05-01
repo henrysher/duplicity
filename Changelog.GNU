@@ -1,3 +1,11 @@
+2018-05-01  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~dawgfoto/duplicity/fixup1252
+      * only check decryptable remote manifests
+        - fixup of revision 1252 which introduces a non-fatal error message (see #1729796)
+        - for backups the GPG private key and/or it's password are typically not available
+        - also avoid interactive password queries through e.g. gpg agent
+
 2018-01-21  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~dawgfoto/duplicity/fixup1251

@@ -333,6 +333,11 @@ New in v0.8.00 (2016/07/??)
 * Merged in lp:~dawgfoto/duplicity/fixup1251
   - Avoid redundant replication of already present backup sets.
   - Fixed by adding back BackupSet.__eq__ which was accidentally(?) removed in 1251.
+* Merged in lp:~dawgfoto/duplicity/fixup1252
+  * only check decryptable remote manifests
+    - fixup of revision 1252 which introduces a non-fatal error message (see #1729796)
+    - for backups the GPG private key and/or it's password are typically not available
+    - also avoid interactive password queries through e.g. gpg agent
 
 
 New in v0.7.08 (2016/07/02)
