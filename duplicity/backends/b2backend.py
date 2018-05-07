@@ -24,6 +24,7 @@
 
 import os
 import hashlib
+from urllib import quote_plus
 
 import duplicity.backend
 from duplicity.errors import BackendException, FatalBackendException
@@ -98,7 +99,7 @@ class B2Backend(duplicity.backend.Backend):
         Download remote_filename to local_path
         """
         log.Log("Get: %s -> %s" % (self.path + remote_filename, local_path.name), log.INFO)
-        self.bucket.download_file_by_name(self.path + remote_filename,
+        self.bucket.download_file_by_name(quote_plus(self.path + remote_filename),
                                           b2.download_dest.DownloadDestLocalFile(local_path.name))
 
     def _put(self, source_path, remote_filename):
@@ -106,7 +107,7 @@ class B2Backend(duplicity.backend.Backend):
         Copy source_path to remote_filename
         """
         log.Log("Put: %s -> %s" % (source_path.name, self.path + remote_filename), log.INFO)
-        self.bucket.upload_local_file(source_path.name, self.path + remote_filename,
+        self.bucket.upload_local_file(source_path.name, quote_plus(self.path + remote_filename),
                                       content_type='application/pgp-encrypted',
                                       progress_listener=B2ProgressListener())
 
@@ -122,7 +123,7 @@ class B2Backend(duplicity.backend.Backend):
         Delete filename from remote server
         """
         log.Log("Delete: %s" % self.path + filename, log.INFO)
-        file_version_info = self.file_info(self.path + filename)
+        file_version_info = self.file_info(quote_plus(self.path + filename))
         self.bucket.delete_file_version(file_version_info.id_, file_version_info.file_name)
 
     def _query(self, filename):
@@ -130,7 +131,7 @@ class B2Backend(duplicity.backend.Backend):
         Get size info of filename
         """
         log.Log("Query: %s" % self.path + filename, log.INFO)
-        file_version_info = self.file_info(self.path + filename)
+        file_version_info = self.file_info(quote_plus(self.path + filename))
         return {'size': file_version_info.size
                 if file_version_info is not None and file_version_info.size is not None else -1}
 

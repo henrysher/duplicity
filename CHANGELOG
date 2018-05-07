@@ -340,6 +340,8 @@ New in v0.8.00 (2016/07/??)
     - also avoid interactive password queries through e.g. gpg agent
 * Fixed bug #1768954 with patch from Max Hallden
   - Add AZURE_ENDPOINT_SUFFIX environ variable to allow setting to non-U.S. servers
+* Fixed bug #x1717935 with suggestion from strainu
+  - Use urllib.quote_plus() to properly quote pathnames passed via URL
 
 
 New in v0.7.08 (2016/07/02)

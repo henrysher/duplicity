@@ -2,6 +2,8 @@
 
     * Fixed bug #1768954 with patch from Max Hallden
       - Add AZURE_ENDPOINT_SUFFIX environ variable to allow setting to non-U.S. servers
+    * Fixed bug #x1717935 with suggestion from strainu
+      - Use urllib.quote_plus() to properly quote pathnames passed via URL
 
 2018-05-01  Kenneth Loafman  <kenneth@loafman.com>
 
