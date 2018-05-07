@@ -1,3 +1,8 @@
+2018-05-07  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Fixed bug #1768954 with patch from Max Hallden
+      - Add AZURE_ENDPOINT_SUFFIX environ variable to allow setting to non-U.S. servers
+
 2018-05-01  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~dawgfoto/duplicity/fixup1252

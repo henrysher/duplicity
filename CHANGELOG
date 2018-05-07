@@ -338,6 +338,8 @@ New in v0.8.00 (2016/07/??)
     - fixup of revision 1252 which introduces a non-fatal error message (see #1729796)
     - for backups the GPG private key and/or it's password are typically not available
     - also avoid interactive password queries through e.g. gpg agent
+* Fixed bug #1768954 with patch from Max Hallden
+  - Add AZURE_ENDPOINT_SUFFIX environ variable to allow setting to non-U.S. servers
 
 
 New in v0.7.08 (2016/07/02)

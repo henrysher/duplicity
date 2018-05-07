@@ -64,12 +64,22 @@ Exception: %s""" % str(e))
             raise BackendException('AZURE_ACCOUNT_NAME environment variable not set.')
 
         if 'AZURE_ACCOUNT_KEY' in os.environ:
-            self.blob_service = BlobService(account_name=os.environ['AZURE_ACCOUNT_NAME'],
-                                            account_key=os.environ['AZURE_ACCOUNT_KEY'])
+            if 'AZURE_ENDPOINT_SUFFIX' in os.environ:
+                self.blob_service = BlobService(account_name=os.environ['AZURE_ACCOUNT_NAME'],
+                                                account_key=os.environ['AZURE_ACCOUNT_KEY'],
+                                                endpoint_suffix=os.environ['AZURE_ENDPOINT_SUFFIX'])
+            else:
+                self.blob_service = BlobService(account_name=os.environ['AZURE_ACCOUNT_NAME'],
+                                                account_key=os.environ['AZURE_ACCOUNT_KEY'])
             self._create_container()
         elif 'AZURE_SHARED_ACCESS_SIGNATURE' in os.environ:
-            self.blob_service = BlobService(account_name=os.environ['AZURE_ACCOUNT_NAME'],
-                                            sas_token=os.environ['AZURE_SHARED_ACCESS_SIGNATURE'])
+            if 'AZURE_ENDPOINT_SUFFIX' in os.environ:
+                self.blob_service = BlobService(account_name=os.environ['AZURE_ACCOUNT_NAME'],
+                                                sas_token=os.environ['AZURE_SHARED_ACCESS_SIGNATURE'],
+                                                endpoint_suffix=os.environ['AZURE_ENDPOINT_SUFFIX'])
+            else:
+                self.blob_service = BlobService(account_name=os.environ['AZURE_ACCOUNT_NAME'],
+                                                sas_token=os.environ['AZURE_SHARED_ACCESS_SIGNATURE'])
         else:
             raise BackendException(
                 'Neither AZURE_ACCOUNT_KEY nor AZURE_SHARED_ACCESS_SIGNATURE environment variable not set.')
