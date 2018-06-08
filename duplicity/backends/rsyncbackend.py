@@ -100,7 +100,7 @@ class RsyncBackend(duplicity.backend.Backend):
 
     def get_rsync_path(self):
         url = self.parsed_url.url_string
-        m = re.search("(:\d+|)?::([^:]*)$", url)
+        m = re.search(r"(:\d+|)?::([^:]*)$", url)
         if m:
             return m.group(2), m.group(1).lstrip(':')
         raise InvalidBackendURL("Could not determine rsync path: %s"
