@@ -5,6 +5,13 @@
         Ignored W504 for now and marked as a TODO.
         Marked W503 as a permanent ignore, as it is prefered to the (mutually exclusive) W504 under PEP8.
       - Marked various regex strings as raw strings to avoid the new W605 "invalid escape sequence".
+    * Merged in lp:~aaron-whitehouse/duplicity/08-unadorned-strings
+      - Added new script to find unadorned strings (testing/find_unadorned_strings.py python_file)
+        which prints all unadorned strings in a .py file.
+      - Added a new test to test_code.py that checks across all files for unadorned strings and gives
+        an error if any are found (most files are in an ignore list at this stage, but this will allow
+        us to incrementally remove the exceptions as we adorn the strings in each file).
+      - Adorn string literals in test_code.py with u/b
 
 2018-05-07  Kenneth Loafman  <kenneth@loafman.com>
 
