@@ -342,6 +342,11 @@ New in v0.8.00 (2016/07/??)
   - Add AZURE_ENDPOINT_SUFFIX environ variable to allow setting to non-U.S. servers
 * Fixed bug #x1717935 with suggestion from strainu
   - Use urllib.quote_plus() to properly quote pathnames passed via URL
+* Merged in lp:~aaron-whitehouse/duplicity/08-pycodestyle
+  - Tox changes to accommodate new pycodestyle version warnings.
+    Ignored W504 for now and marked as a TODO.
+    Marked W503 as a permanent ignore, as it is prefered to the (mutually exclusive) W504 under PEP8.
+  - Marked various regex strings as raw strings to avoid the new W605 "invalid escape sequence".
 
 
 New in v0.7.08 (2016/07/02)

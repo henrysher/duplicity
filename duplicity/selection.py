@@ -144,9 +144,9 @@ class Select:
                     error_handler, Path.append, (path, filename))
                 if new_path:
                     s = self.Select(new_path)
-                    if (new_path.type in ["reg", "dir"] and
-                        not os.access(new_path.name, os.R_OK)) and \
-                            (s == 1 or s == 2):
+                    if (new_path.type in ["reg", "dir"]
+                        and not os.access(new_path.name, os.R_OK)) \
+                            and (s == 1 or s == 2):
                         # Path is a file or folder that cannot be read, but
                         # should be included or scanned.
                         log.Warn(_("Error accessing possibly locked file %s") %
@@ -307,8 +307,7 @@ pattern (such as '**') which matches the base directory.""") %
     def parse_last_excludes(self):
         """Exit with error if last selection function isn't an exclude"""
         # Internal. Used by ParseArgs.
-        if (self.selection_functions and
-                not self.selection_functions[-1].exclude):
+        if (self.selection_functions and not self.selection_functions[-1].exclude):
             log.FatalError(_(u"""\
 Last selection expression:
     %s
@@ -509,8 +508,8 @@ probably isn't what you meant.""") %
         file_prefix_selection = select_fn_from_glob(glob_str, include=1)(self.rootpath)
         if not file_prefix_selection:
             # file_prefix_selection == 1 (include) or 2 (scan)
-            raise FilePrefixError(glob_str + " glob with " + self.rootpath.name +
-                                  " path gives " + str(file_prefix_selection))
+            raise FilePrefixError(glob_str + " glob with " + self.rootpath.name
+                                  + " path gives " + str(file_prefix_selection))
 
         return select_fn_from_glob(glob_str, include, ignore_case)
 

@@ -1,3 +1,11 @@
+2018-06-09  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/08-pycodestyle
+      - Tox changes to accommodate new pycodestyle version warnings.
+        Ignored W504 for now and marked as a TODO.
+        Marked W503 as a permanent ignore, as it is prefered to the (mutually exclusive) W504 under PEP8.
+      - Marked various regex strings as raw strings to avoid the new W605 "invalid escape sequence".
+
 2018-05-07  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1768954 with patch from Max Hallden

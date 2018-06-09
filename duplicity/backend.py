@@ -160,7 +160,7 @@ def strip_prefix(url_string, prefix_scheme):
     """
     strip the prefix from a string e.g. par2+ftp://... -> ftp://...
     """
-    return re.sub('(?i)^' + re.escape(prefix_scheme) + '\+', '', url_string)
+    return re.sub(r'(?i)^' + re.escape(prefix_scheme) + r'\+', r'', url_string)
 
 
 def is_backend_url(url_string):

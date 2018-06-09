@@ -193,7 +193,7 @@ Are you sure you want to continue connecting (yes/no)? """ % (hostname,
         else:
             self.config.update({'port': 22})
         # parse ssh options for alternative ssh private key, identity file
-        m = re.search("^(?:.+\s+)?(?:-oIdentityFile=|-i\s+)(([\"'])([^\\2]+)\\2|[\S]+).*",
+        m = re.search(r"^(?:.+\s+)?(?:-oIdentityFile=|-i\s+)(([\"'])([^\\2]+)\\2|[\S]+).*",
                       globals.ssh_options)
         if (m is not None):
             keyfilename = m.group(3) if m.group(3) else m.group(1)
