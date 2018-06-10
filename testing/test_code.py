@@ -161,7 +161,6 @@ class CodeTest(DuplicityTestCase):
                          os.path.join(_top_dir, u'duplicity', u'file_naming.py'),
                          os.path.join(_top_dir, u'duplicity', u'filechunkio.py'),
                          os.path.join(_top_dir, u'duplicity', u'globals.py'),
-                         os.path.join(_top_dir, u'duplicity', u'globmatch.py'),
                          os.path.join(_top_dir, u'duplicity', u'gpg.py'),
                          os.path.join(_top_dir, u'duplicity', u'gpginterface.py'),
                          os.path.join(_top_dir, u'duplicity', u'lazy.py'),
