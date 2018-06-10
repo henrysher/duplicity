@@ -200,7 +200,6 @@ class CodeTest(DuplicityTestCase):
                          os.path.join(_top_dir, u'testing', u'unit', u'test_dup_temp.py'),
                          os.path.join(_top_dir, u'testing', u'unit', u'test_dup_time.py'),
                          os.path.join(_top_dir, u'testing', u'unit', u'test_file_naming.py'),
-                         os.path.join(_top_dir, u'testing', u'unit', u'test_globmatch.py'),
                          os.path.join(_top_dir, u'testing', u'unit', u'test_gpg.py'),
                          os.path.join(_top_dir, u'testing', u'unit', u'test_gpginterface.py'),
                          os.path.join(_top_dir, u'testing', u'unit', u'test_lazy.py'),
