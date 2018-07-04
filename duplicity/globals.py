@@ -197,6 +197,9 @@ s3_use_rrs = False
 # Whether to use S3 Infrequent Access Storage
 s3_use_ia = False
 
+# Whether to use S3 One Zone Infrequent Access Storage
+s3_use_onezone_ia = False
+
 # True if we should use boto multiprocessing version
 s3_use_multiprocessing = False
 

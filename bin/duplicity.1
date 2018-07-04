@@ -776,6 +776,12 @@ Amazon, this storage is ideal for long-term file storage, backups, and disaster
 recovery.
 
 .TP
+.BI "--s3-use-onezone-ia"
+Store volumes using One Zone - Infrequent Access when uploading to Amazon S3.
+This storage is similar to Standard - Infrequent Access, but only stores object
+data in one Availability Zone.
+
+.TP
 .BI "--s3-use-multiprocessing"
 Allow multipart volumne uploads to S3 through multiprocessing. This option
 requires Python 2.6 and can be used to make uploads to S3 more efficient.
