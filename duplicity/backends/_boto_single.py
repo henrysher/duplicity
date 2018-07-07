@@ -221,6 +221,8 @@ class BotoBackend(duplicity.backend.Backend):
             storage_class = 'REDUCED_REDUNDANCY'
         elif globals.s3_use_ia:
             storage_class = 'STANDARD_IA'
+        elif globals.s3_use_onezone_ia:
+            storage_class = 'ONEZONE_IA'
         else:
             storage_class = 'STANDARD'
         log.Info("Uploading %s/%s to %s Storage" % (self.straight_url, remote_filename, storage_class))

@@ -1,3 +1,8 @@
+2018-07-07  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~excitablesnowball/duplicity/s3-onezone-ia
+      - Add option --s3-use-onezone-ia S3 One Zone Infrequent Access Storage
+
 2018-06-09  Kenneth Loafman  <kenneth@loafman.com>
 
     * Merged in lp:~aaron-whitehouse/duplicity/08-pycodestyle

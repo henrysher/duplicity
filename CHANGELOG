@@ -402,6 +402,8 @@ New in v0.7.08 (2016/07/02)
 * Fixes so pylint 1.8.1 does not complain about missing conditional imports.
   - Fix dpbxbackend so that imports require instantiation of the class.
   - Added pylint: disable=import-error to a couple of conditional imports
+* Merged in lp:~excitablesnowball/duplicity/s3-onezone-ia
+  - Add option --s3-use-onezone-ia S3 One Zone Infrequent Access Storage
 
 
 New in v0.7.07.1 (2016/04/19)
