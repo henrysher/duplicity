@@ -2,10 +2,12 @@
 *.log
 .DS_Store
 ._.DS_Store
+.cache
 .eggs
 .idea
 .project
 .pydevproject
+.pytest_cache
 .settings
 .tox
 __pycache__
@@ -19,4 +21,3 @@ random_seed
 testfiles
 testing/gnupg/.gpg-v21-migrated
 testing/gnupg/private-keys-v1.d
-.cache
