@@ -143,6 +143,7 @@ class GPGFile:
             gnupg.call = globals.gpg_binary
         gnupg.options.meta_interactive = 0
         gnupg.options.extra_args.append('--no-secmem-warning')
+        gnupg.options.extra_args.append('--ignore-mdc-error')
 
         # Support three versions of gpg present 1.x, 2.0.x, 2.1.x
         if profile.gpg_version[:1] == (1,):

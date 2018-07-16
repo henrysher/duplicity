@@ -354,6 +354,9 @@ New in v0.8.00 (2016/07/??)
     an error if any are found (most files are in an ignore list at this stage, but this will allow
     us to incrementally remove the exceptions as we adorn the strings in each file).
   - Adorn string literals in test_code.py with u/b
+* Fixed bug #1780617 Test fail when GnuPG >= 2.2.8
+  - Relevant change in GnuPG 2.2.8: https://dev.gnupg.org/T3981
+  - Added '--ignore-mdc-error' to all gpg calls made.
 
 
 New in v0.7.08 (2016/07/02)
@@ -402,6 +405,8 @@ New in v0.7.08 (2016/07/02)
 * Fixes so pylint 1.8.1 does not complain about missing conditional imports.
   - Fix dpbxbackend so that imports require instantiation of the class.
   - Added pylint: disable=import-error to a couple of conditional imports
+* Merged in lp:~excitablesnowball/duplicity/s3-onezone-ia
+  - Add option --s3-use-onezone-ia S3 One Zone Infrequent Access Storage
 
 
 New in v0.7.07.1 (2016/04/19)
