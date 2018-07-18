@@ -171,7 +171,6 @@ class CodeTest(DuplicityTestCase):
                          os.path.join(_top_dir, u'duplicity', u'path.py'),
                          os.path.join(_top_dir, u'duplicity', u'progress.py'),
                          os.path.join(_top_dir, u'duplicity', u'robust.py'),
-                         os.path.join(_top_dir, u'duplicity', u'selection.py'),
                          os.path.join(_top_dir, u'duplicity', u'statistics.py'),
                          os.path.join(_top_dir, u'duplicity', u'tarfile.py'),
                          os.path.join(_top_dir, u'duplicity', u'tempdir.py'),
