@@ -185,7 +185,6 @@ class CodeTest(DuplicityTestCase):
                          os.path.join(_top_dir, u'testing', u'functional', u'test_rdiffdir.py'),
                          os.path.join(_top_dir, u'testing', u'functional', u'test_replicate.py'),
                          os.path.join(_top_dir, u'testing', u'functional', u'test_restart.py'),
-                         os.path.join(_top_dir, u'testing', u'functional', u'test_selection.py'),
                          os.path.join(_top_dir, u'testing', u'functional', u'test_verify.py'),
                          os.path.join(_top_dir, u'testing', u'manual', u'__init__.py'),
                          os.path.join(_top_dir, u'testing', u'overrides', u'__init__.py'),
@@ -205,7 +204,6 @@ class CodeTest(DuplicityTestCase):
                          os.path.join(_top_dir, u'testing', u'unit', u'test_manifest.py'),
                          os.path.join(_top_dir, u'testing', u'unit', u'test_patchdir.py'),
                          os.path.join(_top_dir, u'testing', u'unit', u'test_path.py'),
-                         os.path.join(_top_dir, u'testing', u'unit', u'test_selection.py'),
                          os.path.join(_top_dir, u'testing', u'unit', u'test_statistics.py'),
                          os.path.join(_top_dir, u'testing', u'unit', u'test_tarfile.py'),
                          os.path.join(_top_dir, u'testing', u'unit', u'test_tempdir.py')]
