@@ -357,6 +357,14 @@ New in v0.8.00 (2016/07/??)
 * Fixed bug #1780617 Test fail when GnuPG >= 2.2.8
   - Relevant change in GnuPG 2.2.8: https://dev.gnupg.org/T3981
   - Added '--ignore-mdc-error' to all gpg calls made.
+* Merged in lp:~aaron-whitehouse/duplicity/08-adorn-strings
+  - Adorning string literals (normally to make these unicode), in support of a transition to Python 3.
+    See https://blueprints.launchpad.net/duplicity/+spec/adorn-string-literals
+  - Adorn string in duplicity/globmatch.py.
+  - Adorn strings in testing/unit/test_globmatch.py
+  - Adorn strings in selection.py
+  - Adorn strings in functional/test_selection.py and unit/test_selection.py
+  - Remove ignores for these files in test_code.py
 
 
 New in v0.7.08 (2016/07/02)

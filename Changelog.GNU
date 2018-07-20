@@ -1,3 +1,14 @@
+2018-07-20  Kenneth Loafman  <kenneth@loafman.com>
+
+    * Merged in lp:~aaron-whitehouse/duplicity/08-adorn-strings
+      - Adorning string literals (normally to make these unicode), in support of a transition to Python 3.
+        See https://blueprints.launchpad.net/duplicity/+spec/adorn-string-literals
+      - Adorn string in duplicity/globmatch.py.
+      - Adorn strings in testing/unit/test_globmatch.py
+      - Adorn strings in selection.py
+      - Adorn strings in functional/test_selection.py and unit/test_selection.py
+      - Remove ignores for these files in test_code.py
+
 2018-07-08  Kenneth Loafman  <kenneth@loafman.com>
 
     * Fixed bug #1780617 Test fail when GnuPG >= 2.2.8

@@ -30,17 +30,17 @@ from builtins import range
 
 
 class GlobbingError(Exception):
-    """Something has gone wrong when parsing a glob string"""
+    u"""Something has gone wrong when parsing a glob string"""
     pass
 
 
 class FilePrefixError(GlobbingError):
-    """Signals that a specified file doesn't start with correct prefix"""
+    u"""Signals that a specified file doesn't start with correct prefix"""
     pass
 
 
 def _glob_get_prefix_regexs(glob_str):
-    """Return list of regexps equivalent to prefixes of glob_str"""
+    u"""Return list of regexps equivalent to prefixes of glob_str"""
     # Internal. Used by glob_get_normal_sf.
     glob_parts = glob_str.split(u"/")
     if u"" in glob_parts[1:-1]:
@@ -56,7 +56,7 @@ def _glob_get_prefix_regexs(glob_str):
 
 
 def select_fn_from_glob(glob_str, include, ignore_case=False):
-    """Return a function test_fn(path) which
+    u"""Return a function test_fn(path) which
     tests whether path matches glob, as per the Unix shell rules, taking as
     arguments a path, a glob string and include (0 indicating that the glob
     string is an exclude glob and 1 indicating that it is an include glob,
@@ -147,7 +147,7 @@ def select_fn_from_glob(glob_str, include, ignore_case=False):
 
 
 def glob_to_regex(pat):
-    """Returned regular expression equivalent to shell glob pat
+    u"""Returned regular expression equivalent to shell glob pat
 
     Currently only the ?, *, [], and ** expressions are supported.
     Ranges like [a-z] are currently unsupported.  There is no
@@ -161,7 +161,7 @@ def glob_to_regex(pat):
 
     assert isinstance(pat, unicode)
 
-    i, n, res = 0, len(pat), ''
+    i, n, res = 0, len(pat), u''
     while i < n:
         c, s = pat[i], pat[i:i + 2]
         i = i + 1
